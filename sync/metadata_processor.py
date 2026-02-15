@@ -133,9 +133,10 @@ def process_metadata_file(file_path, technology, column_map, vendor=None):
     return upserted, skipped, None
 
 
-def run_metadata_sync(downloaded_files, column_map):
+def run_metadata_sync(downloaded_files, column_maps):
     """
     downloaded_files = {technology: local_path or None}
+    column_maps      = {technology: {col_map}}  (per-tech dict)
     Returns summary dict.
     """
     summary = {}
@@ -143,11 +144,76 @@ def run_metadata_sync(downloaded_files, column_map):
         if not file_path:
             summary[tech] = {'status': 'skipped', 'reason': 'Download failed or not configured'}
             continue
-        upserted, skipped, error = process_metadata_file(file_path, tech, column_map)
+        col_map = column_maps.get(tech) if isinstance(column_maps.get(next(iter(column_maps))), dict) else column_maps
+        if not col_map:
+            summary[tech] = {'status': 'skipped', 'reason': f'No column map for {tech}'}
+            continue
+        upserted, skipped, error = process_metadata_file(file_path, tech, col_map)
         summary[tech] = {'status': 'error', 'error': error} if error else {
             'status': 'ok', 'upserted': upserted, 'skipped': skipped
         }
     return summary
+
+
+def seed_pm_cells_to_metadata(pm_db_path, vendor):
+    """
+    For every cell_name in a PM database that is missing from metadata.db,
+    insert a placeholder site + cell row so the cross-DB JOIN works.
+    Returns the number of cells seeded.
+    """
+    import re
+
+    def _site_id(cell_name):
+        m = re.match(r'^(\d+)', cell_name)
+        return m.group(1) if m else None
+
+    def _site_name(cell_name):
+        return re.sub(r'[-_][A-Za-z]\d*$', '', cell_name)
+
+    try:
+        pm_conn   = sqlite3.connect(pm_db_path)
+        meta_conn = sqlite3.connect(METADATA_DB)
+
+        pm_rows = pm_conn.execute(
+            'SELECT DISTINCT cell_name, technology FROM cell_kpis'
+        ).fetchall()
+        pm_conn.close()
+
+        existing_cells = {r[0] for r in meta_conn.execute(
+            'SELECT cell_name FROM cells'
+        ).fetchall()}
+        existing_sites = {r[0] for r in meta_conn.execute(
+            'SELECT site_id FROM sites'
+        ).fetchall()}
+
+        seeded = 0
+        for cell_name, tech in pm_rows:
+            if cell_name in existing_cells:
+                continue
+            site_id   = _site_id(cell_name)
+            site_name = _site_name(cell_name)
+            if site_id and site_id not in existing_sites:
+                meta_conn.execute(
+                    "INSERT OR IGNORE INTO sites (site_id, site_name, vendor, status) "
+                    "VALUES (?, ?, ?, 'Active')",
+                    (site_id, site_name, vendor)
+                )
+                existing_sites.add(site_id)
+            meta_conn.execute(
+                "INSERT OR IGNORE INTO cells (cell_name, site_id, technology, vendor, status) "
+                "VALUES (?, ?, ?, ?, 'Active')",
+                (cell_name, site_id, tech, vendor)
+            )
+            existing_cells.add(cell_name)
+            seeded += 1
+
+        meta_conn.commit()
+        meta_conn.close()
+        logger.info(f'Seeded {seeded} PM cells from {pm_db_path} into {METADATA_DB}.')
+        return seeded
+    except Exception as e:
+        logger.error(f'seed_pm_cells_to_metadata failed: {e}')
+        return 0
 
 
 # ---------------------------------------------------------------------------
