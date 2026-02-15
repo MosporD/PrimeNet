@@ -211,6 +211,106 @@ def import_huawei_pm():
 
 
 # ---------------------------------------------------------------------------
+# Step 5 — Seed metadata.db with PM cells that are not already there
+# The app JOINs cells ↔ cell_kpis on cell_name, so every PM cell must
+# exist in metadata.db for its data to appear in the UI.
+# ---------------------------------------------------------------------------
+
+# Technology each Nokia Excel file covers
+NOKIA_FILE_TECH = {
+    '2G': '2G',
+    '3G': '3G',
+    '4G': '4G',
+    '5G': '5G',
+}
+
+# Technology each Huawei sheet covers
+HUAWEI_SHEET_TECH = {
+    '4G': '4G',
+    '3G': '3G',
+    '2G': '2G',
+}
+
+
+def seed_metadata_from_pm():
+    """
+    For every cell_name in nokia_pm.db / huawei_pm.db that is missing from
+    metadata.db, insert a minimal cells row so the JOIN works in the app.
+    """
+    import sqlite3 as _sq
+
+    meta = _sq.connect(_abs('metadata.db'))
+    nokia_pm = _sq.connect(_abs('nokia_pm.db'))
+    huawei_pm = _sq.connect(_abs('huawei_pm.db'))
+
+    existing = {r[0] for r in meta.execute("SELECT cell_name FROM cells").fetchall()}
+
+    seeded = 0
+
+    # Nokia — we know cell names per tech from the Excel files
+    for tech, filename in NOKIA_PM_EXCEL_FILES.items():
+        path = _abs(filename)
+        if not os.path.exists(path):
+            continue
+        col_map = NOKIA_PM_COLUMN_MAPS.get(tech, {})
+        cell_col = col_map.get('cell_name')
+        if not cell_col:
+            continue
+        sheet_name = f'{tech} Performance'
+        try:
+            df = pd.read_excel(path, sheet_name=sheet_name, engine='openpyxl',
+                               usecols=[cell_col])
+        except Exception:
+            continue
+        for cell_name in df[cell_col].dropna().unique():
+            cell_name = str(cell_name).strip()
+            if not cell_name or cell_name.lower() == 'nan':
+                continue
+            if cell_name not in existing:
+                meta.execute(
+                    "INSERT OR IGNORE INTO cells (cell_name, technology, vendor, status) "
+                    "VALUES (?, ?, 'Nokia', 'Active')",
+                    (cell_name, NOKIA_FILE_TECH[tech])
+                )
+                existing.add(cell_name)
+                seeded += 1
+
+    # Huawei — from Performance.xlsx sheets
+    perf_path = _abs(HUAWEI_PM_FILE)
+    if os.path.exists(perf_path):
+        for tech, sheet_name in HUAWEI_PM_SHEETS.items():
+            col_map = HUAWEI_PM_COLUMN_MAPS.get(tech, {})
+            cell_col = col_map.get('cell_name')
+            if not cell_col:
+                continue
+            try:
+                df = pd.read_excel(perf_path, sheet_name=sheet_name,
+                                   engine='openpyxl', usecols=[cell_col])
+            except Exception:
+                continue
+            for cell_name in df[cell_col].dropna().unique():
+                cell_name = str(cell_name).strip()
+                if not cell_name or cell_name.lower() == 'nan':
+                    continue
+                if cell_name not in existing:
+                    meta.execute(
+                        "INSERT OR IGNORE INTO cells (cell_name, technology, vendor, status) "
+                        "VALUES (?, ?, 'Huawei', 'Active')",
+                        (cell_name, HUAWEI_SHEET_TECH[tech])
+                    )
+                    existing.add(cell_name)
+                    seeded += 1
+
+    meta.commit()
+    meta.close()
+    nokia_pm.close()
+    huawei_pm.close()
+
+    logger.info(f'Metadata seeding complete: {seeded} PM cells added to metadata.db.')
+    return seeded
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -219,10 +319,12 @@ def main():
     meta_rows   = import_metadata()
     nokia_rows  = import_nokia_pm()
     huawei_rows = import_huawei_pm()
+    seeded_rows = seed_metadata_from_pm()
 
     logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     logger.info('Import finished:')
     logger.info(f'  metadata.db   →  {meta_rows} site/cell rows upserted')
+    logger.info(f'                    + {seeded_rows} PM cells seeded')
     logger.info(f'  nokia_pm.db   →  {nokia_rows} KPI rows inserted')
     logger.info(f'  huawei_pm.db  →  {huawei_rows} KPI rows inserted')
     logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
