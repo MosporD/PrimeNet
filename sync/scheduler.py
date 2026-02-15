@@ -4,7 +4,7 @@ Sync Scheduler
 Three background jobs:
   nokia_pm_pull   — every 2 h — downloads latest XLSX from each Nokia tech folder
   huawei_pm_pull  — every 2 h — downloads latest XLSX from Huawei folder, reads 3 sheets
-  metadata_pull   — daily     — enters newest snapshot subdir, downloads 5 tech files
+  metadata_pull   — daily     — enters newest snapshot folder, downloads all Excel files from each subfolder
 """
 
 import logging
@@ -134,7 +134,7 @@ def pull_huawei_pm():
 
 def pull_metadata():
     from sync_config import (
-        METADATA_SERVER, METADATA_CSV_COLUMN_MAPS, METADATA_FILE_MAP, LOCAL_DOWNLOAD_DIR
+        METADATA_SERVER, METADATA_CSV_COLUMN_MAPS, LOCAL_DOWNLOAD_DIR
     )
 
     host = METADATA_SERVER['host']
@@ -151,9 +151,10 @@ def pull_metadata():
         local_dir=f'{LOCAL_DOWNLOAD_DIR}/metadata',
     )
 
-    downloaded = client.download_latest_subdir_files(
+    # Enter the latest dated snapshot folder, then download ALL Excel files
+    # from each subfolder inside it (e.g. 2G/, 3G/, 4G-FDD/, 4G-TDD/, 5G/).
+    downloaded = client.download_all_xlsx_from_subfolders(
         root_dir=METADATA_SERVER['root_dir'],
-        tech_filename_map=METADATA_FILE_MAP,
         prefix='meta_',
     )
 

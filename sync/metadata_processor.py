@@ -135,23 +135,62 @@ def process_metadata_file(file_path, technology, column_map, vendor=None):
 
 def run_metadata_sync(downloaded_files, column_maps):
     """
-    downloaded_files = {technology: local_path or None}
-    column_maps      = {technology: {col_map}}  (per-tech dict)
-    Returns summary dict.
+    downloaded_files can be:
+      {tech: local_path}          — legacy one-file-per-tech format
+      {subfolder: [local_path]}   — new format: multiple files per subfolder
+
+    Subfolder names are matched to column_maps keys case-insensitively
+    (e.g. subfolder '4G-FDD' matches key '4G-FDD').
+
+    Returns summary dict {tech: {status, upserted, skipped} or {status, error}}.
     """
     summary = {}
-    for tech, file_path in downloaded_files.items():
-        if not file_path:
-            summary[tech] = {'status': 'skipped', 'reason': 'Download failed or not configured'}
+    for key, value in downloaded_files.items():
+        # Normalise to a list of file paths
+        if isinstance(value, list):
+            file_paths = [p for p in value if p]
+        elif value:
+            file_paths = [value]
+        else:
+            summary[key] = {'status': 'skipped', 'reason': 'Download failed or not configured'}
             continue
-        col_map = column_maps.get(tech) if isinstance(column_maps.get(next(iter(column_maps))), dict) else column_maps
-        if not col_map:
-            summary[tech] = {'status': 'skipped', 'reason': f'No column map for {tech}'}
+
+        if not file_paths:
+            summary[key] = {'status': 'skipped', 'reason': 'No files downloaded'}
             continue
-        upserted, skipped, error = process_metadata_file(file_path, tech, col_map)
-        summary[tech] = {'status': 'error', 'error': error} if error else {
-            'status': 'ok', 'upserted': upserted, 'skipped': skipped
-        }
+
+        # Match subfolder name to a technology key in column_maps
+        tech = None
+        key_norm = key.replace('-', '').upper()
+        for t in column_maps:
+            if t.upper() == key.upper() or t.replace('-', '').upper() == key_norm:
+                tech = t
+                break
+        if not tech:
+            tech = key  # use as-is; process_metadata_file will log any missing columns
+
+        col_map = column_maps.get(tech, {})
+
+        total_upserted = 0
+        total_skipped  = 0
+        last_error     = None
+
+        for file_path in file_paths:
+            if not col_map:
+                summary[tech] = {'status': 'skipped', 'reason': f'No column map for {tech}'}
+                continue
+            upserted, skipped, error = process_metadata_file(file_path, tech, col_map)
+            if error:
+                last_error = error
+            else:
+                total_upserted += upserted
+                total_skipped  += skipped
+
+        if last_error and total_upserted == 0:
+            summary[tech] = {'status': 'error', 'error': last_error}
+        else:
+            summary[tech] = {'status': 'ok', 'upserted': total_upserted, 'skipped': total_skipped}
+
     return summary
 
 
