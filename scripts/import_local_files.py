@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sync.db_migration import run_migrations
 from sync.metadata_processor import process_metadata_file
-from sync.pm_processor import _insert_df, NOKIA_PM_DB, HUAWEI_PM_DB, KPI_FIELDS
+from sync.pm_processor import _insert_df, NOKIA_PM_DB, HUAWEI_PM_DB
 from sync_config import METADATA_CSV_COLUMN_MAPS, NOKIA_PM_COLUMN_MAPS, HUAWEI_PM_COLUMN_MAPS
 
 logging.basicConfig(
@@ -86,10 +86,10 @@ def _import_pm_df(df, tech, db_path, col_map, label):
                      f'Found: {list(df.columns)}')
         return 0
 
-    # Coerce KPI columns to numeric; text values (totals, headers) → NaN → NULL
-    for kpi in KPI_FIELDS:
-        if kpi in df.columns:
-            df[kpi] = pd.to_numeric(df[kpi], errors='coerce')
+    # Coerce all non-key columns to numeric; text/total rows → NaN → NULL
+    for col in df.columns:
+        if col not in ('cell_name', 'timestamp'):
+            df[col] = pd.to_numeric(df[col], errors='coerce')
 
     # Drop rows with missing/invalid cell names
     df = df[df['cell_name'].notna()]
