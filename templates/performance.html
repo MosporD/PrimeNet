@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Analytics - Nokia NCM</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/performance.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/performance.css') }}?v=2.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -25,13 +25,26 @@
         </div>
     </header>
 
-    <main class="main-content">
+    <div class="perf-body">
 
-        <!-- Filter Bar -->
-        <div class="filter-bar">
+        <!-- ================================================================
+             LEFT: Filter Panel
+        ================================================================ -->
+        <aside class="filter-panel">
+            <h3 class="filter-title">Filters</h3>
+
+            <div class="filter-group">
+                <label>Vendor</label>
+                <select id="filter-vendor" onchange="onVendorChange()">
+                    <option value="">All Vendors</option>
+                    <option value="Nokia">Nokia</option>
+                    <option value="Huawei">Huawei</option>
+                </select>
+            </div>
+
             <div class="filter-group">
                 <label>Technology</label>
-                <select id="filter-tech" onchange="applyFilters()">
+                <select id="filter-tech">
                     <option value="">All</option>
                     <option value="2G">2G</option>
                     <option value="3G">3G</option>
@@ -39,154 +52,118 @@
                     <option value="5G">5G</option>
                 </select>
             </div>
+
             <div class="filter-group">
                 <label>Region</label>
-                <select id="filter-region" onchange="applyFilters()">
+                <select id="filter-region" onchange="onRegionChange()">
                     <option value="">All Regions</option>
                 </select>
             </div>
+
             <div class="filter-group">
                 <label>Site</label>
-                <select id="filter-site" onchange="applyFilters()">
+                <select id="filter-site" onchange="onSiteChange()">
                     <option value="">All Sites</option>
                 </select>
             </div>
+
             <div class="filter-group">
-                <label>Trend Window</label>
+                <label>Cell</label>
+                <select id="filter-cell">
+                    <option value="">All Cells</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Time Window</label>
                 <select id="filter-hours">
                     <option value="24">Last 24 hours</option>
                     <option value="48">Last 48 hours</option>
                     <option value="72">Last 72 hours</option>
-                    <option value="168">Last 7 days</option>
+                    <option value="168" selected>Last 7 days</option>
                 </select>
             </div>
-            <button class="btn-primary" onclick="applyFilters()">Refresh</button>
-        </div>
 
-        <!-- Summary KPI Cards -->
-        <div class="summary-cards" id="summary-cards">
-            <div class="summary-card">
-                <div class="summary-value" id="sum-cells">-</div>
-                <div class="summary-label">Cells</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="sum-availability">-</div>
-                <div class="summary-label">Avg Availability</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="sum-rrc">-</div>
-                <div class="summary-label">Avg RRC Success</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="sum-drop">-</div>
-                <div class="summary-label">Avg Drop Rate</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="sum-dl">-</div>
-                <div class="summary-label">Avg DL Throughput</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-value" id="sum-users">-</div>
-                <div class="summary-label">Avg Users</div>
-            </div>
-        </div>
+            <button class="btn-apply" onclick="applyFilters()">Apply</button>
 
-        <!-- Main Layout: table + trend panel -->
-        <div class="perf-layout">
+            <div class="filter-divider"></div>
 
-            <!-- Cell Table -->
-            <div class="cell-table-wrap">
-                <div class="table-header-row">
-                    <h3>Cell KPI Snapshot</h3>
-                    <span id="cell-count-label" class="count-label"></span>
+            <!-- Summary stats -->
+            <div class="side-stats">
+                <div class="side-stat">
+                    <div class="side-stat-value" id="sum-cells">-</div>
+                    <div class="side-stat-label">Cells loaded</div>
                 </div>
-                <div id="loading-indicator" class="loading-indicator" style="display:none;">
-                    <div class="loading-spinner"></div>
+                <div class="side-stat">
+                    <div class="side-stat-value" id="sum-availability">-</div>
+                    <div class="side-stat-label">Avg Availability</div>
                 </div>
-                <div class="table-scroll">
-                    <table id="cell-table">
-                        <thead>
-                            <tr>
-                                <th>Cell</th>
-                                <th>Site</th>
-                                <th>Tech</th>
-                                <th>Band</th>
-                                <th>Avail %</th>
-                                <th>RRC %</th>
-                                <th>Drop %</th>
-                                <th>DL Mbps</th>
-                                <th>RSRP</th>
-                                <th>Users</th>
-                                <th>Last Update</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cell-tbody">
-                            <tr><td colspan="11" class="no-data">Loading...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="side-stat">
+                    <div class="side-stat-value" id="sum-drop">-</div>
+                    <div class="side-stat-label">Avg Drop Rate</div>
+                </div>
+                <div class="side-stat">
+                    <div class="side-stat-value" id="sum-dl">-</div>
+                    <div class="side-stat-label">Avg DL Throughput</div>
                 </div>
             </div>
 
-            <!-- Trend Panel -->
-            <div class="trend-panel" id="trend-panel" style="display:none;">
-                <div class="trend-header">
-                    <div>
-                        <h3 id="trend-title">Cell Trend</h3>
-                        <p id="trend-subtitle" class="trend-subtitle"></p>
-                    </div>
-                    <button class="close-trend" onclick="closeTrendPanel()">✕</button>
-                </div>
-                <div class="trend-controls">
-                    <label>Show KPI:</label>
-                    <select id="trend-kpi-select" onchange="renderChart()">
-                        <option value="availability_percent">Availability %</option>
-                        <option value="rrc_success_rate">RRC Success %</option>
-                        <option value="call_drop_rate">Call Drop %</option>
-                        <option value="throughput_dl_mbps">DL Throughput (Mbps)</option>
-                        <option value="throughput_ul_mbps">UL Throughput (Mbps)</option>
-                        <option value="rsrp">RSRP (dBm)</option>
-                        <option value="rsrq">RSRQ (dB)</option>
-                        <option value="sinr">SINR (dB)</option>
-                        <option value="avg_users">Avg Users</option>
-                        <option value="data_volume_gb">Data Volume (GB)</option>
-                    </select>
-                </div>
-                <div class="chart-wrap">
-                    <canvas id="trend-chart"></canvas>
-                </div>
-                <div id="no-trend-data" class="no-trend-data" style="display:none;">
-                    No historical data available for this cell yet.
-                </div>
-                <a id="map-link" href="#" class="map-link" style="display:none;">
-                    📍 View on Network Map
-                </a>
+            <a id="map-link" href="/network-map" class="map-back-link">📍 View on Map</a>
+        </aside>
+
+        <!-- ================================================================
+             RIGHT: Charts Area
+        ================================================================ -->
+        <main class="charts-area">
+
+            <div class="charts-header">
+                <div id="charts-title" class="charts-title">Select a cell to view KPI trends</div>
+                <div id="charts-subtitle" class="charts-subtitle"></div>
             </div>
 
-        </div>
-    </main>
+            <div id="no-selection" class="no-selection">
+                <div class="no-selection-icon">📊</div>
+                <p>Use the filters on the left to find a site or cell,<br>then click a cell name to load its KPI charts.</p>
+                <div id="cell-list-wrap" style="display:none;">
+                    <p class="cell-list-label">Available cells:</p>
+                    <div id="cell-list" class="cell-list"></div>
+                </div>
+            </div>
+
+            <div id="charts-wrap" class="charts-wrap" style="display:none;">
+                <!-- Charts injected here by JS -->
+            </div>
+
+            <div id="loading-charts" class="loading-charts" style="display:none;">
+                <div class="loading-spinner"></div>
+                <p>Loading KPI data...</p>
+            </div>
+
+        </main>
+
+    </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-<script src="{{ url_for('static', filename='js/performance.js') }}?v=1.0"></script>
+<script src="{{ url_for('static', filename='js/performance.js') }}?v=2.0"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Pre-filter from network map link (e.g. ?site_id=X&technology=4G)
         const params = new URLSearchParams(window.location.search);
-        if (params.get('technology')) document.getElementById('filter-tech').value = params.get('technology');
-        if (params.get('site_id'))    document.getElementById('filter-site').value = params.get('site_id');
-        if (params.get('region'))     document.getElementById('filter-region').value = params.get('region');
+        if (params.get('vendor'))     document.getElementById('filter-vendor').value = params.get('vendor');
+        if (params.get('technology')) document.getElementById('filter-tech').value   = params.get('technology');
 
         loadFilters().then(() => {
-            // Re-apply after dropdowns are populated
-            if (params.get('site_id'))   document.getElementById('filter-site').value = params.get('site_id');
-            if (params.get('region'))    document.getElementById('filter-region').value = params.get('region');
-            applyFilters();
+            if (params.get('region'))  document.getElementById('filter-region').value = params.get('region');
+            if (params.get('site_id')) document.getElementById('filter-site').value   = params.get('site_id');
+
+            if (params.get('site_id') || params.get('region') || params.get('technology') || params.get('vendor')) {
+                applyFilters().then(() => {
+                    if (params.get('cell_id')) loadCellCharts(params.get('cell_id'));
+                });
+            }
         });
 
-        // If a cell_id is passed directly, open its trend immediately after load
-        if (params.get('cell_id')) {
-            applyFilters().then(() => openTrend(params.get('cell_id')));
-        }
+        onVendorChange();
     });
 </script>
 </body>

@@ -1,51 +1,55 @@
 /**
- * Performance Analytics
- * Cell KPI table + Chart.js trend panel
+ * Performance Analytics v2
+ * Left filter panel + stacked KPI charts on the right
  */
 
-let allCells = [];
-let trendChart = null;
-let selectedCellId = null;
+// All Chart.js instances keyed by KPI key
+const charts = {};
+let allCells  = [];
+let allSites  = [];
+let activeCellId = null;
 
-// KPI display config: label, good/warn/bad thresholds, inverse flag
-const KPI_CONFIG = {
-    availability_percent:   { label: 'Avail %',    good: 99,   warn: 95,  inverse: false },
-    rrc_success_rate:       { label: 'RRC %',      good: 98,   warn: 95,  inverse: false },
-    erab_success_rate:      { label: 'ERAB %',     good: 98,   warn: 95,  inverse: false },
-    call_drop_rate:         { label: 'Drop %',     good: 0.5,  warn: 2,   inverse: true  },
-    handover_success_rate:  { label: 'HO %',       good: 98,   warn: 95,  inverse: false },
-    throughput_dl_mbps:     { label: 'DL Mbps',    good: 50,   warn: 20,  inverse: false },
-    throughput_ul_mbps:     { label: 'UL Mbps',    good: 20,   warn: 5,   inverse: false },
-    rsrp:                   { label: 'RSRP',       good: -80,  warn: -100, inverse: false },
-    rsrq:                   { label: 'RSRQ',       good: -10,  warn: -15,  inverse: false },
-    sinr:                   { label: 'SINR',       good: 15,   warn: 5,   inverse: false },
-    avg_users:              { label: 'Users',      good: null, warn: null, inverse: false },
-    data_volume_gb:         { label: 'Data GB',    good: null, warn: null, inverse: false },
-};
+// ============================================================
+// KPI definitions — update labels/thresholds when vendor
+// column mappings are confirmed. good/warn thresholds:
+// inverse=false → higher is better
+// inverse=true  → lower is better
+// ============================================================
+const KPI_DEFS = [
+    { key: 'availability_percent',  label: 'Cell Availability',          unit: '%',    good: 99,   warn: 95,   inverse: false, color: '#27ae60' },
+    { key: 'rrc_success_rate',      label: 'RRC Setup Success Rate',      unit: '%',    good: 98,   warn: 95,   inverse: false, color: '#3498db' },
+    { key: 'erab_success_rate',     label: 'ERAB Setup Success Rate',     unit: '%',    good: 98,   warn: 95,   inverse: false, color: '#2980b9' },
+    { key: 'call_drop_rate',        label: 'Call Drop Rate',              unit: '%',    good: 0.5,  warn: 2,    inverse: true,  color: '#e74c3c' },
+    { key: 'handover_success_rate', label: 'Handover Success Rate',       unit: '%',    good: 98,   warn: 95,   inverse: false, color: '#1abc9c' },
+    { key: 'throughput_dl_mbps',    label: 'DL Throughput',               unit: 'Mbps', good: 50,   warn: 20,   inverse: false, color: '#9b59b6' },
+    { key: 'throughput_ul_mbps',    label: 'UL Throughput',               unit: 'Mbps', good: 20,   warn: 5,    inverse: false, color: '#8e44ad' },
+    { key: 'rsrp',                  label: 'RSRP',                        unit: 'dBm',  good: -80,  warn: -100, inverse: false, color: '#f39c12' },
+    { key: 'rsrq',                  label: 'RSRQ',                        unit: 'dB',   good: -10,  warn: -15,  inverse: false, color: '#e67e22' },
+    { key: 'sinr',                  label: 'SINR',                        unit: 'dB',   good: 15,   warn: 5,    inverse: false, color: '#d35400' },
+    { key: 'avg_users',             label: 'Average Users',               unit: '',     good: null, warn: null, inverse: false, color: '#34495e' },
+    { key: 'data_volume_gb',        label: 'Data Volume',                 unit: 'GB',   good: null, warn: null, inverse: false, color: '#7f8c8d' },
+];
 
-function kpiClass(value, kpiKey) {
-    const cfg = KPI_CONFIG[kpiKey];
-    if (!cfg || value === null || value === undefined) return 'kpi-na';
-    if (cfg.good === null) return '';
-    if (!cfg.inverse) {
-        return value >= cfg.good ? 'kpi-good' : value >= cfg.warn ? 'kpi-warn' : 'kpi-bad';
-    } else {
-        return value <= cfg.good ? 'kpi-good' : value <= cfg.warn ? 'kpi-warn' : 'kpi-bad';
-    }
+function kpiClass(value, def) {
+    if (value === null || value === undefined || def.good === null) return '';
+    if (!def.inverse) return value >= def.good ? 'good' : value >= def.warn ? 'warn' : 'bad';
+    return value <= def.good ? 'good' : value <= def.warn ? 'warn' : 'bad';
 }
 
-function fmt(value, decimals = 1, suffix = '') {
-    if (value === null || value === undefined) return '<span class="kpi-na">N/A</span>';
-    return Number(value).toFixed(decimals) + suffix;
+function fmt(value, unit, decimals = 2) {
+    if (value === null || value === undefined) return 'N/A';
+    return Number(value).toFixed(decimals) + (unit ? ' ' + unit : '');
 }
 
-// ---------------------------------------------------------------------------
-// Load filter dropdowns
-// ---------------------------------------------------------------------------
+// ============================================================
+// Filter dropdowns
+// ============================================================
 async function loadFilters() {
-    const res = await fetch('/api/performance/filters');
+    const res  = await fetch('/api/performance/filters');
     const data = await res.json();
     if (!data.success) return;
+
+    allSites = data.sites;
 
     const regionSel = document.getElementById('filter-region');
     data.regions.forEach(r => {
@@ -54,232 +58,275 @@ async function loadFilters() {
         regionSel.appendChild(o);
     });
 
+    _populateSites(allSites);
+}
+
+function _populateSites(sites) {
     const siteSel = document.getElementById('filter-site');
-    data.sites.forEach(s => {
+    const prev = siteSel.value;
+    siteSel.innerHTML = '<option value="">All Sites</option>';
+    sites.forEach(s => {
         const o = document.createElement('option');
         o.value = s.site_id;
         o.textContent = s.site_name;
         o.dataset.region = s.region || '';
         siteSel.appendChild(o);
     });
+    if (prev) siteSel.value = prev;
+}
 
-    // Filter site dropdown when region changes
-    document.getElementById('filter-region').addEventListener('change', () => {
-        const region = document.getElementById('filter-region').value;
-        document.querySelectorAll('#filter-site option').forEach(o => {
-            if (!o.value) { o.style.display = ''; return; }
-            o.style.display = (!region || o.dataset.region === region) ? '' : 'none';
-        });
-        document.getElementById('filter-site').value = '';
+function onVendorChange() {
+    // When Huawei is selected, hide 5G option
+    const vendor = document.getElementById('filter-vendor').value;
+    const techSel = document.getElementById('filter-tech');
+    const opt5g = techSel.querySelector('option[value="5G"]');
+    if (opt5g) opt5g.style.display = vendor === 'Huawei' ? 'none' : '';
+    if (vendor === 'Huawei' && techSel.value === '5G') techSel.value = '';
+}
+
+function onRegionChange() {
+    const region = document.getElementById('filter-region').value;
+    const filtered = region ? allSites.filter(s => s.region === region) : allSites;
+    _populateSites(filtered);
+    document.getElementById('filter-site').value = '';
+    document.getElementById('filter-cell').innerHTML = '<option value="">All Cells</option>';
+}
+
+async function onSiteChange() {
+    const siteId = document.getElementById('filter-site').value;
+    const cellSel = document.getElementById('filter-cell');
+    cellSel.innerHTML = '<option value="">All Cells</option>';
+    if (!siteId) return;
+
+    const tech = document.getElementById('filter-tech').value;
+    const params = new URLSearchParams({ site_id: siteId });
+    if (tech) params.set('technology', tech);
+
+    const res  = await fetch('/api/performance/cells?' + params);
+    const data = await res.json();
+    if (!data.success) return;
+
+    data.cells.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c.cell_id;
+        o.textContent = `${c.cell_name} (${c.technology || 'N/A'})`;
+        cellSel.appendChild(o);
     });
 }
 
-// ---------------------------------------------------------------------------
-// Apply filters and reload cell table
-// ---------------------------------------------------------------------------
+// ============================================================
+// Apply filters — loads cell list and shows cell chips
+// ============================================================
 async function applyFilters() {
     const tech   = document.getElementById('filter-tech').value;
     const region = document.getElementById('filter-region').value;
     const site   = document.getElementById('filter-site').value;
-
-    document.getElementById('loading-indicator').style.display = 'block';
-    document.getElementById('cell-tbody').innerHTML = '';
+    const cell   = document.getElementById('filter-cell').value;
 
     const params = new URLSearchParams();
     if (tech)   params.set('technology', tech);
     if (region) params.set('region', region);
     if (site)   params.set('site_id', site);
 
-    try {
-        const res  = await fetch('/api/performance/cells?' + params);
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error);
-        allCells = data.cells;
-        renderTable(allCells);
-        renderSummary(allCells);
-    } catch (e) {
-        document.getElementById('cell-tbody').innerHTML =
-            `<tr><td colspan="11" class="no-data">Error loading data: ${e.message}</td></tr>`;
-    } finally {
-        document.getElementById('loading-indicator').style.display = 'none';
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Render cell table
-// ---------------------------------------------------------------------------
-function renderTable(cells) {
-    const tbody = document.getElementById('cell-tbody');
-    document.getElementById('cell-count-label').textContent = `${cells.length} cells`;
-
-    if (!cells.length) {
-        tbody.innerHTML = '<tr><td colspan="11" class="no-data">No cells found for the selected filters.</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = cells.map(c => {
-        const techClass = `tech-${c.technology || ''}`;
-        const ts = c.timestamp ? new Date(c.timestamp).toLocaleString() : 'N/A';
-        return `
-        <tr onclick="openTrend('${c.cell_id}')" id="row-${c.cell_id}"
-            class="${c.cell_id === selectedCellId ? 'selected' : ''}">
-            <td><strong>${c.cell_name}</strong></td>
-            <td>${c.site_name}</td>
-            <td><span class="tech-badge ${techClass}">${c.technology || 'N/A'}</span></td>
-            <td>${c.frequency_band || 'N/A'}</td>
-            <td class="${kpiClass(c.availability_percent, 'availability_percent')}">${fmt(c.availability_percent, 2, '%')}</td>
-            <td class="${kpiClass(c.rrc_success_rate, 'rrc_success_rate')}">${fmt(c.rrc_success_rate, 2, '%')}</td>
-            <td class="${kpiClass(c.call_drop_rate, 'call_drop_rate')}">${fmt(c.call_drop_rate, 2, '%')}</td>
-            <td>${fmt(c.throughput_dl_mbps, 1, ' Mbps')}</td>
-            <td class="${kpiClass(c.rsrp, 'rsrp')}">${fmt(c.rsrp, 1, ' dBm')}</td>
-            <td>${c.avg_users !== null && c.avg_users !== undefined ? Math.round(c.avg_users) : '<span class="kpi-na">N/A</span>'}</td>
-            <td style="color:#95a5a6;font-size:0.85em;">${ts}</td>
-        </tr>`;
-    }).join('');
-}
-
-// ---------------------------------------------------------------------------
-// Render summary cards
-// ---------------------------------------------------------------------------
-function renderSummary(cells) {
-    const withKpi = cells.filter(c => c.availability_percent !== null);
-    const avg = (key) => {
-        const vals = cells.map(c => c[key]).filter(v => v !== null && v !== undefined);
-        return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
-    };
-
-    document.getElementById('sum-cells').textContent = cells.length;
-    document.getElementById('sum-availability').textContent =
-        avg('availability_percent') !== null ? avg('availability_percent').toFixed(1) + '%' : 'N/A';
-    document.getElementById('sum-rrc').textContent =
-        avg('rrc_success_rate') !== null ? avg('rrc_success_rate').toFixed(1) + '%' : 'N/A';
-    document.getElementById('sum-drop').textContent =
-        avg('call_drop_rate') !== null ? avg('call_drop_rate').toFixed(2) + '%' : 'N/A';
-    document.getElementById('sum-dl').textContent =
-        avg('throughput_dl_mbps') !== null ? avg('throughput_dl_mbps').toFixed(1) + ' Mbps' : 'N/A';
-    document.getElementById('sum-users').textContent =
-        avg('avg_users') !== null ? Math.round(avg('avg_users')) : 'N/A';
-}
-
-// ---------------------------------------------------------------------------
-// Open trend panel for a cell
-// ---------------------------------------------------------------------------
-async function openTrend(cellId) {
-    selectedCellId = cellId;
-
-    // Highlight row
-    document.querySelectorAll('#cell-table tbody tr').forEach(r => r.classList.remove('selected'));
-    const row = document.getElementById(`row-${cellId}`);
-    if (row) { row.classList.add('selected'); row.scrollIntoView({ block: 'nearest' }); }
-
-    const panel = document.getElementById('trend-panel');
-    panel.style.display = 'block';
-    document.getElementById('no-trend-data').style.display = 'none';
-    document.getElementById('trend-title').textContent = 'Loading...';
-    document.getElementById('trend-subtitle').textContent = '';
-
-    const hours = document.getElementById('filter-hours').value;
-    const res  = await fetch(`/api/performance/cell/${cellId}/trend?hours=${hours}`);
+    const res  = await fetch('/api/performance/cells?' + params);
     const data = await res.json();
-
     if (!data.success) return;
 
-    const cell = data.cell;
-    document.getElementById('trend-title').textContent = cell.cell_name;
-    document.getElementById('trend-subtitle').textContent =
-        `${cell.site_name} · ${cell.technology || ''} ${cell.frequency_band || ''}`;
+    allCells = data.cells;
+    updateSummary(allCells);
 
-    // Map link back to network map filtered by site
-    const mapLink = document.getElementById('map-link');
-    mapLink.href = `/network-map`;
-    mapLink.style.display = 'block';
-
-    if (!data.trend.length) {
-        document.getElementById('no-trend-data').style.display = 'block';
-        if (trendChart) { trendChart.destroy(); trendChart = null; }
+    // If a specific cell is selected in dropdown, load it directly
+    if (cell) {
+        loadCellCharts(cell);
         return;
     }
 
-    window._trendData = data.trend;
-    renderChart();
+    // Otherwise show cell chips to pick from
+    showCellPicker(allCells);
 }
 
-// ---------------------------------------------------------------------------
-// Render Chart.js line chart
-// ---------------------------------------------------------------------------
-function renderChart() {
-    const trend = window._trendData;
-    if (!trend || !trend.length) return;
+function showCellPicker(cells) {
+    document.getElementById('charts-wrap').style.display   = 'none';
+    document.getElementById('loading-charts').style.display = 'none';
+    document.getElementById('no-selection').style.display  = 'flex';
 
-    const kpiKey = document.getElementById('trend-kpi-select').value;
-    const cfg    = KPI_CONFIG[kpiKey] || { label: kpiKey };
+    document.getElementById('charts-title').textContent = 'Select a cell';
+    document.getElementById('charts-subtitle').textContent = `${cells.length} cell${cells.length !== 1 ? 's' : ''} found`;
+
+    const wrap = document.getElementById('cell-list-wrap');
+    const list = document.getElementById('cell-list');
+    list.innerHTML = '';
+
+    if (!cells.length) {
+        wrap.style.display = 'none';
+        return;
+    }
+
+    wrap.style.display = 'block';
+    cells.forEach(c => {
+        const chip = document.createElement('div');
+        chip.className = `cell-chip tech-${c.technology || ''}${c.cell_id === activeCellId ? ' active' : ''}`;
+        chip.textContent = c.cell_name;
+        chip.title = `${c.site_name} · ${c.technology || ''} ${c.frequency_band || ''}`;
+        chip.onclick = () => loadCellCharts(c.cell_id);
+        list.appendChild(chip);
+    });
+}
+
+// ============================================================
+// Load charts for a selected cell
+// ============================================================
+async function loadCellCharts(cellId) {
+    activeCellId = cellId;
+
+    // Update chip highlights
+    document.querySelectorAll('.cell-chip').forEach(c => {
+        c.classList.toggle('active', c.onclick.toString().includes(cellId));
+    });
+
+    document.getElementById('no-selection').style.display   = 'none';
+    document.getElementById('charts-wrap').style.display    = 'none';
+    document.getElementById('loading-charts').style.display = 'flex';
+
+    const hours = document.getElementById('filter-hours').value;
+
+    try {
+        const res  = await fetch(`/api/performance/cell/${cellId}/trend?hours=${hours}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+
+        const cell  = data.cell;
+        const trend = data.trend;
+
+        document.getElementById('charts-title').textContent =
+            `${cell.cell_name}`;
+        document.getElementById('charts-subtitle').textContent =
+            `${cell.site_name} · ${cell.technology || ''} ${cell.frequency_band || ''} · ${trend.length} data points`;
+
+        // Update map link
+        document.getElementById('map-link').href =
+            `/network-map`;
+
+        renderAllCharts(trend);
+
+    } catch (e) {
+        document.getElementById('loading-charts').style.display = 'none';
+        document.getElementById('no-selection').style.display   = 'flex';
+        document.getElementById('charts-title').textContent = 'Error loading data';
+        document.getElementById('charts-subtitle').textContent  = e.message;
+    }
+}
+
+// ============================================================
+// Render one chart card per KPI, stacked vertically
+// ============================================================
+function renderAllCharts(trend) {
+    // Destroy old charts
+    Object.values(charts).forEach(c => c.destroy());
+    Object.keys(charts).forEach(k => delete charts[k]);
+
+    const wrap = document.getElementById('charts-wrap');
+    wrap.innerHTML = '';
 
     const labels = trend.map(r => {
         const d = new Date(r.timestamp);
         return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
                d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     });
-    const values = trend.map(r => r[kpiKey]);
 
-    // Color points by threshold
-    const pointColors = values.map(v => {
-        if (v === null) return '#bdc3c7';
-        const cls = kpiClass(v, kpiKey);
-        return cls === 'kpi-good' ? '#27ae60' : cls === 'kpi-warn' ? '#f39c12' : cls === 'kpi-bad' ? '#e74c3c' : '#3498db';
-    });
+    KPI_DEFS.forEach(def => {
+        const values = trend.map(r => r[def.key]);
+        const lastVal = [...values].reverse().find(v => v !== null && v !== undefined);
 
-    const ctx = document.getElementById('trend-chart').getContext('2d');
-    if (trendChart) trendChart.destroy();
+        // Card
+        const card = document.createElement('div');
+        card.className = 'kpi-chart-card';
 
-    trendChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                label: cfg.label || kpiKey,
-                data: values,
-                borderColor: '#3498db',
-                backgroundColor: 'rgba(52,152,219,0.08)',
-                pointBackgroundColor: pointColors,
-                pointRadius: 3,
-                pointHoverRadius: 5,
-                borderWidth: 2,
-                tension: 0.3,
-                fill: true,
-                spanGaps: true,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => {
-                            const v = ctx.parsed.y;
-                            return v !== null ? `${cfg.label || kpiKey}: ${Number(v).toFixed(2)}` : 'N/A';
+        const cls = lastVal !== undefined ? kpiClass(lastVal, def) : '';
+        const displayVal = lastVal !== undefined ? fmt(lastVal, def.unit) : 'N/A';
+
+        card.innerHTML = `
+            <div class="kpi-chart-title">
+                <span class="kpi-chart-name">${def.label}</span>
+                <span class="kpi-chart-value ${cls}">${displayVal}</span>
+            </div>
+            <div class="kpi-chart-canvas-wrap">
+                <canvas id="chart-${def.key}"></canvas>
+            </div>
+        `;
+        wrap.appendChild(card);
+
+        // Point colors based on threshold
+        const pointColors = values.map(v => {
+            if (v === null || v === undefined) return '#bdc3c7';
+            const c = kpiClass(v, def);
+            return c === 'good' ? '#27ae60' : c === 'warn' ? '#f39c12' : c === 'bad' ? '#e74c3c' : def.color;
+        });
+
+        const ctx = document.getElementById(`chart-${def.key}`).getContext('2d');
+        charts[def.key] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: def.label,
+                    data: values,
+                    borderColor: def.color,
+                    backgroundColor: def.color + '18',
+                    pointBackgroundColor: pointColors,
+                    pointRadius: trend.length > 48 ? 2 : 3,
+                    pointHoverRadius: 5,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    spanGaps: true,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => {
+                                const v = ctx.parsed.y;
+                                return v !== null ? `${def.label}: ${Number(v).toFixed(2)}${def.unit ? ' ' + def.unit : ''}` : 'N/A';
+                            }
                         }
                     }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: { maxTicksLimit: 8, font: { size: 10 }, maxRotation: 30 },
-                    grid: { color: '#f0f0f0' }
                 },
-                y: {
-                    ticks: { font: { size: 11 } },
-                    grid: { color: '#f0f0f0' }
+                scales: {
+                    x: {
+                        ticks: { maxTicksLimit: 8, font: { size: 10 }, maxRotation: 0 },
+                        grid: { color: '#f5f6fa' }
+                    },
+                    y: {
+                        ticks: { font: { size: 10 } },
+                        grid: { color: '#f5f6fa' }
+                    }
                 }
             }
-        }
+        });
     });
+
+    document.getElementById('loading-charts').style.display = 'none';
+    wrap.style.display = 'flex';
 }
 
-function closeTrendPanel() {
-    document.getElementById('trend-panel').style.display = 'none';
-    selectedCellId = null;
-    document.querySelectorAll('#cell-table tbody tr').forEach(r => r.classList.remove('selected'));
-    if (trendChart) { trendChart.destroy(); trendChart = null; }
+// ============================================================
+// Side summary stats
+// ============================================================
+function updateSummary(cells) {
+    const avg = key => {
+        const vals = cells.map(c => c[key]).filter(v => v !== null && v !== undefined);
+        return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+    };
+    document.getElementById('sum-cells').textContent = cells.length;
+    const avail = avg('availability_percent');
+    document.getElementById('sum-availability').textContent = avail !== null ? avail.toFixed(1) + '%' : 'N/A';
+    const drop = avg('call_drop_rate');
+    document.getElementById('sum-drop').textContent = drop !== null ? drop.toFixed(2) + '%' : 'N/A';
+    const dl = avg('throughput_dl_mbps');
+    document.getElementById('sum-dl').textContent = dl !== null ? dl.toFixed(1) + ' Mbps' : 'N/A';
 }
