@@ -1,0 +1,145 @@
+"""
+Sync Scheduler
+Runs PM pulls every 2 hours and metadata pulls daily using APScheduler.
+"""
+
+import logging
+import sqlite3
+from datetime import datetime
+
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+
+from sync.sftp_client import SFTPClient
+from sync.pm_processor import run_pm_sync
+from sync.metadata_processor import run_metadata_sync
+from sync.db_migration import run_migrations
+
+logger = logging.getLogger(__name__)
+
+_scheduler = None
+
+
+def _log_sync(sync_type, technology, status, rows_affected=0, message=None):
+    try:
+        conn = sqlite3.connect('ncm_users.db')
+        conn.execute(
+            'INSERT INTO sync_log (sync_type, technology, status, rows_affected, message) VALUES (?,?,?,?,?)',
+            (sync_type, technology, status, rows_affected, message)
+        )
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logger.error(f'Failed to write sync log: {e}')
+
+
+def pull_pm_data():
+    """Job: download and process PM data from server 1."""
+    from sync_config import PM_SERVER, PM_COLUMN_MAP, LOCAL_DOWNLOAD_DIR
+
+    if not PM_SERVER['host']:
+        logger.warning('PM server not configured, skipping pull.')
+        return
+
+    logger.info('Starting PM data pull...')
+    client = SFTPClient(
+        host=PM_SERVER['host'],
+        port=PM_SERVER['port'],
+        username=PM_SERVER['username'],
+        password=PM_SERVER['password'],
+        remote_dir=PM_SERVER['remote_dir'],
+        local_dir=f"{LOCAL_DOWNLOAD_DIR}/pm"
+    )
+
+    downloaded = client.download_all(PM_SERVER['files'])
+    summary = run_pm_sync(downloaded, PM_COLUMN_MAP)
+
+    for tech, result in summary.items():
+        status = result.get('status', 'error')
+        rows = result.get('inserted', result.get('upserted', 0))
+        msg = result.get('error') or result.get('reason')
+        _log_sync('pm', tech, status, rows, msg)
+        logger.info(f'PM [{tech}]: {result}')
+
+    logger.info('PM data pull complete.')
+
+
+def pull_metadata():
+    """Job: download and process metadata from server 2."""
+    from sync_config import METADATA_SERVER, METADATA_COLUMN_MAP, LOCAL_DOWNLOAD_DIR
+
+    if not METADATA_SERVER['host']:
+        logger.warning('Metadata server not configured, skipping pull.')
+        return
+
+    logger.info('Starting metadata pull...')
+    client = SFTPClient(
+        host=METADATA_SERVER['host'],
+        port=METADATA_SERVER['port'],
+        username=METADATA_SERVER['username'],
+        password=METADATA_SERVER['password'],
+        remote_dir=METADATA_SERVER['remote_dir'],
+        local_dir=f"{LOCAL_DOWNLOAD_DIR}/metadata"
+    )
+
+    downloaded = client.download_all(METADATA_SERVER['files'])
+    summary = run_metadata_sync(downloaded, METADATA_COLUMN_MAP)
+
+    for tech, result in summary.items():
+        status = result.get('status', 'error')
+        rows = result.get('upserted', 0)
+        msg = result.get('error') or result.get('reason')
+        _log_sync('metadata', tech, status, rows, msg)
+        logger.info(f'Metadata [{tech}]: {result}')
+
+    logger.info('Metadata pull complete.')
+
+
+def start_scheduler():
+    """Initialize DB migrations and start background scheduler."""
+    global _scheduler
+
+    # Run DB migrations first
+    try:
+        run_migrations()
+    except Exception as e:
+        logger.error(f'DB migration failed: {e}')
+
+    from sync_config import PM_PULL_INTERVAL_HOURS, METADATA_PULL_INTERVAL_HOURS
+
+    _scheduler = BackgroundScheduler(daemon=True)
+
+    # PM pull every 2 hours
+    _scheduler.add_job(
+        pull_pm_data,
+        trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
+        id='pm_pull',
+        name='PM Data Pull',
+        replace_existing=True
+    )
+
+    # Metadata pull once daily
+    _scheduler.add_job(
+        pull_metadata,
+        trigger=IntervalTrigger(hours=METADATA_PULL_INTERVAL_HOURS),
+        id='metadata_pull',
+        name='Metadata Pull',
+        replace_existing=True
+    )
+
+    _scheduler.start()
+    logger.info(f'Scheduler started. PM every {PM_PULL_INTERVAL_HOURS}h, Metadata every {METADATA_PULL_INTERVAL_HOURS}h.')
+
+
+def get_scheduler():
+    return _scheduler
+
+
+def trigger_pm_now():
+    """Manually trigger a PM pull immediately."""
+    pull_pm_data()
+
+
+def trigger_metadata_now():
+    """Manually trigger a metadata pull immediately."""
+    pull_metadata()

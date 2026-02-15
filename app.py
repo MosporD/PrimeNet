@@ -27,6 +27,7 @@ from routes.ne_comparison_routes import ne_comparison_bp
 from routes.parameter_dictionary_routes import parameter_dictionary_bp
 from routes.network_map_routes import network_map_bp
 from routes.admin_panel_routes import admin_panel_bp
+from routes.sync_routes import sync_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(xml_parser_bp)
@@ -35,6 +36,7 @@ app.register_blueprint(ne_comparison_bp)
 app.register_blueprint(parameter_dictionary_bp)
 app.register_blueprint(network_map_bp)
 app.register_blueprint(admin_panel_bp)
+app.register_blueprint(sync_bp)
 
 # ============================================================================
 # ERROR HANDLERS
@@ -62,6 +64,14 @@ try:
     print("[OK] Database initialized successfully")
 except Exception as e:
     print(f"[WARNING] Database initialization: {e}")
+
+# Start SFTP sync scheduler
+from sync.scheduler import start_scheduler
+try:
+    start_scheduler()
+    print("[OK] Sync scheduler started")
+except Exception as e:
+    print(f"[WARNING] Sync scheduler could not start: {e}")
 
 # ============================================================================
 # MAIN
