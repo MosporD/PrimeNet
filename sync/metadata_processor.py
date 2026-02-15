@@ -1,16 +1,17 @@
 """
 Metadata Processor
 ==================
-Reads metadata XLSX files (lat/long, azimuth, tilt, site/cell info)
-and upserts into metadata.db → sites + cells tables.
+Reads metadata files (XLSX or CSV) with lat/long, azimuth, tilt, site/cell
+info and upserts into metadata.db → sites + cells tables.
 
-The metadata server has snapshot folders; each folder contains 5 Excel files:
-  2G, 3G, 4G-FDD, 4G-TDD, 5G
+The metadata server has snapshot folders; each folder contains 5 files:
+  2G, 3G, 4G-FDD, 4G-TDD, 5G  (XLSX or CSV)
 
 Nokia and Huawei sites are in the same metadata snapshot — vendor is
-inferred from a 'Vendor' column if present, or passed explicitly.
+inferred from a 'vendor' / 'Vendor' column if present, or passed explicitly.
 """
 
+import os
 import sqlite3
 import logging
 import pandas as pd
@@ -20,6 +21,18 @@ logger = logging.getLogger(__name__)
 METADATA_DB = 'metadata.db'
 
 
+def _load_file(file_path):
+    """Load a metadata file as a DataFrame; supports CSV and XLSX/XLS."""
+    ext = os.path.splitext(file_path)[1].lower()
+    if ext == '.csv':
+        return pd.read_csv(file_path, dtype=str)
+    # Try openpyxl first (proper .xlsx), fall back to xlrd (old .xls/.xlsx)
+    try:
+        return pd.read_excel(file_path, engine='openpyxl', dtype=str)
+    except Exception:
+        return pd.read_excel(file_path, engine='xlrd', dtype=str)
+
+
 def process_metadata_file(file_path, technology, column_map, vendor=None):
     """
     Process one metadata XLSX file for a given technology.
@@ -27,13 +40,17 @@ def process_metadata_file(file_path, technology, column_map, vendor=None):
     Returns (upserted, skipped, error_message).
     """
     try:
-        df = pd.read_excel(file_path, engine='openpyxl')
+        df = _load_file(file_path)
     except Exception as e:
         logger.error(f'Failed to read metadata file {file_path}: {e}')
         return 0, 0, str(e)
 
-    # Rename columns using map
-    reverse_map = {v: k for k, v in column_map.items() if v in df.columns}
+    # Build rename map: {original_column_name → db_field_name}
+    # column_map values are the source column names; keys are DB field names.
+    reverse_map = {}
+    for db_field, src_col in column_map.items():
+        if src_col and src_col in df.columns and src_col != db_field:
+            reverse_map[src_col] = db_field
     df = df.rename(columns=reverse_map)
 
     # Minimum required for a useful row
