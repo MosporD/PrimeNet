@@ -28,6 +28,7 @@ from routes.parameter_dictionary_routes import parameter_dictionary_bp
 from routes.network_map_routes import network_map_bp
 from routes.admin_panel_routes import admin_panel_bp
 from routes.sync_routes import sync_bp
+from routes.performance_routes import performance_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(xml_parser_bp)
@@ -37,6 +38,7 @@ app.register_blueprint(parameter_dictionary_bp)
 app.register_blueprint(network_map_bp)
 app.register_blueprint(admin_panel_bp)
 app.register_blueprint(sync_bp)
+app.register_blueprint(performance_bp)
 
 # ============================================================================
 # ERROR HANDLERS

@@ -211,6 +211,12 @@ function displaySiteInfo(site) {
         <p style="margin: 5px 0;"><strong>Type:</strong> ${site.site_type || 'N/A'}</p>
         <p style="margin: 5px 0;"><strong>Sectors:</strong> ${site.sectors.length}</p>
         ${sectorsHtml}
+        <a href="/performance?site_id=${site.site_id}"
+           style="display:block; margin-top:14px; padding:10px; text-align:center;
+                  background:#3498db; color:white; border-radius:6px;
+                  text-decoration:none; font-weight:600; font-size:0.9em;">
+            📈 In-depth KPI
+        </a>
     `;
     infoPanel.style.display = 'block';
 }
@@ -338,11 +344,19 @@ function displayKPIDashboard(sector) {
         <h2 style="margin-top: 0; color: #2C3E50;">
             ${sector.sector_name} - KPI Dashboard
         </h2>
-        <div style="margin-bottom: 15px; padding: 10px; background: #ecf0f1; border-radius: 5px;">
-            <strong>Site:</strong> ${sector.site_name} |
-            <strong>Technology:</strong> ${sector.technology || 'N/A'} |
-            <strong>Band:</strong> ${sector.frequency_band || 'N/A'} |
-            <strong>Azimuth:</strong> ${sector.azimuth}°
+        <div style="margin-bottom: 15px; padding: 10px; background: #ecf0f1; border-radius: 5px;
+                    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <span>
+                <strong>Site:</strong> ${sector.site_name} |
+                <strong>Technology:</strong> ${sector.technology || 'N/A'} |
+                <strong>Band:</strong> ${sector.frequency_band || 'N/A'} |
+                <strong>Azimuth:</strong> ${sector.azimuth}°
+            </span>
+            <a href="/performance?site_id=${sector.site_id}&technology=${sector.technology || ''}"
+               style="padding:8px 18px; background:#3498db; color:white; border-radius:6px;
+                      text-decoration:none; font-weight:600; font-size:0.88em; white-space:nowrap;">
+                📈 In-depth KPI
+            </a>
         </div>
         ${cellsHtml}
     `;
