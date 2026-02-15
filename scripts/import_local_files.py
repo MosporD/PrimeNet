@@ -232,10 +232,23 @@ HUAWEI_SHEET_TECH = {
 }
 
 
+def _pm_site_id(cell_name):
+    """Extract site_id from a PM cell name (numeric prefix before first - or _)."""
+    import re
+    m = re.match(r'^(\d+)', cell_name)
+    return m.group(1) if m else None
+
+
+def _pm_site_name(cell_name):
+    """Derive site name by stripping the trailing sector suffix (-A, -B1, _A1, etc.)."""
+    import re
+    return re.sub(r'[-_][A-Za-z]\d*$', '', cell_name)
+
+
 def seed_metadata_from_pm():
     """
     For every cell_name in nokia_pm.db / huawei_pm.db that is missing from
-    metadata.db, insert a minimal cells row so the JOIN works in the app.
+    metadata.db, insert a placeholder site + cells row so the JOIN works in the app.
     """
     import sqlite3 as _sq
 
@@ -243,9 +256,32 @@ def seed_metadata_from_pm():
     nokia_pm = _sq.connect(_abs('nokia_pm.db'))
     huawei_pm = _sq.connect(_abs('huawei_pm.db'))
 
-    existing = {r[0] for r in meta.execute("SELECT cell_name FROM cells").fetchall()}
+    existing_cells = {r[0] for r in meta.execute("SELECT cell_name FROM cells").fetchall()}
+    existing_sites = {r[0] for r in meta.execute("SELECT site_id FROM sites").fetchall()}
 
     seeded = 0
+
+    def _seed_cell(cell_name, tech, vendor):
+        nonlocal seeded
+        if cell_name in existing_cells:
+            return
+        site_id   = _pm_site_id(cell_name)
+        site_name = _pm_site_name(cell_name)
+        # Ensure a placeholder site exists so the JOIN works
+        if site_id and site_id not in existing_sites:
+            meta.execute(
+                "INSERT OR IGNORE INTO sites (site_id, site_name, vendor, status) "
+                "VALUES (?, ?, ?, 'Active')",
+                (site_id, site_name, vendor)
+            )
+            existing_sites.add(site_id)
+        meta.execute(
+            "INSERT OR IGNORE INTO cells (cell_name, site_id, technology, vendor, status) "
+            "VALUES (?, ?, ?, ?, 'Active')",
+            (cell_name, site_id, tech, vendor)
+        )
+        existing_cells.add(cell_name)
+        seeded += 1
 
     # Nokia — we know cell names per tech from the Excel files
     for tech, filename in NOKIA_PM_EXCEL_FILES.items():
@@ -266,14 +302,7 @@ def seed_metadata_from_pm():
             cell_name = str(cell_name).strip()
             if not cell_name or cell_name.lower() == 'nan':
                 continue
-            if cell_name not in existing:
-                meta.execute(
-                    "INSERT OR IGNORE INTO cells (cell_name, technology, vendor, status) "
-                    "VALUES (?, ?, 'Nokia', 'Active')",
-                    (cell_name, NOKIA_FILE_TECH[tech])
-                )
-                existing.add(cell_name)
-                seeded += 1
+            _seed_cell(cell_name, NOKIA_FILE_TECH[tech], 'Nokia')
 
     # Huawei — from Performance.xlsx sheets
     perf_path = _abs(HUAWEI_PM_FILE)
@@ -292,14 +321,7 @@ def seed_metadata_from_pm():
                 cell_name = str(cell_name).strip()
                 if not cell_name or cell_name.lower() == 'nan':
                     continue
-                if cell_name not in existing:
-                    meta.execute(
-                        "INSERT OR IGNORE INTO cells (cell_name, technology, vendor, status) "
-                        "VALUES (?, ?, 'Huawei', 'Active')",
-                        (cell_name, HUAWEI_SHEET_TECH[tech])
-                    )
-                    existing.add(cell_name)
-                    seeded += 1
+                _seed_cell(cell_name, HUAWEI_SHEET_TECH[tech], 'Huawei')
 
     meta.commit()
     meta.close()

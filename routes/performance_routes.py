@@ -183,7 +183,7 @@ def get_cells():
                     k.call_drop_rate, k.handover_success_rate,
                     k.availability_percent, k.timestamp AS kpi_ts
                 FROM cells c
-                JOIN sites st ON c.site_id = st.site_id
+                LEFT JOIN sites st ON c.site_id = st.site_id
                 LEFT JOIN pm.cell_kpis k
                     ON k.cell_name = c.cell_name
                     AND k.timestamp = (
@@ -208,7 +208,7 @@ def get_cells():
                     k.call_drop_rate, k.handover_success_rate,
                     k.availability_percent, k.timestamp AS kpi_ts
                 FROM cells c
-                JOIN sites st ON c.site_id = st.site_id
+                LEFT JOIN sites st ON c.site_id = st.site_id
                 LEFT JOIN (
                     SELECT * FROM nokia_pm.cell_kpis
                     UNION ALL
@@ -240,7 +240,7 @@ def get_cells():
                 NULL as call_drop_rate, NULL as handover_success_rate,
                 NULL as availability_percent, NULL as kpi_ts
             FROM cells c
-            JOIN sites st ON c.site_id = st.site_id
+            LEFT JOIN sites st ON c.site_id = st.site_id
             WHERE {where_sql}
             ORDER BY st.site_name, c.cell_name
         ''', params).fetchall()]
@@ -272,7 +272,7 @@ def get_cell_trend(cell_id):
                c.frequency_band, c.azimuth, c.mechanical_tilt, c.pci,
                st.site_id, st.site_name, st.region, st.latitude, st.longitude
         FROM cells c
-        JOIN sites st ON c.site_id = st.site_id
+        LEFT JOIN sites st ON c.site_id = st.site_id
         WHERE c.cell_id = ?
     ''', (cell_id,)).fetchone()
     meta_conn.close()
