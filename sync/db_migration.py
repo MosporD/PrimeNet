@@ -1,7 +1,13 @@
 """
-DB Migration
-Adds columns and indexes needed for the SFTP sync feature.
-Run once on startup (safe to re-run, uses IF NOT EXISTS).
+DB Migration — Three-Database Architecture
+==========================================
+metadata.db   → sites, cells, sectors for ALL vendors (source of truth)
+nokia_pm.db   → Nokia hourly KPI rows keyed by cell_name + timestamp
+huawei_pm.db  → Huawei hourly KPI rows keyed by cell_name + timestamp
+
+Cell linkage: cell_name is the shared key across all three DBs.
+The performance API queries metadata.db and ATTACHes the relevant PM db
+to do cross-db JOINs purely in SQLite.
 """
 
 import sqlite3
@@ -9,46 +15,130 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = 'ncm_users.db'
+METADATA_DB  = 'metadata.db'
+NOKIA_PM_DB  = 'nokia_pm.db'
+HUAWEI_PM_DB = 'huawei_pm.db'
+APP_DB       = 'ncm_users.db'  # auth / session / sync_log
 
 
-def run_migrations():
-    conn = sqlite3.connect(DB_PATH)
+_KPI_COLS = '''
+    id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+    cell_name             TEXT    NOT NULL,
+    timestamp             TEXT    NOT NULL,
+    avg_users             REAL,
+    data_volume_gb        REAL,
+    rsrp                  REAL,
+    rsrq                  REAL,
+    sinr                  REAL,
+    cqi                   REAL,
+    throughput_dl_mbps    REAL,
+    throughput_ul_mbps    REAL,
+    rrc_success_rate      REAL,
+    erab_success_rate     REAL,
+    call_drop_rate        REAL,
+    handover_success_rate REAL,
+    availability_percent  REAL
+'''
+
+
+def _create_pm_db(db_path):
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-
-    # 1. Add mechanical_tilt to sectors if missing
-    cursor.execute("PRAGMA table_info(sectors)")
-    sector_cols = [row[1] for row in cursor.fetchall()]
-    if 'mechanical_tilt' not in sector_cols:
-        cursor.execute('ALTER TABLE sectors ADD COLUMN mechanical_tilt REAL')
-        logger.info('Added mechanical_tilt column to sectors.')
-
-    # 2. Add unique index on cell_kpis(cell_id, timestamp) for upsert support
-    cursor.execute('''
-        SELECT name FROM sqlite_master
-        WHERE type='index' AND name='idx_cell_kpis_unique'
-    ''')
-    if not cursor.fetchone():
-        cursor.execute('''
-            CREATE UNIQUE INDEX idx_cell_kpis_unique
-            ON cell_kpis (cell_id, timestamp)
-        ''')
-        logger.info('Created unique index on cell_kpis(cell_id, timestamp).')
-
-    # 3. Add sync_log table to track pull history
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS sync_log (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            sync_type   TEXT NOT NULL,   -- 'pm' or 'metadata'
-            technology  TEXT NOT NULL,   -- '2G','3G','4G','5G'
-            status      TEXT NOT NULL,   -- 'ok','error','skipped'
-            rows_affected INTEGER DEFAULT 0,
-            message     TEXT,
-            started_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    cursor.execute(f'''
+        CREATE TABLE IF NOT EXISTS cell_kpis (
+            {_KPI_COLS},
+            UNIQUE (cell_name, timestamp) ON CONFLICT REPLACE
         )
     ''')
-    logger.info('sync_log table ready.')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_kpis_cell_ts ON cell_kpis (cell_name, timestamp)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_kpis_ts       ON cell_kpis (timestamp)')
+    conn.commit()
+    conn.close()
+    logger.info(f'{db_path} ready.')
+
+
+def _create_metadata_db():
+    conn = sqlite3.connect(METADATA_DB)
+    cursor = conn.cursor()
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sites (
+            site_id    TEXT PRIMARY KEY,
+            site_name  TEXT NOT NULL,
+            latitude   REAL,
+            longitude  REAL,
+            region     TEXT,
+            site_type  TEXT,
+            vendor     TEXT,
+            status     TEXT DEFAULT 'Active',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    # One row per cell; cell_name is the cross-DB join key
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS cells (
+            cell_id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            cell_name       TEXT    NOT NULL UNIQUE,
+            site_id         TEXT    REFERENCES sites(site_id),
+            technology      TEXT,
+            vendor          TEXT,
+            frequency_band  TEXT,
+            azimuth         REAL,
+            mechanical_tilt REAL,
+            electrical_tilt REAL,
+            pci             INTEGER,
+            status          TEXT DEFAULT 'Active',
+            updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS sectors (
+            sector_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+            site_id         TEXT REFERENCES sites(site_id),
+            sector_name     TEXT,
+            technology      TEXT,
+            frequency_band  TEXT,
+            azimuth         REAL,
+            mechanical_tilt REAL,
+            electrical_tilt REAL,
+            vendor          TEXT,
+            updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_cells_site   ON cells(site_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_cells_vendor ON cells(vendor)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_cells_tech   ON cells(technology)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_sectors_site ON sectors(site_id)')
 
     conn.commit()
     conn.close()
-    logger.info('DB migrations complete.')
+    logger.info(f'{METADATA_DB} ready.')
+
+
+def _ensure_sync_log():
+    conn = sqlite3.connect(APP_DB)
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS sync_log (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            sync_type     TEXT NOT NULL,
+            technology    TEXT NOT NULL,
+            status        TEXT NOT NULL,
+            rows_affected INTEGER DEFAULT 0,
+            message       TEXT,
+            started_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
+    logger.info('sync_log ready.')
+
+
+def run_migrations():
+    _create_metadata_db()
+    _create_pm_db(NOKIA_PM_DB)
+    _create_pm_db(HUAWEI_PM_DB)
+    _ensure_sync_log()
+    logger.info('All DB migrations complete.')

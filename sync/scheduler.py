@@ -1,17 +1,20 @@
 """
 Sync Scheduler
-Pulls Nokia PM + Huawei PM every 2 hours, metadata daily.
+==============
+Three background jobs:
+  nokia_pm_pull   — every 2 h — downloads latest XLSX from each Nokia tech folder
+  huawei_pm_pull  — every 2 h — downloads latest XLSX from Huawei folder, reads 3 sheets
+  metadata_pull   — daily     — enters newest snapshot subdir, downloads 5 tech files
 """
 
 import logging
 import sqlite3
-from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
 from sync.sftp_client import SFTPClient
-from sync.pm_processor import run_pm_sync
+from sync.pm_processor import run_nokia_pm_sync, process_huawei_pm_file
 from sync.metadata_processor import run_metadata_sync
 from sync.db_migration import run_migrations
 
@@ -20,82 +23,135 @@ logger = logging.getLogger(__name__)
 _scheduler = None
 
 
-def _log_sync(sync_type, technology, status, rows_affected=0, message=None):
+# ---------------------------------------------------------------------------
+# Sync log helper
+# ---------------------------------------------------------------------------
+
+def _log_sync(sync_type, technology, status, rows=0, message=None):
     try:
         conn = sqlite3.connect('ncm_users.db')
         conn.execute(
             'INSERT INTO sync_log (sync_type, technology, status, rows_affected, message) VALUES (?,?,?,?,?)',
-            (sync_type, technology, status, rows_affected, message)
+            (sync_type, technology, status, rows, message)
         )
         conn.commit()
         conn.close()
     except Exception as e:
-        logger.error(f'Failed to write sync log: {e}')
+        logger.error(f'sync_log write failed: {e}')
 
 
-def _pull_pm_server(server_cfg, column_map, vendor_label):
-    """Download and process PM files from one vendor server."""
-    if not server_cfg['host']:
-        logger.warning(f'{vendor_label} PM server not configured, skipping.')
-        return
+# ---------------------------------------------------------------------------
+# Nokia PM — one folder per tech, pull latest XLSX from each
+# ---------------------------------------------------------------------------
 
-    logger.info(f'Starting {vendor_label} PM pull...')
-    from sync_config import LOCAL_DOWNLOAD_DIR
-    client = SFTPClient(
-        host=server_cfg['host'],
-        port=server_cfg['port'],
-        username=server_cfg['username'],
-        password=server_cfg['password'],
-        remote_dir=server_cfg['remote_dir'],
-        local_dir=f"{LOCAL_DOWNLOAD_DIR}/pm_{vendor_label.lower()}"
+def pull_nokia_pm():
+    from sync_config import (
+        NOKIA_PM_SERVER, NOKIA_PM_COLUMN_MAP, LOCAL_DOWNLOAD_DIR
     )
 
-    downloaded = client.download_all(server_cfg['files'])
-    summary    = run_pm_sync(downloaded, column_map)
+    host = NOKIA_PM_SERVER['host']
+    if not host:
+        logger.warning('Nokia PM server not configured.')
+        return
 
+    logger.info('Starting Nokia PM pull...')
+    client = SFTPClient(
+        host=host,
+        port=NOKIA_PM_SERVER['port'],
+        username=NOKIA_PM_SERVER['username'],
+        password=NOKIA_PM_SERVER['password'],
+        local_dir=f'{LOCAL_DOWNLOAD_DIR}/pm_nokia',
+    )
+
+    downloaded = {}
+    for tech, remote_dir in NOKIA_PM_SERVER['dirs'].items():
+        downloaded[tech] = client.download_latest_xlsx(remote_dir, prefix=f'nokia_{tech}_')
+
+    summary = run_nokia_pm_sync(downloaded, NOKIA_PM_COLUMN_MAP)
     for tech, result in summary.items():
         status = result.get('status', 'error')
         rows   = result.get('inserted', result.get('upserted', 0))
         msg    = result.get('error') or result.get('reason')
-        _log_sync(f'pm_{vendor_label.lower()}', tech, status, rows, msg)
-        logger.info(f'{vendor_label} PM [{tech}]: {result}')
+        _log_sync('pm_nokia', tech, status, rows, msg)
+        logger.info(f'Nokia PM [{tech}]: {result}')
 
-    logger.info(f'{vendor_label} PM pull complete.')
+    logger.info('Nokia PM pull complete.')
 
 
-def pull_nokia_pm():
-    """Job: pull Nokia PM data."""
-    from sync_config import NOKIA_PM_SERVER, NOKIA_PM_COLUMN_MAP
-    _pull_pm_server(NOKIA_PM_SERVER, NOKIA_PM_COLUMN_MAP, 'Nokia')
-
+# ---------------------------------------------------------------------------
+# Huawei PM — single folder, single file with 3 sheets (2G/3G/4G)
+# ---------------------------------------------------------------------------
 
 def pull_huawei_pm():
-    """Job: pull Huawei PM data."""
-    from sync_config import HUAWEI_PM_SERVER, HUAWEI_PM_COLUMN_MAP
-    _pull_pm_server(HUAWEI_PM_SERVER, HUAWEI_PM_COLUMN_MAP, 'Huawei')
+    from sync_config import (
+        HUAWEI_PM_SERVER, HUAWEI_PM_COLUMN_MAP, HUAWEI_SHEET_TECH_MAP, LOCAL_DOWNLOAD_DIR
+    )
 
-
-def pull_metadata():
-    """Job: pull metadata from server 2."""
-    from sync_config import METADATA_SERVER, METADATA_COLUMN_MAP, LOCAL_DOWNLOAD_DIR
-
-    if not METADATA_SERVER['host']:
-        logger.warning('Metadata server not configured, skipping.')
+    host = HUAWEI_PM_SERVER['host']
+    if not host:
+        logger.warning('Huawei PM server not configured.')
         return
 
-    logger.info('Starting metadata pull...')
+    logger.info('Starting Huawei PM pull...')
     client = SFTPClient(
-        host=METADATA_SERVER['host'],
+        host=host,
+        port=HUAWEI_PM_SERVER['port'],
+        username=HUAWEI_PM_SERVER['username'],
+        password=HUAWEI_PM_SERVER['password'],
+        local_dir=f'{LOCAL_DOWNLOAD_DIR}/pm_huawei',
+    )
+
+    local_path = client.download_latest_xlsx(
+        HUAWEI_PM_SERVER['remote_dir'],
+        prefix='huawei_all_'
+    )
+
+    if not local_path:
+        logger.error('Huawei PM: no file downloaded.')
+        _log_sync('pm_huawei', 'all', 'error', 0, 'Download failed')
+        return
+
+    summary = process_huawei_pm_file(local_path, HUAWEI_PM_COLUMN_MAP, HUAWEI_SHEET_TECH_MAP)
+    for tech, result in summary.items():
+        status = result.get('status', 'error')
+        rows   = result.get('inserted', result.get('upserted', 0))
+        msg    = result.get('error') or result.get('reason')
+        _log_sync('pm_huawei', tech, status, rows, msg)
+        logger.info(f'Huawei PM [{tech}]: {result}')
+
+    logger.info('Huawei PM pull complete.')
+
+
+# ---------------------------------------------------------------------------
+# Metadata — root dir has dated snapshot folders; enter newest, pull 5 files
+# ---------------------------------------------------------------------------
+
+def pull_metadata():
+    from sync_config import (
+        METADATA_SERVER, METADATA_COLUMN_MAP, METADATA_FILE_MAP, LOCAL_DOWNLOAD_DIR
+    )
+
+    host = METADATA_SERVER['host']
+    if not host:
+        logger.warning('Metadata server not configured.')
+        return
+
+    logger.info('Starting Metadata pull...')
+    client = SFTPClient(
+        host=host,
         port=METADATA_SERVER['port'],
         username=METADATA_SERVER['username'],
         password=METADATA_SERVER['password'],
-        remote_dir=METADATA_SERVER['remote_dir'],
-        local_dir=f"{LOCAL_DOWNLOAD_DIR}/metadata"
+        local_dir=f'{LOCAL_DOWNLOAD_DIR}/metadata',
     )
 
-    downloaded = client.download_all(METADATA_SERVER['files'])
-    summary    = run_metadata_sync(downloaded, METADATA_COLUMN_MAP)
+    downloaded = client.download_latest_subdir_files(
+        root_dir=METADATA_SERVER['root_dir'],
+        tech_filename_map=METADATA_FILE_MAP,
+        prefix='meta_',
+    )
 
+    summary = run_metadata_sync(downloaded, METADATA_COLUMN_MAP)
     for tech, result in summary.items():
         status = result.get('status', 'error')
         rows   = result.get('upserted', 0)
@@ -106,8 +162,11 @@ def pull_metadata():
     logger.info('Metadata pull complete.')
 
 
+# ---------------------------------------------------------------------------
+# Scheduler lifecycle
+# ---------------------------------------------------------------------------
+
 def start_scheduler():
-    """Run DB migrations and start the background scheduler."""
     global _scheduler
 
     try:
@@ -119,7 +178,6 @@ def start_scheduler():
 
     _scheduler = BackgroundScheduler(daemon=True)
 
-    # Nokia PM — every 2 hours
     _scheduler.add_job(
         pull_nokia_pm,
         trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
@@ -127,8 +185,6 @@ def start_scheduler():
         name='Nokia PM Pull',
         replace_existing=True
     )
-
-    # Huawei PM — every 2 hours
     _scheduler.add_job(
         pull_huawei_pm,
         trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
@@ -136,8 +192,6 @@ def start_scheduler():
         name='Huawei PM Pull',
         replace_existing=True
     )
-
-    # Metadata — daily
     _scheduler.add_job(
         pull_metadata,
         trigger=IntervalTrigger(hours=METADATA_PULL_INTERVAL_HOURS),
@@ -148,7 +202,7 @@ def start_scheduler():
 
     _scheduler.start()
     logger.info(
-        f'Scheduler started — Nokia PM, Huawei PM every {PM_PULL_INTERVAL_HOURS}h, '
+        f'Scheduler started — Nokia PM + Huawei PM every {PM_PULL_INTERVAL_HOURS}h, '
         f'Metadata every {METADATA_PULL_INTERVAL_HOURS}h.'
     )
 
@@ -156,17 +210,8 @@ def start_scheduler():
 def get_scheduler():
     return _scheduler
 
-
-def trigger_nokia_pm_now():
-    pull_nokia_pm()
-
-def trigger_huawei_pm_now():
-    pull_huawei_pm()
-
-def trigger_pm_now():
-    """Trigger both vendors at once."""
-    pull_nokia_pm()
-    pull_huawei_pm()
-
-def trigger_metadata_now():
-    pull_metadata()
+# Manual trigger helpers
+def trigger_nokia_pm_now():  pull_nokia_pm()
+def trigger_huawei_pm_now(): pull_huawei_pm()
+def trigger_pm_now():        pull_nokia_pm(); pull_huawei_pm()
+def trigger_metadata_now():  pull_metadata()
