@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nokia Configuration Manager - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=1.0">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>Nokia Configuration Manager</h1>
+                    <p>Advanced Network Configuration Tool</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span class="user-greeting">Welcome, <strong>{{ user.username }}</strong></span>
+                        <span class="user-role">Role: {{ user.role }}</span>
+                        <button onclick="logout()" class="btn-logout">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <h2 class="dashboard-title">Select a Function</h2>
+
+            <div class="function-grid">
+                <!-- XML Parser -->
+                <a href="/xml-parser" class="function-card">
+                    <div class="function-icon">📄</div>
+                    <div class="function-name">XML Parser</div>
+                    <div class="function-description">Parse XML files and convert to Excel format</div>
+                </a>
+
+                <!-- Excel Generator -->
+                <a href="/excel-generator" class="function-card">
+                    <div class="function-icon">📊</div>
+                    <div class="function-name">Excel Generator</div>
+                    <div class="function-description">Generate XML files from Excel templates</div>
+                </a>
+
+                <!-- NE Comparison -->
+                <a href="/ne-comparison" class="function-card">
+                    <div class="function-icon">🔍</div>
+                    <div class="function-name">NE Comparison</div>
+                    <div class="function-description">Compare XML configurations between network elements</div>
+                </a>
+
+                <!-- Parameter Dictionary -->
+                <a href="/parameter-dictionary" class="function-card">
+                    <div class="function-icon">📚</div>
+                    <div class="function-name">Parameter Dictionary</div>
+                    <div class="function-description">Browse and search Nokia MO parameters database</div>
+                </a>
+
+                <!-- Network Map -->
+                <a href="/network-map" class="function-card">
+                    <div class="function-icon">🗺️</div>
+                    <div class="function-name">Network Map</div>
+                    <div class="function-description">Interactive map of network sites and KPIs</div>
+                </a>
+
+                <!-- Admin Panel (only visible for admins) -->
+                {% if user.role == 'admin' %}
+                <a href="/admin-panel" class="function-card admin-card">
+                    <div class="function-icon">⚙️</div>
+                    <div class="function-name">Admin Panel</div>
+                    <div class="function-description">User management and system administration</div>
+                </a>
+                {% endif %}
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Nokia Configuration Manager | Version 4.0</p>
+        </footer>
+    </div>
+
+    <script>
+        async function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    const response = await fetch('/api/logout', { method: 'POST' });
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '/login';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

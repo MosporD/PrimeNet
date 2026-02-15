@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nokia Configuration Manager - Web</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.1">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>📡 Nokia Configuration Manager</h1>
+                    <p class="subtitle">Professional XML Configuration Processing Tool</p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span class="user-name">👤 {{ user.full_name if user.full_name else user.username }}</span>
+                        {% if user.department %}
+                        <span class="user-dept">{{ user.department }}</span>
+                        {% endif %}
+                        <span class="user-role" id="user-role-badge">{{ user.role }}</span>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button onclick="toggleDarkMode()" class="btn-logout" id="dark-mode-btn">🌙 Dark</button>
+                        <button onclick="logout()" class="btn-logout">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button" onclick="openTab(event, 'xml-to-excel')">
+                <div style="font-size: 3em; margin-bottom: 15px;">📄</div>
+                <div>XML Parser</div>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'excel-to-xml')">
+                <div style="font-size: 3em; margin-bottom: 15px;">📊</div>
+                <div>Excel Generator</div>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'xml-compare')">
+                <div style="font-size: 3em; margin-bottom: 15px;">🔍</div>
+                <div>NE Comparison</div>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'mo-database')">
+                <div style="font-size: 3em; margin-bottom: 15px;">📚</div>
+                <div>Parameter Dictionary</div>
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'map-view')">
+                <div style="font-size: 3em; margin-bottom: 15px;">🗺️</div>
+                <div>Network Map</div>
+            </button>
+            <button class="tab-button" id="admin-tab" onclick="openTab(event, 'admin-panel')" style="display: none;">
+                <div style="font-size: 3em; margin-bottom: 15px;">⚙️</div>
+                <div>Admin Panel</div>
+            </button>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcome" class="tab-content active" style="text-align: center; padding: 80px 60px;">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <div style="font-size: 5em; margin-bottom: 30px;">📡</div>
+                <h1 style="font-size: 2.5em; color: #2C3E50; margin-bottom: 20px;">Welcome to Nokia Configuration Manager</h1>
+                <p style="font-size: 1.2em; color: #7F8C8D; line-height: 1.8; margin-bottom: 40px;">
+                    Professional XML Configuration Processing Tool for Radio Network Optimization
+                </p>
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 30px; border-radius: 15px; margin-top: 40px;">
+                    <h3 style="color: #2C3E50; margin-bottom: 15px;">Select a function above to get started</h3>
+                    <p style="color: #555; margin: 0;">Parse configurations, generate XML, compare network elements, or search the parameter dictionary</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: XML Parser -->
+        <div id="xml-to-excel" class="tab-content">
+            <div class="upload-section">
+                <div class="file-upload-area" id="xml-upload-area">
+                    <input type="file" id="xml-file" accept=".xml" hidden>
+                    <div class="upload-icon">📁</div>
+                    <h3>Upload XML Configuration File</h3>
+                    <p>Click to browse or drag & drop your XML file here</p>
+                    <p class="file-name" id="xml-file-name"></p>
+                </div>
+
+                <div class="file-upload-area optional" id="params-upload-area">
+                    <input type="file" id="params-file" accept=".xlsx,.xls" hidden>
+                    <div class="upload-icon">📋</div>
+                    <h3>Parameter Filter (Optional)</h3>
+                    <p>Upload Excel file with 'MO' and 'Parameter' columns to filter output</p>
+                    <p class="file-name" id="params-file-name"></p>
+                </div>
+            </div>
+
+            <button class="action-button" id="convert-xml-btn" disabled>
+                🔄 Convert to Excel
+            </button>
+
+            <div class="progress-section" id="xml-progress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="xml-progress-fill"></div>
+                </div>
+                <p class="progress-text" id="xml-progress-text">Processing...</p>
+            </div>
+        </div>
+
+        <!-- TAB 2: Excel Generator -->
+        <div id="excel-to-xml" class="tab-content">
+            <div class="upload-section">
+                <div class="file-upload-area" id="excel-upload-area">
+                    <input type="file" id="excel-file" accept=".xlsx" hidden>
+                    <div class="upload-icon">📊</div>
+                    <h3>Upload Excel Configuration File</h3>
+                    <p>Click to browse or drag & drop your Excel file here</p>
+                    <p class="file-name" id="excel-file-name"></p>
+                </div>
+            </div>
+
+            <div class="operations-section" id="operations-section" style="display: none;">
+                <h3>Select Operations for Each MO Class</h3>
+                <div id="mo-operations-list"></div>
+                <button class="action-button" id="convert-excel-btn">
+                    🔄 Convert to XML
+                </button>
+            </div>
+
+            <!-- Create Task Button (appears after successful conversion) -->
+            <div id="create-task-section" style="display: none; margin-top: 20px;">
+                <button class="action-button" id="create-task-btn" onclick="openCreateTaskFromXmlModal()" style="background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%);">
+                    ✨ Create Task from Generated XML
+                </button>
+            </div>
+
+            <div class="progress-section" id="excel-progress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="excel-progress-fill"></div>
+                </div>
+                <p class="progress-text" id="excel-progress-text">Processing...</p>
+            </div>
+        </div>
+
+        <!-- TAB 3: NE Comparison -->
+        <div id="xml-compare" class="tab-content">
+            <div class="upload-section">
+                <div class="file-upload-area" id="compare-xml1-area">
+                    <input type="file" id="compare-xml1" accept=".xml" hidden>
+                    <div class="upload-icon">📄</div>
+                    <h3>XML File 1 (Baseline)</h3>
+                    <p>Upload your baseline/reference configuration</p>
+                    <p class="file-name" id="compare-xml1-name"></p>
+                </div>
+
+                <div class="file-upload-area" id="compare-xml2-area">
+                    <input type="file" id="compare-xml2" accept=".xml" hidden>
+                    <div class="upload-icon">📄</div>
+                    <h3>XML File 2 (Compare)</h3>
+                    <p>Upload your comparison configuration</p>
+                    <p class="file-name" id="compare-xml2-name"></p>
+                </div>
+            </div>
+
+            <button class="action-button" id="compare-btn" disabled>
+                🔍 Compare XMLs
+            </button>
+
+            <div class="progress-section" id="compare-progress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="compare-progress-fill"></div>
+                </div>
+                <p class="progress-text" id="compare-progress-text">Processing...</p>
+            </div>
+        </div>
+
+        <!-- TAB 4: Parameter Dictionary -->
+        <div id="mo-database" class="tab-content">
+            <!-- Stats Bar -->
+            <div class="mo-stats-bar" id="mo-stats-bar">
+                <div class="mo-stat">
+                    <span class="mo-stat-value" id="mo-total-mos">-</span>
+                    <span class="mo-stat-label">MO Classes</span>
+                </div>
+                <div class="mo-stat">
+                    <span class="mo-stat-value" id="mo-total-params">-</span>
+                    <span class="mo-stat-label">Parameters</span>
+                </div>
+            </div>
+
+            <!-- Search Section -->
+            <div class="mo-search-section">
+                <div class="mo-search-box">
+                    <input type="text" id="mo-search-input" placeholder="Search MO classes or parameters..." autocomplete="off">
+                    <select id="mo-search-type">
+                        <option value="all">All</option>
+                        <option value="mo">MO Classes Only</option>
+                        <option value="param">Parameters Only</option>
+                    </select>
+                    <button class="mo-search-btn" onclick="searchMoDatabase()">Search</button>
+                </div>
+            </div>
+
+            <!-- Results and Info Panel Container -->
+            <div class="mo-content-wrapper">
+                <!-- Search Results -->
+                <div class="mo-results-panel">
+                    <div class="mo-results-header">
+                        <h3>Search Results</h3>
+                        <span class="mo-results-count" id="mo-results-count"></span>
+                    </div>
+                    <div class="mo-results-list" id="mo-results-list">
+                        <div class="mo-empty-state">
+                            <div class="mo-empty-icon">🔍</div>
+                            <p>Enter a search term to find MO classes or parameters</p>
+                            <p class="mo-hint">Try searching for: LNCEL, LNBTS, pMax, etc.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Panel -->
+                <div class="mo-info-panel">
+                    <div class="mo-info-header">
+                        <h3>Information</h3>
+                    </div>
+                    <div class="mo-info-content" id="mo-info-content">
+                        <div class="mo-empty-state">
+                            <div class="mo-empty-icon">📋</div>
+                            <p>Select an MO class or parameter to view details</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: Network Map -->
+        <div id="map-view" class="tab-content">
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <button class="map-control-btn" onclick="refreshMap()">
+                    🔄 Refresh
+                </button>
+                <button class="map-control-btn" onclick="addSiteDialog()">
+                    ➕ Add Site
+                </button>
+                <input type="text" id="map-search" placeholder="Search sites..." onkeyup="filterSites()">
+            </div>
+
+            <!-- Map Container -->
+            <div id="network-map" style="width: 100%; height: 600px; border-radius: 10px; margin-bottom: 20px;"></div>
+
+            <!-- Sites Info Panel -->
+            <div class="sites-info-panel">
+                <h3>Network Overview</h3>
+                <div class="network-stats">
+                    <div class="network-stat-box">
+                        <span class="stat-number" id="total-sites">0</span>
+                        <span class="stat-label">Total Sites</span>
+                    </div>
+                    <div class="network-stat-box">
+                        <span class="stat-number" id="total-sectors">0</span>
+                        <span class="stat-label">Total Sectors</span>
+                    </div>
+                    <div class="network-stat-box">
+                        <span class="stat-number" id="active-cells">0</span>
+                        <span class="stat-label">Active Cells</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: Admin Panel (Only visible to admin users) -->
+        <div id="admin-panel" class="tab-content">
+            <!-- Statistics Dashboard -->
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="stat-total-users">-</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔑</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="stat-admin-users">-</div>
+                        <div class="stat-label">Administrators</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚙️</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="stat-config-team">-</div>
+                        <div class="stat-label">Config Team</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="stat-active-users">-</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management Section -->
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3>👥 User Management</h3>
+                    <div class="admin-controls">
+                        <input type="text" id="user-search" placeholder="🔍 Search users..." style="padding: 8px 15px; border: 1px solid #ddd; border-radius: 5px; width: 250px;">
+                        <select id="role-filter" style="padding: 8px 15px; border: 1px solid #ddd; border-radius: 5px; margin-left: 10px;">
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="config_team">Config Team</option>
+                            <option value="user">User</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="user-table-container">
+                    <table class="user-table" id="users-table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Last Login</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px;">
+                                    Loading users...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Nokia Configuration Manager Web v2.0 | Developed for Radio Network Optimization</p>
+        </footer>
+    </div>
+
+    <!-- Edit User Role Modal -->
+    <div id="edit-role-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close" onclick="document.getElementById('edit-role-modal').style.display='none'">&times;</span>
+            <h2>Edit User Role</h2>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label><strong>User:</strong> <span id="edit-user-name"></span></label>
+                </div>
+                <div class="form-group">
+                    <label for="edit-role-select">Select Role:</label>
+                    <select id="edit-role-select" class="form-control">
+                        <option value="user">User - View assigned tasks only</option>
+                        <option value="config_team">Config Team - Create/manage tasks</option>
+                        <option value="admin">Admin - Full system access</option>
+                    </select>
+                </div>
+                <div class="role-descriptions">
+                    <div class="role-desc">
+                        <strong>User:</strong> Can view and update tasks assigned to them
+                    </div>
+                    <div class="role-desc">
+                        <strong>Config Team:</strong> Can create tasks, assign tasks, share profiles, view all tasks
+                    </div>
+                    <div class="role-desc">
+                        <strong>Admin:</strong> Full access including user management and system settings
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="saveUserRole()" class="btn-primary">Save Changes</button>
+                <button onclick="document.getElementById('edit-role-modal').style.display='none'" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Selection Modal (Improved UI) -->
+    <div id="profile-modal" class="modal" style="display: none;">
+        <div class="modal-content large-modal">
+            <span class="modal-close" onclick="document.getElementById('profile-modal').style.display='none'">&times;</span>
+            <h2>📋 Load Filter Profile</h2>
+            <div class="modal-body">
+                <div class="profile-search">
+                    <input type="text" id="profile-search-input" placeholder="🔍 Search profiles by name or description..." onkeyup="filterProfileList()">
+                </div>
+                <div class="profile-cards-container" id="profile-cards">
+                    <div class="profile-card-loading">
+                        <div class="spinner"></div>
+                        <p>Loading profiles...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Task from XML Modal -->
+    <div id="create-task-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close" onclick="document.getElementById('create-task-modal').style.display='none'">&times;</span>
+            <h2>✨ Create Task from Generated XML</h2>
+            <div class="modal-body">
+                <div class="xml-file-info" id="task-xml-info" style="background: #e3f2fd; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <strong>XML File:</strong> <span id="task-xml-filename"></span><br>
+                    <small style="color: #666;">Path: <span id="task-xml-path"></span></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-title">Task Title *</label>
+                    <input type="text" id="task-title" class="form-control" placeholder="Enter task title..." required>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-description">Description</label>
+                    <textarea id="task-description" class="form-control" rows="4" placeholder="Enter task description..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="task-type">Task Type *</label>
+                        <select id="task-type" class="form-control">
+                            <option value="excel_to_xml">Excel → XML</option>
+                            <option value="xml_to_excel">XML → Excel</option>
+                            <option value="comparison">XML Comparison</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-priority">Priority *</label>
+                        <select id="task-priority" class="form-control">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="task-assignee">Assign To (Optional)</label>
+                    <select id="task-assignee" class="form-control">
+                        <option value="">-- Unassigned --</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="createTaskFromXml()" class="btn-primary">Create Task</button>
+                <button onclick="document.getElementById('create-task-modal').style.display='none'" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KPI Dashboard Modal -->
+    <div id="kpi-modal">
+        <div id="kpi-content">
+            <span class="close-modal" onclick="closeKPIModal()">&times;</span>
+            <!-- KPI content will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Make user data available to JavaScript
+        window.currentUserRole = "{{ user.role }}";
+    </script>
+    <!-- Leaflet JS for Map -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=3.1"></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}?v=1.0"></script>
+</body>
+</html>

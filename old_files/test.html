@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f0f0f0;
+        }
+        .box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2C3E50; }
+        .success { color: #27AE60; font-weight: bold; }
+        .info { background: #E8F5E9; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        button {
+            background: #3498DB;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2980B9; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>✓ Authentication Test Page</h1>
+        
+        <div class="info">
+            <p class="success">🎉 You are successfully logged in!</p>
+            <p>If you can see this page, authentication is working correctly.</p>
+        </div>
+        
+        <h2>Your Information:</h2>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Full Name:</strong> {{ user.full_name if user.full_name else 'Not set' }}</p>
+        <p><strong>Department:</strong> {{ user.department if user.department else 'Not set' }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+        
+        <h2>Next Steps:</h2>
+        <button onclick="window.location.href='/'">Go to Main Application</button>
+        <button onclick="logout()">Logout</button>
+        
+        <script>
+            async function logout() {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/login';
+            }
+        </script>
+    </div>
+</body>
+</html>

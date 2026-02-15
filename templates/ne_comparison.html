@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NE Comparison - Nokia NCM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ne_comparison.css') }}?v=1.0">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">← Dashboard</a>
+                    <h1>🔍 NE Comparison</h1>
+                    <p>Compare XML configurations between network elements</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="upload-section">
+                <h2>Upload XML Files for Comparison</h2>
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="file-pair">
+                        <div class="file-group">
+                            <label>First XML File (Baseline)</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="xml-file1" name="file1" accept=".xml" required>
+                                <label for="xml-file1" class="file-label">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-text" id="file1-text">Choose first XML...</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="file-group">
+                            <label>Second XML File (Compare)</label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="xml-file2" name="file2" accept=".xml" required>
+                                <label for="xml-file2" class="file-label">
+                                    <span class="file-icon">📄</span>
+                                    <span class="file-text" id="file2-text">Choose second XML...</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large">Compare Files</button>
+                </form>
+                <div id="upload-status" class="status-message"></div>
+            </div>
+
+            <div id="results-section" class="results-section" style="display: none;">
+                <h2>Comparison Results</h2>
+                <div id="comparison-stats" class="stats-bar"></div>
+                <div id="comparison-results" class="comparison-results"></div>
+                <div class="action-buttons">
+                    <button onclick="downloadReport()" class="btn-success">📥 Download Report</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script src="{{ url_for('static', filename='js/ne_comparison.js') }}?v=1.0"></script>
+</body>
+</html>
