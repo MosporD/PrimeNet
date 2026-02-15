@@ -4,8 +4,9 @@ Import Local Files → Database
 One-time (and re-runnable) script that reads the local CSV and XLSX
 snapshot files and imports them into the three-database architecture:
 
-  CSV  files  →  metadata.db  (sites + cells)
-  XLSX files  →  nokia_pm.db  (cell_kpis)
+  CSV  files         →  metadata.db  (sites + cells)
+  Nokia XLSX files   →  nokia_pm.db  (cell_kpis)
+  Huawei XLSX file   →  huawei_pm.db (cell_kpis)
 
 Usage:
     python scripts/import_local_files.py
@@ -16,14 +17,15 @@ Run from the project root directory.
 import os
 import sys
 import logging
+import pandas as pd
 
 # Allow imports from the project root
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sync.db_migration import run_migrations
 from sync.metadata_processor import process_metadata_file
-from sync.pm_processor import process_nokia_pm_file
-from sync_config import METADATA_CSV_COLUMN_MAPS, NOKIA_PM_COLUMN_MAP
+from sync.pm_processor import _insert_df, NOKIA_PM_DB, HUAWEI_PM_DB, KPI_FIELDS
+from sync_config import METADATA_CSV_COLUMN_MAPS, NOKIA_PM_COLUMN_MAPS, HUAWEI_PM_COLUMN_MAPS
 
 logging.basicConfig(
     level=logging.INFO,
@@ -46,17 +48,17 @@ METADATA_CSV_FILES = {
     '5G':     '5G - 2026-02-15.csv',
 }
 
-# Nokia PM Excel files; only 4G is a proper .xlsx — others are encrypted.
-# Add file paths here as they become available/decrypted.
+# Nokia PM: one file per technology; each has a single KPI sheet named "<TECH> Performance"
 NOKIA_PM_EXCEL_FILES = {
+    '2G': '2G-42729-2026_02_15-12_00_04__458.xlsx',
+    '3G': '3G-42727-2026_02_15-12_00_16__894.xlsx',
     '4G': '4G-2026_02_15-12_49_23__178.xlsx',
-    # '2G': '2G-42729-2026_02_15-12_00_04__458.xlsx',   # encrypted
-    # '3G': '3G-42727-2026_02_15-12_00_16__894.xlsx',   # encrypted
-    # '5G': '5G-42731-2026_02_15-12_00_24__466.xlsx',   # encrypted
+    '5G': '5G-42731-2026_02_15-12_00_24__466.xlsx',
 }
 
-# Nokia 4G Excel sheet name that contains the KPI data
-NOKIA_4G_SHEET = '4G Performance'
+# Huawei PM: single file with one sheet per technology
+HUAWEI_PM_FILE   = 'Performance.xlsx'
+HUAWEI_PM_SHEETS = {'4G': '4G', '3G': '3G', '2G': '2G'}
 
 
 # ---------------------------------------------------------------------------
@@ -66,6 +68,36 @@ NOKIA_4G_SHEET = '4G Performance'
 def _abs(filename):
     """Return absolute path relative to project root."""
     return os.path.join(BASE_DIR, filename)
+
+
+def _import_pm_df(df, tech, db_path, col_map, label):
+    """
+    Rename columns using col_map, coerce KPI fields to numeric,
+    drop invalid rows, then insert into db_path.
+    Returns rows inserted.
+    """
+    # Rename XLSX header → DB field name
+    rename = {v: k for k, v in col_map.items() if v and v in df.columns}
+    df = df.rename(columns=rename)
+
+    missing = [f for f in ('cell_name', 'timestamp') if f not in df.columns]
+    if missing:
+        logger.error(f'[{label}] Missing columns {missing} after mapping. '
+                     f'Found: {list(df.columns)}')
+        return 0
+
+    # Coerce KPI columns to numeric; text values (totals, headers) → NaN → NULL
+    for kpi in KPI_FIELDS:
+        if kpi in df.columns:
+            df[kpi] = pd.to_numeric(df[kpi], errors='coerce')
+
+    # Drop rows with missing/invalid cell names
+    df = df[df['cell_name'].notna()]
+    df = df[~df['cell_name'].astype(str).str.strip().str.lower().isin(['nan', ''])]
+
+    inserted, skipped = _insert_df(db_path, df, tech)
+    logger.info(f'[{label}] Done — {inserted} inserted, {skipped} skipped.')
+    return inserted
 
 
 # ---------------------------------------------------------------------------
@@ -85,7 +117,7 @@ def ensure_schema():
 def import_metadata():
     logger.info('─── Importing metadata CSV files ───')
     total_upserted = 0
-    total_skipped = 0
+    total_skipped  = 0
 
     for tech, filename in METADATA_CSV_FILES.items():
         path = _abs(filename)
@@ -95,7 +127,7 @@ def import_metadata():
 
         col_map = METADATA_CSV_COLUMN_MAPS.get(tech)
         if col_map is None:
-            logger.warning(f'[{tech}] No column map defined in METADATA_CSV_COLUMN_MAPS, skipping.')
+            logger.warning(f'[{tech}] No column map defined, skipping.')
             continue
 
         logger.info(f'[{tech}] Reading {filename} …')
@@ -116,8 +148,6 @@ def import_metadata():
 # ---------------------------------------------------------------------------
 
 def import_nokia_pm():
-    import pandas as pd
-
     logger.info('─── Importing Nokia PM Excel files ───')
     total_inserted = 0
 
@@ -127,58 +157,56 @@ def import_nokia_pm():
             logger.warning(f'[Nokia {tech}] File not found, skipping: {path}')
             continue
 
-        logger.info(f'[Nokia {tech}] Reading {filename} …')
+        col_map = NOKIA_PM_COLUMN_MAPS.get(tech)
+        if col_map is None:
+            logger.warning(f'[Nokia {tech}] No column map defined, skipping.')
+            continue
 
-        # The 4G file has multiple sheets; pick the KPI sheet
-        if tech == '4G':
-            try:
-                df = pd.read_excel(path, sheet_name=NOKIA_4G_SHEET, engine='openpyxl')
-            except Exception as e:
-                logger.error(f'[Nokia {tech}] Failed to read sheet "{NOKIA_4G_SHEET}": {e}')
-                continue
+        sheet_name = f'{tech} Performance'
+        logger.info(f'[Nokia {tech}] Reading sheet "{sheet_name}" from {filename} …')
+        try:
+            df = pd.read_excel(path, sheet_name=sheet_name, engine='openpyxl')
+        except Exception as e:
+            logger.error(f'[Nokia {tech}] Failed to read file: {e}')
+            continue
 
-            # Build a single-sheet temp file isn't needed — pass the DataFrame directly
-            # to _insert_df after renaming columns via the column map.
-            from sync.pm_processor import _insert_df, NOKIA_PM_DB
-
-            # Rename columns: map XLSX header → DB field
-            reverse_map = {
-                v: k
-                for k, v in NOKIA_PM_COLUMN_MAP.items()
-                if v and v in df.columns
-            }
-            df = df.rename(columns=reverse_map)
-
-            missing = [f for f in ('cell_name', 'timestamp') if f not in df.columns]
-            if missing:
-                logger.error(f'[Nokia {tech}] Missing columns {missing} after mapping. '
-                             f'Found: {list(df.columns)}')
-                continue
-
-            # Coerce all KPI columns to numeric; non-numeric cells become NaN → stored as NULL
-            from sync.pm_processor import KPI_FIELDS
-            for kpi in KPI_FIELDS:
-                if kpi in df.columns:
-                    df[kpi] = pd.to_numeric(df[kpi], errors='coerce')
-
-            # Drop rows with missing/invalid cell names (summary / header rows)
-            df = df[df['cell_name'].notna()]
-            df = df[df['cell_name'].astype(str).str.strip().str.lower() != 'nan']
-            df = df[df['cell_name'].astype(str).str.strip() != '']
-
-            inserted, skipped = _insert_df(NOKIA_PM_DB, df, tech)
-            logger.info(f'[Nokia {tech}] Done — {inserted} inserted, {skipped} skipped.')
-            total_inserted += inserted
-        else:
-            # For 2G / 3G / 5G: use the standard processor (single-sheet XLSX expected)
-            inserted, skipped, error = process_nokia_pm_file(path, tech, NOKIA_PM_COLUMN_MAP)
-            if error:
-                logger.error(f'[Nokia {tech}] Import failed: {error}')
-            else:
-                logger.info(f'[Nokia {tech}] Done — {inserted} inserted, {skipped} skipped.')
-                total_inserted += inserted
+        inserted = _import_pm_df(df, tech, NOKIA_PM_DB, col_map, f'Nokia {tech}')
+        total_inserted += inserted
 
     logger.info(f'Nokia PM import complete: {total_inserted} total rows inserted.')
+    return total_inserted
+
+
+# ---------------------------------------------------------------------------
+# Step 4 — Import Huawei PM Excel file
+# ---------------------------------------------------------------------------
+
+def import_huawei_pm():
+    logger.info('─── Importing Huawei PM Excel file ───')
+    path = _abs(HUAWEI_PM_FILE)
+    if not os.path.exists(path):
+        logger.warning(f'Huawei PM file not found, skipping: {path}')
+        return 0
+
+    total_inserted = 0
+
+    for tech, sheet_name in HUAWEI_PM_SHEETS.items():
+        col_map = HUAWEI_PM_COLUMN_MAPS.get(tech)
+        if col_map is None:
+            logger.warning(f'[Huawei {tech}] No column map defined, skipping.')
+            continue
+
+        logger.info(f'[Huawei {tech}] Reading sheet "{sheet_name}" from {HUAWEI_PM_FILE} …')
+        try:
+            df = pd.read_excel(path, sheet_name=sheet_name, engine='openpyxl')
+        except Exception as e:
+            logger.error(f'[Huawei {tech}] Failed to read sheet "{sheet_name}": {e}')
+            continue
+
+        inserted = _import_pm_df(df, tech, HUAWEI_PM_DB, col_map, f'Huawei {tech}')
+        total_inserted += inserted
+
+    logger.info(f'Huawei PM import complete: {total_inserted} total rows inserted.')
     return total_inserted
 
 
@@ -188,13 +216,15 @@ def import_nokia_pm():
 
 def main():
     ensure_schema()
-    meta_rows  = import_metadata()
-    pm_rows    = import_nokia_pm()
+    meta_rows   = import_metadata()
+    nokia_rows  = import_nokia_pm()
+    huawei_rows = import_huawei_pm()
 
     logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
-    logger.info(f'Import finished:')
-    logger.info(f'  metadata.db  →  {meta_rows} site/cell rows upserted')
-    logger.info(f'  nokia_pm.db  →  {pm_rows} KPI rows inserted')
+    logger.info('Import finished:')
+    logger.info(f'  metadata.db   →  {meta_rows} site/cell rows upserted')
+    logger.info(f'  nokia_pm.db   →  {nokia_rows} KPI rows inserted')
+    logger.info(f'  huawei_pm.db  →  {huawei_rows} KPI rows inserted')
     logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
 
 
