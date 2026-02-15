@@ -140,15 +140,22 @@ def test_connectivity():
             remote_dir = cfg.get('remote_dir') or cfg.get('root_dir') or (
                 list(cfg.get('dirs', {}).values())[0] if cfg.get('dirs') else '/'
             )
-            entries = sftp.listdir(remote_dir)
+            try:
+                entries = sftp.listdir(remote_dir)
+                dir_used = remote_dir
+            except Exception:
+                # Configured path doesn't exist — fall back to SFTP home dir
+                dir_used = sftp.normalize('.')
+                entries = sftp.listdir(dir_used)
             sftp.close()
             ssh.close()
             results[name] = {
                 'status': 'ok',
                 'host': host,
-                'remote_dir': remote_dir,
+                'remote_dir': dir_used,
+                'configured_dir': remote_dir,
                 'files_found': len(entries),
-                'sample': entries[:5],
+                'sample': entries[:10],
             }
         except Exception as e:
             results[name] = {'status': 'error', 'host': host, 'error': str(e)}
