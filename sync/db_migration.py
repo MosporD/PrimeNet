@@ -22,22 +22,9 @@ APP_DB       = 'ncm_users.db'  # auth / session / sync_log
 
 
 _KPI_COLS = '''
-    id                    INTEGER PRIMARY KEY AUTOINCREMENT,
-    cell_name             TEXT    NOT NULL,
-    timestamp             TEXT    NOT NULL,
-    avg_users             REAL,
-    data_volume_gb        REAL,
-    rsrp                  REAL,
-    rsrq                  REAL,
-    sinr                  REAL,
-    cqi                   REAL,
-    throughput_dl_mbps    REAL,
-    throughput_ul_mbps    REAL,
-    rrc_success_rate      REAL,
-    erab_success_rate     REAL,
-    call_drop_rate        REAL,
-    handover_success_rate REAL,
-    availability_percent  REAL
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    cell_name TEXT    NOT NULL,
+    timestamp TEXT    NOT NULL
 '''
 
 

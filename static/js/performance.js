@@ -5,30 +5,45 @@
 
 // All Chart.js instances keyed by KPI key
 const charts = {};
-let allCells  = [];
-let allSites  = [];
+let allCells     = [];
+let allSites     = [];
 let activeCellId = null;
 
-// ============================================================
-// KPI definitions — update labels/thresholds when vendor
-// column mappings are confirmed. good/warn thresholds:
-// inverse=false → higher is better
-// inverse=true  → lower is better
-// ============================================================
-const KPI_DEFS = [
-    { key: 'availability_percent',  label: 'Cell Availability',          unit: '%',    good: 99,   warn: 95,   inverse: false, color: '#27ae60' },
-    { key: 'rrc_success_rate',      label: 'RRC Setup Success Rate',      unit: '%',    good: 98,   warn: 95,   inverse: false, color: '#3498db' },
-    { key: 'erab_success_rate',     label: 'ERAB Setup Success Rate',     unit: '%',    good: 98,   warn: 95,   inverse: false, color: '#2980b9' },
-    { key: 'call_drop_rate',        label: 'Call Drop Rate',              unit: '%',    good: 0.5,  warn: 2,    inverse: true,  color: '#e74c3c' },
-    { key: 'handover_success_rate', label: 'Handover Success Rate',       unit: '%',    good: 98,   warn: 95,   inverse: false, color: '#1abc9c' },
-    { key: 'throughput_dl_mbps',    label: 'DL Throughput',               unit: 'Mbps', good: 50,   warn: 20,   inverse: false, color: '#9b59b6' },
-    { key: 'throughput_ul_mbps',    label: 'UL Throughput',               unit: 'Mbps', good: 20,   warn: 5,    inverse: false, color: '#8e44ad' },
-    { key: 'rsrp',                  label: 'RSRP',                        unit: 'dBm',  good: -80,  warn: -100, inverse: false, color: '#f39c12' },
-    { key: 'rsrq',                  label: 'RSRQ',                        unit: 'dB',   good: -10,  warn: -15,  inverse: false, color: '#e67e22' },
-    { key: 'sinr',                  label: 'SINR',                        unit: 'dB',   good: 15,   warn: 5,    inverse: false, color: '#d35400' },
-    { key: 'avg_users',             label: 'Average Users',               unit: '',     good: null, warn: null, inverse: false, color: '#34495e' },
-    { key: 'data_volume_gb',        label: 'Data Volume',                 unit: 'GB',   good: null, warn: null, inverse: false, color: '#7f8c8d' },
+// KPI definitions — populated dynamically from /api/performance/kpi_columns
+// Colors are assigned deterministically from the column name.
+let KPI_DEFS = [];
+
+const _CHART_COLORS = [
+    '#3498db','#27ae60','#e74c3c','#9b59b6','#f39c12',
+    '#1abc9c','#e67e22','#2980b9','#8e44ad','#d35400',
+    '#34495e','#7f8c8d','#16a085','#c0392b','#2ecc71',
 ];
+
+function _colorFor(col) {
+    let h = 0;
+    for (let i = 0; i < col.length; i++) h = (h + col.charCodeAt(i)) % _CHART_COLORS.length;
+    return _CHART_COLORS[h];
+}
+
+async function loadKpiColumns() {
+    try {
+        const res  = await fetch('/api/performance/kpi_columns');
+        const data = await res.json();
+        if (!data.success) return;
+        const all = [...new Set([...data.nokia, ...data.huawei])];
+        KPI_DEFS = all.map(col => ({
+            key:     col,
+            label:   col,
+            unit:    '',
+            good:    null,
+            warn:    null,
+            inverse: false,
+            color:   _colorFor(col),
+        }));
+    } catch (e) {
+        console.warn('Could not load KPI columns:', e);
+    }
+}
 
 function kpiClass(value, def) {
     if (value === null || value === undefined || def.good === null) return '';
@@ -45,6 +60,8 @@ function fmt(value, unit, decimals = 2) {
 // Filter dropdowns
 // ============================================================
 async function loadFilters() {
+    await loadKpiColumns();
+
     const res  = await fetch('/api/performance/filters');
     const data = await res.json();
     if (!data.success) return;
@@ -82,6 +99,8 @@ function onVendorChange() {
     const opt5g = techSel.querySelector('option[value="5G"]');
     if (opt5g) opt5g.style.display = vendor === 'Huawei' ? 'none' : '';
     if (vendor === 'Huawei' && techSel.value === '5G') techSel.value = '';
+    // Reload KPI column list for the selected vendor
+    loadKpiColumns();
 }
 
 function onRegionChange() {
@@ -228,13 +247,29 @@ function renderAllCharts(trend) {
     const wrap = document.getElementById('charts-wrap');
     wrap.innerHTML = '';
 
+    // If KPI_DEFS haven't loaded yet, build them from the trend row keys directly
+    let defs = KPI_DEFS;
+    if (!defs.length && trend.length) {
+        const skip = new Set(['id', 'cell_name', 'timestamp']);
+        defs = Object.keys(trend[0])
+            .filter(k => !skip.has(k))
+            .map(col => ({ key: col, label: col, unit: '', good: null, warn: null, inverse: false, color: _colorFor(col) }));
+    }
+
+    if (!defs.length) {
+        wrap.innerHTML = '<p style="padding:1rem;color:#888">No KPI data available yet.</p>';
+        document.getElementById('loading-charts').style.display = 'none';
+        wrap.style.display = 'flex';
+        return;
+    }
+
     const labels = trend.map(r => {
         const d = new Date(r.timestamp);
         return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
                d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     });
 
-    KPI_DEFS.forEach(def => {
+    defs.forEach(def => {
         const values = trend.map(r => r[def.key]);
         const lastVal = [...values].reverse().find(v => v !== null && v !== undefined);
 
@@ -323,10 +358,22 @@ function updateSummary(cells) {
         return vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
     };
     document.getElementById('sum-cells').textContent = cells.length;
-    const avail = avg('availability_percent');
-    document.getElementById('sum-availability').textContent = avail !== null ? avail.toFixed(1) + '%' : 'N/A';
-    const drop = avg('call_drop_rate');
-    document.getElementById('sum-drop').textContent = drop !== null ? drop.toFixed(2) + '%' : 'N/A';
-    const dl = avg('throughput_dl_mbps');
-    document.getElementById('sum-dl').textContent = dl !== null ? dl.toFixed(1) + ' Mbps' : 'N/A';
+
+    // Try to find availability/drop/throughput columns by partial name match
+    const findCol = (...keywords) => {
+        const keys = cells.length ? Object.keys(cells[0]) : [];
+        return keys.find(k => keywords.some(kw => k.toLowerCase().includes(kw.toLowerCase())));
+    };
+
+    const availCol = findCol('avail');
+    const dropCol  = findCol('drop');
+    const dlCol    = findCol('thp dl', 'throughput dl', 'thp DL', 'DL thp', 'dl_mbps', 'DL (Mbps)', 'PDSCH');
+
+    const availEl = document.getElementById('sum-availability');
+    const dropEl  = document.getElementById('sum-drop');
+    const dlEl    = document.getElementById('sum-dl');
+
+    if (availEl) { const v = availCol ? avg(availCol) : null; availEl.textContent = v !== null ? v.toFixed(1) + '%' : 'N/A'; }
+    if (dropEl)  { const v = dropCol  ? avg(dropCol)  : null; dropEl.textContent  = v !== null ? v.toFixed(2) + '%' : 'N/A'; }
+    if (dlEl)    { const v = dlCol    ? avg(dlCol)    : null; dlEl.textContent    = v !== null ? v.toFixed(1) + ' Mbps' : 'N/A'; }
 }
