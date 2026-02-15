@@ -142,7 +142,8 @@ def logout():
         if session_token:
             user = get_user_by_session(session_token)
             if user:
-                log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'logout', f'User {(user.get('username') if isinstance(user, dict) else user[1])} logged out')
+                username = user.get('username') if isinstance(user, dict) else user[1]
+                log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'logout', f'User {username} logged out')
             delete_session(session_token)
 
         response = make_response(jsonify({'success': True}))
