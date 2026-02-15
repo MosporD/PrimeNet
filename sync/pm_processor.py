@@ -104,9 +104,10 @@ def process_nokia_pm_file(file_path, technology, column_map):
     return inserted, skipped, None
 
 
-def run_nokia_pm_sync(downloaded_files, column_map):
+def run_nokia_pm_sync(downloaded_files, column_maps):
     """
     downloaded_files = {technology: local_path or None}
+    column_maps      = {technology: {col_map}}  (per-tech dict)
     Returns summary dict.
     """
     summary = {}
@@ -114,7 +115,11 @@ def run_nokia_pm_sync(downloaded_files, column_map):
         if not file_path:
             summary[tech] = {'status': 'skipped', 'reason': 'Download failed or not configured'}
             continue
-        inserted, skipped, error = process_nokia_pm_file(file_path, tech, column_map)
+        col_map = column_maps.get(tech) if isinstance(column_maps.get(next(iter(column_maps))), dict) else column_maps
+        if not col_map:
+            summary[tech] = {'status': 'skipped', 'reason': f'No column map for {tech}'}
+            continue
+        inserted, skipped, error = process_nokia_pm_file(file_path, tech, col_map)
         summary[tech] = {'status': 'error', 'error': error} if error else {
             'status': 'ok', 'inserted': inserted, 'skipped': skipped
         }
@@ -125,11 +130,12 @@ def run_nokia_pm_sync(downloaded_files, column_map):
 # Huawei: single XLSX with one sheet per technology
 # ---------------------------------------------------------------------------
 
-def process_huawei_pm_file(file_path, column_map, sheet_tech_map=None):
+def process_huawei_pm_file(file_path, column_maps, sheet_tech_map=None):
     """
     Process a Huawei PM XLSX with multiple sheets (one per technology).
+    column_maps    = {technology: {col_map}}  (per-tech dict)
     sheet_tech_map = {'2G': 'SheetName2G', '3G': 'SheetName3G', '4G': 'SheetName4G'}
-    If None, defaults to {'2G': '2G', '3G': '3G', '4G': '4G'}.
+    If sheet_tech_map is None, defaults to {'2G': '2G', '3G': '3G', '4G': '4G'}.
 
     Returns summary dict {tech: {status, inserted, skipped, error}}.
     """
@@ -145,8 +151,16 @@ def process_huawei_pm_file(file_path, column_map, sheet_tech_map=None):
     available_sheets = xl.sheet_names
     logger.info(f'Huawei PM file sheets: {available_sheets}')
 
+    # Support both per-tech dict-of-dicts and legacy flat map
+    _is_per_tech = isinstance(column_maps.get(next(iter(column_maps))), dict)
+
     summary = {}
     for tech, sheet_name in sheet_tech_map.items():
+        col_map = column_maps.get(tech) if _is_per_tech else column_maps
+        if not col_map:
+            summary[tech] = {'status': 'skipped', 'reason': f'No column map for {tech}'}
+            continue
+
         # Try exact match first, then case-insensitive
         actual_sheet = None
         for s in available_sheets:
@@ -165,7 +179,7 @@ def process_huawei_pm_file(file_path, column_map, sheet_tech_map=None):
             summary[tech] = {'status': 'error', 'error': str(e)}
             continue
 
-        reverse_map = {v: k for k, v in column_map.items() if v in df.columns}
+        reverse_map = {v: k for k, v in col_map.items() if v in df.columns}
         df = df.rename(columns=reverse_map)
 
         missing = [f for f in ('cell_name', 'timestamp') if f not in df.columns]

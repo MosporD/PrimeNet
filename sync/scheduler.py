@@ -46,8 +46,10 @@ def _log_sync(sync_type, technology, status, rows=0, message=None):
 
 def pull_nokia_pm():
     from sync_config import (
-        NOKIA_PM_SERVER, NOKIA_PM_COLUMN_MAP, LOCAL_DOWNLOAD_DIR
+        NOKIA_PM_SERVER, NOKIA_PM_COLUMN_MAPS, LOCAL_DOWNLOAD_DIR
     )
+    from sync.metadata_processor import seed_pm_cells_to_metadata
+    from sync.pm_processor import NOKIA_PM_DB
 
     host = NOKIA_PM_SERVER['host']
     if not host:
@@ -67,7 +69,7 @@ def pull_nokia_pm():
     for tech, remote_dir in NOKIA_PM_SERVER['dirs'].items():
         downloaded[tech] = client.download_latest_xlsx(remote_dir, prefix=f'nokia_{tech}_')
 
-    summary = run_nokia_pm_sync(downloaded, NOKIA_PM_COLUMN_MAP)
+    summary = run_nokia_pm_sync(downloaded, NOKIA_PM_COLUMN_MAPS)
     for tech, result in summary.items():
         status = result.get('status', 'error')
         rows   = result.get('inserted', result.get('upserted', 0))
@@ -75,6 +77,7 @@ def pull_nokia_pm():
         _log_sync('pm_nokia', tech, status, rows, msg)
         logger.info(f'Nokia PM [{tech}]: {result}')
 
+    seed_pm_cells_to_metadata(NOKIA_PM_DB, 'Nokia')
     logger.info('Nokia PM pull complete.')
 
 
@@ -84,8 +87,10 @@ def pull_nokia_pm():
 
 def pull_huawei_pm():
     from sync_config import (
-        HUAWEI_PM_SERVER, HUAWEI_PM_COLUMN_MAP, HUAWEI_SHEET_TECH_MAP, LOCAL_DOWNLOAD_DIR
+        HUAWEI_PM_SERVER, HUAWEI_PM_COLUMN_MAPS, HUAWEI_SHEET_TECH_MAP, LOCAL_DOWNLOAD_DIR
     )
+    from sync.metadata_processor import seed_pm_cells_to_metadata
+    from sync.pm_processor import HUAWEI_PM_DB
 
     host = HUAWEI_PM_SERVER['host']
     if not host:
@@ -111,7 +116,7 @@ def pull_huawei_pm():
         _log_sync('pm_huawei', 'all', 'error', 0, 'Download failed')
         return
 
-    summary = process_huawei_pm_file(local_path, HUAWEI_PM_COLUMN_MAP, HUAWEI_SHEET_TECH_MAP)
+    summary = process_huawei_pm_file(local_path, HUAWEI_PM_COLUMN_MAPS, HUAWEI_SHEET_TECH_MAP)
     for tech, result in summary.items():
         status = result.get('status', 'error')
         rows   = result.get('inserted', result.get('upserted', 0))
@@ -119,6 +124,7 @@ def pull_huawei_pm():
         _log_sync('pm_huawei', tech, status, rows, msg)
         logger.info(f'Huawei PM [{tech}]: {result}')
 
+    seed_pm_cells_to_metadata(HUAWEI_PM_DB, 'Huawei')
     logger.info('Huawei PM pull complete.')
 
 
@@ -128,7 +134,7 @@ def pull_huawei_pm():
 
 def pull_metadata():
     from sync_config import (
-        METADATA_SERVER, METADATA_COLUMN_MAP, METADATA_FILE_MAP, LOCAL_DOWNLOAD_DIR
+        METADATA_SERVER, METADATA_CSV_COLUMN_MAPS, METADATA_FILE_MAP, LOCAL_DOWNLOAD_DIR
     )
 
     host = METADATA_SERVER['host']
@@ -151,7 +157,7 @@ def pull_metadata():
         prefix='meta_',
     )
 
-    summary = run_metadata_sync(downloaded, METADATA_COLUMN_MAP)
+    summary = run_metadata_sync(downloaded, METADATA_CSV_COLUMN_MAPS)
     for tech, result in summary.items():
         status = result.get('status', 'error')
         rows   = result.get('upserted', 0)

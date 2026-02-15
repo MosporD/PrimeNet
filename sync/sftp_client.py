@@ -23,6 +23,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 EXCEL_EXTS = ('.xlsx', '.xls')
+DATA_EXTS  = ('.xlsx', '.xls', '.csv')   # used for metadata which may be CSV
 
 
 class SFTPClient:
@@ -126,12 +127,12 @@ class SFTPClient:
             latest_subdir = f'{root_dir.rstrip("/")}/{subdirs[0].filename}'
             logger.info(f'Latest metadata subdir: {latest_subdir}')
 
-            # List files in that subdir
+            # List files in that subdir (XLSX or CSV)
             subdir_entries = sftp.listdir_attr(latest_subdir)
             xlsx_files = [
                 e for e in subdir_entries
                 if not stat.S_ISDIR(e.st_mode)
-                and e.filename.lower().endswith(EXCEL_EXTS)
+                and e.filename.lower().endswith(DATA_EXTS)
             ]
             xlsx_files.sort(key=lambda e: e.st_mtime or 0, reverse=True)
 
