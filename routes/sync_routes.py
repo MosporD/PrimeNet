@@ -105,3 +105,52 @@ def trigger_metadata():
         return jsonify({'success': True, 'message': 'Metadata pull triggered in background.'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/test', methods=['GET'])
+@admin_required
+def test_connectivity():
+    """Test SFTP connectivity to all three servers without downloading anything."""
+    import paramiko
+    from sync_config import NOKIA_PM_SERVER, HUAWEI_PM_SERVER, METADATA_SERVER
+
+    results = {}
+
+    for name, cfg in [
+        ('nokia_pm',  NOKIA_PM_SERVER),
+        ('huawei_pm', HUAWEI_PM_SERVER),
+        ('metadata',  METADATA_SERVER),
+    ]:
+        host = cfg.get('host', '')
+        if not host:
+            results[name] = {'status': 'skipped', 'reason': 'No host configured'}
+            continue
+        try:
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(
+                hostname=host,
+                port=cfg.get('port', 22),
+                username=cfg.get('username', ''),
+                password=cfg.get('password', ''),
+                timeout=10
+            )
+            sftp = ssh.open_sftp()
+            # Try to list the remote dir to confirm access
+            remote_dir = cfg.get('remote_dir') or cfg.get('root_dir') or (
+                list(cfg.get('dirs', {}).values())[0] if cfg.get('dirs') else '/'
+            )
+            entries = sftp.listdir(remote_dir)
+            sftp.close()
+            ssh.close()
+            results[name] = {
+                'status': 'ok',
+                'host': host,
+                'remote_dir': remote_dir,
+                'files_found': len(entries),
+                'sample': entries[:5],
+            }
+        except Exception as e:
+            results[name] = {'status': 'error', 'host': host, 'error': str(e)}
+
+    return jsonify({'success': True, 'results': results})

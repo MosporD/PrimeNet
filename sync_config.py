@@ -32,10 +32,10 @@ NOKIA_PM_SERVER = {
 # All other columns are stored as-is using the original header names.
 # ⚠ Update these if the actual file headers differ.
 NOKIA_PM_COLUMN_MAPS = {
-    '2G': {'cell_name': 'Cell Name', 'timestamp': 'Date'},
-    '3G': {'cell_name': 'Cell Name', 'timestamp': 'Date'},
-    '4G': {'cell_name': 'Cell Name', 'timestamp': 'Date'},
-    '5G': {'cell_name': 'Cell Name', 'timestamp': 'Date'},
+    '2G': {'cell_name': 'BTS name',   'timestamp': 'Period start time'},
+    '3G': {'cell_name': 'WCEL name',  'timestamp': 'Period start time'},
+    '4G': {'cell_name': 'LNCEL name', 'timestamp': 'Period start time'},
+    '5G': {'cell_name': 'NRCEL name', 'timestamp': 'Period start time'},
 }
 
 
