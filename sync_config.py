@@ -30,26 +30,82 @@ NOKIA_PM_SERVER = {
     }
 }
 
-# Nokia KPI column mappings  (XLSX header → DB field name)
-# Verified against 4G-2026_02_15-12_49_23__178.xlsx ("4G Performance" sheet).
-# Same sheet structure is expected for 2G / 3G / 5G files when decrypted.
-NOKIA_PM_COLUMN_MAP = {
-    'cell_name':             'LNCEL name',
-    'timestamp':             'Period start time',
-    'avg_users':             'Avg act UEs DL',
-    'data_volume_gb':        'PDCP SDU Volume, DL (GB)',
-    'rsrp':                  None,   # not present in this report
-    'rsrq':                  None,
-    'sinr':                  None,
-    'cqi':                   'Average CQI',
-    'throughput_dl_mbps':    'Avg PDCP cell thp DL (Mbps)',
-    'throughput_ul_mbps':    'Avg PDCP cell thp UL (Mbps)',
-    'rrc_success_rate':      'Total E-UTRAN RRC conn stp SR',
-    'erab_success_rate':     'E-UTRAN E-RAB stp SR',
-    'call_drop_rate':        'E-UTRAN E-RAB Drop Ratio, User Perspective',
-    'handover_success_rate': 'E-UTRAN Intra-Freq HO SR',
-    'availability_percent':  'Cell Avail',
+# Nokia KPI column mappings — per-technology dicts  (XLSX header → DB field name)
+# Sheet name for each technology:  "<TECH> Performance"  (e.g. "4G Performance")
+# Verified against local 2026-02-15 sample files.
+NOKIA_PM_COLUMN_MAPS = {
+    '2G': {
+        'cell_name':             'BTS name',
+        'timestamp':             'Period start time',
+        'avg_users':             None,
+        'data_volume_gb':        None,
+        'rsrp':                  None,
+        'rsrq':                  None,
+        'sinr':                  None,
+        'cqi':                   None,
+        'throughput_dl_mbps':    None,
+        'throughput_ul_mbps':    None,
+        'rrc_success_rate':      'Call Setup Success Rate - overall',
+        'erab_success_rate':     'Immediate assignment success rate',
+        'call_drop_rate':        'Call DR',
+        'handover_success_rate': 'HO SR w/o Intracell',
+        'availability_percent':  'TCH availability ratio',
+    },
+    '3G': {
+        'cell_name':             'WCEL name',
+        'timestamp':             'Period start time',
+        'avg_users':             'Average number of simultaneous HSDPA users',
+        'data_volume_gb':        None,
+        'rsrp':                  'Average CPICH RSCP',
+        'rsrq':                  'Average CPICH ECNO',
+        'sinr':                  None,
+        'cqi':                   'Avg reported CQI',
+        'throughput_dl_mbps':    'HSDPA Cell thp',
+        'throughput_ul_mbps':    'Active  HSUPA cell thp',
+        'rrc_success_rate':      'RRC Success Rate (Total)(%)',
+        'erab_success_rate':     'U.PS RAB Establishment Success Rate (Cell)(%)',
+        'call_drop_rate':        'AMR Call Drop Ratio(%)',
+        'handover_success_rate': 'Soft HO Success rate, RT',
+        'availability_percent':  'Cell Availability',
+    },
+    '4G': {
+        'cell_name':             'LNCEL name',
+        'timestamp':             'Period start time',
+        'avg_users':             'Avg act UEs DL',
+        'data_volume_gb':        'PDCP SDU Volume, DL (GB)',
+        'rsrp':                  None,
+        'rsrq':                  None,
+        'sinr':                  None,
+        'cqi':                   'Average CQI',
+        'throughput_dl_mbps':    'Avg PDCP cell thp DL (Mbps)',
+        'throughput_ul_mbps':    'Avg PDCP cell thp UL (Mbps)',
+        'rrc_success_rate':      'Total E-UTRAN RRC conn stp SR',
+        'erab_success_rate':     'E-UTRAN E-RAB stp SR',
+        'call_drop_rate':        'E-UTRAN E-RAB Drop Ratio, User Perspective',
+        'handover_success_rate': 'E-UTRAN Intra-Freq HO SR',
+        'availability_percent':  'Cell Avail',
+    },
+    '5G': {
+        'cell_name':             'NRCEL name',
+        'timestamp':             'Period start time',
+        'avg_users':             'Avg nr act UEs data buff DRBs DL',
+        'data_volume_gb':        None,
+        'rsrp':                  None,
+        'rsrq':                  None,
+        'sinr':                  'Avg UE rel SINR PUSCH rank1',
+        'cqi':                   'Avg wb CQI 256QAM',
+        'throughput_dl_mbps':    'Act cell MAC thp PDSCH',
+        'throughput_ul_mbps':    'Act cell MAC thp PUSCH',
+        'rrc_success_rate':      'Act RACH stp SR',
+        'erab_success_rate':     'RB estab SR',
+        'call_drop_rate':        'UE rel R abnorm rel',
+        'handover_success_rate': 'IntergNB HO SR NSA',
+        'availability_percent':  'Cell avail R',
+    },
 }
+
+# Backward-compat alias used by the scheduler (4G map)
+NOKIA_PM_COLUMN_MAP = NOKIA_PM_COLUMN_MAPS['4G']
 
 
 # ============================================================
@@ -75,25 +131,65 @@ HUAWEI_SHEET_TECH_MAP = {
     '4G': '4G',
 }
 
-# Huawei KPI column mappings  (XLSX header → DB field name)
-# ⚠ Update these with real column headers from your Huawei Excel file.
-HUAWEI_PM_COLUMN_MAP = {
-    'cell_name':             'Cell Name',
-    'timestamp':             'Date',
-    'avg_users':             'Average Users',
-    'data_volume_gb':        'Data Volume (GB)',
-    'rsrp':                  'RSRP',
-    'rsrq':                  'RSRQ',
-    'sinr':                  'SINR',
-    'cqi':                   'CQI',
-    'throughput_dl_mbps':    'DL Throughput (Mbps)',
-    'throughput_ul_mbps':    'UL Throughput (Mbps)',
-    'rrc_success_rate':      'RRC Setup Success Rate',
-    'erab_success_rate':     'ERAB Setup Success Rate',
-    'call_drop_rate':        'Call Drop Rate',
-    'handover_success_rate': 'Handover Success Rate',
-    'availability_percent':  'Cell Availability',
+# Huawei KPI column mappings — per-technology dicts  (XLSX header → DB field name)
+# Source file: Performance.xlsx  (sheets: '4G', '3G', '2G')
+# Verified against local 2026-02-15 sample file.
+HUAWEI_PM_COLUMN_MAPS = {
+    '4G': {
+        'cell_name':             'Cell Name',
+        'timestamp':             'Date',
+        'avg_users':             'L.Traffic.User.Avg',
+        'data_volume_gb':        'Downlink Traffic Volume (GB)',
+        'rsrp':                  None,
+        'rsrq':                  None,
+        'sinr':                  None,
+        'cqi':                   'Average CQI',
+        'throughput_dl_mbps':    'User DL PDCP Average Throughput (Mbps)',
+        'throughput_ul_mbps':    'User UL PDCP Average Throughput (Mbps)',
+        'rrc_success_rate':      'RRC Setup Success Rate(%)',
+        'erab_success_rate':     'E-RAB Setup Success Rate (ALL)(%)',
+        'call_drop_rate':        'Call Drop Rate (All)(%)',
+        'handover_success_rate': 'Intra-Freq HO Success Rate(%)',
+        'availability_percent':  'Radio Network Availability Rate(%)',
+    },
+    '3G': {
+        'cell_name':             'Cell Name',
+        'timestamp':             'Date',
+        'avg_users':             'VS.HSDPA.UE.Mean.Cell',
+        'data_volume_gb':        'HSDPA Traffic (GB)',
+        'rsrp':                  'VS.MeanTCP(dBm)',
+        'rsrq':                  'VS.MeanRTWP(dBm)',
+        'sinr':                  None,
+        'cqi':                   None,
+        'throughput_dl_mbps':    'VS.HSDPA.MeanChThroughput(kbit/s)',
+        'throughput_ul_mbps':    'VS.HSUPA.MeanChThroughput(kbit/s)',
+        'rrc_success_rate':      'U.RRC Connection Success Rate (Service)(%)',
+        'erab_success_rate':     'U.PS RAB Establishment Success Rate (Cell)(%)',
+        'call_drop_rate':        'AMR Call Drop Ratio(%)',
+        'handover_success_rate': 'Soft Handover Success Ratio (Cell)(%)',
+        'availability_percent':  None,   # only unavailability ratio available
+    },
+    '2G': {
+        'cell_name':             'Cell Name',
+        'timestamp':             'Date',
+        'avg_users':             None,
+        'data_volume_gb':        'DL Traffic (GB)',
+        'rsrp':                  None,
+        'rsrq':                  None,
+        'sinr':                  None,
+        'cqi':                   None,
+        'throughput_dl_mbps':    None,
+        'throughput_ul_mbps':    None,
+        'rrc_success_rate':      'CSSR(%)',
+        'erab_success_rate':     'Assignment success Rate TCH(%)',
+        'call_drop_rate':        'Drop Call Rate',
+        'handover_success_rate': 'Handover Success Rate(%)',
+        'availability_percent':  'TCH Availability Rate(%)',
+    },
 }
+
+# Backward-compat alias used by the scheduler (4G map)
+HUAWEI_PM_COLUMN_MAP = HUAWEI_PM_COLUMN_MAPS['4G']
 
 
 # ============================================================
