@@ -136,27 +136,42 @@ def test_connectivity():
                 timeout=10
             )
             sftp = ssh.open_sftp()
-            # Try to list the remote dir to confirm access
-            remote_dir = cfg.get('remote_dir') or cfg.get('root_dir') or (
-                list(cfg.get('dirs', {}).values())[0] if cfg.get('dirs') else '/'
-            )
-            try:
-                entries = sftp.listdir(remote_dir)
-                dir_used = remote_dir
-            except Exception:
-                # Configured path doesn't exist — fall back to SFTP home dir
-                dir_used = sftp.normalize('.')
-                entries = sftp.listdir(dir_used)
-            sftp.close()
-            ssh.close()
-            results[name] = {
-                'status': 'ok',
-                'host': host,
-                'remote_dir': dir_used,
-                'configured_dir': remote_dir,
-                'files_found': len(entries),
-                'sample': entries[:10],
-            }
+
+            # Nokia PM has per-technology dirs — check each one separately
+            if cfg.get('dirs'):
+                dirs_result = {}
+                for tech, remote_dir in cfg['dirs'].items():
+                    try:
+                        entries = sftp.listdir(remote_dir)
+                        dirs_result[tech] = {
+                            'remote_dir': remote_dir,
+                            'files_found': len(entries),
+                            'sample': entries[:5],
+                        }
+                    except Exception as dir_err:
+                        dirs_result[tech] = {'remote_dir': remote_dir, 'error': str(dir_err)}
+                sftp.close()
+                ssh.close()
+                results[name] = {'status': 'ok', 'host': host, 'dirs': dirs_result}
+            else:
+                remote_dir = cfg.get('remote_dir') or cfg.get('root_dir') or '/'
+                try:
+                    entries = sftp.listdir(remote_dir)
+                    dir_used = remote_dir
+                except Exception:
+                    # Configured path doesn't exist — fall back to SFTP home dir
+                    dir_used = sftp.normalize('.')
+                    entries = sftp.listdir(dir_used)
+                sftp.close()
+                ssh.close()
+                results[name] = {
+                    'status': 'ok',
+                    'host': host,
+                    'remote_dir': dir_used,
+                    'configured_dir': remote_dir,
+                    'files_found': len(entries),
+                    'sample': entries[:10],
+                }
         except Exception as e:
             results[name] = {'status': 'error', 'host': host, 'error': str(e)}
 
