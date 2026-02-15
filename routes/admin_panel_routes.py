@@ -79,13 +79,13 @@ def get_users():
         users_data = []
         for u in users:
             users_data.append({
-                'id': u[0],
-                'username': u[1],
-                'email': u[2],
-                'created_at': u[4],
-                'is_active': bool(u[5]),
-                'role': u[6],
-                'last_activity': u[7] if len(u) > 7 else None
+                'id': u['id'],
+                'username': u['username'],
+                'email': u['email'],
+                'created_at': u['created_at'],
+                'is_active': bool(u['is_active']),
+                'role': u['role'],
+                'last_activity': u['last_login'],
             })
 
         log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'admin_view_users', 'Viewed user list')
