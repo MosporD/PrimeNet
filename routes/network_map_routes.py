@@ -11,6 +11,11 @@ from database_enhanced import get_user_by_session, log_activity
 
 network_map_bp = Blueprint('network_map', __name__)
 
+METADATA_DB  = 'metadata.db'
+NOKIA_PM_DB  = 'nokia_pm.db'
+HUAWEI_PM_DB = 'huawei_pm.db'
+
+
 def login_required(f):
     """Decorator to require login"""
     @wraps(f)
@@ -34,6 +39,7 @@ def get_current_user():
     if session_token:
         return get_user_by_session(session_token)
     return None
+
 def format_user_data(user):
     """Format user data for templates"""
     if not user:
@@ -52,18 +58,18 @@ def network_map_page():
 
 @network_map_bp.route('/api/map/sites', methods=['GET'])
 def get_all_sites():
-    """Get all network sites"""
+    """Get all network sites from metadata.db"""
     user = get_current_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
 
     try:
-        conn = sqlite3.connect('ncm_users.db')
+        conn = sqlite3.connect(METADATA_DB)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
         cursor.execute('''
-            SELECT site_id, site_name, latitude, longitude, region, site_type, status
+            SELECT site_id, site_name, latitude, longitude, region, site_type, vendor, status
             FROM sites
             WHERE status = 'Active'
             ORDER BY site_name
@@ -86,12 +92,12 @@ def get_site_details(site_id):
         return jsonify({'error': 'Unauthorized'}), 401
 
     try:
-        conn = sqlite3.connect('ncm_users.db')
+        conn = sqlite3.connect(METADATA_DB)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
         cursor.execute('''
-            SELECT site_id, site_name, latitude, longitude, region, site_type, status
+            SELECT site_id, site_name, latitude, longitude, region, site_type, vendor, status
             FROM sites
             WHERE site_id = ?
         ''', (site_id,))
@@ -103,15 +109,27 @@ def get_site_details(site_id):
 
         site_data = dict(site)
 
+        # Sectors (azimuth / tilt info stored in sectors table)
         cursor.execute('''
-            SELECT sector_id, sector_name, azimuth, beamwidth, technology, frequency_band, status
+            SELECT sector_id, sector_name, azimuth, mechanical_tilt, electrical_tilt,
+                   technology, frequency_band, vendor
             FROM sectors
-            WHERE site_id = ? AND status = 'Active'
+            WHERE site_id = ?
             ORDER BY sector_name
         ''', (site_id,))
-
         sectors = [dict(row) for row in cursor.fetchall()]
         site_data['sectors'] = sectors
+
+        # Cells for this site
+        cursor.execute('''
+            SELECT cell_id, cell_name, technology, vendor, frequency_band,
+                   azimuth, mechanical_tilt, electrical_tilt, pci, status
+            FROM cells
+            WHERE site_id = ? AND status = 'Active'
+            ORDER BY cell_name
+        ''', (site_id,))
+        cells = [dict(row) for row in cursor.fetchall()]
+        site_data['cells'] = cells
 
         conn.close()
 
@@ -121,106 +139,82 @@ def get_site_details(site_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@network_map_bp.route('/api/map/sector/<sector_id>/kpis', methods=['GET'])
-def get_sector_kpis(sector_id):
-    """Get KPI data for all cells in a sector"""
+@network_map_bp.route('/api/map/cell/<int:cell_id>/kpis', methods=['GET'])
+def get_cell_kpis(cell_id):
+    """Get the latest KPI snapshot for a cell from the appropriate PM database."""
     user = get_current_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
 
     try:
-        conn = sqlite3.connect('ncm_users.db')
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
+        meta_conn = sqlite3.connect(METADATA_DB)
+        meta_conn.row_factory = sqlite3.Row
+        cell = meta_conn.execute('''
+            SELECT c.cell_id, c.cell_name, c.technology, c.vendor,
+                   c.azimuth, c.mechanical_tilt, c.electrical_tilt, c.pci,
+                   st.site_id, st.site_name, st.region
+            FROM cells c
+            LEFT JOIN sites st ON c.site_id = st.site_id
+            WHERE c.cell_id = ?
+        ''', (cell_id,)).fetchone()
+        meta_conn.close()
 
-        cursor.execute('''
-            SELECT s.sector_id, s.sector_name, s.site_id, s.azimuth, s.beamwidth,
-                   s.technology, s.frequency_band, st.site_name
-            FROM sectors s
-            JOIN sites st ON s.site_id = st.site_id
-            WHERE s.sector_id = ?
-        ''', (sector_id,))
+        if not cell:
+            return jsonify({'error': 'Cell not found'}), 404
 
-        sector = cursor.fetchone()
-        if not sector:
-            conn.close()
-            return jsonify({'error': 'Sector not found'}), 404
+        cell_data = dict(cell)
+        vendor    = cell_data.get('vendor', '')
+        cell_name = cell_data['cell_name']
+        pm_db     = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
 
-        sector_data = dict(sector)
-
-        cursor.execute('''
-            SELECT cell_id, cell_name, pci, tac, status
-            FROM cells
-            WHERE sector_id = ?
-            ORDER BY cell_name
-        ''', (sector_id,))
-
-        cells = [dict(row) for row in cursor.fetchall()]
-
-        for cell in cells:
-            cursor.execute('''
-                SELECT avg_users, data_volume_gb, rsrp, rsrq, sinr, cqi,
-                       throughput_dl_mbps, throughput_ul_mbps, rrc_success_rate,
-                       erab_success_rate, call_drop_rate, handover_success_rate,
-                       availability_percent, timestamp
+        try:
+            pm_conn = sqlite3.connect(pm_db)
+            pm_conn.row_factory = sqlite3.Row
+            kpi = pm_conn.execute('''
+                SELECT *
                 FROM cell_kpis
-                WHERE cell_id = ?
+                WHERE cell_name = ?
                 ORDER BY timestamp DESC
                 LIMIT 1
-            ''', (cell['cell_id'],))
+            ''', (cell_name,)).fetchone()
+            pm_conn.close()
+            cell_data['kpis'] = dict(kpi) if kpi else None
+        except sqlite3.OperationalError:
+            cell_data['kpis'] = None
 
-            kpi = cursor.fetchone()
-            cell['kpis'] = dict(kpi) if kpi else None
-
-        sector_data['cells'] = cells
-        conn.close()
-
-        log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'sector_kpi_view', f'Viewed KPIs for sector {sector_id}')
-        return jsonify({'success': True, 'sector': sector_data})
+        log_activity((user.get('id') if isinstance(user, dict) else user[0]),
+                     'cell_kpi_view', f'Viewed KPIs for cell {cell_name}')
+        return jsonify({'success': True, 'cell': cell_data})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @network_map_bp.route('/api/map/stats', methods=['GET'])
 def get_network_stats():
-    """Get overall network statistics"""
+    """Get overall network statistics from metadata.db"""
     user = get_current_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
 
     try:
-        conn = sqlite3.connect('ncm_users.db')
+        conn = sqlite3.connect(METADATA_DB)
         cursor = conn.cursor()
 
-        cursor.execute('SELECT COUNT(*) FROM sites WHERE status = "Active"')
+        cursor.execute("SELECT COUNT(*) FROM sites WHERE status = 'Active'")
         total_sites = cursor.fetchone()[0]
 
-        cursor.execute('SELECT COUNT(*) FROM sectors WHERE status = "Active"')
+        cursor.execute('SELECT COUNT(*) FROM sectors')
         total_sectors = cursor.fetchone()[0]
 
-        cursor.execute('SELECT COUNT(*) FROM cells WHERE status = "Active"')
+        cursor.execute("SELECT COUNT(*) FROM cells WHERE status = 'Active'")
         total_cells = cursor.fetchone()[0]
-
-        cursor.execute('''
-            SELECT AVG(k.availability_percent)
-            FROM (
-                SELECT cell_id, MAX(timestamp) as latest
-                FROM cell_kpis
-                GROUP BY cell_id
-            ) latest_kpis
-            JOIN cell_kpis k ON k.cell_id = latest_kpis.cell_id
-                            AND k.timestamp = latest_kpis.latest
-        ''')
-
-        avg_availability = cursor.fetchone()[0] or 100.0
 
         conn.close()
 
         stats = {
-            'total_sites': total_sites,
-            'total_sectors': total_sectors,
-            'total_cells': total_cells,
-            'avg_availability': round(avg_availability, 2)
+            'total_sites':    total_sites,
+            'total_sectors':  total_sectors,
+            'total_cells':    total_cells,
         }
 
         return jsonify({'success': True, 'stats': stats})

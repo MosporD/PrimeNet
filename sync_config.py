@@ -76,7 +76,7 @@ METADATA_SERVER = {
     'port':     22,
     'username': 'ftpuser',
     'password': 'Zain@1234',
-    'root_dir': '/home/ftpuser',
+    'root_dir': '/',   # dated snapshot folders sit at the SFTP root, not /home/ftpuser
 }
 
 # Expected filename for each technology inside the snapshot folder.

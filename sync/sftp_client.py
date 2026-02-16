@@ -231,21 +231,24 @@ class SFTPClient:
                     if downloaded:
                         results[sub.filename] = downloaded
             else:
-                # Flat structure — download all Excel files directly in latest_dir
+                # Flat structure — files sit directly in latest_dir (no tech subfolders).
+                # Key each file by its stem (e.g. "2G-2025-12-03" or "2G") so the
+                # metadata processor can match it to the right technology column map.
                 xlsx_files = [
                     e for e in inner_entries
                     if not stat.S_ISDIR(e.st_mode)
                     and e.filename.lower().endswith(DATA_EXTS)
                 ]
                 if not xlsx_files:
-                    logger.warning(f'No Excel files found in {latest_dir}')
+                    logger.warning(f'No Excel/CSV files found in {latest_dir}')
                 else:
                     for f in xlsx_files:
                         remote_path = f'{latest_dir}/{f.filename}'
                         local_name  = f'{prefix}{ts}_{f.filename}'
                         local_path  = self._download(sftp, remote_path, local_name)
                         if local_path:
-                            results.setdefault('_root', []).append(local_path)
+                            stem = os.path.splitext(f.filename)[0]
+                            results[stem] = [local_path]
 
         except Exception as e:
             logger.error(f'download_all_xlsx_from_subfolders({root_dir}): {e}')

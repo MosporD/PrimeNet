@@ -159,15 +159,23 @@ def run_metadata_sync(downloaded_files, column_maps):
             summary[key] = {'status': 'skipped', 'reason': 'No files downloaded'}
             continue
 
-        # Match subfolder name to a technology key in column_maps
+        # Match key (subfolder name or filename stem) to a technology in column_maps.
+        # Sort longest-first so "4G-FDD" is tried before a bare "4G".
+        # Handles: exact match, normalised match, and prefix match
+        # e.g. "2G-2025-12-03" → startswith "2G"; "4G-FDD-2025-12-03" → startswith "4G-FDD".
         tech = None
-        key_norm = key.replace('-', '').upper()
-        for t in column_maps:
-            if t.upper() == key.upper() or t.replace('-', '').upper() == key_norm:
+        key_upper = key.upper()
+        for t in sorted(column_maps.keys(), key=len, reverse=True):
+            t_upper = t.upper()
+            if (t_upper == key_upper
+                    or t.replace('-', '').upper() == key.replace('-', '').upper()
+                    or key_upper.startswith(t_upper + '-')
+                    or key_upper.startswith(t_upper + '_')
+                    or key_upper == t_upper):
                 tech = t
                 break
         if not tech:
-            tech = key  # use as-is; process_metadata_file will log any missing columns
+            tech = key  # use as-is; process_metadata_file will log missing columns
 
         col_map = column_maps.get(tech, {})
 
