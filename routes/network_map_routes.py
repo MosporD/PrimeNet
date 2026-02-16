@@ -222,3 +222,21 @@ def get_network_stats():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@network_map_bp.route('/api/map/refresh', methods=['POST'])
+@login_required
+def refresh_metadata():
+    """Trigger a metadata sync in the background and return immediately."""
+    import threading
+    try:
+        from sync.scheduler import trigger_metadata_now
+        t = threading.Thread(target=trigger_metadata_now, daemon=True)
+        t.start()
+        uid = (request.current_user.get('id')
+               if isinstance(request.current_user, dict)
+               else request.current_user[0])
+        log_activity(uid, 'metadata_refresh', 'Triggered metadata refresh from network map')
+        return jsonify({'success': True, 'message': 'Metadata sync started'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

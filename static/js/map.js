@@ -409,6 +409,43 @@ function filterByRegion() {
         );
 }
 
+// ─── Metadata refresh ────────────────────────────────────────────────────────
+
+async function refreshMetadata() {
+    const btn = document.getElementById('refresh-btn');
+    btn.disabled = true;
+    btn.textContent = '↻ Syncing…';
+
+    try {
+        const res  = await fetch('/api/map/refresh', { method: 'POST' });
+        const data = await res.json();
+
+        if (data.success) {
+            btn.textContent = '✓ Started — reloading in 15 s…';
+            // Give the background sync time to download + process files,
+            // then automatically reload the map data.
+            setTimeout(async () => {
+                await loadNetworkStats();
+                await loadNetworkSites();
+                btn.textContent = '↻ Refresh Data';
+                btn.disabled = false;
+            }, 15000);
+        } else {
+            btn.textContent = '✗ Failed: ' + (data.error || 'unknown');
+            setTimeout(() => {
+                btn.textContent = '↻ Refresh Data';
+                btn.disabled = false;
+            }, 4000);
+        }
+    } catch (e) {
+        btn.textContent = '✗ Error';
+        setTimeout(() => {
+            btn.textContent = '↻ Refresh Data';
+            btn.disabled = false;
+        }, 3000);
+    }
+}
+
 // Close modal on backdrop click
 window.onclick = e => {
     if (e.target === document.getElementById('kpi-modal')) closeKPIModal();
