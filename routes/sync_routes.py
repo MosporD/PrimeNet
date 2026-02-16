@@ -110,68 +110,174 @@ def trigger_metadata():
 @sync_bp.route('/api/sync/test', methods=['GET'])
 @admin_required
 def test_connectivity():
-    """Test SFTP connectivity to all three servers without downloading anything."""
+    """
+    Test SFTP connectivity to all three servers without downloading anything.
+    For the metadata server, walk the full directory tree so the actual layout
+    is visible — this makes it easy to diagnose wrong paths or empty folders.
+    """
+    import stat
     import paramiko
     from sync_config import NOKIA_PM_SERVER, HUAWEI_PM_SERVER, METADATA_SERVER
 
+    EXCEL_EXTS = ('.xlsx', '.xls', '.csv')
+
+    def _sftp_connect(cfg):
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(
+            hostname=cfg['host'],
+            port=cfg.get('port', 22),
+            username=cfg.get('username', ''),
+            password=cfg.get('password', ''),
+            timeout=10,
+        )
+        return ssh, ssh.open_sftp()
+
+    def _list_dir(sftp, path):
+        """Return (subdirs, files) entry lists for path."""
+        try:
+            entries = sftp.listdir_attr(path)
+        except Exception as e:
+            return [], [], str(e)
+        subdirs = [e for e in entries if stat.S_ISDIR(e.st_mode)]
+        files   = [e for e in entries if not stat.S_ISDIR(e.st_mode)]
+        return subdirs, files, None
+
+    def _excel_files(files):
+        return [e.filename for e in files if e.filename.lower().endswith(EXCEL_EXTS)]
+
     results = {}
 
-    for name, cfg in [
-        ('nokia_pm',  NOKIA_PM_SERVER),
-        ('huawei_pm', HUAWEI_PM_SERVER),
-        ('metadata',  METADATA_SERVER),
-    ]:
-        host = cfg.get('host', '')
-        if not host:
-            results[name] = {'status': 'skipped', 'reason': 'No host configured'}
-            continue
+    # ── Nokia PM ──────────────────────────────────────────────────────────
+    name = 'nokia_pm'
+    cfg  = NOKIA_PM_SERVER
+    host = cfg.get('host', '')
+    if not host:
+        results[name] = {'status': 'skipped', 'reason': 'No host configured'}
+    else:
         try:
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(
-                hostname=host,
-                port=cfg.get('port', 22),
-                username=cfg.get('username', ''),
-                password=cfg.get('password', ''),
-                timeout=10
-            )
-            sftp = ssh.open_sftp()
+            ssh, sftp = _sftp_connect(cfg)
+            dirs_result = {}
+            for tech, remote_dir in cfg['dirs'].items():
+                subdirs, files, err = _list_dir(sftp, remote_dir)
+                if err:
+                    dirs_result[tech] = {'remote_dir': remote_dir, 'error': err}
+                else:
+                    xlsx = _excel_files(files)
+                    dirs_result[tech] = {
+                        'remote_dir':   remote_dir,
+                        'total_items':  len(subdirs) + len(files),
+                        'excel_files':  len(xlsx),
+                        'sample_excel': xlsx[:5],
+                    }
+            sftp.close(); ssh.close()
+            results[name] = {'status': 'ok', 'host': host, 'dirs': dirs_result}
+        except Exception as e:
+            results[name] = {'status': 'error', 'host': host, 'error': str(e)}
 
-            # Nokia PM has per-technology dirs — check each one separately
-            if cfg.get('dirs'):
-                dirs_result = {}
-                for tech, remote_dir in cfg['dirs'].items():
-                    try:
-                        entries = sftp.listdir(remote_dir)
-                        dirs_result[tech] = {
-                            'remote_dir': remote_dir,
-                            'files_found': len(entries),
-                            'sample': entries[:5],
+    # ── Huawei PM ─────────────────────────────────────────────────────────
+    name = 'huawei_pm'
+    cfg  = HUAWEI_PM_SERVER
+    host = cfg.get('host', '')
+    if not host:
+        results[name] = {'status': 'skipped', 'reason': 'No host configured'}
+    else:
+        try:
+            ssh, sftp = _sftp_connect(cfg)
+            remote_dir = cfg.get('remote_dir', '/')
+            subdirs, files, err = _list_dir(sftp, remote_dir)
+            if err:
+                # Fall back to home dir
+                remote_dir = sftp.normalize('.')
+                subdirs, files, err2 = _list_dir(sftp, remote_dir)
+            xlsx = _excel_files(files)
+            sftp.close(); ssh.close()
+            results[name] = {
+                'status':       'ok' if not err else 'error',
+                'host':         host,
+                'remote_dir':   remote_dir,
+                'total_items':  len(subdirs) + len(files),
+                'excel_files':  len(xlsx),
+                'sample_excel': xlsx[:5],
+            }
+        except Exception as e:
+            results[name] = {'status': 'error', 'host': host, 'error': str(e)}
+
+    # ── Metadata — full directory tree ────────────────────────────────────
+    name = 'metadata'
+    cfg  = METADATA_SERVER
+    host = cfg.get('host', '')
+    if not host:
+        results[name] = {'status': 'skipped', 'reason': 'No host configured'}
+    else:
+        try:
+            ssh, sftp = _sftp_connect(cfg)
+            root = cfg.get('root_dir', '/')
+
+            # Level 1: root
+            subdirs_l1, files_l1, err = _list_dir(sftp, root)
+            if err:
+                root = sftp.normalize('.')
+                subdirs_l1, files_l1, _ = _list_dir(sftp, root)
+
+            tree = {
+                'root':         root,
+                'root_items':   [e.filename for e in sorted(subdirs_l1 + files_l1, key=lambda x: x.filename)],
+                'latest_folder': None,
+                'structure':    {},
+            }
+
+            if subdirs_l1:
+                # Level 2: newest subdir (by mtime)
+                subdirs_l1.sort(key=lambda e: e.st_mtime or 0, reverse=True)
+                latest = subdirs_l1[0]
+                latest_path = f'{root.rstrip("/")}/{latest.filename}'
+                tree['latest_folder'] = latest.filename
+
+                subdirs_l2, files_l2, _ = _list_dir(sftp, latest_path)
+                direct_xlsx = _excel_files(files_l2)
+
+                if subdirs_l2:
+                    # Level 3: tech subfolders inside the latest folder
+                    for sub in subdirs_l2:
+                        sub_path = f'{latest_path}/{sub.filename}'
+                        _, files_l3, sub_err = _list_dir(sftp, sub_path)
+                        if sub_err:
+                            tree['structure'][sub.filename] = {'error': sub_err}
+                        else:
+                            xlsx_in_sub = _excel_files(files_l3)
+                            all_files = [e.filename for e in files_l3]
+                            tree['structure'][sub.filename] = {
+                                'path':        sub_path,
+                                'total_files': len(files_l3),
+                                'excel_files': xlsx_in_sub,
+                                'all_files':   all_files,
+                            }
+                    if direct_xlsx:
+                        tree['structure']['_direct_in_latest'] = {
+                            'path':        latest_path,
+                            'excel_files': direct_xlsx,
                         }
-                    except Exception as dir_err:
-                        dirs_result[tech] = {'remote_dir': remote_dir, 'error': str(dir_err)}
-                sftp.close()
-                ssh.close()
-                results[name] = {'status': 'ok', 'host': host, 'dirs': dirs_result}
+                else:
+                    # Flat structure — files directly in the latest folder
+                    all_files = [e.filename for e in files_l2]
+                    tree['structure']['_flat'] = {
+                        'path':        latest_path,
+                        'total_files': len(files_l2),
+                        'excel_files': direct_xlsx,
+                        'all_files':   all_files,
+                    }
             else:
-                remote_dir = cfg.get('remote_dir') or cfg.get('root_dir') or '/'
-                try:
-                    entries = sftp.listdir(remote_dir)
-                    dir_used = remote_dir
-                except Exception:
-                    # Configured path doesn't exist — fall back to SFTP home dir
-                    dir_used = sftp.normalize('.')
-                    entries = sftp.listdir(dir_used)
-                sftp.close()
-                ssh.close()
-                results[name] = {
-                    'status': 'ok',
-                    'host': host,
-                    'remote_dir': dir_used,
-                    'configured_dir': remote_dir,
-                    'files_found': len(entries),
-                    'sample': entries[:10],
+                # No subfolders at root — check root directly
+                direct_xlsx = _excel_files(files_l1)
+                tree['structure']['_root_flat'] = {
+                    'path':        root,
+                    'total_files': len(files_l1),
+                    'excel_files': direct_xlsx,
                 }
+
+            sftp.close(); ssh.close()
+            results[name] = {'status': 'ok', 'host': host, 'tree': tree}
         except Exception as e:
             results[name] = {'status': 'error', 'host': host, 'error': str(e)}
 
