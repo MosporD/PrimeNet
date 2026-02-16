@@ -179,6 +179,10 @@ def _process_cell_file(file_path, key):
     mtilt_col     = _find_col(cols, ['mechanical downtilt', 'mechanical_tilt',
                                       'mtilt', 'mechanicaltilt'])
     vendor_col    = _find_col(cols, ['vendor'])
+    # PSC (3G Primary Scrambling Code), PCI (4G Physical Cell ID), BCC/BCCH (2G)
+    pci_col       = _find_col(cols, ['psc', 'scrambling_code', 'scrambling code',
+                                      'primary scrambling code', 'pci',
+                                      'bcc', 'bcch'])
 
     if not cell_name_col:
         msg = f'Cell file [{key}]: cannot detect cell name column. Columns: {cols}'
@@ -186,6 +190,11 @@ def _process_cell_file(file_path, key):
         return 0, 0, msg
 
     logger.info(f'Cell file [{key}/{_infer_tech(key)}]: using column "{cell_name_col}" as cell name')
+    if pci_col:
+        logger.info(f'Cell file [{key}/{_infer_tech(key)}]: using column "{pci_col}" as PSC/PCI/BCCH')
+    else:
+        logger.warning(f'Cell file [{key}/{_infer_tech(key)}]: no PSC/PCI/BCCH column detected — pci will be NULL. '
+                       f'Columns available: {cols}')
 
     # Warn early if the chosen column has many duplicates
     total_rows   = len(df)
@@ -249,12 +258,14 @@ def _process_cell_file(file_path, key):
         azimuth = _safe_float(row.get(az_col))    if az_col    else None
         etilt   = _safe_float(row.get(etilt_col)) if etilt_col else None
         mtilt   = _safe_float(row.get(mtilt_col)) if mtilt_col else None
+        pci     = _safe_float(row.get(pci_col))   if pci_col   else None
+        pci_int = int(pci) if pci is not None else None
 
         cursor.execute('''
             INSERT INTO cells
                 (cell_name, site_id, technology, frequency_band,
-                 azimuth, mechanical_tilt, electrical_tilt, vendor, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Active')
+                 azimuth, mechanical_tilt, electrical_tilt, vendor, pci, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')
             ON CONFLICT(cell_name) DO UPDATE SET
                 site_id         = COALESCE(excluded.site_id,         cells.site_id),
                 technology      = COALESCE(excluded.technology,      cells.technology),
@@ -263,9 +274,10 @@ def _process_cell_file(file_path, key):
                 mechanical_tilt = COALESCE(excluded.mechanical_tilt, cells.mechanical_tilt),
                 electrical_tilt = COALESCE(excluded.electrical_tilt, cells.electrical_tilt),
                 vendor          = COALESCE(excluded.vendor,          cells.vendor),
+                pci             = COALESCE(excluded.pci,             cells.pci),
                 status          = 'Active',
                 updated_at      = CURRENT_TIMESTAMP
-        ''', (cell_name, site_id, technology, technology, azimuth, mtilt, etilt, vendor))
+        ''', (cell_name, site_id, technology, technology, azimuth, mtilt, etilt, vendor, pci_int))
 
     after_count = conn.execute(
         "SELECT COUNT(*) FROM cells WHERE technology=?", (technology,)
@@ -374,6 +386,8 @@ def _process_transmitter_file(file_path, key):
     etilt_col = _find_col(cols, ['elect_tilt', 'electrical_tilt', 'etilt', 'electricaltilt'])
     mtilt_col = _find_col(cols, ['mechanical downtilt', 'mechanical_tilt',
                                   'mtilt', 'mechanicaltilt'])
+    pci_col   = _find_col(cols, ['psc', 'scrambling_code', 'scrambling code',
+                                  'primary scrambling code', 'pci', 'bcc', 'bcch'])
 
     if not cell_col:
         msg = f'Transmitter file [{key}]: cannot detect cell_name column. Columns: {cols}'
@@ -398,6 +412,8 @@ def _process_transmitter_file(file_path, key):
         azimuth   = _safe_float(row.get(az_col))    if az_col    else None
         etilt     = _safe_float(row.get(etilt_col)) if etilt_col else None
         mtilt     = _safe_float(row.get(mtilt_col)) if mtilt_col else None
+        pci_raw   = _safe_float(row.get(pci_col))   if pci_col   else None
+        pci_int   = int(pci_raw) if pci_raw is not None else None
 
         if site_id:
             cursor.execute('''
@@ -408,22 +424,130 @@ def _process_transmitter_file(file_path, key):
         cursor.execute('''
             INSERT INTO cells
                 (cell_name, site_id, technology, frequency_band,
-                 azimuth, mechanical_tilt, electrical_tilt, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'Active')
+                 azimuth, mechanical_tilt, electrical_tilt, pci, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Active')
             ON CONFLICT(cell_name) DO UPDATE SET
                 site_id         = COALESCE(excluded.site_id,         cells.site_id),
                 technology      = COALESCE(excluded.technology,      cells.technology),
                 azimuth         = COALESCE(excluded.azimuth,         cells.azimuth),
                 mechanical_tilt = COALESCE(excluded.mechanical_tilt, cells.mechanical_tilt),
                 electrical_tilt = COALESCE(excluded.electrical_tilt, cells.electrical_tilt),
+                pci             = COALESCE(excluded.pci,             cells.pci),
                 status          = 'Active',
                 updated_at      = CURRENT_TIMESTAMP
-        ''', (cell_name, site_id, technology, technology, azimuth, mtilt, etilt))
+        ''', (cell_name, site_id, technology, technology, azimuth, mtilt, etilt, pci_int))
         upserted += 1
 
     conn.commit()
     conn.close()
     logger.info(f'Transmitter [{key}/{technology}]: {upserted} upserted, {skipped} skipped.')
+    return upserted, skipped, None
+
+
+# ---------------------------------------------------------------------------
+# Explicit-column-map entry point  (used by import_local_files.py)
+# ---------------------------------------------------------------------------
+
+def process_metadata_file(file_path, tech, col_map):
+    """
+    Import a single metadata CSV/XLSX using an explicit column map.
+
+    col_map maps DB field names → CSV column names, e.g.:
+        {'cell_name': 'cell_name', 'pci': 'psc', 'latitude': 'lat', ...}
+
+    Returns (upserted, skipped, error_string_or_None).
+    """
+    try:
+        df = _load_file(file_path)
+    except Exception as e:
+        return 0, 0, str(e)
+
+    # Reverse map: csv_col → db_field
+    rev = {v: k for k, v in col_map.items()}
+
+    def _csv(db_field):
+        """Return the CSV column name for a DB field, or None if not mapped."""
+        csv_col = col_map.get(db_field)
+        return csv_col if csv_col in df.columns else None
+
+    cell_col  = _csv('cell_name')
+    site_id_c = _csv('site_id')
+    sname_c   = _csv('site_name')
+    lat_c     = _csv('latitude')
+    lon_c     = _csv('longitude')
+    az_c      = _csv('azimuth')
+    etilt_c   = _csv('electrical_tilt')
+    mtilt_c   = _csv('mechanical_tilt')
+    vendor_c  = _csv('vendor')
+    pci_c     = _csv('pci')
+
+    if not cell_col:
+        return 0, 0, f'[{tech}] cell_name column "{col_map.get("cell_name")}" not found in file. Columns: {list(df.columns)}'
+
+    logger.info(f'[{tech}] Columns mapped — cell:{cell_col}, lat:{lat_c}, lon:{lon_c}, pci:{pci_c}')
+
+    conn     = sqlite3.connect(METADATA_DB)
+    cursor   = conn.cursor()
+    upserted = 0
+    skipped  = 0
+    sites_seen = set()
+
+    for _, row in df.iterrows():
+        cell_name = _safe_str(row.get(cell_col))
+        if not cell_name:
+            skipped += 1
+            continue
+
+        raw_sid   = _safe_str(row.get(site_id_c))  if site_id_c else None
+        raw_sname = _safe_str(row.get(sname_c))    if sname_c   else None
+        site_id   = raw_sid or (raw_sname and _extract_site_id(raw_sname)) or _extract_site_id(cell_name)
+        site_name = raw_sname or site_id
+        lat       = _safe_float(row.get(lat_c))    if lat_c     else None
+        lon       = _safe_float(row.get(lon_c))    if lon_c     else None
+        vendor    = _safe_str(row.get(vendor_c))   if vendor_c  else None
+        azimuth   = _safe_float(row.get(az_c))     if az_c      else None
+        etilt     = _safe_float(row.get(etilt_c))  if etilt_c   else None
+        mtilt     = _safe_float(row.get(mtilt_c))  if mtilt_c   else None
+        pci_raw   = _safe_float(row.get(pci_c))    if pci_c     else None
+        pci_int   = int(pci_raw) if pci_raw is not None else None
+
+        if site_id and site_id not in sites_seen:
+            cursor.execute('''
+                INSERT INTO sites (site_id, site_name, latitude, longitude, site_type, vendor, status)
+                VALUES (?, ?, ?, ?, ?, ?, 'Active')
+                ON CONFLICT(site_id) DO UPDATE SET
+                    site_name  = COALESCE(excluded.site_name,  sites.site_name),
+                    latitude   = COALESCE(excluded.latitude,   sites.latitude),
+                    longitude  = COALESCE(excluded.longitude,  sites.longitude),
+                    site_type  = COALESCE(excluded.site_type,  sites.site_type),
+                    vendor     = COALESCE(excluded.vendor,     sites.vendor),
+                    status     = 'Active',
+                    updated_at = CURRENT_TIMESTAMP
+            ''', (site_id, site_name, lat, lon, tech, vendor))
+            sites_seen.add(site_id)
+
+        cursor.execute('''
+            INSERT INTO cells
+                (cell_name, site_id, technology, frequency_band,
+                 azimuth, mechanical_tilt, electrical_tilt, vendor, pci, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')
+            ON CONFLICT(cell_name) DO UPDATE SET
+                site_id         = COALESCE(excluded.site_id,         cells.site_id),
+                technology      = COALESCE(excluded.technology,      cells.technology),
+                frequency_band  = COALESCE(excluded.frequency_band,  cells.frequency_band),
+                azimuth         = COALESCE(excluded.azimuth,         cells.azimuth),
+                mechanical_tilt = COALESCE(excluded.mechanical_tilt, cells.mechanical_tilt),
+                electrical_tilt = COALESCE(excluded.electrical_tilt, cells.electrical_tilt),
+                vendor          = COALESCE(excluded.vendor,          cells.vendor),
+                pci             = COALESCE(excluded.pci,             cells.pci),
+                status          = 'Active',
+                updated_at      = CURRENT_TIMESTAMP
+        ''', (cell_name, site_id, tech, tech, azimuth, mtilt, etilt, vendor, pci_int))
+        upserted += 1
+
+    conn.commit()
+    conn.close()
+    logger.info(f'[{tech}] process_metadata_file: {upserted} upserted, {skipped} skipped.')
     return upserted, skipped, None
 
 
