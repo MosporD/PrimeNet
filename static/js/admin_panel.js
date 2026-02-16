@@ -6,6 +6,8 @@ let allUsers = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     loadAllUsers();
+    loadSyncStatus();
+    loadSyncHistory();
 });
 
 async function loadAllUsers() {
@@ -166,4 +168,116 @@ function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+}
+
+// ── Sync section ──────────────────────────────────────────────────────────
+
+function showSyncMsg(text, type) {
+    const el = document.getElementById('sync-msg');
+    el.textContent = text;
+    el.className = 'sync-msg ' + type;
+    el.style.display = 'block';
+    setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+
+function renderSyncRows(rows, tbodyId) {
+    const tbody = document.getElementById(tbodyId);
+    if (!rows || rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No data</td></tr>';
+        return;
+    }
+    tbody.innerHTML = rows.map(r => `
+        <tr>
+            <td>${r.sync_type || ''}</td>
+            <td>${r.technology || ''}</td>
+            <td><span class="sync-badge ${r.status}">${r.status}</span></td>
+            <td>${r.rows_affected != null ? r.rows_affected : '-'}</td>
+            <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+                title="${r.message || ''}">${r.message || '-'}</td>
+            <td>${r.started_at || '-'}</td>
+        </tr>
+    `).join('');
+}
+
+async function loadSyncStatus() {
+    try {
+        const res  = await fetch('/api/sync/status');
+        const data = await res.json();
+        if (data.success) renderSyncRows(data.last_syncs, 'sync-status-body');
+    } catch (e) {
+        document.getElementById('sync-status-body').innerHTML =
+            `<tr><td colspan="6" style="color:#e74c3c;text-align:center;">Error: ${e.message}</td></tr>`;
+    }
+}
+
+async function loadSyncHistory() {
+    try {
+        const res  = await fetch('/api/sync/history?limit=20');
+        const data = await res.json();
+        if (data.success) renderSyncRows(data.history, 'sync-history-body');
+    } catch (e) {
+        document.getElementById('sync-history-body').innerHTML =
+            `<tr><td colspan="6" style="color:#e74c3c;text-align:center;">Error: ${e.message}</td></tr>`;
+    }
+}
+
+async function triggerSync(type) {
+    // type: 'nokia_pm' | 'huawei_pm' | 'metadata'
+    const endpointMap = {
+        nokia_pm:  '/api/sync/trigger/pm',      // triggers both nokia
+        huawei_pm: '/api/sync/trigger/pm',      // same endpoint triggers both Nokia+Huawei
+        metadata:  '/api/sync/trigger/metadata',
+    };
+
+    // Nokia and Huawei share the /trigger/pm endpoint; use dedicated ones if available
+    const endpoint = type === 'metadata'
+        ? '/api/sync/trigger/metadata'
+        : '/api/sync/trigger/pm';
+
+    showSyncMsg(`Triggering ${type.replace('_', ' ')} sync…`, 'info');
+
+    try {
+        const res  = await fetch(endpoint, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            showSyncMsg(data.message || 'Sync started in background.', 'success');
+            // Refresh status after a short delay
+            setTimeout(loadSyncStatus,  4000);
+            setTimeout(loadSyncHistory, 4000);
+        } else {
+            showSyncMsg(data.error || 'Sync trigger failed.', 'error');
+        }
+    } catch (e) {
+        showSyncMsg('Error: ' + e.message, 'error');
+    }
+}
+
+async function testConnectivity() {
+    showSyncMsg('Testing connectivity to all servers…', 'info');
+    try {
+        const res  = await fetch('/api/sync/test');
+        const data = await res.json();
+        if (!data.success) { showSyncMsg('Test failed.', 'error'); return; }
+
+        const r = data.results;
+        const lines = Object.entries(r).map(([name, info]) => {
+            if (info.status === 'skipped') return `${name}: skipped (${info.reason})`;
+            if (info.status === 'error')   return `${name}: ERROR — ${info.error}`;
+            if (info.tree) {
+                const f = info.tree.latest_folder || '(none)';
+                const keys = Object.keys(info.tree.structure || {});
+                return `${name}: OK — latest folder: ${f}, sub-keys: ${keys.join(', ') || 'flat'}`;
+            }
+            if (info.dirs) {
+                const summary = Object.entries(info.dirs)
+                    .map(([t, d]) => `${t}:${d.excel_files ?? d.files_found ?? '?'}`)
+                    .join(' ');
+                return `${name}: OK — ${summary}`;
+            }
+            return `${name}: OK — ${info.excel_files ?? info.files_found ?? '?'} files`;
+        });
+        showSyncMsg(lines.join(' | '), 'success');
+    } catch (e) {
+        showSyncMsg('Error: ' + e.message, 'error');
+    }
 }
