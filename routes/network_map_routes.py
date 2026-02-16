@@ -224,6 +224,52 @@ def get_network_stats():
         return jsonify({'error': str(e)}), 500
 
 
+@network_map_bp.route('/api/map/search/cell-code', methods=['GET'])
+def search_by_cell_code():
+    """Search cells by PCI (4G), Scrambling Code (3G), or BCCH (2G) stored in the pci column."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    code = request.args.get('code', '').strip()
+    tech = request.args.get('tech', '').strip()
+
+    if not code or not code.lstrip('-').isdigit():
+        return jsonify({'success': True, 'matches': []})
+
+    try:
+        conn = sqlite3.connect(METADATA_DB)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        query = '''
+            SELECT c.cell_id, c.cell_name, c.technology, c.vendor, c.frequency_band,
+                   c.azimuth, c.mechanical_tilt, c.electrical_tilt, c.pci,
+                   s.site_id, s.site_name, s.latitude, s.longitude
+            FROM cells c
+            JOIN sites s ON c.site_id = s.site_id
+            WHERE c.pci = ? AND c.status = 'Active'
+              AND s.status = 'Active'
+              AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+        '''
+        params = [int(code)]
+
+        if tech and tech != 'all':
+            query += ' AND c.technology = ?'
+            params.append(tech)
+
+        query += ' ORDER BY s.site_name, c.technology, c.cell_name'
+
+        cursor.execute(query, params)
+        matches = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+
+        return jsonify({'success': True, 'matches': matches})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @network_map_bp.route('/api/map/refresh', methods=['POST'])
 @login_required
 def refresh_metadata():

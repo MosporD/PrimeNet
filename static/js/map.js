@@ -44,11 +44,14 @@ const CLUSTER_AREA = {
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
-let map          = null;
-let sitesData    = [];
-let siteMarkers  = [];
-let sectorLayers = [];
-let activeTech   = '3G';
+let map              = null;
+let sitesData        = [];
+let siteMarkers      = [];
+let sectorLayers     = [];
+let activeTech       = '3G';
+let highlightMarkers = [];
+let highlightLayers  = [];
+let codeSearchTimer  = null;
 
 // ─── Initialization ──────────────────────────────────────────────────────────
 
@@ -113,7 +116,17 @@ function setTechFilter(tech) {
         btn.classList.toggle('active', btn.dataset.tech === tech)
     );
     clearSectorLayers();
+    clearHighlights();
     document.getElementById('site-info-panel').style.display = 'none';
+
+    const codeInput = document.getElementById('cell-code-search');
+    if (codeInput) {
+        codeInput.placeholder =
+            tech === '3G'                             ? 'Scrambling Code...' :
+            ['4G', '4G-FDD', '4G-TDD'].includes(tech)? 'PCI...'             :
+            tech === '2G'                             ? 'BCCH...'            :
+                                                        'SC / PCI / BCCH...';
+    }
     loadNetworkSites();
 }
 
@@ -425,6 +438,192 @@ function renderKPIModal(cell) {
 
 function closeKPIModal() {
     document.getElementById('kpi-modal').style.display = 'none';
+}
+
+// ─── Cell-code search (SC / PCI / BCCH) ──────────────────────────────────────
+
+function cellCodeSearch() {
+    clearTimeout(codeSearchTimer);
+    const val = document.getElementById('cell-code-search').value.trim();
+    if (!val) { clearHighlights(); return; }
+    codeSearchTimer = setTimeout(doCodeSearch, 400);
+}
+
+async function doCodeSearch() {
+    const code = document.getElementById('cell-code-search').value.trim();
+    if (!code || isNaN(code)) return;
+
+    clearHighlights();
+
+    const techParam = activeTech !== 'all'
+        ? `&tech=${encodeURIComponent(activeTech)}` : '';
+
+    try {
+        const res  = await fetch(`/api/map/search/cell-code?code=${code}${techParam}`);
+        const data = await res.json();
+        if (!data.success) return;
+
+        const panel = document.getElementById('site-info-panel');
+        if (!data.matches.length) {
+            const techLabel = _codeLabel();
+            panel.innerHTML = `<div class="code-no-results">No cells found with ${techLabel} = ${code}</div>`;
+            panel.style.display = 'block';
+            return;
+        }
+
+        drawCodeSearchResults(data.matches, parseInt(code));
+    } catch (e) {
+        console.error('Code search error:', e);
+    }
+}
+
+function drawCodeSearchResults(matches, code) {
+    // Group by site
+    const siteMap = {};
+    matches.forEach(cell => {
+        if (!siteMap[cell.site_id]) {
+            siteMap[cell.site_id] = {
+                site_id:   cell.site_id,
+                site_name: cell.site_name,
+                latitude:  cell.latitude,
+                longitude: cell.longitude,
+                cells: []
+            };
+        }
+        siteMap[cell.site_id].cells.push(cell);
+    });
+
+    // Draw highlight wedges for every matching cell that has azimuth data
+    matches.forEach(cell => {
+        if (cell.azimuth != null) drawHighlightWedge(cell);
+    });
+
+    // Drop highlight markers on matching sites
+    Object.values(siteMap).forEach(site => {
+        const icon = L.divIcon({
+            className: 'site-marker',
+            html: `<div class="site-marker-inner highlight-marker" title="${site.site_name}">
+                     <div class="site-icon">📡</div>
+                   </div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+        });
+        const marker = L.marker([site.latitude, site.longitude], { icon }).addTo(map);
+        marker.on('click', () => showSiteDetails(site.site_id));
+        highlightMarkers.push(marker);
+    });
+
+    // Fit map to matches
+    map.fitBounds(
+        matches.map(m => [m.latitude, m.longitude]),
+        { padding: [60, 60] }
+    );
+
+    // Populate side panel
+    const techLabel = _codeLabel();
+    let siteHtml = '';
+    Object.values(siteMap).forEach(site => {
+        siteHtml += `
+            <div class="code-result-site" onclick="showSiteDetails('${site.site_id}')">
+                <div class="code-result-site-name">📡 ${site.site_name}</div>`;
+        site.cells.forEach(c => {
+            const color = TECH_COLORS[c.technology] || '#34495e';
+            siteHtml += `
+                <div class="code-result-cell">
+                    <span class="cell-tech-badge" style="background:${color}">${c.technology}</span>
+                    <span class="cell-name">${c.cell_name}</span>
+                    <span class="cell-meta">Az: ${c.azimuth ?? '—'}°</span>
+                </div>`;
+        });
+        siteHtml += '</div>';
+    });
+
+    const panel = document.getElementById('site-info-panel');
+    panel.innerHTML = `
+        <h3 class="site-panel-title">🔍 ${techLabel} = ${code}</h3>
+        <div class="site-meta-row" style="margin-bottom:8px;">
+            ${matches.length} cell${matches.length !== 1 ? 's' : ''}
+            across ${Object.keys(siteMap).length} site${Object.keys(siteMap).length !== 1 ? 's' : ''}
+        </div>
+        ${siteHtml}
+    `;
+    panel.style.display = 'block';
+}
+
+function drawHighlightWedge(cell) {
+    const az    = cell.azimuth || 0;
+    const half  = SECTOR_BEAMWIDTH / 2;
+    const rLat  = SECTOR_RADIUS_M / 111320;
+    const rLng  = SECTOR_RADIUS_M / (111320 * Math.cos(cell.latitude * Math.PI / 180));
+
+    const pts = [[cell.latitude, cell.longitude]];
+    for (let a = az - half; a <= az + half; a += 3) {
+        const rad = a * Math.PI / 180;
+        pts.push([
+            cell.latitude  + rLat * Math.cos(rad),
+            cell.longitude + rLng * Math.sin(rad)
+        ]);
+    }
+    pts.push([cell.latitude, cell.longitude]);
+
+    const techColor = TECH_COLORS[cell.technology] || '#34495e';
+    const polygon   = L.polygon(pts, {
+        color:       '#f1c40f',   // bright yellow border = highlighted
+        fillColor:   techColor,
+        fillOpacity: 0.65,
+        weight:      3,
+    }).addTo(map);
+
+    polygon.bindPopup(`
+        <div style="min-width:190px;font-family:sans-serif;">
+            <div style="font-weight:700;font-size:1em;margin-bottom:6px;">
+                ${cell.cell_name}
+            </div>
+            <div style="color:${techColor};font-weight:600;margin-bottom:6px;">
+                ${cell.technology || ''}
+                ${cell.frequency_band ? ' · ' + cell.frequency_band : ''}
+            </div>
+            <table style="font-size:0.88em;border-collapse:collapse;width:100%;">
+                <tr><td style="color:#777;">${_codeLabel()}</td>
+                    <td style="font-weight:600;color:#e67e22;">${cell.pci}</td></tr>
+                <tr><td style="color:#777;">Azimuth</td>
+                    <td style="font-weight:600;">${az}°</td></tr>
+                ${cell.mechanical_tilt != null
+                    ? `<tr><td style="color:#777;">M.Tilt</td><td>${cell.mechanical_tilt}°</td></tr>` : ''}
+                ${cell.electrical_tilt != null
+                    ? `<tr><td style="color:#777;">E.Tilt</td><td>${cell.electrical_tilt}°</td></tr>` : ''}
+            </table>
+            <button onclick="showCellKPIs(${cell.cell_id})"
+                    style="margin-top:10px;padding:5px 14px;background:${techColor};
+                           color:white;border:none;border-radius:5px;cursor:pointer;
+                           width:100%;font-weight:600;">
+                View KPIs
+            </button>
+        </div>
+    `);
+    polygon.on('click', e => { L.DomEvent.stopPropagation(e); polygon.openPopup(); });
+    highlightLayers.push(polygon);
+}
+
+function clearHighlights() {
+    highlightLayers.forEach(l => map && map.removeLayer(l));
+    highlightLayers = [];
+    highlightMarkers.forEach(m => map && map.removeLayer(m));
+    highlightMarkers = [];
+}
+
+function clearCodeSearch() {
+    document.getElementById('cell-code-search').value = '';
+    clearHighlights();
+    document.getElementById('site-info-panel').style.display = 'none';
+}
+
+/** Returns the human label for the active-tech code type. */
+function _codeLabel() {
+    if (activeTech === '3G') return 'SC';
+    if (['4G', '4G-FDD', '4G-TDD'].includes(activeTech)) return 'PCI';
+    if (activeTech === '2G') return 'BCCH';
+    return 'Code';
 }
 
 // ─── Filter builders ──────────────────────────────────────────────────────────

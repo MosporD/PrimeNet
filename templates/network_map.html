@@ -6,7 +6,7 @@
     <title>Network Map - Nokia NCM</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/network_map.css') }}?v=1.1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/network_map.css') }}?v=1.2">
 </head>
 <body class="map-page">
     <header class="map-header">
@@ -25,6 +25,11 @@
         <div class="left-panel">
             <div class="map-controls">
                 <input type="text" id="site-search" placeholder="Search sites..." onkeyup="searchSites()">
+                <div class="code-search-row">
+                    <input type="number" id="cell-code-search" placeholder="SC / PCI / BCCH..."
+                           min="0" oninput="cellCodeSearch()">
+                    <button class="clear-code-btn" onclick="clearCodeSearch()" title="Clear code search">✕</button>
+                </div>
                 <select id="vendor-filter" onchange="filterByVendor()">
                     <option value="all">All Vendors</option>
                     <option value="Nokia">Nokia</option>
@@ -66,7 +71,7 @@
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{{ url_for('static', filename='js/map.js') }}?v=1.3"></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}?v=1.4"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initializeMap();
