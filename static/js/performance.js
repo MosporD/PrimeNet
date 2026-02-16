@@ -1,16 +1,19 @@
 /**
- * Performance Analytics v2
- * Left filter panel + stacked KPI charts on the right
+ * Performance Analytics v3
+ * - Cluster / Area filter cascade
+ * - Cell search bar (no flooding on Apply)
+ * - 2 charts per row from live KPI DB headers
+ * - CSV export of tabular trend data
  */
 
-// All Chart.js instances keyed by KPI key
 const charts = {};
-let allCells     = [];
-let allSites     = [];
+let allCells    = [];
+let allSites    = [];
+let allClusters = [];
+let allAreas    = [];   // [{cluster, area}]
 let activeCellId = null;
+let lastTrendData = null;  // {cell, trend} kept for export
 
-// KPI definitions — populated dynamically from /api/performance/kpi_columns
-// Colors are assigned deterministically from the column name.
 let KPI_DEFS = [];
 
 const _CHART_COLORS = [
@@ -24,6 +27,10 @@ function _colorFor(col) {
     for (let i = 0; i < col.length; i++) h = (h + col.charCodeAt(i)) % _CHART_COLORS.length;
     return _CHART_COLORS[h];
 }
+
+// ============================================================
+// KPI columns
+// ============================================================
 
 async function loadKpiColumns() {
     try {
@@ -59,6 +66,7 @@ function fmt(value, unit, decimals = 2) {
 // ============================================================
 // Filter dropdowns
 // ============================================================
+
 async function loadFilters() {
     await loadKpiColumns();
 
@@ -66,8 +74,11 @@ async function loadFilters() {
     const data = await res.json();
     if (!data.success) return;
 
-    allSites = data.sites;
+    allSites    = data.sites;
+    allClusters = data.clusters || [];
+    allAreas    = data.areas    || [];
 
+    // Regions
     const regionSel = document.getElementById('filter-region');
     data.regions.forEach(r => {
         const o = document.createElement('option');
@@ -75,7 +86,34 @@ async function loadFilters() {
         regionSel.appendChild(o);
     });
 
+    // Clusters
+    _populateClusters(allClusters);
+    _populateAreas(allAreas);
     _populateSites(allSites);
+}
+
+function _populateClusters(clusters) {
+    const sel = document.getElementById('filter-cluster');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">All Clusters</option>';
+    clusters.forEach(c => {
+        const o = document.createElement('option');
+        o.value = c; o.textContent = c;
+        sel.appendChild(o);
+    });
+    if (prev) sel.value = prev;
+}
+
+function _populateAreas(areas) {
+    const sel = document.getElementById('filter-area');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">All Areas</option>';
+    areas.forEach(a => {
+        const o = document.createElement('option');
+        o.value = a.area; o.textContent = a.area;
+        sel.appendChild(o);
+    });
+    if (prev) sel.value = prev;
 }
 
 function _populateSites(sites) {
@@ -86,26 +124,58 @@ function _populateSites(sites) {
         const o = document.createElement('option');
         o.value = s.site_id;
         o.textContent = s.site_name;
-        o.dataset.region = s.region || '';
+        o.dataset.region  = s.region  || '';
+        o.dataset.cluster = s.cluster || '';
+        o.dataset.area    = s.area    || '';
         siteSel.appendChild(o);
     });
     if (prev) siteSel.value = prev;
 }
 
 function onVendorChange() {
-    // When Huawei is selected, hide 5G option
-    const vendor = document.getElementById('filter-vendor').value;
+    const vendor  = document.getElementById('filter-vendor').value;
     const techSel = document.getElementById('filter-tech');
-    const opt5g = techSel.querySelector('option[value="5G"]');
+    const opt5g   = techSel.querySelector('option[value="5G"]');
     if (opt5g) opt5g.style.display = vendor === 'Huawei' ? 'none' : '';
     if (vendor === 'Huawei' && techSel.value === '5G') techSel.value = '';
-    // Reload KPI column list for the selected vendor
     loadKpiColumns();
 }
 
 function onRegionChange() {
-    const region = document.getElementById('filter-region').value;
-    const filtered = region ? allSites.filter(s => s.region === region) : allSites;
+    const region  = document.getElementById('filter-region').value;
+    const cluster = document.getElementById('filter-cluster').value;
+    const area    = document.getElementById('filter-area').value;
+    _applyGeoFilters(region, cluster, area);
+}
+
+function onClusterChange() {
+    const region  = document.getElementById('filter-region').value;
+    const cluster = document.getElementById('filter-cluster').value;
+
+    // Filter area options to match selected cluster
+    const filteredAreas = cluster
+        ? allAreas.filter(a => a.cluster === cluster)
+        : (region ? allAreas.filter(a => {
+            const clusterMatchesSite = allSites.some(s => s.region === region && s.cluster === a.cluster);
+            return clusterMatchesSite;
+          }) : allAreas);
+    _populateAreas(filteredAreas);
+    document.getElementById('filter-area').value = '';
+    _applyGeoFilters(region, cluster, '');
+}
+
+function onAreaChange() {
+    const region  = document.getElementById('filter-region').value;
+    const cluster = document.getElementById('filter-cluster').value;
+    const area    = document.getElementById('filter-area').value;
+    _applyGeoFilters(region, cluster, area);
+}
+
+function _applyGeoFilters(region, cluster, area) {
+    let filtered = allSites;
+    if (region)  filtered = filtered.filter(s => s.region  === region);
+    if (cluster) filtered = filtered.filter(s => s.cluster === cluster);
+    if (area)    filtered = filtered.filter(s => s.area    === area);
     _populateSites(filtered);
     document.getElementById('filter-site').value = '';
     document.getElementById('filter-cell').innerHTML = '<option value="">All Cells</option>';
@@ -117,7 +187,7 @@ async function onSiteChange() {
     cellSel.innerHTML = '<option value="">All Cells</option>';
     if (!siteId) return;
 
-    const tech = document.getElementById('filter-tech').value;
+    const tech   = document.getElementById('filter-tech').value;
     const params = new URLSearchParams({ site_id: siteId });
     if (tech) params.set('technology', tech);
 
@@ -134,18 +204,25 @@ async function onSiteChange() {
 }
 
 // ============================================================
-// Apply filters — loads cell list and shows cell chips
+// Apply filters — load cell list and show search+chips
 // ============================================================
+
 async function applyFilters() {
-    const tech   = document.getElementById('filter-tech').value;
-    const region = document.getElementById('filter-region').value;
-    const site   = document.getElementById('filter-site').value;
-    const cell   = document.getElementById('filter-cell').value;
+    const vendor  = document.getElementById('filter-vendor').value;
+    const tech    = document.getElementById('filter-tech').value;
+    const region  = document.getElementById('filter-region').value;
+    const cluster = document.getElementById('filter-cluster').value;
+    const area    = document.getElementById('filter-area').value;
+    const site    = document.getElementById('filter-site').value;
+    const cell    = document.getElementById('filter-cell').value;
 
     const params = new URLSearchParams();
-    if (tech)   params.set('technology', tech);
-    if (region) params.set('region', region);
-    if (site)   params.set('site_id', site);
+    if (vendor)  params.set('vendor',     vendor);
+    if (tech)    params.set('technology', tech);
+    if (region)  params.set('region',     region);
+    if (cluster) params.set('cluster',    cluster);
+    if (area)    params.set('area',       area);
+    if (site)    params.set('site_id',    site);
 
     const res  = await fetch('/api/performance/cells?' + params);
     const data = await res.json();
@@ -154,23 +231,27 @@ async function applyFilters() {
     allCells = data.cells;
     updateSummary(allCells);
 
-    // If a specific cell is selected in dropdown, load it directly
     if (cell) {
         loadCellCharts(cell);
         return;
     }
 
-    // Otherwise show cell chips to pick from
     showCellPicker(allCells);
 }
 
+// ============================================================
+// Cell picker with search bar
+// ============================================================
+
 function showCellPicker(cells) {
-    document.getElementById('charts-wrap').style.display   = 'none';
+    document.getElementById('charts-wrap').style.display    = 'none';
     document.getElementById('loading-charts').style.display = 'none';
-    document.getElementById('no-selection').style.display  = 'flex';
+    document.getElementById('no-selection').style.display   = 'flex';
+    document.getElementById('btn-export').style.display     = 'none';
 
     document.getElementById('charts-title').textContent = 'Select a cell';
-    document.getElementById('charts-subtitle').textContent = `${cells.length} cell${cells.length !== 1 ? 's' : ''} found`;
+    document.getElementById('charts-subtitle').textContent =
+        `${cells.length} cell${cells.length !== 1 ? 's' : ''} found`;
 
     const wrap = document.getElementById('cell-list-wrap');
     const list = document.getElementById('cell-list');
@@ -181,31 +262,66 @@ function showCellPicker(cells) {
         return;
     }
 
+    // Clear search bar
+    const searchInput = document.getElementById('cell-search');
+    if (searchInput) searchInput.value = '';
+    _updateCellCountBadge(cells.length, cells.length);
+
     wrap.style.display = 'block';
+
     cells.forEach(c => {
         const chip = document.createElement('div');
         chip.className = `cell-chip tech-${c.technology || ''}${c.cell_id === activeCellId ? ' active' : ''}`;
         chip.textContent = c.cell_name;
-        chip.title = `${c.site_name} · ${c.technology || ''} ${c.frequency_band || ''}`;
+        const clusterArea = [c.cluster, c.area].filter(Boolean).join(' / ');
+        chip.title = [
+            c.site_name,
+            c.technology || '',
+            c.frequency_band || '',
+            clusterArea
+        ].filter(Boolean).join(' · ');
+        chip.dataset.search = (c.cell_name + ' ' + c.site_name + ' ' + (c.cluster || '') + ' ' + (c.area || '')).toLowerCase();
         chip.onclick = () => loadCellCharts(c.cell_id);
         list.appendChild(chip);
     });
 }
 
+function filterCellChips(query) {
+    const q = query.toLowerCase().trim();
+    const chips = document.querySelectorAll('#cell-list .cell-chip');
+    let visible = 0;
+    chips.forEach(chip => {
+        const match = !q || chip.dataset.search.includes(q);
+        chip.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+    _updateCellCountBadge(visible, chips.length);
+}
+
+function _updateCellCountBadge(visible, total) {
+    const badge = document.getElementById('cell-count-badge');
+    if (!badge) return;
+    badge.textContent = visible === total
+        ? `${total} cells`
+        : `${visible} / ${total} cells`;
+}
+
 // ============================================================
 // Load charts for a selected cell
 // ============================================================
+
 async function loadCellCharts(cellId) {
     activeCellId = cellId;
 
-    // Update chip highlights
     document.querySelectorAll('.cell-chip').forEach(c => {
-        c.classList.toggle('active', c.onclick.toString().includes(cellId));
+        const match = c.onclick && c.onclick.toString().includes(String(cellId));
+        c.classList.toggle('active', match);
     });
 
     document.getElementById('no-selection').style.display   = 'none';
     document.getElementById('charts-wrap').style.display    = 'none';
     document.getElementById('loading-charts').style.display = 'flex';
+    document.getElementById('btn-export').style.display     = 'none';
 
     const hours = document.getElementById('filter-hours').value;
 
@@ -216,38 +332,43 @@ async function loadCellCharts(cellId) {
 
         const cell  = data.cell;
         const trend = data.trend;
+        lastTrendData = data;
 
-        document.getElementById('charts-title').textContent =
-            `${cell.cell_name}`;
-        document.getElementById('charts-subtitle').textContent =
-            `${cell.site_name} · ${cell.technology || ''} ${cell.frequency_band || ''} · ${trend.length} data points`;
+        // Build subtitle with cluster / area
+        const parts = [cell.site_name, cell.technology || '', cell.frequency_band || ''];
+        if (cell.cluster) parts.push('Cluster: ' + cell.cluster);
+        if (cell.area)    parts.push('Area: '    + cell.area);
+        parts.push(trend.length + ' data points');
 
-        // Update map link
-        document.getElementById('map-link').href =
-            `/network-map`;
+        document.getElementById('charts-title').textContent    = cell.cell_name;
+        document.getElementById('charts-subtitle').textContent = parts.filter(Boolean).join('  ·  ');
 
         renderAllCharts(trend);
+
+        // Show export button only when we have trend data
+        if (trend.length) {
+            document.getElementById('btn-export').style.display = 'inline-flex';
+        }
 
     } catch (e) {
         document.getElementById('loading-charts').style.display = 'none';
         document.getElementById('no-selection').style.display   = 'flex';
-        document.getElementById('charts-title').textContent = 'Error loading data';
+        document.getElementById('charts-title').textContent     = 'Error loading data';
         document.getElementById('charts-subtitle').textContent  = e.message;
     }
 }
 
 // ============================================================
-// Render one chart card per KPI, stacked vertically
+// Render charts — 2 per row
 // ============================================================
+
 function renderAllCharts(trend) {
-    // Destroy old charts
     Object.values(charts).forEach(c => c.destroy());
     Object.keys(charts).forEach(k => delete charts[k]);
 
     const wrap = document.getElementById('charts-wrap');
     wrap.innerHTML = '';
 
-    // If KPI_DEFS haven't loaded yet, build them from the trend row keys directly
     let defs = KPI_DEFS;
     if (!defs.length && trend.length) {
         const skip = new Set(['id', 'cell_name', 'timestamp']);
@@ -259,7 +380,7 @@ function renderAllCharts(trend) {
     if (!defs.length) {
         wrap.innerHTML = '<p style="padding:1rem;color:#888">No KPI data available yet.</p>';
         document.getElementById('loading-charts').style.display = 'none';
-        wrap.style.display = 'flex';
+        wrap.style.display = 'grid';
         return;
     }
 
@@ -270,20 +391,17 @@ function renderAllCharts(trend) {
     });
 
     defs.forEach(def => {
-        const values = trend.map(r => r[def.key]);
-        const lastVal = [...values].reverse().find(v => v !== null && v !== undefined);
+        const values   = trend.map(r => r[def.key]);
+        const lastVal  = [...values].reverse().find(v => v !== null && v !== undefined);
+        const cls      = lastVal !== undefined ? kpiClass(lastVal, def) : '';
+        const dispVal  = lastVal !== undefined ? fmt(lastVal, def.unit) : 'N/A';
 
-        // Card
         const card = document.createElement('div');
         card.className = 'kpi-chart-card';
-
-        const cls = lastVal !== undefined ? kpiClass(lastVal, def) : '';
-        const displayVal = lastVal !== undefined ? fmt(lastVal, def.unit) : 'N/A';
-
         card.innerHTML = `
             <div class="kpi-chart-title">
                 <span class="kpi-chart-name">${def.label}</span>
-                <span class="kpi-chart-value ${cls}">${displayVal}</span>
+                <span class="kpi-chart-value ${cls}">${dispVal}</span>
             </div>
             <div class="kpi-chart-canvas-wrap">
                 <canvas id="chart-${def.key}"></canvas>
@@ -291,7 +409,6 @@ function renderAllCharts(trend) {
         `;
         wrap.appendChild(card);
 
-        // Point colors based on threshold
         const pointColors = values.map(v => {
             if (v === null || v === undefined) return '#bdc3c7';
             const c = kpiClass(v, def);
@@ -326,7 +443,9 @@ function renderAllCharts(trend) {
                         callbacks: {
                             label: ctx => {
                                 const v = ctx.parsed.y;
-                                return v !== null ? `${def.label}: ${Number(v).toFixed(2)}${def.unit ? ' ' + def.unit : ''}` : 'N/A';
+                                return v !== null
+                                    ? `${def.label}: ${Number(v).toFixed(2)}${def.unit ? ' ' + def.unit : ''}`
+                                    : 'N/A';
                             }
                         }
                     }
@@ -346,12 +465,62 @@ function renderAllCharts(trend) {
     });
 
     document.getElementById('loading-charts').style.display = 'none';
-    wrap.style.display = 'flex';
+    wrap.style.display = 'grid';
+}
+
+// ============================================================
+// CSV Export
+// ============================================================
+
+function exportCSV() {
+    if (!lastTrendData || !lastTrendData.trend || !lastTrendData.trend.length) return;
+
+    const { cell, trend } = lastTrendData;
+
+    // Columns: all keys from first row
+    const skip = new Set(['id']);
+    const cols = Object.keys(trend[0]).filter(k => !skip.has(k));
+
+    const escape = v => {
+        if (v === null || v === undefined) return '';
+        const s = String(v);
+        return s.includes(',') || s.includes('"') || s.includes('\n')
+            ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+
+    const lines = [];
+
+    // Header comment rows
+    lines.push(`# Cell: ${cell.cell_name}`);
+    lines.push(`# Site: ${cell.site_name}  |  Vendor: ${cell.vendor}  |  Technology: ${cell.technology || ''}`);
+    if (cell.cluster || cell.area)
+        lines.push(`# Cluster: ${cell.cluster || ''}  |  Area: ${cell.area || ''}`);
+    lines.push(`# Region: ${cell.region || ''}  |  Exported: ${new Date().toISOString()}`);
+    lines.push('');
+
+    // Column headers
+    lines.push(cols.map(escape).join(','));
+
+    // Data rows
+    trend.forEach(row => {
+        lines.push(cols.map(c => escape(row[c])).join(','));
+    });
+
+    const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `${cell.cell_name}_kpi_trend.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 // ============================================================
 // Side summary stats
 // ============================================================
+
 function updateSummary(cells) {
     const avg = key => {
         const vals = cells.map(c => c[key]).filter(v => v !== null && v !== undefined);
@@ -359,7 +528,6 @@ function updateSummary(cells) {
     };
     document.getElementById('sum-cells').textContent = cells.length;
 
-    // Try to find availability/drop/throughput columns by partial name match
     const findCol = (...keywords) => {
         const keys = cells.length ? Object.keys(cells[0]) : [];
         return keys.find(k => keywords.some(kw => k.toLowerCase().includes(kw.toLowerCase())));

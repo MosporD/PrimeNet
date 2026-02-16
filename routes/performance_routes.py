@@ -25,6 +25,26 @@ _FIXED_COLS = {'id', 'cell_name', 'timestamp'}
 
 
 # ---------------------------------------------------------------------------
+# One-time schema migration: add cluster / area to sites if missing
+# ---------------------------------------------------------------------------
+
+def _ensure_cluster_area_cols():
+    try:
+        conn = sqlite3.connect(METADATA_DB, timeout=15)
+        existing = {r[1] for r in conn.execute('PRAGMA table_info(sites)').fetchall()}
+        if 'cluster' not in existing:
+            conn.execute('ALTER TABLE sites ADD COLUMN cluster TEXT')
+        if 'area' not in existing:
+            conn.execute('ALTER TABLE sites ADD COLUMN area TEXT')
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
+
+_ensure_cluster_area_cols()
+
+
+# ---------------------------------------------------------------------------
 # Auth helpers
 # ---------------------------------------------------------------------------
 
@@ -148,12 +168,20 @@ def get_filters():
         "SELECT DISTINCT region FROM sites WHERE region IS NOT NULL ORDER BY region"
     ).fetchall()]
 
+    clusters = [r['cluster'] for r in conn.execute(
+        "SELECT DISTINCT cluster FROM sites WHERE cluster IS NOT NULL ORDER BY cluster"
+    ).fetchall()]
+
+    areas = [dict(r) for r in conn.execute(
+        "SELECT DISTINCT cluster, area FROM sites WHERE area IS NOT NULL ORDER BY cluster, area"
+    ).fetchall()]
+
     sites = [dict(r) for r in conn.execute(
-        "SELECT site_id, site_name, region, vendor FROM sites WHERE status='Active' ORDER BY site_name"
+        "SELECT site_id, site_name, region, cluster, area, vendor FROM sites WHERE status='Active' ORDER BY site_name"
     ).fetchall()]
 
     conn.close()
-    return jsonify({'success': True, 'regions': regions, 'sites': sites})
+    return jsonify({'success': True, 'regions': regions, 'clusters': clusters, 'areas': areas, 'sites': sites})
 
 
 # ---------------------------------------------------------------------------
@@ -170,6 +198,8 @@ def get_cells():
     technology = request.args.get('technology', '')
     site_id    = request.args.get('site_id', '')
     region     = request.args.get('region', '')
+    cluster    = request.args.get('cluster', '')
+    area       = request.args.get('area', '')
 
     where  = ["c.status = 'Active'"]
     params = []
@@ -189,6 +219,12 @@ def get_cells():
     if region:
         where.append('st.region = ?')
         params.append(region)
+    if cluster:
+        where.append('st.cluster = ?')
+        params.append(cluster)
+    if area:
+        where.append('st.area = ?')
+        params.append(area)
 
     where_sql = ' AND '.join(where)
 
@@ -205,7 +241,7 @@ def get_cells():
                 SELECT
                     c.cell_id, c.cell_name, c.technology, c.vendor,
                     c.frequency_band, c.azimuth, c.pci,
-                    st.site_id, st.site_name, st.region, st.latitude, st.longitude,
+                    st.site_id, st.site_name, st.region, st.cluster, st.area, st.latitude, st.longitude,
                     k.timestamp AS kpi_ts{kpi_select}
                 FROM cells c
                 LEFT JOIN sites st ON c.site_id = st.site_id
@@ -241,7 +277,7 @@ def get_cells():
                 SELECT
                     c.cell_id, c.cell_name, c.technology, c.vendor,
                     c.frequency_band, c.azimuth, c.pci,
-                    st.site_id, st.site_name, st.region, st.latitude, st.longitude,
+                    st.site_id, st.site_name, st.region, st.cluster, st.area, st.latitude, st.longitude,
                     k.timestamp AS kpi_ts{outer_kpi}
                 FROM cells c
                 LEFT JOIN sites st ON c.site_id = st.site_id
@@ -269,8 +305,8 @@ def get_cells():
             SELECT
                 c.cell_id, c.cell_name, c.technology, c.vendor,
                 c.frequency_band, c.azimuth, c.pci,
-                st.site_id, st.site_name, st.region, st.latitude, st.longitude,
-                NULL AS kpi_ts
+                st.site_id, st.site_name, st.region, st.cluster, st.area,
+                st.latitude, st.longitude, NULL AS kpi_ts
             FROM cells c
             LEFT JOIN sites st ON c.site_id = st.site_id
             WHERE {where_sql}
@@ -300,7 +336,8 @@ def get_cell_trend(cell_id):
     cell = meta_conn.execute('''
         SELECT c.cell_id, c.cell_name, c.technology, c.vendor,
                c.frequency_band, c.azimuth, c.mechanical_tilt, c.pci,
-               st.site_id, st.site_name, st.region, st.latitude, st.longitude
+               st.site_id, st.site_name, st.region, st.cluster, st.area,
+               st.latitude, st.longitude
         FROM cells c
         LEFT JOIN sites st ON c.site_id = st.site_id
         WHERE c.cell_id = ?

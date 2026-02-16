@@ -1,4 +1,4 @@
-/* Performance Analytics - v2 */
+/* Performance Analytics - v3 */
 
 /* Full-height two-column layout below header */
 .perf-body {
@@ -19,7 +19,7 @@
     padding: 24px 18px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     overflow-y: auto;
 }
 
@@ -35,11 +35,11 @@
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 4px;
 }
 
 .filter-group label {
-    font-size: 0.75em;
+    font-size: 0.72em;
     font-weight: 600;
     color: #95a5a6;
     text-transform: uppercase;
@@ -50,7 +50,7 @@
     padding: 7px 10px;
     border: 1px solid #dce1e7;
     border-radius: 6px;
-    font-size: 0.9em;
+    font-size: 0.88em;
     color: #2C3E50;
     background: #f8f9fa;
     outline: none;
@@ -74,6 +74,7 @@
     cursor: pointer;
     transition: background 0.2s;
     width: 100%;
+    margin-top: 4px;
 }
 
 .btn-apply:hover { background: #2980b9; }
@@ -87,24 +88,24 @@
 .side-stats {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 
 .side-stat {
     background: #f8f9fa;
     border-radius: 7px;
-    padding: 10px 12px;
+    padding: 9px 12px;
     border-left: 3px solid #3498db;
 }
 
 .side-stat-value {
-    font-size: 1.2em;
+    font-size: 1.15em;
     font-weight: 700;
     color: #2C3E50;
 }
 
 .side-stat-label {
-    font-size: 0.75em;
+    font-size: 0.72em;
     color: #95a5a6;
     margin-top: 2px;
 }
@@ -136,11 +137,19 @@
     background: #f5f7fa;
 }
 
+/* Header row with title + export button */
 .charts-header {
-    padding: 18px 28px 12px;
+    padding: 14px 24px 12px;
     background: #fff;
     border-bottom: 1px solid #e8ecf0;
     flex-shrink: 0;
+}
+
+.charts-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .charts-title {
@@ -150,41 +159,93 @@
 }
 
 .charts-subtitle {
-    font-size: 0.85em;
-    color: #95a5a6;
+    font-size: 0.82em;
+    color: #7f8c8d;
     margin-top: 3px;
+    line-height: 1.4;
 }
 
-/* No selection state */
+/* Export CSV button */
+.btn-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.btn-export:hover { background: #1e8449; }
+
+/* ── No-selection / cell picker ─────────────────────────── */
 .no-selection {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 40px;
+    padding: 36px 32px 20px;
     color: #95a5a6;
     text-align: center;
-    gap: 12px;
+    gap: 10px;
+    overflow-y: auto;
 }
 
 .no-selection-icon { font-size: 3em; }
-.no-selection p { font-size: 0.95em; line-height: 1.6; }
+.no-selection > p  { font-size: 0.95em; line-height: 1.6; }
 
-/* Cell picker list */
-.cell-list-label {
-    font-size: 0.85em;
-    font-weight: 600;
-    color: #7f8c8d;
-    margin-bottom: 8px;
+/* Cell search bar */
+.cell-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 560px;
+    margin-bottom: 12px;
 }
 
+.cell-search-input {
+    flex: 1;
+    padding: 9px 14px;
+    border: 1.5px solid #dce1e7;
+    border-radius: 8px;
+    font-size: 0.92em;
+    color: #2C3E50;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.cell-search-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52,152,219,0.12);
+}
+
+.cell-count-badge {
+    font-size: 0.8em;
+    color: #7f8c8d;
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: right;
+}
+
+/* Cell chips list */
 .cell-list {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
-    max-width: 700px;
+    max-width: 800px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 4px 2px;
 }
 
 .cell-chip {
@@ -196,7 +257,8 @@
     font-weight: 600;
     color: #2C3E50;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.18s;
+    user-select: none;
 }
 
 .cell-chip:hover {
@@ -217,14 +279,15 @@
 .cell-chip.tech-4G { border-color: #3498db; }
 .cell-chip.tech-5G { border-color: #9b59b6; }
 
-/* Scrollable charts container */
+/* ── Charts grid: 2 per row ─────────────────────────────── */
 .charts-wrap {
     flex: 1;
     overflow-y: auto;
-    padding: 20px 28px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    align-content: start;
 }
 
 /* Individual KPI chart card */
@@ -232,29 +295,36 @@
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    padding: 18px 22px;
+    padding: 16px 18px;
+    min-width: 0;   /* prevent grid overflow */
 }
 
 .kpi-chart-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
+    gap: 8px;
 }
 
 .kpi-chart-name {
-    font-size: 0.92em;
+    font-size: 0.88em;
     font-weight: 700;
     color: #2C3E50;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .kpi-chart-value {
-    font-size: 0.88em;
+    font-size: 0.82em;
     font-weight: 600;
-    padding: 3px 10px;
+    padding: 3px 9px;
     border-radius: 12px;
     background: #f0f3f4;
     color: #2C3E50;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .kpi-chart-value.good  { background: #d5f5e3; color: #1e8449; }
@@ -263,7 +333,7 @@
 
 .kpi-chart-canvas-wrap {
     position: relative;
-    height: 180px;
+    height: 170px;
 }
 
 /* Loading state */
@@ -278,10 +348,24 @@
     font-size: 0.95em;
 }
 
-/* Responsive */
+/* ── Responsive ─────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .charts-wrap {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 900px) {
     .perf-body { flex-direction: column; height: auto; }
-    .filter-panel { width: 100%; flex-direction: row; flex-wrap: wrap; height: auto; border-right: none; border-bottom: 1px solid #e8ecf0; }
-    .filter-group { min-width: 140px; flex: 1; }
-    .charts-area { height: calc(100vh - 300px); }
+    .filter-panel {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #e8ecf0;
+    }
+    .filter-group { min-width: 130px; flex: 1; }
+    .charts-area  { height: calc(100vh - 320px); }
+    .charts-wrap  { grid-template-columns: 1fr; }
 }
