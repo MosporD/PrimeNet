@@ -56,22 +56,35 @@ def network_map_page():
 
 @network_map_bp.route('/api/map/sites', methods=['GET'])
 def get_all_sites():
-    """Get all network sites from metadata.db"""
+    """Get all network sites from metadata.db, optionally filtered by technology."""
     user = get_current_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
+
+    tech = request.args.get('tech', '').strip()
 
     try:
         conn = sqlite3.connect(METADATA_DB)
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        cursor.execute('''
-            SELECT site_id, site_name, latitude, longitude, region, site_type, vendor, status
-            FROM sites
-            WHERE status = 'Active'
-            ORDER BY site_name
-        ''')
+        if tech and tech != 'all':
+            cursor.execute('''
+                SELECT DISTINCT s.site_id, s.site_name, s.latitude, s.longitude,
+                       s.region, s.site_type, s.vendor, s.status
+                FROM sites s
+                JOIN cells c ON s.site_id = c.site_id
+                WHERE s.status = 'Active' AND c.technology = ? AND c.status = 'Active'
+                  AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+                ORDER BY s.site_name
+            ''', (tech,))
+        else:
+            cursor.execute('''
+                SELECT site_id, site_name, latitude, longitude, region, site_type, vendor, status
+                FROM sites
+                WHERE status = 'Active' AND latitude IS NOT NULL AND longitude IS NOT NULL
+                ORDER BY site_name
+            ''')
 
         sites = [dict(row) for row in cursor.fetchall()]
         conn.close()
@@ -107,27 +120,15 @@ def get_site_details(site_id):
 
         site_data = dict(site)
 
-        # Sectors (azimuth / tilt info stored in sectors table)
-        cursor.execute('''
-            SELECT sector_id, sector_name, azimuth, mechanical_tilt, electrical_tilt,
-                   technology, frequency_band, vendor
-            FROM sectors
-            WHERE site_id = ?
-            ORDER BY sector_name
-        ''', (site_id,))
-        sectors = [dict(row) for row in cursor.fetchall()]
-        site_data['sectors'] = sectors
-
-        # Cells for this site
+        # Cells are the sectors — query them with all fields needed for map drawing
         cursor.execute('''
             SELECT cell_id, cell_name, technology, vendor, frequency_band,
                    azimuth, mechanical_tilt, electrical_tilt, pci, status
             FROM cells
             WHERE site_id = ? AND status = 'Active'
-            ORDER BY cell_name
+            ORDER BY technology, cell_name
         ''', (site_id,))
-        cells = [dict(row) for row in cursor.fetchall()]
-        site_data['cells'] = cells
+        site_data['cells'] = [dict(row) for row in cursor.fetchall()]
 
         conn.close()
 
@@ -201,21 +202,23 @@ def get_network_stats():
         cursor.execute("SELECT COUNT(*) FROM sites WHERE status = 'Active'")
         total_sites = cursor.fetchone()[0]
 
-        cursor.execute('SELECT COUNT(*) FROM sectors')
-        total_sectors = cursor.fetchone()[0]
-
         cursor.execute("SELECT COUNT(*) FROM cells WHERE status = 'Active'")
         total_cells = cursor.fetchone()[0]
 
+        cursor.execute('''
+            SELECT technology, COUNT(*) FROM cells
+            WHERE status = 'Active' GROUP BY technology ORDER BY technology
+        ''')
+        tech_counts = {row[0]: row[1] for row in cursor.fetchall()}
+
         conn.close()
 
-        stats = {
-            'total_sites':    total_sites,
-            'total_sectors':  total_sectors,
-            'total_cells':    total_cells,
-        }
-
-        return jsonify({'success': True, 'stats': stats})
+        return jsonify({'success': True, 'stats': {
+            'total_sites':   total_sites,
+            'total_sectors': total_cells,
+            'total_cells':   total_cells,
+            'tech_counts':   tech_counts,
+        }})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

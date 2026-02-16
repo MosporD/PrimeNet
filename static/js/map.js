@@ -1,444 +1,415 @@
 /**
- * Network Map Visualization with Leaflet
- * Displays sites, sectors, and KPIs
+ * Network Map – Leaflet visualization
+ * Sites → sector wedges drawn per cell (azimuth-aligned)
+ * Tech filter: All / 2G / 3G / 4G / 4G-FDD / 4G-TDD / 5G
  */
 
-let map = null;
-let sitesData = [];
-let siteMarkers = [];
-let sectorOverlays = [];
+// ─── Constants ───────────────────────────────────────────────────────────────
 
-// Default map center (will be adjusted based on site locations)
-const DEFAULT_CENTER = [31.9539, 35.9106]; // Amman, Jordan
-const DEFAULT_ZOOM = 10;
+const TECH_COLORS = {
+    '2G':     '#7f8c8d',
+    '3G':     '#27ae60',
+    '4G':     '#3498db',
+    '4G-FDD': '#1a5276',
+    '4G-TDD': '#148f77',
+    '5G':     '#9b59b6',
+};
 
-/**
- * Initialize the map when the tab is opened
- */
+const TECH_ORDER = ['2G', '3G', '4G', '4G-FDD', '4G-TDD', '5G'];
+
+const DEFAULT_CENTER = [31.9539, 35.9106];   // Amman, Jordan
+const DEFAULT_ZOOM   = 10;
+const SECTOR_RADIUS_M = 600;                 // wedge radius in metres
+const SECTOR_BEAMWIDTH = 65;                 // 3 dB beamwidth in degrees
+
+// ─── State ───────────────────────────────────────────────────────────────────
+
+let map          = null;
+let sitesData    = [];
+let siteMarkers  = [];
+let sectorLayers = [];
+let activeTech   = 'all';
+
+// ─── Initialization ──────────────────────────────────────────────────────────
+
 function initializeMap() {
-    if (map) {
-        map.invalidateSize();
-        return;
-    }
+    if (map) { map.invalidateSize(); return; }
 
-    // Initialize Leaflet map
     map = L.map('network-map').setView(DEFAULT_CENTER, DEFAULT_ZOOM);
 
-    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 18
     }).addTo(map);
 
-    // Load sites data
-    loadNetworkSites();
-    loadNetworkStats();
+    loadNetworkStats().then(() => loadNetworkSites());
 }
 
-/**
- * Load all network sites from the API
- */
+// ─── Stats & tech filter buttons ─────────────────────────────────────────────
+
+async function loadNetworkStats() {
+    try {
+        const res  = await fetch('/api/map/stats');
+        const data = await res.json();
+        if (!data.success) return;
+
+        const s = data.stats;
+        document.getElementById('sites-count').textContent   = s.total_sites;
+        document.getElementById('sectors-count').textContent = s.total_cells;
+        document.getElementById('cells-count').textContent   = s.total_cells;
+        document.getElementById('availability-percent').textContent = '—';
+
+        buildTechButtons(s.tech_counts || {});
+    } catch (e) {
+        console.error('Stats error:', e);
+    }
+}
+
+function buildTechButtons(counts) {
+    const container = document.getElementById('tech-filter');
+    if (!container) return;
+
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+
+    let html = `<button class="tech-btn active" data-tech="all"
+                        onclick="setTechFilter('all')">
+                  All <span class="tech-count">${total}</span>
+                </button>`;
+
+    TECH_ORDER.forEach(tech => {
+        if (!counts[tech]) return;
+        const color = TECH_COLORS[tech] || '#3498db';
+        html += `<button class="tech-btn" data-tech="${tech}"
+                         style="--tc:${color}"
+                         onclick="setTechFilter('${tech}')">
+                   ${tech} <span class="tech-count">${counts[tech]}</span>
+                 </button>`;
+    });
+
+    container.innerHTML = html;
+}
+
+function setTechFilter(tech) {
+    activeTech = tech;
+    document.querySelectorAll('.tech-btn').forEach(btn =>
+        btn.classList.toggle('active', btn.dataset.tech === tech)
+    );
+    clearSectorLayers();
+    document.getElementById('site-info-panel').style.display = 'none';
+    loadNetworkSites();
+}
+
+// ─── Site loading & display ───────────────────────────────────────────────────
+
 async function loadNetworkSites() {
     try {
-        const response = await fetch('/api/map/sites');
-        const data = await response.json();
+        const url  = activeTech !== 'all'
+            ? `/api/map/sites?tech=${encodeURIComponent(activeTech)}`
+            : '/api/map/sites';
+        const res  = await fetch(url);
+        const data = await res.json();
+        if (!data.success) return;
 
-        if (data.success) {
-            sitesData = data.sites;
-            displaySites(sitesData);
+        sitesData = data.sites;
+        displaySites(sitesData);
+        document.getElementById('sites-count').textContent = sitesData.length;
 
-            // Update sites count
-            document.getElementById('sites-count').textContent = sitesData.length;
-
-            // Auto-fit map to show all sites
-            if (sitesData.length > 0) {
-                const bounds = sitesData.map(site => [site.latitude, site.longitude]);
-                map.fitBounds(bounds, { padding: [50, 50] });
-            }
+        if (sitesData.length > 0) {
+            map.fitBounds(
+                sitesData.map(s => [s.latitude, s.longitude]),
+                { padding: [50, 50] }
+            );
         }
-    } catch (error) {
-        console.error('Error loading sites:', error);
+
+        buildRegionFilter(sitesData);
+    } catch (e) {
+        console.error('Sites error:', e);
         showNotification('Failed to load network sites', 'error');
     }
 }
 
-/**
- * Display sites on the map
- */
 function displaySites(sites) {
-    // Clear existing markers
-    siteMarkers.forEach(marker => map.removeLayer(marker));
+    siteMarkers.forEach(m => map.removeLayer(m));
     siteMarkers = [];
 
     sites.forEach(site => {
-        // Create custom icon based on site type
+        const color = activeTech !== 'all'
+            ? (TECH_COLORS[activeTech] || '#3498db')
+            : (site.vendor === 'Nokia' ? '#00a3e0' : '#e55300');
+
         const icon = L.divIcon({
             className: 'site-marker',
-            html: `<div class="site-marker-inner" title="${site.site_name}">
-                    <div class="site-icon">📡</div>
+            html: `<div class="site-marker-inner" style="border-color:${color}" title="${site.site_name}">
+                     <div class="site-icon">📡</div>
                    </div>`,
-            iconSize: [40, 40],
-            iconAnchor: [20, 20]
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
         });
 
-        // Add marker
-        const marker = L.marker([site.latitude, site.longitude], { icon: icon })
-            .addTo(map);
-
-        // Add click handler to show site details
+        const marker = L.marker([site.latitude, site.longitude], { icon }).addTo(map);
         marker.on('click', () => showSiteDetails(site.site_id));
-
         siteMarkers.push(marker);
     });
 }
 
-/**
- * Show detailed information about a site including sectors
- */
+// ─── Site detail: draw sector wedges ─────────────────────────────────────────
+
 async function showSiteDetails(siteId) {
     try {
-        const response = await fetch(`/api/map/site/${siteId}`);
-        const data = await response.json();
+        clearSectorLayers();
+        const res  = await fetch(`/api/map/site/${siteId}`);
+        const data = await res.json();
+        if (!data.success) return;
 
-        if (data.success) {
-            const site = data.site;
+        const site = data.site;
 
-            // Clear existing sector overlays
-            sectorOverlays.forEach(overlay => map.removeLayer(overlay));
-            sectorOverlays = [];
+        // Filter to active tech; keep all when 'all'
+        const cells = (activeTech === 'all')
+            ? site.cells
+            : site.cells.filter(c => c.technology === activeTech);
 
-            // Display sectors
-            site.sectors.forEach(sector => {
-                drawSectorOverlay(site, sector);
-            });
+        // Draw a wedge per cell that has azimuth data
+        cells
+            .filter(c => c.azimuth != null)
+            .forEach(cell => drawSectorWedge(site, cell));
 
-            // Show site info panel
-            displaySiteInfo(site);
-        }
-    } catch (error) {
-        console.error('Error loading site details:', error);
+        displaySiteInfo(site, cells);
+    } catch (e) {
+        console.error('Site detail error:', e);
         showNotification('Failed to load site details', 'error');
     }
 }
 
 /**
- * Draw sector direction overlay on the map
+ * Draw a sector wedge polygon.
+ *
+ * Geographic azimuth convention:
+ *   0° = North, 90° = East, 180° = South, 270° = West
+ *
+ *   lat  offset = R * cos(azimuth)   (North component)
+ *   lng  offset = R * sin(azimuth)   (East component, scaled for latitude)
  */
-function drawSectorOverlay(site, sector) {
-    const sectorRadius = 0.005; // Approx 500m in degrees
-    const azimuth = sector.azimuth || 0;
-    const beamwidth = sector.beamwidth || 65;
+function drawSectorWedge(site, cell) {
+    const az    = cell.azimuth || 0;
+    const half  = SECTOR_BEAMWIDTH / 2;
+    const rLat  = SECTOR_RADIUS_M / 111320;
+    const rLng  = SECTOR_RADIUS_M / (111320 * Math.cos(site.latitude * Math.PI / 180));
 
-    // Calculate sector arc points
-    const startAngle = azimuth - (beamwidth / 2);
-    const endAngle = azimuth + (beamwidth / 2);
-
-    const points = [[site.latitude, site.longitude]];
-
-    // Generate arc points
-    for (let angle = startAngle; angle <= endAngle; angle += 5) {
-        const rad = (angle * Math.PI) / 180;
-        const lat = site.latitude + sectorRadius * Math.cos(rad);
-        const lng = site.longitude + sectorRadius * Math.sin(rad);
-        points.push([lat, lng]);
+    const pts = [[site.latitude, site.longitude]];
+    for (let a = az - half; a <= az + half; a += 3) {
+        const rad = a * Math.PI / 180;
+        pts.push([
+            site.latitude  + rLat * Math.cos(rad),
+            site.longitude + rLng * Math.sin(rad)
+        ]);
     }
+    pts.push([site.latitude, site.longitude]);
 
-    points.push([site.latitude, site.longitude]);
-
-    // Color based on technology
-    const colors = {
-        '5G': '#9b59b6',
-        'LTE': '#3498db',
-        '3G': '#27ae60',
-        '2G': '#95a5a6'
-    };
-    const color = colors[sector.technology] || '#34495e';
-
-    // Draw sector polygon
-    const polygon = L.polygon(points, {
-        color: color,
+    const color   = TECH_COLORS[cell.technology] || '#34495e';
+    const polygon = L.polygon(pts, {
+        color,
         fillColor: color,
-        fillOpacity: 0.3,
-        weight: 2
+        fillOpacity: 0.35,
+        weight: 1.5
     }).addTo(map);
 
-    // Add click handler to show KPIs
-    polygon.on('click', (e) => {
-        L.DomEvent.stopPropagation(e);
-        showSectorKPIs(sector.sector_id);
-    });
-
-    // Add popup with sector info
     polygon.bindPopup(`
-        <div style="text-align: center;">
-            <strong>${sector.sector_name}</strong><br>
-            Technology: ${sector.technology || 'N/A'}<br>
-            Band: ${sector.frequency_band || 'N/A'}<br>
-            Azimuth: ${azimuth}°<br>
-            <button onclick="showSectorKPIs('${sector.sector_id}')"
-                    style="margin-top: 8px; padding: 5px 15px; background: #3498db;
-                           color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <div style="min-width:190px;font-family:sans-serif;">
+            <div style="font-weight:700;font-size:1em;margin-bottom:6px;">
+                ${cell.cell_name}
+            </div>
+            <div style="color:${color};font-weight:600;margin-bottom:6px;">
+                ${cell.technology || ''}
+                ${cell.frequency_band ? ' · ' + cell.frequency_band : ''}
+            </div>
+            <table style="font-size:0.88em;border-collapse:collapse;width:100%;">
+                <tr><td style="color:#777;">Azimuth</td>
+                    <td style="font-weight:600;">${az}°</td></tr>
+                ${cell.mechanical_tilt != null
+                    ? `<tr><td style="color:#777;">M.Tilt</td>
+                           <td>${cell.mechanical_tilt}°</td></tr>` : ''}
+                ${cell.electrical_tilt != null
+                    ? `<tr><td style="color:#777;">E.Tilt</td>
+                           <td>${cell.electrical_tilt}°</td></tr>` : ''}
+                ${cell.pci != null
+                    ? `<tr><td style="color:#777;">PCI</td>
+                           <td>${cell.pci}</td></tr>` : ''}
+            </table>
+            <button onclick="showCellKPIs(${cell.cell_id})"
+                    style="margin-top:10px;padding:5px 14px;background:${color};
+                           color:white;border:none;border-radius:5px;cursor:pointer;
+                           width:100%;font-weight:600;">
                 View KPIs
             </button>
         </div>
     `);
 
-    sectorOverlays.push(polygon);
+    polygon.on('click', e => { L.DomEvent.stopPropagation(e); polygon.openPopup(); });
+    sectorLayers.push(polygon);
 }
 
-/**
- * Display site information in the info panel
- */
-function displaySiteInfo(site) {
-    const infoPanel = document.getElementById('site-info-panel');
+function clearSectorLayers() {
+    sectorLayers.forEach(l => map.removeLayer(l));
+    sectorLayers = [];
+}
 
-    let sectorsHtml = '<div style="margin-top: 10px;">';
-    site.sectors.forEach(sector => {
-        sectorsHtml += `
-            <div style="padding: 8px; background: #f8f9fa; margin: 5px 0; border-radius: 5px; cursor: pointer;"
-                 onclick="showSectorKPIs('${sector.sector_id}')">
-                <strong>${sector.sector_name}</strong> - ${sector.technology || 'N/A'}<br>
-                <small>Azimuth: ${sector.azimuth}° | Band: ${sector.frequency_band || 'N/A'}</small>
-            </div>
-        `;
+// ─── Site info panel ─────────────────────────────────────────────────────────
+
+function displaySiteInfo(site, cells) {
+    const panel = document.getElementById('site-info-panel');
+
+    // Group cells by technology
+    const byTech = {};
+    cells.forEach(c => {
+        (byTech[c.technology] = byTech[c.technology] || []).push(c);
     });
-    sectorsHtml += '</div>';
 
-    infoPanel.innerHTML = `
-        <h3 style="margin: 0 0 15px 0; color: #2C3E50;">📡 ${site.site_name}</h3>
-        <p style="margin: 5px 0;"><strong>Site ID:</strong> ${site.site_id}</p>
-        <p style="margin: 5px 0;"><strong>Region:</strong> ${site.region || 'N/A'}</p>
-        <p style="margin: 5px 0;"><strong>Type:</strong> ${site.site_type || 'N/A'}</p>
-        <p style="margin: 5px 0;"><strong>Sectors:</strong> ${site.sectors.length}</p>
-        ${sectorsHtml}
+    let techHtml = '';
+    TECH_ORDER.concat(
+        Object.keys(byTech).filter(t => !TECH_ORDER.includes(t))
+    ).forEach(tech => {
+        if (!byTech[tech]) return;
+        const color = TECH_COLORS[tech] || '#34495e';
+        techHtml += `<div class="tech-group">
+            <div class="tech-group-label" style="color:${color};">${tech}</div>`;
+        byTech[tech].forEach(c => {
+            techHtml += `
+            <div class="cell-row" onclick="showCellKPIs(${c.cell_id})">
+                <span class="cell-name">${c.cell_name}</span>
+                <span class="cell-meta">Az: ${c.azimuth ?? '—'}°</span>
+                ${c.frequency_band
+                    ? `<span class="cell-meta">${c.frequency_band}</span>`
+                    : ''}
+            </div>`;
+        });
+        techHtml += '</div>';
+    });
+
+    panel.innerHTML = `
+        <h3 class="site-panel-title">📡 ${site.site_name}</h3>
+        <div class="site-meta-row"><strong>Site ID:</strong> ${site.site_id}</div>
+        <div class="site-meta-row"><strong>Region:</strong> ${site.region || '—'}</div>
+        <div class="site-meta-row"><strong>Vendor:</strong> ${site.vendor || '—'}</div>
+        <div class="site-meta-row"><strong>Cells shown:</strong> ${cells.length}</div>
+        ${techHtml}
         <a href="/performance?site_id=${site.site_id}"
-           style="display:block; margin-top:14px; padding:10px; text-align:center;
-                  background:#3498db; color:white; border-radius:6px;
-                  text-decoration:none; font-weight:600; font-size:0.9em;">
+           class="kpi-link">
             📈 In-depth KPI
         </a>
     `;
-    infoPanel.style.display = 'block';
+    panel.style.display = 'block';
 }
 
-/**
- * Show KPI dashboard for a sector
- */
-async function showSectorKPIs(sectorId) {
-    try {
-        const response = await fetch(`/api/map/sector/${sectorId}/kpis`);
-        const data = await response.json();
+// ─── Cell KPI modal ───────────────────────────────────────────────────────────
 
-        if (data.success) {
-            displayKPIDashboard(data.sector);
-        }
-    } catch (error) {
-        console.error('Error loading sector KPIs:', error);
-        showNotification('Failed to load KPI data', 'error');
+async function showCellKPIs(cellId) {
+    try {
+        const res  = await fetch(`/api/map/cell/${cellId}/kpis`);
+        const data = await res.json();
+        if (!data.success) return;
+        renderKPIModal(data.cell);
+    } catch (e) {
+        console.error('KPI error:', e);
     }
 }
 
-/**
- * Display KPI dashboard modal
- */
-function displayKPIDashboard(sector) {
-    const modal = document.getElementById('kpi-modal');
-    const content = document.getElementById('kpi-content');
+function renderKPIModal(cell) {
+    const color = TECH_COLORS[cell.technology] || '#34495e';
+    const kpis  = cell.kpis;
 
-    let cellsHtml = '';
+    const kpiRow = (label, val, unit = '') =>
+        `<div class="kpi-item">
+            <div class="kpi-label">${label}</div>
+            <div class="kpi-value">${val != null ? val + unit : '—'}</div>
+         </div>`;
 
-    sector.cells.forEach(cell => {
-        const kpis = cell.kpis;
+    const kpiHtml = kpis
+        ? `<div class="kpi-grid">
+               ${kpiRow('Users',      kpis.avg_users)}
+               ${kpiRow('Data',       kpis.data_volume_gb?.toFixed(2), ' GB')}
+               ${kpiRow('RSRP',       kpis.rsrp?.toFixed(1),           ' dBm')}
+               ${kpiRow('RSRQ',       kpis.rsrq?.toFixed(1),           ' dB')}
+               ${kpiRow('SINR',       kpis.sinr?.toFixed(1),           ' dB')}
+               ${kpiRow('DL Tput',    kpis.throughput_dl_mbps?.toFixed(1), ' Mbps')}
+               ${kpiRow('RRC Succ',   kpis.rrc_success_rate?.toFixed(2),   '%')}
+               ${kpiRow('Drop Rate',  kpis.call_drop_rate?.toFixed(2),      '%')}
+               ${kpiRow('Avail',      kpis.availability_percent?.toFixed(2), '%')}
+           </div>
+           <div style="font-size:0.82em;color:#7f8c8d;margin-top:10px;">
+               Last: ${kpis.timestamp ? new Date(kpis.timestamp).toLocaleString() : '—'}
+           </div>`
+        : `<p style="color:#95a5a6;">No KPI data available</p>`;
 
-        if (!kpis) {
-            cellsHtml += `
-                <div class="kpi-cell-card">
-                    <h4>${cell.cell_name}</h4>
-                    <p style="color: #95a5a6;">No KPI data available</p>
-                </div>
-            `;
-            return;
-        }
-
-        // Determine status colors
-        const getStatusColor = (value, goodThreshold, badThreshold, inverse = false) => {
-            if (!value) return '#95a5a6';
-            if (inverse) {
-                return value < goodThreshold ? '#27ae60' : value > badThreshold ? '#e74c3c' : '#f39c12';
-            } else {
-                return value > goodThreshold ? '#27ae60' : value < badThreshold ? '#e74c3c' : '#f39c12';
-            }
-        };
-
-        cellsHtml += `
-            <div class="kpi-cell-card">
-                <h4>${cell.cell_name} <span style="font-size: 0.8em; color: #7f8c8d;">(PCI: ${cell.pci || 'N/A'})</span></h4>
-
-                <div class="kpi-grid">
-                    <div class="kpi-item">
-                        <div class="kpi-label">Users</div>
-                        <div class="kpi-value">${kpis.avg_users || 0}</div>
-                    </div>
-
-                    <div class="kpi-item">
-                        <div class="kpi-label">Data (GB)</div>
-                        <div class="kpi-value">${(kpis.data_volume_gb || 0).toFixed(2)}</div>
-                    </div>
-
-                    <div class="kpi-item">
-                        <div class="kpi-label">RSRP (dBm)</div>
-                        <div class="kpi-value" style="color: ${getStatusColor(kpis.rsrp, -80, -100)}">
-                            ${kpis.rsrp ? kpis.rsrp.toFixed(1) : 'N/A'}
-                        </div>
-                    </div>
-
-                    <div class="kpi-item">
-                        <div class="kpi-label">RSRQ (dB)</div>
-                        <div class="kpi-value" style="color: ${getStatusColor(kpis.rsrq, -10, -15)}">
-                            ${kpis.rsrq ? kpis.rsrq.toFixed(1) : 'N/A'}
-                        </div>
-                    </div>
-
-                    <div class="kpi-item">
-                        <div class="kpi-label">SINR (dB)</div>
-                        <div class="kpi-value" style="color: ${getStatusColor(kpis.sinr, 15, 5)}">
-                            ${kpis.sinr ? kpis.sinr.toFixed(1) : 'N/A'}
-                        </div>
-                    </div>
-
-                    <div class="kpi-item">
-                        <div class="kpi-label">Throughput DL</div>
-                        <div class="kpi-value">${kpis.throughput_dl_mbps ? kpis.throughput_dl_mbps.toFixed(1) + ' Mbps' : 'N/A'}</div>
-                    </div>
-
-                    <div class="kpi-item">
-                        <div class="kpi-label">RRC Success</div>
-                        <div class="kpi-value" style="color: ${getStatusColor(kpis.rrc_success_rate, 98, 95)}">
-                            ${kpis.rrc_success_rate ? kpis.rrc_success_rate.toFixed(2) + '%' : 'N/A'}
-                        </div>
-                    </div>
-
-                    <div class="kpi-item">
-                        <div class="kpi-label">Call Drop Rate</div>
-                        <div class="kpi-value" style="color: ${getStatusColor(kpis.call_drop_rate, 0.5, 2, true)}">
-                            ${kpis.call_drop_rate ? kpis.call_drop_rate.toFixed(2) + '%' : 'N/A'}
-                        </div>
-                    </div>
-
-                    <div class="kpi-item">
-                        <div class="kpi-label">Availability</div>
-                        <div class="kpi-value" style="color: ${getStatusColor(kpis.availability_percent, 99, 95)}">
-                            ${kpis.availability_percent ? kpis.availability_percent.toFixed(2) + '%' : 'N/A'}
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 10px; font-size: 0.85em; color: #7f8c8d;">
-                    Last updated: ${kpis.timestamp ? new Date(kpis.timestamp).toLocaleString() : 'N/A'}
-                </div>
-            </div>
-        `;
-    });
-
-    content.innerHTML = `
-        <h2 style="margin-top: 0; color: #2C3E50;">
-            ${sector.sector_name} - KPI Dashboard
+    document.getElementById('kpi-content').innerHTML = `
+        <span class="close-modal" onclick="closeKPIModal()">&times;</span>
+        <h2 style="margin-top:0;color:#2C3E50;border-bottom:3px solid ${color};
+                   padding-bottom:8px;">
+            ${cell.cell_name}
         </h2>
-        <div style="margin-bottom: 15px; padding: 10px; background: #ecf0f1; border-radius: 5px;
-                    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <span>
-                <strong>Site:</strong> ${sector.site_name} |
-                <strong>Technology:</strong> ${sector.technology || 'N/A'} |
-                <strong>Band:</strong> ${sector.frequency_band || 'N/A'} |
-                <strong>Azimuth:</strong> ${sector.azimuth}°
-            </span>
-            <a href="/performance?site_id=${sector.site_id}&technology=${sector.technology || ''}"
-               style="padding:8px 18px; background:#3498db; color:white; border-radius:6px;
-                      text-decoration:none; font-weight:600; font-size:0.88em; white-space:nowrap;">
-                📈 In-depth KPI
-            </a>
+        <div style="margin-bottom:14px;color:#555;font-size:0.9em;line-height:1.7;">
+            <strong>Site:</strong> ${cell.site_name || '—'} &nbsp;|&nbsp;
+            <strong style="color:${color};">${cell.technology || '—'}</strong>
+            &nbsp;|&nbsp; Az: ${cell.azimuth ?? '—'}°
+            &nbsp;|&nbsp; PCI: ${cell.pci ?? '—'}
         </div>
-        ${cellsHtml}
+        ${kpiHtml}
     `;
-
-    modal.style.display = 'flex';
+    document.getElementById('kpi-modal').style.display = 'flex';
 }
 
-/**
- * Close KPI modal
- */
 function closeKPIModal() {
     document.getElementById('kpi-modal').style.display = 'none';
 }
 
-/**
- * Load network statistics
- */
-async function loadNetworkStats() {
-    try {
-        const response = await fetch('/api/map/stats');
-        const data = await response.json();
+// ─── Search & region filter ───────────────────────────────────────────────────
 
-        if (data.success) {
-            const stats = data.stats;
-            document.getElementById('sites-count').textContent = stats.total_sites;
-            document.getElementById('sectors-count').textContent = stats.total_sectors;
-            document.getElementById('cells-count').textContent = stats.total_cells;
-            document.getElementById('availability-percent').textContent = stats.avg_availability.toFixed(2) + '%';
-        }
-    } catch (error) {
-        console.error('Error loading stats:', error);
-    }
+function buildRegionFilter(sites) {
+    const select  = document.getElementById('region-filter');
+    const current = select.value;
+    const regions = [...new Set(sites.map(s => s.region).filter(Boolean))].sort();
+
+    select.innerHTML = '<option value="all">All Regions</option>';
+    regions.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = `Region ${r}`;
+        if (r === current) opt.selected = true;
+        select.appendChild(opt);
+    });
 }
 
-/**
- * Search sites by name or ID
- */
 function searchSites() {
-    const searchTerm = document.getElementById('site-search').value.toLowerCase();
+    const term = document.getElementById('site-search').value.toLowerCase();
+    if (!term) { displaySites(sitesData); return; }
 
-    if (!searchTerm) {
-        displaySites(sitesData);
-        return;
-    }
-
-    const filtered = sitesData.filter(site =>
-        site.site_name.toLowerCase().includes(searchTerm) ||
-        site.site_id.toLowerCase().includes(searchTerm)
+    const filtered = sitesData.filter(s =>
+        s.site_name.toLowerCase().includes(term) ||
+        String(s.site_id).toLowerCase().includes(term)
     );
-
     displaySites(filtered);
 
-    if (filtered.length > 0) {
-        const bounds = filtered.map(site => [site.latitude, site.longitude]);
-        map.fitBounds(bounds, { padding: [50, 50] });
-    }
+    if (filtered.length > 0)
+        map.fitBounds(
+            filtered.map(s => [s.latitude, s.longitude]),
+            { padding: [50, 50] }
+        );
 }
 
-/**
- * Filter sites by region
- */
 function filterByRegion() {
-    const region = document.getElementById('region-filter').value;
-
-    if (region === 'all') {
-        displaySites(sitesData);
-        return;
-    }
-
-    const filtered = sitesData.filter(site => site.region === region);
+    const region   = document.getElementById('region-filter').value;
+    const filtered = region === 'all'
+        ? sitesData
+        : sitesData.filter(s => s.region === region);
     displaySites(filtered);
 
-    if (filtered.length > 0) {
-        const bounds = filtered.map(site => [site.latitude, site.longitude]);
-        map.fitBounds(bounds, { padding: [50, 50] });
-    }
+    if (filtered.length > 0)
+        map.fitBounds(
+            filtered.map(s => [s.latitude, s.longitude]),
+            { padding: [50, 50] }
+        );
 }
 
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('kpi-modal');
-    if (event.target === modal) {
-        closeKPIModal();
-    }
-}
+// Close modal on backdrop click
+window.onclick = e => {
+    if (e.target === document.getElementById('kpi-modal')) closeKPIModal();
+};
