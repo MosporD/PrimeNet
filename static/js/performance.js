@@ -248,7 +248,7 @@ function showCellPicker(cells) {
     document.getElementById('loading-charts').style.display = 'none';
     document.getElementById('no-selection').style.display   = 'flex';
     document.getElementById('btn-export').style.display     = 'none';
-    document.getElementById('btn-refresh').style.display    = 'none';
+    document.getElementById('btn-refresh').style.display    = 'inline-flex';
 
     document.getElementById('charts-title').textContent = 'Select a cell';
     document.getElementById('charts-subtitle').textContent =
