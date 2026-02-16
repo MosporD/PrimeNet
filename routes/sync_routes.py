@@ -6,8 +6,10 @@ Admin-only.
 
 from flask import Blueprint, request, jsonify, redirect, url_for
 from functools import wraps
-import sqlite3
+import sqlite3, os, sys
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from sync_config import NCMUSERS_DB
 from database_enhanced import get_user_by_session
 
 sync_bp = Blueprint('sync', __name__)
@@ -43,7 +45,7 @@ def sync_status():
             jobs.append({'id': job.id, 'name': job.name, 'next_run': next_run})
 
     # Last sync per type/technology from sync_log
-    conn = sqlite3.connect('ncm_users.db')
+    conn = sqlite3.connect(NCMUSERS_DB)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute('''
@@ -65,7 +67,7 @@ def sync_status():
 def sync_history():
     """Return recent sync log entries."""
     limit = request.args.get('limit', 50, type=int)
-    conn = sqlite3.connect('ncm_users.db')
+    conn = sqlite3.connect(NCMUSERS_DB)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     cursor.execute('''

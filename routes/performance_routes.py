@@ -13,15 +13,13 @@ live DB schema so no code changes are needed when the file structure changes.
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from functools import wraps
-import sqlite3
+import sqlite3, os, sys
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB
 from database_enhanced import get_user_by_session, log_activity
 
 performance_bp = Blueprint('performance', __name__)
-
-METADATA_DB  = 'metadata.db'
-NOKIA_PM_DB  = 'nokia_pm.db'
-HUAWEI_PM_DB = 'huawei_pm.db'
 
 _FIXED_COLS = {'id', 'cell_name', 'timestamp'}
 
@@ -68,7 +66,8 @@ def _user_id(user):
 # ---------------------------------------------------------------------------
 
 def _meta_conn():
-    conn = sqlite3.connect(METADATA_DB)
+    conn = sqlite3.connect(METADATA_DB, timeout=15)
+    conn.execute('PRAGMA journal_mode=WAL')
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -90,7 +89,8 @@ def _pm_conn(vendor=None):
     Open metadata.db and ATTACH the right PM db(s).
     Returns (conn, pm_alias_or_None).
     """
-    conn = sqlite3.connect(METADATA_DB)
+    conn = sqlite3.connect(METADATA_DB, timeout=15)
+    conn.execute('PRAGMA journal_mode=WAL')
     conn.row_factory = sqlite3.Row
 
     if vendor == 'Nokia':

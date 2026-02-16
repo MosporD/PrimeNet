@@ -10,6 +10,18 @@ Column detection is fully automatic — no mapping configuration needed.
 Files are stored with their original header names.
 """
 
+import os
+
+# Absolute path to the project root (directory containing this file).
+# All other paths are anchored here so the app works regardless of CWD.
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# ── Database files (all in project root) ────────────────────────────────────
+NOKIA_PM_DB  = os.path.join(PROJECT_ROOT, 'nokia_pm.db')
+HUAWEI_PM_DB = os.path.join(PROJECT_ROOT, 'huawei_pm.db')
+METADATA_DB  = os.path.join(PROJECT_ROOT, 'metadata.db')
+NCMUSERS_DB  = os.path.join(PROJECT_ROOT, 'ncm_users.db')
+
 # ============================================================
 # SERVER 1A — Nokia PM
 # 4 separate technology folders; each contains multiple XLSX
@@ -64,5 +76,5 @@ METADATA_SERVER = {
 PM_PULL_INTERVAL_HOURS       = 2   # Nokia + Huawei PM pulled every 2 hours
 METADATA_PULL_INTERVAL_HOURS = 24  # Metadata pulled once daily
 
-# Local staging directory for downloaded files
-LOCAL_DOWNLOAD_DIR = 'sync_downloads'
+# Local staging directory for downloaded files (absolute path)
+LOCAL_DOWNLOAD_DIR = os.path.join(PROJECT_ROOT, 'sync_downloads')

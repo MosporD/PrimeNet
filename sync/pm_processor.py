@@ -17,10 +17,11 @@ import logging
 import pandas as pd
 from datetime import datetime
 
-logger = logging.getLogger(__name__)
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB
 
-NOKIA_PM_DB  = 'nokia_pm.db'
-HUAWEI_PM_DB = 'huawei_pm.db'
+logger = logging.getLogger(__name__)
 
 # Keywords used to auto-detect the cell_name column (case-insensitive substring match)
 _CELL_KEYWORDS = ['cell', 'bts', 'wcel', 'lncel', 'nrcel', 'name', 'trans']
@@ -112,7 +113,8 @@ def _insert_df(db_path, df, technology):
     """
     kpi_cols = [c for c in df.columns if c not in ('cell_name', 'timestamp')]
 
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute('PRAGMA journal_mode=WAL')   # allow readers while writing
     _ensure_columns(conn, 'cell_kpis', kpi_cols)
 
     inserted = 0
