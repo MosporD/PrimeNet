@@ -20,15 +20,15 @@ app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
 # ============================================================================
 
 # Import and register blueprints
-from routes.auth_routes import auth_bp
-from routes.xml_parser_routes import xml_parser_bp
-from routes.excel_generator_routes import excel_generator_bp
-from routes.ne_comparison_routes import ne_comparison_bp
-from routes.parameter_dictionary_routes import parameter_dictionary_bp
-from routes.network_map_routes import network_map_bp
-from routes.admin_panel_routes import admin_panel_bp
-from routes.sync_routes import sync_bp
-from routes.performance_routes import performance_bp
+from routes.auth_routes import auth_bp                          # auth (shared infra)
+from network_map.routes import network_map_bp                   # module: network_map/
+from performance.routes import performance_bp                   # module: performance/
+from ne_comparison.routes import ne_comparison_bp               # module: ne_comparison/
+from excel_generator.routes import excel_generator_bp           # module: excel_generator/
+from xml_parser.routes import xml_parser_bp                     # module: xml_parser/
+from parameter_dictionary.routes import parameter_dictionary_bp # module: parameter_dictionary/
+from admin_panel.routes import admin_panel_bp                   # module: admin_panel/
+from sync.routes import sync_bp                                 # sync infra: sync/
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(xml_parser_bp)

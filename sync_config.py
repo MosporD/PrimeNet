@@ -6,16 +6,26 @@ Three data sources:
   Server 1B — Huawei PM   (10.119.10.104)
   Server 2  — Metadata    (192.168.7.207)
 
-Column maps verified against actual sample files (2026-02-15 snapshot):
-  - Metadata: CSV files per technology (2G, 3G, 4G FDD, 4G TDD, 5G)
-  - Nokia PM: XLSX per technology; 4G headers confirmed from local sample
+PM column detection is fully automatic (no mapping needed at runtime).
+Column maps below are kept as reference / used by import_local_files.py.
 """
+
+import os
+
+# Absolute path to the project root (directory containing this file).
+# All other paths are anchored here so the app works regardless of CWD.
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# ── Database files (all in project root) ────────────────────────────────────
+NOKIA_PM_DB  = os.path.join(PROJECT_ROOT, 'nokia_pm.db')
+HUAWEI_PM_DB = os.path.join(PROJECT_ROOT, 'huawei_pm.db')
+METADATA_DB  = os.path.join(PROJECT_ROOT, 'metadata.db')
+NCMUSERS_DB  = os.path.join(PROJECT_ROOT, 'ncm_users.db')
 
 # ============================================================
 # SERVER 1A — Nokia PM
 # 4 separate technology folders; each contains multiple XLSX
 # files — the scheduler downloads the LATEST one per folder.
-# Technologies: 2G, 3G, 4G, 5G
 # ============================================================
 NOKIA_PM_SERVER = {
     'host':     '10.119.219.77',
@@ -31,22 +41,13 @@ NOKIA_PM_SERVER = {
 }
 
 # Nokia KPI column mappings — per-technology dicts  (XLSX header → DB field name)
-# Sheet name for each technology:  "<TECH> Performance"  (e.g. "4G Performance")
-# Verified against local 2026-02-15 sample files.
+# Used by import_local_files.py; runtime scheduler uses auto-detection instead.
+# ⚠ Update these if the actual file headers differ.
 NOKIA_PM_COLUMN_MAPS = {
     '2G': {
         'cell_name':             'BTS name',
         'timestamp':             'Period start time',
-        'avg_users':             None,
-        'data_volume_gb':        None,
-        'rsrp':                  None,
-        'rsrq':                  None,
-        'sinr':                  None,
-        'cqi':                   None,
-        'throughput_dl_mbps':    None,
-        'throughput_ul_mbps':    None,
         'rrc_success_rate':      'Call Setup Success Rate - overall',
-        'erab_success_rate':     'Immediate assignment success rate',
         'call_drop_rate':        'Call DR',
         'handover_success_rate': 'HO SR w/o Intracell',
         'availability_percent':  'TCH availability ratio',
@@ -55,10 +56,8 @@ NOKIA_PM_COLUMN_MAPS = {
         'cell_name':             'WCEL name',
         'timestamp':             'Period start time',
         'avg_users':             'Average number of simultaneous HSDPA users',
-        'data_volume_gb':        None,
         'rsrp':                  'Average CPICH RSCP',
         'rsrq':                  'Average CPICH ECNO',
-        'sinr':                  None,
         'cqi':                   'Avg reported CQI',
         'throughput_dl_mbps':    'HSDPA Cell thp',
         'throughput_ul_mbps':    'Active  HSUPA cell thp',
@@ -73,9 +72,6 @@ NOKIA_PM_COLUMN_MAPS = {
         'timestamp':             'Period start time',
         'avg_users':             'Avg act UEs DL',
         'data_volume_gb':        'PDCP SDU Volume, DL (GB)',
-        'rsrp':                  None,
-        'rsrq':                  None,
-        'sinr':                  None,
         'cqi':                   'Average CQI',
         'throughput_dl_mbps':    'Avg PDCP cell thp DL (Mbps)',
         'throughput_ul_mbps':    'Avg PDCP cell thp UL (Mbps)',
@@ -89,9 +85,6 @@ NOKIA_PM_COLUMN_MAPS = {
         'cell_name':             'NRCEL name',
         'timestamp':             'Period start time',
         'avg_users':             'Avg nr act UEs data buff DRBs DL',
-        'data_volume_gb':        None,
-        'rsrp':                  None,
-        'rsrq':                  None,
         'sinr':                  'Avg UE rel SINR PUSCH rank1',
         'cqi':                   'Avg wb CQI 256QAM',
         'throughput_dl_mbps':    'Act cell MAC thp PDSCH',
@@ -104,16 +97,13 @@ NOKIA_PM_COLUMN_MAPS = {
     },
 }
 
-# Backward-compat alias used by the scheduler (4G map)
+# Backward-compat alias
 NOKIA_PM_COLUMN_MAP = NOKIA_PM_COLUMN_MAPS['4G']
 
 
 # ============================================================
 # SERVER 1B — Huawei PM
-# Single folder containing one XLSX file; the scheduler
-# downloads the LATEST file in that folder.
-# The file has 3 sheets: one per technology (2G, 3G, 4G).
-# Technologies: 2G, 3G, 4G  (no 5G for Huawei)
+# Single folder containing one XLSX file with multiple sheets.
 # ============================================================
 HUAWEI_PM_SERVER = {
     'host':       '10.119.10.104',
@@ -124,7 +114,6 @@ HUAWEI_PM_SERVER = {
 }
 
 # Huawei sheet names inside the Excel file → technology label
-# ⚠ Update the right-hand values if the sheet names differ from these defaults.
 HUAWEI_SHEET_TECH_MAP = {
     '2G': '2G',
     '3G': '3G',
@@ -132,17 +121,13 @@ HUAWEI_SHEET_TECH_MAP = {
 }
 
 # Huawei KPI column mappings — per-technology dicts  (XLSX header → DB field name)
-# Source file: Performance.xlsx  (sheets: '4G', '3G', '2G')
-# Verified against local 2026-02-15 sample file.
+# Used by import_local_files.py; runtime scheduler uses auto-detection instead.
 HUAWEI_PM_COLUMN_MAPS = {
     '4G': {
         'cell_name':             'Cell Name',
         'timestamp':             'Date',
         'avg_users':             'L.Traffic.User.Avg',
         'data_volume_gb':        'Downlink Traffic Volume (GB)',
-        'rsrp':                  None,
-        'rsrq':                  None,
-        'sinr':                  None,
         'cqi':                   'Average CQI',
         'throughput_dl_mbps':    'User DL PDCP Average Throughput (Mbps)',
         'throughput_ul_mbps':    'User UL PDCP Average Throughput (Mbps)',
@@ -159,27 +144,17 @@ HUAWEI_PM_COLUMN_MAPS = {
         'data_volume_gb':        'HSDPA Traffic (GB)',
         'rsrp':                  'VS.MeanTCP(dBm)',
         'rsrq':                  'VS.MeanRTWP(dBm)',
-        'sinr':                  None,
-        'cqi':                   None,
         'throughput_dl_mbps':    'VS.HSDPA.MeanChThroughput(kbit/s)',
         'throughput_ul_mbps':    'VS.HSUPA.MeanChThroughput(kbit/s)',
         'rrc_success_rate':      'U.RRC Connection Success Rate (Service)(%)',
         'erab_success_rate':     'U.PS RAB Establishment Success Rate (Cell)(%)',
         'call_drop_rate':        'AMR Call Drop Ratio(%)',
         'handover_success_rate': 'Soft Handover Success Ratio (Cell)(%)',
-        'availability_percent':  None,   # only unavailability ratio available
     },
     '2G': {
         'cell_name':             'Cell Name',
         'timestamp':             'Date',
-        'avg_users':             None,
         'data_volume_gb':        'DL Traffic (GB)',
-        'rsrp':                  None,
-        'rsrq':                  None,
-        'sinr':                  None,
-        'cqi':                   None,
-        'throughput_dl_mbps':    None,
-        'throughput_ul_mbps':    None,
         'rrc_success_rate':      'CSSR(%)',
         'erab_success_rate':     'Assignment success Rate TCH(%)',
         'call_drop_rate':        'Drop Call Rate',
@@ -188,82 +163,43 @@ HUAWEI_PM_COLUMN_MAPS = {
     },
 }
 
-# Backward-compat alias used by the scheduler (4G map)
+# Backward-compat alias
 HUAWEI_PM_COLUMN_MAP = HUAWEI_PM_COLUMN_MAPS['4G']
 
 
 # ============================================================
 # SERVER 2 — Metadata
 # Root directory contains multiple dated snapshot folders.
-# The scheduler enters the NEWEST folder and downloads one
-# file per technology (5 files: 2G, 3G, 4G-FDD, 4G-TDD, 5G).
+# Each folder contains Atoll-exported CSVs:
+#   Site 3G - YYYY-MM-DD.csv, Site L18 - YYYY-MM-DD.csv, …
+#   Transmitter 2G - YYYY-MM-DD.csv, …
 # ============================================================
 METADATA_SERVER = {
     'host':     '192.168.7.207',
     'port':     22,
     'username': 'ftpuser',
     'password': 'Zain@1234',
-    # ⚠ Set to the root directory that contains the dated snapshot folders.
-    # e.g. '/home/ftpuser/metadata' or '/data/network/metadata'
-    'root_dir': '/home/ftpuser',
-}
-
-# Expected filename for each technology inside the snapshot folder.
-# Set to None to auto-pick the first XLSX found for that slot.
-# ⚠ Update filenames to match what's actually on the server.
-METADATA_FILE_MAP = {
-    '2G':     None,       # e.g. '2G.xlsx'
-    '3G':     None,       # e.g. '3G.xlsx'
-    '4G-FDD': None,       # e.g. '4G-FDD.xlsx'
-    '4G-TDD': None,       # e.g. '4G-TDD.xlsx'
-    '5G':     None,       # e.g. '5G.xlsx'
-}
-
-# Metadata column mappings  (file header → DB field name)
-# Generic/fallback map used when headers already match DB field names.
-METADATA_COLUMN_MAP = {
-    'site_id':          'Site ID',
-    'site_name':        'Site Name',
-    'cell_name':        'Cell Name',
-    'vendor':           'Vendor',
-    'latitude':         'Latitude',
-    'longitude':        'Longitude',
-    'region':           'Region',
-    'site_type':        'Site Type',
-    'frequency_band':   'Frequency Band',
-    'azimuth':          'Azimuth',
-    'mechanical_tilt':  'Mechanical Tilt',
-    'electrical_tilt':  'Electrical Tilt',
-    'pci':              'PCI',
+    'root_dir': '/',   # dated snapshot folders sit at the SFTP root
 }
 
 # Per-technology CSV column maps (CSV header → DB field name).
 # Verified against *-2026-02-15.csv snapshot files.
-# Common fields shared across all technologies:
-#   cell_name, vendor, lat→latitude, long→longitude, cluster→region,
-#   azimuth, etilt→electrical_tilt, mtilt→mechanical_tilt
 METADATA_CSV_COLUMN_MAPS = {
     '2G': {
-        # site identification
         'site_id':          'site_id',
         'site_name':        'site_name',
-        # cell
         'cell_name':        'cell_name',
         'vendor':           'vendor',
-        # location
         'latitude':         'lat',
         'longitude':        'long',
         'region':           'cluster',
-        # antenna
         'azimuth':          'azimuth',
         'electrical_tilt':  'etilt',
         'mechanical_tilt':  'mtilt',
-        # radio
         'frequency_band':   'frequency_band',
         'pci':              'bcc',       # BCC is the closest 2G analogue
     },
     '3G': {
-        # 3G uses nodeb for the site; no site_id column — use nodeb_id
         'site_id':          'nodeb_id',
         'site_name':        'nodeb_name',
         'cell_name':        'cell_name',
@@ -328,5 +264,5 @@ METADATA_CSV_COLUMN_MAPS = {
 PM_PULL_INTERVAL_HOURS       = 2   # Nokia + Huawei PM pulled every 2 hours
 METADATA_PULL_INTERVAL_HOURS = 24  # Metadata pulled once daily
 
-# Local staging directory for downloaded files
-LOCAL_DOWNLOAD_DIR = 'sync_downloads'
+# Local staging directory for downloaded files (absolute path)
+LOCAL_DOWNLOAD_DIR = os.path.join(PROJECT_ROOT, 'sync_downloads')

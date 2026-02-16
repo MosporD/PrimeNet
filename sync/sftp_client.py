@@ -166,6 +166,158 @@ class SFTPClient:
 
         return results
 
+    def download_all_xlsx_from_subfolders(self, root_dir, prefix=''):
+        """
+        Find the newest subdirectory inside root_dir, enter it, then
+        descend into each subfolder within it and download ALL Excel/CSV
+        files found there.
+
+        Folder structure expected:
+            root_dir/
+              <latest_dated_folder>/     ← newest by mtime
+                <tech_subfolder>/        ← e.g. 2G, 3G, 4G-FDD …
+                  file1.xlsx
+                  file2.xlsx
+                  ...
+
+        Returns {subfolder_name: [local_path, ...]}
+
+        Falls back gracefully if the latest folder has no subfolders (flat
+        structure) — in that case all Excel files are returned under the
+        key '_root'.
+        """
+        ssh, sftp = None, None
+        results = {}
+        try:
+            ssh, sftp = self._open()
+
+            # ── 1. Find newest subdirectory in root_dir ──────────────────
+            entries = sftp.listdir_attr(root_dir)
+            subdirs = [e for e in entries if stat.S_ISDIR(e.st_mode)]
+            if not subdirs:
+                logger.warning(f'No subdirectories found in {root_dir}')
+                return results
+
+            subdirs.sort(key=lambda e: e.st_mtime or 0, reverse=True)
+            latest_dir = f'{root_dir.rstrip("/")}/{subdirs[0].filename}'
+            logger.info(f'Latest metadata folder: {latest_dir}')
+
+            # ── 2. List contents of the latest folder ────────────────────
+            inner_entries = sftp.listdir_attr(latest_dir)
+            inner_subdirs = [e for e in inner_entries if stat.S_ISDIR(e.st_mode)]
+            ts = datetime.now().strftime('%Y%m%d_%H%M')
+
+            if inner_subdirs:
+                # Expected path: root/latest/<subfolder>/*.xlsx
+                for sub in inner_subdirs:
+                    sub_path = f'{latest_dir}/{sub.filename}'
+                    sub_entries = sftp.listdir_attr(sub_path)
+                    xlsx_files = [
+                        e for e in sub_entries
+                        if not stat.S_ISDIR(e.st_mode)
+                        and e.filename.lower().endswith(DATA_EXTS)
+                    ]
+                    if not xlsx_files:
+                        logger.info(f'No Excel files in subfolder {sub_path}')
+                        continue
+
+                    downloaded = []
+                    for f in xlsx_files:
+                        remote_path = f'{sub_path}/{f.filename}'
+                        local_name  = f'{prefix}{sub.filename}_{ts}_{f.filename}'
+                        local_path  = self._download(sftp, remote_path, local_name)
+                        if local_path:
+                            downloaded.append(local_path)
+                    if downloaded:
+                        results[sub.filename] = downloaded
+            else:
+                # Flat structure — files sit directly in latest_dir (no tech subfolders).
+                # Key each file by its stem (e.g. "2G-2025-12-03" or "2G") so the
+                # metadata processor can match it to the right technology column map.
+                xlsx_files = [
+                    e for e in inner_entries
+                    if not stat.S_ISDIR(e.st_mode)
+                    and e.filename.lower().endswith(DATA_EXTS)
+                ]
+                if not xlsx_files:
+                    logger.warning(f'No Excel/CSV files found in {latest_dir}')
+                else:
+                    for f in xlsx_files:
+                        remote_path = f'{latest_dir}/{f.filename}'
+                        local_name  = f'{prefix}{ts}_{f.filename}'
+                        local_path  = self._download(sftp, remote_path, local_name)
+                        if local_path:
+                            stem = os.path.splitext(f.filename)[0]
+                            results[stem] = [local_path]
+
+        except Exception as e:
+            logger.error(f'download_all_xlsx_from_subfolders({root_dir}): {e}')
+        finally:
+            if sftp: sftp.close()
+            if ssh:  ssh.close()
+
+        return results
+
+    def download_files_from_latest_subdir(self, root_dir, prefix=''):
+        """
+        Find the newest subdirectory inside root_dir, then download ALL
+        data files (CSV / XLSX) that sit DIRECTLY in it — no recursion
+        into inner sub-subfolders.
+
+        Folder structure expected:
+            root_dir/
+              <latest_dated_folder>/     ← newest by mtime
+                file1.csv                ← downloaded
+                file2.csv                ← downloaded
+                some_subfolder/          ← IGNORED
+
+        Returns {file_stem: [local_path]}
+        """
+        ssh, sftp = None, None
+        results = {}
+        try:
+            ssh, sftp = self._open()
+
+            # Find newest subdirectory at root
+            entries = sftp.listdir_attr(root_dir)
+            subdirs = [e for e in entries if stat.S_ISDIR(e.st_mode)]
+            if not subdirs:
+                logger.warning(f'No subdirectories found in {root_dir}')
+                return results
+
+            subdirs.sort(key=lambda e: e.st_mtime or 0, reverse=True)
+            latest_dir = f'{root_dir.rstrip("/")}/{subdirs[0].filename}'
+            logger.info(f'Latest metadata folder: {latest_dir}')
+
+            # Download only files at the first level (skip subdirectories)
+            inner_entries = sftp.listdir_attr(latest_dir)
+            data_files = [
+                e for e in inner_entries
+                if not stat.S_ISDIR(e.st_mode)
+                and e.filename.lower().endswith(DATA_EXTS)
+            ]
+
+            if not data_files:
+                logger.warning(f'No data files found at first tier of {latest_dir}')
+                return results
+
+            ts = datetime.now().strftime('%Y%m%d_%H%M')
+            for f in data_files:
+                remote_path = f'{latest_dir}/{f.filename}'
+                local_name  = f'{prefix}{ts}_{f.filename}'
+                local_path  = self._download(sftp, remote_path, local_name)
+                if local_path:
+                    stem = os.path.splitext(f.filename)[0]
+                    results[stem] = [local_path]
+
+        except Exception as e:
+            logger.error(f'download_files_from_latest_subdir({root_dir}): {e}')
+        finally:
+            if sftp: sftp.close()
+            if ssh:  ssh.close()
+
+        return results
+
     def download_file_exact(self, remote_path, local_filename=None):
         """Download a single file by its full remote path."""
         ssh, sftp = None, None

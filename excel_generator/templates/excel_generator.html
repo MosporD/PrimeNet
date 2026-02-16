@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Generator - Nokia NCM</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('excel_generator.static', filename='excel_generator.css') }}?v=1.0">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">← Dashboard</a>
+                    <h1>📊 Excel Generator</h1>
+                    <p>Generate XML configuration files from Excel templates</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="upload-section">
+                <h2>Upload Excel File</h2>
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="excel-file" name="file" accept=".xlsx,.xls" required>
+                        <label for="excel-file" class="file-label">
+                            <span class="file-icon">📁</span>
+                            <span class="file-text">Choose Excel file...</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-primary">Upload Excel File</button>
+                </form>
+                <div id="upload-status" class="status-message"></div>
+            </div>
+
+            <div id="operations-section" class="operations-section" style="display: none;">
+                <h2>Select Operations for MO Classes</h2>
+                <p class="section-description">Choose the operation type for each MO class found in your Excel file:</p>
+                <div id="operations-list" class="operations-list"></div>
+                <div class="actions-row">
+                    <button onclick="generateXML()" class="btn-success btn-large">
+                        ⚙️ Generate XML
+                    </button>
+                </div>
+            </div>
+
+            <div id="results-section" class="results-section" style="display: none;">
+                <h2>XML Generated Successfully</h2>
+                <div class="results-info">
+                    <p id="results-message"></p>
+                    <button onclick="downloadFile()" class="btn-success btn-large">
+                        📥 Download XML File
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script src="{{ url_for('excel_generator.static', filename='excel_generator.js') }}?v=1.0"></script>
+</body>
+</html>

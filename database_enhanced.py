@@ -8,9 +8,11 @@ import hashlib
 import secrets
 from datetime import datetime
 import os
+import sys
 import json
 
-DATABASE = 'ncm_users.db'
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from sync_config import NCMUSERS_DB as DATABASE
 
 def get_db():
     """Get database connection"""
