@@ -82,8 +82,18 @@ def _infer_tech(key):
 
 
 # ---------------------------------------------------------------------------
-# Site file processing  (columns: Name, lat, long)
+# Site file processing  (columns: Name, lat, long  OR  enb_name, lat, long)
 # ---------------------------------------------------------------------------
+
+def _extract_site_id(site_name):
+    """
+    Extract the numeric prefix from an Atoll site name.
+    '601-North_Jordan_Cement_Factory' → '601'
+    Falls back to the full name when no numeric prefix is present.
+    """
+    m = re.match(r'^(\d+)', str(site_name).strip())
+    return m.group(1) if m else site_name
+
 
 def _process_site_file(file_path, key):
     technology = _infer_tech(key)
@@ -95,9 +105,12 @@ def _process_site_file(file_path, key):
 
     cols = list(df.columns)
 
-    name_col = _find_col(cols, ['name', 'site_name', 'site name', 'sitename'])
-    lat_col  = _find_col(cols, ['lat', 'latitude'])
-    lon_col  = _find_col(cols, ['long', 'longitude', 'lng', 'lon'])
+    # Explicit numeric ID column present in Pin/eNB files
+    site_id_col = _find_col(cols, ['enb_id_actual', 'site_id', 'enb_id'])
+    name_col    = _find_col(cols, ['enb_name', 'name', 'site_name', 'site name', 'sitename'])
+    lat_col     = _find_col(cols, ['lat', 'latitude'])
+    lon_col     = _find_col(cols, ['long', 'longitude', 'lng', 'lon'])
+    vendor_col  = _find_col(cols, ['vendor'])
 
     if not name_col:
         msg = f'Site file [{key}]: cannot detect name column. Found: {cols}'
@@ -115,21 +128,28 @@ def _process_site_file(file_path, key):
             skipped += 1
             continue
 
-        site_id = site_name   # use name as primary key (no numeric ID in Atoll exports)
-        lat = _safe_float(row.get(lat_col))  if lat_col else None
-        lon = _safe_float(row.get(lon_col))  if lon_col else None
+        # Prefer an explicit ID column; otherwise extract numeric prefix from name
+        if site_id_col:
+            site_id = _safe_str(row.get(site_id_col)) or _extract_site_id(site_name)
+        else:
+            site_id = _extract_site_id(site_name)
+
+        lat    = _safe_float(row.get(lat_col))   if lat_col    else None
+        lon    = _safe_float(row.get(lon_col))   if lon_col    else None
+        vendor = _safe_str(row.get(vendor_col))  if vendor_col else None
 
         cursor.execute('''
-            INSERT INTO sites (site_id, site_name, latitude, longitude, site_type, status)
-            VALUES (?, ?, ?, ?, ?, 'Active')
+            INSERT INTO sites (site_id, site_name, latitude, longitude, site_type, vendor, status)
+            VALUES (?, ?, ?, ?, ?, ?, 'Active')
             ON CONFLICT(site_id) DO UPDATE SET
                 site_name  = excluded.site_name,
                 latitude   = COALESCE(excluded.latitude,  sites.latitude),
                 longitude  = COALESCE(excluded.longitude, sites.longitude),
                 site_type  = COALESCE(excluded.site_type, sites.site_type),
+                vendor     = COALESCE(excluded.vendor,    sites.vendor),
                 status     = 'Active',
                 updated_at = CURRENT_TIMESTAMP
-        ''', (site_id, site_name, lat, lon, technology))
+        ''', (site_id, site_name, lat, lon, technology, vendor))
         upserted += 1
 
     conn.commit()

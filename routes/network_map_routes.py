@@ -5,15 +5,13 @@ Handles network visualization and KPI display
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from functools import wraps
-import sqlite3
+import sqlite3, os, sys
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB
 from database_enhanced import get_user_by_session, log_activity
 
 network_map_bp = Blueprint('network_map', __name__)
-
-METADATA_DB  = 'metadata.db'
-NOKIA_PM_DB  = 'nokia_pm.db'
-HUAWEI_PM_DB = 'huawei_pm.db'
 
 
 def login_required(f):

@@ -258,6 +258,66 @@ class SFTPClient:
 
         return results
 
+    def download_files_from_latest_subdir(self, root_dir, prefix=''):
+        """
+        Find the newest subdirectory inside root_dir, then download ALL
+        data files (CSV / XLSX) that sit DIRECTLY in it — no recursion
+        into inner sub-subfolders.
+
+        Folder structure expected:
+            root_dir/
+              <latest_dated_folder>/     ← newest by mtime
+                file1.csv                ← downloaded
+                file2.csv                ← downloaded
+                some_subfolder/          ← IGNORED
+
+        Returns {file_stem: [local_path]}
+        """
+        ssh, sftp = None, None
+        results = {}
+        try:
+            ssh, sftp = self._open()
+
+            # Find newest subdirectory at root
+            entries = sftp.listdir_attr(root_dir)
+            subdirs = [e for e in entries if stat.S_ISDIR(e.st_mode)]
+            if not subdirs:
+                logger.warning(f'No subdirectories found in {root_dir}')
+                return results
+
+            subdirs.sort(key=lambda e: e.st_mtime or 0, reverse=True)
+            latest_dir = f'{root_dir.rstrip("/")}/{subdirs[0].filename}'
+            logger.info(f'Latest metadata folder: {latest_dir}')
+
+            # Download only files at the first level (skip subdirectories)
+            inner_entries = sftp.listdir_attr(latest_dir)
+            data_files = [
+                e for e in inner_entries
+                if not stat.S_ISDIR(e.st_mode)
+                and e.filename.lower().endswith(DATA_EXTS)
+            ]
+
+            if not data_files:
+                logger.warning(f'No data files found at first tier of {latest_dir}')
+                return results
+
+            ts = datetime.now().strftime('%Y%m%d_%H%M')
+            for f in data_files:
+                remote_path = f'{latest_dir}/{f.filename}'
+                local_name  = f'{prefix}{ts}_{f.filename}'
+                local_path  = self._download(sftp, remote_path, local_name)
+                if local_path:
+                    stem = os.path.splitext(f.filename)[0]
+                    results[stem] = [local_path]
+
+        except Exception as e:
+            logger.error(f'download_files_from_latest_subdir({root_dir}): {e}')
+        finally:
+            if sftp: sftp.close()
+            if ssh:  ssh.close()
+
+        return results
+
     def download_file_exact(self, remote_path, local_filename=None):
         """Download a single file by its full remote path."""
         ssh, sftp = None, None

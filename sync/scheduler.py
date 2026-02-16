@@ -145,9 +145,10 @@ def pull_metadata():
         local_dir=f'{LOCAL_DOWNLOAD_DIR}/metadata',
     )
 
-    # Enter the latest dated snapshot folder, then download ALL Excel files
-    # from each subfolder inside it (e.g. 2G/, 3G/, 4G-FDD/, 4G-TDD/, 5G/).
-    downloaded = client.download_all_xlsx_from_subfolders(
+    # Enter the latest dated snapshot folder and download the CSV files
+    # that sit directly at its first level (skip any inner sub-subfolders
+    # such as "Atoll Files/").
+    downloaded = client.download_files_from_latest_subdir(
         root_dir=METADATA_SERVER['root_dir'],
         prefix='meta_',
     )
