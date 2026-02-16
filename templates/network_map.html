@@ -6,25 +6,23 @@
     <title>Network Map - Nokia NCM</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/network_map.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/network_map.css') }}?v=1.1">
 </head>
-<body>
-    <div class="container">
-        <header>
-            <div class="header-content">
-                <div class="header-left">
-                    <a href="/dashboard" class="back-link">← Dashboard</a>
-                    <h1>🗺️ Network Map</h1>
-                    <p>Interactive visualization of network sites and KPIs</p>
-                </div>
-                <div class="header-right">
-                    <span class="user-name">{{ user.username }}</span>
-                    <button onclick="logout()" class="btn-logout">Logout</button>
-                </div>
-            </div>
-        </header>
+<body class="map-page">
+    <header class="map-header">
+        <div class="header-left">
+            <a href="/dashboard" class="back-link">← Dashboard</a>
+            <h1>🗺️ Network Map</h1>
+        </div>
+        <div class="header-right">
+            <span class="user-name">{{ user.username }}</span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </header>
 
-        <main class="main-content">
+    <div class="map-body">
+        <!-- Left overlay panel -->
+        <div class="left-panel">
             <div class="map-controls">
                 <input type="text" id="site-search" placeholder="Search sites..." onkeyup="searchSites()">
                 <select id="region-filter" onchange="filterByRegion()">
@@ -36,35 +34,20 @@
                 </button>
             </div>
 
-            <div id="tech-filter" class="tech-filter">
-                <!-- Populated by map.js after stats load -->
-            </div>
+            <div id="tech-filter" class="tech-filter"></div>
 
-            <div id="network-map"></div>
-
-            <div class="map-panels">
-                <div class="network-stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="sites-count">0</div>
-                        <div class="stat-label">Sites</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="sectors-count">0</div>
-                        <div class="stat-label">Sectors</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="cells-count">0</div>
-                        <div class="stat-label">Cells</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="availability-percent">0%</div>
-                        <div class="stat-label">Availability</div>
-                    </div>
+            <div class="network-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="sites-count">0</div>
+                    <div class="stat-label">Sites</div>
                 </div>
-
-                <div id="site-info-panel" style="display: none;"></div>
             </div>
-        </main>
+
+            <div id="site-info-panel" style="display: none;"></div>
+        </div>
+
+        <!-- Full-page map -->
+        <div id="network-map"></div>
     </div>
 
     <div id="kpi-modal">
@@ -75,9 +58,8 @@
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{{ url_for('static', filename='js/map.js') }}?v=1.0"></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}?v=1.1"></script>
     <script>
-        // Initialize map on page load
         document.addEventListener('DOMContentLoaded', () => {
             initializeMap();
         });

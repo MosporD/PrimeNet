@@ -54,10 +54,7 @@ async function loadNetworkStats() {
         if (!data.success) return;
 
         const s = data.stats;
-        document.getElementById('sites-count').textContent   = s.total_sites;
-        document.getElementById('sectors-count').textContent = s.total_cells;
-        document.getElementById('cells-count').textContent   = s.total_cells;
-        document.getElementById('availability-percent').textContent = '—';
+        document.getElementById('sites-count').textContent = s.total_sites;
 
         buildTechButtons(s.tech_counts || {});
     } catch (e) {
