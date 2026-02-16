@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=3.0">
 </head>
 <body>
     <div class="container">
@@ -26,61 +26,76 @@
 
         <main class="dashboard-main">
 
-            <!-- Primary features -->
-            <h2 class="dashboard-title">Core Functions</h2>
-            <div class="function-grid primary-grid">
-
-                <a href="/performance" class="function-card featured-card">
-                    <div class="function-icon">📈</div>
-                    <div class="function-name">Performance</div>
-                    <div class="function-description">Cell-level KPI trends, analytics and performance monitoring</div>
-                </a>
-
-                <a href="/network-map" class="function-card featured-card">
-                    <div class="function-icon">🗺️</div>
-                    <div class="function-name">Network Map</div>
-                    <div class="function-description">Live interactive map of network sites, sectors and KPIs</div>
-                </a>
-
-                <a href="/parameter-dictionary" class="function-card featured-card">
-                    <div class="function-icon">📚</div>
-                    <div class="function-name">Configuration</div>
-                    <div class="function-description">Browse and search network element parameter database</div>
-                </a>
-
-            </div>
-
-            <!-- Secondary tools -->
-            <h2 class="dashboard-title section-gap">Tools</h2>
-            <div class="function-grid">
-
-                <a href="/xml-parser" class="function-card">
-                    <div class="function-icon">📄</div>
-                    <div class="function-name">XML Parser</div>
-                    <div class="function-description">Parse XML files and convert to Excel format</div>
-                </a>
-
-                <a href="/excel-generator" class="function-card">
-                    <div class="function-icon">📊</div>
-                    <div class="function-name">Excel Generator</div>
-                    <div class="function-description">Generate XML files from Excel templates</div>
-                </a>
-
-                <a href="/ne-comparison" class="function-card">
-                    <div class="function-icon">🔍</div>
-                    <div class="function-name">NE Comparison</div>
-                    <div class="function-description">Compare XML configurations between network elements</div>
-                </a>
-
+            <!-- ── Section buttons ── -->
+            <div class="section-tabs">
+                <button class="section-tab active" id="tab-performance" onclick="openSection('performance')">
+                    📈 Performance
+                </button>
+                <button class="section-tab" id="tab-configuration" onclick="openSection('configuration')">
+                    ⚙️ Configuration
+                </button>
                 {% if user.role == 'admin' %}
-                <a href="/admin-panel" class="function-card admin-card">
-                    <div class="function-icon">🛡️</div>
-                    <div class="function-name">Admin</div>
-                    <div class="function-description">User management and system administration</div>
-                </a>
+                <button class="section-tab tab-admin" id="tab-admin" onclick="openSection('admin')">
+                    🛡️ Admin Panel
+                </button>
                 {% endif %}
-
             </div>
+
+            <!-- ── Performance panel ── -->
+            <div class="section-panel" id="section-performance">
+                <div class="function-grid">
+                    <a href="/performance" class="function-card">
+                        <div class="function-icon">📈</div>
+                        <div class="function-name">Analytics</div>
+                        <div class="function-description">Cell-level KPI trends, analytics and performance monitoring</div>
+                    </a>
+                    <a href="/network-map" class="function-card">
+                        <div class="function-icon">🗺️</div>
+                        <div class="function-name">Network Map</div>
+                        <div class="function-description">Live interactive map of network sites, sectors and KPIs</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ── Configuration panel ── -->
+            <div class="section-panel hidden" id="section-configuration">
+                <div class="function-grid">
+                    <a href="/parameter-dictionary" class="function-card">
+                        <div class="function-icon">📚</div>
+                        <div class="function-name">Parameter Dictionary</div>
+                        <div class="function-description">Browse and search network element parameter database</div>
+                    </a>
+                    <a href="/xml-parser" class="function-card">
+                        <div class="function-icon">📄</div>
+                        <div class="function-name">XML Parser</div>
+                        <div class="function-description">Parse XML files and convert to Excel format</div>
+                    </a>
+                    <a href="/excel-generator" class="function-card">
+                        <div class="function-icon">📊</div>
+                        <div class="function-name">Excel Generator</div>
+                        <div class="function-description">Generate XML files from Excel templates</div>
+                    </a>
+                    <a href="/ne-comparison" class="function-card">
+                        <div class="function-icon">🔍</div>
+                        <div class="function-name">NE Comparison</div>
+                        <div class="function-description">Compare XML configurations between network elements</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ── Admin panel (admin only) ── -->
+            {% if user.role == 'admin' %}
+            <div class="section-panel hidden" id="section-admin">
+                <div class="function-grid">
+                    <a href="/admin-panel" class="function-card admin-card">
+                        <div class="function-icon">🛡️</div>
+                        <div class="function-name">Admin Panel</div>
+                        <div class="function-description">User management and system administration</div>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
         </main>
 
         <footer>
@@ -89,6 +104,18 @@
     </div>
 
     <script>
+        function openSection(name) {
+            // Hide all panels and deactivate all tabs
+            document.querySelectorAll('.section-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+
+            // Show selected panel and activate tab
+            const panel = document.getElementById('section-' + name);
+            const tab   = document.getElementById('tab-' + name);
+            if (panel) panel.classList.remove('hidden');
+            if (tab)   tab.classList.add('active');
+        }
+
         async function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 try {
@@ -97,7 +124,6 @@
                         window.location.href = '/login';
                     }
                 } catch (error) {
-                    console.error('Logout error:', error);
                     window.location.href = '/login';
                 }
             }
