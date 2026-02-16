@@ -82,13 +82,41 @@ def sync_history():
 @sync_bp.route('/api/sync/trigger/pm', methods=['POST'])
 @admin_required
 def trigger_pm():
-    """Manually trigger a PM data pull now."""
+    """Manually trigger Nokia + Huawei PM pull."""
     try:
         from sync.scheduler import trigger_pm_now
         import threading
         t = threading.Thread(target=trigger_pm_now, daemon=True)
         t.start()
-        return jsonify({'success': True, 'message': 'PM pull triggered in background.'})
+        return jsonify({'success': True, 'message': 'Nokia + Huawei PM pull triggered in background.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/nokia_pm', methods=['POST'])
+@admin_required
+def trigger_nokia_pm():
+    """Manually trigger Nokia PM pull only."""
+    try:
+        from sync.scheduler import trigger_nokia_pm_now
+        import threading
+        t = threading.Thread(target=trigger_nokia_pm_now, daemon=True)
+        t.start()
+        return jsonify({'success': True, 'message': 'Nokia PM pull triggered in background.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/huawei_pm', methods=['POST'])
+@admin_required
+def trigger_huawei_pm():
+    """Manually trigger Huawei PM pull only."""
+    try:
+        from sync.scheduler import trigger_huawei_pm_now
+        import threading
+        t = threading.Thread(target=trigger_huawei_pm_now, daemon=True)
+        t.start()
+        return jsonify({'success': True, 'message': 'Huawei PM pull triggered in background.'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -314,21 +342,39 @@ def inspect_local():
         return max(candidates, key=os.path.getmtime) if candidates else None
 
     def _read_headers(file_path):
-        """Return (columns, sheets, error).  Tries openpyxl → xlrd → csv."""
+        """Return (columns, sheets, error).  Tries openpyxl → xlrd → CSV."""
         ext = os.path.splitext(file_path)[1].lower()
-        try:
-            if ext == '.csv':
+        if ext == '.csv':
+            try:
                 df = pd.read_csv(file_path, nrows=0)
                 return list(df.columns), None, None
+            except Exception as e:
+                return None, None, str(e)
+        # Try Excel engines first
+        xl = None
+        for engine in ('openpyxl', 'xlrd'):
             try:
-                xl = pd.ExcelFile(file_path, engine='openpyxl')
+                xl = pd.ExcelFile(file_path, engine=engine)
+                break
             except Exception:
-                xl = pd.ExcelFile(file_path, engine='xlrd')
-            sheets = {}
-            for s in xl.sheet_names:
-                df = xl.parse(s, nrows=0)
-                sheets[s] = list(df.columns)
-            return None, sheets, None
+                pass
+        if xl is not None:
+            try:
+                sheets = {s: list(xl.parse(s, nrows=0).columns) for s in xl.sheet_names}
+                return None, sheets, None
+            except Exception:
+                pass
+        # Excel failed — file is likely text disguised as .xlsx; try CSV delimiters
+        for sep in ('\t', ',', ';'):
+            try:
+                df = pd.read_csv(file_path, sep=sep, nrows=0)
+                if len(df.columns) > 1:
+                    return list(df.columns), None, None
+            except Exception:
+                pass
+        try:
+            df = pd.read_csv(file_path, nrows=0)
+            return list(df.columns), None, None
         except Exception as e:
             return None, None, str(e)
 

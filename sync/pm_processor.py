@@ -35,8 +35,8 @@ _TS_KEYWORDS   = ['time', 'date', 'period', 'start', 'timestamp']
 def _load_pm_file(file_path):
     """
     Return a DataFrame from an XLSX, XLS, or CSV file.
-    Tries openpyxl → xlrd → CSV so that Nokia OSS exports in old binary
-    .xls format (mis-named as .xlsx) are still readable.
+    Tries openpyxl → xlrd → tab/comma/semicolon CSV so that Nokia OSS exports
+    in old binary .xls format or text format mis-named as .xlsx are readable.
     """
     try:
         return pd.read_excel(file_path, engine='openpyxl')
@@ -46,6 +46,14 @@ def _load_pm_file(file_path):
         return pd.read_excel(file_path, engine='xlrd')
     except Exception:
         pass
+    # Text file disguised as .xlsx — try common delimiters
+    for sep in ('\t', ',', ';'):
+        try:
+            df = pd.read_csv(file_path, sep=sep, dtype=str)
+            if len(df.columns) > 1:
+                return df
+        except Exception:
+            pass
     return pd.read_csv(file_path, dtype=str)
 
 

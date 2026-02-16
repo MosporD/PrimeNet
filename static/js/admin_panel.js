@@ -224,15 +224,12 @@ async function loadSyncHistory() {
 async function triggerSync(type) {
     // type: 'nokia_pm' | 'huawei_pm' | 'metadata'
     const endpointMap = {
-        nokia_pm:  '/api/sync/trigger/pm',      // triggers both nokia
-        huawei_pm: '/api/sync/trigger/pm',      // same endpoint triggers both Nokia+Huawei
+        nokia_pm:  '/api/sync/trigger/nokia_pm',
+        huawei_pm: '/api/sync/trigger/huawei_pm',
         metadata:  '/api/sync/trigger/metadata',
     };
 
-    // Nokia and Huawei share the /trigger/pm endpoint; use dedicated ones if available
-    const endpoint = type === 'metadata'
-        ? '/api/sync/trigger/metadata'
-        : '/api/sync/trigger/pm';
+    const endpoint = endpointMap[type] || '/api/sync/trigger/pm';
 
     showSyncMsg(`Triggering ${type.replace('_', ' ')} sync…`, 'info');
 
@@ -256,14 +253,32 @@ async function inspectLocal() {
     const pre = document.getElementById('inspect-output');
     pre.style.display = 'block';
     pre.textContent = 'Reading locally downloaded files…';
+
+    function renderColumns(columns, indent) {
+        const pad = '  '.repeat(indent);
+        if (Array.isArray(columns)) {
+            return [`${pad}Columns: ${columns.join(', ')}`];
+        }
+        if (columns && typeof columns === 'object') {
+            // Excel file — columns is {sheetName: [col, ...], ...}
+            return Object.entries(columns).flatMap(([sheet, cols]) =>
+                [`${pad}Sheet [${sheet}]: ${Array.isArray(cols) ? cols.join(', ') : cols}`]
+            );
+        }
+        return [];
+    }
+
     try {
         const res  = await fetch('/api/sync/inspect_local');
         const data = await res.json();
         if (!data.success) { pre.textContent = 'Error: ' + (data.error || 'unknown'); return; }
 
         const lines = [];
-        for (const [source, info] of Object.entries(data.report)) {
+        const r = data.report;
+
+        for (const [source, info] of Object.entries(r)) {
             lines.push(`\n══ ${source.toUpperCase()} ══`);
+
             if (info.status === 'no_files') {
                 lines.push(`  No files found in ${info.dir}`);
                 lines.push(`  → Trigger a sync first, then click Inspect again.`);
@@ -273,44 +288,21 @@ async function inspectLocal() {
                 lines.push(`  ERROR reading ${info.file}: ${info.error}`);
                 continue;
             }
-            // Nokia PM — flat columns array
-            if (info.columns) {
+
+            // Nokia PM / Huawei PM — single file result
+            if (!info.files) {
                 lines.push(`  File: ${info.file}`);
-                lines.push(`  Detected tech: ${info.detected_tech || 'unknown'}`);
-                lines.push(`  Columns (${info.columns.length}):`);
-                info.columns.forEach(c => lines.push(`    • ${c}`));
-                if (typeof info.mapping_check === 'object') {
-                    lines.push(`  Mapping check (configured source → found?):`);
-                    for (const [src, status] of Object.entries(info.mapping_check))
-                        lines.push(`    ${status === 'ok' ? '✓' : '✗ MISSING'} "${src}"`);
-                }
+                lines.push(...renderColumns(info.columns, 2));
             }
-            // Huawei PM — sheets
-            if (info.sheets) {
-                lines.push(`  File: ${info.file}`);
-                for (const [tech, sr] of Object.entries(info.sheets)) {
-                    lines.push(`  Sheet [${tech}] → "${sr.sheet}": ${sr.found ? 'found' : 'NOT FOUND'}`);
-                    if (sr.found) {
-                        lines.push(`    Columns: ${sr.columns.join(', ')}`);
-                        if (sr.mapping_check)
-                            for (const [src, status] of Object.entries(sr.mapping_check))
-                                lines.push(`    ${status === 'ok' ? '✓' : '✗ MISSING'} "${src}"`);
-                    } else if (sr.available_sheets) {
-                        lines.push(`    Available sheets: ${sr.available_sheets.join(', ')}`);
-                    }
-                }
-            }
-            // Metadata
+
+            // Metadata — multiple files
             if (info.files) {
-                for (const [tech, fr] of Object.entries(info.files)) {
-                    lines.push(`  [${tech}] ${fr.file}`);
-                    if (Array.isArray(fr.columns)) {
-                        lines.push(`    Columns: ${fr.columns.join(', ')}`);
-                        if (typeof fr.mapping_check === 'object')
-                            for (const [src, status] of Object.entries(fr.mapping_check))
-                                lines.push(`    ${status === 'ok' ? '✓' : '✗ MISSING'} "${src}"`);
+                for (const [key, fr] of Object.entries(info.files)) {
+                    lines.push(`  [${key}] ${fr.file}`);
+                    if (fr.error) {
+                        lines.push(`    ERROR: ${fr.error}`);
                     } else {
-                        lines.push(`    ${fr.mapping_check || fr.columns}`);
+                        lines.push(...renderColumns(fr.columns, 3));
                     }
                 }
             }
