@@ -14,7 +14,12 @@ from functools import wraps
 from ncm_core import XMLToExcelConverter
 from database_enhanced import get_user_by_session, log_activity
 
-xml_parser_bp = Blueprint('xml_parser', __name__)
+xml_parser_bp = Blueprint(
+    'xml_parser', __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/xml_parser/static',
+)
 
 # Temporary storage for uploaded files
 TEMP_FILES = {}

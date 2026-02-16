@@ -13,7 +13,12 @@ from functools import wraps
 from ncm_core import XMLComparator
 from database_enhanced import get_user_by_session, log_activity
 
-ne_comparison_bp = Blueprint('ne_comparison', __name__)
+ne_comparison_bp = Blueprint(
+    'ne_comparison', __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/ne_comparison/static',
+)
 
 TEMP_FILES = {}
 

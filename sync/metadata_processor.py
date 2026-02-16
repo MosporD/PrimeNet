@@ -185,11 +185,26 @@ def _process_cell_file(file_path, key):
         logger.error(msg)
         return 0, 0, msg
 
+    logger.info(f'Cell file [{key}/{_infer_tech(key)}]: using column "{cell_name_col}" as cell name')
+
+    # Warn early if the chosen column has many duplicates
+    total_rows   = len(df)
+    unique_names = df[cell_name_col].dropna().nunique()
+    if total_rows > 0 and unique_names < total_rows * 0.7:
+        logger.warning(
+            f'Cell file [{key}]: only {unique_names} unique values in '
+            f'"{cell_name_col}" out of {total_rows} rows. '
+            f'This column may not be the per-cell identifier — check your export.'
+        )
+
     conn = sqlite3.connect(METADATA_DB)
     cursor = conn.cursor()
     sites_seen = set()
-    cells_up   = 0
     skipped    = 0
+
+    before_count = conn.execute(
+        "SELECT COUNT(*) FROM cells WHERE technology=?", (_infer_tech(key),)
+    ).fetchone()[0]
 
     for _, row in df.iterrows():
         cell_name = _safe_str(row.get(cell_name_col))
@@ -251,15 +266,21 @@ def _process_cell_file(file_path, key):
                 status          = 'Active',
                 updated_at      = CURRENT_TIMESTAMP
         ''', (cell_name, site_id, technology, technology, azimuth, mtilt, etilt, vendor))
-        cells_up += 1
+
+    after_count = conn.execute(
+        "SELECT COUNT(*) FROM cells WHERE technology=?", (technology,)
+    ).fetchone()[0]
+    new_inserts = after_count - before_count
 
     conn.commit()
     conn.close()
     logger.info(
-        f'Cell file [{key}/{technology}]: {cells_up} cells upserted, '
-        f'{len(sites_seen)} sites upserted, {skipped} skipped.'
+        f'Cell file [{key}/{technology}]: {new_inserts} new cells, '
+        f'{unique_names - new_inserts} updated, '
+        f'{len(sites_seen)} sites upserted, {skipped} skipped. '
+        f'(file had {total_rows} rows, {unique_names} unique names in "{cell_name_col}")'
     )
-    return cells_up, skipped, None
+    return new_inserts, skipped, None
 
 
 # ---------------------------------------------------------------------------

@@ -25,7 +25,12 @@ except:
     def get_mo_description(mo): return "No description available"
     def get_mo_category(mo): return "Other"
 
-parameter_dictionary_bp = Blueprint('parameter_dictionary', __name__)
+parameter_dictionary_bp = Blueprint(
+    'parameter_dictionary', __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/parameter_dictionary/static',
+)
 
 def login_required(f):
     """Decorator to require login"""

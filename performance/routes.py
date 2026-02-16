@@ -19,7 +19,12 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB
 from database_enhanced import get_user_by_session, log_activity
 
-performance_bp = Blueprint('performance', __name__)
+performance_bp = Blueprint(
+    'performance', __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/performance/static',
+)
 
 _FIXED_COLS = {'id', 'cell_name', 'timestamp'}
 

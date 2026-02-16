@@ -8,7 +8,12 @@ from functools import wraps
 
 from database_enhanced import get_user_by_session, log_activity, get_all_users
 
-admin_panel_bp = Blueprint('admin_panel', __name__)
+admin_panel_bp = Blueprint(
+    'admin_panel', __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/admin_panel/static',
+)
 
 def login_required(f):
     """Decorator to require login"""

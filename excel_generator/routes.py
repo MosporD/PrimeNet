@@ -13,7 +13,12 @@ from functools import wraps
 from ncm_core import ExcelToXMLConverter
 from database_enhanced import get_user_by_session, log_activity
 
-excel_generator_bp = Blueprint('excel_generator', __name__)
+excel_generator_bp = Blueprint(
+    'excel_generator', __name__,
+    template_folder='templates',
+    static_folder='static',
+    static_url_path='/excel_generator/static',
+)
 
 TEMP_FILES = {}
 
