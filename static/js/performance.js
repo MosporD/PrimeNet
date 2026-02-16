@@ -248,6 +248,7 @@ function showCellPicker(cells) {
     document.getElementById('loading-charts').style.display = 'none';
     document.getElementById('no-selection').style.display   = 'flex';
     document.getElementById('btn-export').style.display     = 'none';
+    document.getElementById('btn-refresh').style.display    = 'none';
 
     document.getElementById('charts-title').textContent = 'Select a cell';
     document.getElementById('charts-subtitle').textContent =
@@ -322,6 +323,7 @@ async function loadCellCharts(cellId) {
     document.getElementById('charts-wrap').style.display    = 'none';
     document.getElementById('loading-charts').style.display = 'flex';
     document.getElementById('btn-export').style.display     = 'none';
+    document.getElementById('btn-refresh').style.display    = 'inline-flex';
 
     const hours = document.getElementById('filter-hours').value;
 
@@ -466,6 +468,30 @@ function renderAllCharts(trend) {
 
     document.getElementById('loading-charts').style.display = 'none';
     wrap.style.display = 'grid';
+}
+
+// ============================================================
+// Refresh
+// ============================================================
+
+async function refreshData() {
+    const btn = document.getElementById('btn-refresh');
+    if (btn) {
+        btn.disabled = true;
+        btn.querySelector('.refresh-icon').classList.add('spinning');
+    }
+    try {
+        if (activeCellId) {
+            await loadCellCharts(activeCellId);
+        } else {
+            await applyFilters();
+        }
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.querySelector('.refresh-icon').classList.remove('spinning');
+        }
+    }
 }
 
 // ============================================================
