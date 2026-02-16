@@ -282,3 +282,168 @@ def test_connectivity():
             results[name] = {'status': 'error', 'host': host, 'error': str(e)}
 
     return jsonify({'success': True, 'results': results})
+
+
+@sync_bp.route('/api/sync/inspect_local', methods=['GET'])
+@admin_required
+def inspect_local():
+    """
+    Read column headers from the most recently downloaded file in each
+    sync_downloads sub-directory and compare them against the configured
+    column maps.  No SFTP connection required — purely local file reads.
+
+    Returns a report showing:
+      - which files were found
+      - actual column names in each file
+      - which configured mappings match / are missing
+    """
+    import os
+    import glob as _glob
+
+    try:
+        import pandas as pd
+    except ImportError:
+        return jsonify({'error': 'pandas not installed'}), 500
+
+    from sync_config import (
+        NOKIA_PM_COLUMN_MAPS, HUAWEI_PM_COLUMN_MAPS,
+        HUAWEI_SHEET_TECH_MAP, METADATA_CSV_COLUMN_MAPS,
+        LOCAL_DOWNLOAD_DIR,
+    )
+
+    DATA_EXTS = ('.xlsx', '.xls', '.csv')
+
+    def _newest_file(directory):
+        """Return the most recently modified data file in directory, or None."""
+        if not os.path.isdir(directory):
+            return None
+        candidates = [
+            f for f in (os.path.join(directory, n) for n in os.listdir(directory))
+            if os.path.isfile(f) and f.lower().endswith(DATA_EXTS)
+        ]
+        return max(candidates, key=os.path.getmtime) if candidates else None
+
+    def _read_headers(file_path):
+        """Return (columns, sheets, error)."""
+        ext = os.path.splitext(file_path)[1].lower()
+        try:
+            if ext == '.csv':
+                df = pd.read_csv(file_path, nrows=0)
+                return list(df.columns), None, None
+            xl = pd.ExcelFile(file_path, engine='openpyxl')
+            sheets = {}
+            for s in xl.sheet_names:
+                df = xl.parse(s, nrows=0)
+                sheets[s] = list(df.columns)
+            return None, sheets, None
+        except Exception as e:
+            return None, None, str(e)
+
+    def _check_map(actual_cols, column_map):
+        """Return {src_col: 'ok'|'MISSING'} for each value in column_map."""
+        actual_set = {str(c).strip() for c in actual_cols}
+        return {
+            src_col: ('ok' if src_col in actual_set else 'MISSING')
+            for src_col in column_map.values() if src_col
+        }
+
+    report = {}
+
+    # ── Nokia PM ─────────────────────────────────────────────────────
+    nokia_dir = os.path.join(LOCAL_DOWNLOAD_DIR, 'pm_nokia')
+    nokia_file = _newest_file(nokia_dir)
+    if not nokia_file:
+        report['nokia_pm'] = {'status': 'no_files', 'dir': nokia_dir}
+    else:
+        cols, _, err = _read_headers(nokia_file)
+        if err:
+            report['nokia_pm'] = {'status': 'read_error', 'file': nokia_file, 'error': err}
+        else:
+            # Guess tech from filename prefix
+            fname = os.path.basename(nokia_file).upper()
+            tech  = next((t for t in NOKIA_PM_COLUMN_MAPS if fname.startswith(t)), None)
+            cmap  = NOKIA_PM_COLUMN_MAPS.get(tech, {}) if tech else {}
+            report['nokia_pm'] = {
+                'status':        'ok',
+                'file':          nokia_file,
+                'detected_tech': tech,
+                'columns':       cols,
+                'mapping_check': _check_map(cols, cmap) if cmap else 'no map for detected tech',
+            }
+
+    # ── Huawei PM ────────────────────────────────────────────────────
+    huawei_dir  = os.path.join(LOCAL_DOWNLOAD_DIR, 'pm_huawei')
+    huawei_file = _newest_file(huawei_dir)
+    if not huawei_file:
+        report['huawei_pm'] = {'status': 'no_files', 'dir': huawei_dir}
+    else:
+        cols, sheets, err = _read_headers(huawei_file)
+        if err:
+            report['huawei_pm'] = {'status': 'read_error', 'file': huawei_file, 'error': err}
+        else:
+            sheet_report = {}
+            for tech, sheet_name in HUAWEI_SHEET_TECH_MAP.items():
+                actual_sheet = next(
+                    (s for s in (sheets or {}) if s.lower() == sheet_name.lower()), None
+                )
+                if not actual_sheet:
+                    sheet_report[tech] = {
+                        'sheet': sheet_name, 'found': False,
+                        'available_sheets': list(sheets.keys()) if sheets else [],
+                    }
+                else:
+                    sheet_cols = sheets[actual_sheet]
+                    cmap       = HUAWEI_PM_COLUMN_MAPS.get(tech, {})
+                    sheet_report[tech] = {
+                        'sheet':         actual_sheet,
+                        'found':         True,
+                        'columns':       sheet_cols,
+                        'mapping_check': _check_map(sheet_cols, cmap),
+                    }
+            report['huawei_pm'] = {
+                'status': 'ok',
+                'file':   huawei_file,
+                'sheets': sheet_report,
+            }
+
+    # ── Metadata ─────────────────────────────────────────────────────
+    meta_dir = os.path.join(LOCAL_DOWNLOAD_DIR, 'metadata')
+    if not os.path.isdir(meta_dir):
+        report['metadata'] = {'status': 'no_files', 'dir': meta_dir}
+    else:
+        # Collect one newest file per detected technology key
+        meta_files = [
+            os.path.join(meta_dir, n) for n in os.listdir(meta_dir)
+            if os.path.isfile(os.path.join(meta_dir, n))
+            and os.path.join(meta_dir, n).lower().endswith(DATA_EXTS)
+        ]
+        meta_files.sort(key=os.path.getmtime, reverse=True)
+
+        if not meta_files:
+            report['metadata'] = {'status': 'no_files', 'dir': meta_dir}
+        else:
+            meta_report = {}
+            seen_techs  = set()
+            for fpath in meta_files:
+                fname_upper = os.path.basename(fpath).upper()
+                tech = next(
+                    (t for t in sorted(METADATA_CSV_COLUMN_MAPS, key=len, reverse=True)
+                     if fname_upper.startswith(t.upper())),
+                    None,
+                )
+                if tech in seen_techs:
+                    continue
+                seen_techs.add(tech or fname_upper)
+                cols, _, err = _read_headers(fpath)
+                cmap = METADATA_CSV_COLUMN_MAPS.get(tech, {}) if tech else {}
+                meta_report[tech or os.path.basename(fpath)] = {
+                    'file':          fpath,
+                    'columns':       cols if cols else '(excel — see sheets)',
+                    'mapping_check': _check_map(cols or [], cmap) if cmap else 'no column map matched',
+                }
+                if len(seen_techs) >= len(METADATA_CSV_COLUMN_MAPS) + 3:
+                    break  # enough samples
+
+            report['metadata'] = {'status': 'ok', 'dir': meta_dir, 'files': meta_report}
+
+    return jsonify({'success': True, 'report': report})

@@ -252,6 +252,75 @@ async function triggerSync(type) {
     }
 }
 
+async function inspectLocal() {
+    const pre = document.getElementById('inspect-output');
+    pre.style.display = 'block';
+    pre.textContent = 'Reading locally downloaded files…';
+    try {
+        const res  = await fetch('/api/sync/inspect_local');
+        const data = await res.json();
+        if (!data.success) { pre.textContent = 'Error: ' + (data.error || 'unknown'); return; }
+
+        const lines = [];
+        for (const [source, info] of Object.entries(data.report)) {
+            lines.push(`\n══ ${source.toUpperCase()} ══`);
+            if (info.status === 'no_files') {
+                lines.push(`  No files found in ${info.dir}`);
+                lines.push(`  → Trigger a sync first, then click Inspect again.`);
+                continue;
+            }
+            if (info.status === 'read_error') {
+                lines.push(`  ERROR reading ${info.file}: ${info.error}`);
+                continue;
+            }
+            // Nokia PM — flat columns array
+            if (info.columns) {
+                lines.push(`  File: ${info.file}`);
+                lines.push(`  Detected tech: ${info.detected_tech || 'unknown'}`);
+                lines.push(`  Columns (${info.columns.length}):`);
+                info.columns.forEach(c => lines.push(`    • ${c}`));
+                if (typeof info.mapping_check === 'object') {
+                    lines.push(`  Mapping check (configured source → found?):`);
+                    for (const [src, status] of Object.entries(info.mapping_check))
+                        lines.push(`    ${status === 'ok' ? '✓' : '✗ MISSING'} "${src}"`);
+                }
+            }
+            // Huawei PM — sheets
+            if (info.sheets) {
+                lines.push(`  File: ${info.file}`);
+                for (const [tech, sr] of Object.entries(info.sheets)) {
+                    lines.push(`  Sheet [${tech}] → "${sr.sheet}": ${sr.found ? 'found' : 'NOT FOUND'}`);
+                    if (sr.found) {
+                        lines.push(`    Columns: ${sr.columns.join(', ')}`);
+                        if (sr.mapping_check)
+                            for (const [src, status] of Object.entries(sr.mapping_check))
+                                lines.push(`    ${status === 'ok' ? '✓' : '✗ MISSING'} "${src}"`);
+                    } else if (sr.available_sheets) {
+                        lines.push(`    Available sheets: ${sr.available_sheets.join(', ')}`);
+                    }
+                }
+            }
+            // Metadata
+            if (info.files) {
+                for (const [tech, fr] of Object.entries(info.files)) {
+                    lines.push(`  [${tech}] ${fr.file}`);
+                    if (Array.isArray(fr.columns)) {
+                        lines.push(`    Columns: ${fr.columns.join(', ')}`);
+                        if (typeof fr.mapping_check === 'object')
+                            for (const [src, status] of Object.entries(fr.mapping_check))
+                                lines.push(`    ${status === 'ok' ? '✓' : '✗ MISSING'} "${src}"`);
+                    } else {
+                        lines.push(`    ${fr.mapping_check || fr.columns}`);
+                    }
+                }
+            }
+        }
+        pre.textContent = lines.join('\n');
+    } catch (e) {
+        pre.textContent = 'Error: ' + e.message;
+    }
+}
+
 async function testConnectivity() {
     showSyncMsg('Testing connectivity to all servers…', 'info');
     try {
