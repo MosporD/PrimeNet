@@ -48,7 +48,7 @@ let map          = null;
 let sitesData    = [];
 let siteMarkers  = [];
 let sectorLayers = [];
-let activeTech   = 'all';
+let activeTech   = '3G';
 
 // ─── Initialization ──────────────────────────────────────────────────────────
 
@@ -88,15 +88,16 @@ function buildTechButtons(counts) {
 
     const total = Object.values(counts).reduce((a, b) => a + b, 0);
 
-    let html = `<button class="tech-btn active" data-tech="all"
+    let html = `<button class="tech-btn${activeTech === 'all' ? ' active' : ''}" data-tech="all"
                         onclick="setTechFilter('all')">
                   All <span class="tech-count">${total}</span>
                 </button>`;
 
     TECH_ORDER.forEach(tech => {
         if (!counts[tech]) return;
-        const color = TECH_COLORS[tech] || '#3498db';
-        html += `<button class="tech-btn" data-tech="${tech}"
+        const color    = TECH_COLORS[tech] || '#3498db';
+        const isActive = activeTech === tech ? ' active' : '';
+        html += `<button class="tech-btn${isActive}" data-tech="${tech}"
                          style="--tc:${color}"
                          onclick="setTechFilter('${tech}')">
                    ${tech} <span class="tech-count">${counts[tech]}</span>
@@ -130,16 +131,16 @@ function enrichSites(sites) {
 
 function applyClientFilters(sites) {
     const term    = document.getElementById('site-search').value.toLowerCase();
-    const region  = document.getElementById('region-filter').value;
-    const cluster = document.getElementById('cluster-filter').value;
+    const vendor  = document.getElementById('vendor-filter').value;
     const area    = document.getElementById('area-filter').value;
+    const cluster = document.getElementById('cluster-filter').value;
 
     return sites.filter(s => {
         if (term && !s.site_name.toLowerCase().includes(term) &&
                     !String(s.site_id).includes(term)) return false;
-        if (region  !== 'all' && s.region          !== region)  return false;
-        if (cluster !== 'all' && String(s.cluster) !== cluster) return false;
+        if (vendor  !== 'all' && s.vendor          !== vendor)  return false;
         if (area    !== 'all' && s.area            !== area)    return false;
+        if (cluster !== 'all' && String(s.cluster) !== cluster) return false;
         return true;
     });
 }
@@ -179,7 +180,6 @@ async function loadNetworkSites() {
             );
         }
 
-        buildRegionFilter(sitesData);
         buildClusterFilter(sitesData);
         buildAreaFilter(sitesData);
     } catch (e) {
@@ -355,7 +355,6 @@ function displaySiteInfo(site, cells) {
         <div class="site-meta-row"><strong>Site ID:</strong> ${site.site_id}</div>
         <div class="site-meta-row"><strong>Cluster:</strong> ${site.cluster ?? '—'}</div>
         <div class="site-meta-row"><strong>Area:</strong> ${site.area || '—'}</div>
-        <div class="site-meta-row"><strong>Region:</strong> ${site.region || '—'}</div>
         <div class="site-meta-row"><strong>Vendor:</strong> ${site.vendor || '—'}</div>
         <div class="site-meta-row"><strong>Cells shown:</strong> ${cells.length}</div>
         ${techHtml}
@@ -430,21 +429,6 @@ function closeKPIModal() {
 
 // ─── Filter builders ──────────────────────────────────────────────────────────
 
-function buildRegionFilter(sites) {
-    const select  = document.getElementById('region-filter');
-    const current = select.value;
-    const regions = [...new Set(sites.map(s => s.region).filter(Boolean))].sort();
-
-    select.innerHTML = '<option value="all">All Regions</option>';
-    regions.forEach(r => {
-        const opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = `Region ${r}`;
-        if (r === current) opt.selected = true;
-        select.appendChild(opt);
-    });
-}
-
 function buildClusterFilter(sites) {
     const select  = document.getElementById('cluster-filter');
     const current = select.value;
@@ -479,9 +463,9 @@ function buildAreaFilter(sites) {
 // ─── Filter callbacks (all funnel into runFilters) ────────────────────────────
 
 function searchSites()    { runFilters(); }
-function filterByRegion() { runFilters(); }
-function filterByCluster(){ runFilters(); }
+function filterByVendor() { runFilters(); }
 function filterByArea()   { runFilters(); }
+function filterByCluster(){ runFilters(); }
 
 // ─── Metadata refresh ────────────────────────────────────────────────────────
 
