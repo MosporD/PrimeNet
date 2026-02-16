@@ -30,9 +30,9 @@ except ImportError:
     sys.exit(1)
 
 from sync_config import (
-    NOKIA_PM_SERVER, NOKIA_PM_COLUMN_MAPS,
-    HUAWEI_PM_SERVER, HUAWEI_PM_COLUMN_MAPS, HUAWEI_SHEET_TECH_MAP,
-    METADATA_SERVER, METADATA_CSV_COLUMN_MAPS, METADATA_FILE_MAP,
+    NOKIA_PM_SERVER,
+    HUAWEI_PM_SERVER,
+    METADATA_SERVER,
 )
 
 REPORT_PATH = os.path.join(os.path.dirname(__file__), 'headers_report.txt')
@@ -94,14 +94,6 @@ def print_excel_headers(local_path, label):
         log(f'  ERROR reading {label}: {e}')
 
 
-def print_mapping_diff(found_cols, column_map, label):
-    """Show which configured header values are actually found in the file."""
-    log(f'\n  --- sync_config mapping check for {label} ---')
-    found_set = {str(c).strip() for c in found_cols}
-    for db_field, xlsx_header in column_map.items():
-        status = '✓' if xlsx_header in found_set else '✗  NOT FOUND'
-        log(f'  {status}  {xlsx_header!r:40s} → {db_field}')
-
 
 # ============================================================
 # Nokia PM
@@ -133,7 +125,6 @@ def inspect_nokia():
             log(f'  Columns ({len(cols)}):')
             for c in cols:
                 log(f'    • {repr(c)}')
-            print_mapping_diff(cols, NOKIA_PM_COLUMN_MAPS.get(tech, {}), f'Nokia {tech}')
             os.unlink(tmp)
     finally:
         sftp.close(); ssh.close()
@@ -165,15 +156,6 @@ def inspect_huawei():
         log(f'  Downloading latest: {fname}')
         tmp = download_to_tmp(sftp, rpath)
         print_excel_headers(tmp, 'Huawei PM')
-
-        # Also check mapping for each sheet
-        xl = pd.ExcelFile(tmp, engine='openpyxl')
-        for tech, sheet_name in HUAWEI_SHEET_TECH_MAP.items():
-            actual = next((s for s in xl.sheet_names
-                           if s.lower() == sheet_name.lower()), None)
-            if actual:
-                df = xl.parse(actual, nrows=0)
-                print_mapping_diff(df.columns, HUAWEI_PM_COLUMN_MAPS.get(tech, {}), f'Huawei {tech}')
         os.unlink(tmp)
     finally:
         sftp.close(); ssh.close()
@@ -237,19 +219,6 @@ def inspect_metadata():
             log(f'  Columns ({len(cols)}):')
             for c in cols:
                 log(f'    • {repr(c)}')
-            # Use the column map for whichever tech the filename starts with,
-            # falling back to the combined map of all technologies.
-            stem = os.path.splitext(xf.filename)[0].upper()
-            meta_map = {}
-            for t, cmap in METADATA_CSV_COLUMN_MAPS.items():
-                if stem.startswith(t.upper()):
-                    meta_map = cmap
-                    break
-            if not meta_map:
-                # Flatten all maps for a broad check
-                for cmap in METADATA_CSV_COLUMN_MAPS.values():
-                    meta_map.update(cmap)
-            print_mapping_diff(cols, meta_map, xf.filename)
             os.unlink(tmp)
 
     finally:
@@ -270,7 +239,7 @@ if __name__ == '__main__':
     inspect_metadata()
 
     log('\n' + '=' * 60)
-    log('DONE — copy the column names above into sync_config.py')
+    log('DONE — column names auto-detected at import time; no config needed.')
     log('=' * 60)
 
     with open(REPORT_PATH, 'w', encoding='utf-8') as f:

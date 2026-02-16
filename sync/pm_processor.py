@@ -1,14 +1,15 @@
 """
 PM Data Processor
 =================
-Reads hourly KPI XLSX files and loads data into the appropriate PM database.
+Reads hourly KPI XLSX/XLS/CSV files and loads data into the appropriate PM database.
 
 Nokia:  one file per technology → each file has many cells as rows
 Huawei: single file, one sheet per technology (2G / 3G / 4G)
 
-Column maps only need to identify cell_name and timestamp.
-All other columns are stored as-is using the original header names.
-The DB schema evolves automatically — new columns are added via ALTER TABLE.
+No column mapping configuration is required.  The code auto-detects which
+column holds the cell name and which holds the timestamp by scanning column
+names for well-known keywords.  All other columns are stored as-is using
+the original header names, so charts can display them unchanged.
 """
 
 import sqlite3
@@ -21,13 +22,73 @@ logger = logging.getLogger(__name__)
 NOKIA_PM_DB  = 'nokia_pm.db'
 HUAWEI_PM_DB = 'huawei_pm.db'
 
+# Keywords used to auto-detect the cell_name column (case-insensitive substring match)
+_CELL_KEYWORDS = ['cell', 'bts', 'wcel', 'lncel', 'nrcel', 'name', 'trans']
+# Keywords used to auto-detect the timestamp column
+_TS_KEYWORDS   = ['time', 'date', 'period', 'start', 'timestamp']
+
 
 # ---------------------------------------------------------------------------
-# Helpers: dynamic schema evolution + insert
+# File reader — tries multiple engines so corrupted/old-format files work
+# ---------------------------------------------------------------------------
+
+def _load_pm_file(file_path):
+    """
+    Return a DataFrame from an XLSX, XLS, or CSV file.
+    Tries openpyxl → xlrd → CSV so that Nokia OSS exports in old binary
+    .xls format (mis-named as .xlsx) are still readable.
+    """
+    try:
+        return pd.read_excel(file_path, engine='openpyxl')
+    except Exception:
+        pass
+    try:
+        return pd.read_excel(file_path, engine='xlrd')
+    except Exception:
+        pass
+    return pd.read_csv(file_path, dtype=str)
+
+
+# ---------------------------------------------------------------------------
+# Auto-detect cell_name / timestamp columns
+# ---------------------------------------------------------------------------
+
+def _detect_col(columns, keywords):
+    """Return the first column whose lower-case name contains any keyword."""
+    col_lower = {c: str(c).lower() for c in columns}
+    for kw in keywords:
+        for col, low in col_lower.items():
+            if kw in low:
+                return col
+    return None
+
+
+def _resolve_key_cols(df):
+    """
+    Return (cell_name_col, timestamp_col).
+    Falls back to column index 0 / 1 if auto-detect finds nothing.
+    """
+    cols = list(df.columns)
+    cn = _detect_col(cols, _CELL_KEYWORDS)
+    ts = _detect_col(cols, _TS_KEYWORDS)
+
+    if cn is None:
+        cn = cols[0]
+        logger.warning(f'cell_name not detected — using first column: {cn!r}')
+    if ts is None and len(cols) > 1:
+        ts = cols[1]
+        logger.warning(f'timestamp not detected — using second column: {ts!r}')
+    elif ts is None:
+        ts = cn
+
+    return cn, ts
+
+
+# ---------------------------------------------------------------------------
+# Helpers: dynamic schema + insert
 # ---------------------------------------------------------------------------
 
 def _ensure_columns(conn, table, cols):
-    """Add any missing columns to the table (as REAL). Quoted to handle special chars."""
     existing = {r[1] for r in conn.execute(f'PRAGMA table_info({table})').fetchall()}
     for col in cols:
         if col not in existing:
@@ -37,8 +98,8 @@ def _ensure_columns(conn, table, cols):
 def _insert_df(db_path, df, technology):
     """
     Insert all rows of df into cell_kpis.
-    df must already have 'cell_name' and 'timestamp' columns.
-    All other columns are treated as KPI fields and stored as-is.
+    df must have 'cell_name' and 'timestamp' columns.
+    All other columns stored as-is with their original names.
     Returns (inserted, skipped).
     """
     kpi_cols = [c for c in df.columns if c not in ('cell_name', 'timestamp')]
@@ -64,7 +125,10 @@ def _insert_df(db_path, df, technology):
         record = {'cell_name': cell_name, 'timestamp': ts}
         for col in kpi_cols:
             val = row.get(col)
-            record[col] = float(val) if pd.notna(val) else None
+            try:
+                record[col] = float(val) if pd.notna(val) else None
+            except (TypeError, ValueError):
+                record[col] = None
 
         quoted_cols  = ', '.join(f'"{c}"' for c in record.keys())
         placeholders = ', '.join(['?'] * len(record))
@@ -81,45 +145,44 @@ def _insert_df(db_path, df, technology):
 
 
 # ---------------------------------------------------------------------------
-# Nokia: one XLSX per technology, rows = cells
+# Nokia: one file per technology
 # ---------------------------------------------------------------------------
 
-def process_nokia_pm_file(file_path, technology, column_map):
+def process_nokia_pm_file(file_path, technology):
     """
-    Process a Nokia PM XLSX file (one file per technology).
-    column_map only needs 'cell_name' and 'timestamp' keys.
+    Process a Nokia PM file (XLSX, XLS, or CSV).
+    Auto-detects cell_name and timestamp columns.
     Returns (inserted, skipped, error_message).
     """
     try:
-        df = pd.read_excel(file_path, engine='openpyxl')
+        df = _load_pm_file(file_path)
     except Exception as e:
         logger.error(f'Failed to read Nokia PM file {file_path}: {e}')
         return 0, 0, str(e)
 
-    # Rename cell_name and timestamp columns only
+    cn_col, ts_col = _resolve_key_cols(df)
+    logger.info(f'Nokia PM [{technology}]: cell_name={cn_col!r}, timestamp={ts_col!r}')
+
     rename = {}
-    cn = column_map.get('cell_name')
-    ts = column_map.get('timestamp')
-    if cn and cn in df.columns and cn != 'cell_name':
-        rename[cn] = 'cell_name'
-    if ts and ts in df.columns and ts != 'timestamp':
-        rename[ts] = 'timestamp'
+    if cn_col != 'cell_name':
+        rename[cn_col] = 'cell_name'
+    if ts_col != 'timestamp' and ts_col != cn_col:
+        rename[ts_col] = 'timestamp'
     df = df.rename(columns=rename)
 
-    missing = [f for f in ('cell_name', 'timestamp') if f not in df.columns]
-    if missing:
-        msg = f'Nokia PM [{technology}] missing {missing}. Found: {list(df.columns)}'
-        logger.error(msg)
-        return 0, 0, msg
+    if 'cell_name' not in df.columns:
+        df = df.rename(columns={df.columns[0]: 'cell_name'})
+    if 'timestamp' not in df.columns:
+        df['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     inserted, skipped = _insert_df(NOKIA_PM_DB, df, technology)
     return inserted, skipped, None
 
 
-def run_nokia_pm_sync(downloaded_files, column_maps):
+def run_nokia_pm_sync(downloaded_files, column_maps=None):
     """
     downloaded_files = {technology: local_path or None}
-    column_maps      = {technology: {'cell_name': '...', 'timestamp': '...'}}
+    column_maps is accepted but ignored (kept for call-site compatibility).
     Returns summary dict.
     """
     summary = {}
@@ -127,8 +190,7 @@ def run_nokia_pm_sync(downloaded_files, column_maps):
         if not file_path:
             summary[tech] = {'status': 'skipped', 'reason': 'Download failed or not configured'}
             continue
-        col_map = column_maps.get(tech, {})
-        inserted, skipped, error = process_nokia_pm_file(file_path, tech, col_map)
+        inserted, skipped, error = process_nokia_pm_file(file_path, tech)
         summary[tech] = {'status': 'error', 'error': error} if error else {
             'status': 'ok', 'inserted': inserted, 'skipped': skipped
         }
@@ -139,66 +201,50 @@ def run_nokia_pm_sync(downloaded_files, column_maps):
 # Huawei: single XLSX with one sheet per technology
 # ---------------------------------------------------------------------------
 
-def process_huawei_pm_file(file_path, column_maps, sheet_tech_map=None):
+def process_huawei_pm_file(file_path, column_maps=None, sheet_tech_map=None):
     """
-    Process a Huawei PM XLSX with multiple sheets (one per technology).
-    column_maps    = {technology: {'cell_name': '...', 'timestamp': '...'}}
-    sheet_tech_map = {'2G': 'SheetName2G', ...}
-    Returns summary dict {tech: {status, inserted, skipped, error}}.
+    Process a Huawei PM XLSX with multiple sheets.
+    column_maps and sheet_tech_map are accepted but both ignored;
+    auto-detection handles everything.
+    Returns summary dict {sheet_name: {status, inserted, skipped, error}}.
     """
-    if sheet_tech_map is None:
-        sheet_tech_map = {'2G': '2G', '3G': '3G', '4G': '4G'}
-
     try:
         xl = pd.ExcelFile(file_path, engine='openpyxl')
-    except Exception as e:
-        logger.error(f'Failed to open Huawei PM file {file_path}: {e}')
-        return {t: {'status': 'error', 'error': str(e)} for t in sheet_tech_map}
+    except Exception:
+        try:
+            xl = pd.ExcelFile(file_path, engine='xlrd')
+        except Exception as e:
+            logger.error(f'Failed to open Huawei PM file {file_path}: {e}')
+            return {'all': {'status': 'error', 'error': str(e)}}
 
     available_sheets = xl.sheet_names
-    logger.info(f'Huawei PM file sheets: {available_sheets}')
+    logger.info(f'Huawei PM sheets: {available_sheets}')
 
     summary = {}
-    for tech, sheet_name in sheet_tech_map.items():
-        col_map = column_maps.get(tech, {})
-
-        # Match sheet name (case-insensitive)
-        actual_sheet = None
-        for s in available_sheets:
-            if s == sheet_name or s.lower() == sheet_name.lower():
-                actual_sheet = s
-                break
-
-        if not actual_sheet:
-            logger.warning(f'Sheet "{sheet_name}" not found in Huawei PM file. Available: {available_sheets}')
-            summary[tech] = {'status': 'skipped', 'reason': f'Sheet "{sheet_name}" not found'}
-            continue
-
+    for sheet_name in available_sheets:
         try:
-            df = xl.parse(actual_sheet)
+            df = xl.parse(sheet_name)
         except Exception as e:
-            summary[tech] = {'status': 'error', 'error': str(e)}
+            summary[sheet_name] = {'status': 'error', 'error': str(e)}
             continue
 
-        # Rename cell_name and timestamp only
+        cn_col, ts_col = _resolve_key_cols(df)
+        logger.info(f'Huawei PM [{sheet_name}]: cell_name={cn_col!r}, timestamp={ts_col!r}')
+
         rename = {}
-        cn = col_map.get('cell_name')
-        ts = col_map.get('timestamp')
-        if cn and cn in df.columns and cn != 'cell_name':
-            rename[cn] = 'cell_name'
-        if ts and ts in df.columns and ts != 'timestamp':
-            rename[ts] = 'timestamp'
+        if cn_col != 'cell_name':
+            rename[cn_col] = 'cell_name'
+        if ts_col != 'timestamp' and ts_col != cn_col:
+            rename[ts_col] = 'timestamp'
         df = df.rename(columns=rename)
 
-        missing = [f for f in ('cell_name', 'timestamp') if f not in df.columns]
-        if missing:
-            msg = f'Huawei PM sheet [{sheet_name}] missing {missing}. Found: {list(df.columns)}'
-            logger.error(msg)
-            summary[tech] = {'status': 'error', 'error': msg}
-            continue
+        if 'cell_name' not in df.columns:
+            df = df.rename(columns={df.columns[0]: 'cell_name'})
+        if 'timestamp' not in df.columns:
+            df['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-        inserted, skipped = _insert_df(HUAWEI_PM_DB, df, tech)
-        summary[tech] = {'status': 'ok', 'inserted': inserted, 'skipped': skipped}
+        inserted, skipped = _insert_df(HUAWEI_PM_DB, df, sheet_name)
+        summary[sheet_name] = {'status': 'ok', 'inserted': inserted, 'skipped': skipped}
 
     return summary
 
@@ -207,6 +253,6 @@ def process_huawei_pm_file(file_path, column_maps, sheet_tech_map=None):
 # Legacy compat shim
 # ---------------------------------------------------------------------------
 
-def run_pm_sync(downloaded_files, column_map):
-    """Compat shim — calls Nokia processor."""
-    return run_nokia_pm_sync(downloaded_files, column_map)
+def run_pm_sync(downloaded_files, column_map=None):
+    """Compat shim — column_map ignored."""
+    return run_nokia_pm_sync(downloaded_files)

@@ -6,8 +6,8 @@ Three data sources:
   Server 1B — Huawei PM   (10.119.10.104)
   Server 2  — Metadata    (192.168.7.207)
 
-PM column maps only specify how to identify cell_name and timestamp in each
-file.  All remaining columns are stored as-is using the original header name.
+Column detection is fully automatic — no mapping configuration needed.
+Files are stored with their original header names.
 """
 
 # ============================================================
@@ -28,22 +28,10 @@ NOKIA_PM_SERVER = {
     }
 }
 
-# Only cell_name and timestamp need to be identified per technology.
-# All other columns are stored as-is using the original header names.
-# ⚠ Update these if the actual file headers differ.
-NOKIA_PM_COLUMN_MAPS = {
-    '2G': {'cell_name': 'BTS name',   'timestamp': 'Period start time'},
-    '3G': {'cell_name': 'WCEL name',  'timestamp': 'Period start time'},
-    '4G': {'cell_name': 'LNCEL name', 'timestamp': 'Period start time'},
-    '5G': {'cell_name': 'NRCEL name', 'timestamp': 'Period start time'},
-}
-
 
 # ============================================================
 # SERVER 1B — Huawei PM
-# Single folder containing one XLSX file; the scheduler
-# downloads the LATEST file in that folder.
-# The file has 3 sheets: one per technology (2G, 3G, 4G).
+# Single folder containing one XLSX file with multiple sheets.
 # ============================================================
 HUAWEI_PM_SERVER = {
     'host':       '10.119.10.104',
@@ -53,116 +41,20 @@ HUAWEI_PM_SERVER = {
     'remote_dir': '/export/home/omc/objectstorage/var/prs/result_file/malek.mohammad/Performance_Project/Performance',
 }
 
-# Huawei sheet names inside the Excel file → technology label
-HUAWEI_SHEET_TECH_MAP = {
-    '2G': '2G',
-    '3G': '3G',
-    '4G': '4G',
-}
-
-HUAWEI_PM_COLUMN_MAPS = {
-    '2G': {'cell_name': 'Cell Name', 'timestamp': 'Date'},
-    '3G': {'cell_name': 'Cell Name', 'timestamp': 'Date'},
-    '4G': {'cell_name': 'Cell Name', 'timestamp': 'Date'},
-}
-
 
 # ============================================================
 # SERVER 2 — Metadata
 # Root directory contains multiple dated snapshot folders.
+# Each folder contains Atoll-exported CSVs:
+#   Site 3G - YYYY-MM-DD.csv, Site L18 - YYYY-MM-DD.csv, …
+#   Transmitter 2G - YYYY-MM-DD.csv, …
 # ============================================================
 METADATA_SERVER = {
     'host':     '192.168.7.207',
     'port':     22,
     'username': 'ftpuser',
     'password': 'Zain@1234',
-    'root_dir': '/',   # dated snapshot folders sit at the SFTP root, not /home/ftpuser
-}
-
-# Expected filename for each technology inside the snapshot folder.
-# Set to None to auto-pick the first file found for that slot.
-# ⚠ Update filenames to match what's actually on the server.
-METADATA_FILE_MAP = {
-    '2G':     None,
-    '3G':     None,
-    '4G-FDD': None,
-    '4G-TDD': None,
-    '5G':     None,
-}
-
-# Per-technology CSV column maps (CSV header → DB field name).
-# Verified against *-2026-02-15.csv snapshot files.
-METADATA_CSV_COLUMN_MAPS = {
-    '2G': {
-        'site_id':          'site_id',
-        'site_name':        'site_name',
-        'cell_name':        'cell_name',
-        'vendor':           'vendor',
-        'latitude':         'lat',
-        'longitude':        'long',
-        'region':           'cluster',
-        'azimuth':          'azimuth',
-        'electrical_tilt':  'etilt',
-        'mechanical_tilt':  'mtilt',
-        'frequency_band':   'frequency_band',
-        'pci':              'bcc',
-    },
-    '3G': {
-        'site_id':          'nodeb_id',
-        'site_name':        'nodeb_name',
-        'cell_name':        'cell_name',
-        'vendor':           'vendor',
-        'latitude':         'lat',
-        'longitude':        'long',
-        'region':           'cluster',
-        'azimuth':          'azimuth',
-        'electrical_tilt':  'etilt',
-        'mechanical_tilt':  'mtilt',
-        'frequency_band':   'dl_uarfcn',
-        'pci':              'psc',
-    },
-    '4G-FDD': {
-        'site_id':          'enb_id_actual',
-        'site_name':        'enb_name',
-        'cell_name':        'cell_name',
-        'vendor':           'vendor',
-        'latitude':         'lat',
-        'longitude':        'long',
-        'region':           'cluster',
-        'azimuth':          'azimuth',
-        'electrical_tilt':  'etilt',
-        'mechanical_tilt':  'mtilt',
-        'frequency_band':   'band',
-        'pci':              'pci',
-    },
-    '4G-TDD': {
-        'site_id':          'enb_id_actual',
-        'site_name':        'enb_name',
-        'cell_name':        'cell_name',
-        'vendor':           'vendor',
-        'latitude':         'lat',
-        'longitude':        'long',
-        'region':           'cluster',
-        'azimuth':          'azimuth',
-        'electrical_tilt':  'etilt',
-        'mechanical_tilt':  'mtilt',
-        'frequency_band':   'band',
-        'pci':              'pci',
-    },
-    '5G': {
-        'site_id':          'gnb_id_actual',
-        'site_name':        'gnb_name',
-        'cell_name':        'cell_name',
-        'vendor':           'vendor',
-        'latitude':         'lat',
-        'longitude':        'long',
-        'region':           'cluster',
-        'azimuth':          'azimuth',
-        'electrical_tilt':  'etilt',
-        'mechanical_tilt':  'mtilt',
-        'frequency_band':   'bw',
-        'pci':              'pci',
-    },
+    'root_dir': '/',   # dated snapshot folders sit at the SFTP root
 }
 
 
