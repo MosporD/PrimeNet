@@ -22,6 +22,26 @@ const DEFAULT_ZOOM   = 10;
 const SECTOR_RADIUS_M = 600;                 // wedge radius in metres
 const SECTOR_BEAMWIDTH = 65;                 // 3 dB beamwidth in degrees
 
+// Cluster number → Area name  (cluster = Math.floor(site_id / 100))
+const CLUSTER_AREA = {
+     3: 'East Amman',  13: 'East Amman',  17: 'East Amman',  21: 'East Amman',
+    23: 'East Amman',  27: 'East Amman',  48: 'East Amman',  49: 'East Amman',
+    50: 'East Amman',  51: 'East Amman',  52: 'East Amman',  54: 'East Amman',
+    10: 'East Jordan', 11: 'East Jordan', 19: 'East Jordan', 28: 'East Jordan',
+    31: 'East Jordan', 42: 'East Jordan', 43: 'East Jordan', 47: 'East Jordan',
+     1: 'South Amman',  6: 'South Amman',  9: 'South Amman', 18: 'South Amman',
+    30: 'South Amman', 36: 'South Amman', 38: 'South Amman', 39: 'South Amman',
+    53: 'South Amman', 57: 'South Amman', 59: 'South Amman',
+     7: 'South Jordan',  8: 'South Jordan', 12: 'South Jordan', 15: 'South Jordan',
+    33: 'South Jordan', 41: 'South Jordan', 58: 'South Jordan',
+     2: 'West Amman',   5: 'West Amman',  16: 'West Amman',  20: 'West Amman',
+    22: 'West Amman',  25: 'West Amman',  26: 'West Amman',  32: 'West Amman',
+    35: 'West Amman',  40: 'West Amman',  55: 'West Amman',  56: 'West Amman',
+     4: 'North Jordan', 14: 'North Jordan', 24: 'North Jordan', 29: 'North Jordan',
+    34: 'North Jordan', 37: 'North Jordan', 44: 'North Jordan', 45: 'North Jordan',
+    46: 'North Jordan', 65: 'North Jordan',
+};
+
 // ─── State ───────────────────────────────────────────────────────────────────
 
 let map          = null;
@@ -96,6 +116,45 @@ function setTechFilter(tech) {
     loadNetworkSites();
 }
 
+// ─── Site enrichment ──────────────────────────────────────────────────────────
+
+function enrichSites(sites) {
+    return sites.map(s => {
+        const cluster = Math.floor(s.site_id / 100);
+        const area    = CLUSTER_AREA[cluster] || 'Unknown';
+        return Object.assign({}, s, { cluster, area });
+    });
+}
+
+// ─── Client-side filtering ────────────────────────────────────────────────────
+
+function applyClientFilters(sites) {
+    const term    = document.getElementById('site-search').value.toLowerCase();
+    const region  = document.getElementById('region-filter').value;
+    const cluster = document.getElementById('cluster-filter').value;
+    const area    = document.getElementById('area-filter').value;
+
+    return sites.filter(s => {
+        if (term && !s.site_name.toLowerCase().includes(term) &&
+                    !String(s.site_id).includes(term)) return false;
+        if (region  !== 'all' && s.region          !== region)  return false;
+        if (cluster !== 'all' && String(s.cluster) !== cluster) return false;
+        if (area    !== 'all' && s.area            !== area)    return false;
+        return true;
+    });
+}
+
+function runFilters() {
+    const filtered = applyClientFilters(sitesData);
+    displaySites(filtered);
+    document.getElementById('sites-count').textContent = filtered.length;
+    if (filtered.length > 0)
+        map.fitBounds(
+            filtered.map(s => [s.latitude, s.longitude]),
+            { padding: [50, 50] }
+        );
+}
+
 // ─── Site loading & display ───────────────────────────────────────────────────
 
 async function loadNetworkSites() {
@@ -107,18 +166,22 @@ async function loadNetworkSites() {
         const data = await res.json();
         if (!data.success) return;
 
-        sitesData = data.sites;
-        displaySites(sitesData);
-        document.getElementById('sites-count').textContent = sitesData.length;
+        sitesData = enrichSites(data.sites);
 
-        if (sitesData.length > 0) {
+        const filtered = applyClientFilters(sitesData);
+        displaySites(filtered);
+        document.getElementById('sites-count').textContent = filtered.length;
+
+        if (filtered.length > 0) {
             map.fitBounds(
-                sitesData.map(s => [s.latitude, s.longitude]),
+                filtered.map(s => [s.latitude, s.longitude]),
                 { padding: [50, 50] }
             );
         }
 
         buildRegionFilter(sitesData);
+        buildClusterFilter(sitesData);
+        buildAreaFilter(sitesData);
     } catch (e) {
         console.error('Sites error:', e);
         showNotification('Failed to load network sites', 'error');
@@ -159,6 +222,11 @@ async function showSiteDetails(siteId) {
         if (!data.success) return;
 
         const site = data.site;
+
+        // Enrich with cluster/area so the info panel can display them
+        const cluster = Math.floor(site.site_id / 100);
+        site.cluster  = cluster;
+        site.area     = CLUSTER_AREA[cluster] || 'Unknown';
 
         // Filter to active tech; keep all when 'all'
         const cells = (activeTech === 'all')
@@ -285,6 +353,8 @@ function displaySiteInfo(site, cells) {
     panel.innerHTML = `
         <h3 class="site-panel-title">📡 ${site.site_name}</h3>
         <div class="site-meta-row"><strong>Site ID:</strong> ${site.site_id}</div>
+        <div class="site-meta-row"><strong>Cluster:</strong> ${site.cluster ?? '—'}</div>
+        <div class="site-meta-row"><strong>Area:</strong> ${site.area || '—'}</div>
         <div class="site-meta-row"><strong>Region:</strong> ${site.region || '—'}</div>
         <div class="site-meta-row"><strong>Vendor:</strong> ${site.vendor || '—'}</div>
         <div class="site-meta-row"><strong>Cells shown:</strong> ${cells.length}</div>
@@ -358,7 +428,7 @@ function closeKPIModal() {
     document.getElementById('kpi-modal').style.display = 'none';
 }
 
-// ─── Search & region filter ───────────────────────────────────────────────────
+// ─── Filter builders ──────────────────────────────────────────────────────────
 
 function buildRegionFilter(sites) {
     const select  = document.getElementById('region-filter');
@@ -375,36 +445,43 @@ function buildRegionFilter(sites) {
     });
 }
 
-function searchSites() {
-    const term = document.getElementById('site-search').value.toLowerCase();
-    if (!term) { displaySites(sitesData); return; }
+function buildClusterFilter(sites) {
+    const select  = document.getElementById('cluster-filter');
+    const current = select.value;
+    const clusters = [...new Set(sites.map(s => s.cluster).filter(c => c != null))]
+        .sort((a, b) => a - b);
 
-    const filtered = sitesData.filter(s =>
-        s.site_name.toLowerCase().includes(term) ||
-        String(s.site_id).toLowerCase().includes(term)
-    );
-    displaySites(filtered);
-
-    if (filtered.length > 0)
-        map.fitBounds(
-            filtered.map(s => [s.latitude, s.longitude]),
-            { padding: [50, 50] }
-        );
+    select.innerHTML = '<option value="all">All Clusters</option>';
+    clusters.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = String(c);
+        opt.textContent = `Cluster ${c}`;
+        if (String(c) === current) opt.selected = true;
+        select.appendChild(opt);
+    });
 }
 
-function filterByRegion() {
-    const region   = document.getElementById('region-filter').value;
-    const filtered = region === 'all'
-        ? sitesData
-        : sitesData.filter(s => s.region === region);
-    displaySites(filtered);
+function buildAreaFilter(sites) {
+    const select  = document.getElementById('area-filter');
+    const current = select.value;
+    const areas = [...new Set(sites.map(s => s.area).filter(Boolean))].sort();
 
-    if (filtered.length > 0)
-        map.fitBounds(
-            filtered.map(s => [s.latitude, s.longitude]),
-            { padding: [50, 50] }
-        );
+    select.innerHTML = '<option value="all">All Areas</option>';
+    areas.forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a;
+        opt.textContent = a;
+        if (a === current) opt.selected = true;
+        select.appendChild(opt);
+    });
 }
+
+// ─── Filter callbacks (all funnel into runFilters) ────────────────────────────
+
+function searchSites()    { runFilters(); }
+function filterByRegion() { runFilters(); }
+function filterByCluster(){ runFilters(); }
+function filterByArea()   { runFilters(); }
 
 // ─── Metadata refresh ────────────────────────────────────────────────────────
 
