@@ -53,6 +53,13 @@ let highlightMarkers = [];
 let highlightLayers  = [];
 let codeSearchTimer  = null;
 
+// ─── Measure tool state ───────────────────────────────────────────────────────
+let measureActive    = false;
+let measurePoints    = [];
+let measurePtMarkers = [];
+let measurePolyline  = null;
+let measureDistLabel = null;
+
 // ─── Initialization ──────────────────────────────────────────────────────────
 
 function initializeMap() {
@@ -478,6 +485,9 @@ async function doCodeSearch() {
 }
 
 function drawCodeSearchResults(matches, code) {
+    // Hide all regular site markers — only show matching ones
+    siteMarkers.forEach(m => map.removeLayer(m));
+
     // Group by site
     const siteMap = {};
     matches.forEach(cell => {
@@ -498,7 +508,7 @@ function drawCodeSearchResults(matches, code) {
         if (cell.azimuth != null) drawHighlightWedge(cell);
     });
 
-    // Drop highlight markers on matching sites
+    // Drop highlight markers on matching sites only
     Object.values(siteMap).forEach(site => {
         const icon = L.divIcon({
             className: 'site-marker',
@@ -521,6 +531,7 @@ function drawCodeSearchResults(matches, code) {
 
     // Populate side panel
     const techLabel = _codeLabel();
+    const techParam = activeTech !== 'all' ? activeTech : '';
     let siteHtml = '';
     Object.values(siteMap).forEach(site => {
         siteHtml += `
@@ -545,9 +556,18 @@ function drawCodeSearchResults(matches, code) {
             ${matches.length} cell${matches.length !== 1 ? 's' : ''}
             across ${Object.keys(siteMap).length} site${Object.keys(siteMap).length !== 1 ? 's' : ''}
         </div>
+        <button class="export-btn" onclick="exportCodeSearch(${code}, '${techParam}')">
+            ⬇ Export to Excel
+        </button>
         ${siteHtml}
     `;
     panel.style.display = 'block';
+}
+
+/** Download matching cells as an Excel file. */
+function exportCodeSearch(code, tech) {
+    const techParam = tech ? `&tech=${encodeURIComponent(tech)}` : '';
+    window.location.href = `/api/map/export/cell-code?code=${code}${techParam}`;
 }
 
 function drawHighlightWedge(cell) {
@@ -610,6 +630,8 @@ function clearHighlights() {
     highlightLayers = [];
     highlightMarkers.forEach(m => map && map.removeLayer(m));
     highlightMarkers = [];
+    // Restore all regular site markers
+    siteMarkers.forEach(m => { try { m.addTo(map); } catch (_) {} });
 }
 
 function clearCodeSearch() {
@@ -701,6 +723,82 @@ async function refreshMetadata() {
             btn.disabled = false;
         }, 3000);
     }
+}
+
+// ─── Measuring tool ───────────────────────────────────────────────────────────
+
+function toggleMeasure() {
+    measureActive = !measureActive;
+    const btn = document.getElementById('measure-btn');
+    if (measureActive) {
+        btn.classList.add('active');
+        btn.textContent = '✕ Stop Measuring';
+        map.getContainer().style.cursor = 'crosshair';
+        map.on('click', onMeasureClick);
+    } else {
+        btn.classList.remove('active');
+        btn.textContent = '📏 Measure Distance';
+        map.getContainer().style.cursor = '';
+        map.off('click', onMeasureClick);
+        clearMeasure();
+    }
+}
+
+function onMeasureClick(e) {
+    measurePoints.push(e.latlng);
+
+    const pt = L.circleMarker(e.latlng, {
+        radius: 5, color: '#e74c3c', fillColor: '#fff',
+        fillOpacity: 1, weight: 2.5
+    }).addTo(map);
+    measurePtMarkers.push(pt);
+
+    if (measurePoints.length < 2) return;
+
+    // Redraw polyline through all points
+    if (measurePolyline) map.removeLayer(measurePolyline);
+    measurePolyline = L.polyline(measurePoints, {
+        color: '#e74c3c', weight: 2, dashArray: '7,5', opacity: 0.85
+    }).addTo(map);
+
+    // Accumulate total distance
+    let totalM = 0;
+    for (let i = 1; i < measurePoints.length; i++) {
+        totalM += measurePoints[i - 1].distanceTo(measurePoints[i]);
+    }
+    const distText = totalM >= 1000
+        ? `${(totalM / 1000).toFixed(2)} km`
+        : `${Math.round(totalM)} m`;
+
+    // Segment distance for last segment
+    const segM     = measurePoints[measurePoints.length - 2]
+                        .distanceTo(measurePoints[measurePoints.length - 1]);
+    const segText  = segM >= 1000
+        ? `+${(segM / 1000).toFixed(2)} km`
+        : `+${Math.round(segM)} m`;
+
+    // Move/update total label to last point
+    if (measureDistLabel) map.removeLayer(measureDistLabel);
+    measureDistLabel = L.marker(e.latlng, {
+        icon: L.divIcon({
+            className: 'measure-label-icon',
+            html: `<div class="measure-tooltip">
+                       <span class="measure-total">${distText}</span>
+                       <span class="measure-seg">${segText}</span>
+                   </div>`,
+            iconAnchor: [-8, 10]
+        }),
+        interactive: false,
+        zIndexOffset: 1000
+    }).addTo(map);
+}
+
+function clearMeasure() {
+    measurePtMarkers.forEach(m => map && map.removeLayer(m));
+    measurePtMarkers = [];
+    if (measurePolyline)  { map.removeLayer(measurePolyline);  measurePolyline  = null; }
+    if (measureDistLabel) { map.removeLayer(measureDistLabel); measureDistLabel = null; }
+    measurePoints = [];
 }
 
 // Close modal on backdrop click

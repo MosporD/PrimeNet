@@ -275,6 +275,95 @@ def search_by_cell_code():
         return jsonify({'error': str(e)}), 500
 
 
+@network_map_bp.route('/api/map/export/cell-code', methods=['GET'])
+@login_required
+def export_cell_code():
+    """Export cells matching a PCI / SC / BCCH code as an Excel file."""
+    from io import BytesIO
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from flask import send_file
+
+    code = request.args.get('code', '').strip()
+    tech = request.args.get('tech', '').strip()
+
+    if not code or not code.lstrip('-').isdigit():
+        return jsonify({'error': 'Invalid code'}), 400
+
+    try:
+        conn = sqlite3.connect(METADATA_DB)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+
+        query = '''
+            SELECT c.cell_name, s.site_name, s.site_id, c.technology, c.vendor,
+                   c.frequency_band, c.pci, c.azimuth, c.mechanical_tilt,
+                   c.electrical_tilt, s.latitude, s.longitude
+            FROM cells c
+            JOIN sites s ON c.site_id = s.site_id
+            WHERE c.pci = ? AND c.status = 'Active'
+              AND s.status = 'Active'
+              AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+        '''
+        params = [int(code)]
+        if tech and tech != 'all':
+            query += ' AND c.technology = ?'
+            params.append(tech)
+        query += ' ORDER BY s.site_name, c.technology, c.cell_name'
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+
+        code_label = 'PSC' if tech == '3G' else ('BCCH' if tech == '2G' else 'PCI')
+
+        wb  = openpyxl.Workbook()
+        ws  = wb.active
+        ws.title = f'{code_label}_{code}'
+
+        headers = ['Cell Name', 'Site Name', 'Site ID', 'Technology', 'Vendor',
+                   'Band', code_label, 'Azimuth (°)', 'M.Tilt (°)', 'E.Tilt (°)',
+                   'Latitude', 'Longitude']
+        ws.append(headers)
+
+        hdr_fill = PatternFill(start_color='1F4E79', end_color='1F4E79', fill_type='solid')
+        for cell in ws[1]:
+            cell.font      = Font(bold=True, color='FFFFFF')
+            cell.fill      = hdr_fill
+            cell.alignment = Alignment(horizontal='center')
+
+        for row in rows:
+            ws.append([
+                row['cell_name'], row['site_name'], row['site_id'],
+                row['technology'], row['vendor'], row['frequency_band'],
+                row['pci'], row['azimuth'], row['mechanical_tilt'],
+                row['electrical_tilt'], row['latitude'], row['longitude']
+            ])
+
+        for col in ws.columns:
+            max_len = max((len(str(c.value or '')) for c in col), default=10)
+            ws.column_dimensions[col[0].column_letter].width = min(max_len + 4, 40)
+
+        buf = BytesIO()
+        wb.save(buf)
+        buf.seek(0)
+
+        uid = (request.current_user.get('id')
+               if isinstance(request.current_user, dict)
+               else request.current_user[0])
+        log_activity(uid, 'export', f'Exported {len(rows)} cells with {code_label}={code}')
+
+        return send_file(
+            buf,
+            download_name=f'{code_label}_{code}_cells.xlsx',
+            as_attachment=True,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @network_map_bp.route('/api/map/refresh', methods=['POST'])
 @login_required
 def refresh_metadata():
