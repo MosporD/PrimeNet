@@ -4,8 +4,8 @@ Import Local Files → Database
 Reads local CSV / XLSX snapshots and imports them into the three databases:
 
   CSV  files         →  metadata.db  (sites + cells)
-  Nokia XLSX files   →  nokia_pm.db  (cell_kpis)
-  Huawei XLSX file   →  huawei_pm.db (cell_kpis)
+  Nokia XLSX files   →  nokia_pm.db  (2G_Hourly / 3G_Hourly / 4G_Hourly / 5G_Hourly)
+  Huawei XLSX file   →  huawei_pm.db (2G_Hourly / 3G_Hourly / 4G_Hourly)
 
 File discovery — the script searches these directories in order:
   1. Project root

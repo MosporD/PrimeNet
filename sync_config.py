@@ -22,6 +22,25 @@ HUAWEI_PM_DB = os.path.join(PROJECT_ROOT, 'huawei_pm.db')
 METADATA_DB  = os.path.join(PROJECT_ROOT, 'metadata.db')
 NCMUSERS_DB  = os.path.join(PROJECT_ROOT, 'ncm_users.db')
 
+# ── Per-technology PM tables ────────────────────────────────────────────────
+# Each PM database stores data in separate tables per technology instead of
+# a single cell_kpis table.  Table names: "2G_Hourly", "3G_Hourly", etc.
+PM_TECHNOLOGIES = ['2G', '3G', '4G', '5G']
+
+def pm_table_name(technology):
+    """Map a technology label to its PM database table name.
+    '4G', '4G-FDD', '4G-TDD', 'LTE' → '4G_Hourly', etc."""
+    tech = str(technology).upper().strip()
+    if '5G' in tech or 'NR' in tech:
+        return '5G_Hourly'
+    if '4G' in tech or 'LTE' in tech:
+        return '4G_Hourly'
+    if '3G' in tech or 'WCDMA' in tech or 'UMTS' in tech:
+        return '3G_Hourly'
+    if '2G' in tech or 'GSM' in tech:
+        return '2G_Hourly'
+    return f'{tech}_Hourly'
+
 # ============================================================
 # SERVER 1A — Nokia PM
 # 4 separate technology folders; each contains multiple XLSX

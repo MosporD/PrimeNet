@@ -8,7 +8,7 @@ from functools import wraps
 import sqlite3, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB
+from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB, pm_table_name
 from database_enhanced import get_user_by_session, log_activity
 
 network_map_bp = Blueprint(
@@ -169,14 +169,16 @@ def get_cell_kpis(cell_id):
         cell_data = dict(cell)
         vendor    = cell_data.get('vendor', '')
         cell_name = cell_data['cell_name']
+        cell_tech = cell_data.get('technology', '4G')
         pm_db     = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
+        table     = pm_table_name(cell_tech)
 
         try:
             pm_conn = sqlite3.connect(pm_db)
             pm_conn.row_factory = sqlite3.Row
-            kpi = pm_conn.execute('''
+            kpi = pm_conn.execute(f'''
                 SELECT *
-                FROM cell_kpis
+                FROM "{table}"
                 WHERE cell_name = ?
                 ORDER BY timestamp DESC
                 LIMIT 1

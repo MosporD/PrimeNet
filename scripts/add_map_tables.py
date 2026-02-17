@@ -61,28 +61,17 @@ def add_map_tables():
         )
     ''')
 
-    # KPIs table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS cell_kpis (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cell_id TEXT NOT NULL,
-            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            avg_users INTEGER DEFAULT 0,
-            data_volume_gb REAL DEFAULT 0,
-            rsrp REAL,
-            rsrq REAL,
-            sinr REAL,
-            cqi REAL,
-            throughput_dl_mbps REAL,
-            throughput_ul_mbps REAL,
-            rrc_success_rate REAL,
-            erab_success_rate REAL,
-            call_drop_rate REAL,
-            handover_success_rate REAL,
-            availability_percent REAL DEFAULT 100,
-            FOREIGN KEY (cell_id) REFERENCES cells(cell_id)
-        )
-    ''')
+    # Per-technology KPI tables (2G_Hourly, 3G_Hourly, 4G_Hourly, 5G_Hourly)
+    for tech in ('2G', '3G', '4G', '5G'):
+        table = f'{tech}_Hourly'
+        cursor.execute(f'''
+            CREATE TABLE IF NOT EXISTS "{table}" (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                cell_name TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                UNIQUE (cell_name, timestamp) ON CONFLICT REPLACE
+            )
+        ''')
 
     conn.commit()
     print("[OK] Network Map tables created successfully")
@@ -90,8 +79,10 @@ def add_map_tables():
     # Add indexes for performance
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_sectors_site ON sectors(site_id)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_cells_sector ON cells(sector_id)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_kpis_cell ON cell_kpis(cell_id)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_kpis_timestamp ON cell_kpis(timestamp)')
+    for tech in ('2G', '3G', '4G', '5G'):
+        table = f'{tech}_Hourly'
+        cursor.execute(f'CREATE INDEX IF NOT EXISTS "idx_{table}_cell_ts" ON "{table}" (cell_name, timestamp)')
+        cursor.execute(f'CREATE INDEX IF NOT EXISTS "idx_{table}_ts"      ON "{table}" (timestamp)')
 
     conn.commit()
     print("[OK] Indexes created")

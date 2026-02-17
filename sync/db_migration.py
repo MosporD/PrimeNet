@@ -16,7 +16,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sync_config import METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB, NCMUSERS_DB as APP_DB
+from sync_config import METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB, NCMUSERS_DB as APP_DB, PM_TECHNOLOGIES, pm_table_name
 
 logger = logging.getLogger(__name__)
 
@@ -31,17 +31,19 @@ _KPI_COLS = '''
 def _create_pm_db(db_path):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute(f'''
-        CREATE TABLE IF NOT EXISTS cell_kpis (
-            {_KPI_COLS},
-            UNIQUE (cell_name, timestamp) ON CONFLICT REPLACE
-        )
-    ''')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_kpis_cell_ts ON cell_kpis (cell_name, timestamp)')
-    cursor.execute('CREATE INDEX IF NOT EXISTS idx_kpis_ts       ON cell_kpis (timestamp)')
+    for tech in PM_TECHNOLOGIES:
+        table = pm_table_name(tech)
+        cursor.execute(f'''
+            CREATE TABLE IF NOT EXISTS "{table}" (
+                {_KPI_COLS},
+                UNIQUE (cell_name, timestamp) ON CONFLICT REPLACE
+            )
+        ''')
+        cursor.execute(f'CREATE INDEX IF NOT EXISTS "idx_{table}_cell_ts" ON "{table}" (cell_name, timestamp)')
+        cursor.execute(f'CREATE INDEX IF NOT EXISTS "idx_{table}_ts"      ON "{table}" (timestamp)')
     conn.commit()
     conn.close()
-    logger.info(f'{db_path} ready.')
+    logger.info(f'{db_path} ready ({", ".join(pm_table_name(t) for t in PM_TECHNOLOGIES)}).')
 
 
 def _create_metadata_db():
