@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 
 # Use canonical paths from sync_config
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sync_config import METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB
+from sync_config import METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB, pm_table_name
 
 # First, ensure DB schemas exist
 from sync.db_migration import run_migrations
@@ -168,28 +168,34 @@ def insert_sample_data():
         conn = sqlite3.connect(pm_db, timeout=30)
         conn.execute('PRAGMA journal_mode=WAL')
 
-        # Ensure KPI columns exist for ALL technologies in this vendor
-        all_techs = set(t for _, t in cells)
-        existing = {r[1] for r in conn.execute('PRAGMA table_info(cell_kpis)').fetchall()}
-        for tech in all_techs:
+        # Group cells by technology so we insert into the correct table
+        cells_by_tech = {}
+        for cell_name, tech in cells:
+            cells_by_tech.setdefault(tech, []).append(cell_name)
+
+        inserted = 0
+        for tech, cell_names in cells_by_tech.items():
+            table = pm_table_name(tech)
+
+            # Ensure KPI columns exist in this technology's table
+            existing = {r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()}
             sample = _random_kpi_row('test', '2000-01-01', tech)
             for col in sample.keys():
                 if col not in ('cell_name', 'timestamp') and col not in existing:
-                    conn.execute(f'ALTER TABLE cell_kpis ADD COLUMN "{col}" REAL')
+                    conn.execute(f'ALTER TABLE "{table}" ADD COLUMN "{col}" REAL')
                     existing.add(col)
 
-        inserted = 0
-        for cell_name, tech in cells:
-            for h in range(hours):
-                ts = (now - timedelta(hours=hours - h)).strftime('%Y-%m-%d %H:%M:%S')
-                row = _random_kpi_row(cell_name, ts, tech)
-                cols_q   = ', '.join(f'"{c}"' for c in row.keys())
-                placeholders = ', '.join(['?'] * len(row))
-                conn.execute(
-                    f'INSERT OR REPLACE INTO cell_kpis ({cols_q}) VALUES ({placeholders})',
-                    list(row.values())
-                )
-                inserted += 1
+            for cell_name in cell_names:
+                for h in range(hours):
+                    ts = (now - timedelta(hours=hours - h)).strftime('%Y-%m-%d %H:%M:%S')
+                    row = _random_kpi_row(cell_name, ts, tech)
+                    cols_q   = ', '.join(f'"{c}"' for c in row.keys())
+                    placeholders = ', '.join(['?'] * len(row))
+                    conn.execute(
+                        f'INSERT OR REPLACE INTO "{table}" ({cols_q}) VALUES ({placeholders})',
+                        list(row.values())
+                    )
+                    inserted += 1
 
         conn.commit()
         conn.close()

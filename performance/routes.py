@@ -16,7 +16,7 @@ from functools import wraps
 import sqlite3, os, sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB
+from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB, PM_TECHNOLOGIES, pm_table_name
 from database_enhanced import get_user_by_session, log_activity
 
 performance_bp = Blueprint(
@@ -111,31 +111,55 @@ def _meta_conn():
     return conn
 
 
-def _get_pm_cols(db_path):
+def _get_pm_cols(db_path, technology=None):
     """
     Return KPI column names that contain actual numeric data.
-    Vendor files include text columns (eNodeB name, Object, BTS ID, etc.)
-    which get stored as all-NULL REAL columns — those are excluded here.
+    Scans all per-technology tables (or a single one when technology is given).
     """
+    techs = [technology] if technology else PM_TECHNOLOGIES
+    result = set()
     try:
         conn = sqlite3.connect(db_path)
-        all_cols = [r[1] for r in conn.execute('PRAGMA table_info(cell_kpis)').fetchall()
-                    if r[1] not in _FIXED_COLS]
-        if not all_cols:
+        for tech in techs:
+            table = pm_table_name(tech)
+            try:
+                cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()
+                        if r[1] not in _FIXED_COLS]
+                if not cols:
+                    continue
+                counts_sql = ', '.join(
+                    f'SUM(CASE WHEN "{col}" IS NOT NULL THEN 1 ELSE 0 END)'
+                    for col in cols
+                )
+                row = conn.execute(f'SELECT {counts_sql} FROM "{table}"').fetchone()
+                if row:
+                    result.update(col for col, cnt in zip(cols, row) if cnt and cnt > 0)
+            except sqlite3.OperationalError:
+                continue
+        conn.close()
+    except Exception:
+        pass
+    return sorted(result)
+
+
+def _get_pm_cols_for_table(db_path, table):
+    """Return non-empty KPI columns for a specific table."""
+    try:
+        conn = sqlite3.connect(db_path)
+        cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()
+                if r[1] not in _FIXED_COLS]
+        if not cols:
             conn.close()
             return []
-
-        # Single query: count non-NULL values for every candidate column
         counts_sql = ', '.join(
             f'SUM(CASE WHEN "{col}" IS NOT NULL THEN 1 ELSE 0 END)'
-            for col in all_cols
+            for col in cols
         )
-        row = conn.execute(f'SELECT {counts_sql} FROM cell_kpis').fetchone()
+        row = conn.execute(f'SELECT {counts_sql} FROM "{table}"').fetchone()
         conn.close()
-
         if not row:
             return []
-        return [col for col, cnt in zip(all_cols, row) if cnt and cnt > 0]
+        return [col for col, cnt in zip(cols, row) if cnt and cnt > 0]
     except Exception:
         return []
 
@@ -159,6 +183,66 @@ def _pm_conn(vendor=None):
         conn.execute(f"ATTACH DATABASE '{NOKIA_PM_DB}'  AS nokia_pm")
         conn.execute(f"ATTACH DATABASE '{HUAWEI_PM_DB}' AS huawei_pm")
         return conn, None
+
+
+def _build_pm_union(alias, db_path, technology=None):
+    """
+    Build UNION ALL subqueries across per-technology tables.
+
+    Returns (data_sql, max_sql) where:
+      data_sql — full UNION ALL with all KPI columns (for LEFT JOIN)
+      max_sql  — minimal UNION ALL with just cell_name + timestamp (for MAX subquery)
+
+    Both are None when no tables have data.
+    """
+    techs = [technology] if technology else PM_TECHNOLOGIES
+    all_kpi = set()
+    table_cols = {}  # {table: [cols_with_data]}
+
+    try:
+        conn = sqlite3.connect(db_path)
+        for tech in techs:
+            table = pm_table_name(tech)
+            try:
+                cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()
+                        if r[1] not in _FIXED_COLS]
+                if not cols:
+                    continue
+                counts_sql = ', '.join(
+                    f'SUM(CASE WHEN "{c}" IS NOT NULL THEN 1 ELSE 0 END)' for c in cols
+                )
+                row = conn.execute(f'SELECT {counts_sql} FROM "{table}"').fetchone()
+                if row:
+                    good = [c for c, cnt in zip(cols, row) if cnt and cnt > 0]
+                    if good:
+                        table_cols[table] = good
+                        all_kpi.update(good)
+            except sqlite3.OperationalError:
+                continue
+        conn.close()
+    except Exception:
+        return None, None
+
+    if not table_cols:
+        return None, None
+
+    all_kpi_sorted = sorted(all_kpi)
+
+    data_parts = []
+    max_parts  = []
+    for table, cols in table_cols.items():
+        col_exprs = ', '.join(
+            f'"{c}"' if c in cols else f'NULL AS "{c}"'
+            for c in all_kpi_sorted
+        )
+        data_parts.append(
+            f'SELECT cell_name, timestamp, {col_exprs} FROM {alias}."{table}"'
+        )
+        max_parts.append(
+            f'SELECT cell_name, timestamp FROM {alias}."{table}"'
+        )
+
+    return ' UNION ALL '.join(data_parts), ' UNION ALL '.join(max_parts)
 
 
 # ---------------------------------------------------------------------------
@@ -286,75 +370,96 @@ def get_cells():
 
     try:
         if pm_alias:
-            # Single vendor — build KPI select from live schema
+            # Single vendor — build UNION ALL across per-technology tables
             pm_db = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
-            kpi_cols = _get_pm_cols(pm_db)
+            kpi_cols = _get_pm_cols(pm_db, technology if technology else None)
             kpi_select = (',' + ','.join(f'k."{c}"' for c in kpi_cols)) if kpi_cols else ''
 
-            sql = f'''
-                SELECT
-                    c.cell_id, c.cell_name, c.technology, c.vendor,
-                    c.frequency_band, c.azimuth, c.pci,
-                    st.site_id, st.site_name, st.latitude, st.longitude,
-                    k.timestamp AS kpi_ts{kpi_select}
-                FROM cells c
-                LEFT JOIN sites st ON c.site_id = st.site_id
-                LEFT JOIN pm.cell_kpis k
-                    ON k.cell_name = c.cell_name
-                    AND k.timestamp = (
-                        SELECT MAX(timestamp) FROM pm.cell_kpis
-                        WHERE cell_name = c.cell_name
-                    )
-                WHERE {where_sql}
-                ORDER BY st.site_name, c.cell_name
-            '''
+            # Build the PM subquery (single table or UNION ALL)
+            pm_sub, pm_max = _build_pm_union('pm', pm_db, technology if technology else None)
+
+            if pm_sub:
+                sql = f'''
+                    SELECT
+                        c.cell_id, c.cell_name, c.technology, c.vendor,
+                        c.frequency_band, c.azimuth, c.pci,
+                        st.site_id, st.site_name, st.latitude, st.longitude,
+                        k.timestamp AS kpi_ts{kpi_select}
+                    FROM cells c
+                    LEFT JOIN sites st ON c.site_id = st.site_id
+                    LEFT JOIN ({pm_sub}) k
+                        ON k.cell_name = c.cell_name
+                        AND k.timestamp = (
+                            SELECT MAX(timestamp) FROM ({pm_max})
+                            WHERE cell_name = c.cell_name
+                        )
+                    WHERE {where_sql}
+                    ORDER BY st.site_name, c.cell_name
+                '''
+            else:
+                sql = f'''
+                    SELECT
+                        c.cell_id, c.cell_name, c.technology, c.vendor,
+                        c.frequency_band, c.azimuth, c.pci,
+                        st.site_id, st.site_name, st.latitude, st.longitude,
+                        NULL AS kpi_ts
+                    FROM cells c
+                    LEFT JOIN sites st ON c.site_id = st.site_id
+                    WHERE {where_sql}
+                    ORDER BY st.site_name, c.cell_name
+                '''
             rows = [dict(r) for r in conn.execute(sql, params).fetchall()]
 
         else:
-            # Both vendors — align columns from both PM dbs for UNION ALL
-            nokia_cols  = _get_pm_cols(NOKIA_PM_DB)
-            huawei_cols = _get_pm_cols(HUAWEI_PM_DB)
+            # Both vendors — build UNION ALL across all tech tables in both PM dbs
+            nokia_sub,  nokia_max  = _build_pm_union('nokia_pm',  NOKIA_PM_DB,  technology if technology else None)
+            huawei_sub, huawei_max = _build_pm_union('huawei_pm', HUAWEI_PM_DB, technology if technology else None)
+
+            nokia_cols  = _get_pm_cols(NOKIA_PM_DB,  technology if technology else None)
+            huawei_cols = _get_pm_cols(HUAWEI_PM_DB, technology if technology else None)
             all_cols    = sorted(set(nokia_cols) | set(huawei_cols))
+            outer_kpi   = (',' + ','.join(f'k."{c}"' for c in all_cols)) if all_cols else ''
 
-            if all_cols:
-                nokia_inner  = ', '.join(f'"{c}"' if c in nokia_cols  else f'NULL AS "{c}"' for c in all_cols)
-                huawei_inner = ', '.join(f'"{c}"' if c in huawei_cols else f'NULL AS "{c}"' for c in all_cols)
-                outer_kpi    = ',' + ','.join(f'k."{c}"' for c in all_cols)
-                union_nokia  = f'SELECT cell_name, timestamp, {nokia_inner}  FROM nokia_pm.cell_kpis'
-                union_huawei = f'SELECT cell_name, timestamp, {huawei_inner} FROM huawei_pm.cell_kpis'
+            # Combine UNION parts from both vendors
+            union_parts = [p for p in (nokia_sub, huawei_sub) if p]
+            max_parts   = [p for p in (nokia_max, huawei_max) if p]
+
+            if union_parts:
+                combined_sub = ' UNION ALL '.join(union_parts)
+                combined_max = ' UNION ALL '.join(max_parts)
+                sql = f'''
+                    SELECT
+                        c.cell_id, c.cell_name, c.technology, c.vendor,
+                        c.frequency_band, c.azimuth, c.pci,
+                        st.site_id, st.site_name, st.latitude, st.longitude,
+                        k.timestamp AS kpi_ts{outer_kpi}
+                    FROM cells c
+                    LEFT JOIN sites st ON c.site_id = st.site_id
+                    LEFT JOIN ({combined_sub}) k
+                        ON k.cell_name = c.cell_name
+                        AND k.timestamp = (
+                            SELECT MAX(timestamp) FROM ({combined_max})
+                            WHERE cell_name = c.cell_name
+                        )
+                    WHERE {where_sql}
+                    ORDER BY st.site_name, c.cell_name
+                '''
             else:
-                outer_kpi    = ''
-                union_nokia  = 'SELECT cell_name, timestamp FROM nokia_pm.cell_kpis'
-                union_huawei = 'SELECT cell_name, timestamp FROM huawei_pm.cell_kpis'
-
-            sql = f'''
-                SELECT
-                    c.cell_id, c.cell_name, c.technology, c.vendor,
-                    c.frequency_band, c.azimuth, c.pci,
-                    st.site_id, st.site_name, st.latitude, st.longitude,
-                    k.timestamp AS kpi_ts{outer_kpi}
-                FROM cells c
-                LEFT JOIN sites st ON c.site_id = st.site_id
-                LEFT JOIN (
-                    {union_nokia}
-                    UNION ALL
-                    {union_huawei}
-                ) k ON k.cell_name = c.cell_name
-                    AND k.timestamp = (
-                        SELECT MAX(timestamp) FROM (
-                            SELECT cell_name, timestamp FROM nokia_pm.cell_kpis
-                            UNION ALL
-                            SELECT cell_name, timestamp FROM huawei_pm.cell_kpis
-                        ) WHERE cell_name = c.cell_name
-                    )
-                WHERE {where_sql}
-                ORDER BY st.site_name, c.cell_name
-            '''
+                sql = f'''
+                    SELECT
+                        c.cell_id, c.cell_name, c.technology, c.vendor,
+                        c.frequency_band, c.azimuth, c.pci,
+                        st.site_id, st.site_name, st.latitude, st.longitude,
+                        NULL AS kpi_ts
+                    FROM cells c
+                    LEFT JOIN sites st ON c.site_id = st.site_id
+                    WHERE {where_sql}
+                    ORDER BY st.site_name, c.cell_name
+                '''
             rows = [dict(r) for r in conn.execute(sql, params).fetchall()]
 
     except sqlite3.OperationalError as e:
         # PM db doesn't exist yet (first run before any sync)
-        logger_msg = str(e)
         rows = [dict(r) for r in conn.execute(f'''
             SELECT
                 c.cell_id, c.cell_name, c.technology, c.vendor,
@@ -412,11 +517,13 @@ def get_cell_trend(cell_id):
     cell['area']    = area
     vendor    = cell.get('vendor')
     cell_name = cell['cell_name']
+    cell_tech = cell.get('technology', '4G')
     pm_db     = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
+    table     = pm_table_name(cell_tech)
 
     try:
         # Only select KPI columns that have real numeric data (not text leftovers)
-        kpi_cols = _get_pm_cols(pm_db)
+        kpi_cols = _get_pm_cols_for_table(pm_db, table)
         if kpi_cols:
             col_list = 'cell_name, timestamp, ' + ', '.join(f'"{c}"' for c in kpi_cols)
         else:
@@ -429,10 +536,10 @@ def get_cell_trend(cell_id):
         # the scheduler hasn't run recently.
         trend = [dict(r) for r in pm_conn.execute(f'''
             SELECT {col_list}
-            FROM cell_kpis
+            FROM "{table}"
             WHERE cell_name = ?
               AND timestamp >= datetime(
-                  (SELECT MAX(timestamp) FROM cell_kpis WHERE cell_name = ?),
+                  (SELECT MAX(timestamp) FROM "{table}" WHERE cell_name = ?),
                   ? || ' hours'
               )
             ORDER BY timestamp ASC

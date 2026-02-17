@@ -19,7 +19,7 @@ from datetime import datetime
 
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB
+from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, pm_table_name
 
 logger = logging.getLogger(__name__)
 
@@ -121,24 +121,25 @@ def _resolve_key_cols(df):
 # ---------------------------------------------------------------------------
 
 def _ensure_columns(conn, table, cols):
-    existing = {r[1] for r in conn.execute(f'PRAGMA table_info({table})').fetchall()}
+    existing = {r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()}
     for col in cols:
         if col not in existing:
-            conn.execute(f'ALTER TABLE {table} ADD COLUMN "{col}" REAL')
+            conn.execute(f'ALTER TABLE "{table}" ADD COLUMN "{col}" REAL')
 
 
 def _insert_df(db_path, df, technology):
     """
-    Insert all rows of df into cell_kpis.
+    Insert all rows of df into the technology-specific table (e.g. "4G_Hourly").
     df must have 'cell_name' and 'timestamp' columns.
     All other columns stored as-is with their original names.
     Returns (inserted, skipped).
     """
+    table = pm_table_name(technology)
     kpi_cols = [c for c in df.columns if c not in ('cell_name', 'timestamp')]
 
     conn = sqlite3.connect(db_path, timeout=30)
     conn.execute('PRAGMA journal_mode=WAL')   # allow readers while writing
-    _ensure_columns(conn, 'cell_kpis', kpi_cols)
+    _ensure_columns(conn, table, kpi_cols)
 
     inserted = 0
     skipped  = 0
@@ -166,14 +167,14 @@ def _insert_df(db_path, df, technology):
         quoted_cols  = ', '.join(f'"{c}"' for c in record.keys())
         placeholders = ', '.join(['?'] * len(record))
         conn.execute(
-            f'INSERT OR REPLACE INTO cell_kpis ({quoted_cols}) VALUES ({placeholders})',
+            f'INSERT OR REPLACE INTO "{table}" ({quoted_cols}) VALUES ({placeholders})',
             list(record.values())
         )
         inserted += 1
 
     conn.commit()
     conn.close()
-    logger.info(f'[{technology}] {db_path}: {inserted} inserted, {skipped} skipped.')
+    logger.info(f'[{technology}] {db_path} → {table}: {inserted} inserted, {skipped} skipped.')
     return inserted, skipped
 
 

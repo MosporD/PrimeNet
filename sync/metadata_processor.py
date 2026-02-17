@@ -609,7 +609,11 @@ def seed_pm_cells_to_metadata(pm_db_path, vendor):
     For every cell_name in a PM database that is not yet in metadata.db,
     insert a placeholder site + cell so cross-DB JOINs work even before a
     full metadata sync has run.
+
+    Scans all per-technology tables (2G_Hourly, 3G_Hourly, etc.).
     """
+    from sync_config import PM_TECHNOLOGIES, pm_table_name
+
     def _site_id(cell_name):
         m = re.match(r'^(\d+)', cell_name)
         return m.group(1) if m else None
@@ -621,9 +625,18 @@ def seed_pm_cells_to_metadata(pm_db_path, vendor):
         pm_conn   = sqlite3.connect(pm_db_path)
         meta_conn = sqlite3.connect(METADATA_DB)
 
-        pm_rows = pm_conn.execute(
-            'SELECT DISTINCT cell_name, technology FROM cell_kpis'
-        ).fetchall()
+        # Collect cell_name + technology from all per-tech tables
+        pm_rows = []
+        for tech in PM_TECHNOLOGIES:
+            table = pm_table_name(tech)
+            try:
+                rows = pm_conn.execute(
+                    f'SELECT DISTINCT cell_name FROM "{table}"'
+                ).fetchall()
+                for r in rows:
+                    pm_rows.append((r[0], tech))
+            except sqlite3.OperationalError:
+                continue
         pm_conn.close()
 
         existing_cells = {r[0] for r in meta_conn.execute('SELECT cell_name FROM cells').fetchall()}
