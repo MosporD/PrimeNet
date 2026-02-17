@@ -27,15 +27,18 @@ run_migrations()
 
 # ── Sample sites around Amman ───────────────────────────────────────────────
 
+# site_id must be numeric so cluster = floor(site_id/100) maps to CLUSTER_AREA.
+# Cluster 3 → East Amman,  Cluster 2 → West Amman,  Cluster 1 → South Amman,
+# Cluster 4 → North Jordan, Cluster 7 → South Jordan, Cluster 10 → East Jordan
 SITES = [
-    {'site_id': 'AMM_001', 'site_name': 'Abdali Tower',       'latitude': 31.9624, 'longitude': 35.9153, 'region': 'Amman Center', 'site_type': 'Macro', 'vendor': 'Nokia'},
-    {'site_id': 'AMM_002', 'site_name': 'Sweifieh Mall',      'latitude': 31.9398, 'longitude': 35.8515, 'region': 'Amman West',   'site_type': 'Macro', 'vendor': 'Nokia'},
-    {'site_id': 'AMM_003', 'site_name': 'University Street',  'latitude': 32.0110, 'longitude': 35.8706, 'region': 'Amman North',  'site_type': 'Macro', 'vendor': 'Nokia'},
-    {'site_id': 'AMM_004', 'site_name': 'Mecca Street Hub',   'latitude': 31.9286, 'longitude': 35.9040, 'region': 'Amman South',  'site_type': 'Macro', 'vendor': 'Nokia'},
-    {'site_id': 'AMM_005', 'site_name': 'Downtown Center',    'latitude': 31.9540, 'longitude': 35.9450, 'region': 'Amman Center', 'site_type': 'Micro', 'vendor': 'Huawei'},
-    {'site_id': 'AMM_006', 'site_name': 'Sports City',        'latitude': 31.9870, 'longitude': 35.8960, 'region': 'Amman North',  'site_type': 'Macro', 'vendor': 'Huawei'},
-    {'site_id': 'AMM_007', 'site_name': 'Abdoun Circle',      'latitude': 31.9480, 'longitude': 35.8790, 'region': 'Amman West',   'site_type': 'Micro', 'vendor': 'Huawei'},
-    {'site_id': 'AMM_008', 'site_name': 'Queen Alia Airport', 'latitude': 31.7227, 'longitude': 35.9932, 'region': 'Airport Zone', 'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': '305',  'site_name': 'Abdali Tower',       'latitude': 31.9624, 'longitude': 35.9153, 'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': '210',  'site_name': 'Sweifieh Mall',      'latitude': 31.9398, 'longitude': 35.8515, 'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': '415',  'site_name': 'University Street',  'latitude': 32.0110, 'longitude': 35.8706, 'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': '120',  'site_name': 'Mecca Street Hub',   'latitude': 31.9286, 'longitude': 35.9040, 'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': '325',  'site_name': 'Downtown Center',    'latitude': 31.9540, 'longitude': 35.9450, 'site_type': 'Micro', 'vendor': 'Huawei'},
+    {'site_id': '1022', 'site_name': 'Sports City',        'latitude': 31.9870, 'longitude': 35.8960, 'site_type': 'Macro', 'vendor': 'Huawei'},
+    {'site_id': '215',  'site_name': 'Abdoun Circle',      'latitude': 31.9480, 'longitude': 35.8790, 'site_type': 'Micro', 'vendor': 'Huawei'},
+    {'site_id': '730',  'site_name': 'Queen Alia Airport', 'latitude': 31.7227, 'longitude': 35.9932, 'site_type': 'Macro', 'vendor': 'Nokia'},
 ]
 
 # Technology distribution per vendor
@@ -107,17 +110,16 @@ def insert_sample_data():
     print(f"Inserting {len(SITES)} sites...")
     for site in SITES:
         mc.execute('''
-            INSERT INTO sites (site_id, site_name, latitude, longitude, region, site_type, vendor, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'Active')
+            INSERT INTO sites (site_id, site_name, latitude, longitude, site_type, vendor, status)
+            VALUES (?, ?, ?, ?, ?, ?, 'Active')
             ON CONFLICT(site_id) DO UPDATE SET
                 site_name = excluded.site_name,
                 latitude  = excluded.latitude,
                 longitude = excluded.longitude,
-                region    = excluded.region,
                 vendor    = excluded.vendor,
                 status    = 'Active'
         ''', (site['site_id'], site['site_name'], site['latitude'], site['longitude'],
-              site['region'], site['site_type'], site['vendor']))
+              site['site_type'], site['vendor']))
 
         vendor = site['vendor']
         techs  = NOKIA_TECHS if vendor == 'Nokia' else HUAWEI_TECHS

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Analytics - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
-    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=3.1">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=4.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -54,13 +54,6 @@
             </div>
 
             <div class="filter-group">
-                <label>Region</label>
-                <select id="filter-region" onchange="onRegionChange()">
-                    <option value="">All Regions</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
                 <label>Cluster</label>
                 <select id="filter-cluster" onchange="onClusterChange()">
                     <option value="">All Clusters</option>
@@ -102,6 +95,23 @@
 
             <div class="filter-divider"></div>
 
+            <!-- Cell search + chip list (always in left panel) -->
+            <div id="cell-list-wrap" style="display:none;">
+                <div class="cell-search-wrap">
+                    <input
+                        id="cell-search"
+                        class="cell-search-input"
+                        type="text"
+                        placeholder="Search cells..."
+                        oninput="filterCellChips(this.value)"
+                    />
+                    <span id="cell-count-badge" class="cell-count-badge"></span>
+                </div>
+                <div id="cell-list" class="cell-list"></div>
+            </div>
+
+            <div class="filter-divider"></div>
+
             <!-- Summary stats -->
             <div class="side-stats">
                 <div class="side-stat">
@@ -122,7 +132,7 @@
                 </div>
             </div>
 
-            <a id="map-link" href="/network-map" class="map-back-link">📍 View on Map</a>
+            <a id="map-link" href="/network-map" class="map-back-link">View on Map</a>
         </aside>
 
         <!-- ================================================================
@@ -141,30 +151,16 @@
                             <span class="refresh-icon">↻</span> Refresh
                         </button>
                         <button id="btn-export" class="btn-export" onclick="exportCSV()" style="display:none;">
-                            ⬇ Export CSV
+                            Export CSV
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Cell picker (shown after Apply) -->
+            <!-- Placeholder when no cell is selected -->
             <div id="no-selection" class="no-selection">
                 <div class="no-selection-icon">📊</div>
-                <p>Use the filters on the left to find a site or cell,<br>then click a cell name to load its KPI charts.</p>
-
-                <div id="cell-list-wrap" style="display:none;">
-                    <div class="cell-search-wrap">
-                        <input
-                            id="cell-search"
-                            class="cell-search-input"
-                            type="text"
-                            placeholder="🔍  Search cells..."
-                            oninput="filterCellChips(this.value)"
-                        />
-                        <span id="cell-count-badge" class="cell-count-badge"></span>
-                    </div>
-                    <div id="cell-list" class="cell-list"></div>
-                </div>
+                <p>Use the filters on the left, then click a cell to load its KPI charts.</p>
             </div>
 
             <div id="charts-wrap" class="charts-wrap" style="display:none;">
@@ -182,7 +178,7 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-<script src="{{ url_for('performance.static', filename='performance.js') }}?v=3.2"></script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=4.0"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
@@ -190,12 +186,11 @@
         if (params.get('technology')) document.getElementById('filter-tech').value   = params.get('technology');
 
         loadFilters().then(() => {
-            if (params.get('region'))  document.getElementById('filter-region').value  = params.get('region');
             if (params.get('cluster')) document.getElementById('filter-cluster').value = params.get('cluster');
             if (params.get('area'))    document.getElementById('filter-area').value    = params.get('area');
             if (params.get('site_id')) document.getElementById('filter-site').value    = params.get('site_id');
 
-            if (params.get('site_id') || params.get('region') || params.get('technology') || params.get('vendor')) {
+            if (params.get('site_id') || params.get('technology') || params.get('vendor')) {
                 applyFilters().then(() => {
                     if (params.get('cell_id')) loadCellCharts(params.get('cell_id'));
                 });

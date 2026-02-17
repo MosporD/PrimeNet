@@ -1,7 +1,7 @@
 /**
- * Performance Analytics v3
- * - Cluster / Area filter cascade
- * - Cell search bar (no flooding on Apply)
+ * Performance Analytics v4
+ * - Cluster / Area derived from site_id (matching network map logic)
+ * - Cell search in left panel (always visible after Apply)
  * - 2 charts per row from live KPI DB headers
  * - CSV export of tabular trend data
  */
@@ -78,15 +78,7 @@ async function loadFilters() {
     allClusters = data.clusters || [];
     allAreas    = data.areas    || [];
 
-    // Regions
-    const regionSel = document.getElementById('filter-region');
-    data.regions.forEach(r => {
-        const o = document.createElement('option');
-        o.value = r; o.textContent = r;
-        regionSel.appendChild(o);
-    });
-
-    // Clusters
+    // Clusters (numeric)
     _populateClusters(allClusters);
     _populateAreas(allAreas);
     _populateSites(allSites);
@@ -98,7 +90,7 @@ function _populateClusters(clusters) {
     sel.innerHTML = '<option value="">All Clusters</option>';
     clusters.forEach(c => {
         const o = document.createElement('option');
-        o.value = c; o.textContent = c;
+        o.value = String(c); o.textContent = 'Cluster ' + c;
         sel.appendChild(o);
     });
     if (prev) sel.value = prev;
@@ -108,7 +100,10 @@ function _populateAreas(areas) {
     const sel = document.getElementById('filter-area');
     const prev = sel.value;
     sel.innerHTML = '<option value="">All Areas</option>';
+    const seen = new Set();
     areas.forEach(a => {
+        if (seen.has(a.area)) return;
+        seen.add(a.area);
         const o = document.createElement('option');
         o.value = a.area; o.textContent = a.area;
         sel.appendChild(o);
@@ -124,8 +119,7 @@ function _populateSites(sites) {
         const o = document.createElement('option');
         o.value = s.site_id;
         o.textContent = s.site_name;
-        o.dataset.region  = s.region  || '';
-        o.dataset.cluster = s.cluster || '';
+        o.dataset.cluster = s.cluster != null ? String(s.cluster) : '';
         o.dataset.area    = s.area    || '';
         siteSel.appendChild(o);
     });
@@ -141,41 +135,28 @@ function onVendorChange() {
     loadKpiColumns();
 }
 
-function onRegionChange() {
-    const region  = document.getElementById('filter-region').value;
-    const cluster = document.getElementById('filter-cluster').value;
-    const area    = document.getElementById('filter-area').value;
-    _applyGeoFilters(region, cluster, area);
-}
-
 function onClusterChange() {
-    const region  = document.getElementById('filter-region').value;
     const cluster = document.getElementById('filter-cluster').value;
 
     // Filter area options to match selected cluster
     const filteredAreas = cluster
-        ? allAreas.filter(a => a.cluster === cluster)
-        : (region ? allAreas.filter(a => {
-            const clusterMatchesSite = allSites.some(s => s.region === region && s.cluster === a.cluster);
-            return clusterMatchesSite;
-          }) : allAreas);
+        ? allAreas.filter(a => String(a.cluster) === cluster)
+        : allAreas;
     _populateAreas(filteredAreas);
     document.getElementById('filter-area').value = '';
-    _applyGeoFilters(region, cluster, '');
+    _applyGeoFilters(cluster, '');
 }
 
 function onAreaChange() {
-    const region  = document.getElementById('filter-region').value;
     const cluster = document.getElementById('filter-cluster').value;
     const area    = document.getElementById('filter-area').value;
-    _applyGeoFilters(region, cluster, area);
+    _applyGeoFilters(cluster, area);
 }
 
-function _applyGeoFilters(region, cluster, area) {
+function _applyGeoFilters(cluster, area) {
     let filtered = allSites;
-    if (region)  filtered = filtered.filter(s => s.region  === region);
-    if (cluster) filtered = filtered.filter(s => s.cluster === cluster);
-    if (area)    filtered = filtered.filter(s => s.area    === area);
+    if (cluster) filtered = filtered.filter(s => String(s.cluster) === cluster);
+    if (area)    filtered = filtered.filter(s => s.area === area);
     _populateSites(filtered);
     document.getElementById('filter-site').value = '';
     document.getElementById('filter-cell').innerHTML = '<option value="">All Cells</option>';
@@ -204,13 +185,12 @@ async function onSiteChange() {
 }
 
 // ============================================================
-// Apply filters — load cell list and show search+chips
+// Apply filters — load cell list into left-panel search
 // ============================================================
 
 async function applyFilters() {
     const vendor  = document.getElementById('filter-vendor').value;
     const tech    = document.getElementById('filter-tech').value;
-    const region  = document.getElementById('filter-region').value;
     const cluster = document.getElementById('filter-cluster').value;
     const area    = document.getElementById('filter-area').value;
     const site    = document.getElementById('filter-site').value;
@@ -219,7 +199,6 @@ async function applyFilters() {
     const params = new URLSearchParams();
     if (vendor)  params.set('vendor',     vendor);
     if (tech)    params.set('technology', tech);
-    if (region)  params.set('region',     region);
     if (cluster) params.set('cluster',    cluster);
     if (area)    params.set('area',       area);
     if (site)    params.set('site_id',    site);
@@ -236,21 +215,19 @@ async function applyFilters() {
         return;
     }
 
+    // Populate the cell chip list in the left panel
     showCellPicker(allCells);
 }
 
 // ============================================================
-// Cell picker with search bar
+// Cell picker — shown in left panel after Apply
 // ============================================================
 
 function showCellPicker(cells) {
-    document.getElementById('charts-wrap').style.display    = 'none';
-    document.getElementById('loading-charts').style.display = 'none';
-    document.getElementById('no-selection').style.display   = 'flex';
-    document.getElementById('btn-export').style.display     = 'none';
-    document.getElementById('btn-refresh').style.display    = 'inline-flex';
+    document.getElementById('btn-refresh').style.display = 'inline-flex';
 
-    document.getElementById('charts-title').textContent = 'Select a cell';
+    document.getElementById('charts-title').textContent =
+        cells.length ? 'Select a cell' : 'No cells found';
     document.getElementById('charts-subtitle').textContent =
         `${cells.length} cell${cells.length !== 1 ? 's' : ''} found`;
 
@@ -274,7 +251,7 @@ function showCellPicker(cells) {
         const chip = document.createElement('div');
         chip.className = `cell-chip tech-${c.technology || ''}${c.cell_id === activeCellId ? ' active' : ''}`;
         chip.textContent = c.cell_name;
-        const clusterArea = [c.cluster, c.area].filter(Boolean).join(' / ');
+        const clusterArea = [c.cluster ? 'Cluster ' + c.cluster : '', c.area || ''].filter(Boolean).join(' / ');
         chip.title = [
             c.site_name,
             c.technology || '',
@@ -521,7 +498,7 @@ function exportCSV() {
     lines.push(`# Site: ${cell.site_name}  |  Vendor: ${cell.vendor}  |  Technology: ${cell.technology || ''}`);
     if (cell.cluster || cell.area)
         lines.push(`# Cluster: ${cell.cluster || ''}  |  Area: ${cell.area || ''}`);
-    lines.push(`# Region: ${cell.region || ''}  |  Exported: ${new Date().toISOString()}`);
+    lines.push(`# Exported: ${new Date().toISOString()}`);
     lines.push('');
 
     // Column headers
