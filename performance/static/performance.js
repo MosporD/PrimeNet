@@ -356,6 +356,16 @@ function renderAllCharts(trend) {
             .map(col => ({ key: col, label: col, unit: '', good: null, warn: null, inverse: false, color: _colorFor(col) }));
     }
 
+    // Filter out columns that have no numeric values (all null/undefined/NaN)
+    if (trend.length) {
+        defs = defs.filter(def => {
+            return trend.some(r => {
+                const v = r[def.key];
+                return v !== null && v !== undefined && typeof v === 'number' && !isNaN(v);
+            });
+        });
+    }
+
     if (!defs.length) {
         wrap.innerHTML = '<p style="padding:1rem;color:#888">No KPI data available yet.</p>';
         document.getElementById('loading-charts').style.display = 'none';

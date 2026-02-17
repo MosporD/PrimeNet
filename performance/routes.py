@@ -112,13 +112,30 @@ def _meta_conn():
 
 
 def _get_pm_cols(db_path):
-    """Return KPI column names from a PM db (excludes id, cell_name, timestamp)."""
+    """
+    Return KPI column names that contain actual numeric data.
+    Vendor files include text columns (eNodeB name, Object, BTS ID, etc.)
+    which get stored as all-NULL REAL columns — those are excluded here.
+    """
     try:
         conn = sqlite3.connect(db_path)
-        cols = [r[1] for r in conn.execute('PRAGMA table_info(cell_kpis)').fetchall()
-                if r[1] not in _FIXED_COLS]
+        all_cols = [r[1] for r in conn.execute('PRAGMA table_info(cell_kpis)').fetchall()
+                    if r[1] not in _FIXED_COLS]
+        if not all_cols:
+            conn.close()
+            return []
+
+        # Single query: count non-NULL values for every candidate column
+        counts_sql = ', '.join(
+            f'SUM(CASE WHEN "{col}" IS NOT NULL THEN 1 ELSE 0 END)'
+            for col in all_cols
+        )
+        row = conn.execute(f'SELECT {counts_sql} FROM cell_kpis').fetchone()
         conn.close()
-        return cols
+
+        if not row:
+            return []
+        return [col for col, cnt in zip(all_cols, row) if cnt and cnt > 0]
     except Exception:
         return []
 
@@ -398,11 +415,17 @@ def get_cell_trend(cell_id):
     pm_db     = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
 
     try:
+        # Only select KPI columns that have real numeric data (not text leftovers)
+        kpi_cols = _get_pm_cols(pm_db)
+        if kpi_cols:
+            col_list = 'cell_name, timestamp, ' + ', '.join(f'"{c}"' for c in kpi_cols)
+        else:
+            col_list = 'cell_name, timestamp'
+
         pm_conn = sqlite3.connect(pm_db)
         pm_conn.row_factory = sqlite3.Row
-        # SELECT * returns all KPI columns dynamically — no hardcoding needed
-        trend = [dict(r) for r in pm_conn.execute('''
-            SELECT *
+        trend = [dict(r) for r in pm_conn.execute(f'''
+            SELECT {col_list}
             FROM cell_kpis
             WHERE cell_name = ?
               AND timestamp >= datetime('now', ? || ' hours')
