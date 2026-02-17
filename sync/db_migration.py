@@ -12,13 +12,13 @@ to do cross-db JOINs purely in SQLite.
 
 import sqlite3
 import logging
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from sync_config import METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB, NCMUSERS_DB as APP_DB
 
 logger = logging.getLogger(__name__)
-
-METADATA_DB  = 'metadata.db'
-NOKIA_PM_DB  = 'nokia_pm.db'
-HUAWEI_PM_DB = 'huawei_pm.db'
-APP_DB       = 'ncm_users.db'  # auth / session / sync_log
 
 
 _KPI_COLS = '''

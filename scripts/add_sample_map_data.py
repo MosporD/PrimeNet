@@ -1,266 +1,209 @@
 """
-Add sample network data for testing the Network Map
-This script creates sample sites, sectors, cells, and KPIs for demonstration
+Add sample network data for testing the Performance module and Network Map.
+
+Three-database architecture:
+  metadata.db  → sites + cells  (the performance module queries this)
+  nokia_pm.db  → Nokia hourly KPIs keyed by cell_name + timestamp
+  huawei_pm.db → Huawei hourly KPIs keyed by cell_name + timestamp
+
+Run:
+    python scripts/add_sample_map_data.py
 """
 
 import sqlite3
 import random
-from datetime import datetime
+import os
+import sys
+from datetime import datetime, timedelta
 
-DATABASE = 'ncm_users.db'
+# Use canonical paths from sync_config
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from sync_config import METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB
 
-def generate_sample_data():
-    """Generate sample network data for Amman, Jordan region"""
+# First, ensure DB schemas exist
+from sync.db_migration import run_migrations
+run_migrations()
 
-    # Sample sites around Amman
-    sites = [
-        {
-            'site_id': 'AMM_001',
-            'site_name': 'Abdali Tower',
-            'latitude': 31.9624,
-            'longitude': 35.9153,
-            'region': 'Amman Center',
-            'site_type': 'Macro'
-        },
-        {
-            'site_id': 'AMM_002',
-            'site_name': 'Sweifieh Mall',
-            'latitude': 31.9398,
-            'longitude': 35.8515,
-            'region': 'Amman West',
-            'site_type': 'Macro'
-        },
-        {
-            'site_id': 'AMM_003',
-            'site_name': 'University Street',
-            'latitude': 32.0110,
-            'longitude': 35.8706,
-            'region': 'Amman North',
-            'site_type': 'Macro'
-        },
-        {
-            'site_id': 'AMM_004',
-            'site_name': 'Mecca Street Hub',
-            'latitude': 31.9286,
-            'longitude': 35.9040,
-            'region': 'Amman South',
-            'site_type': 'Macro'
-        },
-        {
-            'site_id': 'AMM_005',
-            'site_name': 'Downtown Center',
-            'latitude': 31.9540,
-            'longitude': 35.9450,
-            'region': 'Amman Center',
-            'site_type': 'Micro'
-        },
-        {
-            'site_id': 'AMM_006',
-            'site_name': 'Sports City',
-            'latitude': 31.9870,
-            'longitude': 35.8960,
-            'region': 'Amman North',
-            'site_type': 'Macro'
-        },
-        {
-            'site_id': 'AMM_007',
-            'site_name': 'Abdoun Circle',
-            'latitude': 31.9480,
-            'longitude': 35.8790,
-            'region': 'Amman West',
-            'site_type': 'Micro'
-        },
-        {
-            'site_id': 'AMM_008',
-            'site_name': 'Queen Alia Airport',
-            'latitude': 31.7227,
-            'longitude': 35.9932,
-            'region': 'Airport Zone',
-            'site_type': 'Macro'
-        }
-    ]
 
-    # Generate sectors for each site (3 sectors per site with 120° separation)
-    sectors = []
-    cells = []
-    kpis = []
+# ── Sample sites around Amman ───────────────────────────────────────────────
 
-    technologies = ['5G', 'LTE', 'LTE']  # More LTE than 5G
-    frequency_bands = {
-        '5G': ['n78 (3.5GHz)', 'n1 (2.1GHz)'],
-        'LTE': ['B3 (1800MHz)', 'B7 (2600MHz)', 'B20 (800MHz)']
+SITES = [
+    {'site_id': 'AMM_001', 'site_name': 'Abdali Tower',       'latitude': 31.9624, 'longitude': 35.9153, 'region': 'Amman Center', 'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': 'AMM_002', 'site_name': 'Sweifieh Mall',      'latitude': 31.9398, 'longitude': 35.8515, 'region': 'Amman West',   'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': 'AMM_003', 'site_name': 'University Street',  'latitude': 32.0110, 'longitude': 35.8706, 'region': 'Amman North',  'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': 'AMM_004', 'site_name': 'Mecca Street Hub',   'latitude': 31.9286, 'longitude': 35.9040, 'region': 'Amman South',  'site_type': 'Macro', 'vendor': 'Nokia'},
+    {'site_id': 'AMM_005', 'site_name': 'Downtown Center',    'latitude': 31.9540, 'longitude': 35.9450, 'region': 'Amman Center', 'site_type': 'Micro', 'vendor': 'Huawei'},
+    {'site_id': 'AMM_006', 'site_name': 'Sports City',        'latitude': 31.9870, 'longitude': 35.8960, 'region': 'Amman North',  'site_type': 'Macro', 'vendor': 'Huawei'},
+    {'site_id': 'AMM_007', 'site_name': 'Abdoun Circle',      'latitude': 31.9480, 'longitude': 35.8790, 'region': 'Amman West',   'site_type': 'Micro', 'vendor': 'Huawei'},
+    {'site_id': 'AMM_008', 'site_name': 'Queen Alia Airport', 'latitude': 31.7227, 'longitude': 35.9932, 'region': 'Airport Zone', 'site_type': 'Macro', 'vendor': 'Nokia'},
+]
+
+# Technology distribution per vendor
+NOKIA_TECHS   = ['2G', '3G', '4G', '5G']
+HUAWEI_TECHS  = ['2G', '3G', '4G']
+
+FREQ_BANDS = {
+    '2G': ['900MHz', '1800MHz'],
+    '3G': ['2100MHz'],
+    '4G': ['B3 (1800MHz)', 'B7 (2600MHz)', 'B20 (800MHz)'],
+    '5G': ['n78 (3.5GHz)', 'n1 (2.1GHz)'],
+}
+
+
+def _random_kpi_row(cell_name, ts_str, technology):
+    """Return a dict of realistic KPI values for one hourly sample."""
+    base = {
+        'cell_name': cell_name,
+        'timestamp': ts_str,
     }
+    if technology in ('4G', '5G'):
+        base.update({
+            'Avg act UEs DL':                            random.randint(10, 300),
+            'PDCP SDU Volume, DL (GB)':                  round(random.uniform(0.5, 20), 2),
+            'Average CQI':                               round(random.uniform(7, 14), 1),
+            'Avg PDCP cell thp DL (Mbps)':               round(random.uniform(30, 150), 1),
+            'Avg PDCP cell thp UL (Mbps)':               round(random.uniform(5, 50), 1),
+            'Total E-UTRAN RRC conn stp SR':             round(random.uniform(96, 99.9), 2),
+            'E-UTRAN E-RAB stp SR':                      round(random.uniform(95, 99.5), 2),
+            'E-UTRAN E-RAB Drop Ratio, User Perspective':round(random.uniform(0.05, 2.5), 2),
+            'E-UTRAN Intra-Freq HO SR':                  round(random.uniform(96, 99.8), 2),
+            'Cell Avail':                                round(random.uniform(97, 100), 2),
+        })
+    elif technology == '3G':
+        base.update({
+            'Average number of simultaneous HSDPA users': random.randint(5, 150),
+            'Avg reported CQI':                           round(random.uniform(7, 14), 1),
+            'HSDPA Cell thp':                             round(random.uniform(2, 20), 1),
+            'Active  HSUPA cell thp':                     round(random.uniform(1, 10), 1),
+            'RRC Success Rate (Total)(%)':                round(random.uniform(96, 99.9), 2),
+            'AMR Call Drop Ratio(%)':                     round(random.uniform(0.1, 3.0), 2),
+            'Soft HO Success rate, RT':                   round(random.uniform(96, 99.8), 2),
+            'Cell Availability':                          round(random.uniform(97, 100), 2),
+        })
+    else:  # 2G
+        base.update({
+            'Call Setup Success Rate - overall':          round(random.uniform(95, 99.5), 2),
+            'Call DR':                                    round(random.uniform(0.1, 3.0), 2),
+            'HO SR w/o Intracell':                        round(random.uniform(95, 99.5), 2),
+            'TCH availability ratio':                     round(random.uniform(97, 100), 2),
+        })
+    return base
 
-    for site in sites:
-        site_id = site['site_id']
-
-        # Each site has 3 sectors
-        for sector_num in range(1, 4):
-            tech = random.choice(technologies)
-            sector_id = f"{site_id}_S{sector_num}"
-            azimuth = (sector_num - 1) * 120  # 0°, 120°, 240°
-
-            sector = {
-                'sector_id': sector_id,
-                'site_id': site_id,
-                'sector_name': f"{site['site_name']}-S{sector_num}",
-                'azimuth': azimuth,
-                'beamwidth': 65,
-                'technology': tech,
-                'frequency_band': random.choice(frequency_bands[tech]),
-                'status': 'Active'
-            }
-            sectors.append(sector)
-
-            # Each sector has 1-3 cells depending on technology
-            num_cells = 3 if tech == '5G' else 2
-
-            for cell_num in range(1, num_cells + 1):
-                cell_id = f"{sector_id}_C{cell_num}"
-                pci = random.randint(0, 503)
-                tac = random.randint(1000, 9999)
-
-                cell = {
-                    'cell_id': cell_id,
-                    'cell_name': f"{sector['sector_name']}-C{cell_num}",
-                    'sector_id': sector_id,
-                    'pci': pci,
-                    'tac': tac,
-                    'status': 'Active'
-                }
-                cells.append(cell)
-
-                # Generate realistic KPIs for each cell
-                kpi = {
-                    'cell_id': cell_id,
-                    'avg_users': random.randint(50, 300),
-                    'data_volume_gb': round(random.uniform(500, 2000), 2),
-                    'rsrp': round(random.uniform(-95, -70), 1),
-                    'rsrq': round(random.uniform(-14, -8), 1),
-                    'sinr': round(random.uniform(5, 25), 1),
-                    'cqi': round(random.uniform(7, 14), 1),
-                    'throughput_dl_mbps': round(random.uniform(30, 150), 1),
-                    'throughput_ul_mbps': round(random.uniform(10, 50), 1),
-                    'rrc_success_rate': round(random.uniform(96, 99.5), 2),
-                    'erab_success_rate': round(random.uniform(95, 99), 2),
-                    'call_drop_rate': round(random.uniform(0.1, 2.5), 2),
-                    'handover_success_rate': round(random.uniform(97, 99.8), 2),
-                    'availability_percent': round(random.uniform(98, 100), 2)
-                }
-                kpis.append(kpi)
-
-    return sites, sectors, cells, kpis
 
 def insert_sample_data():
-    """Insert sample data into the database"""
-    conn = sqlite3.connect(DATABASE)
-    cursor = conn.cursor()
+    """Create sample sites + cells in metadata.db and KPI rows in PM dbs."""
 
-    print("Generating sample network data...")
-    sites, sectors, cells, kpis = generate_sample_data()
+    # ── metadata.db: sites + cells ──────────────────────────────────────────
+    meta = sqlite3.connect(METADATA_DB)
+    mc   = meta.cursor()
 
-    print(f"Inserting {len(sites)} sites...")
-    for site in sites:
-        try:
-            cursor.execute('''
-                INSERT INTO sites (site_id, site_name, latitude, longitude, region, site_type, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                site['site_id'],
-                site['site_name'],
-                site['latitude'],
-                site['longitude'],
-                site['region'],
-                site['site_type'],
-                'Active'
-            ))
-        except sqlite3.IntegrityError:
-            print(f"  [SKIP] Site {site['site_id']} already exists")
+    cells_by_vendor = {'Nokia': [], 'Huawei': []}   # collect for PM insert
 
-    print(f"Inserting {len(sectors)} sectors...")
-    for sector in sectors:
-        try:
-            cursor.execute('''
-                INSERT INTO sectors (sector_id, site_id, sector_name, azimuth, beamwidth,
-                                   technology, frequency_band, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                sector['sector_id'],
-                sector['site_id'],
-                sector['sector_name'],
-                sector['azimuth'],
-                sector['beamwidth'],
-                sector['technology'],
-                sector['frequency_band'],
-                sector['status']
-            ))
-        except sqlite3.IntegrityError:
-            print(f"  [SKIP] Sector {sector['sector_id']} already exists")
+    print(f"Using metadata DB: {METADATA_DB}")
+    print(f"Using Nokia PM DB: {NOKIA_PM_DB}")
+    print(f"Using Huawei PM DB: {HUAWEI_PM_DB}")
+    print()
 
-    print(f"Inserting {len(cells)} cells...")
-    for cell in cells:
-        try:
-            cursor.execute('''
-                INSERT INTO cells (cell_id, cell_name, sector_id, pci, tac, status)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (
-                cell['cell_id'],
-                cell['cell_name'],
-                cell['sector_id'],
-                cell['pci'],
-                cell['tac'],
-                cell['status']
-            ))
-        except sqlite3.IntegrityError:
-            print(f"  [SKIP] Cell {cell['cell_id']} already exists")
+    print(f"Inserting {len(SITES)} sites...")
+    for site in SITES:
+        mc.execute('''
+            INSERT INTO sites (site_id, site_name, latitude, longitude, region, site_type, vendor, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'Active')
+            ON CONFLICT(site_id) DO UPDATE SET
+                site_name = excluded.site_name,
+                latitude  = excluded.latitude,
+                longitude = excluded.longitude,
+                region    = excluded.region,
+                vendor    = excluded.vendor,
+                status    = 'Active'
+        ''', (site['site_id'], site['site_name'], site['latitude'], site['longitude'],
+              site['region'], site['site_type'], site['vendor']))
 
-    print(f"Inserting {len(kpis)} KPI records...")
-    for kpi in kpis:
-        cursor.execute('''
-            INSERT INTO cell_kpis (cell_id, avg_users, data_volume_gb, rsrp, rsrq, sinr, cqi,
-                                 throughput_dl_mbps, throughput_ul_mbps, rrc_success_rate,
-                                 erab_success_rate, call_drop_rate, handover_success_rate,
-                                 availability_percent)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            kpi['cell_id'],
-            kpi['avg_users'],
-            kpi['data_volume_gb'],
-            kpi['rsrp'],
-            kpi['rsrq'],
-            kpi['sinr'],
-            kpi['cqi'],
-            kpi['throughput_dl_mbps'],
-            kpi['throughput_ul_mbps'],
-            kpi['rrc_success_rate'],
-            kpi['erab_success_rate'],
-            kpi['call_drop_rate'],
-            kpi['handover_success_rate'],
-            kpi['availability_percent']
-        ))
+        vendor = site['vendor']
+        techs  = NOKIA_TECHS if vendor == 'Nokia' else HUAWEI_TECHS
 
-    conn.commit()
-    print("[OK] Sample data inserted successfully!")
+        # 3 sectors × selected technologies
+        for sector_num in range(1, 4):
+            azimuth = (sector_num - 1) * 120
+            tech    = techs[sector_num % len(techs)]
+            freq    = random.choice(FREQ_BANDS[tech])
+            pci     = random.randint(0, 503)
 
-    # Print summary
-    cursor.execute('SELECT COUNT(*) FROM sites WHERE status = "Active"')
-    total_sites = cursor.fetchone()[0]
+            cell_name = f"{site['site_name']}-S{sector_num}-{tech}"
 
-    cursor.execute('SELECT COUNT(*) FROM sectors WHERE status = "Active"')
-    total_sectors = cursor.fetchone()[0]
+            mc.execute('''
+                INSERT INTO cells
+                    (cell_name, site_id, technology, vendor, frequency_band, azimuth, pci, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'Active')
+                ON CONFLICT(cell_name) DO UPDATE SET
+                    site_id        = excluded.site_id,
+                    technology     = excluded.technology,
+                    vendor         = excluded.vendor,
+                    frequency_band = excluded.frequency_band,
+                    azimuth        = excluded.azimuth,
+                    pci            = excluded.pci,
+                    status         = 'Active'
+            ''', (cell_name, site['site_id'], tech, vendor, freq, azimuth, pci))
 
-    cursor.execute('SELECT COUNT(*) FROM cells WHERE status = "Active"')
-    total_cells = cursor.fetchone()[0]
+            cells_by_vendor[vendor].append((cell_name, tech))
 
-    print(f"\n=== Network Summary ===")
-    print(f"Total Sites: {total_sites}")
-    print(f"Total Sectors: {total_sectors}")
-    print(f"Total Cells: {total_cells}")
-    print(f"======================\n")
+    meta.commit()
 
-    conn.close()
+    total_sites = mc.execute("SELECT COUNT(*) FROM sites").fetchone()[0]
+    total_cells = mc.execute("SELECT COUNT(*) FROM cells").fetchone()[0]
+    meta.close()
+    print(f"[OK] metadata.db: {total_sites} sites, {total_cells} cells")
+
+    # ── PM databases: hourly KPI rows for the last 7 days ──────────────────
+    now   = datetime.now()
+    hours = 168  # 7 days
+
+    for vendor, pm_db in [('Nokia', NOKIA_PM_DB), ('Huawei', HUAWEI_PM_DB)]:
+        cells = cells_by_vendor[vendor]
+        if not cells:
+            continue
+
+        conn = sqlite3.connect(pm_db, timeout=30)
+        conn.execute('PRAGMA journal_mode=WAL')
+
+        # Ensure KPI columns exist for ALL technologies in this vendor
+        all_techs = set(t for _, t in cells)
+        existing = {r[1] for r in conn.execute('PRAGMA table_info(cell_kpis)').fetchall()}
+        for tech in all_techs:
+            sample = _random_kpi_row('test', '2000-01-01', tech)
+            for col in sample.keys():
+                if col not in ('cell_name', 'timestamp') and col not in existing:
+                    conn.execute(f'ALTER TABLE cell_kpis ADD COLUMN "{col}" REAL')
+                    existing.add(col)
+
+        inserted = 0
+        for cell_name, tech in cells:
+            for h in range(hours):
+                ts = (now - timedelta(hours=hours - h)).strftime('%Y-%m-%d %H:%M:%S')
+                row = _random_kpi_row(cell_name, ts, tech)
+                cols_q   = ', '.join(f'"{c}"' for c in row.keys())
+                placeholders = ', '.join(['?'] * len(row))
+                conn.execute(
+                    f'INSERT OR REPLACE INTO cell_kpis ({cols_q}) VALUES ({placeholders})',
+                    list(row.values())
+                )
+                inserted += 1
+
+        conn.commit()
+        conn.close()
+        print(f"[OK] {os.path.basename(pm_db)}: {inserted} KPI rows for {len(cells)} cells ({hours}h each)")
+
+    print()
+    print("=== Sample Data Summary ===")
+    print(f"  Sites: {total_sites}")
+    print(f"  Cells: {total_cells}")
+    print(f"  Nokia cells:  {len(cells_by_vendor['Nokia'])}")
+    print(f"  Huawei cells: {len(cells_by_vendor['Huawei'])}")
+    print(f"  KPI hours:    {hours} per cell")
+    print("===========================")
+
 
 if __name__ == '__main__':
     insert_sample_data()
-    print("Sample data is ready! You can now test the Network Map feature.")
-    print("Note: This data will be replaced when OSS integration is configured.")
+    print("\nSample data is ready! Performance module should now show KPI data.")
+    print("Note: This data will be replaced when SFTP sync is configured.")
