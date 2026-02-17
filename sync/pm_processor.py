@@ -36,26 +36,49 @@ _TS_KEYWORDS   = ['time', 'date', 'period', 'start', 'timestamp']
 def _load_pm_file(file_path):
     """
     Return a DataFrame from an XLSX, XLS, or CSV file.
-    Tries openpyxl → xlrd → tab/comma/semicolon CSV so that Nokia OSS exports
-    in old binary .xls format or text format mis-named as .xlsx are readable.
+    Nokia NetAct and Huawei U2000 often export files with a .xlsx extension
+    that are actually HTML tables or tab/comma-delimited text in non-UTF-8
+    encoding (latin-1, cp1252).  We try every plausible format.
     """
+    # 1. Real XLSX (ZIP-based Office Open XML)
     try:
         return pd.read_excel(file_path, engine='openpyxl')
     except Exception:
         pass
+
+    # 2. Old binary XLS (BIFF format)
     try:
         return pd.read_excel(file_path, engine='xlrd')
     except Exception:
         pass
-    # Text file disguised as .xlsx — try common delimiters
-    for sep in ('\t', ',', ';'):
-        try:
-            df = pd.read_csv(file_path, sep=sep, dtype=str)
-            if len(df.columns) > 1:
-                return df
-        except Exception:
-            pass
-    return pd.read_csv(file_path, dtype=str)
+
+    # 3. HTML table disguised as .xlsx (common Nokia NetAct export)
+    try:
+        dfs = pd.read_html(file_path, encoding='utf-8')
+        if dfs and len(dfs[0].columns) > 1:
+            return dfs[0]
+    except Exception:
+        pass
+    try:
+        dfs = pd.read_html(file_path, encoding='latin-1')
+        if dfs and len(dfs[0].columns) > 1:
+            return dfs[0]
+    except Exception:
+        pass
+
+    # 4. Text file (tab / comma / semicolon) in various encodings
+    for encoding in ('utf-8', 'latin-1', 'cp1252', 'iso-8859-1'):
+        for sep in ('\t', ',', ';'):
+            try:
+                df = pd.read_csv(file_path, sep=sep, dtype=str, encoding=encoding)
+                if len(df.columns) > 1:
+                    logger.info(f'Loaded {file_path} as CSV (sep={sep!r}, enc={encoding})')
+                    return df
+            except Exception:
+                pass
+
+    # 5. Last resort — let pandas guess, with latin-1 (never fails on byte level)
+    return pd.read_csv(file_path, dtype=str, encoding='latin-1')
 
 
 # ---------------------------------------------------------------------------
