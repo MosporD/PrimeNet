@@ -1,12 +1,20 @@
 """
 Import Local Files → Database
 ==============================
-One-time (and re-runnable) script that reads the local CSV and XLSX
-snapshot files and imports them into the three-database architecture:
+Reads local CSV / XLSX snapshots and imports them into the three databases:
 
   CSV  files         →  metadata.db  (sites + cells)
   Nokia XLSX files   →  nokia_pm.db  (cell_kpis)
   Huawei XLSX file   →  huawei_pm.db (cell_kpis)
+
+File discovery — the script searches these directories in order:
+  1. Project root
+  2. sync_downloads/metadata/       (Metadata CSVs)
+  3. sync_downloads/pm_nokia/       (Nokia PM XLSXs)
+  4. sync_downloads/pm_huawei/      (Huawei PM XLSX)
+
+No hardcoded filenames — it matches by pattern so newly downloaded
+files (different date suffixes) are picked up automatically.
 
 Usage:
     python scripts/import_local_files.py
@@ -16,16 +24,21 @@ Run from the project root directory.
 
 import os
 import sys
+import glob
 import logging
+import re
 import pandas as pd
 
-# Allow imports from the project root
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sync.db_migration import run_migrations
-from sync.metadata_processor import process_metadata_file
-from sync.pm_processor import _insert_df, NOKIA_PM_DB, HUAWEI_PM_DB
-from sync_config import METADATA_CSV_COLUMN_MAPS, NOKIA_PM_COLUMN_MAPS, HUAWEI_PM_COLUMN_MAPS
+from sync.metadata_processor import process_metadata_file, seed_pm_cells_to_metadata
+from sync.pm_processor import process_nokia_pm_file, process_huawei_pm_file, NOKIA_PM_DB, HUAWEI_PM_DB
+from sync_config import (
+    METADATA_CSV_COLUMN_MAPS,
+    NOKIA_PM_COLUMN_MAPS, HUAWEI_PM_COLUMN_MAPS,
+    METADATA_DB, PROJECT_ROOT
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -35,69 +48,69 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# File paths (relative to project root)
+# Search directories
 # ---------------------------------------------------------------------------
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DOWNLOADS = os.path.join(PROJECT_ROOT, 'sync_downloads')
 
-METADATA_CSV_FILES = {
-    '2G':     '2G - 2026-02-15.csv',
-    '3G':     '3G - 2026-02-15.csv',
-    '4G-FDD': '4G FDD - 2026-02-15.csv',
-    '4G-TDD': '4G TDD - 2026-02-15.csv',
-    '5G':     '5G - 2026-02-15.csv',
-}
+METADATA_SEARCH_DIRS = [
+    PROJECT_ROOT,
+    os.path.join(DOWNLOADS, 'metadata'),
+]
 
-# Nokia PM: one file per technology; each has a single KPI sheet named "<TECH> Performance"
-NOKIA_PM_EXCEL_FILES = {
-    '2G': '2G-42729-2026_02_15-12_00_04__458.xlsx',
-    '3G': '3G-42727-2026_02_15-12_00_16__894.xlsx',
-    '4G': '4G-2026_02_15-12_49_23__178.xlsx',
-    '5G': '5G-42731-2026_02_15-12_00_24__466.xlsx',
-}
+NOKIA_SEARCH_DIRS = [
+    PROJECT_ROOT,
+    os.path.join(DOWNLOADS, 'pm_nokia'),
+]
 
-# Huawei PM: single file with one sheet per technology
-HUAWEI_PM_FILE   = 'Performance.xlsx'
-HUAWEI_PM_SHEETS = {'4G': '4G', '3G': '3G', '2G': '2G'}
+HUAWEI_SEARCH_DIRS = [
+    PROJECT_ROOT,
+    os.path.join(DOWNLOADS, 'pm_huawei'),
+]
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# File finder helpers
 # ---------------------------------------------------------------------------
 
-def _abs(filename):
-    """Return absolute path relative to project root."""
-    return os.path.join(BASE_DIR, filename)
-
-
-def _import_pm_df(df, tech, db_path, col_map, label):
+def _find_files(search_dirs, pattern):
     """
-    Rename columns using col_map, coerce KPI fields to numeric,
-    drop invalid rows, then insert into db_path.
-    Returns rows inserted.
+    Glob for `pattern` in each directory. Returns all matches sorted newest-first.
+    pattern is a glob pattern like '2G*.csv' or '*.xlsx'.
     """
-    # Rename XLSX header → DB field name
-    rename = {v: k for k, v in col_map.items() if v and v in df.columns}
-    df = df.rename(columns=rename)
+    found = []
+    for d in search_dirs:
+        if os.path.isdir(d):
+            found.extend(glob.glob(os.path.join(d, pattern)))
+    # Sort by modification time, newest first
+    found.sort(key=lambda f: os.path.getmtime(f), reverse=True)
+    return found
 
-    missing = [f for f in ('cell_name', 'timestamp') if f not in df.columns]
-    if missing:
-        logger.error(f'[{label}] Missing columns {missing} after mapping. '
-                     f'Found: {list(df.columns)}')
-        return 0
 
-    # Coerce all non-key columns to numeric; text/total rows → NaN → NULL
-    for col in df.columns:
-        if col not in ('cell_name', 'timestamp'):
-            df[col] = pd.to_numeric(df[col], errors='coerce')
+def _find_latest(search_dirs, pattern):
+    """Return the single newest file matching pattern, or None."""
+    files = _find_files(search_dirs, pattern)
+    return files[0] if files else None
 
-    # Drop rows with missing/invalid cell names
-    df = df[df['cell_name'].notna()]
-    df = df[~df['cell_name'].astype(str).str.strip().str.lower().isin(['nan', ''])]
 
-    inserted, skipped = _insert_df(db_path, df, tech)
-    logger.info(f'[{label}] Done — {inserted} inserted, {skipped} skipped.')
-    return inserted
+def _infer_tech_from_name(filename):
+    """
+    Infer 2G / 3G / 4G-FDD / 4G-TDD / 5G / 4G from a filename stem.
+    """
+    stem = os.path.splitext(os.path.basename(filename))[0].upper()
+    if '5G' in stem:
+        return '5G'
+    if '4G-TDD' in stem or '4G TDD' in stem or 'TDD' in stem:
+        return '4G-TDD'
+    if '4G-FDD' in stem or '4G FDD' in stem or 'FDD' in stem:
+        return '4G-FDD'
+    if '4G' in stem or 'LTE' in stem or re.search(r'L\d+', stem):
+        return '4G'
+    if '3G' in stem or 'WCDMA' in stem or 'UMTS' in stem:
+        return '3G'
+    if '2G' in stem or 'GSM' in stem:
+        return '2G'
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -115,31 +128,56 @@ def ensure_schema():
 # ---------------------------------------------------------------------------
 
 def import_metadata():
-    logger.info('─── Importing metadata CSV files ───')
+    """
+    Find metadata CSV/XLSX files by pattern and import them.
+    Searches for files starting with '2G', '3G', '4G', '5G' in metadata dirs.
+    """
+    logger.info('─── Importing metadata files ───')
+
+    # Patterns to look for, mapped to technology labels.
+    # The order matters: more specific patterns before general ones.
+    TECH_PATTERNS = [
+        ('5G',     ['5G*.csv',      '5G*.xlsx']),
+        ('4G-TDD', ['*TDD*.csv',    '*TDD*.xlsx', '4G TDD*.csv', '4G TDD*.xlsx']),
+        ('4G-FDD', ['*FDD*.csv',    '*FDD*.xlsx', '4G FDD*.csv', '4G FDD*.xlsx']),
+        ('4G',     ['4G*.csv',      '4G*.xlsx', 'LTE*.csv', 'LTE*.xlsx']),
+        ('3G',     ['3G*.csv',      '3G*.xlsx', 'WCDMA*.csv', 'UMTS*.csv']),
+        ('2G',     ['2G*.csv',      '2G*.xlsx', 'GSM*.csv']),
+    ]
+
     total_upserted = 0
-    total_skipped  = 0
+    processed = set()  # avoid double-importing the same file
 
-    for tech, filename in METADATA_CSV_FILES.items():
-        path = _abs(filename)
-        if not os.path.exists(path):
-            logger.warning(f'[{tech}] File not found, skipping: {path}')
-            continue
-
+    for tech, patterns in TECH_PATTERNS:
         col_map = METADATA_CSV_COLUMN_MAPS.get(tech)
         if col_map is None:
-            logger.warning(f'[{tech}] No column map defined, skipping.')
             continue
 
-        logger.info(f'[{tech}] Reading {filename} …')
-        upserted, skipped, error = process_metadata_file(path, tech, col_map)
-        if error:
-            logger.error(f'[{tech}] Import failed: {error}')
-        else:
-            logger.info(f'[{tech}] Done — {upserted} upserted, {skipped} skipped.')
-            total_upserted += upserted
-            total_skipped  += skipped
+        for pat in patterns:
+            files = _find_files(METADATA_SEARCH_DIRS, pat)
+            for fpath in files:
+                real = os.path.realpath(fpath)
+                if real in processed:
+                    continue
+                processed.add(real)
 
-    logger.info(f'Metadata import complete: {total_upserted} total upserted, {total_skipped} skipped.')
+                logger.info(f'[{tech}] Importing {os.path.basename(fpath)} …')
+                upserted, skipped, error = process_metadata_file(fpath, tech, col_map)
+                if error:
+                    logger.error(f'[{tech}] {error}')
+                else:
+                    logger.info(f'[{tech}] {upserted} upserted, {skipped} skipped.')
+                    total_upserted += upserted
+                break  # one file per tech is enough (newest found)
+
+    if total_upserted == 0:
+        logger.warning(
+            'No metadata files found. Place CSV/XLSX exports in the project root or '
+            'sync_downloads/metadata/ and re-run.'
+        )
+    else:
+        logger.info(f'Metadata import complete: {total_upserted} total rows upserted.')
+
     return total_upserted
 
 
@@ -148,32 +186,50 @@ def import_metadata():
 # ---------------------------------------------------------------------------
 
 def import_nokia_pm():
+    """
+    Find Nokia PM Excel files by technology pattern and import them.
+    Nokia exports one XLSX per technology with a sheet named '<TECH> Performance'.
+    Falls back to the first sheet if that sheet name is not found.
+    """
     logger.info('─── Importing Nokia PM Excel files ───')
+
+    NOKIA_TECHS = ['2G', '3G', '4G', '5G']
+    NOKIA_PATTERNS = {
+        '2G': ['2G*.xlsx', '2G*.xls'],
+        '3G': ['3G*.xlsx', '3G*.xls'],
+        '4G': ['4G*.xlsx', '4G*.xls'],
+        '5G': ['5G*.xlsx', '5G*.xls'],
+    }
+
     total_inserted = 0
+    processed = set()
 
-    for tech, filename in NOKIA_PM_EXCEL_FILES.items():
-        path = _abs(filename)
-        if not os.path.exists(path):
-            logger.warning(f'[Nokia {tech}] File not found, skipping: {path}')
-            continue
+    for tech in NOKIA_TECHS:
+        for pat in NOKIA_PATTERNS[tech]:
+            files = _find_files(NOKIA_SEARCH_DIRS, pat)
+            for fpath in files:
+                real = os.path.realpath(fpath)
+                if real in processed:
+                    continue
+                processed.add(real)
 
-        col_map = NOKIA_PM_COLUMN_MAPS.get(tech)
-        if col_map is None:
-            logger.warning(f'[Nokia {tech}] No column map defined, skipping.')
-            continue
+                logger.info(f'[Nokia {tech}] Importing {os.path.basename(fpath)} …')
+                inserted, skipped, error = process_nokia_pm_file(fpath, tech)
+                if error:
+                    logger.error(f'[Nokia {tech}] {error}')
+                else:
+                    logger.info(f'[Nokia {tech}] {inserted} inserted, {skipped} skipped.')
+                    total_inserted += inserted
+                break  # one file per tech
 
-        sheet_name = f'{tech} Performance'
-        logger.info(f'[Nokia {tech}] Reading sheet "{sheet_name}" from {filename} …')
-        try:
-            df = pd.read_excel(path, sheet_name=sheet_name, engine='openpyxl')
-        except Exception as e:
-            logger.error(f'[Nokia {tech}] Failed to read file: {e}')
-            continue
+    if total_inserted == 0:
+        logger.warning(
+            'No Nokia PM files found. Place XLSX exports in the project root or '
+            'sync_downloads/pm_nokia/ and re-run.'
+        )
+    else:
+        logger.info(f'Nokia PM import complete: {total_inserted} total rows inserted.')
 
-        inserted = _import_pm_df(df, tech, NOKIA_PM_DB, col_map, f'Nokia {tech}')
-        total_inserted += inserted
-
-    logger.info(f'Nokia PM import complete: {total_inserted} total rows inserted.')
     return total_inserted
 
 
@@ -182,154 +238,52 @@ def import_nokia_pm():
 # ---------------------------------------------------------------------------
 
 def import_huawei_pm():
+    """
+    Find Huawei PM Excel file (single file with sheets 2G/3G/4G) and import.
+    Tries 'Performance.xlsx' first, then any *.xlsx in the Huawei search dirs.
+    """
     logger.info('─── Importing Huawei PM Excel file ───')
-    path = _abs(HUAWEI_PM_FILE)
-    if not os.path.exists(path):
-        logger.warning(f'Huawei PM file not found, skipping: {path}')
+
+    # Try named file first, then any xlsx
+    path = _find_latest(HUAWEI_SEARCH_DIRS, 'Performance.xlsx')
+    if not path:
+        path = _find_latest(HUAWEI_SEARCH_DIRS, '*.xlsx')
+
+    if not path:
+        logger.warning(
+            'No Huawei PM file found. Place Performance.xlsx in the project root or '
+            'sync_downloads/pm_huawei/ and re-run.'
+        )
         return 0
 
+    logger.info(f'[Huawei] Importing {os.path.basename(path)} …')
+    summary = process_huawei_pm_file(path)
     total_inserted = 0
-
-    for tech, sheet_name in HUAWEI_PM_SHEETS.items():
-        col_map = HUAWEI_PM_COLUMN_MAPS.get(tech)
-        if col_map is None:
-            logger.warning(f'[Huawei {tech}] No column map defined, skipping.')
-            continue
-
-        logger.info(f'[Huawei {tech}] Reading sheet "{sheet_name}" from {HUAWEI_PM_FILE} …')
-        try:
-            df = pd.read_excel(path, sheet_name=sheet_name, engine='openpyxl')
-        except Exception as e:
-            logger.error(f'[Huawei {tech}] Failed to read sheet "{sheet_name}": {e}')
-            continue
-
-        inserted = _import_pm_df(df, tech, HUAWEI_PM_DB, col_map, f'Huawei {tech}')
-        total_inserted += inserted
+    for sheet, result in summary.items():
+        if result.get('status') == 'ok':
+            logger.info(f'[Huawei/{sheet}] {result["inserted"]} inserted, {result["skipped"]} skipped.')
+            total_inserted += result.get('inserted', 0)
+        else:
+            logger.error(f'[Huawei/{sheet}] {result.get("error")}')
 
     logger.info(f'Huawei PM import complete: {total_inserted} total rows inserted.')
     return total_inserted
 
 
 # ---------------------------------------------------------------------------
-# Step 5 — Seed metadata.db with PM cells that are not already there
-# The app JOINs cells ↔ cell_kpis on cell_name, so every PM cell must
-# exist in metadata.db for its data to appear in the UI.
+# Step 5 — Seed metadata.db with PM cell placeholders
 # ---------------------------------------------------------------------------
 
-# Technology each Nokia Excel file covers
-NOKIA_FILE_TECH = {
-    '2G': '2G',
-    '3G': '3G',
-    '4G': '4G',
-    '5G': '5G',
-}
-
-# Technology each Huawei sheet covers
-HUAWEI_SHEET_TECH = {
-    '4G': '4G',
-    '3G': '3G',
-    '2G': '2G',
-}
-
-
-def _pm_site_id(cell_name):
-    """Extract site_id from a PM cell name (numeric prefix before first - or _)."""
-    import re
-    m = re.match(r'^(\d+)', cell_name)
-    return m.group(1) if m else None
-
-
-def _pm_site_name(cell_name):
-    """Derive site name by stripping the trailing sector suffix (-A, -B1, _A1, etc.)."""
-    import re
-    return re.sub(r'[-_][A-Za-z]\d*$', '', cell_name)
-
-
-def seed_metadata_from_pm():
+def seed_metadata():
     """
-    For every cell_name in nokia_pm.db / huawei_pm.db that is missing from
-    metadata.db, insert a placeholder site + cells row so the JOIN works in the app.
+    For every cell in the PM databases not yet in metadata.db,
+    insert placeholder site + cell rows so the performance JOIN works.
     """
-    import sqlite3 as _sq
-
-    meta = _sq.connect(_abs('metadata.db'))
-    nokia_pm = _sq.connect(_abs('nokia_pm.db'))
-    huawei_pm = _sq.connect(_abs('huawei_pm.db'))
-
-    existing_cells = {r[0] for r in meta.execute("SELECT cell_name FROM cells").fetchall()}
-    existing_sites = {r[0] for r in meta.execute("SELECT site_id FROM sites").fetchall()}
-
-    seeded = 0
-
-    def _seed_cell(cell_name, tech, vendor):
-        nonlocal seeded
-        if cell_name in existing_cells:
-            return
-        site_id   = _pm_site_id(cell_name)
-        site_name = _pm_site_name(cell_name)
-        # Ensure a placeholder site exists so the JOIN works
-        if site_id and site_id not in existing_sites:
-            meta.execute(
-                "INSERT OR IGNORE INTO sites (site_id, site_name, vendor, status) "
-                "VALUES (?, ?, ?, 'Active')",
-                (site_id, site_name, vendor)
-            )
-            existing_sites.add(site_id)
-        meta.execute(
-            "INSERT OR IGNORE INTO cells (cell_name, site_id, technology, vendor, status) "
-            "VALUES (?, ?, ?, ?, 'Active')",
-            (cell_name, site_id, tech, vendor)
-        )
-        existing_cells.add(cell_name)
-        seeded += 1
-
-    # Nokia — we know cell names per tech from the Excel files
-    for tech, filename in NOKIA_PM_EXCEL_FILES.items():
-        path = _abs(filename)
-        if not os.path.exists(path):
-            continue
-        col_map = NOKIA_PM_COLUMN_MAPS.get(tech, {})
-        cell_col = col_map.get('cell_name')
-        if not cell_col:
-            continue
-        sheet_name = f'{tech} Performance'
-        try:
-            df = pd.read_excel(path, sheet_name=sheet_name, engine='openpyxl',
-                               usecols=[cell_col])
-        except Exception:
-            continue
-        for cell_name in df[cell_col].dropna().unique():
-            cell_name = str(cell_name).strip()
-            if not cell_name or cell_name.lower() == 'nan':
-                continue
-            _seed_cell(cell_name, NOKIA_FILE_TECH[tech], 'Nokia')
-
-    # Huawei — from Performance.xlsx sheets
-    perf_path = _abs(HUAWEI_PM_FILE)
-    if os.path.exists(perf_path):
-        for tech, sheet_name in HUAWEI_PM_SHEETS.items():
-            col_map = HUAWEI_PM_COLUMN_MAPS.get(tech, {})
-            cell_col = col_map.get('cell_name')
-            if not cell_col:
-                continue
-            try:
-                df = pd.read_excel(perf_path, sheet_name=sheet_name,
-                                   engine='openpyxl', usecols=[cell_col])
-            except Exception:
-                continue
-            for cell_name in df[cell_col].dropna().unique():
-                cell_name = str(cell_name).strip()
-                if not cell_name or cell_name.lower() == 'nan':
-                    continue
-                _seed_cell(cell_name, HUAWEI_SHEET_TECH[tech], 'Huawei')
-
-    meta.commit()
-    meta.close()
-    nokia_pm.close()
-    huawei_pm.close()
-
-    logger.info(f'Metadata seeding complete: {seeded} PM cells added to metadata.db.')
-    return seeded
+    logger.info('─── Seeding metadata from PM databases ───')
+    n = seed_pm_cells_to_metadata(NOKIA_PM_DB, 'Nokia')
+    h = seed_pm_cells_to_metadata(HUAWEI_PM_DB, 'Huawei')
+    logger.info(f'Seeded {n} Nokia cells + {h} Huawei cells into metadata.db.')
+    return n + h
 
 
 # ---------------------------------------------------------------------------
@@ -341,15 +295,22 @@ def main():
     meta_rows   = import_metadata()
     nokia_rows  = import_nokia_pm()
     huawei_rows = import_huawei_pm()
-    seeded_rows = seed_metadata_from_pm()
+    seeded_rows = seed_metadata()
 
     logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     logger.info('Import finished:')
     logger.info(f'  metadata.db   →  {meta_rows} site/cell rows upserted')
-    logger.info(f'                    + {seeded_rows} PM cells seeded')
+    logger.info(f'                    + {seeded_rows} PM cells seeded as placeholders')
     logger.info(f'  nokia_pm.db   →  {nokia_rows} KPI rows inserted')
     logger.info(f'  huawei_pm.db  →  {huawei_rows} KPI rows inserted')
     logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
+    if meta_rows + nokia_rows + huawei_rows == 0:
+        logger.info('')
+        logger.info('No files were imported. To use this script:')
+        logger.info('  • Place metadata CSV exports  in: sync_downloads/metadata/')
+        logger.info('  • Place Nokia PM XLSX exports in: sync_downloads/pm_nokia/')
+        logger.info('  • Place Huawei Performance.xlsx in: sync_downloads/pm_huawei/')
+        logger.info('  • Or place any of the above directly in the project root.')
 
 
 if __name__ == '__main__':
