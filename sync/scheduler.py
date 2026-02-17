@@ -9,6 +9,7 @@ Three background jobs:
 
 import logging
 import sqlite3
+from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -168,6 +169,38 @@ def pull_metadata():
 # Scheduler lifecycle
 # ---------------------------------------------------------------------------
 
+def _dbs_are_empty():
+    """Return True if metadata + PM databases have no data rows."""
+    from sync_config import METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB
+    for db_path in (METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB):
+        try:
+            conn = sqlite3.connect(db_path)
+            tables = [r[0] for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()]
+            for t in tables:
+                if conn.execute(f'SELECT COUNT(*) FROM "{t}"').fetchone()[0] > 0:
+                    conn.close()
+                    return False
+            conn.close()
+        except Exception:
+            continue
+    return True
+
+
+def _seed_sample_data():
+    """Populate databases with sample data so the UI is never blank on first run."""
+    import os, sys
+    scripts_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts')
+    sys.path.insert(0, scripts_dir)
+    try:
+        from add_sample_map_data import insert_sample_data
+        insert_sample_data()
+        logger.info('Sample data seeded — databases were empty on first run.')
+    except Exception as e:
+        logger.error(f'Failed to seed sample data: {e}')
+
+
 def start_scheduler():
     global _scheduler
 
@@ -176,36 +209,47 @@ def start_scheduler():
     except Exception as e:
         logger.error(f'DB migration failed: {e}')
 
+    # Seed sample data on first run so the UI is never blank
+    if _dbs_are_empty():
+        _seed_sample_data()
+
     from sync_config import PM_PULL_INTERVAL_HOURS, METADATA_PULL_INTERVAL_HOURS
 
     _scheduler = BackgroundScheduler(daemon=True)
 
+    # next_run_time=datetime.now() makes each job run immediately on startup
+    # (then repeat on the interval).  This way real SFTP data replaces sample
+    # data as soon as the servers are reachable.
     _scheduler.add_job(
         pull_nokia_pm,
         trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
         id='nokia_pm_pull',
         name='Nokia PM Pull',
-        replace_existing=True
+        replace_existing=True,
+        next_run_time=datetime.now()
     )
     _scheduler.add_job(
         pull_huawei_pm,
         trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
         id='huawei_pm_pull',
         name='Huawei PM Pull',
-        replace_existing=True
+        replace_existing=True,
+        next_run_time=datetime.now()
     )
     _scheduler.add_job(
         pull_metadata,
         trigger=IntervalTrigger(hours=METADATA_PULL_INTERVAL_HOURS),
         id='metadata_pull',
         name='Metadata Pull',
-        replace_existing=True
+        replace_existing=True,
+        next_run_time=datetime.now()
     )
 
     _scheduler.start()
     logger.info(
         f'Scheduler started — Nokia PM + Huawei PM every {PM_PULL_INTERVAL_HOURS}h, '
-        f'Metadata every {METADATA_PULL_INTERVAL_HOURS}h.'
+        f'Metadata every {METADATA_PULL_INTERVAL_HOURS}h. '
+        f'First pull running now.'
     )
 
 
