@@ -424,13 +424,19 @@ def get_cell_trend(cell_id):
 
         pm_conn = sqlite3.connect(pm_db)
         pm_conn.row_factory = sqlite3.Row
+        # Use time window relative to the latest available data, not 'now'.
+        # This ensures imported/historical data always shows up even when
+        # the scheduler hasn't run recently.
         trend = [dict(r) for r in pm_conn.execute(f'''
             SELECT {col_list}
             FROM cell_kpis
             WHERE cell_name = ?
-              AND timestamp >= datetime('now', ? || ' hours')
+              AND timestamp >= datetime(
+                  (SELECT MAX(timestamp) FROM cell_kpis WHERE cell_name = ?),
+                  ? || ' hours'
+              )
             ORDER BY timestamp ASC
-        ''', (cell_name, f'-{hours}')).fetchall()]
+        ''', (cell_name, cell_name, f'-{hours}')).fetchall()]
         pm_conn.close()
     except sqlite3.OperationalError:
         trend = []
