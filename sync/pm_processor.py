@@ -165,10 +165,13 @@ def _insert_df(db_path, df, technology):
         record = {'cell_name': cell_name, 'timestamp': ts}
         for col in kpi_cols:
             val = row.get(col)
-            try:
-                record[col] = float(val) if pd.notna(val) else None
-            except (TypeError, ValueError):
+            if not pd.notna(val):
                 record[col] = None
+            else:
+                try:
+                    record[col] = float(val)
+                except (TypeError, ValueError):
+                    record[col] = str(val).strip()
 
         quoted_cols  = ', '.join(f'"{c}"' for c in record.keys())
         placeholders = ', '.join(['?'] * len(record))

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Analytics - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
-    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=4.0">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=5.0">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -147,6 +147,11 @@
                         <div id="charts-subtitle" class="charts-subtitle"></div>
                     </div>
                     <div class="header-actions">
+                        <!-- View-mode toggle (visible once a vendor is selected) -->
+                        <div id="view-toggle" class="view-toggle" style="display:none;">
+                            <button id="btn-charts-view" class="view-btn active" onclick="switchViewMode('charts')">Charts</button>
+                            <button id="btn-table-view"  class="view-btn"        onclick="switchViewMode('table')">PM Database</button>
+                        </div>
                         <button id="btn-refresh" class="btn-refresh" onclick="refreshData()" style="display:none;">
                             <span class="refresh-icon">↻</span> Refresh
                         </button>
@@ -172,13 +177,29 @@
                 <p>Loading KPI data...</p>
             </div>
 
+            <!-- ============================================================
+                 PM Database table view (replaces charts when toggled)
+            ============================================================ -->
+            <div id="pm-table-view" class="pm-table-view" style="display:none;">
+                <div class="hw-toolbar">
+                    <input type="text" id="hw-search" class="hw-search-input"
+                           placeholder="Search by cell name…"
+                           oninput="onHwSearch(this.value)">
+                    <span id="hw-row-count" class="hw-row-count"></span>
+                </div>
+                <div id="hw-table-container" class="hw-table-container">
+                    <p class="hw-empty-msg">Select a vendor + technology, then click <strong>PM Database</strong>.</p>
+                </div>
+                <div id="hw-pagination" class="hw-pagination"></div>
+            </div>
+
         </main>
 
     </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-<script src="{{ url_for('performance.static', filename='performance.js') }}?v=4.0"></script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=5.0"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams(window.location.search);
