@@ -117,7 +117,49 @@ def init_db():
             UNIQUE(user_id, profile_name)
         )
     ''')
-    
+
+    # ── New feature tables ────────────────────────────────────────────────────
+
+    # Config version history
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS config_versions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ne_name TEXT NOT NULL,
+            file_name TEXT NOT NULL,
+            version_num INTEGER NOT NULL,
+            xml_content TEXT NOT NULL,
+            comment TEXT,
+            uploaded_by INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (uploaded_by) REFERENCES users (id)
+        )
+    ''')
+
+    # Report archive (generated report files)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS report_archive (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            report_name TEXT NOT NULL,
+            report_type TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            file_size INTEGER DEFAULT 0,
+            generated_by INTEGER NOT NULL,
+            generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (generated_by) REFERENCES users (id)
+        )
+    ''')
+
+    # User preferences (dashboard personalisation)
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_preferences (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER UNIQUE NOT NULL,
+            preferences TEXT NOT NULL DEFAULT '{}',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 

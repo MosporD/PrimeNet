@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Config Version History - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('config_history.static', filename='config_history.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>Config Version History</h1>
+                <p>Track, compare and restore XML configuration versions</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        <!-- Upload Panel -->
+        <div class="panel upload-panel">
+            <h2>Upload Configuration</h2>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('xmlFile').click()"
+                 ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+                <div class="upload-icon">📁</div>
+                <p>Click to select XML file or drag &amp; drop</p>
+                <small>Each upload creates a new version for the network element</small>
+                <input type="file" id="xmlFile" accept=".xml" style="display:none" onchange="handleFileSelect(this)">
+            </div>
+            <div id="uploadForm" class="upload-form" style="display:none">
+                <span id="selectedFileName" class="file-badge"></span>
+                <input type="text" id="uploadComment" placeholder="Version comment (optional)" class="comment-input">
+                <button onclick="uploadVersion()" class="btn-primary">Save Version</button>
+                <button onclick="cancelUpload()" class="btn-secondary">Cancel</button>
+            </div>
+            <div id="uploadStatus" class="status-message"></div>
+        </div>
+
+        <!-- Split Panel: NE List + Versions -->
+        <div class="split-panel">
+
+            <!-- Left: NE List -->
+            <div class="panel ne-panel">
+                <div class="panel-header">
+                    <h2>Network Elements</h2>
+                    <input type="text" id="neSearch" placeholder="Search..." class="search-input" oninput="filterNEs()">
+                </div>
+                <div id="neList" class="ne-list">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+
+            <!-- Right: Versions -->
+            <div class="panel versions-panel">
+                <div class="panel-header">
+                    <h2 id="versionsTitle">Versions</h2>
+                    <button id="compareBtn" onclick="openDiff()" class="btn-primary small-btn" style="display:none">
+                        Compare
+                    </button>
+                </div>
+                <div id="versionsList" class="versions-list">
+                    <p class="placeholder-text">← Select a network element</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- Diff Modal -->
+<div id="diffModal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeDiff()">
+    <div class="modal-large">
+        <div class="modal-header">
+            <h3>Configuration Diff</h3>
+            <div id="diffStats" class="diff-stats"></div>
+            <button onclick="closeDiff()" class="modal-close">✕</button>
+        </div>
+        <div class="diff-selectors">
+            <select id="diffV1" class="version-select"></select>
+            <span class="vs-label">vs</span>
+            <select id="diffV2" class="version-select"></select>
+            <button onclick="runDiff()" class="btn-primary small-btn">Show Diff</button>
+        </div>
+        <pre id="diffOutput" class="diff-output">Select two versions and click Show Diff</pre>
+    </div>
+</div>
+
+<script src="{{ url_for('config_history.static', filename='config_history.js') }}"></script>
+<script>
+async function logout() {
+    if (confirm('Logout?')) {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+}
+</script>
+</body>
+</html>
