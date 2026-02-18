@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('user_profile.static', filename='user_profile.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>My Profile</h1>
+                <p>Manage your account and dashboard preferences</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="profile-layout">
+
+            <!-- Left column: avatar + stats -->
+            <div class="profile-left">
+                <div class="avatar-card">
+                    <div class="avatar-circle" id="avatarCircle">?</div>
+                    <div class="avatar-name" id="avatarName">{{ user.username }}</div>
+                    <div class="avatar-role" id="avatarRole">{{ user.role }}</div>
+                    <div class="avatar-stats">
+                        <div class="stat-row"><span class="stat-l">Member since</span><span class="stat-r" id="memberSince">—</span></div>
+                        <div class="stat-row"><span class="stat-l">Last login</span><span class="stat-r" id="lastLogin">—</span></div>
+                        <div class="stat-row"><span class="stat-l">Actions logged</span><span class="stat-r" id="activityCount">—</span></div>
+                    </div>
+                </div>
+
+                <!-- Dashboard preferences -->
+                <div class="pref-card">
+                    <h3>Dashboard Preferences</h3>
+                    <div class="pref-group">
+                        <label class="pref-label">Default Tab</label>
+                        <select id="prefDefaultTab" class="pref-select">
+                            <option value="performance">Performance</option>
+                            <option value="configuration">Configuration</option>
+                        </select>
+                    </div>
+                    <div class="pref-group">
+                        <label class="pref-label">Default Technology</label>
+                        <select id="prefDefaultTech" class="pref-select">
+                            <option value="">None</option>
+                            <option value="2G">2G</option>
+                            <option value="3G">3G</option>
+                            <option value="4G">4G</option>
+                            <option value="5G">5G</option>
+                        </select>
+                    </div>
+                    <div class="pref-group">
+                        <label class="pref-label">Default Vendor</label>
+                        <select id="prefDefaultVendor" class="pref-select">
+                            <option value="">None</option>
+                            <option value="Nokia">Nokia</option>
+                            <option value="Huawei">Huawei</option>
+                        </select>
+                    </div>
+                    <div class="pref-group toggle-row">
+                        <label class="pref-label">Compact tables</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="prefCompact">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <button onclick="savePreferences()" class="btn-primary full-btn">Save Preferences</button>
+                    <div id="prefStatus" class="status-message"></div>
+                </div>
+            </div>
+
+            <!-- Right column: edit profile + password -->
+            <div class="profile-right">
+
+                <!-- Edit profile -->
+                <div class="form-card">
+                    <h3>Account Information</h3>
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="fieldUsername" class="form-input" disabled>
+                        <small class="field-hint">Username cannot be changed</small>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="fieldFullName" class="form-input" placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label>Department</label>
+                            <input type="text" id="fieldDepartment" class="form-input" placeholder="e.g. RF Engineering">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="fieldEmail" class="form-input" placeholder="your@email.com">
+                    </div>
+                    <button onclick="updateProfile()" class="btn-primary">Update Profile</button>
+                    <div id="profileStatus" class="status-message"></div>
+                </div>
+
+                <!-- Change password -->
+                <div class="form-card">
+                    <h3>Change Password</h3>
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password">
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" class="form-input" placeholder="Min. 6 characters">
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmPassword" class="form-input" placeholder="Repeat new password">
+                        </div>
+                    </div>
+                    <div class="strength-bar" id="strengthBar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <small id="strengthLabel" class="field-hint"></small>
+                    <button onclick="changePassword()" class="btn-primary" style="margin-top:14px">Change Password</button>
+                    <div id="passwordStatus" class="status-message"></div>
+                </div>
+
+                <!-- Recent activity -->
+                <div class="form-card">
+                    <h3>Recent Activity</h3>
+                    <div id="activityList" class="activity-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="{{ url_for('user_profile.static', filename='user_profile.js') }}"></script>
+<script>
+async function logout() {
+    if (confirm('Logout?')) {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+}
+</script>
+</body>
+</html>

@@ -168,9 +168,23 @@ def _process_cell_file(file_path, key):
                          'trans_name', 'transname'])
         or _find_col(cols, ['name'])
     )
-    site_id_col   = _find_col(cols, ['site_id', 'site id', 'enb_id_actual', 'enb_id'])
+    # site_id candidates — cover all vendor/technology naming conventions:
+    #   2G : site_id          (Atoll 2G export)
+    #   3G : nodeb_id         (Atoll 3G export)
+    #   4G : enb_id_actual    (Atoll 4G FDD/TDD export)
+    #   5G : gnb_id_actual    (Atoll 5G export)
+    site_id_col   = _find_col(cols, ['site_id', 'site id',
+                                      'enb_id_actual', 'enb_id',
+                                      'gnb_id_actual', 'gnb_id',
+                                      'nodeb_id'])
+    # site_name candidates — cover all vendor/technology naming conventions:
+    #   2G : site_name        (Atoll 2G export)
+    #   3G : nodeb_name       (Atoll 3G export)
+    #   4G : enb_name         (Atoll 4G FDD/TDD export)
+    #   5G : gnb_name         (Atoll 5G export)
     site_name_col = _find_col(cols, ['site_name', 'site name', 'sitename',
-                                     'site', 'enb_name'])
+                                      'enb_name', 'gnb_name', 'nodeb_name',
+                                      'site'])
     lat_col       = _find_col(cols, ['lat', 'latitude'])
     lon_col       = _find_col(cols, ['long', 'longitude', 'lng', 'lon'])
     az_col        = _find_col(cols, ['azimuth'])
@@ -179,6 +193,14 @@ def _process_cell_file(file_path, key):
     mtilt_col     = _find_col(cols, ['mechanical downtilt', 'mechanical_tilt',
                                       'mtilt', 'mechanicaltilt'])
     vendor_col    = _find_col(cols, ['vendor'])
+    # Frequency band / channel — actual value differs per technology:
+    #   2G : frequency_band  (e.g. 'GSM900')
+    #   3G : dl_uarfcn       (e.g. 10562)
+    #   4G : band            (e.g. 'B7', 'B3')
+    #   5G : bw              (bandwidth, e.g. 100)
+    freq_col      = _find_col(cols, ['frequency_band', 'band', 'dl_uarfcn',
+                                      'uarfcn', 'earfcn', 'nrarfcn', 'bw',
+                                      'freq', 'arfcn'])
     # PSC (3G Primary Scrambling Code), PCI (4G Physical Cell ID), BCC/BCCH (2G)
     pci_col       = _find_col(cols, ['psc', 'scrambling_code', 'scrambling code',
                                       'primary scrambling code', 'pci',
@@ -255,11 +277,14 @@ def _process_cell_file(file_path, key):
             sites_seen.add(site_id)
 
         # ── Upsert cell ───────────────────────────────────────────────────
-        azimuth = _safe_float(row.get(az_col))    if az_col    else None
-        etilt   = _safe_float(row.get(etilt_col)) if etilt_col else None
-        mtilt   = _safe_float(row.get(mtilt_col)) if mtilt_col else None
-        pci     = _safe_float(row.get(pci_col))   if pci_col   else None
-        pci_int = int(pci) if pci is not None else None
+        azimuth   = _safe_float(row.get(az_col))    if az_col    else None
+        etilt     = _safe_float(row.get(etilt_col)) if etilt_col else None
+        mtilt     = _safe_float(row.get(mtilt_col)) if mtilt_col else None
+        pci       = _safe_float(row.get(pci_col))   if pci_col   else None
+        pci_int   = int(pci) if pci is not None else None
+        # Use the actual band/channel value from the CSV; fall back to technology label
+        freq_val  = _safe_str(row.get(freq_col)) if freq_col else None
+        freq_band = freq_val or technology
 
         cursor.execute('''
             INSERT INTO cells
@@ -277,7 +302,7 @@ def _process_cell_file(file_path, key):
                 pci             = COALESCE(excluded.pci,             cells.pci),
                 status          = 'Active',
                 updated_at      = CURRENT_TIMESTAMP
-        ''', (cell_name, site_id, technology, technology, azimuth, mtilt, etilt, vendor, pci_int))
+        ''', (cell_name, site_id, technology, freq_band, azimuth, mtilt, etilt, vendor, pci_int))
 
     after_count = conn.execute(
         "SELECT COUNT(*) FROM cells WHERE technology=?", (technology,)
@@ -313,8 +338,13 @@ def _process_site_file(file_path, key):
 
     cols = list(df.columns)
 
-    site_id_col  = _find_col(cols, ['enb_id_actual', 'site_id', 'site id', 'enb_id'])
-    name_col     = _find_col(cols, ['enb_name', 'name', 'site_name', 'site name', 'sitename'])
+    site_id_col  = _find_col(cols, ['site_id', 'site id',
+                                      'enb_id_actual', 'enb_id',
+                                      'gnb_id_actual', 'gnb_id',
+                                      'nodeb_id'])
+    name_col     = _find_col(cols, ['site_name', 'site name', 'sitename',
+                                     'enb_name', 'gnb_name', 'nodeb_name',
+                                     'name'])
     lat_col      = _find_col(cols, ['lat', 'latitude'])
     lon_col      = _find_col(cols, ['long', 'longitude', 'lng', 'lon'])
     vendor_col   = _find_col(cols, ['vendor'])

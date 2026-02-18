@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Management - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('network_management.static', filename='network_management.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>Network Management</h1>
+                <p>PCI/PSC/BCCH conflict detection &amp; site cell browser</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        <!-- Summary Cards -->
+        <div class="summary-cards" id="summaryCards">
+            <div class="stat-card"><div class="stat-val" id="statSites">—</div><div class="stat-lbl">Active Sites</div></div>
+            <div class="stat-card"><div class="stat-val" id="statCells">—</div><div class="stat-lbl">Active Cells</div></div>
+            <div class="stat-card" id="statConflictCard"><div class="stat-val" id="statConflicts">—</div><div class="stat-lbl">PCI Conflicts</div></div>
+            <div class="stat-card"><div class="stat-val" id="statTechs">—</div><div class="stat-lbl">Technologies</div></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="openTab('conflicts', this)">PCI Conflict Detection</button>
+            <button class="tab" onclick="openTab('browser', this)">Site Cell Browser</button>
+        </div>
+
+        <!-- ── PCI Conflict Detection ── -->
+        <div class="tab-panel" id="tab-conflicts">
+            <div class="filter-bar">
+                <select id="conflictTech" class="filter-select" onchange="loadConflicts()">
+                    <option value="">All Technologies</option>
+                    <option value="2G">2G</option>
+                    <option value="3G">3G</option>
+                    <option value="4G">4G</option>
+                    <option value="5G">5G</option>
+                </select>
+                <select id="conflictScope" class="filter-select" onchange="loadConflicts()">
+                    <option value="area">Scope: Area</option>
+                    <option value="cluster">Scope: Cluster</option>
+                </select>
+                <button onclick="loadConflicts()" class="btn-primary small-btn">Refresh</button>
+                <span id="conflictsSummary" class="filter-info"></span>
+            </div>
+
+            <div id="conflictsContainer">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- ── Site Cell Browser ── -->
+        <div class="tab-panel hidden" id="tab-browser">
+            <div class="browser-layout">
+                <div class="browser-left">
+                    <div class="filter-bar-vert">
+                        <input type="text" id="siteSearch" placeholder="Search site..." class="search-input full-w" oninput="filterSites()">
+                        <select id="browserVendor" class="filter-select full-w" onchange="loadSites()">
+                            <option value="">All Vendors</option>
+                            <option value="Nokia">Nokia</option>
+                            <option value="Huawei">Huawei</option>
+                        </select>
+                    </div>
+                    <div id="siteList" class="site-list">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+                <div class="browser-right">
+                    <div class="panel" id="cellPanel">
+                        <p class="placeholder-text">← Select a site to view cells</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="{{ url_for('network_management.static', filename='network_management.js') }}"></script>
+<script>
+async function logout() {
+    if (confirm('Logout?')) {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+}
+</script>
+</body>
+</html>

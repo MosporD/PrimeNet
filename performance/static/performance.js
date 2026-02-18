@@ -1,5 +1,5 @@
 /**
- * Performance Analytics v4
+ * Performance Analytics v5
  * - Cluster / Area derived from site_id (matching network map logic)
  * - Cell search in left panel (always visible after Apply)
  * - 2 charts per row from live KPI DB headers
@@ -15,6 +15,14 @@ let activeCellId = null;
 let lastTrendData = null;  // {cell, trend} kept for export
 
 let KPI_DEFS = [];
+
+// ── PM table view state ──────────────────────────────────
+let hwCurrentPage   = 1;
+let hwCurrentSearch = '';
+let hwCurrentTech   = '';
+let hwCurrentVendor = '';
+let hwSearchTimer   = null;
+const HW_PAGE_SIZE  = 100;
 
 const _CHART_COLORS = [
     '#3498db','#27ae60','#e74c3c','#9b59b6','#f39c12',
@@ -132,6 +140,17 @@ function onVendorChange() {
     const opt5g   = techSel.querySelector('option[value="5G"]');
     if (opt5g) opt5g.style.display = vendor === 'Huawei' ? 'none' : '';
     if (vendor === 'Huawei' && techSel.value === '5G') techSel.value = '';
+
+    // Show view toggle only when a specific vendor is selected
+    const toggle = document.getElementById('view-toggle');
+    if (toggle) toggle.style.display = vendor ? 'flex' : 'none';
+
+    // If no vendor, make sure we're back in charts mode
+    if (!vendor) {
+        const tView = document.getElementById('pm-table-view');
+        if (tView && tView.style.display !== 'none') switchViewMode('charts');
+    }
+
     loadKpiColumns();
 }
 
@@ -217,6 +236,14 @@ async function applyFilters() {
 
     // Populate the cell chip list in the left panel
     showCellPicker(allCells);
+
+    // If the PM Database table view is currently open, refresh it too
+    const tView = document.getElementById('pm-table-view');
+    if (tView && tView.style.display !== 'none') {
+        const v = document.getElementById('filter-vendor').value;
+        const t = document.getElementById('filter-tech').value;
+        if (v && t) loadPmTable(v, t, hwCurrentSearch, 1);
+    }
 }
 
 // ============================================================
@@ -557,4 +584,189 @@ function updateSummary(cells) {
     if (availEl) { const v = availCol ? avg(availCol) : null; availEl.textContent = v !== null ? v.toFixed(1) + '%' : 'N/A'; }
     if (dropEl)  { const v = dropCol  ? avg(dropCol)  : null; dropEl.textContent  = v !== null ? v.toFixed(2) + '%' : 'N/A'; }
     if (dlEl)    { const v = dlCol    ? avg(dlCol)    : null; dlEl.textContent    = v !== null ? v.toFixed(1) + ' Mbps' : 'N/A'; }
+}
+
+// ============================================================
+// PM Database table view
+// ============================================================
+
+/** Escape a string for safe insertion into innerHTML. */
+function _esc(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+/**
+ * Switch between Charts and PM Database modes.
+ * @param {'charts'|'table'} mode
+ */
+function switchViewMode(mode) {
+    const noSel     = document.getElementById('no-selection');
+    const cWrap     = document.getElementById('charts-wrap');
+    const cLoad     = document.getElementById('loading-charts');
+    const tView     = document.getElementById('pm-table-view');
+    const btnC      = document.getElementById('btn-charts-view');
+    const btnT      = document.getElementById('btn-table-view');
+    const exportBtn = document.getElementById('btn-export');
+
+    if (mode === 'table') {
+        if (noSel)     noSel.style.display     = 'none';
+        if (cWrap)     cWrap.style.display     = 'none';
+        if (cLoad)     cLoad.style.display     = 'none';
+        if (exportBtn) exportBtn.style.display = 'none';
+        tView.style.display = 'flex';
+        btnC && btnC.classList.remove('active');
+        btnT && btnT.classList.add('active');
+
+        // Clear search bar
+        hwCurrentSearch = '';
+        const searchInput = document.getElementById('hw-search');
+        if (searchInput) searchInput.value = '';
+
+        const vendor = document.getElementById('filter-vendor').value;
+        const tech   = document.getElementById('filter-tech').value;
+        if (vendor && tech) {
+            loadPmTable(vendor, tech, '', 1);
+        } else {
+            document.getElementById('hw-table-container').innerHTML =
+                '<p class="hw-empty-msg" style="color:#e74c3c">Please select a vendor and technology first, then click Apply.</p>';
+        }
+    } else {
+        tView.style.display = 'none';
+        btnC && btnC.classList.add('active');
+        btnT && btnT.classList.remove('active');
+
+        if (activeCellId) {
+            if (cWrap) cWrap.style.display = 'grid';
+        } else {
+            if (noSel) noSel.style.display = 'flex';
+        }
+    }
+}
+
+/**
+ * Fetch a page of PM raw data from the server and render it.
+ */
+async function loadPmTable(vendor, technology, search, page) {
+    hwCurrentVendor = vendor;
+    hwCurrentTech   = technology;
+    hwCurrentSearch = search;
+    hwCurrentPage   = page;
+
+    const container = document.getElementById('hw-table-container');
+    container.innerHTML = '<div style="padding:20px;color:#999">Loading…</div>';
+
+    const params = new URLSearchParams({ vendor, technology, page, page_size: HW_PAGE_SIZE });
+    if (search) params.set('search', search);
+
+    try {
+        const res  = await fetch('/api/performance/pm-table?' + params);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Server error');
+        renderPmTable(data);
+    } catch (e) {
+        container.innerHTML =
+            `<div style="padding:20px;color:#e74c3c">Error: ${_esc(e.message)}</div>`;
+    }
+}
+
+/**
+ * Render the PM data table from an API response object.
+ */
+function renderPmTable(data) {
+    const container  = document.getElementById('hw-table-container');
+    const pagination = document.getElementById('hw-pagination');
+    const countEl    = document.getElementById('hw-row-count');
+
+    const { columns, static_cols, column_labels, rows, total, page, page_size, cell_label } = data;
+    const staticSet = new Set(static_cols);
+
+    // Update row count badge
+    const start = total ? (page - 1) * page_size + 1 : 0;
+    const end   = Math.min(page * page_size, total);
+    countEl.textContent = total
+        ? `${start.toLocaleString()}–${end.toLocaleString()} of ${total.toLocaleString()} rows`
+        : '0 rows';
+
+    // Update search placeholder to show the right cell label
+    const searchInput = document.getElementById('hw-search');
+    if (searchInput && cell_label) searchInput.placeholder = `Search by ${cell_label}…`;
+
+    if (!rows.length) {
+        container.innerHTML = '<div class="hw-empty-msg">No data found.</div>';
+        pagination.innerHTML = '';
+        return;
+    }
+
+    // Build <thead>
+    const colHeaders = columns.map(col => {
+        const isStatic = staticSet.has(col);
+        const label    = column_labels[col] || col;
+        return `<th class="${isStatic ? 'hw-static' : ''}">${_esc(label)}</th>`;
+    }).join('');
+
+    // Build <tbody>
+    const tableRows = rows.map(row => {
+        const cells = columns.map(col => {
+            const v        = row[col];
+            const isStatic = staticSet.has(col);
+            let display;
+            if (v === null || v === undefined) {
+                display = '';
+            } else if (typeof v === 'number') {
+                display = Number.isInteger(v) ? String(v) : v.toFixed(4);
+            } else {
+                display = _esc(String(v));
+            }
+            return `<td class="${isStatic ? 'hw-static-cell' : ''}">${display}</td>`;
+        }).join('');
+        return `<tr>${cells}</tr>`;
+    }).join('');
+
+    container.innerHTML = `
+        <div class="hw-table-wrapper">
+            <table class="hw-table">
+                <thead><tr>${colHeaders}</tr></thead>
+                <tbody>${tableRows}</tbody>
+            </table>
+        </div>`;
+
+    // Build pagination controls
+    const totalPages = Math.ceil(total / page_size);
+    if (totalPages <= 1) { pagination.innerHTML = ''; return; }
+
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= page - 2 && i <= page + 2)) {
+            pages.push(i);
+        } else if (pages[pages.length - 1] !== '…') {
+            pages.push('…');
+        }
+    }
+
+    // Use global vars in onclick so search strings with special chars don't break
+    pagination.innerHTML =
+        `<button ${page === 1 ? 'disabled' : ''}
+            onclick="loadPmTable(hwCurrentVendor,hwCurrentTech,hwCurrentSearch,${page - 1})">← Prev</button>` +
+        pages.map(p =>
+            p === '…'
+                ? `<span class="hw-ellipsis">…</span>`
+                : `<button class="${p === page ? 'hw-page-active' : ''}"
+                    onclick="loadPmTable(hwCurrentVendor,hwCurrentTech,hwCurrentSearch,${p})">${p}</button>`
+        ).join('') +
+        `<button ${page === totalPages ? 'disabled' : ''}
+            onclick="loadPmTable(hwCurrentVendor,hwCurrentTech,hwCurrentSearch,${page + 1})">Next →</button>`;
+}
+
+/** Debounced handler for the search input. */
+function onHwSearch(value) {
+    clearTimeout(hwSearchTimer);
+    hwSearchTimer = setTimeout(() => {
+        if (hwCurrentVendor && hwCurrentTech) {
+            loadPmTable(hwCurrentVendor, hwCurrentTech, value.trim(), 1);
+        }
+    }, 400);
 }

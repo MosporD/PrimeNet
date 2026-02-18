@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('reports.static', filename='reports.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>Report Generation</h1>
+                <p>Generate on-demand Excel reports for network data</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        <!-- Report Type Cards -->
+        <section class="section">
+            <h2>Generate Report</h2>
+            <p class="section-description">Click a report type to generate and download an Excel file instantly.</p>
+            <div class="report-cards" id="reportCards">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <div id="generateStatus" class="status-message"></div>
+
+        <!-- Archive -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Report Archive</h2>
+                <button onclick="loadArchive()" class="btn-secondary small-btn">Refresh</button>
+            </div>
+            <div id="archiveContainer">
+                <div class="loading-spinner"></div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="{{ url_for('reports.static', filename='reports.js') }}"></script>
+<script>
+async function logout() {
+    if (confirm('Logout?')) {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+}
+</script>
+</body>
+</html>

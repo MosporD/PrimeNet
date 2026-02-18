@@ -29,6 +29,10 @@ from xml_parser.routes import xml_parser_bp                     # module: xml_pa
 from parameter_dictionary.routes import parameter_dictionary_bp # module: parameter_dictionary/
 from admin_panel.routes import admin_panel_bp                   # module: admin_panel/
 from sync.routes import sync_bp                                 # sync infra: sync/
+from config_history.routes import config_history_bp             # module: config_history/
+from network_management.routes import network_management_bp     # module: network_management/
+from reports.routes import reports_bp                           # module: reports/
+from user_profile.routes import user_profile_bp                 # module: user_profile/
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(xml_parser_bp)
@@ -39,6 +43,10 @@ app.register_blueprint(network_map_bp)
 app.register_blueprint(admin_panel_bp)
 app.register_blueprint(sync_bp)
 app.register_blueprint(performance_bp)
+app.register_blueprint(config_history_bp)
+app.register_blueprint(network_management_bp)
+app.register_blueprint(reports_bp)
+app.register_blueprint(user_profile_bp)
 
 # ============================================================================
 # ERROR HANDLERS

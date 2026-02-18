@@ -29,6 +29,34 @@ performance_bp = Blueprint(
 _FIXED_COLS = {'id', 'cell_name', 'timestamp'}
 
 # ---------------------------------------------------------------------------
+# PM table view — static identifier columns per vendor / technology
+# ---------------------------------------------------------------------------
+
+_PM_STATIC_COLS = {
+    'Huawei': {
+        '2G': ['timestamp', 'cell_name', 'GBSC', 'Cell CI', 'CellIndex'],
+        '3G': ['timestamp', 'cell_name', 'RNC', 'Cell ID', 'NodeB Name'],
+        '4G': ['timestamp', 'cell_name', 'eNodeB Name', 'Cell FDD TDD Indication',
+               'LocalCell Id', 'eNodeB Function Name'],
+    },
+    'Nokia': {
+        '2G': ['timestamp', 'cell_name', 'BSC name', 'BCF name'],
+        '3G': ['timestamp', 'cell_name', 'PLMN name', 'RNC name',
+               'WBTS name', 'WBTS ID', 'WCEL ID'],
+        '4G': ['timestamp', 'cell_name', 'MRBTS name', 'LNBTS name'],
+        '5G': ['timestamp', 'cell_name', 'MRBTS name', 'NRBTS name'],
+    },
+}
+
+_PM_EXCLUDE_COLS = {'id', 'Integrity'}
+
+# Human-readable label for the cell_name column per vendor/technology
+_PM_CELL_LABEL = {
+    'Huawei': {'2G': 'Cell Name', '3G': 'Cell Name', '4G': 'Cell Name'},
+    'Nokia':  {'2G': 'BTS name', '3G': 'WCEL name', '4G': 'LNCEL name', '5G': 'NRCEL name'},
+}
+
+# ---------------------------------------------------------------------------
 # Cluster / Area derivation  (same logic as network_map/static/map.js)
 # cluster = floor(site_id / 100),  area = CLUSTER_AREA[cluster]
 # ---------------------------------------------------------------------------
@@ -549,6 +577,91 @@ def get_cell_trend(cell_id):
         trend = []
 
     return jsonify({'success': True, 'cell': cell, 'trend': trend})
+
+
+# ---------------------------------------------------------------------------
+# API: PM raw data table (paginated, with static identifier columns)
+# ---------------------------------------------------------------------------
+
+@performance_bp.route('/api/performance/pm-table')
+def get_pm_table():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    vendor     = request.args.get('vendor', '')
+    technology = request.args.get('technology', '')
+    search     = request.args.get('search', '').strip()
+    page       = request.args.get('page', 1, type=int)
+    page_size  = min(request.args.get('page_size', 100, type=int), 500)
+
+    if vendor not in ('Nokia', 'Huawei'):
+        return jsonify({'error': 'Vendor must be Nokia or Huawei'}), 400
+    if not technology:
+        return jsonify({'error': 'Technology is required'}), 400
+
+    db_path    = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
+    table      = pm_table_name(technology)
+    static_cfg = _PM_STATIC_COLS.get(vendor, {}).get(technology, [])
+    cell_label = _PM_CELL_LABEL.get(vendor, {}).get(technology, 'Cell Name')
+    ts_label   = 'Period Start' if vendor == 'Nokia' else 'Date'
+
+    empty = {
+        'success': True, 'columns': [], 'static_cols': [],
+        'column_labels': {}, 'rows': [], 'total': 0,
+        'page': page, 'page_size': page_size, 'cell_label': cell_label,
+    }
+
+    try:
+        conn     = sqlite3.connect(db_path, timeout=15)
+        conn.row_factory = sqlite3.Row
+        all_cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
+
+        if not all_cols:
+            conn.close()
+            return jsonify(empty)
+
+        # Build column order: static first (only those that exist in the table),
+        # then every other column except excluded ones.
+        existing_static = [c for c in static_cfg if c in all_cols]
+        static_set      = set(existing_static)
+        kpi_cols        = [c for c in all_cols
+                           if c not in _PM_EXCLUDE_COLS and c not in static_set]
+        ordered_cols    = existing_static + kpi_cols
+        col_select      = ', '.join(f'"{c}"' for c in ordered_cols)
+
+        where_clause = '1=1'
+        params       = []
+        if search:
+            where_clause = 'cell_name LIKE ?'
+            params.append(f'%{search}%')
+
+        total  = conn.execute(
+            f'SELECT COUNT(*) FROM "{table}" WHERE {where_clause}', params
+        ).fetchone()[0]
+        offset = (page - 1) * page_size
+        rows   = conn.execute(f'''
+            SELECT {col_select} FROM "{table}"
+            WHERE  {where_clause}
+            ORDER  BY timestamp DESC
+            LIMIT  ? OFFSET ?
+        ''', params + [page_size, offset]).fetchall()
+        conn.close()
+
+        return jsonify({
+            'success':       True,
+            'columns':       ordered_cols,
+            'static_cols':   existing_static,
+            'column_labels': {'timestamp': ts_label, 'cell_name': cell_label},
+            'rows':          [dict(r) for r in rows],
+            'total':         total,
+            'page':          page,
+            'page_size':     page_size,
+            'cell_label':    cell_label,
+        })
+
+    except sqlite3.OperationalError:
+        return jsonify(empty)
 
 
 # ---------------------------------------------------------------------------
