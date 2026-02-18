@@ -23,10 +23,16 @@ from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, pm_table_name
 
 logger = logging.getLogger(__name__)
 
-# Keywords used to auto-detect the cell_name column (case-insensitive substring match)
-_CELL_KEYWORDS = ['cell', 'bts', 'wcel', 'lncel', 'nrcel', 'name', 'trans']
-# Keywords used to auto-detect the timestamp column
-_TS_KEYWORDS   = ['time', 'date', 'period', 'start', 'timestamp']
+# Keywords used to auto-detect the cell_name column (order matters — more specific first).
+# Technology-specific prefixes must come before generic 'cell' so Nokia KPI columns
+# like "Cell avail R" are not wrongly selected ahead of "NRCEL name" (5G) etc.
+# Two-word 'cell name' catches Huawei's "Cell Name" before bare 'cell' fires on
+# "Cell ID", "Cell FDD TDD Indication", "CellIndex", etc.
+_CELL_KEYWORDS = ['nrcel', 'lncel', 'wcel', 'bts', 'cell name', 'cell_name', 'cellname', 'cell', 'name', 'trans']
+# Keywords used to auto-detect the timestamp column.
+# 'period start' (multi-word) targets Nokia's "Period start time" before bare 'time'
+# fires on any other column containing 'time'.
+_TS_KEYWORDS   = ['period start', 'period', 'time', 'date', 'start', 'timestamp']
 
 
 # ---------------------------------------------------------------------------
