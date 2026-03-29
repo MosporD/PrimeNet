@@ -209,14 +209,24 @@ def get_network_stats():
         cursor.execute("SELECT COUNT(*) FROM sites")
         total_sites = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM cells")
+        # Only count cells that have real site coordinates — excludes PM-seeded placeholders
+        cursor.execute('''
+            SELECT COUNT(*) FROM cells c
+            JOIN sites s ON c.site_id = s.site_id
+            WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+        ''')
         total_cells = cursor.fetchone()[0]
 
+        # Per-technology counts (coordinates only).
         cursor.execute('''
-            SELECT technology, COUNT(*) FROM cells
-            GROUP BY technology ORDER BY technology
+            SELECT c.technology, COUNT(*) FROM cells c
+            JOIN sites s ON c.site_id = s.site_id
+            WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+            GROUP BY c.technology ORDER BY c.technology
         ''')
-        tech_counts = {row[0]: row[1] for row in cursor.fetchall()}
+        tech_counts = {}
+        for tech, cnt in cursor.fetchall():
+            tech_counts[tech] = cnt
 
         conn.close()
 
