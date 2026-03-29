@@ -283,7 +283,7 @@ def _process_cell_file(file_path, key):
             f'This column may not be the per-cell identifier — check your export.'
         )
 
-    conn = sqlite3.connect(METADATA_DB)
+    conn = sqlite3.connect(METADATA_DB, timeout=30)
     cursor = conn.cursor()
     sites_seen = set()
     skipped    = 0
@@ -417,7 +417,7 @@ def _process_site_file(file_path, key):
         logger.error(msg)
         return 0, 0, msg
 
-    conn     = sqlite3.connect(METADATA_DB)
+    conn     = sqlite3.connect(METADATA_DB, timeout=30)
     cursor   = conn.cursor()
     upserted = 0
     skipped  = 0
@@ -488,7 +488,7 @@ def _process_transmitter_file(file_path, key):
         logger.error(msg)
         return 0, 0, msg
 
-    conn     = sqlite3.connect(METADATA_DB)
+    conn     = sqlite3.connect(METADATA_DB, timeout=30)
     cursor   = conn.cursor()
     upserted = 0
     skipped  = 0
@@ -589,7 +589,7 @@ def process_metadata_file(file_path, tech, col_map):
 
     logger.info(f'[{tech}] Columns mapped — cell:{cell_col}, lat:{lat_c}, lon:{lon_c}, pci:{pci_c}')
 
-    conn     = sqlite3.connect(METADATA_DB)
+    conn     = sqlite3.connect(METADATA_DB, timeout=30)
     cursor   = conn.cursor()
     upserted = 0
     skipped  = 0
@@ -734,7 +734,7 @@ def seed_pm_cells_to_metadata(pm_db_path, vendor):
 
     try:
         pm_conn   = sqlite3.connect(pm_db_path)
-        meta_conn = sqlite3.connect(METADATA_DB)
+        meta_conn = sqlite3.connect(METADATA_DB, timeout=30)
 
         # Collect cell_name + technology from all per-tech tables
         pm_rows = []

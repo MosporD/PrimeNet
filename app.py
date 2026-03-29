@@ -75,13 +75,15 @@ try:
 except Exception as e:
     print(f"[WARNING] Database initialization: {e}")
 
-# Start SFTP sync scheduler
-from sync.scheduler import start_scheduler
-try:
-    start_scheduler()
-    print("[OK] Sync scheduler started")
-except Exception as e:
-    print(f"[WARNING] Sync scheduler could not start: {e}")
+# Start SFTP sync scheduler — only in the main process, not the Werkzeug reloader child
+import os
+if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
+    from sync.scheduler import start_scheduler
+    try:
+        start_scheduler()
+        print("[OK] Sync scheduler started")
+    except Exception as e:
+        print(f"[WARNING] Sync scheduler could not start: {e}")
 
 # ============================================================================
 # MAIN
