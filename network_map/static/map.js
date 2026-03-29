@@ -805,3 +805,21 @@ function clearMeasure() {
 window.onclick = e => {
     if (e.target === document.getElementById('kpi-modal')) closeKPIModal();
 };
+
+// ─── Export (Excel / KML) ────────────────────────────────────────────────────
+function exportCurrentView(format) {
+    const tech   = activeTech !== 'all' ? activeTech : '';
+    const vendor = document.getElementById('vendor-filter').value;
+    const search = document.getElementById('site-search').value.trim();
+
+    const params = new URLSearchParams();
+    if (tech)             params.set('tech',   tech);
+    if (vendor !== 'all') params.set('vendor', vendor);
+    if (search)           params.set('search', search);
+
+    const endpoint = format === 'kml'
+        ? `/api/map/export/kml?${params}`
+        : `/api/map/export/sites?${params}`;
+
+    window.location.href = endpoint;
+}

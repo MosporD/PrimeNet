@@ -79,7 +79,7 @@ def get_all_sites():
                        s.region, s.site_type, s.vendor, s.status
                 FROM sites s
                 JOIN cells c ON s.site_id = c.site_id
-                WHERE s.status = 'Active' AND c.technology = ? AND c.status = 'Active'
+                WHERE c.technology = ?
                   AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
                 ORDER BY s.site_name
             ''', (tech,))
@@ -87,7 +87,7 @@ def get_all_sites():
             cursor.execute('''
                 SELECT site_id, site_name, latitude, longitude, region, site_type, vendor, status
                 FROM sites
-                WHERE status = 'Active' AND latitude IS NOT NULL AND longitude IS NOT NULL
+                WHERE latitude IS NOT NULL AND longitude IS NOT NULL
                 ORDER BY site_name
             ''')
 
@@ -130,7 +130,7 @@ def get_site_details(site_id):
             SELECT cell_id, cell_name, technology, vendor, frequency_band,
                    azimuth, mechanical_tilt, electrical_tilt, pci, status
             FROM cells
-            WHERE site_id = ? AND status = 'Active'
+            WHERE site_id = ?
             ORDER BY technology, cell_name
         ''', (site_id,))
         site_data['cells'] = [dict(row) for row in cursor.fetchall()]
@@ -206,17 +206,20 @@ def get_network_stats():
         conn = sqlite3.connect(METADATA_DB)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT COUNT(*) FROM sites WHERE status = 'Active'")
+        cursor.execute("SELECT COUNT(*) FROM sites")
         total_sites = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM cells WHERE status = 'Active'")
+        cursor.execute("SELECT COUNT(*) FROM cells")
         total_cells = cursor.fetchone()[0]
 
+        # Per-technology cell counts — all cells regardless of coordinates.
         cursor.execute('''
             SELECT technology, COUNT(*) FROM cells
-            WHERE status = 'Active' GROUP BY technology ORDER BY technology
+            GROUP BY technology ORDER BY technology
         ''')
-        tech_counts = {row[0]: row[1] for row in cursor.fetchall()}
+        tech_counts = {}
+        for tech, cnt in cursor.fetchall():
+            tech_counts[tech] = cnt
 
         conn.close()
 
@@ -361,6 +364,222 @@ def export_cell_code():
             as_attachment=True,
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@network_map_bp.route('/api/map/export/sites', methods=['GET'])
+@login_required
+def export_sites_excel():
+    """Export all sites + cells for the current filter as an Excel file (two sheets)."""
+    from io import BytesIO
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+    from flask import send_file
+    from datetime import datetime as dt
+
+    tech   = request.args.get('tech',   '').strip()
+    vendor = request.args.get('vendor', '').strip()
+    search = request.args.get('search', '').strip()
+
+    try:
+        conn = sqlite3.connect(METADATA_DB)
+        conn.row_factory = sqlite3.Row
+
+        # ── Sites ─────────────────────────────────────────────────────────────
+        s_cond   = ['s.latitude IS NOT NULL', 's.longitude IS NOT NULL']
+        s_params = []
+        if vendor:
+            s_cond.append('s.vendor = ?');  s_params.append(vendor)
+        if search:
+            s_cond.append('(s.site_name LIKE ? OR CAST(s.site_id AS TEXT) LIKE ?)')
+            s_params += [f'%{search}%', f'%{search}%']
+
+        if tech and tech != 'all':
+            s_cond.append('c.technology = ?');  s_params.append(tech)
+            sites = conn.execute(f'''
+                SELECT DISTINCT s.site_id, s.site_name, s.latitude, s.longitude,
+                       s.region, s.site_type, s.vendor, s.status
+                FROM sites s JOIN cells c ON s.site_id = c.site_id
+                WHERE {" AND ".join(s_cond)} ORDER BY s.site_name
+            ''', s_params).fetchall()
+        else:
+            sites = conn.execute(f'''
+                SELECT site_id, site_name, latitude, longitude,
+                       region, site_type, vendor, status
+                FROM sites s WHERE {" AND ".join(s_cond)} ORDER BY site_name
+            ''', s_params).fetchall()
+
+        # ── Cells ─────────────────────────────────────────────────────────────
+        c_cond, c_params = [], []
+        if tech and tech != 'all':
+            c_cond.append('c.technology = ?');  c_params.append(tech)
+        if vendor:
+            c_cond.append('s.vendor = ?');      c_params.append(vendor)
+        if search:
+            c_cond.append('(s.site_name LIKE ? OR CAST(s.site_id AS TEXT) LIKE ?)')
+            c_params += [f'%{search}%', f'%{search}%']
+        c_where = ('WHERE ' + ' AND '.join(c_cond)) if c_cond else ''
+        cells = conn.execute(f'''
+            SELECT c.cell_name, c.site_id, s.site_name, c.technology,
+                   c.frequency_band, c.azimuth, c.mechanical_tilt, c.electrical_tilt,
+                   c.pci, c.status, c.vendor, s.latitude, s.longitude
+            FROM cells c JOIN sites s ON c.site_id = s.site_id
+            {c_where} ORDER BY s.site_name, c.technology, c.cell_name
+        ''', c_params).fetchall()
+        conn.close()
+
+        # ── Build workbook ────────────────────────────────────────────────────
+        HDR_FILL = PatternFill(start_color='1F4E79', end_color='1F4E79', fill_type='solid')
+        HDR_FONT = Font(bold=True, color='FFFFFF')
+        CTR      = Alignment(horizontal='center')
+
+        def _style_header(ws):
+            for cell in ws[1]:
+                cell.font = HDR_FONT; cell.fill = HDR_FILL; cell.alignment = CTR
+
+        def _autofit(ws):
+            for col in ws.columns:
+                w = max((len(str(c.value or '')) for c in col), default=10)
+                ws.column_dimensions[col[0].column_letter].width = min(w + 4, 45)
+
+        wb   = openpyxl.Workbook()
+        ws_s = wb.active
+        ws_s.title = 'Sites'
+        ws_s.append(['Site ID', 'Site Name', 'Latitude', 'Longitude',
+                     'Region', 'Site Type', 'Vendor', 'Status'])
+        _style_header(ws_s)
+        for r in sites:
+            ws_s.append([r['site_id'], r['site_name'], r['latitude'], r['longitude'],
+                         r['region'], r['site_type'], r['vendor'], r['status']])
+        _autofit(ws_s)
+
+        ws_c = wb.create_sheet('Cells')
+        ws_c.append(['Cell Name', 'Site ID', 'Site Name', 'Technology', 'Frequency Band',
+                     'Azimuth (°)', 'Mech. Tilt (°)', 'Elec. Tilt (°)',
+                     'PCI / SC / BCCH', 'Status', 'Vendor', 'Latitude', 'Longitude'])
+        _style_header(ws_c)
+        for r in cells:
+            ws_c.append([r['cell_name'], r['site_id'], r['site_name'], r['technology'],
+                         r['frequency_band'], r['azimuth'], r['mechanical_tilt'],
+                         r['electrical_tilt'], r['pci'], r['status'], r['vendor'],
+                         r['latitude'], r['longitude']])
+        _autofit(ws_c)
+
+        buf = BytesIO(); wb.save(buf); buf.seek(0)
+        tech_label = (tech or 'All').replace('-', '_')
+        fname = f'network_export_{tech_label}_{dt.now().strftime("%Y%m%d_%H%M")}.xlsx'
+        uid = (request.current_user.get('id')
+               if isinstance(request.current_user, dict) else request.current_user[0])
+        log_activity(uid, 'export',
+                     f'Excel export: tech={tech or "All"}, {len(sites)} sites, {len(cells)} cells')
+        return send_file(buf, as_attachment=True, download_name=fname,
+                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@network_map_bp.route('/api/map/export/kml', methods=['GET'])
+@login_required
+def export_sites_kml():
+    """Export sites as a KML file for Google Earth."""
+    from flask import Response
+    from datetime import datetime as dt
+    import xml.sax.saxutils as sx
+
+    tech   = request.args.get('tech',   '').strip()
+    vendor = request.args.get('vendor', '').strip()
+    search = request.args.get('search', '').strip()
+
+    try:
+        conn = sqlite3.connect(METADATA_DB)
+        conn.row_factory = sqlite3.Row
+
+        s_cond   = ['s.latitude IS NOT NULL', 's.longitude IS NOT NULL']
+        s_params = []
+        if vendor:
+            s_cond.append('s.vendor = ?');  s_params.append(vendor)
+        if search:
+            s_cond.append('(s.site_name LIKE ? OR CAST(s.site_id AS TEXT) LIKE ?)')
+            s_params += [f'%{search}%', f'%{search}%']
+        if tech and tech != 'all':
+            s_cond.append('c.technology = ?');  s_params.append(tech)
+            sites = conn.execute(f'''
+                SELECT DISTINCT s.site_id, s.site_name, s.latitude, s.longitude,
+                       s.region, s.vendor, s.status
+                FROM sites s JOIN cells c ON s.site_id = c.site_id
+                WHERE {" AND ".join(s_cond)} ORDER BY s.site_name
+            ''', s_params).fetchall()
+        else:
+            sites = conn.execute(f'''
+                SELECT site_id, site_name, latitude, longitude, region, vendor, status
+                FROM sites s WHERE {" AND ".join(s_cond)} ORDER BY site_name
+            ''', s_params).fetchall()
+
+        # Fetch cells for each site to populate the description balloon
+        cells_by_site = {}
+        if sites:
+            ids   = [r['site_id'] for r in sites]
+            ph    = ','.join('?' * len(ids))
+            c_cond, c_params = [f'c.site_id IN ({ph})'], list(ids)
+            if tech and tech != 'all':
+                c_cond.append('c.technology = ?');  c_params.append(tech)
+            for r in conn.execute(f'''
+                SELECT site_id, cell_name, technology, azimuth, frequency_band, pci, status
+                FROM cells c WHERE {" AND ".join(c_cond)} ORDER BY technology, cell_name
+            ''', c_params).fetchall():
+                cells_by_site.setdefault(r['site_id'], []).append(r)
+        conn.close()
+
+        # ── Build KML ─────────────────────────────────────────────────────────
+        tech_label = tech or 'All Technologies'
+        lines = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<kml xmlns="http://www.opengis.net/kml/2.2">',
+            '<Document>',
+            f'<name>{sx.escape(tech_label)} Network Export</name>',
+            f'<description>Exported {dt.now().strftime("%Y-%m-%d %H:%M")}</description>',
+        ]
+        for site in sites:
+            site_cells = cells_by_site.get(site['site_id'], [])
+            rows_html  = ''.join(
+                f'<tr><td>{sx.escape(c["cell_name"])}</td><td>{c["technology"]}</td>'
+                f'<td>{c["azimuth"] or "—"}°</td><td>{c["frequency_band"] or "—"}</td>'
+                f'<td>{c["status"] or "—"}</td></tr>'
+                for c in site_cells
+            )
+            table = (
+                '<table border="1" cellpadding="3">'
+                '<tr><th>Cell</th><th>Tech</th><th>Azimuth</th><th>Band</th><th>Status</th></tr>'
+                f'{rows_html}</table>'
+            ) if rows_html else ''
+            desc = (
+                f'<b>Site ID:</b> {sx.escape(str(site["site_id"]))}<br/>'
+                f'<b>Vendor:</b> {sx.escape(site["vendor"] or "")}<br/>'
+                f'<b>Region:</b> {sx.escape(site["region"] or "")}<br/>'
+                f'<b>Status:</b> {sx.escape(site["status"] or "")}<br/><br/>{table}'
+            )
+            lines += [
+                '<Placemark>',
+                f'<name>{sx.escape(site["site_name"])}</name>',
+                f'<description><![CDATA[{desc}]]></description>',
+                '<Point>',
+                f'<coordinates>{site["longitude"]},{site["latitude"]},0</coordinates>',
+                '</Point>',
+                '</Placemark>',
+            ]
+        lines += ['</Document>', '</kml>']
+
+        tech_fn = (tech or 'All').replace('-', '_')
+        fname   = f'network_export_{tech_fn}_{dt.now().strftime("%Y%m%d_%H%M")}.kml'
+        uid = (request.current_user.get('id')
+               if isinstance(request.current_user, dict) else request.current_user[0])
+        log_activity(uid, 'export', f'KML export: tech={tech or "All"}, {len(sites)} sites')
+        return Response('\n'.join(lines),
+                        mimetype='application/vnd.google-earth.kml+xml',
+                        headers={'Content-Disposition': f'attachment; filename="{fname}"'})
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
