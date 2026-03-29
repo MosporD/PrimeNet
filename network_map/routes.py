@@ -79,7 +79,7 @@ def get_all_sites():
                        s.region, s.site_type, s.vendor, s.status
                 FROM sites s
                 JOIN cells c ON s.site_id = c.site_id
-                WHERE s.status = 'Active' AND c.technology = ? AND c.status = 'Active'
+                WHERE c.technology = ?
                   AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
                 ORDER BY s.site_name
             ''', (tech,))
@@ -87,7 +87,7 @@ def get_all_sites():
             cursor.execute('''
                 SELECT site_id, site_name, latitude, longitude, region, site_type, vendor, status
                 FROM sites
-                WHERE status = 'Active' AND latitude IS NOT NULL AND longitude IS NOT NULL
+                WHERE latitude IS NOT NULL AND longitude IS NOT NULL
                 ORDER BY site_name
             ''')
 
@@ -130,7 +130,7 @@ def get_site_details(site_id):
             SELECT cell_id, cell_name, technology, vendor, frequency_band,
                    azimuth, mechanical_tilt, electrical_tilt, pci, status
             FROM cells
-            WHERE site_id = ? AND status = 'Active'
+            WHERE site_id = ?
             ORDER BY technology, cell_name
         ''', (site_id,))
         site_data['cells'] = [dict(row) for row in cursor.fetchall()]
@@ -206,15 +206,15 @@ def get_network_stats():
         conn = sqlite3.connect(METADATA_DB)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT COUNT(*) FROM sites WHERE status = 'Active'")
+        cursor.execute("SELECT COUNT(*) FROM sites")
         total_sites = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM cells WHERE status = 'Active'")
+        cursor.execute("SELECT COUNT(*) FROM cells")
         total_cells = cursor.fetchone()[0]
 
         cursor.execute('''
             SELECT technology, COUNT(*) FROM cells
-            WHERE status = 'Active' GROUP BY technology ORDER BY technology
+            GROUP BY technology ORDER BY technology
         ''')
         tech_counts = {row[0]: row[1] for row in cursor.fetchall()}
 
