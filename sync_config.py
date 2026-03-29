@@ -390,7 +390,10 @@ METADATA_CSV_COLUMN_MAPS = {
         'electrical_tilt':  'etilt',
         'mechanical_tilt':  'mtilt',
         'frequency_band':   'frequency_band',
-        'pci':              'bcc',       # BCC is the closest 2G analogue
+        'pci':              'bcc',          # BCC is the closest 2G analogue
+        # Huawei 2G exports 'active_state' (Activated/Deactivated)
+        # Nokia  2G exports 'admin_state'  (Unlocked/Locked) — handled as fallback in code
+        'status':           'active_state',
     },
     '3G': {
         'site_id':          'nodeb_id',
@@ -404,7 +407,8 @@ METADATA_CSV_COLUMN_MAPS = {
         'electrical_tilt':  'etilt',
         'mechanical_tilt':  'mtilt',
         'frequency_band':   'dl_uarfcn',
-        'pci':              'psc',       # Primary Scrambling Code
+        'pci':              'psc',          # Primary Scrambling Code
+        'status':           'active_state',
     },
     '4G-FDD': {
         'site_id':          'enb_id_actual',
@@ -419,6 +423,7 @@ METADATA_CSV_COLUMN_MAPS = {
         'mechanical_tilt':  'mtilt',
         'frequency_band':   'band',
         'pci':              'pci',
+        'status':           'active_state',
     },
     '4G-TDD': {
         'site_id':          'enb_id_actual',
@@ -433,6 +438,7 @@ METADATA_CSV_COLUMN_MAPS = {
         'mechanical_tilt':  'mtilt',
         'frequency_band':   'band',
         'pci':              'pci',
+        'status':           'active_state',
     },
     '5G': {
         'site_id':          'gnb_id_actual',
@@ -447,6 +453,7 @@ METADATA_CSV_COLUMN_MAPS = {
         'mechanical_tilt':  'mtilt',
         'frequency_band':   'bw',
         'pci':              'pci',
+        'status':           'active_state',
     },
 }
 

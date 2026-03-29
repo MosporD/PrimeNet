@@ -117,6 +117,27 @@ def _safe_str(val):
     return None if s in ('', 'nan', 'None') else s
 
 
+# Canonical values used across all vendors / technologies:
+#   Huawei  → Activated / Deactivated
+#   Nokia   → Unlocked  / Locked
+#   4G-TDD  → CELL_ACTIVE / CELL_INACTIVE
+_ACTIVE_VALUES   = {'activated', 'unlocked', 'cell_active',
+                    'active', 'enabled', 'true', '1', 'yes'}
+_INACTIVE_VALUES = {'deactivated', 'locked', 'cell_inactive',
+                    'inactive', 'disabled', 'false', '0', 'no'}
+
+def _normalize_status(raw):
+    """Map vendor-specific active-state values to canonical 'Active'/'Inactive'."""
+    if not raw:
+        return 'Active'
+    val = raw.strip().lower()
+    if val in _ACTIVE_VALUES:
+        return 'Active'
+    if val in _INACTIVE_VALUES:
+        return 'Inactive'
+    return raw   # preserve any unknown value as-is
+
+
 # ---------------------------------------------------------------------------
 # Auto-detect: does this file contain cell-level data?
 # ---------------------------------------------------------------------------
@@ -205,6 +226,8 @@ def _process_cell_file(file_path, key):
     pci_col       = _find_col(cols, ['psc', 'scrambling_code', 'scrambling code',
                                       'primary scrambling code', 'pci',
                                       'bcc', 'bcch'])
+    # Cell active state — Huawei: 'active_state', Nokia 2G: 'admin_state'
+    status_col    = _find_col(cols, ['active_state', 'admin_state', 'cell_status', 'status', 'state'])
 
     if not cell_name_col:
         msg = f'Cell file [{key}]: cannot detect cell name column. Columns: {cols}'
@@ -285,12 +308,14 @@ def _process_cell_file(file_path, key):
         # Use the actual band/channel value from the CSV; fall back to technology label
         freq_val  = _safe_str(row.get(freq_col)) if freq_col else None
         freq_band = freq_val or technology
+        # Use active_state from source if available, otherwise default to 'Active'
+        status = _normalize_status(_safe_str(row.get(status_col)) if status_col else None)
 
         cursor.execute('''
             INSERT INTO cells
                 (cell_name, site_id, technology, frequency_band,
                  azimuth, mechanical_tilt, electrical_tilt, vendor, pci, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(cell_name) DO UPDATE SET
                 site_id         = COALESCE(excluded.site_id,         cells.site_id),
                 technology      = COALESCE(excluded.technology,      cells.technology),
@@ -300,9 +325,9 @@ def _process_cell_file(file_path, key):
                 electrical_tilt = COALESCE(excluded.electrical_tilt, cells.electrical_tilt),
                 vendor          = COALESCE(excluded.vendor,          cells.vendor),
                 pci             = COALESCE(excluded.pci,             cells.pci),
-                status          = 'Active',
+                status          = excluded.status,
                 updated_at      = CURRENT_TIMESTAMP
-        ''', (cell_name, site_id, technology, freq_band, azimuth, mtilt, etilt, vendor, pci_int))
+        ''', (cell_name, site_id, technology, freq_band, azimuth, mtilt, etilt, vendor, pci_int, status))
 
     after_count = conn.execute(
         "SELECT COUNT(*) FROM cells WHERE technology=?", (technology,)
@@ -416,8 +441,9 @@ def _process_transmitter_file(file_path, key):
     etilt_col = _find_col(cols, ['elect_tilt', 'electrical_tilt', 'etilt', 'electricaltilt'])
     mtilt_col = _find_col(cols, ['mechanical downtilt', 'mechanical_tilt',
                                   'mtilt', 'mechanicaltilt'])
-    pci_col   = _find_col(cols, ['psc', 'scrambling_code', 'scrambling code',
-                                  'primary scrambling code', 'pci', 'bcc', 'bcch'])
+    pci_col    = _find_col(cols, ['psc', 'scrambling_code', 'scrambling code',
+                                   'primary scrambling code', 'pci', 'bcc', 'bcch'])
+    status_col = _find_col(cols, ['active_state', 'admin_state', 'cell_status', 'status', 'state'])
 
     if not cell_col:
         msg = f'Transmitter file [{key}]: cannot detect cell_name column. Columns: {cols}'
@@ -437,13 +463,14 @@ def _process_transmitter_file(file_path, key):
 
         site_name = _safe_str(row.get(site_col)) if site_col else None
         site_id   = _extract_site_id(site_name) if site_name else _extract_site_id(cell_name)
-        lat       = _safe_float(row.get(lat_col))   if lat_col   else None
-        lon       = _safe_float(row.get(lon_col))   if lon_col   else None
-        azimuth   = _safe_float(row.get(az_col))    if az_col    else None
-        etilt     = _safe_float(row.get(etilt_col)) if etilt_col else None
-        mtilt     = _safe_float(row.get(mtilt_col)) if mtilt_col else None
-        pci_raw   = _safe_float(row.get(pci_col))   if pci_col   else None
+        lat       = _safe_float(row.get(lat_col))   if lat_col    else None
+        lon       = _safe_float(row.get(lon_col))   if lon_col    else None
+        azimuth   = _safe_float(row.get(az_col))    if az_col     else None
+        etilt     = _safe_float(row.get(etilt_col)) if etilt_col  else None
+        mtilt     = _safe_float(row.get(mtilt_col)) if mtilt_col  else None
+        pci_raw   = _safe_float(row.get(pci_col))   if pci_col    else None
         pci_int   = int(pci_raw) if pci_raw is not None else None
+        status = _normalize_status(_safe_str(row.get(status_col)) if status_col else None)
 
         if site_id:
             cursor.execute('''
@@ -455,7 +482,7 @@ def _process_transmitter_file(file_path, key):
             INSERT INTO cells
                 (cell_name, site_id, technology, frequency_band,
                  azimuth, mechanical_tilt, electrical_tilt, pci, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Active')
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(cell_name) DO UPDATE SET
                 site_id         = COALESCE(excluded.site_id,         cells.site_id),
                 technology      = COALESCE(excluded.technology,      cells.technology),
@@ -463,9 +490,9 @@ def _process_transmitter_file(file_path, key):
                 mechanical_tilt = COALESCE(excluded.mechanical_tilt, cells.mechanical_tilt),
                 electrical_tilt = COALESCE(excluded.electrical_tilt, cells.electrical_tilt),
                 pci             = COALESCE(excluded.pci,             cells.pci),
-                status          = 'Active',
+                status          = excluded.status,
                 updated_at      = CURRENT_TIMESTAMP
-        ''', (cell_name, site_id, technology, technology, azimuth, mtilt, etilt, pci_int))
+        ''', (cell_name, site_id, technology, technology, azimuth, mtilt, etilt, pci_int, status))
         upserted += 1
 
     conn.commit()
@@ -510,6 +537,10 @@ def process_metadata_file(file_path, tech, col_map):
     mtilt_c   = _csv('mechanical_tilt')
     vendor_c  = _csv('vendor')
     pci_c     = _csv('pci')
+    status_c  = _csv('status')
+    # Nokia 2G uses 'admin_state' instead of 'active_state'
+    if not status_c and 'admin_state' in df.columns:
+        status_c = 'admin_state'
 
     if not cell_col:
         return 0, 0, f'[{tech}] cell_name column "{col_map.get("cell_name")}" not found in file. Columns: {list(df.columns)}'
@@ -540,6 +571,7 @@ def process_metadata_file(file_path, tech, col_map):
         mtilt     = _safe_float(row.get(mtilt_c))  if mtilt_c   else None
         pci_raw   = _safe_float(row.get(pci_c))    if pci_c     else None
         pci_int   = int(pci_raw) if pci_raw is not None else None
+        status = _normalize_status(_safe_str(row.get(status_c)) if status_c else None)
 
         if site_id and site_id not in sites_seen:
             cursor.execute('''
@@ -560,7 +592,7 @@ def process_metadata_file(file_path, tech, col_map):
             INSERT INTO cells
                 (cell_name, site_id, technology, frequency_band,
                  azimuth, mechanical_tilt, electrical_tilt, vendor, pci, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Active')
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(cell_name) DO UPDATE SET
                 site_id         = COALESCE(excluded.site_id,         cells.site_id),
                 technology      = COALESCE(excluded.technology,      cells.technology),
@@ -570,9 +602,9 @@ def process_metadata_file(file_path, tech, col_map):
                 electrical_tilt = COALESCE(excluded.electrical_tilt, cells.electrical_tilt),
                 vendor          = COALESCE(excluded.vendor,          cells.vendor),
                 pci             = COALESCE(excluded.pci,             cells.pci),
-                status          = 'Active',
+                status          = excluded.status,
                 updated_at      = CURRENT_TIMESTAMP
-        ''', (cell_name, site_id, tech, tech, azimuth, mtilt, etilt, vendor, pci_int))
+        ''', (cell_name, site_id, tech, tech, azimuth, mtilt, etilt, vendor, pci_int, status))
         upserted += 1
 
     conn.commit()
