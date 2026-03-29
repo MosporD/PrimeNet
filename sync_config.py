@@ -391,6 +391,8 @@ METADATA_CSV_COLUMN_MAPS = {
         'mechanical_tilt':  'mtilt',
         'frequency_band':   'frequency_band',
         'pci':              'bcc',          # BCC is the closest 2G analogue
+        # Huawei 2G exports 'active_state' (Activated/Deactivated)
+        # Nokia  2G exports 'admin_state'  (Unlocked/Locked) — handled as fallback in code
         'status':           'active_state',
     },
     '3G': {

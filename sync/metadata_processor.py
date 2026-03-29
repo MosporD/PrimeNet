@@ -117,6 +117,27 @@ def _safe_str(val):
     return None if s in ('', 'nan', 'None') else s
 
 
+# Canonical values used across all vendors / technologies:
+#   Huawei  → Activated / Deactivated
+#   Nokia   → Unlocked  / Locked
+#   4G-TDD  → CELL_ACTIVE / CELL_INACTIVE
+_ACTIVE_VALUES   = {'activated', 'unlocked', 'cell_active',
+                    'active', 'enabled', 'true', '1', 'yes'}
+_INACTIVE_VALUES = {'deactivated', 'locked', 'cell_inactive',
+                    'inactive', 'disabled', 'false', '0', 'no'}
+
+def _normalize_status(raw):
+    """Map vendor-specific active-state values to canonical 'Active'/'Inactive'."""
+    if not raw:
+        return 'Active'
+    val = raw.strip().lower()
+    if val in _ACTIVE_VALUES:
+        return 'Active'
+    if val in _INACTIVE_VALUES:
+        return 'Inactive'
+    return raw   # preserve any unknown value as-is
+
+
 # ---------------------------------------------------------------------------
 # Auto-detect: does this file contain cell-level data?
 # ---------------------------------------------------------------------------
@@ -205,8 +226,8 @@ def _process_cell_file(file_path, key):
     pci_col       = _find_col(cols, ['psc', 'scrambling_code', 'scrambling code',
                                       'primary scrambling code', 'pci',
                                       'bcc', 'bcch'])
-    # Cell active state — Atoll exports this as 'active_state'
-    status_col    = _find_col(cols, ['active_state', 'cell_status', 'status', 'state'])
+    # Cell active state — Huawei: 'active_state', Nokia 2G: 'admin_state'
+    status_col    = _find_col(cols, ['active_state', 'admin_state', 'cell_status', 'status', 'state'])
 
     if not cell_name_col:
         msg = f'Cell file [{key}]: cannot detect cell name column. Columns: {cols}'
@@ -288,8 +309,7 @@ def _process_cell_file(file_path, key):
         freq_val  = _safe_str(row.get(freq_col)) if freq_col else None
         freq_band = freq_val or technology
         # Use active_state from source if available, otherwise default to 'Active'
-        status    = _safe_str(row.get(status_col)) if status_col else None
-        status    = status or 'Active'
+        status = _normalize_status(_safe_str(row.get(status_col)) if status_col else None)
 
         cursor.execute('''
             INSERT INTO cells
@@ -423,7 +443,7 @@ def _process_transmitter_file(file_path, key):
                                   'mtilt', 'mechanicaltilt'])
     pci_col    = _find_col(cols, ['psc', 'scrambling_code', 'scrambling code',
                                    'primary scrambling code', 'pci', 'bcc', 'bcch'])
-    status_col = _find_col(cols, ['active_state', 'cell_status', 'status', 'state'])
+    status_col = _find_col(cols, ['active_state', 'admin_state', 'cell_status', 'status', 'state'])
 
     if not cell_col:
         msg = f'Transmitter file [{key}]: cannot detect cell_name column. Columns: {cols}'
@@ -450,8 +470,7 @@ def _process_transmitter_file(file_path, key):
         mtilt     = _safe_float(row.get(mtilt_col)) if mtilt_col  else None
         pci_raw   = _safe_float(row.get(pci_col))   if pci_col    else None
         pci_int   = int(pci_raw) if pci_raw is not None else None
-        status    = _safe_str(row.get(status_col))  if status_col else None
-        status    = status or 'Active'
+        status = _normalize_status(_safe_str(row.get(status_col)) if status_col else None)
 
         if site_id:
             cursor.execute('''
@@ -519,6 +538,9 @@ def process_metadata_file(file_path, tech, col_map):
     vendor_c  = _csv('vendor')
     pci_c     = _csv('pci')
     status_c  = _csv('status')
+    # Nokia 2G uses 'admin_state' instead of 'active_state'
+    if not status_c and 'admin_state' in df.columns:
+        status_c = 'admin_state'
 
     if not cell_col:
         return 0, 0, f'[{tech}] cell_name column "{col_map.get("cell_name")}" not found in file. Columns: {list(df.columns)}'
@@ -549,8 +571,7 @@ def process_metadata_file(file_path, tech, col_map):
         mtilt     = _safe_float(row.get(mtilt_c))  if mtilt_c   else None
         pci_raw   = _safe_float(row.get(pci_c))    if pci_c     else None
         pci_int   = int(pci_raw) if pci_raw is not None else None
-        status    = _safe_str(row.get(status_c))   if status_c  else None
-        status    = status or 'Active'
+        status = _normalize_status(_safe_str(row.get(status_c)) if status_c else None)
 
         if site_id and site_id not in sites_seen:
             cursor.execute('''
