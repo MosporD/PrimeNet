@@ -138,6 +138,22 @@ def _normalize_status(raw):
     return raw   # preserve any unknown value as-is
 
 
+def _sanitize_col_name(name):
+    """Convert a CSV column name to a safe SQLite identifier."""
+    s = re.sub(r'[^\w]', '_', str(name).strip().lower())
+    s = re.sub(r'_+', '_', s).strip('_')
+    return s or 'col'
+
+
+def _ensure_cells_columns(cursor, col_names):
+    """Add any missing TEXT columns to the cells table."""
+    existing = {row[1].lower()
+                for row in cursor.execute('PRAGMA table_info(cells)').fetchall()}
+    for col in col_names:
+        if col.lower() not in existing:
+            cursor.execute(f'ALTER TABLE cells ADD COLUMN "{col}" TEXT')
+
+
 # LTE TDD EARFCN range (bands 33–46: 36200–45589).
 # Anything outside this range is treated as FDD.
 _LTE_TDD_EARFCN_MIN = 36200
@@ -288,6 +304,16 @@ def _process_cell_file(file_path, key):
     sites_seen = set()
     skipped    = 0
 
+    # ── Collect extra CSV columns (not already mapped to a known DB field) ──
+    _handled = {c for c in [cell_name_col, site_id_col, site_name_col,
+                             lat_col, lon_col, az_col, etilt_col, mtilt_col,
+                             vendor_col, freq_col, pci_col, status_col, duplex_col]
+                if c is not None}
+    extra_cols = [(csv_c, _sanitize_col_name(csv_c))
+                  for csv_c in df.columns if csv_c not in _handled]
+    if extra_cols:
+        _ensure_cells_columns(cursor, [db_c for _, db_c in extra_cols])
+
     before_count = conn.execute(
         "SELECT COUNT(*) FROM cells WHERE technology=?", (_infer_tech(key),)
     ).fetchone()[0]
@@ -349,23 +375,34 @@ def _process_cell_file(file_path, key):
         # Use active_state from source if available, otherwise default to 'Active'
         status = _normalize_status(_safe_str(row.get(status_col)) if status_col else None)
 
-        cursor.execute('''
-            INSERT INTO cells
-                (cell_name, site_id, technology, frequency_band,
-                 azimuth, mechanical_tilt, electrical_tilt, vendor, pci, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(cell_name) DO UPDATE SET
-                site_id         = COALESCE(excluded.site_id,         cells.site_id),
-                technology      = COALESCE(excluded.technology,      cells.technology),
-                frequency_band  = COALESCE(excluded.frequency_band,  cells.frequency_band),
-                azimuth         = COALESCE(excluded.azimuth,         cells.azimuth),
-                mechanical_tilt = COALESCE(excluded.mechanical_tilt, cells.mechanical_tilt),
-                electrical_tilt = COALESCE(excluded.electrical_tilt, cells.electrical_tilt),
-                vendor          = COALESCE(excluded.vendor,          cells.vendor),
-                pci             = COALESCE(excluded.pci,             cells.pci),
-                status          = excluded.status,
-                updated_at      = CURRENT_TIMESTAMP
-        ''', (cell_name, site_id, cell_tech, freq_band, azimuth, mtilt, etilt, vendor, pci_int, status))
+        _fixed_cols = ['cell_name', 'site_id', 'technology', 'frequency_band',
+                       'azimuth', 'mechanical_tilt', 'electrical_tilt',
+                       'vendor', 'pci', 'status']
+        _fixed_vals = [cell_name, site_id, cell_tech, freq_band,
+                       azimuth, mtilt, etilt, vendor, pci_int, status]
+        _extra_vals = [_safe_str(row.get(csv_c)) for csv_c, _ in extra_cols]
+        _all_cols   = _fixed_cols + [db_c for _, db_c in extra_cols]
+        _all_vals   = _fixed_vals + _extra_vals
+        _col_sql    = ', '.join(f'"{c}"' for c in _all_cols)
+        _ph_sql     = ', '.join(['?'] * len(_all_cols))
+        _update_parts = [
+            'site_id         = COALESCE(excluded.site_id,         cells.site_id)',
+            'technology      = COALESCE(excluded.technology,      cells.technology)',
+            'frequency_band  = COALESCE(excluded.frequency_band,  cells.frequency_band)',
+            'azimuth         = COALESCE(excluded.azimuth,         cells.azimuth)',
+            'mechanical_tilt = COALESCE(excluded.mechanical_tilt, cells.mechanical_tilt)',
+            'electrical_tilt = COALESCE(excluded.electrical_tilt, cells.electrical_tilt)',
+            'vendor          = COALESCE(excluded.vendor,          cells.vendor)',
+            'pci             = COALESCE(excluded.pci,             cells.pci)',
+            'status          = excluded.status',
+            'updated_at      = CURRENT_TIMESTAMP',
+        ] + [f'"{db_c}" = excluded."{db_c}"' for _, db_c in extra_cols]
+        cursor.execute(
+            f'INSERT INTO cells ({_col_sql}) VALUES ({_ph_sql})\n'
+            f'ON CONFLICT(cell_name) DO UPDATE SET\n    '
+            + ',\n    '.join(_update_parts),
+            _all_vals,
+        )
 
     after_count = conn.execute(
         "SELECT COUNT(*) FROM cells WHERE technology=?", (technology,)
