@@ -125,8 +125,71 @@ def _ensure_sync_log():
     logger.info('sync_log ready.')
 
 
+def _create_per_tech_tables():
+    """
+    Create five per-technology staging tables in metadata.db.
+    Each table stores the exact CSV column headers from the Atoll export
+    as TEXT columns, plus synthetic `technology` and `updated_at` columns.
+    `cell_name` is the natural primary key used for ON CONFLICT upserts.
+    """
+    # Columns are exactly the CSV header names from the Atoll exports
+    # (verified against 2026-02-15 snapshot).
+    _PER_TECH_SCHEMAS = {
+        'cells_2g': [
+            'cell_name', 'site_id', 'site_name', 'vendor',
+            'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
+            'frequency_band', 'bcc', 'active_state',
+        ],
+        'cells_3g': [
+            'cell_name', 'nodeb_id', 'nodeb_name', 'vendor',
+            'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
+            'dl_uarfcn', 'psc', 'active_state',
+        ],
+        'cells_4g_fdd': [
+            'cell_name', 'enb_id_actual', 'enb_name', 'vendor',
+            'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
+            'band', 'pci', 'active_state',
+        ],
+        'cells_4g_tdd': [
+            'cell_name', 'enb_id_actual', 'enb_name', 'vendor',
+            'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
+            'band', 'pci', 'active_state',
+        ],
+        'cells_5g': [
+            'cell_name', 'gnb_id_actual', 'gnb_name', 'vendor',
+            'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
+            'bw', 'pci', 'active_state',
+        ],
+    }
+
+    conn   = sqlite3.connect(METADATA_DB)
+    cursor = conn.cursor()
+
+    for table, csv_cols in _PER_TECH_SCHEMAS.items():
+        # cell_name is PRIMARY KEY; every other CSV column is TEXT nullable;
+        # technology and updated_at are synthetic (not in the raw CSV).
+        col_defs = ['cell_name TEXT PRIMARY KEY']
+        col_defs += [f'"{c}" TEXT' for c in csv_cols if c != 'cell_name']
+        col_defs += [
+            'technology TEXT',
+            'updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+        ]
+        cursor.execute(
+            f'CREATE TABLE IF NOT EXISTS "{table}" ({", ".join(col_defs)})'
+        )
+        cursor.execute(
+            f'CREATE INDEX IF NOT EXISTS "idx_{table}_technology" '
+            f'ON "{table}" (technology)'
+        )
+
+    conn.commit()
+    conn.close()
+    logger.info('Per-tech tables (cells_2g/3g/4g_fdd/4g_tdd/5g) ready.')
+
+
 def run_migrations():
     _create_metadata_db()
+    _create_per_tech_tables()
     _create_pm_db(NOKIA_PM_DB)
     _create_pm_db(HUAWEI_PM_DB)
     _ensure_sync_log()
