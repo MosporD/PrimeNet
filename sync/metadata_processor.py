@@ -175,6 +175,9 @@ def import_csv_to_cells(file_path, table_name, technology):
         logger.error(f'[{table_name}] Cannot read {file_path}: {e}')
         return 0, 0, str(e)
 
+    # Normalise column headers: lowercase + strip so 'Lat'/'LAT' matches 'lat'.
+    df.columns = df.columns.str.lower().str.strip()
+
     # ── Normalise string values ─────────────────────────────────────────────
     # fillna('') so str.strip() never sees float NaN, then blank/nan → None.
     df = df.fillna('')
@@ -266,8 +269,11 @@ def _populate_legacy_tables(conn, table_name, technology):
     lmap               = _LEGACY_MAP[table_name]
 
     # ── Sites ───────────────────────────────────────────────────────────────
+    # Use ON CONFLICT DO UPDATE with COALESCE so a later tech CSV that has
+    # NULL lat/long does not wipe coordinates already set by an earlier one
+    # (e.g. 4G-TDD import must not erase 3G coordinates for co-located sites).
     conn.execute(f'''
-        INSERT OR REPLACE INTO sites
+        INSERT INTO sites
             (site_id, site_name, latitude, longitude, region, vendor, status, updated_at)
         SELECT
             NULLIF(TRIM("{sid_col}"),   '') ,
@@ -284,6 +290,14 @@ def _populate_legacy_tables(conn, table_name, technology):
         FROM   "{table_name}"
         WHERE  NULLIF(TRIM("{sid_col}"), '') IS NOT NULL
         GROUP  BY NULLIF(TRIM("{sid_col}"), '')
+        ON CONFLICT(site_id) DO UPDATE SET
+            site_name  = COALESCE(excluded.site_name,  sites.site_name),
+            latitude   = COALESCE(excluded.latitude,   sites.latitude),
+            longitude  = COALESCE(excluded.longitude,  sites.longitude),
+            region     = COALESCE(excluded.region,     sites.region),
+            vendor     = COALESCE(excluded.vendor,     sites.vendor),
+            status     = 'Active',
+            updated_at = CURRENT_TIMESTAMP
     ''')
 
     # ── Cells ────────────────────────────────────────────────────────────────
