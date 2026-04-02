@@ -48,7 +48,7 @@ let map              = null;
 let sitesData        = [];
 let siteMarkers      = [];
 let sectorLayers     = [];
-let activeTech       = '3G';
+let activeTech       = 'all';
 let highlightMarkers = [];
 let highlightLayers  = [];
 let codeSearchTimer  = null;
@@ -185,7 +185,10 @@ async function loadNetworkSites() {
             : '/api/map/sites';
         const res  = await fetch(url);
         const data = await res.json();
-        if (!data.success) return;
+        if (!data.success) {
+            console.error('Sites API error:', data.error || data);
+            return;
+        }
 
         sitesData = enrichSites(data.sites);
 
