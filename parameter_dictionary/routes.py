@@ -15,7 +15,7 @@ try:
         get_mo_description, get_mo_category
     )
     MO_DESCRIPTIONS_AVAILABLE = True
-except:
+except ImportError:
     MO_DESCRIPTIONS = {}
     MO_CATEGORIES = {}
     PARAM_DESCRIPTIONS = {}

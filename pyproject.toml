@@ -1,0 +1,24 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+exclude = [
+    ".venv",
+    "venv",
+    "sync_downloads",
+    "databases",
+    "old_files",
+    "config_history",
+    "generated_reports",
+]
+
+[tool.ruff.lint]
+# Start conservative; expand categories as noise is addressed.
+select = ["E4", "E7", "E9", "F"]
+# One-line compound statements are used heavily in SFTP helpers; optional to tighten later.
+ignore = ["E701", "E702"]
+
+[tool.ruff.lint.per-file-ignores]
+# Large vendor/MO lookup table: duplicate keys are intentional last-wins merges from source dumps.
+"mo_descriptions.py" = ["F601"]
+# Flask entrypoint loads dotenv before blueprints that read env at import time.
+"app.py" = ["E402"]

@@ -3,15 +3,15 @@ Import Local Files → Database
 ==============================
 Reads local CSV / XLSX snapshots and imports them into the three databases:
 
-  CSV  files         →  metadata.db  (sites + cells)
-  Nokia XLSX files   →  nokia_pm.db  (2G_Hourly / 3G_Hourly / 4G_Hourly / 5G_Hourly)
-  Huawei XLSX file   →  huawei_pm.db (2G_Hourly / 3G_Hourly / 4G_Hourly)
+  CSV  files         →  metadata.db         (sites + cells)
+  Nokia XLSX files   →  nokia_pm_cells.db  (2G_Hourly / 3G_Hourly / 4G_Hourly / 5G_Hourly)
+  Huawei ZIP / XLSX / CSV  →  huawei_pm_cells.db (same 2G_Hourly … 5G_Hourly tables as Nokia PM)
 
 File discovery — the script searches these directories in order:
   1. Project root
   2. sync_downloads/metadata/       (Metadata CSVs)
   3. sync_downloads/pm_nokia/       (Nokia PM XLSXs)
-  4. sync_downloads/pm_huawei/      (Huawei PM XLSX)
+  4. sync_downloads/pm_huawei/      (Huawei PM XLSX or CSV — same rules as Nokia per-tech files)
 
 No hardcoded filenames — it matches by pattern so newly downloaded
 files (different date suffixes) are picked up automatically.
@@ -27,7 +27,6 @@ import sys
 import glob
 import logging
 import re
-import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -36,8 +35,7 @@ from sync.metadata_processor import process_metadata_file, seed_pm_cells_to_meta
 from sync.pm_processor import process_nokia_pm_file, process_huawei_pm_file, NOKIA_PM_DB, HUAWEI_PM_DB
 from sync_config import (
     METADATA_CSV_COLUMN_MAPS,
-    NOKIA_PM_COLUMN_MAPS, HUAWEI_PM_COLUMN_MAPS,
-    METADATA_DB, PROJECT_ROOT
+    PROJECT_ROOT
 )
 
 logging.basicConfig(
@@ -239,34 +237,70 @@ def import_nokia_pm():
 
 def import_huawei_pm():
     """
-    Find Huawei PM Excel file (single file with sheets 2G/3G/4G) and import.
-    Tries 'Performance.xlsx' first, then any *.xlsx in the Huawei search dirs.
+    Huawei PM: prefer one multi-sheet workbook; otherwise per-tech files like Nokia (CSV/XLSX/XLS).
     """
-    logger.info('─── Importing Huawei PM Excel file ───')
+    logger.info('─── Importing Huawei PM files ───')
 
-    # Try named file first, then any xlsx
+    def _accumulate(summary, total_ref):
+        t = total_ref[0]
+        for sheet, result in summary.items():
+            st = result.get('status')
+            if st == 'ok':
+                logger.info(
+                    f'[Huawei/{sheet}] {result["inserted"]} inserted, {result["skipped"]} skipped.'
+                )
+                t += result.get('inserted', 0)
+            elif st == 'skipped':
+                logger.warning(f'[Huawei/{sheet}] skipped: {result.get("reason")}')
+            else:
+                logger.error(f'[Huawei/{sheet}] {result.get("error")}')
+        total_ref[0] = t
+
+    total_ref = [0]
+
     path = _find_latest(HUAWEI_SEARCH_DIRS, 'Performance.xlsx')
     if not path:
         path = _find_latest(HUAWEI_SEARCH_DIRS, '*.xlsx')
 
-    if not path:
+    if path:
+        logger.info(f'[Huawei] Importing {os.path.basename(path)} …')
+        _accumulate(process_huawei_pm_file(path), total_ref)
+
+    # Raw per-technology exports (same discovery idea as Nokia)
+    if total_ref[0] == 0:
+        HUAWEI_TECHS = ['2G', '3G', '4G', '5G']
+        patterns_by_tech = {
+            t: [f'{t}*.csv', f'{t}*.xlsx', f'{t}*.xls', f'Huawei*{t}*.csv', f'huawei*{t}*.csv']
+            for t in HUAWEI_TECHS
+        }
+        processed = set()
+        for tech in HUAWEI_TECHS:
+            imported_this_tech = False
+            for pat in patterns_by_tech[tech]:
+                for fpath in _find_files(HUAWEI_SEARCH_DIRS, pat):
+                    real = os.path.realpath(fpath)
+                    if real in processed:
+                        continue
+                    processed.add(real)
+                    logger.info(f'[Huawei {tech}] Importing {os.path.basename(fpath)} …')
+                    _accumulate(
+                        process_huawei_pm_file(fpath, default_technology=tech),
+                        total_ref,
+                    )
+                    imported_this_tech = True
+                    break
+                if imported_this_tech:
+                    break
+
+    total_inserted = total_ref[0]
+
+    if total_inserted == 0:
         logger.warning(
-            'No Huawei PM file found. Place Performance.xlsx in the project root or '
-            'sync_downloads/pm_huawei/ and re-run.'
+            'No Huawei PM data imported. Place a multi-sheet Performance.xlsx, or per-tech '
+            'CSV/XLSX (e.g. 4G*.csv) in the project root or sync_downloads/pm_huawei/, then re-run.'
         )
-        return 0
-
-    logger.info(f'[Huawei] Importing {os.path.basename(path)} …')
-    summary = process_huawei_pm_file(path)
-    total_inserted = 0
-    for sheet, result in summary.items():
-        if result.get('status') == 'ok':
-            logger.info(f'[Huawei/{sheet}] {result["inserted"]} inserted, {result["skipped"]} skipped.')
-            total_inserted += result.get('inserted', 0)
-        else:
-            logger.error(f'[Huawei/{sheet}] {result.get("error")}')
-
-    logger.info(f'Huawei PM import complete: {total_inserted} total rows inserted.')
+    else:
+        logger.info(f'Huawei PM import complete: {total_inserted} total rows inserted.')
     return total_inserted
 
 
@@ -301,15 +335,15 @@ def main():
     logger.info('Import finished:')
     logger.info(f'  metadata.db   →  {meta_rows} site/cell rows upserted')
     logger.info(f'                    + {seeded_rows} PM cells seeded as placeholders')
-    logger.info(f'  nokia_pm.db   →  {nokia_rows} KPI rows inserted')
-    logger.info(f'  huawei_pm.db  →  {huawei_rows} KPI rows inserted')
+    logger.info(f'  nokia_pm_cells.db   →  {nokia_rows} KPI rows inserted')
+    logger.info(f'  huawei_pm_cells.db  →  {huawei_rows} KPI rows inserted')
     logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━')
     if meta_rows + nokia_rows + huawei_rows == 0:
         logger.info('')
         logger.info('No files were imported. To use this script:')
         logger.info('  • Place metadata CSV exports  in: sync_downloads/metadata/')
         logger.info('  • Place Nokia PM XLSX exports in: sync_downloads/pm_nokia/')
-        logger.info('  • Place Huawei Performance.xlsx in: sync_downloads/pm_huawei/')
+        logger.info('  • Place Huawei Performance.xlsx or 2G/3G/4G*.csv in: sync_downloads/pm_huawei/')
         logger.info('  • Or place any of the above directly in the project root.')
 
 

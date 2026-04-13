@@ -96,7 +96,7 @@ def test_full_loop():
         success, diff_count = comparator.compare(progress_callback=progress_callback)
 
         if success:
-            print(f"  ✓ SUCCESS")
+            print("  ✓ SUCCESS")
             print(f"  Differences found: {diff_count}")
             print(f"  Comparison report created: {os.path.exists(comparison_report)}")
 

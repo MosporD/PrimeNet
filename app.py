@@ -68,16 +68,36 @@ def internal_error(error):
 
 from database_enhanced import init_db, create_admin_user
 
+# ============================================================================
+# DATA DB MIGRATIONS (SQLite files or PostgreSQL bootstrap)
+# ============================================================================
+from sync_config import probe_postgresql_at_startup
+
+probe_postgresql_at_startup()
+
+try:
+    from sync.db_migration import run_migrations
+
+    run_migrations()
+    print('[OK] Data databases migrated successfully')
+except Exception as e:
+    print(f'[WARNING] Data DB migrations: {e}')
+
 try:
     init_db()
     create_admin_user()
-    print("[OK] Database initialized successfully")
+    print('[OK] App user database initialized successfully')
 except Exception as e:
-    print(f"[WARNING] Database initialization: {e}")
+    print(f'[WARNING] App database initialization: {e}')
 
-# Start SFTP sync scheduler — only in the main process, not the Werkzeug reloader child
+# Start SFTP sync scheduler
+# - In debug mode, Werkzeug starts a reloader parent process + a child server process.
+#   We only start the scheduler once (in the reloader parent) using the same guard
+#   we already had, but we also allow disabling it entirely for local debugging.
 import os
-if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
+if os.environ.get('NCM_DISABLE_SCHEDULER') == '1':
+    print("[INFO] Sync scheduler disabled (NCM_DISABLE_SCHEDULER=1)")
+elif os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
     from sync.scheduler import start_scheduler
     try:
         start_scheduler()

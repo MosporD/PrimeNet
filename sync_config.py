@@ -11,16 +11,196 @@ Column maps below are kept as reference / used by import_local_files.py.
 """
 
 import os
+import sqlite3
 
 # Absolute path to the project root (directory containing this file).
 # All other paths are anchored here so the app works regardless of CWD.
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+
+def _load_dotenv_if_present():
+    path = os.path.join(PROJECT_ROOT, '.env')
+    if not os.path.isfile(path):
+        return
+    try:
+        from dotenv import load_dotenv
+    except ImportError:
+        return
+    # Prefer values from `.env` over inherited shell/session variables (fixes stale DATABASE_URL).
+    load_dotenv(path, override=True)
+
+
+_load_dotenv_if_present()
+
 # ── Database files (all in project root) ────────────────────────────────────
-NOKIA_PM_DB  = os.path.join(PROJECT_ROOT, 'nokia_pm.db')
-HUAWEI_PM_DB = os.path.join(PROJECT_ROOT, 'huawei_pm.db')
-METADATA_DB  = os.path.join(PROJECT_ROOT, 'metadata.db')
-NCMUSERS_DB  = os.path.join(PROJECT_ROOT, 'ncm_users.db')
+DATABASES_ROOT = os.path.join(PROJECT_ROOT, 'databases')
+CELLS_DB_DIR = os.path.join(DATABASES_ROOT, 'cells')
+GROUPS_DB_DIR = os.path.join(DATABASES_ROOT, 'groups')
+os.makedirs(CELLS_DB_DIR, exist_ok=True)
+os.makedirs(GROUPS_DB_DIR, exist_ok=True)
+
+NOKIA_PM_DB  = os.path.join(CELLS_DB_DIR, 'nokia_pm_cells.db')
+HUAWEI_PM_DB = os.path.join(CELLS_DB_DIR, 'huawei_pm_cells.db')
+METADATA_DB  = os.path.join(CELLS_DB_DIR, 'metadata.db')
+NCMUSERS_DB  = os.path.join(CELLS_DB_DIR, 'ncm_users.db')
+NOKIA_GROUPS_DB = os.path.join(GROUPS_DB_DIR, 'nokia_cell_groups.db')
+HUAWEI_GROUPS_DB = os.path.join(GROUPS_DB_DIR, 'huawei_cell_groups.db')
+
+
+def _migrate_legacy_db_names():
+    """One-time migration from legacy root DB names to databases/* subfolders."""
+    def _db_has_nonzero_rows(path: str) -> bool:
+        try:
+            conn = sqlite3.connect(path, timeout=5)
+            tables = conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+            for (table_name,) in tables:
+                try:
+                    row = conn.execute(f'SELECT COUNT(*) FROM "{table_name}"').fetchone()
+                    if row and int(row[0] or 0) > 0:
+                        conn.close()
+                        return True
+                except Exception:
+                    continue
+            conn.close()
+        except Exception:
+            return False
+        return False
+
+    legacy_pairs = (
+        # PM cells DBs
+        (os.path.join(PROJECT_ROOT, 'nokia_pm.db'), NOKIA_PM_DB),
+        (os.path.join(PROJECT_ROOT, 'nokia_pm_cells.db'), NOKIA_PM_DB),
+        (os.path.join(PROJECT_ROOT, 'huawei_pm.db'), HUAWEI_PM_DB),
+        (os.path.join(PROJECT_ROOT, 'huawei_pm_cells.db'), HUAWEI_PM_DB),
+        # Metadata / app DBs
+        (os.path.join(PROJECT_ROOT, 'metadata.db'), METADATA_DB),
+        (os.path.join(PROJECT_ROOT, 'ncm_users.db'), NCMUSERS_DB),
+        # Group DBs
+        (os.path.join(PROJECT_ROOT, 'nokia_cell_groups.db'), NOKIA_GROUPS_DB),
+        (os.path.join(PROJECT_ROOT, 'huawei_cell_groups.db'), HUAWEI_GROUPS_DB),
+    )
+    for old_path, new_path in legacy_pairs:
+        if not os.path.isfile(old_path):
+            continue
+        if os.path.isfile(new_path):
+            # Keep non-empty target DBs; otherwise promote legacy DB if it has data.
+            if _db_has_nonzero_rows(new_path):
+                continue
+            if not _db_has_nonzero_rows(old_path):
+                continue
+        try:
+            os.replace(old_path, new_path)
+        except OSError:
+            # Non-fatal: app can still work if caller handles path externally.
+            pass
+
+
+_migrate_legacy_db_names()
+
+# ── PostgreSQL (optional — one DB, schema per former SQLite file) ───────────
+# export DB_ENGINE=postgresql
+# export DATABASE_URL=postgresql://user:password@localhost:5432/primenet
+DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite').strip().lower()
+DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
+SCHEMA_APP = os.getenv('PG_SCHEMA_APP', 'app')
+SCHEMA_METADATA = os.getenv('PG_SCHEMA_METADATA', 'metadata')
+SCHEMA_NOKIA_PM = os.getenv('PG_SCHEMA_NOKIA_PM', 'nokia_pm')
+SCHEMA_HUAWEI_PM = os.getenv('PG_SCHEMA_HUAWEI_PM', 'huawei_pm')
+
+
+def _env_int(key: str, default: int) -> int:
+    try:
+        raw = os.getenv(key)
+        if raw is None or str(raw).strip() == '':
+            return default
+        return int(str(raw).strip())
+    except ValueError:
+        return default
+
+
+# Nokia + Huawei hourly PM ingest
+# PM_SYNC_MODE=full (default) — DELETE/TRUNCATE all rows in each RAT table before ingest.
+# PM_SYNC_MODE=incremental — keep existing rows; upsert only from new files (UNIQUE cell_name,timestamp).
+#   Best for frequent pulls where exports repeat history and add new timestamps.
+_PM_SYNC_RAW = (os.getenv('PM_SYNC_MODE', 'full') or 'full').strip().lower()
+PM_SYNC_FULL_CLEAR = _PM_SYNC_RAW not in ('incremental', 'incr', 'merge')
+
+# After each successful PM ingest, delete PM rows with timestamp older than N calendar days.
+# Default 7; set PM_RETENTION_DAYS=0 in .env to disable.
+PM_RETENTION_DAYS = _env_int('PM_RETENTION_DAYS', 7)
+
+# Rows per SQLite executemany batch inside _insert_df (tune for speed vs. memory).
+PM_INSERT_BATCH_SIZE = max(200, min(20000, _env_int('PM_INSERT_BATCH_SIZE', 2500)))
+
+_pg_driver_warned = False
+_postgres_unreachable = False
+_postgres_unreachable_warned = False
+
+
+def _psycopg2_available() -> bool:
+    try:
+        import psycopg2  # noqa: F401
+
+        return True
+    except ImportError:
+        return False
+
+
+def use_postgresql():
+    """
+    True when Postgres mode is requested **and** ``psycopg2`` is importable
+    **and** startup probing (see ``probe_postgresql_at_startup``) has not
+    marked the server unreachable (wrong password, host down, placeholder URL, etc.).
+    """
+    global _pg_driver_warned
+    if _postgres_unreachable:
+        return False
+    if DB_ENGINE != 'postgresql' or not DATABASE_URL:
+        return False
+    if _psycopg2_available():
+        return True
+    if not _pg_driver_warned:
+        _pg_driver_warned = True
+        import logging
+
+        logging.getLogger(__name__).warning(
+            'DB_ENGINE=postgresql and DATABASE_URL are set but psycopg2 is not installed; '
+            'using local SQLite databases (ncm_users.db, etc.). '
+            'Install psycopg2-binary or unset DB_ENGINE / DATABASE_URL.'
+        )
+    return False
+
+
+def probe_postgresql_at_startup(connect_timeout: int = 5) -> None:
+    """
+    If Postgres is selected, try one connection before migrations.
+    On any failure (e.g. ``FATAL: password authentication failed for user \"USER\"``
+    from a template URL), Postgres is disabled for this process and SQLite is used.
+    """
+    global _postgres_unreachable, _postgres_unreachable_warned
+    if DB_ENGINE != 'postgresql' or not DATABASE_URL:
+        return
+    if not _psycopg2_available():
+        return
+    try:
+        import psycopg2
+
+        conn = psycopg2.connect(DATABASE_URL, connect_timeout=connect_timeout)
+        conn.close()
+    except Exception as e:
+        _postgres_unreachable = True
+        if not _postgres_unreachable_warned:
+            _postgres_unreachable_warned = True
+            import logging
+
+            logging.getLogger(__name__).warning(
+                'PostgreSQL connection failed: %s. '
+                'Using SQLite databases for this process. '
+                'Use a real DATABASE_URL (not placeholders like user USER), or remove DB_ENGINE=postgresql.',
+                e,
+            )
 
 # ── Per-technology PM tables ────────────────────────────────────────────────
 # Each PM database stores data in separate tables per technology instead of
@@ -56,7 +236,11 @@ NOKIA_PM_SERVER = {
         '3G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project/3G',
         '4G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project/4G',
         '5G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project/5G',
-    }
+    },
+    # Some NetAct exports are placed under date/batch subfolders per technology.
+    # Enable recursive newest-subfolder search by default.
+    'descend_into_newest_subdir': os.getenv('NOKIA_PM_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
 }
 
 # Nokia KPI column mappings — per-technology dicts  (XLSX header → DB field name)
@@ -190,6 +374,38 @@ HUAWEI_PM_SERVER = {
     'username':   'tooluser',
     'password':   'Zain@1234',
     'remote_dir': '/export/home/omc/objectstorage/var/prs/result_file/malek.mohammad/Performance_Project/Performance',
+    # PRS often drops exports in a date-named subfolder under ``remote_dir``; SFTP then
+    # opens the newest subfolder first. Set False if workbooks sit directly in ``remote_dir``.
+    'descend_into_newest_subdir': os.getenv('HUAWEI_PM_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
+}
+
+# ============================================================
+# GROUP FILE SOURCES (same SFTP credentials as PM sources)
+# ============================================================
+NOKIA_GROUPS_SERVER = {
+    'host': NOKIA_PM_SERVER['host'],
+    'port': NOKIA_PM_SERVER['port'],
+    'username': NOKIA_PM_SERVER['username'],
+    'password': NOKIA_PM_SERVER['password'],
+    'dirs': {
+        '2G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance_Project_Groups/2G',
+        '3G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance_Project_Groups/3G',
+        '4G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance_Project_Groups/4G',
+        '5G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance_Project_Groups/5G',
+    },
+    'descend_into_newest_subdir': os.getenv('NOKIA_GROUPS_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
+}
+
+HUAWEI_GROUPS_SERVER = {
+    'host': HUAWEI_PM_SERVER['host'],
+    'port': HUAWEI_PM_SERVER['port'],
+    'username': HUAWEI_PM_SERVER['username'],
+    'password': HUAWEI_PM_SERVER['password'],
+    'remote_dir': '/export/home/omc/objectstorage/var/prs/result_file/malek.mohammad/Performance_Project_Group/Performance Groups',
+    'descend_into_newest_subdir': os.getenv('HUAWEI_GROUPS_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
 }
 
 # Huawei sheet names inside the Excel file → technology label
@@ -466,3 +682,10 @@ METADATA_PULL_INTERVAL_HOURS = 24  # Metadata pulled once daily
 
 # Local staging directory for downloaded files (absolute path)
 LOCAL_DOWNLOAD_DIR = os.path.join(PROJECT_ROOT, 'sync_downloads')
+
+# After each successful pull, delete older files in that folder that share the same
+# basename prefix (e.g. nokia_4G_*). Set lower to save disk; higher keeps more history.
+try:
+    SYNC_DOWNLOAD_KEEP_FILES = max(1, int(os.getenv('SYNC_DOWNLOAD_KEEP_FILES', '15')))
+except ValueError:
+    SYNC_DOWNLOAD_KEEP_FILES = 15

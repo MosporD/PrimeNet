@@ -4,7 +4,6 @@ Creates tables for sites, sectors, cells, and KPIs
 """
 
 import sqlite3
-import os
 
 DATABASE = 'ncm_users.db'
 

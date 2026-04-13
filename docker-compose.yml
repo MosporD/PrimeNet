@@ -1,0 +1,18 @@
+# Optional local PostgreSQL (app defaults to SQLite; enable in .env if you use this).
+#   docker compose up -d
+#   DB_ENGINE=postgresql
+#   DATABASE_URL=postgresql://primenet:primenet@localhost:5432/primenet
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: primenet
+      POSTGRES_PASSWORD: primenet
+      POSTGRES_DB: primenet
+    ports:
+      - "5432:5432"
+    volumes:
+      - primenet_pgdata:/var/lib/postgresql/data
+
+volumes:
+  primenet_pgdata:

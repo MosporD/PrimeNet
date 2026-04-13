@@ -4,9 +4,13 @@ API endpoints for sync status, history, and manual triggers.
 Admin-only.
 """
 
-from flask import Blueprint, request, jsonify, redirect, url_for
+from flask import Blueprint, request, jsonify
 from functools import wraps
-import sqlite3, os, sys
+import sqlite3
+import os
+import sys
+from datetime import datetime
+import threading
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sync_config import NCMUSERS_DB
@@ -62,20 +66,38 @@ def sync_status():
     return jsonify({'success': True, 'jobs': jobs, 'last_syncs': last_syncs})
 
 
+@sync_bp.route('/api/sync/progress', methods=['GET'])
+@admin_required
+def sync_progress():
+    """Return live in-memory progress for Nokia PM, Huawei PM, and Metadata."""
+    from sync.scheduler import get_sync_progress
+    return jsonify({'success': True, 'progress': get_sync_progress()})
+
+
 @sync_bp.route('/api/sync/history', methods=['GET'])
 @admin_required
 def sync_history():
     """Return recent sync log entries."""
     limit = request.args.get('limit', 50, type=int)
+    day = (request.args.get('day') or '').strip()  # YYYY-MM-DD
     conn = sqlite3.connect(NCMUSERS_DB)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute('''
-        SELECT sync_type, technology, status, rows_affected, message, started_at
-        FROM sync_log
-        ORDER BY id DESC
-        LIMIT ?
-    ''', (limit,))
+    if day:
+        cursor.execute('''
+            SELECT sync_type, technology, status, rows_affected, message, started_at
+            FROM sync_log
+            WHERE DATE(started_at) = ?
+            ORDER BY id DESC
+            LIMIT ?
+        ''', (day, limit))
+    else:
+        cursor.execute('''
+            SELECT sync_type, technology, status, rows_affected, message, started_at
+            FROM sync_log
+            ORDER BY id DESC
+            LIMIT ?
+        ''', (limit,))
     rows = [dict(r) for r in cursor.fetchall()]
     conn.close()
     return jsonify({'success': True, 'history': rows})
@@ -98,13 +120,16 @@ def trigger_pm():
 @sync_bp.route('/api/sync/trigger/nokia_pm', methods=['POST'])
 @admin_required
 def trigger_nokia_pm():
-    """Manually trigger Nokia PM pull only."""
+    """Manually trigger Nokia cells + groups pull."""
     try:
-        from sync.scheduler import trigger_nokia_pm_now
+        from sync.scheduler import trigger_nokia_pm_now, trigger_nokia_groups_now
         import threading
-        t = threading.Thread(target=trigger_nokia_pm_now, daemon=True)
+        def _run():
+            trigger_nokia_pm_now()
+            trigger_nokia_groups_now()
+        t = threading.Thread(target=_run, daemon=True)
         t.start()
-        return jsonify({'success': True, 'message': 'Nokia PM pull triggered in background.'})
+        return jsonify({'success': True, 'message': 'Nokia cells + groups pull triggered in background.'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -112,13 +137,16 @@ def trigger_nokia_pm():
 @sync_bp.route('/api/sync/trigger/huawei_pm', methods=['POST'])
 @admin_required
 def trigger_huawei_pm():
-    """Manually trigger Huawei PM pull only."""
+    """Manually trigger Huawei cells + groups pull."""
     try:
-        from sync.scheduler import trigger_huawei_pm_now
+        from sync.scheduler import trigger_huawei_pm_now, trigger_huawei_groups_now
         import threading
-        t = threading.Thread(target=trigger_huawei_pm_now, daemon=True)
+        def _run():
+            trigger_huawei_pm_now()
+            trigger_huawei_groups_now()
+        t = threading.Thread(target=_run, daemon=True)
         t.start()
-        return jsonify({'success': True, 'message': 'Huawei PM pull triggered in background.'})
+        return jsonify({'success': True, 'message': 'Huawei cells + groups pull triggered in background.'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -133,6 +161,84 @@ def trigger_metadata():
         t = threading.Thread(target=trigger_metadata_now, daemon=True)
         t.start()
         return jsonify({'success': True, 'message': 'Metadata pull triggered in background.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/nokia_groups', methods=['POST'])
+@admin_required
+def trigger_nokia_groups():
+    """Manually trigger Nokia groups pull."""
+    try:
+        from sync.scheduler import trigger_nokia_groups_now
+        import threading
+        t = threading.Thread(target=trigger_nokia_groups_now, daemon=True)
+        t.start()
+        return jsonify({'success': True, 'message': 'Nokia groups pull triggered in background.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/huawei_groups', methods=['POST'])
+@admin_required
+def trigger_huawei_groups():
+    """Manually trigger Huawei groups pull."""
+    try:
+        from sync.scheduler import trigger_huawei_groups_now
+        import threading
+        t = threading.Thread(target=trigger_huawei_groups_now, daemon=True)
+        t.start()
+        return jsonify({'success': True, 'message': 'Huawei groups pull triggered in background.'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/import_pm_path', methods=['POST'])
+@admin_required
+def import_pm_path():
+    """
+    Import PM files from a local directory path.
+    Body JSON:
+      {
+        "path": "C:/.../folder",
+        "vendor": "all|nokia|huawei",
+        "recursive": true
+      }
+    """
+    try:
+        payload = request.get_json(silent=True) or {}
+        root_path = (payload.get('path') or '').strip()
+        vendor = (payload.get('vendor') or 'all').strip().lower()
+        recursive = bool(payload.get('recursive', True))
+
+        if not root_path:
+            return jsonify({'success': False, 'error': 'path is required'}), 400
+        if vendor not in ('all', 'nokia', 'huawei'):
+            return jsonify({'success': False, 'error': 'vendor must be all, nokia, or huawei'}), 400
+
+        def _run():
+            from sync.pm_processor import import_pm_from_directory
+            result = import_pm_from_directory(root_path, vendor=vendor, recursive=recursive)
+            if result.get('status') != 'ok':
+                _log_sync('pm_local_import', vendor, 'error', 0, result.get('error'))
+                return
+            _log_sync(
+                'pm_local_import',
+                vendor,
+                'ok',
+                int(result.get('inserted', 0) or 0),
+                f'path={root_path}; files={result.get("files", 0)}; skipped={result.get("skipped", 0)}',
+            )
+
+        t = threading.Thread(target=_run, daemon=True)
+        t.start()
+        return jsonify({
+            'success': True,
+            'message': 'PM local import started in background.',
+            'path': root_path,
+            'vendor': vendor,
+            'recursive': recursive,
+        })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -332,53 +438,224 @@ def inspect_local():
 
     from sync_config import LOCAL_DOWNLOAD_DIR
 
-    DATA_EXTS = ('.xlsx', '.xls', '.csv')
+    PM_FILE_EXTS = ('.xlsx', '.xls', '.xlsm', '.csv')
 
-    def _newest_file(directory):
+    def _newest_file(directory, exts=PM_FILE_EXTS):
         if not os.path.isdir(directory):
             return None
         candidates = [
             f for f in (os.path.join(directory, n) for n in os.listdir(directory))
-            if os.path.isfile(f) and f.lower().endswith(DATA_EXTS)
+            if os.path.isfile(f) and f.lower().endswith(exts)
         ]
         return max(candidates, key=os.path.getmtime) if candidates else None
 
+    def _resolve_pm_zip_for_inspect(zip_path):
+        """
+        Pick an inner file from a PM .zip for header inspection.
+
+        Prefer the inner ``.csv`` that parses with the **most meaningful columns**
+        (same heuristic as PM ingest), not merely the largest file — Huawei zips
+        often include a large one-column sidecar that would otherwise show as
+        ``Unnamed: 0``.
+        """
+        import shutil
+        import tempfile
+        import zipfile
+
+        if not str(zip_path).lower().endswith('.zip'):
+            return zip_path, None, None
+        tmp = tempfile.mkdtemp(prefix='inspect_pm_zip_')
+        meta = {'inner_member': None, 'csv_members': 0, 'picked_by': None}
+
+        def _cand_path(member_name: str) -> str:
+            p = os.path.join(tmp, member_name.replace('/', os.sep))
+            if os.path.isfile(p):
+                return p
+            p2 = os.path.join(tmp, os.path.basename(member_name))
+            return p2 if os.path.isfile(p2) else ''
+
+        try:
+            from sync.pm_processor import _read_nokia_csv_best, _nokia_csv_parse_score
+
+            with zipfile.ZipFile(zip_path, 'r') as zf:
+                names = [
+                    n
+                    for n in zf.namelist()
+                    if not n.endswith('/') and n.lower().endswith(PM_FILE_EXTS)
+                ]
+                if not names:
+                    shutil.rmtree(tmp, ignore_errors=True)
+                    return None, None, None
+
+                csv_names = [n for n in names if n.lower().endswith('.csv')]
+                book_names = [n for n in names if n.lower().endswith(('.xlsx', '.xls', '.xlsm'))]
+                meta['csv_members'] = len(csv_names)
+
+                best_csv = None  # (score, ncol, size, member, path)
+                for n in csv_names:
+                    zf.extract(n, tmp)
+                    cand = _cand_path(n)
+                    if not cand:
+                        continue
+                    df = _read_nokia_csv_best(cand, nrows=12000)
+                    ncol = len(df.columns) if df is not None and not df.empty else 0
+                    if ncol < 2:
+                        continue
+                    sc = _nokia_csv_parse_score(df)
+                    sz = zf.getinfo(n).file_size
+                    key = (sc, ncol, sz)
+                    if best_csv is None or key > (best_csv[0], best_csv[1], best_csv[2]):
+                        best_csv = (sc, ncol, sz, n, cand)
+
+                if best_csv:
+                    meta['inner_member'] = best_csv[3]
+                    meta['picked_by'] = 'best multi-column .csv parse (ingest-style heuristic)'
+                    return best_csv[4], tmp, meta
+
+                if book_names:
+                    bn = max(book_names, key=lambda n: zf.getinfo(n).file_size)
+                    zf.extract(bn, tmp)
+                    cand = _cand_path(bn)
+                    if cand:
+                        meta['inner_member'] = bn
+                        meta['picked_by'] = 'largest workbook (no .csv parsed with 2+ columns)'
+                        return cand, tmp, meta
+
+                if csv_names:
+                    bn = max(csv_names, key=lambda n: zf.getinfo(n).file_size)
+                    zf.extract(bn, tmp)
+                    cand = _cand_path(bn)
+                    if cand:
+                        meta['inner_member'] = bn
+                        meta['picked_by'] = 'largest .csv fallback (may be one-column / non-PM)'
+                        return cand, tmp, meta
+
+            shutil.rmtree(tmp, ignore_errors=True)
+            return None, None, None
+        except Exception:
+            shutil.rmtree(tmp, ignore_errors=True)
+            return None, None, None
+
     def _read_headers(file_path):
-        """Return (columns, sheets, error).  Tries openpyxl → xlrd → CSV."""
+        """Return (columns, sheets, error).  Tries openpyxl → xlrd → HTML → CSV (safe encodings)."""
+        encodings = ('utf-8', 'utf-8-sig', 'latin-1', 'cp1252', 'iso-8859-1')
+        last_err = None
+
+        def _csv_probe(sep, min_cols=1):
+            kw = {'nrows': 0, 'sep': sep, 'engine': 'python', 'on_bad_lines': 'skip'}
+            for enc in encodings:
+                try:
+                    df = pd.read_csv(file_path, encoding=enc, **kw)
+                    if len(df.columns) >= min_cols:
+                        return list(df.columns)
+                except Exception:
+                    continue
+            return None
+
         ext = os.path.splitext(file_path)[1].lower()
         if ext == '.csv':
-            try:
-                df = pd.read_csv(file_path, nrows=0)
+            from sync.pm_processor import _load_pm_file, _read_nokia_csv_best
+
+            df = _read_nokia_csv_best(file_path, nrows=8192)
+            if df is not None and len(df.columns) >= 2:
                 return list(df.columns), None, None
+            try:
+                df2 = _load_pm_file(file_path)
+                if df2 is not None and len(df2.columns) >= 2:
+                    return list(df2.columns), None, None
             except Exception as e:
-                return None, None, str(e)
-        # Try Excel engines first
+                last_err = e
+            for sep in (';', '\t', ',', '|'):
+                cols = _csv_probe(sep=sep, min_cols=2)
+                if cols:
+                    return cols, None, None
+            for enc in ('utf-16', 'utf-16-le', 'utf-16-be'):
+                try:
+                    for sep in ('\t', ';', ',', '|'):
+                        df3 = pd.read_csv(
+                            file_path,
+                            encoding=enc,
+                            sep=sep,
+                            nrows=0,
+                            engine='python',
+                            on_bad_lines='skip',
+                        )
+                        if len(df3.columns) >= 2:
+                            return list(df3.columns), None, None
+                except Exception:
+                    continue
+            hint = str(last_err) if last_err else 'no 2+ column parse'
+            return None, None, (
+                'Could not read CSV with 2+ columns (refused single-column / Unnamed: 0 misread). '
+                f'{hint}'
+            )
+
+        # Try Excel engines first (openpyxl handles .xlsx / .xlsm)
         xl = None
         for engine in ('openpyxl', 'xlrd'):
             try:
                 xl = pd.ExcelFile(file_path, engine=engine)
                 break
-            except Exception:
-                pass
+            except Exception as e:
+                last_err = e
         if xl is not None:
             try:
                 sheets = {s: list(xl.parse(s, nrows=0).columns) for s in xl.sheet_names}
                 return None, sheets, None
-            except Exception:
-                pass
-        # Excel failed — file is likely text disguised as .xlsx; try CSV delimiters
-        for sep in ('\t', ',', ';'):
-            try:
-                df = pd.read_csv(file_path, sep=sep, nrows=0)
-                if len(df.columns) > 1:
-                    return list(df.columns), None, None
-            except Exception:
-                pass
+            except Exception as e:
+                last_err = e
+
+        # Real .xlsx is a ZIP (PK\x03\x04…). If Excel engines failed, latin-1 CSV would
+        # still "parse" it and show nonsense columns like "PK…" — report the real error instead.
         try:
-            df = pd.read_csv(file_path, nrows=0)
-            return list(df.columns), None, None
-        except Exception as e:
-            return None, None, str(e)
+            with open(file_path, 'rb') as f:
+                sig = f.read(8)
+        except OSError:
+            sig = b''
+
+        def _is_ooxml_zip(s):
+            return len(s) >= 4 and s[:2] == b'PK' and s[2:4] in (b'\x03\x04', b'\x05\x06', b'\x07\x08')
+
+        def _is_ole_xls(s):
+            return len(s) >= 8 and s[:8] == b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1'
+
+        if ext == '.xlsx' and _is_ooxml_zip(sig):
+            msg = str(last_err) if last_err else 'unknown error'
+            return None, None, (
+                'This is a standard .xlsx (ZIP) file but it could not be opened as a workbook. '
+                f'openpyxl/xlrd error: {msg}. '
+                'If it opens in Excel, try Save As a new .xlsx; otherwise check the download is complete.'
+            )
+        if ext == '.xls' and _is_ole_xls(sig):
+            msg = str(last_err) if last_err else 'unknown error'
+            return None, None, (
+                f'Legacy .xls could not be read: {msg}. '
+                'You may need xlrd 1.x for .xls, or convert the file to .xlsx.'
+            )
+
+        # HTML table saved as .xlsx (common NetAct / vendor export)
+        for enc in encodings:
+            try:
+                dfs = pd.read_html(file_path, encoding=enc)
+                if not dfs:
+                    continue
+                wide = [d for d in dfs if len(d.columns) > 1]
+                if not wide:
+                    continue
+                if len(wide) == 1:
+                    return list(wide[0].columns), None, None
+                return None, {f'table{i}': list(d.columns) for i, d in enumerate(wide)}, None
+            except Exception:
+                continue
+
+        # Delimited text with wrong extension — never assume UTF-8-only (binary .xlsx hits utf-8 decode error)
+        for sep in ('\t', ',', ';', '|'):
+            cols = _csv_probe(sep=sep, min_cols=2)
+            if cols:
+                return cols, None, None
+
+        hint = str(last_err) if last_err else 'not recognized as Excel, HTML table, or delimited text'
+        return None, None, hint
 
     report = {}
 
@@ -399,20 +676,39 @@ def inspect_local():
             }
 
     # ── Huawei PM ────────────────────────────────────────────────────
-    huawei_dir  = os.path.join(LOCAL_DOWNLOAD_DIR, 'pm_huawei')
-    huawei_file = _newest_file(huawei_dir)
+    huawei_dir = os.path.join(LOCAL_DOWNLOAD_DIR, 'pm_huawei')
+    huawei_file = _newest_file(huawei_dir, PM_FILE_EXTS + ('.zip',))
     if not huawei_file:
         report['huawei_pm'] = {'status': 'no_files', 'dir': huawei_dir}
     else:
-        cols, sheets, err = _read_headers(huawei_file)
-        if err:
-            report['huawei_pm'] = {'status': 'read_error', 'file': huawei_file, 'error': err}
-        else:
-            report['huawei_pm'] = {
-                'status':  'ok',
-                'file':    huawei_file,
-                'columns': cols if cols is not None else sheets,
-            }
+        ztmp = None
+        try:
+            read_path, ztmp, zip_meta = _resolve_pm_zip_for_inspect(huawei_file)
+            if read_path is None:
+                report['huawei_pm'] = {
+                    'status': 'read_error',
+                    'file': huawei_file,
+                    'error': 'ZIP has no .xlsx/.xls/.xlsm/.csv inside (or extract failed).',
+                }
+            else:
+                cols, sheets, err = _read_headers(read_path)
+                if err:
+                    report['huawei_pm'] = {'status': 'read_error', 'file': huawei_file, 'error': err}
+                else:
+                    entry = {
+                        'status': 'ok',
+                        'file': huawei_file,
+                        'columns': cols if cols is not None else sheets,
+                    }
+                    if zip_meta:
+                        entry['inner_zip_member'] = zip_meta.get('inner_member')
+                        entry['inner_pick_reason'] = zip_meta.get('picked_by')
+                        entry['inner_csv_count'] = zip_meta.get('csv_members')
+                    report['huawei_pm'] = entry
+        finally:
+            if ztmp:
+                import shutil
+                shutil.rmtree(ztmp, ignore_errors=True)
 
     # ── Metadata ─────────────────────────────────────────────────────
     meta_dir = os.path.join(LOCAL_DOWNLOAD_DIR, 'metadata')
@@ -423,7 +719,7 @@ def inspect_local():
             [
                 os.path.join(meta_dir, n) for n in os.listdir(meta_dir)
                 if os.path.isfile(os.path.join(meta_dir, n))
-                and n.lower().endswith(DATA_EXTS)
+                and n.lower().endswith(PM_FILE_EXTS)
             ],
             key=os.path.getmtime,
             reverse=True,
@@ -445,3 +741,53 @@ def inspect_local():
             report['metadata'] = {'status': 'ok', 'dir': meta_dir, 'files': meta_report}
 
     return jsonify({'success': True, 'report': report})
+
+
+@sync_bp.route('/api/sync/latest_downloads', methods=['GET'])
+@admin_required
+def latest_downloads():
+    """
+    Return recently downloaded local files per sync type.
+    Query param:
+      type = nokia_pm | huawei_pm | metadata | all
+    """
+    from sync_config import LOCAL_DOWNLOAD_DIR
+
+    requested = (request.args.get('type') or 'all').strip().lower()
+    allowed = {'nokia_pm', 'huawei_pm', 'metadata', 'all'}
+    if requested not in allowed:
+        requested = 'all'
+
+    source_dirs = {
+        'nokia_pm': os.path.join(LOCAL_DOWNLOAD_DIR, 'pm_nokia'),
+        'huawei_pm': os.path.join(LOCAL_DOWNLOAD_DIR, 'pm_huawei'),
+        'metadata': os.path.join(LOCAL_DOWNLOAD_DIR, 'metadata'),
+    }
+    selected = source_dirs if requested == 'all' else {requested: source_dirs[requested]}
+
+    exts = ('.xlsx', '.xls', '.xlsm', '.csv', '.zip')
+    out = {}
+    for source, directory in selected.items():
+        files = []
+        if os.path.isdir(directory):
+            for name in os.listdir(directory):
+                full = os.path.join(directory, name)
+                if not os.path.isfile(full):
+                    continue
+                if not name.lower().endswith(exts):
+                    continue
+                mtime = os.path.getmtime(full)
+                files.append({
+                    'name': name,
+                    'modified_at': datetime.fromtimestamp(mtime).strftime('%Y-%m-%d %H:%M:%S'),
+                    'mtime': mtime,
+                })
+            files.sort(key=lambda x: x['mtime'], reverse=True)
+            for f in files:
+                f.pop('mtime', None)
+        out[source] = {
+            'dir': directory,
+            'files': files[:12],
+        }
+
+    return jsonify({'success': True, 'downloads': out})

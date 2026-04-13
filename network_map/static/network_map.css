@@ -11,8 +11,8 @@ body.map-page {
 }
 
 .map-header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     padding: 8px 20px;
     background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 60%, #1f3a5f 100%);
@@ -21,6 +21,7 @@ body.map-page {
     z-index: 1000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
     gap: 12px;
+    min-height: 52px;
 }
 
 .map-header h1 {
@@ -37,6 +38,42 @@ body.map-page {
     align-items: center;
     gap: 12px;
     flex-shrink: 0;
+    justify-self: start;
+    min-width: 0;
+}
+
+/* Center column: site count only */
+.map-header .header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    max-width: min(200px, 30vw);
+    justify-self: center;
+}
+
+.header-sites-stat {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    line-height: 1;
+}
+
+.header-sites-value {
+    font-size: 1.65em;
+    font-weight: 800;
+    color: #5dade2;
+    letter-spacing: 0.02em;
+}
+
+.header-sites-label {
+    font-size: 0.72em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.75);
 }
 
 /* ── Dashboard button ───────────────────────────────────── */
@@ -93,6 +130,7 @@ body.map-page {
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
+    justify-self: end;
 }
 
 .map-header .user-name {
@@ -118,30 +156,101 @@ body.map-page {
     box-shadow: none;
 }
 
-/* ── Left overlay panel ─────────────────────────────────── */
+/* ── Left overlay: collapsible shell + drawer (was 270px → +50% = 405px) ─ */
 
-.left-panel {
+.left-panel-shell {
     position: absolute;
     top: 14px;
     left: 14px;
     z-index: 500;
-    width: 270px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+    max-height: calc(100% - 28px);
+    /* Tab is position:fixed at viewport mid-height; keep drawer clear of it */
+    padding-left: 40px;
+    box-sizing: border-box;
+}
+
+.left-panel-tab {
+    position: fixed;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    min-height: 76px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0 10px 10px 0;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    color: #111;
+    z-index: 510;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.left-panel-tab:hover {
+    background: #fff;
+    color: #000;
+}
+
+.left-panel-tab-icon {
+    display: block;
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.left-panel-shell.collapsed .left-panel-tab-icon {
+    transform: rotate(180deg);
+}
+
+.left-panel-drawer {
+    --left-panel-width: 405px;
+    width: var(--left-panel-width);
+    max-width: calc(100vw - 64px);
+    max-height: calc(100vh - 28px);
+    overflow-x: hidden;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: calc(100% - 28px);
-    overflow-y: auto;
+    flex-shrink: 0;
+    transition: transform 0.3s ease, opacity 0.28s ease;
+    transform: translateX(0);
+    opacity: 1;
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
-.left-panel::-webkit-scrollbar {
-    width: 4px;
+.left-panel-drawer::-webkit-scrollbar {
+    width: 5px;
 }
 
-.left-panel::-webkit-scrollbar-thumb {
+.left-panel-drawer::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.2);
-    border-radius: 2px;
+    border-radius: 3px;
+}
+
+.left-panel-shell.collapsed .left-panel-drawer {
+    transform: translateX(calc(-100% - 10px));
+    opacity: 0;
+    pointer-events: none;
+}
+
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    min-height: 0;
 }
 
 /* ── Map controls ───────────────────────────────────────── */
@@ -226,33 +335,6 @@ body.map-page {
 
 /* ── Network stats (Sites only) ─────────────────────────── */
 
-.network-stats {
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(6px);
-    border-radius: 10px;
-    box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
-    padding: 12px;
-}
-
-.stat-card {
-    text-align: center;
-    padding: 6px 0;
-}
-
-.stat-card .stat-value {
-    font-size: 2em;
-    font-weight: bold;
-    color: #3498db;
-    margin: 4px 0;
-}
-
-.stat-card .stat-label {
-    font-size: 0.85em;
-    color: #7f8c8d;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
 /* ── Site info panel ─────────────────────────────────────── */
 
 #site-info-panel {
@@ -266,7 +348,7 @@ body.map-page {
 
 .site-panel-title {
     margin: 0 0 10px;
-    color: #2c3e50;
+    color: #0a0a0a;
     font-size: 0.95em;
     word-break: break-word;
 }
@@ -306,10 +388,32 @@ body.map-page {
     background: #e9ecef;
 }
 
+.cell-row-offline {
+    cursor: default;
+    opacity: 0.88;
+    background: #f1f2f4;
+}
+
+.cell-row-offline:hover {
+    background: #f1f2f4;
+}
+
+.cell-offline-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #888;
+    background: #e8e8e8;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
 .cell-name {
     flex: 1;
     font-weight: 600;
-    color: #2c3e50;
+    color: #0a0a0a;
     word-break: break-all;
 }
 
@@ -348,6 +452,35 @@ body.map-page {
     flex: 1;
     /* inherits .map-controls input padding/border */
 }
+
+/* ── Coordinate search row (lat/lng) ───────────────────── */
+
+.coord-search-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.coord-search-row input {
+    flex: 1;
+}
+
+.coord-go-btn {
+    padding: 8px 12px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.82em;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background 0.2s;
+}
+
+.coord-go-btn:hover { background: #2e86c1; }
+.coord-nearest-btn { background: #7f8c8d; }
+.coord-nearest-btn:hover { background: #6c7a89; }
 
 /* hide the browser spinner on number inputs */
 .code-search-row input::-webkit-outer-spin-button,
@@ -400,7 +533,7 @@ body.map-page {
 .code-result-site-name {
     font-weight: 600;
     font-size: 0.88em;
-    color: #2c3e50;
+    color: #0a0a0a;
     margin-bottom: 5px;
 }
 
@@ -410,6 +543,18 @@ body.map-page {
     gap: 6px;
     padding: 2px 0;
     font-size: 0.8em;
+}
+
+.code-result-cell-offline {
+    opacity: 0.85;
+}
+
+.code-offline-hint {
+    font-size: 0.72em;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #e67e22;
+    letter-spacing: 0.03em;
 }
 
 .cell-tech-badge {
@@ -452,6 +597,39 @@ body.map-page {
     border: none;
 }
 
+/* Stack: semi-transparent site id above the circular pin (lat/lng = circle center). */
+.site-marker-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.site-marker-stack .site-marker-inner {
+    pointer-events: auto;
+}
+
+.site-marker-id {
+    flex: 0 0 auto;
+    max-width: 100%;
+    padding: 0 2px 2px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: #0a0a0a;
+    text-shadow:
+        0 0 3px rgba(255, 255, 255, 0.98),
+        0 0 6px rgba(255, 255, 255, 0.88);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    user-select: none;
+}
+
 .site-marker-inner {
     background: white;
     border: 3px solid #3498db;
@@ -467,6 +645,29 @@ body.map-page {
 
 .site-marker-inner:hover {
     transform: scale(1.2);
+}
+
+.site-marker-inner.site-marker-has-offline {
+    position: relative;
+}
+
+/* Orange dot: site has offline cell(s) in current filter (tooltip has detail). */
+.site-offline-pin-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 11px;
+    height: 11px;
+    background: #e67e22;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+    pointer-events: none;
+}
+
+.site-offline-summary {
+    color: #7f8c8d;
+    font-size: 0.86em;
 }
 
 .site-icon {

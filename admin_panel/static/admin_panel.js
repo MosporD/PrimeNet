@@ -3,12 +3,91 @@
  */
 
 let allUsers = [];
+let filteredUsers = [];
+let syncMsgTimer = null;
+let syncStatusRows = [];
+let syncHistoryRows = [];
+let usersPage = 1;
+let syncStatusPage = 1;
+let syncHistoryPage = 1;
+const USERS_PAGE_SIZE = 12;
+const SYNC_PAGE_SIZE = 10;
+let progressPollTimer = null;
 
 document.addEventListener('DOMContentLoaded', () => {
+    openAdminPage('data-sync');
     loadAllUsers();
     loadSyncStatus();
     loadSyncHistory();
+    startProgressPolling();
 });
+
+function openAdminPage(pageName) {
+    document.querySelectorAll('.admin-page-tab').forEach(tab => {
+        const isActive = tab.getAttribute('data-page') === pageName;
+        tab.classList.toggle('active', isActive);
+    });
+    document.querySelectorAll('.admin-page-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.getAttribute('data-page') === pageName);
+    });
+    if (pageName === 'data-sync') {
+        startProgressPolling();
+    } else {
+        stopProgressPolling();
+    }
+}
+
+function stopProgressPolling() {
+    if (progressPollTimer) {
+        clearInterval(progressPollTimer);
+        progressPollTimer = null;
+    }
+}
+
+function startProgressPolling() {
+    if (progressPollTimer) return;
+    loadSyncProgress();
+    progressPollTimer = setInterval(loadSyncProgress, 2500);
+}
+
+function _renderOneProgressCard(key, data) {
+    const card = document.getElementById(`progress-card-${key}`);
+    const meta = document.getElementById(`progress-meta-${key}`);
+    const fill = document.getElementById(`progress-fill-${key}`);
+    if (!card || !meta || !fill) return;
+
+    const running = !!data?.running;
+    const stage = String(data?.stage || 'idle');
+    const percent = Math.max(0, Math.min(100, Number(data?.percent || 0)));
+    const progress = Number(data?.progress || 0);
+    const total = Number(data?.total || 0);
+    const message = data?.message || '';
+    const updatedAt = data?.updated_at || '';
+
+    card.classList.remove('running', 'done', 'error');
+    if (running || stage === 'running') card.classList.add('running');
+    else if (stage === 'error') card.classList.add('error');
+    else if (stage === 'done') card.classList.add('done');
+
+    fill.style.width = `${percent}%`;
+    const counter = total > 0 ? `${progress}/${total} (${percent}%)` : `${percent}%`;
+    const shortMsg = message ? ` - ${message}` : '';
+    const stamp = updatedAt ? ` [${updatedAt}]` : '';
+    meta.textContent = `${counter}${shortMsg}${stamp}`;
+}
+
+async function loadSyncProgress() {
+    try {
+        const res = await fetch('/api/sync/progress');
+        const data = await res.json();
+        if (!data.success || !data.progress) return;
+        _renderOneProgressCard('nokia_pm', data.progress.nokia_pm || {});
+        _renderOneProgressCard('huawei_pm', data.progress.huawei_pm || {});
+        _renderOneProgressCard('metadata', data.progress.metadata || {});
+    } catch (e) {
+        // Keep UI silent on transient polling errors.
+    }
+}
 
 async function loadAllUsers() {
     try {
@@ -23,8 +102,10 @@ async function loadAllUsers() {
             throw new Error(data.error || 'Failed to load users');
         }
 
-        allUsers = data.users;
-        displayUsers(allUsers);
+        allUsers = data.users || [];
+        filteredUsers = [...allUsers];
+        usersPage = 1;
+        displayUsers(filteredUsers);
         updateStats(allUsers);
     } catch (error) {
         console.error('Error loading users:', error);
@@ -41,10 +122,13 @@ function displayUsers(users) {
 
     if (!users || users.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No users found</td></tr>';
+        renderPagination('users-pagination', 0, USERS_PAGE_SIZE, 1, 'goToUsersPage');
         return;
     }
 
-    tbody.innerHTML = users.map(user => `
+    const start = (usersPage - 1) * USERS_PAGE_SIZE;
+    const pageRows = users.slice(start, start + USERS_PAGE_SIZE);
+    tbody.innerHTML = pageRows.map(user => `
         <tr>
             <td>${user.id}</td>
             <td><strong>${user.username}</strong></td>
@@ -67,6 +151,7 @@ function displayUsers(users) {
             </td>
         </tr>
     `).join('');
+    renderPagination('users-pagination', users.length, USERS_PAGE_SIZE, usersPage, 'goToUsersPage');
 }
 
 function updateStats(users) {
@@ -147,7 +232,7 @@ function filterUsers() {
     const roleFilter = document.getElementById('role-filter').value;
     const statusFilter = document.getElementById('status-filter').value;
 
-    const filtered = allUsers.filter(user => {
+    filteredUsers = allUsers.filter(user => {
         const matchesSearch = !searchTerm ||
             user.username.toLowerCase().includes(searchTerm) ||
             user.email.toLowerCase().includes(searchTerm);
@@ -161,7 +246,8 @@ function filterUsers() {
         return matchesSearch && matchesRole && matchesStatus;
     });
 
-    displayUsers(filtered);
+    usersPage = 1;
+    displayUsers(filteredUsers);
 }
 
 function formatDate(dateString) {
@@ -172,12 +258,60 @@ function formatDate(dateString) {
 
 // ── Sync section ──────────────────────────────────────────────────────────
 
-function showSyncMsg(text, type) {
+function _escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function hideSyncMsg() {
     const el = document.getElementById('sync-msg');
-    el.textContent = text;
+    if (!el) return;
+    el.style.display = 'none';
+    if (syncMsgTimer) {
+        clearTimeout(syncMsgTimer);
+        syncMsgTimer = null;
+    }
+}
+
+function showSyncMsg(text, type, fileLines = []) {
+    const el = document.getElementById('sync-msg');
+    if (!el) return;
+
+    const filesHtml = (fileLines && fileLines.length)
+        ? `<div class="sync-msg-files">${fileLines.map(line => `<div class="sync-msg-file-line">${_escapeHtml(line)}</div>`).join('')}</div>`
+        : '';
+
     el.className = 'sync-msg ' + type;
+    el.innerHTML = `
+        <button type="button" class="sync-msg-close" aria-label="Close" onclick="hideSyncMsg()">×</button>
+        <div class="sync-msg-title">${_escapeHtml(text)}</div>
+        ${filesHtml}
+    `;
     el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 6000);
+    if (syncMsgTimer) clearTimeout(syncMsgTimer);
+    syncMsgTimer = setTimeout(() => {
+        hideSyncMsg();
+    }, 15000);
+}
+
+async function fetchLatestDownloadedFiles(type) {
+    try {
+        const res = await fetch(`/api/sync/latest_downloads?type=${encodeURIComponent(type)}`);
+        const data = await res.json();
+        if (!data.success || !data.downloads) return [];
+
+        const downloads = data.downloads[type];
+        if (!downloads || !Array.isArray(downloads.files) || downloads.files.length === 0) {
+            return ['No downloaded files found yet for this source.'];
+        }
+        return downloads.files.slice(0, 8).map(f => `${f.name} (${f.modified_at})`);
+    } catch (e) {
+        return [`Could not load file list: ${e.message}`];
+    }
 }
 
 function renderSyncRows(rows, tbodyId) {
@@ -199,11 +333,61 @@ function renderSyncRows(rows, tbodyId) {
     `).join('');
 }
 
+function renderPagination(containerId, totalItems, pageSize, currentPage, callbackName) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    if (totalItems <= pageSize) {
+        el.innerHTML = '';
+        return;
+    }
+    const prevDisabled = currentPage <= 1 ? 'disabled' : '';
+    const nextDisabled = currentPage >= totalPages ? 'disabled' : '';
+    el.innerHTML = `
+        <button class="page-btn" ${prevDisabled} onclick="${callbackName}(${currentPage - 1})">Prev</button>
+        <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+        <button class="page-btn" ${nextDisabled} onclick="${callbackName}(${currentPage + 1})">Next</button>
+    `;
+}
+
+function goToUsersPage(page) {
+    usersPage = Math.max(1, page);
+    displayUsers(filteredUsers);
+}
+
+function goToSyncStatusPage(page) {
+    syncStatusPage = Math.max(1, page);
+    renderSyncStatusPage();
+}
+
+function goToSyncHistoryPage(page) {
+    syncHistoryPage = Math.max(1, page);
+    renderSyncHistoryPage();
+}
+
+function renderSyncStatusPage() {
+    const start = (syncStatusPage - 1) * SYNC_PAGE_SIZE;
+    const rows = syncStatusRows.slice(start, start + SYNC_PAGE_SIZE);
+    renderSyncRows(rows, 'sync-status-body');
+    renderPagination('sync-status-pagination', syncStatusRows.length, SYNC_PAGE_SIZE, syncStatusPage, 'goToSyncStatusPage');
+}
+
+function renderSyncHistoryPage() {
+    const start = (syncHistoryPage - 1) * SYNC_PAGE_SIZE;
+    const rows = syncHistoryRows.slice(start, start + SYNC_PAGE_SIZE);
+    renderSyncRows(rows, 'sync-history-body');
+    renderPagination('sync-history-pagination', syncHistoryRows.length, SYNC_PAGE_SIZE, syncHistoryPage, 'goToSyncHistoryPage');
+}
+
 async function loadSyncStatus() {
     try {
         const res  = await fetch('/api/sync/status');
         const data = await res.json();
-        if (data.success) renderSyncRows(data.last_syncs, 'sync-status-body');
+        if (data.success) {
+            syncStatusRows = data.last_syncs || [];
+            syncStatusPage = 1;
+            renderSyncStatusPage();
+        }
     } catch (e) {
         document.getElementById('sync-status-body').innerHTML =
             `<tr><td colspan="6" style="color:#e74c3c;text-align:center;">Error: ${e.message}</td></tr>`;
@@ -212,13 +396,27 @@ async function loadSyncStatus() {
 
 async function loadSyncHistory() {
     try {
-        const res  = await fetch('/api/sync/history?limit=20');
+        const dayEl = document.getElementById('sync-history-day');
+        const day = dayEl && dayEl.value ? dayEl.value : '';
+        const qs = new URLSearchParams({ limit: '100' });
+        if (day) qs.set('day', day);
+        const res  = await fetch(`/api/sync/history?${qs.toString()}`);
         const data = await res.json();
-        if (data.success) renderSyncRows(data.history, 'sync-history-body');
+        if (data.success) {
+            syncHistoryRows = data.history || [];
+            syncHistoryPage = 1;
+            renderSyncHistoryPage();
+        }
     } catch (e) {
         document.getElementById('sync-history-body').innerHTML =
             `<tr><td colspan="6" style="color:#e74c3c;text-align:center;">Error: ${e.message}</td></tr>`;
     }
+}
+
+function clearSyncHistoryDay() {
+    const dayEl = document.getElementById('sync-history-day');
+    if (dayEl) dayEl.value = '';
+    loadSyncHistory();
 }
 
 async function triggerSync(type) {
@@ -231,13 +429,16 @@ async function triggerSync(type) {
 
     const endpoint = endpointMap[type] || '/api/sync/trigger/pm';
 
-    showSyncMsg(`Triggering ${type.replace('_', ' ')} sync…`, 'info');
+    showSyncMsg(`Triggering ${type.replace('_', ' ')} sync...`, 'info');
 
     try {
         const res  = await fetch(endpoint, { method: 'POST' });
         const data = await res.json();
         if (data.success) {
-            showSyncMsg(data.message || 'Sync started in background.', 'success');
+            // Give background trigger a short head start, then show latest downloaded files.
+            await new Promise(resolve => setTimeout(resolve, 2200));
+            const latestFiles = await fetchLatestDownloadedFiles(type);
+            showSyncMsg(data.message || 'Sync started in background.', 'success', latestFiles);
             // Refresh status after a short delay
             setTimeout(loadSyncStatus,  4000);
             setTimeout(loadSyncHistory, 4000);
@@ -310,6 +511,51 @@ async function inspectLocal() {
         pre.textContent = lines.join('\n');
     } catch (e) {
         pre.textContent = 'Error: ' + e.message;
+    }
+}
+
+async function importPmFromPath() {
+    const pathEl = document.getElementById('pm-local-path');
+    const vendorEl = document.getElementById('pm-local-vendor');
+    const recursiveEl = document.getElementById('pm-local-recursive');
+
+    const path = (pathEl?.value || '').trim();
+    const vendor = (vendorEl?.value || 'all').trim().toLowerCase();
+    const recursive = !!(recursiveEl?.checked);
+
+    if (!path) {
+        showSyncMsg('Please provide a local folder path first.', 'error');
+        return;
+    }
+
+    showSyncMsg('Starting local PM import…', 'info', [
+        `Path: ${path}`,
+        `Vendor: ${vendor}`,
+        `Recursive: ${recursive ? 'yes' : 'no'}`,
+    ]);
+
+    try {
+        const res = await fetch('/api/sync/import_pm_path', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path, vendor, recursive }),
+        });
+        const data = await res.json();
+        if (data.success) {
+            showSyncMsg(data.message || 'Local PM import started.', 'success', [
+                `Path: ${path}`,
+                `Vendor: ${vendor}`,
+                'Track progress in Sync History.',
+            ]);
+            setTimeout(loadSyncStatus, 4000);
+            setTimeout(loadSyncHistory, 4000);
+            setTimeout(loadSyncStatus, 12000);
+            setTimeout(loadSyncHistory, 12000);
+        } else {
+            showSyncMsg(data.error || 'Local PM import failed to start.', 'error');
+        }
+    } catch (e) {
+        showSyncMsg('Error: ' + e.message, 'error');
     }
 }
 

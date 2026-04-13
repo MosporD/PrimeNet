@@ -5,7 +5,7 @@ Provides PCI/PSC/BCCH conflict detection and site cell browser.
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from functools import wraps
-import sqlite3, os
+import sqlite3
 
 from database_enhanced import get_user_by_session, log_activity
 from sync_config import METADATA_DB

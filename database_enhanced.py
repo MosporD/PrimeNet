@@ -6,22 +6,58 @@ SQLite database for user management with all features
 import sqlite3
 import hashlib
 import secrets
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import sys
 import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sync_config import NCMUSERS_DB as DATABASE
+from db.runtime import adapt_placeholders, connect_app, is_postgresql
+
+
+def _unique_constraint_error(exc):
+    if isinstance(exc, sqlite3.IntegrityError):
+        return True
+    try:
+        import psycopg2.errors
+
+        return isinstance(exc, psycopg2.errors.UniqueViolation)
+    except Exception:
+        return False
+
+
+def _exec(cur, sql: str, params=()):
+    return cur.execute(adapt_placeholders(sql), tuple(params) if params is not None else ())
+
+
+def _insert_return_id(conn, sql: str, params):
+    sql = adapt_placeholders(sql)
+    params = tuple(params)
+    if is_postgresql():
+        s = sql.rstrip().rstrip(';')
+        if 'RETURNING' not in s.upper():
+            s = f'{s} RETURNING id'
+        cur = conn.cursor()
+        cur.execute(s, params)
+        row = cur.fetchone()
+        return row['id'] if row else None
+    cur = conn.cursor()
+    cur.execute(sql, params)
+    return cur.lastrowid
+
 
 def get_db():
-    """Get database connection"""
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    return conn
+    """SQLite ``ncm_users.db`` or PostgreSQL ``app`` schema (via ``DATABASE_URL``)."""
+    return connect_app()
+
 
 def init_db():
     """Initialize database with all tables"""
+    if is_postgresql():
+        # App + metadata + PM schemas are created by ``sync.db_migration.run_migrations``.
+        return
+
     conn = get_db()
     cursor = conn.cursor()
     
@@ -179,7 +215,7 @@ def verify_password(password, password_hash):
         salt, pwd_hash = password_hash.split('$')
         test_hash = hashlib.sha256((password + salt).encode()).hexdigest()
         return test_hash == pwd_hash
-    except:
+    except (ValueError, AttributeError):
         return False
 
 # ============================================================================
@@ -190,45 +226,49 @@ def create_user(username, email, password, full_name=None, department=None, role
     """Create new user"""
     try:
         conn = get_db()
-        cursor = conn.cursor()
-        
         password_hash = hash_password(password)
-        
-        cursor.execute('''
+        user_id = _insert_return_id(
+            conn,
+            '''
             INSERT INTO users (username, email, password_hash, full_name, department, role)
             VALUES (?, ?, ?, ?, ?, ?)
-        ''', (username, email, password_hash, full_name, department, role))
-        
+            ''',
+            (username, email, password_hash, full_name, department, role),
+        )
         conn.commit()
-        user_id = cursor.lastrowid
         conn.close()
-        
         return True, user_id
-    except sqlite3.IntegrityError as e:
-        if 'username' in str(e):
-            return False, "Username already exists"
-        elif 'email' in str(e):
-            return False, "Email already exists"
-        return False, "User creation failed"
     except Exception as e:
+        if _unique_constraint_error(e):
+            msg = str(e).lower()
+            if 'username' in msg or 'users_username_key' in msg:
+                return False, 'Username already exists'
+            if 'email' in msg or 'users_email_key' in msg:
+                return False, 'Email already exists'
+            return False, 'User creation failed'
         return False, str(e)
 
 def authenticate_user(username, password):
     """Authenticate user and return user data"""
     conn = get_db()
     cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM users WHERE username = ? AND is_active = 1', (username,))
+    _exec(
+        cursor,
+        'SELECT * FROM users WHERE username = ? AND is_active',
+        (username,),
+    )
     user = cursor.fetchone()
-    
+
     if user and verify_password(password, user['password_hash']):
-        cursor.execute('UPDATE users SET last_login = ? WHERE id = ?', 
-                      (datetime.now(), user['id']))
+        _exec(
+            cursor,
+            'UPDATE users SET last_login = ? WHERE id = ?',
+            (datetime.now(), user['id']),
+        )
         conn.commit()
         conn.close()
-        
         return True, dict(user)
-    
+
     conn.close()
     return False, None
 
@@ -251,7 +291,7 @@ def update_user_role(user_id, new_role):
     conn = get_db()
     cursor = conn.cursor()
     
-    cursor.execute('UPDATE users SET role = ? WHERE id = ?', (new_role, user_id))
+    _exec(cursor, 'UPDATE users SET role = ? WHERE id = ?', (new_role, user_id))
     affected = cursor.rowcount
     
     conn.commit()
@@ -264,7 +304,7 @@ def update_user_status(user_id, is_active):
     conn = get_db()
     cursor = conn.cursor()
     
-    cursor.execute('UPDATE users SET is_active = ? WHERE id = ?', (is_active, user_id))
+    _exec(cursor, 'UPDATE users SET is_active = ? WHERE id = ?', (is_active, user_id))
     affected = cursor.rowcount
     
     conn.commit()
@@ -280,18 +320,20 @@ def create_session(user_id):
     """Create session token for user"""
     conn = get_db()
     cursor = conn.cursor()
-    
     session_token = secrets.token_urlsafe(32)
-    expires_at = datetime.now().timestamp() + (24 * 60 * 60)  # 24 hours
-    
-    cursor.execute('''
+    expires_at = datetime.now() + timedelta(hours=24)
+
+    _exec(
+        cursor,
+        '''
         INSERT INTO sessions (user_id, session_token, expires_at)
         VALUES (?, ?, ?)
-    ''', (user_id, session_token, expires_at))
-    
+        ''',
+        (user_id, session_token, expires_at),
+    )
+
     conn.commit()
     conn.close()
-    
     return session_token
 
 def get_user_by_session(session_token):
@@ -299,11 +341,15 @@ def get_user_by_session(session_token):
     conn = get_db()
     cursor = conn.cursor()
     
-    cursor.execute('''
+    _exec(
+        cursor,
+        '''
         SELECT u.* FROM users u
         JOIN sessions s ON u.id = s.user_id
-        WHERE s.session_token = ? AND s.expires_at > ? AND u.is_active = 1
-    ''', (session_token, datetime.now().timestamp()))
+        WHERE s.session_token = ? AND s.expires_at > ? AND u.is_active
+        ''',
+        (session_token, datetime.now()),
+    )
     
     user = cursor.fetchone()
     conn.close()
@@ -314,7 +360,7 @@ def delete_session(session_token):
     """Delete session (logout)"""
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute('DELETE FROM sessions WHERE session_token = ?', (session_token,))
+    _exec(cursor, 'DELETE FROM sessions WHERE session_token = ?', (session_token,))
     conn.commit()
     conn.close()
 
@@ -327,10 +373,14 @@ def log_activity(user_id, action, details=None, ip_address=None):
     conn = get_db()
     cursor = conn.cursor()
     
-    cursor.execute('''
+    _exec(
+        cursor,
+        '''
         INSERT INTO activity_log (user_id, action, details, ip_address)
         VALUES (?, ?, ?, ?)
-    ''', (user_id, action, details, ip_address))
+        ''',
+        (user_id, action, details, ip_address),
+    )
     
     conn.commit()
     conn.close()
@@ -343,19 +393,26 @@ def create_task_db(title, description, task_type, priority, created_by,
                    assigned_to=None, xml_file_path=None, xml_file_name=None):
     """Create a new task with optional XML file attachment"""
     conn = get_db()
-    cursor = conn.cursor()
-    
-    cursor.execute('''
+
+    task_id = _insert_return_id(
+        conn,
+        '''
         INSERT INTO tasks (
             title, description, task_type, priority, status,
             created_by, assigned_to, xml_file_path, xml_file_name
         ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?)
-    ''', (
-        title, description, task_type, priority,
-        created_by, assigned_to, xml_file_path, xml_file_name
-    ))
-    
-    task_id = cursor.lastrowid
+        ''',
+        (
+            title,
+            description,
+            task_type,
+            priority,
+            created_by,
+            assigned_to,
+            xml_file_path,
+            xml_file_name,
+        ),
+    )
     conn.commit()
     conn.close()
     
@@ -402,7 +459,7 @@ def get_tasks(user_id=None, assigned_to=None, created_by=None, status=None):
 
     query += ' ORDER BY t.created_at DESC'
 
-    cursor.execute(query, params)
+    cursor.execute(adapt_placeholders(query), params)
     tasks = cursor.fetchall()
     conn.close()
 
@@ -413,7 +470,9 @@ def get_task_by_id(task_id):
     conn = get_db()
     cursor = conn.cursor()
     
-    cursor.execute('''
+    _exec(
+        cursor,
+        '''
         SELECT 
             t.*,
             creator.username as creator_name,
@@ -424,7 +483,9 @@ def get_task_by_id(task_id):
         LEFT JOIN users creator ON t.created_by = creator.id
         LEFT JOIN users assignee ON t.assigned_to = assignee.id
         WHERE t.id = ?
-    ''', (task_id,))
+        ''',
+        (task_id,),
+    )
     
     task = cursor.fetchone()
     conn.close()
@@ -446,17 +507,25 @@ def update_task_status(task_id, user_id, new_status, comment=None, error_details
     old_status = row['status']
 
     # Update task
-    cursor.execute('''
+    _exec(
+        cursor,
+        '''
         UPDATE tasks
         SET status = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
-    ''', (new_status, task_id))
+        ''',
+        (new_status, task_id),
+    )
 
     # Log the update
-    cursor.execute('''
+    _exec(
+        cursor,
+        '''
         INSERT INTO task_updates (task_id, user_id, update_type, old_value, new_value, comment)
         VALUES (?, ?, 'status_change', ?, ?, ?)
-    ''', (task_id, user_id, old_status, new_status, comment))
+        ''',
+        (task_id, user_id, old_status, new_status, comment),
+    )
 
     conn.commit()
     conn.close()
@@ -468,7 +537,9 @@ def get_task_updates(task_id):
     conn = get_db()
     cursor = conn.cursor()
 
-    cursor.execute('''
+    _exec(
+        cursor,
+        '''
         SELECT
             tu.*,
             u.username,
@@ -477,7 +548,9 @@ def get_task_updates(task_id):
         LEFT JOIN users u ON tu.user_id = u.id
         WHERE tu.task_id = ?
         ORDER BY tu.created_at DESC
-    ''', (task_id,))
+        ''',
+        (task_id,),
+    )
 
     updates = cursor.fetchall()
     conn.close()
@@ -502,7 +575,7 @@ def assign_task(task_id, user_id, assigned_to, comment=None):
 
     try:
         # Get current assignee
-        cursor.execute('SELECT assigned_to FROM tasks WHERE id = ?', (task_id,))
+        _exec(cursor, 'SELECT assigned_to FROM tasks WHERE id = ?', (task_id,))
         row = cursor.fetchone()
         if not row:
             conn.close()
@@ -511,18 +584,31 @@ def assign_task(task_id, user_id, assigned_to, comment=None):
         old_assignee = row['assigned_to']
 
         # Update task assignment
-        cursor.execute('''
+        _exec(
+            cursor,
+            '''
             UPDATE tasks
             SET assigned_to = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
-        ''', (assigned_to if assigned_to else None, task_id))
+            ''',
+            (assigned_to if assigned_to else None, task_id),
+        )
 
         # Log the assignment change
-        cursor.execute('''
+        _exec(
+            cursor,
+            '''
             INSERT INTO task_updates (task_id, user_id, update_type, old_value, new_value, comment)
             VALUES (?, ?, 'assignment', ?, ?, ?)
-        ''', (task_id, user_id, str(old_assignee) if old_assignee else 'Unassigned',
-              str(assigned_to) if assigned_to else 'Unassigned', comment))
+            ''',
+            (
+                task_id,
+                user_id,
+                str(old_assignee) if old_assignee else 'Unassigned',
+                str(assigned_to) if assigned_to else 'Unassigned',
+                comment,
+            ),
+        )
 
         conn.commit()
         conn.close()
@@ -538,10 +624,14 @@ def add_task_comment(task_id, user_id, comment):
     cursor = conn.cursor()
 
     try:
-        cursor.execute('''
+        _exec(
+            cursor,
+            '''
             INSERT INTO task_updates (task_id, user_id, update_type, comment)
             VALUES (?, ?, 'comment', ?)
-        ''', (task_id, user_id, comment))
+            ''',
+            (task_id, user_id, comment),
+        )
 
         conn.commit()
         conn.close()
@@ -558,24 +648,23 @@ def add_task_comment(task_id, user_id, comment):
 def save_profile(user_id, profile_name, description, filter_data, is_shared=False):
     """Save a filter profile"""
     conn = get_db()
-    cursor = conn.cursor()
 
     try:
-        cursor.execute('''
+        profile_id = _insert_return_id(
+            conn,
+            '''
             INSERT INTO filter_profiles (user_id, profile_name, description, filter_data, is_shared)
             VALUES (?, ?, ?, ?, ?)
-        ''', (user_id, profile_name, description, json.dumps(filter_data), is_shared))
-
-        profile_id = cursor.lastrowid
+            ''',
+            (user_id, profile_name, description, json.dumps(filter_data), is_shared),
+        )
         conn.commit()
         conn.close()
-
         return True, profile_id
-    except sqlite3.IntegrityError:
-        conn.close()
-        return False, "Profile name already exists"
     except Exception as e:
         conn.close()
+        if _unique_constraint_error(e):
+            return False, 'Profile name already exists'
         return False, str(e)
 
 # Alias for compatibility with app_enhanced.py
@@ -593,17 +682,21 @@ def delete_filter_profile(profile_id, user_id):
     cursor = conn.cursor()
 
     try:
-        cursor.execute('''
+        _exec(
+            cursor,
+            '''
             DELETE FROM filter_profiles
             WHERE id = ? AND user_id = ?
-        ''', (profile_id, user_id))
+            ''',
+            (profile_id, user_id),
+        )
 
         affected = cursor.rowcount
         conn.commit()
         conn.close()
 
         return affected > 0
-    except Exception as e:
+    except Exception:
         conn.close()
         return False
 
@@ -612,11 +705,15 @@ def get_profiles(user_id):
     conn = get_db()
     cursor = conn.cursor()
     
-    cursor.execute('''
+    _exec(
+        cursor,
+        '''
         SELECT * FROM filter_profiles
-        WHERE user_id = ? OR is_shared = 1
+        WHERE user_id = ? OR is_shared
         ORDER BY created_at DESC
-    ''', (user_id,))
+        ''',
+        (user_id,),
+    )
     
     profiles = cursor.fetchall()
     conn.close()
@@ -628,10 +725,14 @@ def get_profile_by_id(profile_id, user_id):
     conn = get_db()
     cursor = conn.cursor()
     
-    cursor.execute('''
+    _exec(
+        cursor,
+        '''
         SELECT * FROM filter_profiles
-        WHERE id = ? AND (user_id = ? OR is_shared = 1)
-    ''', (profile_id, user_id))
+        WHERE id = ? AND (user_id = ? OR is_shared)
+        ''',
+        (profile_id, user_id),
+    )
     
     profile = cursor.fetchone()
     conn.close()
@@ -698,10 +799,12 @@ def create_admin_user():
 
 # Initialize database on import
 try:
-    if not os.path.exists(DATABASE):
+    if is_postgresql():
+        pass
+    elif not os.path.exists(DATABASE):
         print(f"Creating database at: {os.path.abspath(DATABASE)}")
         init_db()
         create_admin_user()
-        print("✓ Database initialized successfully")
+        print('✓ Database initialized successfully')
 except Exception as e:
     print(f"⚠️  Warning: Could not auto-initialize database: {e}")

@@ -39,91 +39,148 @@
                 </div>
             </div>
 
-            <!-- ── Data Sync Section ─────────────────────────────────── -->
-            <div class="sync-section">
-                <h2 class="section-title">Data Sync</h2>
+            <div class="admin-pages-nav" role="tablist" aria-label="Admin sections">
+                <button class="admin-page-tab active" data-page="data-sync" type="button" onclick="openAdminPage('data-sync')">Data Sync</button>
+                <button class="admin-page-tab" data-page="sync-status" type="button" onclick="openAdminPage('sync-status')">Sync Status</button>
+                <button class="admin-page-tab" data-page="sync-history" type="button" onclick="openAdminPage('sync-history')">Sync History</button>
+                <button class="admin-page-tab" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
+            </div>
 
-                <div class="sync-actions">
-                    <button class="btn-sync nokia"  onclick="triggerSync('nokia_pm')">Sync Nokia PM</button>
-                    <button class="btn-sync huawei" onclick="triggerSync('huawei_pm')">Sync Huawei PM</button>
-                    <button class="btn-sync meta"   onclick="triggerSync('metadata')">Sync Metadata</button>
-                    <button class="btn-sync test"   onclick="testConnectivity()">Test Connectivity</button>
-                    <button class="btn-sync inspect" onclick="inspectLocal()">Inspect Column Headers</button>
+            <div class="admin-page-panel active" data-page="data-sync">
+                <div class="sync-section">
+                    <h2 class="section-title">Data Sync</h2>
+                    <div class="sync-actions">
+                        <button class="btn-sync nokia"  onclick="triggerSync('nokia_pm')">Sync Nokia PM</button>
+                        <button class="btn-sync huawei" onclick="triggerSync('huawei_pm')">Sync Huawei PM</button>
+                        <button class="btn-sync meta"   onclick="triggerSync('metadata')">Sync Metadata</button>
+                        <button class="btn-sync test"   onclick="testConnectivity()">Test Connectivity</button>
+                        <button class="btn-sync inspect" onclick="inspectLocal()">Inspect Column Headers</button>
+                    </div>
+                    <div class="local-import-box">
+                        <h3 class="section-subtitle">Import PM From Local Path</h3>
+                        <div class="local-import-controls">
+                            <input id="pm-local-path" type="text" placeholder="C:/path/to/folder/with/pm/files">
+                            <select id="pm-local-vendor" title="Vendor filter">
+                                <option value="all">All Vendors</option>
+                                <option value="nokia">Nokia Only</option>
+                                <option value="huawei">Huawei Only</option>
+                            </select>
+                            <label class="local-import-recursive">
+                                <input id="pm-local-recursive" type="checkbox" checked>
+                                Recursive
+                            </label>
+                            <button class="btn-sync import" onclick="importPmFromPath()">Import Local PM</button>
+                        </div>
+                    </div>
+                    <div class="live-progress-box">
+                        <h3 class="section-subtitle">Live Sync Progress</h3>
+                        <div class="live-progress-grid">
+                            <div class="progress-card" id="progress-card-nokia_pm">
+                                <div class="progress-title">Nokia PM</div>
+                                <div class="progress-meta" id="progress-meta-nokia_pm">Idle</div>
+                                <div class="progress-track"><div class="progress-fill" id="progress-fill-nokia_pm"></div></div>
+                            </div>
+                            <div class="progress-card" id="progress-card-huawei_pm">
+                                <div class="progress-title">Huawei PM</div>
+                                <div class="progress-meta" id="progress-meta-huawei_pm">Idle</div>
+                                <div class="progress-track"><div class="progress-fill" id="progress-fill-huawei_pm"></div></div>
+                            </div>
+                            <div class="progress-card" id="progress-card-metadata">
+                                <div class="progress-title">Metadata</div>
+                                <div class="progress-meta" id="progress-meta-metadata">Idle</div>
+                                <div class="progress-track"><div class="progress-fill" id="progress-fill-metadata"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sync-msg" class="sync-msg" style="display:none;"></div>
+                    <pre id="inspect-output" class="inspect-output" style="display:none;"></pre>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="sync-status">
+                <div class="sync-section">
+                    <h2 class="section-title">Last Sync per Source</h2>
+                    <table class="sync-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Technology</th>
+                                <th>Status</th>
+                                <th>Rows</th>
+                                <th>Message</th>
+                                <th>When</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sync-status-body">
+                            <tr><td colspan="6" style="text-align:center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                    <div id="sync-status-pagination" class="table-pagination"></div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="sync-history">
+                <div class="sync-section">
+                    <h2 class="section-title">Recent Sync History</h2>
+                    <h3 class="section-subtitle">Filters
+                        <input type="date" id="sync-history-day" onchange="loadSyncHistory()" title="Filter history by day">
+                        <button class="btn-history-reload" onclick="clearSyncHistoryDay()">Clear Day</button>
+                        <button class="btn-history-reload" onclick="loadSyncHistory()">↻ Refresh</button>
+                    </h3>
+                    <table class="sync-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Technology</th>
+                                <th>Status</th>
+                                <th>Rows</th>
+                                <th>Message</th>
+                                <th>When</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sync-history-body">
+                            <tr><td colspan="6" style="text-align:center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                    <div id="sync-history-pagination" class="table-pagination"></div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="user-admin">
+                <div class="search-section">
+                    <input type="text" id="user-search" placeholder="Search users..." onkeyup="searchUsers()">
+                    <select id="role-filter" onchange="filterUsers()">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">User</option>
+                    </select>
+                    <select id="status-filter" onchange="filterUsers()">
+                        <option value="">All Status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
                 </div>
 
-                <div id="sync-msg" class="sync-msg" style="display:none;"></div>
-                <pre id="inspect-output" class="inspect-output" style="display:none;"></pre>
-
-                <h3 class="section-subtitle">Last Sync per Source</h3>
-                <table class="sync-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Technology</th>
-                            <th>Status</th>
-                            <th>Rows</th>
-                            <th>Message</th>
-                            <th>When</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sync-status-body">
-                        <tr><td colspan="6" style="text-align:center;">Loading…</td></tr>
-                    </tbody>
-                </table>
-
-                <h3 class="section-subtitle">Recent Sync History
-                    <button class="btn-history-reload" onclick="loadSyncHistory()">↻ Refresh</button>
-                </h3>
-                <table class="sync-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Technology</th>
-                            <th>Status</th>
-                            <th>Rows</th>
-                            <th>Message</th>
-                            <th>When</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sync-history-body">
-                        <tr><td colspan="6" style="text-align:center;">Loading…</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <!-- ─────────────────────────────────────────────────────── -->
-
-            <div class="search-section">
-                <input type="text" id="user-search" placeholder="Search users..." onkeyup="searchUsers()">
-                <select id="role-filter" onchange="filterUsers()">
-                    <option value="">All Roles</option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                </select>
-                <select id="status-filter" onchange="filterUsers()">
-                    <option value="">All Status</option>
-                    <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                </select>
-            </div>
-
-            <div class="users-table-container">
-                <table class="users-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th>Last Activity</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="users-table-body">
-                        <tr><td colspan="8" style="text-align: center;">Loading...</td></tr>
-                    </tbody>
-                </table>
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Last Activity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr><td colspan="8" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                    <div id="users-pagination" class="table-pagination"></div>
+                </div>
             </div>
         </main>
     </div>

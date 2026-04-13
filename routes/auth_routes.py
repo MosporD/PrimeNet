@@ -3,13 +3,26 @@ Authentication Routes
 Handles login, logout, registration, and dashboard access
 """
 
+import logging
+import sqlite3
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, make_response
 from database_enhanced import (
     create_user, authenticate_user, create_session,
     get_user_by_session, delete_session, log_activity
 )
+from sync_config import METADATA_DB
+from sync.metadata_active_sql import perf_per_tech_union_sql_with_activity
 
+logger = logging.getLogger(__name__)
 auth_bp = Blueprint('auth', __name__)
+
+_DEFAULT_SITE_COLUMNS = [
+    {'key': '2G', 'title': '2G', 'subtitle': 'GSM / EDGE', 'count': 0},
+    {'key': '3G', 'title': '3G', 'subtitle': 'WCDMA / UMTS', 'count': 0},
+    {'key': '4G-FDD', 'title': '4G - FDD', 'subtitle': 'LTE FDD', 'count': 0},
+    {'key': '4G-TDD', 'title': '4G - TDD', 'subtitle': 'LTE TDD', 'count': 0},
+    {'key': '5G', 'title': '5G', 'subtitle': 'NR', 'count': 0},
+]
 
 def get_current_user():
     """Get current logged-in user"""
@@ -17,6 +30,61 @@ def get_current_user():
     if session_token:
         return get_user_by_session(session_token)
     return None
+
+def get_operational_site_stats():
+    """
+    Distinct site counts per RAT from metadata, counting only cells whose
+    vendor-specific rules mark them as on-air (activity_status = 'Active').
+    4G-FDD and 4G-TDD are reported as separate columns.
+    """
+    union = perf_per_tech_union_sql_with_activity()
+    sql = f'''
+        SELECT technology, site_id
+        FROM ({union}) v
+        WHERE activity_status = 'Active'
+          AND site_id IS NOT NULL
+          AND TRIM(COALESCE(CAST(site_id AS TEXT), '')) != ''
+    '''
+    try:
+        conn = sqlite3.connect(METADATA_DB, timeout=15)
+        rows = conn.execute(sql).fetchall()
+        conn.close()
+    except Exception as e:
+        logger.exception('Dashboard operational site stats failed: %s', e)
+        cols = [dict(c) for c in _DEFAULT_SITE_COLUMNS]
+        return cols, 0
+
+    buckets = {
+        '2G': set(),
+        '3G': set(),
+        '4G-FDD': set(),
+        '4G-TDD': set(),
+        '5G': set(),
+    }
+    for tech, site_id in rows:
+        if tech in buckets:
+            buckets[tech].add(site_id)
+
+    order = [
+        ('2G', '2G', 'GSM / EDGE'),
+        ('3G', '3G', 'WCDMA / UMTS'),
+        ('4G-FDD', '4G - FDD', 'LTE FDD'),
+        ('4G-TDD', '4G - TDD', 'LTE TDD'),
+        ('5G', '5G', 'NR'),
+    ]
+    columns = []
+    all_sites = set()
+    for key, title, subtitle in order:
+        s = buckets.get(key, set())
+        all_sites |= s
+        columns.append({
+            'key': key,
+            'title': title,
+            'subtitle': subtitle,
+            'count': len(s),
+        })
+    return columns, len(all_sites)
+
 
 def format_user_data(user):
     """Format user data consistently for templates"""
@@ -66,7 +134,12 @@ def dashboard():
     if not user:
         return redirect(url_for('auth.login_page'))
 
-    return render_template('dashboard.html', user=format_user_data(user))
+    tech_site_columns, _ = get_operational_site_stats()
+    return render_template(
+        'dashboard.html',
+        user=format_user_data(user),
+        tech_site_columns=tech_site_columns,
+    )
 
 # ============================================================================
 # API ROUTES
@@ -152,3 +225,21 @@ def logout():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@auth_bp.route('/api/dashboard/operational-sites', methods=['GET'])
+def dashboard_operational_sites():
+    """Return latest operational site counts per technology."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    tech_site_columns, total_sites = get_operational_site_stats()
+    resp = jsonify({
+        'success': True,
+        'tech_site_columns': tech_site_columns,
+        'total_sites': total_sites,
+    })
+    resp.headers['Cache-Control'] = 'no-store, private'
+    resp.headers['Pragma'] = 'no-cache'
+    return resp

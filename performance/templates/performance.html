@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Analytics - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
-    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=5.0">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=7.3">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
-<body>
-<div class="container">
+<body class="perf-page">
+<div class="container perf-container">
 
     <header>
         <div class="header-content">
@@ -30,109 +30,141 @@
         <!-- ================================================================
              LEFT: Filter Panel
         ================================================================ -->
-        <aside class="filter-panel">
-            <h3 class="filter-title">Filters</h3>
+        <aside class="filter-panel perf-filter-hw">
+            <input type="hidden" id="filter-site" value="">
+            <input type="hidden" id="filter-cell" value="">
 
-            <div class="filter-group">
-                <label>Vendor</label>
-                <select id="filter-vendor" onchange="onVendorChange()">
-                    <option value="">All Vendors</option>
-                    <option value="Nokia">Nokia</option>
-                    <option value="Huawei">Huawei</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Technology</label>
-                <select id="filter-tech">
-                    <option value="">All</option>
-                    <option value="2G">2G</option>
-                    <option value="3G">3G</option>
-                    <option value="4G">4G</option>
-                    <option value="5G">5G</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Cluster</label>
-                <select id="filter-cluster" onchange="onClusterChange()">
-                    <option value="">All Clusters</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Area</label>
-                <select id="filter-area" onchange="onAreaChange()">
-                    <option value="">All Areas</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Site</label>
-                <select id="filter-site" onchange="onSiteChange()">
-                    <option value="">All Sites</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Cell</label>
-                <select id="filter-cell">
-                    <option value="">All Cells</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Time Window</label>
-                <select id="filter-hours">
+            <div class="perf-time-window-row">
+                <label class="perf-time-window-label" for="filter-hours">Time window</label>
+                <select id="filter-hours" class="perf-time-window-select"
+                        onchange="onPerfTimeWindowChange()">
                     <option value="24">Last 24 hours</option>
                     <option value="48">Last 48 hours</option>
                     <option value="72">Last 72 hours</option>
                     <option value="168" selected>Last 7 days</option>
+                    <option value="336">Last 14 days</option>
+                    <option value="720">Last 30 days</option>
                 </select>
             </div>
 
-            <button class="btn-apply" onclick="applyFilters()">Apply</button>
-
-            <div class="filter-divider"></div>
-
-            <!-- Cell search + chip list (always in left panel) -->
-            <div id="cell-list-wrap" style="display:none;">
-                <div class="cell-search-wrap">
-                    <input
-                        id="cell-search"
-                        class="cell-search-input"
-                        type="text"
-                        placeholder="Search cells..."
-                        oninput="filterCellChips(this.value)"
-                    />
-                    <span id="cell-count-badge" class="cell-count-badge"></span>
+            <div id="cell-list-wrap" class="hw-tree-panel">
+                <div class="perf-sidebar-section perf-sidebar-cells">
+                    <button type="button" class="perf-sidebar-toggle" id="perf-toggle-cells"
+                            aria-expanded="true" aria-controls="perf-cells-body"
+                            onclick="perfSidebarToggle(this)">
+                        <span class="perf-chevron" aria-hidden="true">▼</span>
+                        <span>Objects</span>
+                    </button>
+                    <div id="perf-cells-body" class="perf-sidebar-body perf-cells-body">
+                        <div class="hw-tree-toolbar">
+                            <div class="hw-tree-toolbar-row">
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">NE type</span>
+                                    <select id="filter-tech" class="hw-real-select" onchange="onFilterTechChange()">
+                                        <option value="">All Technologies</option>
+                                        <option value="2G">2G</option>
+                                        <option value="3G">3G</option>
+                                        <option value="4G">4G</option>
+                                        <option value="5G">5G</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Vendor</span>
+                                    <select id="filter-vendor" class="hw-real-select" onchange="onVendorChange()">
+                                        <option value="">All Vendors</option>
+                                        <option value="Nokia">Nokia</option>
+                                        <option value="Huawei">Huawei</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Object group</span>
+                                    <select id="filter-area" class="hw-real-select" onchange="onAreaChange()">
+                                        <option value="">Whole Network</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field hw-toolbar-field--grow">
+                                    <span class="hw-field-label">Object cluster</span>
+                                    <select id="filter-cluster" class="hw-real-select" onchange="onClusterChange()">
+                                        <option value="">All Clusters</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="hw-tree-toolbar-row">
+                                <div class="hw-toolbar-field hw-toolbar-field--grow">
+                                    <span class="hw-field-label">Selection</span>
+                                    <select id="filter-selection-type" class="hw-real-select" onchange="onSelectionTypeChange()">
+                                        <option value="cell" selected>Cell</option>
+                                        <option value="group">Group</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field hw-toolbar-field--grow" id="group-picker-wrap" style="display:none;">
+                                    <span class="hw-field-label">Cell Group</span>
+                                    <select id="filter-group" class="hw-real-select">
+                                        <option value="">Select group...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="hw-tree-toolbar-row hw-tree-toolbar-row--tools">
+                                <input type="search" id="cell-search" class="hw-tree-search"
+                                       placeholder="Filter by keyword…" autocomplete="off"
+                                       oninput="filterCellChips(this.value)">
+                                <div class="hw-select-mode" role="radiogroup" aria-label="Selection mode">
+                                    <label class="hw-radio"><input type="radio" name="perf-sel-mode" value="single" checked onchange="onPerfSelectionModeChange()"> Single</label>
+                                    <label class="hw-radio"><input type="radio" name="perf-sel-mode" value="multiple" onchange="onPerfSelectionModeChange()"> Multiple</label>
+                                </div>
+                                <button type="button" class="hw-icon-btn" title="Collapse all" onclick="perfTreeCollapseAll()">−</button>
+                                <button type="button" class="hw-icon-btn" title="Expand all" onclick="perfTreeExpandAll()">+</button>
+                                <button type="button" class="hw-icon-btn hw-icon-btn-refresh" title="Refresh" onclick="refreshData()">↻</button>
+                                <a id="map-link" href="/network-map" class="hw-toolbar-map" title="Open network map">Map</a>
+                            </div>
+                            <div class="hw-tree-meta"><span id="cell-count-badge"></span></div>
+                        </div>
+                        <div id="cell-list" class="hw-object-tree" role="tree"></div>
+                    </div>
                 </div>
-                <div id="cell-list" class="cell-list"></div>
+                <div id="kpi-scope-panel" class="kpi-scope-panel" aria-label="KPIs for current scope">
+                    <div class="kpi-scope-head">
+                        <button type="button" class="perf-sidebar-toggle perf-sidebar-toggle--nest" id="perf-toggle-kpis"
+                                aria-expanded="true" aria-controls="perf-kpis-body" title="Collapse or expand KPI list"
+                                onclick="perfSidebarToggle(this)">
+                            <span class="perf-chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <span class="kpi-scope-title" id="kpi-scope-title">Available KPIs</span>
+                        <span class="kpi-scope-count" id="kpi-scope-count"></span>
+                    </div>
+                    <div id="perf-kpis-body" class="perf-sidebar-body perf-kpis-body">
+                        <div class="kpi-scope-controls">
+                            <label class="kpi-scope-select-all">
+                                <input type="checkbox" id="kpi-select-all">
+                                <span>Select all KPIs</span>
+                            </label>
+                        </div>
+                        <div id="kpi-scope-list" class="kpi-scope-list"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="filter-divider"></div>
-
-            <!-- Summary stats -->
-            <div class="side-stats">
-                <div class="side-stat">
-                    <div class="side-stat-value" id="sum-cells">-</div>
-                    <div class="side-stat-label">Cells loaded</div>
+            <div class="perf-query-bar" role="region" aria-label="Run query">
+                <div class="perf-bottom-mode">
+                    <button type="button" class="perf-mode-btn active" id="perf-mode-kpis" onclick="setPerfBottomMode('kpis')">KPIs</button>
+                    <button type="button" class="perf-mode-btn" id="perf-mode-reports" onclick="setPerfBottomMode('reports')">Reports</button>
                 </div>
-                <div class="side-stat">
-                    <div class="side-stat-value" id="sum-availability">-</div>
-                    <div class="side-stat-label">Avg Availability</div>
+                <div id="perf-kpis-controls">
+                    <button type="button" class="btn-query" id="btn-perf-query" onclick="runPerformanceQuery()">Query</button>
+                    <p class="perf-query-hint">Loads KPI charts for the selected cell(s) and checked KPIs.</p>
                 </div>
-                <div class="side-stat">
-                    <div class="side-stat-value" id="sum-drop">-</div>
-                    <div class="side-stat-label">Avg Drop Rate</div>
-                </div>
-                <div class="side-stat">
-                    <div class="side-stat-value" id="sum-dl">-</div>
-                    <div class="side-stat-label">Avg DL Throughput</div>
+                <div id="perf-reports-controls" style="display:none;">
+                    <div class="perf-reports-row">
+                        <select id="perf-report-select" class="perf-report-select"></select>
+                        <button type="button" class="btn-query" onclick="runSelectedReport()">Run Report</button>
+                    </div>
+                    <div class="perf-reports-row">
+                        <button type="button" class="btn-query" onclick="saveCurrentReport()">Save Current as Report</button>
+                        <button type="button" class="btn-query btn-query-danger" onclick="deleteSelectedReport()">Delete Selected</button>
+                    </div>
                 </div>
             </div>
 
-            <a id="map-link" href="/network-map" class="map-back-link">View on Map</a>
         </aside>
 
         <!-- ================================================================
@@ -142,9 +174,8 @@
 
             <div class="charts-header">
                 <div class="charts-header-top">
-                    <div>
+                    <div class="charts-header-titles">
                         <div id="charts-title" class="charts-title">Select a cell to view KPI trends</div>
-                        <div id="charts-subtitle" class="charts-subtitle"></div>
                     </div>
                     <div class="header-actions">
                         <!-- View-mode toggle (visible once a vendor is selected) -->
@@ -162,10 +193,14 @@
                 </div>
             </div>
 
+            <div id="perf-chart-tabs-bar" class="perf-chart-tabs-bar" style="display:none;" aria-label="Chart tabs">
+                <div id="perf-chart-tabs-strip" class="perf-chart-tabs-strip" role="tablist"></div>
+            </div>
+
             <!-- Placeholder when no cell is selected -->
             <div id="no-selection" class="no-selection">
                 <div class="no-selection-icon">📊</div>
-                <p>Use the filters on the left, then click a cell to load its KPI charts.</p>
+                <p>Choose vendor and technology (cells load automatically). Select cell(s), check KPIs, then click <strong>Query</strong>.</p>
             </div>
 
             <div id="charts-wrap" class="charts-wrap" style="display:none;">
@@ -199,26 +234,29 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-<script src="{{ url_for('performance.static', filename='performance.js') }}?v=5.0"></script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=7.1"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         const params = new URLSearchParams(window.location.search);
         if (params.get('vendor'))     document.getElementById('filter-vendor').value = params.get('vendor');
         if (params.get('technology')) document.getElementById('filter-tech').value   = params.get('technology');
 
-        loadFilters().then(() => {
-            if (params.get('cluster')) document.getElementById('filter-cluster').value = params.get('cluster');
-            if (params.get('area'))    document.getElementById('filter-area').value    = params.get('area');
-            if (params.get('site_id')) document.getElementById('filter-site').value    = params.get('site_id');
+        await loadFilters();
 
-            if (params.get('site_id') || params.get('technology') || params.get('vendor')) {
-                applyFilters().then(() => {
-                    if (params.get('cell_id')) loadCellCharts(params.get('cell_id'));
-                });
-            }
-        });
+        if (params.get('area'))      document.getElementById('filter-area').value    = params.get('area');
+        if (params.get('cluster'))   document.getElementById('filter-cluster').value = params.get('cluster');
+        if (params.get('site_id'))   document.getElementById('filter-site').value   = params.get('site_id');
+        if (params.get('cell_id') || params.get('cell_name')) {
+            document.getElementById('filter-cell').value = params.get('cell_id') || params.get('cell_name') || '';
+        }
 
-        onVendorChange();
+        const deepLinkFilters = params.get('site_id') || params.get('area') || params.get('cluster')
+            || params.get('cell_id') || params.get('cell_name');
+        if (deepLinkFilters) {
+            await applyFilters();
+        } else {
+            await onVendorChange();
+        }
     });
 </script>
 </body>

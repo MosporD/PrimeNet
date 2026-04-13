@@ -5,7 +5,8 @@ Allows users to update their profile, change password, and customize the dashboa
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from functools import wraps
-import sqlite3, json
+import sqlite3
+import json
 
 from database_enhanced import (
     get_user_by_session, log_activity,

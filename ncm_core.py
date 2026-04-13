@@ -3,12 +3,8 @@ Nokia Configuration Manager - Core Processing Logic
 Extracted from NCM_V3.py without GUI components
 """
 
-import sys
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from typing import Dict, List, Set, Optional, Tuple
-import time
-import os
 from datetime import datetime
 
 try:
@@ -22,16 +18,8 @@ try:
 except ImportError:
     raise ImportError("pandas not installed. Install with: pip install pandas")
 
-# Try to use lxml for faster parsing (optional)
-try:
-    from lxml import etree as lxml_ET
-    LXML_AVAILABLE = True
-except ImportError:
-    LXML_AVAILABLE = False
-
 # Import MO descriptions
 try:
-    import mo_descriptions
     from mo_descriptions import (
         MO_DESCRIPTIONS, MO_CATEGORIES, PARAM_DESCRIPTIONS, MO_TO_PARAMS,
         get_mo_description, get_mo_category, get_param_description, get_mo_params,

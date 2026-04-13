@@ -113,7 +113,7 @@ def add_missing_tables():
     conn.close()
     
     print("\n" + "="*60)
-    print(f"✅ Migration Complete!")
+    print("✅ Migration Complete!")
     print(f"   Tables added: {tables_added}")
     print(f"   Total tables: {len(final_tables)}")
     print(f"   Final tables: {', '.join(final_tables)}")

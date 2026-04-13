@@ -21,7 +21,8 @@ New pipeline (called by scheduler)
 
 Lessons applied
 ---------------
-* No cell_id from CSV — avoids collision with INTEGER PRIMARY KEY AUTOINCREMENT.
+* Per-tech column list is `PER_TECH_CSV_SCHEMA` in `sync/db_migration.py`.
+* No synthetic cell_id from CSV for legacy `cells` — legacy uses INTEGER PK AUTOINCREMENT.
 * INSERT OR REPLACE (not ON CONFLICT DO UPDATE) — compatible with the Windows
   SQLite build shipped with Python 3.14.
 * COALESCE(NULLIF(TRIM(sname),''), sid) — prevents NOT NULL violation on
@@ -43,42 +44,17 @@ import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sync_config import METADATA_DB
+from sync.db_migration import PER_TECH_CSV_SCHEMA
+from sync.metadata_active_sql import legacy_cells_activity_case_sql
 
 logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Per-tech table column schemas (exact Atoll CSV header names, no extras)
-# Must stay in sync with _create_per_tech_tables() in db_migration.py.
+# Per-tech columns: single source of truth in sync/db_migration.py
 # ---------------------------------------------------------------------------
 
-_COLUMNS = {
-    'cells_2g': [
-        'cell_name', 'site_id', 'site_name', 'vendor',
-        'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
-        'frequency_band', 'bcc', 'active_state',
-    ],
-    'cells_3g': [
-        'cell_name', 'nodeb_id', 'nodeb_name', 'vendor',
-        'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
-        'dl_uarfcn', 'psc', 'active_state',
-    ],
-    'cells_4g_fdd': [
-        'cell_name', 'enb_id_actual', 'enb_name', 'vendor',
-        'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
-        'band', 'pci', 'active_state',
-    ],
-    'cells_4g_tdd': [
-        'cell_name', 'enb_id_actual', 'enb_name', 'vendor',
-        'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
-        'band', 'pci', 'active_state',
-    ],
-    'cells_5g': [
-        'cell_name', 'gnb_id_actual', 'gnb_name', 'vendor',
-        'lat', 'long', 'cluster', 'azimuth', 'etilt', 'mtilt',
-        'bw', 'pci', 'active_state',
-    ],
-}
+_COLUMNS = PER_TECH_CSV_SCHEMA
 
 # Per-tech table → (site_id_col, site_name_col) in that table
 _SITE_COL = {
@@ -94,27 +70,27 @@ _LEGACY_MAP = {
     'cells_2g': {
         'site_id': 'site_id', 'frequency_band': 'frequency_band',
         'azimuth': 'azimuth', 'mechanical_tilt': 'mtilt',
-        'electrical_tilt': 'etilt', 'pci': 'bcc', 'status': 'active_state',
+        'electrical_tilt': 'etilt', 'pci': 'bcch',
     },
     'cells_3g': {
         'site_id': 'nodeb_id', 'frequency_band': 'dl_uarfcn',
         'azimuth': 'azimuth', 'mechanical_tilt': 'mtilt',
-        'electrical_tilt': 'etilt', 'pci': 'psc', 'status': 'active_state',
+        'electrical_tilt': 'etilt', 'pci': 'psc',
     },
     'cells_4g_fdd': {
         'site_id': 'enb_id_actual', 'frequency_band': 'band',
         'azimuth': 'azimuth', 'mechanical_tilt': 'mtilt',
-        'electrical_tilt': 'etilt', 'pci': 'pci', 'status': 'active_state',
+        'electrical_tilt': 'etilt', 'pci': 'pci',
     },
     'cells_4g_tdd': {
         'site_id': 'enb_id_actual', 'frequency_band': 'band',
         'azimuth': 'azimuth', 'mechanical_tilt': 'mtilt',
-        'electrical_tilt': 'etilt', 'pci': 'pci', 'status': 'active_state',
+        'electrical_tilt': 'etilt', 'pci': 'pci',
     },
     'cells_5g': {
         'site_id': 'gnb_id_actual', 'frequency_band': 'bw',
         'azimuth': 'azimuth', 'mechanical_tilt': 'mtilt',
-        'electrical_tilt': 'etilt', 'pci': 'pci', 'status': 'active_state',
+        'electrical_tilt': 'etilt', 'pci': 'pci',
     },
 }
 
@@ -283,7 +259,10 @@ def _populate_legacy_tables(conn, table_name, technology):
             ),
             CAST(MAX(lat)  AS REAL),
             CAST(MAX(long) AS REAL),
-            MAX(NULLIF(TRIM(cluster), '')),
+            COALESCE(
+                MAX(NULLIF(TRIM(area),    '')),
+                MAX(NULLIF(TRIM(cluster), ''))
+            ),
             MAX(NULLIF(TRIM(vendor),  '')),
             'Active',
             CURRENT_TIMESTAMP
@@ -303,13 +282,13 @@ def _populate_legacy_tables(conn, table_name, technology):
     # ── Cells ────────────────────────────────────────────────────────────────
     conn.execute('DELETE FROM cells WHERE technology = ?', (technology,))
 
-    status_col   = lmap['status']
     site_id_col  = lmap['site_id']
     freq_col     = lmap['frequency_band']
     az_col       = lmap['azimuth']
     mtilt_col    = lmap['mechanical_tilt']
     etilt_col    = lmap['electrical_tilt']
     pci_col      = lmap['pci']
+    activity_case = legacy_cells_activity_case_sql(table_name)
 
     conn.execute(f'''
         INSERT OR IGNORE INTO cells
@@ -325,17 +304,7 @@ def _populate_legacy_tables(conn, table_name, technology):
             CAST(NULLIF(TRIM("{mtilt_col}"), '') AS REAL),
             CAST(NULLIF(TRIM("{etilt_col}"), '') AS REAL),
             CAST(NULLIF(TRIM("{pci_col}"),   '') AS INTEGER),
-            CASE
-                WHEN LOWER(TRIM(COALESCE("{status_col}", '')))
-                    IN ('activated','active','unlocked','cell_active',
-                        'enabled','1','yes','true')
-                THEN 'Active'
-                WHEN LOWER(TRIM(COALESCE("{status_col}", '')))
-                    IN ('deactivated','locked','cell_inactive',
-                        'inactive','disabled','0','no','false')
-                THEN 'Inactive'
-                ELSE 'Active'
-            END,
+            {activity_case},
             CURRENT_TIMESTAMP
         FROM "{table_name}"
         WHERE cell_name IS NOT NULL AND TRIM(cell_name) != ''
@@ -399,7 +368,7 @@ def seed_pm_cells_to_metadata(pm_db_path, vendor):
     insert a placeholder site + cell so cross-DB JOINs work before a
     full metadata sync has run.
     """
-    from sync_config import PM_TECHNOLOGIES, pm_table_name
+    from sync_config import PM_TECHNOLOGIES, pm_table_name, HUAWEI_PM_DB
 
     def _site_id(cell_name):
         m = re.match(r'^(\d+)', cell_name)
@@ -413,16 +382,29 @@ def seed_pm_cells_to_metadata(pm_db_path, vendor):
         meta_conn = sqlite3.connect(METADATA_DB, timeout=30)
 
         pm_rows = []
-        for tech in PM_TECHNOLOGIES:
-            table = pm_table_name(tech)
-            try:
-                rows = pm_conn.execute(
-                    f'SELECT DISTINCT cell_name FROM "{table}"'
-                ).fetchall()
-                for r in rows:
-                    pm_rows.append((r[0], tech))
-            except sqlite3.OperationalError:
-                continue
+        if os.path.abspath(pm_db_path) == os.path.abspath(HUAWEI_PM_DB):
+            for tech in PM_TECHNOLOGIES:
+                table = pm_table_name(tech)
+                try:
+                    rows = pm_conn.execute(
+                        f'SELECT DISTINCT cell_name FROM "{table}" '
+                        f"WHERE cell_name IS NOT NULL AND TRIM(cell_name) != ''"
+                    ).fetchall()
+                    for r in rows:
+                        pm_rows.append((r[0], tech))
+                except sqlite3.OperationalError:
+                    continue
+        else:
+            for tech in PM_TECHNOLOGIES:
+                table = pm_table_name(tech)
+                try:
+                    rows = pm_conn.execute(
+                        f'SELECT DISTINCT cell_name FROM "{table}"'
+                    ).fetchall()
+                    for r in rows:
+                        pm_rows.append((r[0], tech))
+                except sqlite3.OperationalError:
+                    continue
         pm_conn.close()
 
         existing_cells = {r[0] for r in meta_conn.execute('SELECT cell_name FROM cells').fetchall()}
@@ -542,7 +524,9 @@ def _lte_duplex(duplex_raw, earfcn_raw):
             return '4G-FDD'
         except (TypeError, ValueError):
             pass
-    return '4G'
+    # Default to FDD when duplex cannot be inferred. This keeps the UI and
+    # filters consistent (we only expose 4G-FDD / 4G-TDD).
+    return '4G-FDD'
 
 
 def process_metadata_file(file_path, tech, col_map):

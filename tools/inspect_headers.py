@@ -16,7 +16,6 @@ import os
 import sys
 import stat
 import tempfile
-import textwrap
 from datetime import datetime
 
 # Make sure project root is on the path

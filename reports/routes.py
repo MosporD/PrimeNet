@@ -5,8 +5,10 @@ Generates Excel reports on demand or on a schedule.
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, send_file
 from functools import wraps
-import sqlite3, os, io
-from datetime import datetime, timedelta
+import sqlite3
+import os
+import io
+from datetime import datetime
 
 from database_enhanced import get_user_by_session, log_activity
 from sync_config import NCMUSERS_DB, METADATA_DB, NOKIA_PM_DB, HUAWEI_PM_DB, PROJECT_ROOT, pm_table_name, PM_TECHNOLOGIES
@@ -128,7 +130,7 @@ def _generate_pci_conflicts():
     """Excel: list all PCI conflict groups."""
     try:
         from openpyxl import Workbook
-        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.styles import Font, PatternFill
     except ImportError:
         raise RuntimeError('openpyxl required')
 
@@ -189,9 +191,15 @@ def _generate_performance_summary():
     first = True
     total_rows = 0
 
-    for tech in PM_TECHNOLOGIES:
-        table = pm_table_name(tech)
-        for db_path, vendor in [(NOKIA_PM_DB, 'Nokia'), (HUAWEI_PM_DB, 'Huawei')]:
+    from sync.pm_processor import huawei_pm_kpi_tables
+
+    pm_sets = [
+        (NOKIA_PM_DB, 'Nokia', [pm_table_name(t) for t in PM_TECHNOLOGIES]),
+        (HUAWEI_PM_DB, 'Huawei', huawei_pm_kpi_tables(HUAWEI_PM_DB)),
+    ]
+
+    for db_path, vendor, tables in pm_sets:
+        for table in tables:
             try:
                 conn = sqlite3.connect(db_path)
                 conn.row_factory = sqlite3.Row
@@ -213,7 +221,7 @@ def _generate_performance_summary():
                     continue
 
                 ws = wb.active if first else wb.create_sheet()
-                ws.title = f'{tech}_{vendor}'[:31]
+                ws.title = f'{table}_{vendor}'[:31]
                 first = False
 
                 hdr_fill = PatternFill(start_color='2C3E50', end_color='2C3E50', fill_type='solid')
@@ -365,7 +373,6 @@ def report_archive():
 @reports_bp.route('/api/reports/archive/<int:report_id>', methods=['DELETE'])
 @login_required
 def delete_report(report_id):
-    user = get_current_user()
     conn = _ncm()
     row = conn.execute('SELECT * FROM report_archive WHERE id = ?', (report_id,)).fetchone()
     if row:

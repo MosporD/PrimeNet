@@ -5,8 +5,11 @@ Handles connecting to SFTP servers and downloading files.
 
 Key methods
 -----------
-download_latest_xlsx(remote_dir, prefix)
-    List all .xlsx/.xls files in remote_dir, download the newest by mtime.
+download_latest_xlsx(remote_dir, prefix, descend_into_newest_subdir=False)
+    List all matching files under remote_dir (and PRS subdirs when enabled),
+    log ``Found files:`` then ``Pulled latest file:``, and download the newest by mtime.
+    If ``descend_into_newest_subdir`` is True (Huawei PRS), try the newest
+    immediate child directory first, then fall back to files in ``remote_dir``.
 
 download_latest_subdir_files(root_dir, tech_filename_map, prefix)
     List subdirectories in root_dir, enter the newest one, then download
@@ -22,7 +25,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
-EXCEL_EXTS = ('.xlsx', '.xls')
+EXCEL_EXTS = ('.xlsx', '.xls', '.csv')
 DATA_EXTS  = ('.xlsx', '.xls', '.csv')   # used for metadata which may be CSV
 
 
@@ -62,30 +65,116 @@ class SFTPClient:
     # Public API
     # ------------------------------------------------------------------
 
-    def download_latest_xlsx(self, remote_dir, prefix=''):
+    def _suffix_ok(self, name: str, excel_exts: tuple) -> bool:
+        lower = name.lower()
+        return any(lower.endswith(ext) for ext in excel_exts)
+
+    def _build_prs_search_dirs(self, sftp, base: str, remote_dir: str, max_depth: int = 4):
         """
-        List XLSX files in remote_dir, download the one with the newest
-        modification time. Returns local path, or None on failure.
+        Build ordered list of directories to scan for Excel files.
+
+        PRS/U2000 often uses: ``remote_dir/<date_or_batch>/`` or one more level
+        ``.../<date>/<task>/``. An empty *newest* folder is common; we must try
+        every immediate subdir (newest first), then each one's immediate
+        subdirs (newest first), then ``remote_dir`` itself.
         """
+        search_dirs = [remote_dir]
+        seen = {remote_dir.rstrip('/').lower()}
+        frontier = [(remote_dir, 0)]
+        while frontier:
+            current, depth = frontier.pop(0)
+            if depth >= max_depth:
+                continue
+            try:
+                entries = sftp.listdir_attr(current)
+            except OSError as ex:
+                logger.warning(f'listdir {current}: {ex}')
+                continue
+            subdirs = [e for e in entries if stat.S_ISDIR(e.st_mode)]
+            subdirs.sort(key=lambda e: e.st_mtime or 0, reverse=True)
+            for sd in subdirs:
+                nxt = f'{current.rstrip("/")}/{sd.filename}'
+                key = nxt.rstrip('/').lower()
+                if key in seen:
+                    continue
+                seen.add(key)
+                search_dirs.append(nxt)
+                frontier.append((nxt, depth + 1))
+        return search_dirs
+
+    def download_latest_xlsx(
+        self,
+        remote_dir,
+        prefix='',
+        descend_into_newest_subdir=False,
+        excel_exts: tuple | None = None,
+    ):
+        """
+        Collect every matching spreadsheet under ``remote_dir`` (and PRS subdirs),
+        log them as **Found files**, then log **Pulled latest file** and download
+        that one (newest remote ``st_mtime``).
+
+        When ``descend_into_newest_subdir`` is True, U2000/PRS-style layouts are
+        supported: every immediate subfolder under ``remote_dir`` is tried (newest
+        mtime first), then each one's subfolders, then a flat ``remote_dir/*`` layout
+        filtered by allowed extensions. This avoids missing files when the single
+        "newest" folder is empty.
+        """
+        exts = excel_exts if excel_exts is not None else EXCEL_EXTS
         ssh, sftp = None, None
         try:
             ssh, sftp = self._open()
-            entries = sftp.listdir_attr(remote_dir)
-            xlsx = [
-                e for e in entries
-                if not stat.S_ISDIR(e.st_mode)
-                and e.filename.lower().endswith(EXCEL_EXTS)
-            ]
-            if not xlsx:
-                logger.warning(f'No XLSX files found in {remote_dir}')
+            base = remote_dir.rstrip('/')
+            search_dirs = []
+            if descend_into_newest_subdir:
+                search_dirs = self._build_prs_search_dirs(sftp, base, remote_dir)
+                logger.info(
+                    'SFTP: PRS search order under %s (%s dirs try-first)',
+                    remote_dir,
+                    len(search_dirs),
+                )
+            else:
+                search_dirs = [remote_dir]
+
+            # Every matching file in every searched directory (global newest wins).
+            all_matches = []
+            for td in search_dirs:
+                try:
+                    ent = sftp.listdir_attr(td)
+                except OSError as ex:
+                    logger.warning(f'listdir {td}: {ex}')
+                    continue
+                for e in ent:
+                    if stat.S_ISDIR(e.st_mode):
+                        continue
+                    if not self._suffix_ok(e.filename, exts):
+                        continue
+                    mtime = float(e.st_mtime or 0)
+                    remote_path = f'{td.rstrip("/")}/{e.filename}'
+                    all_matches.append((mtime, remote_path))
+
+            if not all_matches:
+                logger.warning(
+                    'No matching spreadsheet files under %s (searched %s dirs; extensions=%s)',
+                    remote_dir,
+                    len(search_dirs),
+                    exts,
+                )
                 return None
 
-            xlsx.sort(key=lambda e: e.st_mtime or 0, reverse=True)
-            newest = xlsx[0]
-            remote_path = f'{remote_dir.rstrip("/")}/{newest.filename}'
-
+            all_matches.sort(key=lambda x: x[0], reverse=True)
+            listing = '\n  '.join(m[1] for m in all_matches)
+            logger.info(
+                'Found files (%s under %s):\n  %s',
+                len(all_matches),
+                remote_dir,
+                listing,
+            )
+            best_mtime, remote_path = all_matches[0]
+            newest_name = remote_path.rsplit('/', 1)[-1]
+            logger.info('Pulled latest file: %s (remote mtime=%s)', remote_path, int(best_mtime))
             ts = datetime.now().strftime('%Y%m%d_%H%M')
-            local_name = f'{prefix}{ts}_{newest.filename}'
+            local_name = f'{prefix}{ts}_{newest_name}'
             return self._download(sftp, remote_path, local_name)
 
         except Exception as e:
@@ -300,6 +389,14 @@ class SFTPClient:
             if not data_files:
                 logger.warning(f'No data files found at first tier of {latest_dir}')
                 return results
+
+            meta_listing = '\n  '.join(f'{latest_dir}/{e.filename}' for e in data_files)
+            logger.info(
+                'Found files (%s in latest snapshot):\n  %s',
+                len(data_files),
+                meta_listing,
+            )
+            logger.info('Downloading all %s metadata file(s)…', len(data_files))
 
             ts = datetime.now().strftime('%Y%m%d_%H%M')
             for f in data_files:

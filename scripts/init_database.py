@@ -12,31 +12,38 @@ print("Database Initialization")
 print("=" * 50)
 print()
 
-# Make sure we're in the right directory
+# Project root (parent of scripts/)
 script_dir = os.path.dirname(os.path.abspath(__file__))
-os.chdir(script_dir)
+project_root = os.path.dirname(script_dir)
+os.chdir(project_root)
+sys.path.insert(0, project_root)
 print(f"Working directory: {os.getcwd()}")
 print()
 
 # Import database module
 try:
-    from database_enhanced import init_db, create_admin_user, get_db, DATABASE
-    print(f"✓ Database module loaded")
-    print(f"✓ Database location: {DATABASE}")
+    from database_enhanced import init_db, create_admin_user, DATABASE
+    from db.runtime import is_postgresql
+    from sync.db_migration import run_migrations
+
+    print("✓ Database module loaded")
+    print(f"✓ SQLite app DB path (ignored in PostgreSQL mode): {DATABASE}")
     print()
 except Exception as e:
-    print(f"✗ ERROR: Failed to import database module")
+    print("✗ ERROR: Failed to import database module")
     print(f"  {e}")
     input("Press Enter to exit...")
     sys.exit(1)
 
 # Initialize database
 try:
-    print("Creating database tables...")
+    print("Running migrations (SQLite files or PostgreSQL bootstrap)...")
+    run_migrations()
+    print("Creating app tables (SQLite only; PostgreSQL already migrated)...")
     init_db()
     print("✓ Database tables created")
 except Exception as e:
-    print(f"✗ ERROR: Failed to create database")
+    print("✗ ERROR: Failed to create database")
     print(f"  {e}")
     import traceback
     traceback.print_exc()
@@ -52,7 +59,7 @@ try:
     else:
         print("✓ Admin user already exists")
 except Exception as e:
-    print(f"✗ ERROR: Failed to create admin user")
+    print("✗ ERROR: Failed to create admin user")
     print(f"  {e}")
     import traceback
     traceback.print_exc()
@@ -60,7 +67,7 @@ except Exception as e:
     sys.exit(1)
 
 # Verify database was created
-if os.path.exists(DATABASE):
+if is_postgresql() or os.path.exists(DATABASE):
     print()
     print("=" * 50)
     print("SUCCESS! Database initialized")

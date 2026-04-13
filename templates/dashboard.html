@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=3.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=4.5">
 </head>
 <body>
     <div class="container">
@@ -17,8 +17,13 @@
                 <div class="header-right">
                     <div class="user-info">
                         <span class="user-greeting">Welcome, <strong>{{ user.username }}</strong></span>
-                        <span class="user-role">Role: {{ user.role }}</span>
-                        <button onclick="logout()" class="btn-logout">Logout</button>
+                        <div class="header-actions">
+                            <a href="{{ url_for('user_profile.profile_page') }}" class="btn-header">Settings</a>
+                            {% if user.role == 'admin' %}
+                            <a href="/admin-panel" class="btn-header btn-header-admin">Admin</a>
+                            {% endif %}
+                            <button type="button" onclick="logout()" class="btn-header btn-header-outline">Logout</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -26,26 +31,46 @@
 
         <main class="dashboard-main">
 
-            <!-- ── Section buttons ── -->
-            <div class="section-tabs">
-                <button class="section-tab active" id="tab-performance" onclick="openSection('performance')">
-                    📈 Performance
+            <section class="dashboard-op-sites" aria-label="Operational sites by technology">
+                <div class="op-sites-summary-card">
+                    <div class="op-sites-summary-head">
+                        <span>Operational sites by technology</span>
+                        <button type="button" class="op-sites-refresh-btn" id="op-sites-refresh-btn" onclick="refreshOperationalSites()">
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="op-sites-summary-columns" role="presentation">
+                        {% for col in tech_site_columns %}
+                        <div class="op-sites-summary-col" data-rat="{{ col['key'] }}">
+                            <div class="op-sites-summary-col-title">{{ col['title'] }}</div>
+                            <div class="op-sites-summary-col-value" id="op-sites-val-{{ col['key'] }}">{{ col['count'] }}</div>
+                            <div class="op-sites-summary-col-sub">{{ col['subtitle'] }}</div>
+                            <div class="op-sites-summary-col-unit">sites</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+
+            <div class="dashboard-primary-tabs" role="tablist" aria-label="Main sections">
+                <button type="button" role="tab" class="dashboard-primary-tab active" id="tab-performance"
+                        aria-selected="true" aria-controls="section-performance"
+                        onclick="openSection('performance')">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">📈</span>
+                    <span class="dashboard-primary-tab-text">Performance</span>
+                    <span class="dashboard-primary-tab-desc">Analytics, maps &amp; reports</span>
                 </button>
-                <button class="section-tab" id="tab-configuration" onclick="openSection('configuration')">
-                    ⚙️ Configuration
+                <button type="button" role="tab" class="dashboard-primary-tab" id="tab-configuration"
+                        aria-selected="false" aria-controls="section-configuration"
+                        onclick="openSection('configuration')">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">⚙️</span>
+                    <span class="dashboard-primary-tab-text">Configuration</span>
+                    <span class="dashboard-primary-tab-desc">Parameters, XML &amp; tooling</span>
                 </button>
-                <button class="section-tab" id="tab-management" onclick="openSection('management')">
-                    🔧 Management
-                </button>
-                {% if user.role == 'admin' %}
-                <button class="section-tab tab-admin" id="tab-admin" onclick="openSection('admin')">
-                    🛡️ Admin Panel
-                </button>
-                {% endif %}
             </div>
 
             <!-- ── Performance panel ── -->
-            <div class="section-panel" id="section-performance">
+            <div class="section-panel" id="section-performance" role="tabpanel" aria-labelledby="tab-performance">
                 <div class="function-grid">
                     <a href="/performance" class="function-card">
                         <div class="function-icon">📈</div>
@@ -66,7 +91,7 @@
             </div>
 
             <!-- ── Configuration panel ── -->
-            <div class="section-panel hidden" id="section-configuration">
+            <div class="section-panel hidden" id="section-configuration" role="tabpanel" aria-labelledby="tab-configuration" hidden>
                 <div class="function-grid">
                     <a href="/parameter-dictionary" class="function-card">
                         <div class="function-icon">📚</div>
@@ -93,37 +118,13 @@
                         <div class="function-name">Config Version History</div>
                         <div class="function-description">Upload, track, diff, and restore XML configuration versions per NE</div>
                     </a>
-                </div>
-            </div>
-
-            <!-- ── Management panel ── -->
-            <div class="section-panel hidden" id="section-management">
-                <div class="function-grid">
                     <a href="/network-management" class="function-card">
                         <div class="function-icon">⚠️</div>
                         <div class="function-name">Network Management</div>
                         <div class="function-description">PCI/PSC/BCCH conflict detection and site cell browser</div>
                     </a>
-                    <a href="/profile" class="function-card">
-                        <div class="function-icon">👤</div>
-                        <div class="function-name">My Profile</div>
-                        <div class="function-description">Update your account info, password, and dashboard preferences</div>
-                    </a>
                 </div>
             </div>
-
-            <!-- ── Admin panel (admin only) ── -->
-            {% if user.role == 'admin' %}
-            <div class="section-panel hidden" id="section-admin">
-                <div class="function-grid">
-                    <a href="/admin-panel" class="function-card admin-card">
-                        <div class="function-icon">🛡️</div>
-                        <div class="function-name">Admin Panel</div>
-                        <div class="function-description">User management and system administration</div>
-                    </a>
-                </div>
-            </div>
-            {% endif %}
 
         </main>
 
@@ -134,15 +135,26 @@
 
     <script>
         function openSection(name) {
-            // Hide all panels and deactivate all tabs
-            document.querySelectorAll('.section-panel').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.section-panel').forEach(p => {
+                p.classList.add('hidden');
+                p.hidden = true;
+            });
+            document.querySelectorAll('.dashboard-primary-tab').forEach(t => {
+                t.classList.remove('active');
+                t.setAttribute('aria-selected', 'false');
+            });
 
-            // Show selected panel and activate tab
             const panel = document.getElementById('section-' + name);
             const tab   = document.getElementById('tab-' + name);
-            if (panel) panel.classList.remove('hidden');
-            if (tab)   tab.classList.add('active');
+            if (panel) {
+                panel.classList.remove('hidden');
+                panel.hidden = false;
+            }
+            const isPrimary = name === 'performance' || name === 'configuration';
+            if (isPrimary && tab) {
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+            }
         }
 
         async function logout() {
@@ -155,6 +167,50 @@
                 } catch (error) {
                     window.location.href = '/login';
                 }
+            }
+        }
+
+        async function refreshOperationalSites() {
+            const refreshBtn = document.getElementById('op-sites-refresh-btn');
+            if (!refreshBtn || refreshBtn.disabled) {
+                return;
+            }
+
+            const defaultLabel = 'Refresh';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = 'Refreshing...';
+
+            try {
+                const response = await fetch('/api/dashboard/operational-sites', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: { Accept: 'application/json' },
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to refresh operational site counts');
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.error || 'Request failed');
+                }
+                const columns = Array.isArray(data.tech_site_columns) ? data.tech_site_columns : [];
+
+                columns.forEach((column) => {
+                    const key = column && column.key != null ? String(column.key) : '';
+                    if (!key) return;
+                    // Prefer stable ids — CSS [data-rat="4G-FDD"] is easy to mis-parse across engines.
+                    const valueEl = document.getElementById(`op-sites-val-${key}`);
+                    if (valueEl) {
+                        valueEl.textContent = column.count != null ? column.count : 0;
+                    }
+                });
+            } catch (error) {
+                alert(error.message || 'Could not refresh operational site counts');
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = defaultLabel;
             }
         }
     </script>
