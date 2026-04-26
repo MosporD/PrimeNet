@@ -10,9 +10,11 @@ import math
 import sqlite3
 import os
 import sys
+import re
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB, pm_table_name
+from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, METADATA_DB, NEIGHBOR_KPI_DB, pm_table_name
+from network_map.neighbor_raw_linking import build_raw_neighbor_lines, neighbor_ho_failures
 from database_enhanced import get_user_by_session, log_activity
 from sync.metadata_active_sql import (
     _STATUS_2G,
@@ -21,6 +23,77 @@ from sync.metadata_active_sql import (
     _STATUS_4G_TDD,
     _STATUS_5G,
 )
+
+_CLUSTER_AREA = {
+    3: 'East Amman', 13: 'East Amman', 17: 'East Amman', 21: 'East Amman',
+    23: 'East Amman', 27: 'East Amman', 48: 'East Amman', 49: 'East Amman',
+    50: 'East Amman', 51: 'East Amman', 52: 'East Amman', 54: 'East Amman',
+    10: 'East Jordan', 11: 'East Jordan', 19: 'East Jordan', 28: 'East Jordan',
+    31: 'East Jordan', 42: 'East Jordan', 43: 'East Jordan', 47: 'East Jordan',
+    1: 'South Amman', 6: 'South Amman', 9: 'South Amman', 18: 'South Amman',
+    30: 'South Amman', 36: 'South Amman', 38: 'South Amman', 39: 'South Amman',
+    53: 'South Amman', 57: 'South Amman', 59: 'South Amman',
+    7: 'South Jordan', 8: 'South Jordan', 12: 'South Jordan', 15: 'South Jordan',
+    33: 'South Jordan', 41: 'South Jordan', 58: 'South Jordan',
+    2: 'West Amman', 5: 'West Amman', 16: 'West Amman', 20: 'West Amman',
+    22: 'West Amman', 25: 'West Amman', 26: 'West Amman', 32: 'West Amman',
+    35: 'West Amman', 40: 'West Amman', 55: 'West Amman', 56: 'West Amman',
+    4: 'North Jordan', 14: 'North Jordan', 24: 'North Jordan', 29: 'North Jordan',
+    34: 'North Jordan', 37: 'North Jordan', 44: 'North Jordan', 45: 'North Jordan',
+    46: 'North Jordan', 65: 'North Jordan',
+}
+
+
+def _derive_cluster_area(site_id: object) -> tuple[int | None, str]:
+    try:
+        cluster = int(site_id) // 100
+    except (TypeError, ValueError):
+        return None, 'Unknown'
+    return cluster, _CLUSTER_AREA.get(cluster, 'Unknown')
+
+
+def _haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+    r = 6371.0
+    d_lat = math.radians(lat2 - lat1)
+    d_lng = math.radians(lng2 - lng1)
+    a = (
+        math.sin(d_lat / 2) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(d_lng / 2) ** 2
+    )
+    return 2 * r * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+def _assign_area_from_nearest_known(sites: list[dict]) -> None:
+    known = []
+    unknown_idx = []
+    for i, s in enumerate(sites):
+        lat = s.get('latitude')
+        lng = s.get('longitude')
+        if lat is None or lng is None:
+            continue
+        try:
+            lat_f = float(lat)
+            lng_f = float(lng)
+        except (TypeError, ValueError):
+            continue
+        if s.get('area') and s.get('area') != 'Unknown':
+            known.append((lat_f, lng_f, s.get('area')))
+        elif s.get('area') == 'Unknown':
+            unknown_idx.append((i, lat_f, lng_f))
+
+    if not known:
+        return
+
+    for idx, lat_f, lng_f in unknown_idx:
+        nearest_area = None
+        nearest_dist = None
+        for k_lat, k_lng, k_area in known:
+            d = _haversine_km(lat_f, lng_f, k_lat, k_lng)
+            if nearest_dist is None or d < nearest_dist:
+                nearest_dist = d
+                nearest_area = k_area
+        if nearest_area:
+            sites[idx]['area'] = nearest_area
 
 
 def _per_tech_union_sql(tech: str | None = None) -> tuple[str, list]:
@@ -138,6 +211,81 @@ def _per_tech_union_sql(tech: str | None = None) -> tuple[str, list]:
     return " UNION ALL ".join(parts[t] for t in ['2G', '3G', '4G-FDD', '4G-TDD', '5G']), []
 
 
+def _normalize_ui_map_tech_token(tech: str) -> str:
+    """Map chip / query-param variants to canonical tokens (case, unicode dashes, spacing)."""
+    s = (tech or "").strip()
+    for dash in ("\u2011", "\u2013", "\u2212"):
+        s = s.replace(dash, "-")
+    s = re.sub(r"\s+", " ", s)
+    low = s.lower()
+    chips = {
+        "2g-2g": "2G-2G",
+        "3g-3g": "3G-3G",
+        "4g-4g intra-enb": "4G-4G Intra-eNB",
+        "4g-4g inter-enb": "4G-4G Inter-eNB",
+        # legacy UI tokens
+        "4g-4g intra": "4G-4G Intra-eNB",
+        "4g-4g inter": "4G-4G Inter-eNB",
+        "4g-4g": "4G-4G Intra-eNB",
+        "2g": "2G",
+        "3g": "3G",
+        "4g-fdd": "4G-FDD",
+        "4g-tdd": "4G-TDD",
+        "5g": "5G",
+    }
+    return chips.get(low, s)
+
+
+def _union_sql_for_map_filter(tech: str | None = None) -> tuple[str, list]:
+    """
+    UNION for Network Map list/search/export when the UI uses relation-style chips:
+    All → 2G + 3G + LTE FDD/TDD (no 5G on this map); 2G-2G / 3G-3G / 4G-4G Intra-eNB|Inter-eNB use LTE FDD only (no TDD in neighbor HO scope).
+    """
+    raw = (tech or "").strip()
+    if not raw or raw.lower() == "all":
+        s2, _ = _per_tech_union_sql("2G")
+        s3, _ = _per_tech_union_sql("3G")
+        sf, _ = _per_tech_union_sql("4G-FDD")
+        st, _ = _per_tech_union_sql("4G-TDD")
+        return " UNION ALL ".join([s2, s3, sf, st]), []
+    t = _normalize_ui_map_tech_token(raw)
+    if t == "2G-2G":
+        return _per_tech_union_sql("2G")
+    if t == "3G-3G":
+        return _per_tech_union_sql("3G")
+    if t in ("4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter"):
+        sf, _ = _per_tech_union_sql("4G-FDD")
+        return sf, []
+    if t in ("2G", "3G", "4G-FDD", "4G-TDD", "5G"):
+        return _per_tech_union_sql(t)
+    return (
+        "SELECT NULL AS cell_name, NULL AS site_id, NULL AS site_name, NULL AS technology, NULL AS vendor, "
+        "NULL AS latitude, NULL AS longitude, NULL AS azimuth, NULL AS mechanical_tilt, NULL AS electrical_tilt, "
+        "NULL AS frequency_band, NULL AS pci, NULL AS activity_status, NULL AS status WHERE 1=0",
+        [],
+    )
+
+
+def _map_request_tech_filter_to_bcch_band_clause(tech: str) -> bool:
+    """True when tech_value applies to v.pci (BCCH) rather than frequency_band / UARFCN."""
+    t = _normalize_ui_map_tech_token((tech or "").strip())
+    return t in ("2G", "2G-2G")
+
+
+def _cell_kpi_sql_technologies(req_tech: str) -> list[str] | None:
+    """Map map-page technology chip to v.technology IN (...) for KPI lookup."""
+    t = _normalize_ui_map_tech_token((req_tech or "").strip())
+    if not t:
+        return None
+    if t == "2G-2G":
+        return ["2G"]
+    if t == "3G-3G":
+        return ["3G"]
+    if t in ("4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter"):
+        return ["4G-FDD"]
+    return [t]
+
+
 # KML export: match map.js sector geometry (wedges) and tech colours
 _KML_TECH_COLORS = {
     '2G': '#7f8c8d',
@@ -146,7 +294,7 @@ _KML_TECH_COLORS = {
     '4G-TDD': '#148f77',
     '5G': '#9b59b6',
 }
-_KML_SECTOR_RADIUS_M = 600.0
+_KML_SECTOR_RADIUS_M = 240.0
 _KML_SECTOR_BEAMWIDTH = 65.0
 
 
@@ -245,6 +393,121 @@ def _metadata_table_for_tech(tech: str) -> str | None:
     }
     return mapping.get((tech or '').strip())
 
+
+def _norm_cell_key(value: object) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip()).lower()
+
+
+def _safe_int(value: object, default: int) -> int:
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _safe_float(value: object, default: float) -> float:
+    try:
+        if value is None or str(value).strip() == "":
+            return default
+        return float(str(value).replace(",", ""))
+    except (TypeError, ValueError):
+        return default
+
+
+def _load_neighbor_coords(vendor: str, technology: str) -> dict[str, dict]:
+    conn = sqlite3.connect(METADATA_DB)
+    conn.row_factory = sqlite3.Row
+    try:
+        union_sql, params = _union_sql_for_map_filter(technology)
+        rows = conn.execute(
+            f"""
+            SELECT
+                v.cell_name,
+                v.site_id,
+                v.latitude,
+                v.longitude,
+                s.region
+            FROM ({union_sql}) v
+            LEFT JOIN sites s ON s.site_id = v.site_id
+            WHERE LOWER(TRIM(COALESCE(v.vendor, ''))) = LOWER(TRIM(?))
+              AND v.latitude IS NOT NULL
+              AND v.longitude IS NOT NULL
+            """,
+            params + [vendor],
+        ).fetchall()
+        out: dict[str, dict] = {}
+        for r in rows:
+            key = _norm_cell_key(r["cell_name"])
+            if key and key not in out:
+                out[key] = {
+                    "cell_name": r["cell_name"],
+                    "site_id": r["site_id"],
+                    "lat": float(r["latitude"]),
+                    "lng": float(r["longitude"]),
+                    "region": r["region"],
+                    "cluster": (int(r["site_id"]) // 100) if str(r["site_id"]).isdigit() else None,
+                }
+        return out
+    finally:
+        conn.close()
+
+
+def _neighbor_table_exists(conn: sqlite3.Connection, name: str) -> bool:
+    row = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?",
+        (name,),
+    ).fetchone()
+    return bool(row)
+
+
+def _neighbor_raw_table_for_technology(technology: str) -> str | None:
+    tok = _normalize_ui_map_tech_token((technology or "").strip())
+    t = tok.upper()
+    if tok == "2G-2G" or t.startswith("2G"):
+        return "nokia_neighbor_2g"
+    if tok == "3G-3G" or t.startswith("3G"):
+        return "nokia_neighbor_3g"
+    if tok in ("4G-4G Inter-eNB", "4G-4G Inter"):
+        return "nokia_neighbor_4g_inter"
+    if tok in ("4G-4G Intra-eNB", "4G-4G Intra"):
+        return "nokia_neighbor_4g_intra"
+    if "4G" in t or "LTE" in t:
+        return "nokia_neighbor_4g_intra"
+    return None
+
+
+def _resolve_raw_neighbor_table(conn: sqlite3.Connection, technology: str) -> str | None:
+    """Prefer new 4G intra/inter tables; fall back to legacy ``nokia_neighbor_4g`` for intra only."""
+    preferred = _neighbor_raw_table_for_technology(technology)
+    if not preferred:
+        return None
+    if _neighbor_table_exists(conn, preferred):
+        return preferred
+    t = (technology or "").strip().upper()
+    if "INTER" in t and ("4G" in t or "LTE" in t):
+        return None
+    if preferred == "nokia_neighbor_4g_intra" and _neighbor_table_exists(conn, "nokia_neighbor_4g"):
+        return "nokia_neighbor_4g"
+    return None
+
+
+def _neighbor_hourly_tech_aliases(technology: str) -> list[str]:
+    """Map UI technology tokens to likely legacy ``neighbor_hourly.technology`` values."""
+    tok = _normalize_ui_map_tech_token((technology or "").strip())
+    t = tok.upper()
+    if tok == "2G-2G" or t.startswith("2G"):
+        return ["2G", "2G-2G"]
+    if tok == "3G-3G" or t.startswith("3G"):
+        return ["3G", "3G-3G"]
+    if tok in ("4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter") or "4G" in t or "LTE" in t:
+        return ["4G", "4G-FDD", "LTE", "4G-4G Intra-eNB", "4G-4G Inter-eNB"]
+    return [tok] if tok else []
+
+
+def _ensure_neighbor_schema(conn: sqlite3.Connection) -> None:
+    """No legacy neighbor_hourly DDL; data lives in nokia_neighbor_* raw tables."""
+    return
+
 network_map_bp = Blueprint(
     'network_map', __name__,
     template_folder='templates',
@@ -293,6 +556,14 @@ def network_map_page():
     user = get_current_user()
     return render_template('network_map.html', user=format_user_data(user))
 
+
+@network_map_bp.route('/neighbor-analysis')
+@login_required
+def neighbor_analysis_page():
+    """Render dedicated Neighbor Analysis page."""
+    user = get_current_user()
+    return render_template('neighbor_analysis.html', user=format_user_data(user))
+
 @network_map_bp.route('/api/map/sites', methods=['GET'])
 def get_all_sites():
     """Get all network sites, optionally filtered by technology.
@@ -312,11 +583,11 @@ def get_all_sites():
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        union_sql, params = _per_tech_union_sql(tech if tech else None)
+        union_sql, params = _union_sql_for_map_filter(tech if tech else None)
         scope_clause = ''
         sql_params = list(params)
         if tech_value:
-            if tech == '2G':
+            if _map_request_tech_filter_to_bcch_band_clause(tech):
                 scope_clause = ' AND CAST(v.pci AS TEXT) = ?'
             else:
                 scope_clause = ' AND CAST(v.frequency_band AS TEXT) = ?'
@@ -378,6 +649,11 @@ def get_all_sites():
         ''', sql_params)
 
         sites = [dict(row) for row in cursor.fetchall()]
+        for s in sites:
+            cluster, area = _derive_cluster_area(s.get('site_id'))
+            s['cluster'] = cluster
+            s['area'] = area
+        _assign_area_from_nearest_known(sites)
         conn.close()
 
         log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'map_view', 'Viewed network map sites')
@@ -395,6 +671,10 @@ def get_tech_filter_options():
         return jsonify({'error': 'Unauthorized'}), 401
 
     tech = request.args.get('tech', '').strip()
+    if tech in ("2G-2G",):
+        tech = "2G"
+    elif tech in ("3G-3G",):
+        tech = "3G"
     if tech not in ('2G', '3G', '4G-FDD', '4G-TDD'):
         return jsonify({'success': True, 'label': '', 'values': []})
 
@@ -459,6 +739,9 @@ def get_site_details(site_id):
             return jsonify({'error': 'Site not found'}), 404
 
         site_data = dict(site)
+        cluster, area = _derive_cluster_area(site_data.get('site_id'))
+        site_data['cluster'] = cluster
+        site_data['area'] = area
 
         # Cells are the sectors — pull from per-technology tables (no de-dupe).
         union_sql, params = _per_tech_union_sql(None)
@@ -494,6 +777,66 @@ def get_site_details(site_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@network_map_bp.route('/api/map/cells/wedge-data', methods=['GET'])
+@login_required
+def cells_wedge_data():
+    """Return lat/lng/azimuth and display fields for drawing sector wedges for named cells (neighbor scope)."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    technology = _normalize_ui_map_tech_token((request.args.get('technology') or '').strip())
+    raw = request.args.getlist('cell')
+    if not technology or technology.lower() == 'all' or not raw:
+        return jsonify({'success': True, 'cells': []})
+
+    names_norm: list[str] = []
+    seen: set[str] = set()
+    for c in raw:
+        k = _norm_cell_key(c)
+        if not k or k in seen:
+            continue
+        seen.add(k)
+        names_norm.append(k)
+        if len(names_norm) >= 280:
+            break
+
+    try:
+        union_sql, u_params = _union_sql_for_map_filter(technology)
+        ph = ",".join(["?"] * len(names_norm))
+        sql = f"""
+            SELECT
+                v.cell_name,
+                v.site_id,
+                v.site_name,
+                v.latitude,
+                v.longitude,
+                v.azimuth,
+                v.technology,
+                v.vendor,
+                v.frequency_band,
+                v.pci,
+                v.activity_status,
+                v.status,
+                v.mechanical_tilt,
+                v.electrical_tilt
+            FROM ({union_sql}) v
+            WHERE LOWER(TRIM(v.cell_name)) IN ({ph})
+        """
+        conn = sqlite3.connect(METADATA_DB)
+        conn.row_factory = sqlite3.Row
+        rows = [
+            dict(r)
+            for r in conn.execute(sql, u_params + names_norm).fetchall()
+            if r["latitude"] is not None and r["longitude"] is not None
+        ]
+        conn.close()
+        return jsonify({'success': True, 'cells': rows})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @network_map_bp.route('/api/map/cell/<int:cell_id>/kpis', methods=['GET'])
 def get_cell_kpis(cell_id):
     """Get the latest KPI snapshot for a cell from the appropriate PM database."""
@@ -515,7 +858,7 @@ def get_cell_kpis(cell_id):
         meta_conn.close()
 
         if not cell:
-            return jsonify({'error': 'Cell not found'}), 404
+            return jsonify({'success': False, 'error': 'Cell not found'}), 404
 
         cell_data = dict(cell)
         vendor    = cell_data.get('vendor', '')
@@ -566,6 +909,8 @@ def get_cell_kpis_by_name():
         return jsonify({'error': 'Unauthorized'}), 401
 
     cell_name = (request.args.get('cell_name') or '').strip()
+    req_tech = _normalize_ui_map_tech_token((request.args.get('technology') or '').strip())
+    req_vendor = (request.args.get('vendor') or '').strip()
     if not cell_name:
         return jsonify({'error': 'cell_name is required'}), 400
 
@@ -573,7 +918,25 @@ def get_cell_kpis_by_name():
         conn = sqlite3.connect(METADATA_DB)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        union_sql, params = _per_tech_union_sql(None)
+        union_sql, params = (
+            _per_tech_union_sql(None)
+            if not req_tech
+            else _union_sql_for_map_filter(req_tech)
+        )
+        where_filters = ['v.cell_name = ?']
+        where_params = [cell_name]
+        if req_vendor:
+            where_filters.append("LOWER(TRIM(COALESCE(v.vendor,''))) = LOWER(TRIM(?))")
+            where_params.append(req_vendor)
+        if req_tech:
+            tech_vals = _cell_kpi_sql_technologies(req_tech)
+            if tech_vals and len(tech_vals) == 1:
+                where_filters.append("v.technology = ?")
+                where_params.append(tech_vals[0])
+            elif tech_vals and len(tech_vals) > 1:
+                ph = ",".join("?" * len(tech_vals))
+                where_filters.append(f"v.technology IN ({ph})")
+                where_params.extend(tech_vals)
         row = cur.execute(f'''
             SELECT
                 v.cell_name, v.technology, v.vendor,
@@ -582,13 +945,13 @@ def get_cell_kpis_by_name():
                 s.site_id, s.site_name, s.region
             FROM ({union_sql}) v
             LEFT JOIN sites s ON s.site_id = v.site_id
-            WHERE v.cell_name = ?
+            WHERE {' AND '.join(where_filters)}
             LIMIT 1
-        ''', params + [cell_name]).fetchone()
+        ''', params + where_params).fetchone()
         conn.close()
 
         if not row:
-            return jsonify({'error': 'Cell not found'}), 404
+            return jsonify({'success': False, 'error': 'Cell not found'}), 404
 
         cell_data = dict(row)
 
@@ -654,29 +1017,42 @@ def get_network_stats():
         conn = sqlite3.connect(METADATA_DB)
         cursor = conn.cursor()
 
-        # Count per-tech rows directly so numbers match CSV snapshots.
-        tech_counts = {}
-        for tech, table in [
-            ('2G', 'cells_2g'),
-            ('3G', 'cells_3g'),
-            ('4G-FDD', 'cells_4g_fdd'),
-            ('4G-TDD', 'cells_4g_tdd'),
-            ('5G', 'cells_5g'),
-        ]:
-            try:
-                tech_counts[tech] = cursor.execute(f'SELECT COUNT(*) FROM {table}').fetchone()[0]
-            except sqlite3.OperationalError:
-                tech_counts[tech] = 0
+        def _count_active_distinct_sites(union_sql: str, params: list) -> int:
+            val = cursor.execute(f'''
+                SELECT COUNT(DISTINCT v.site_id)
+                FROM ({union_sql}) v
+                WHERE LOWER(TRIM(COALESCE(v.activity_status, v.status, ''))) = 'active'
+                  AND v.site_id IS NOT NULL
+                  AND TRIM(CAST(v.site_id AS TEXT)) <> ''
+            ''', params).fetchone()[0]
+            return int(val or 0)
 
-        total_cells = sum(tech_counts.values())
+        tech_counts: dict[str, int] = {}
+        for tech_key in ("2G", "3G", "4G-FDD", "4G-TDD", "5G"):
+            ut, pt = _per_tech_union_sql(tech_key)
+            tech_counts[tech_key] = _count_active_distinct_sites(ut, pt)
 
-        # Sites shown on map are those with coordinates AND at least one cell row in the per-tech tables.
-        union_sql, params = _per_tech_union_sql(None)
+        union_cells, pc = _union_sql_for_map_filter(None)
+        total_cells = int(
+            cursor.execute(
+                f'''
+                SELECT COUNT(*)
+                FROM ({union_cells}) v
+                WHERE LOWER(TRIM(COALESCE(v.activity_status, v.status, ''))) = 'active'
+                ''',
+                pc,
+            ).fetchone()[0]
+            or 0
+        )
+
+        # Sites shown on map are those with coordinates and at least one active cell in current snapshot.
+        union_sql, params = _union_sql_for_map_filter(None)
         total_sites = cursor.execute(f'''
             SELECT COUNT(DISTINCT s.site_id)
             FROM ({union_sql}) v
             JOIN sites s ON s.site_id = v.site_id
             WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+              AND LOWER(TRIM(COALESCE(v.activity_status, v.status, ''))) = 'active'
         ''', params).fetchone()[0]
 
         conn.close()
@@ -701,6 +1077,7 @@ def search_by_cell_code():
 
     code = request.args.get('code', '').strip()
     tech = request.args.get('tech', '').strip()
+    tech_value = request.args.get('tech_value', '').strip()
 
     if not code or not code.lstrip('-').isdigit():
         return jsonify({'success': True, 'matches': []})
@@ -710,7 +1087,15 @@ def search_by_cell_code():
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        union_sql, u_params = _per_tech_union_sql(tech if tech else None)
+        union_sql, u_params = _union_sql_for_map_filter(tech if tech else None)
+        where_scope = ''
+        q_params = u_params + [int(code)]
+        if tech_value:
+            if _map_request_tech_filter_to_bcch_band_clause(tech):
+                where_scope = ' AND CAST(v.pci AS TEXT) = ?'
+            else:
+                where_scope = ' AND CAST(v.frequency_band AS TEXT) = ?'
+            q_params.append(tech_value)
         cursor.execute(f'''
             SELECT
                 v.cell_name,
@@ -730,9 +1115,10 @@ def search_by_cell_code():
             FROM ({union_sql}) v
             JOIN sites s ON s.site_id = v.site_id
             WHERE v.pci = ?
+              {where_scope}
               AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
             ORDER BY s.site_name, v.technology, v.cell_name
-        ''', u_params + [int(code)])
+        ''', q_params)
 
         matches = []
         for row in cursor.fetchall():
@@ -758,6 +1144,7 @@ def export_cell_code():
 
     code = request.args.get('code', '').strip()
     tech = request.args.get('tech', '').strip()
+    tech_value = request.args.get('tech_value', '').strip()
 
     if not code or not code.lstrip('-').isdigit():
         return jsonify({'error': 'Invalid code'}), 400
@@ -767,7 +1154,15 @@ def export_cell_code():
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        union_sql, u_params = _per_tech_union_sql(tech if tech else None)
+        union_sql, u_params = _union_sql_for_map_filter(tech if tech else None)
+        where_scope = ''
+        q_params = u_params + [int(code)]
+        if tech_value:
+            if _map_request_tech_filter_to_bcch_band_clause(tech):
+                where_scope = ' AND CAST(v.pci AS TEXT) = ?'
+            else:
+                where_scope = ' AND CAST(v.frequency_band AS TEXT) = ?'
+            q_params.append(tech_value)
         rows = cursor.execute(f'''
             SELECT
                 v.cell_name,
@@ -786,12 +1181,17 @@ def export_cell_code():
             FROM ({union_sql}) v
             JOIN sites s ON s.site_id = v.site_id
             WHERE v.pci = ?
+              {where_scope}
               AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
             ORDER BY s.site_name, v.technology, v.cell_name
-        ''', u_params + [int(code)]).fetchall()
+        ''', q_params).fetchall()
         conn.close()
 
-        code_label = 'PSC' if tech == '3G' else ('BCCH' if tech == '2G' else 'PCI')
+        code_label = (
+            'PSC'
+            if tech in ('3G', '3G-3G')
+            else ('BCCH' if tech in ('2G', '2G-2G') else 'PCI')
+        )
 
         wb  = openpyxl.Workbook()
         ws  = wb.active
@@ -869,13 +1269,13 @@ def export_sites_excel():
             s_cond.append('(s.site_name LIKE ? OR CAST(s.site_id AS TEXT) LIKE ?)')
             s_params += [f'%{search}%', f'%{search}%']
         if tech_value:
-            if tech == '2G':
+            if _map_request_tech_filter_to_bcch_band_clause(tech):
                 s_cond.append('CAST(v.pci AS TEXT) = ?')
             else:
                 s_cond.append('CAST(v.frequency_band AS TEXT) = ?')
             s_params.append(tech_value)
 
-        union_sql, u_params = _per_tech_union_sql(tech if tech else None)
+        union_sql, u_params = _union_sql_for_map_filter(tech if tech else None)
         # Sites are those matching the filter and having at least one cell row.
         sites = conn.execute(f'''
             SELECT DISTINCT
@@ -895,13 +1295,13 @@ def export_sites_excel():
             c_cond.append('(s.site_name LIKE ? OR CAST(s.site_id AS TEXT) LIKE ?)')
             c_params += [f'%{search}%', f'%{search}%']
         if tech_value:
-            if tech == '2G':
+            if _map_request_tech_filter_to_bcch_band_clause(tech):
                 c_cond.append('CAST(v.pci AS TEXT) = ?')
             else:
                 c_cond.append('CAST(v.frequency_band AS TEXT) = ?')
             c_params.append(tech_value)
         c_where = ('WHERE ' + ' AND '.join(c_cond)) if c_cond else ''
-        union_sql, u_params = _per_tech_union_sql(tech if tech else None)
+        union_sql, u_params = _union_sql_for_map_filter(tech if tech else None)
         cells = conn.execute(f'''
             SELECT
                 v.cell_name,
@@ -1002,12 +1402,12 @@ def export_sites_kml():
             s_cond.append('(s.site_name LIKE ? OR CAST(s.site_id AS TEXT) LIKE ?)')
             s_params += [f'%{search}%', f'%{search}%']
         if tech_value:
-            if tech == '2G':
+            if _map_request_tech_filter_to_bcch_band_clause(tech):
                 s_cond.append('CAST(v.pci AS TEXT) = ?')
             else:
                 s_cond.append('CAST(v.frequency_band AS TEXT) = ?')
             s_params.append(tech_value)
-        union_sql, u_params = _per_tech_union_sql(tech if tech else None)
+        union_sql, u_params = _union_sql_for_map_filter(tech if tech else None)
         sites = conn.execute(f'''
             SELECT DISTINCT
                 s.site_id, s.site_name, s.latitude, s.longitude,
@@ -1023,7 +1423,7 @@ def export_sites_kml():
         if sites:
             ids = [r['site_id'] for r in sites]
             ph  = ','.join('?' * len(ids))
-            union_sql, u_params = _per_tech_union_sql(tech if tech else None)
+            union_sql, u_params = _union_sql_for_map_filter(tech if tech else None)
             for r in conn.execute(f'''
                 SELECT
                     v.site_id,
@@ -1036,8 +1436,8 @@ def export_sites_kml():
                     v.status
                 FROM ({union_sql}) v
                 WHERE v.site_id IN ({ph})
-                  {("AND CAST(v.pci AS TEXT) = ?" if tech_value and tech == "2G" else "")}
-                  {("AND CAST(v.frequency_band AS TEXT) = ?" if tech_value and tech != "2G" else "")}
+                  {("AND CAST(v.pci AS TEXT) = ?" if tech_value and _map_request_tech_filter_to_bcch_band_clause(tech) else "")}
+                  {("AND CAST(v.frequency_band AS TEXT) = ?" if tech_value and not _map_request_tech_filter_to_bcch_band_clause(tech) else "")}
                 ORDER BY v.technology, v.cell_name
             ''', u_params + ids + ([tech_value] if tech_value else [])).fetchall():
                 cells_by_site.setdefault(r['site_id'], []).append(r)
@@ -1173,6 +1573,303 @@ def export_sites_kml():
                         mimetype='application/vnd.google-earth.kml+xml',
                         headers={'Content-Disposition': f'attachment; filename="{fname}"'})
 
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@network_map_bp.route('/api/network-map/neighbors/lines', methods=['GET'])
+def get_neighbor_lines():
+    """Neighbor lines; ``vendor`` scopes the **source** for raw export linking (targets may be any vendor).
+
+    Query ``cell_name`` (normalized) matches the **source** cell only: outgoing handovers from that cell.
+
+    ``failures_only=1`` (or ``true``): return only links with estimated failures meeting
+    ``min_failures`` (default **1.0**): failures = ``attempts × (1 − SR/100)`` (or ``attempts − successes``);
+    requires SR or success counts. ``min_attempts`` is ignored for filtering in this mode (only attempts ≥ 1).
+    """
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    vendor = (request.args.get('vendor') or '').strip()
+    technology = _normalize_ui_map_tech_token((request.args.get('technology') or '').strip())
+    site_id = (request.args.get('site_id') or '').strip()
+    cell_name = (request.args.get('cell_name') or '').strip()
+    min_attempts = max(0, _safe_int(request.args.get('min_attempts'), 10))
+    max_lines = min(2000, max(10, _safe_int(request.args.get('max_lines'), 300)))
+    failures_only = (request.args.get('failures_only') or '').strip().lower() in (
+        '1', 'true', 'yes', 'on',
+    )
+    min_failures = max(0.0, _safe_float(request.args.get('min_failures'), 1.0))
+
+    if not technology:
+        return jsonify({'error': 'technology is required'}), 400
+
+    try:
+        nconn = sqlite3.connect(NEIGHBOR_KPI_DB, timeout=30)
+        nconn.row_factory = sqlite3.Row
+        _ensure_neighbor_schema(nconn)
+
+        if not _neighbor_table_exists(nconn, "neighbor_hourly"):
+            raw_tbl = _resolve_raw_neighbor_table(nconn, technology)
+            if raw_tbl and _neighbor_table_exists(nconn, raw_tbl):
+                cell_norm = _norm_cell_key(cell_name) if cell_name else ""
+                lines, skipped, total, period, raw_msg = build_raw_neighbor_lines(
+                    neighbor_conn=nconn,
+                    raw_table=raw_tbl,
+                    technology=technology,
+                    vendor=vendor,
+                    cell_norm=cell_norm,
+                    site_id_filter=site_id,
+                    min_attempts=float(min_attempts),
+                    max_lines=max_lines,
+                    failures_only=failures_only,
+                    min_failures=float(min_failures),
+                )
+                nconn.close()
+                payload: dict = {
+                    "success": True,
+                    "period_start": period,
+                    "lines": lines,
+                    "skipped_missing_coords": skipped,
+                    "total_candidates": total,
+                    "raw_neighbor_tables": True,
+                }
+                if raw_msg:
+                    payload["message"] = raw_msg
+                return jsonify(payload)
+            nconn.close()
+            return jsonify({
+                "success": True,
+                "period_start": None,
+                "lines": [],
+                "skipped_missing_coords": 0,
+                "total_candidates": 0,
+            })
+
+        cell_norm = _norm_cell_key(cell_name) if cell_name else ''
+        tech_vals = _neighbor_hourly_tech_aliases(technology)
+        if not tech_vals:
+            nconn.close()
+            return jsonify({'error': 'technology is required'}), 400
+        tech_ph = ",".join("?" for _ in tech_vals)
+        where = [f"technology IN ({tech_ph})"]
+        params: list[object] = [*tech_vals]
+        if failures_only:
+            where.append("COALESCE(ho_attempts, 0) >= 1")
+        else:
+            where.append("COALESCE(ho_attempts, 0) >= ?")
+            params.append(min_attempts)
+        if vendor and vendor.lower() != 'all':
+            where.insert(0, "vendor = ?")
+            params.insert(0, vendor)
+        if cell_norm:
+            where.append("source_cell_norm = ?")
+            params.append(cell_norm)
+
+        max_period = nconn.execute(
+            f'SELECT MAX(period_start) AS p FROM neighbor_hourly WHERE {" AND ".join(where)}',
+            params,
+        ).fetchone()
+        period = max_period["p"] if max_period else None
+        if not period:
+            nconn.close()
+            return jsonify({
+                'success': True,
+                'period_start': None,
+                'lines': [],
+                'skipped_missing_coords': 0,
+                'total_candidates': 0,
+            })
+
+        rows = nconn.execute(
+            f"""
+            SELECT *
+            FROM neighbor_hourly
+            WHERE {" AND ".join(where)} AND period_start = ?
+            ORDER BY COALESCE(ho_attempts, 0) DESC
+            LIMIT ?
+            """,
+            params + [period, max_lines * 4],
+        ).fetchall()
+        nconn.close()
+
+        coords = _load_neighbor_coords(vendor, technology)
+        lines = []
+        skipped_missing = 0
+        for r in rows:
+            src = coords.get(r["source_cell_norm"] or _norm_cell_key(r["source_cell"]))
+            dst = coords.get(r["target_cell_norm"] or _norm_cell_key(r["target_cell"]))
+            if not src or not dst:
+                skipped_missing += 1
+                continue
+            if site_id:
+                if str(src.get("site_id")) != site_id and str(dst.get("site_id")) != site_id:
+                    continue
+            attempts_val = float(r["ho_attempts"] or 0)
+            succ_raw = r["ho_successes"]
+            try:
+                succ_f = float(succ_raw) if succ_raw is not None else None
+            except (TypeError, ValueError):
+                succ_f = None
+            rate = r["ho_success_rate"]
+            if rate is None:
+                try:
+                    if attempts_val > 0 and succ_f is not None:
+                        rate = (succ_f / attempts_val) * 100.0
+                except (TypeError, ValueError, ZeroDivisionError):
+                    rate = None
+            rate_f = float(rate) if rate is not None else None
+            failures = neighbor_ho_failures(attempts_val, rate_f, succ_f)
+            failures_int = int(math.trunc(failures)) if failures is not None else None
+            if failures_only:
+                thr = min_failures if min_failures > 1e-12 else 1e-9
+                if failures_int is None or failures_int < thr - 1e-12:
+                    continue
+            fr_pct = (failures_int / attempts_val * 100.0) if failures_int is not None and attempts_val > 0 else None
+            lines.append({
+                "period_start": r["period_start"],
+                "vendor": r["vendor"],
+                "technology": r["technology"],
+                "source_cell": r["source_cell"],
+                "target_cell": r["target_cell"],
+                "source_site_id": src.get("site_id"),
+                "target_site_id": dst.get("site_id"),
+                "source_lat": src["lat"],
+                "source_lng": src["lng"],
+                "target_lat": dst["lat"],
+                "target_lng": dst["lng"],
+                "ho_attempts": r["ho_attempts"],
+                "ho_successes": r["ho_successes"],
+                "ho_success_rate": rate,
+                "ho_failures": failures_int,
+                "ho_failure_rate_percent": fr_pct,
+            })
+            if len(lines) >= max_lines:
+                break
+
+        return jsonify({
+            "success": True,
+            "period_start": period,
+            "lines": lines,
+            "skipped_missing_coords": skipped_missing,
+            "total_candidates": len(rows),
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@network_map_bp.route('/api/network-map/neighbors/cell-summary', methods=['GET'])
+def get_neighbor_cell_summary():
+    """Top incoming/outgoing neighbors for a selected cell in latest hour."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    vendor = (request.args.get('vendor') or '').strip()
+    technology = _normalize_ui_map_tech_token((request.args.get('technology') or '').strip())
+    cell_name = (request.args.get('cell_name') or '').strip()
+    top_n = min(50, max(1, _safe_int(request.args.get('top_n'), 10)))
+    min_attempts = max(0, _safe_int(request.args.get('min_attempts'), 0))
+    if not technology or not cell_name:
+        return jsonify({'error': 'technology and cell_name are required'}), 400
+    cell_norm = _norm_cell_key(cell_name)
+    try:
+        conn = sqlite3.connect(NEIGHBOR_KPI_DB, timeout=30)
+        conn.row_factory = sqlite3.Row
+        _ensure_neighbor_schema(conn)
+        if not _neighbor_table_exists(conn, "neighbor_hourly"):
+            raw_tbl = _neighbor_raw_table_for_technology(technology)
+            if raw_tbl and _neighbor_table_exists(conn, raw_tbl):
+                conn.close()
+                return jsonify({
+                    "success": True,
+                    "period_start": None,
+                    "cell_name": cell_name,
+                    "outgoing": [],
+                    "incoming": [],
+                    "raw_neighbor_tables": True,
+                })
+            conn.close()
+            return jsonify({
+                "success": True,
+                "period_start": None,
+                "cell_name": cell_name,
+                "outgoing": [],
+                "incoming": [],
+            })
+        vendor_clause = ""
+        vendor_params: list[object] = []
+        if vendor and vendor.lower() != 'all':
+            vendor_clause = "AND vendor = ?"
+            vendor_params = [vendor]
+        tech_vals = _neighbor_hourly_tech_aliases(technology)
+        if not tech_vals:
+            conn.close()
+            return jsonify({'error': 'technology and cell_name are required'}), 400
+        tech_ph = ",".join("?" for _ in tech_vals)
+
+        period_row = conn.execute(
+            f"""
+            SELECT MAX(period_start) AS p
+            FROM neighbor_hourly
+            WHERE technology IN ({tech_ph})
+              {vendor_clause}
+              AND (source_cell_norm = ? OR target_cell_norm = ?)
+              AND COALESCE(ho_attempts, 0) >= ?
+            """,
+            [*tech_vals] + vendor_params + [cell_norm, cell_norm, min_attempts],
+        ).fetchone()
+        period = period_row["p"] if period_row else None
+        if not period:
+            conn.close()
+            return jsonify({"success": True, "period_start": None, "outgoing": [], "incoming": []})
+
+        outgoing = conn.execute(
+            f"""
+            SELECT target_cell AS neighbor_cell,
+                   SUM(COALESCE(ho_attempts,0)) AS ho_attempts,
+                   SUM(COALESCE(ho_successes,0)) AS ho_successes,
+                   CASE WHEN SUM(COALESCE(ho_attempts,0)) > 0
+                        THEN (SUM(COALESCE(ho_successes,0))*100.0) / SUM(COALESCE(ho_attempts,0))
+                        ELSE NULL END AS ho_success_rate
+            FROM neighbor_hourly
+            WHERE technology IN ({tech_ph}) AND period_start = ?
+              {vendor_clause}
+              AND source_cell_norm = ? AND COALESCE(ho_attempts,0) >= ?
+            GROUP BY target_cell_norm, target_cell
+            ORDER BY ho_attempts DESC
+            LIMIT ?
+            """,
+            [*tech_vals, period] + vendor_params + [cell_norm, min_attempts, top_n],
+        ).fetchall()
+        incoming = conn.execute(
+            f"""
+            SELECT source_cell AS neighbor_cell,
+                   SUM(COALESCE(ho_attempts,0)) AS ho_attempts,
+                   SUM(COALESCE(ho_successes,0)) AS ho_successes,
+                   CASE WHEN SUM(COALESCE(ho_attempts,0)) > 0
+                        THEN (SUM(COALESCE(ho_successes,0))*100.0) / SUM(COALESCE(ho_attempts,0))
+                        ELSE NULL END AS ho_success_rate
+            FROM neighbor_hourly
+            WHERE technology IN ({tech_ph}) AND period_start = ?
+              {vendor_clause}
+              AND target_cell_norm = ? AND COALESCE(ho_attempts,0) >= ?
+            GROUP BY source_cell_norm, source_cell
+            ORDER BY ho_attempts DESC
+            LIMIT ?
+            """,
+            [*tech_vals, period] + vendor_params + [cell_norm, min_attempts, top_n],
+        ).fetchall()
+        conn.close()
+
+        return jsonify({
+            "success": True,
+            "period_start": period,
+            "cell_name": cell_name,
+            "outgoing": [dict(r) for r in outgoing],
+            "incoming": [dict(r) for r in incoming],
+        })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

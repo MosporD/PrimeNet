@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Performance Analytics - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
-    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=7.3">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.2">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body class="perf-page">
@@ -16,7 +16,6 @@
             <div class="header-left">
                 <a href="/dashboard" class="back-link">← Dashboard</a>
                 <h1>📈 Performance Analytics</h1>
-                <p>Cell-level KPI trends across the network</p>
             </div>
             <div class="header-right">
                 <span class="user-name">{{ user.username }}</span>
@@ -30,20 +29,16 @@
         <!-- ================================================================
              LEFT: Filter Panel
         ================================================================ -->
-        <aside class="filter-panel perf-filter-hw">
+        <aside id="perf-left-panel" class="filter-panel perf-filter-hw">
             <input type="hidden" id="filter-site" value="">
             <input type="hidden" id="filter-cell" value="">
 
             <div class="perf-time-window-row">
-                <label class="perf-time-window-label" for="filter-hours">Time window</label>
-                <select id="filter-hours" class="perf-time-window-select"
-                        onchange="onPerfTimeWindowChange()">
-                    <option value="24">Last 24 hours</option>
-                    <option value="48">Last 48 hours</option>
-                    <option value="72">Last 72 hours</option>
-                    <option value="168" selected>Last 7 days</option>
-                    <option value="336">Last 14 days</option>
-                    <option value="720">Last 30 days</option>
+                <label class="perf-time-window-label" for="filter-data-scope">Data scope</label>
+                <select id="filter-data-scope" class="perf-time-window-select"
+                        onchange="onDataScopeChange()">
+                    <option value="hourly" selected>Hourly</option>
+                    <option value="daily">Daily</option>
                 </select>
             </div>
 
@@ -116,6 +111,7 @@
                                 <button type="button" class="hw-icon-btn" title="Expand all" onclick="perfTreeExpandAll()">+</button>
                                 <button type="button" class="hw-icon-btn hw-icon-btn-refresh" title="Refresh" onclick="refreshData()">↻</button>
                                 <a id="map-link" href="/network-map" class="hw-toolbar-map" title="Open network map">Map</a>
+                                <a id="drive-test-link" href="/drive-test-viewer" class="hw-toolbar-map" title="Open drive test viewer">Drive Test</a>
                             </div>
                             <div class="hw-tree-meta"><span id="cell-count-badge"></span></div>
                         </div>
@@ -151,7 +147,6 @@
                 </div>
                 <div id="perf-kpis-controls">
                     <button type="button" class="btn-query" id="btn-perf-query" onclick="runPerformanceQuery()">Query</button>
-                    <p class="perf-query-hint">Loads KPI charts for the selected cell(s) and checked KPIs.</p>
                 </div>
                 <div id="perf-reports-controls" style="display:none;">
                     <div class="perf-reports-row">
@@ -166,6 +161,11 @@
             </div>
 
         </aside>
+        <button type="button" id="perf-left-panel-toggle" class="perf-left-panel-toggle"
+                aria-label="Collapse left panel" aria-expanded="true"
+                title="Collapse filters" onclick="togglePerfLeftPanel()">
+            ◀
+        </button>
 
         <!-- ================================================================
              RIGHT: Charts Area
@@ -178,11 +178,9 @@
                         <div id="charts-title" class="charts-title">Select a cell to view KPI trends</div>
                     </div>
                     <div class="header-actions">
-                        <!-- View-mode toggle (visible once a vendor is selected) -->
-                        <div id="view-toggle" class="view-toggle" style="display:none;">
-                            <button id="btn-charts-view" class="view-btn active" onclick="switchViewMode('charts')">Charts</button>
-                            <button id="btn-table-view"  class="view-btn"        onclick="switchViewMode('table')">PM Database</button>
-                        </div>
+                        <button id="btn-add-charts" class="btn-query" onclick="addChartsFromLastQuery()" style="display:none;">
+                            + Add Charts
+                        </button>
                         <button id="btn-refresh" class="btn-refresh" onclick="refreshData()" style="display:none;">
                             <span class="refresh-icon">↻</span> Refresh
                         </button>
@@ -191,10 +189,33 @@
                         </button>
                     </div>
                 </div>
+                <div class="charts-header-bottom">
+                    <!-- View-mode toggle (visible once a vendor is selected) -->
+                    <div id="view-toggle" class="view-toggle" style="display:none;">
+                        <button id="btn-charts-view" class="view-btn active" onclick="switchViewMode('charts')">Charts</button>
+                        <button id="btn-table-view"  class="view-btn"        onclick="switchViewMode('table')">PM Database</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="perf-dod-bar" class="perf-dod-bar" style="display:none;" aria-label="Hourly chart view options">
+                <div class="perf-dod-row perf-dod-row--modes">
+                    <span class="perf-dod-label">Hourly charts</span>
+                    <div class="perf-dod-mode" role="radiogroup" aria-label="Trend or DOD ">
+                        <label class="perf-dod-radio"><input type="radio" name="perf-chart-display" value="trend" checked> Trend</label>
+                        <label class="perf-dod-radio"><input type="radio" name="perf-chart-display" value="dod"> DOD</label>
+                    </div>
+                </div>
+                <div id="perf-dod-days-wrap" class="perf-dod-days-wrap" style="display:none;">
+                    <div id="perf-dod-days" class="perf-dod-days"></div>
+                </div>
             </div>
 
             <div id="perf-chart-tabs-bar" class="perf-chart-tabs-bar" style="display:none;" aria-label="Chart tabs">
                 <div id="perf-chart-tabs-strip" class="perf-chart-tabs-strip" role="tablist"></div>
+            </div>
+            <div id="perf-kpi-category-tabs-bar" class="perf-kpi-category-tabs-bar" style="display:none;" aria-label="KPI category tabs">
+                <div id="perf-kpi-category-tabs-strip" class="perf-kpi-category-tabs-strip" role="tablist"></div>
             </div>
 
             <!-- Placeholder when no cell is selected -->
@@ -228,13 +249,39 @@
                 <div id="hw-pagination" class="hw-pagination"></div>
             </div>
 
+            <div id="chart-config-modal" class="perf-modal-backdrop" style="display:none;">
+                <div class="perf-modal-card perf-modal-card-wide">
+                    <div class="perf-modal-head">
+                        <h3>Switch Object and KPI</h3>
+                        <button type="button" class="perf-modal-close" onclick="closeChartConfigModal()">&times;</button>
+                    </div>
+                    <div class="perf-config-grid">
+                        <div class="perf-config-col">
+                            <div class="perf-config-title">Select Objects</div>
+                            <div id="chart-config-objects" class="perf-config-list"></div>
+                        </div>
+                        <div class="perf-config-col">
+                            <div class="perf-config-title">Select KPIs</div>
+                            <div id="chart-config-kpis" class="perf-config-list"></div>
+                        </div>
+                    </div>
+                    <div class="perf-modal-actions">
+                        <button type="button" class="btn-query" onclick="applyChartConfigModal()">Apply</button>
+                        <button type="button" class="btn-query btn-query-danger" onclick="closeChartConfigModal()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
     </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-<script src="{{ url_for('performance.static', filename='performance.js') }}?v=7.1"></script>
+<script>
+    window.PERF_KPI_CATEGORY_MAP_URL = "{{ url_for('performance.get_kpi_mapping') }}";
+</script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=8.7"></script>
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const params = new URLSearchParams(window.location.search);

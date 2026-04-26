@@ -44,6 +44,8 @@ def _create_app_user_tables(cur):
             department TEXT,
             role TEXT DEFAULT 'user',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            password_changed_at TIMESTAMP,
+            force_password_change BOOLEAN DEFAULT TRUE,
             last_login TIMESTAMP,
             is_active BOOLEAN DEFAULT TRUE
         )
@@ -137,6 +139,44 @@ def _create_app_user_tables(cur):
             user_id INTEGER UNIQUE NOT NULL REFERENCES {A}.users(id),
             preferences TEXT NOT NULL DEFAULT '{{}}',
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    _exec(cur, f'''
+        CREATE TABLE IF NOT EXISTS {A}.config_scheduler_tasks (
+            id SERIAL PRIMARY KEY,
+            task_name TEXT NOT NULL,
+            vendor TEXT NOT NULL DEFAULT 'mixed',
+            schedule_mode TEXT NOT NULL DEFAULT 'run_now',
+            scheduled_at TIMESTAMP,
+            run_mode TEXT NOT NULL DEFAULT 'serial',
+            execution_order TEXT,
+            status TEXT NOT NULL DEFAULT 'pending',
+            completion_notes TEXT,
+            created_by INTEGER NOT NULL REFERENCES {A}.users(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    _exec(cur, f'''
+        CREATE TABLE IF NOT EXISTS {A}.config_scheduler_task_files (
+            id SERIAL PRIMARY KEY,
+            task_id INTEGER NOT NULL REFERENCES {A}.config_scheduler_tasks(id) ON DELETE CASCADE,
+            original_file_name TEXT NOT NULL,
+            stored_file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            file_order INTEGER NOT NULL DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    _exec(cur, f'''
+        CREATE TABLE IF NOT EXISTS {A}.config_scheduler_result_files (
+            id SERIAL PRIMARY KEY,
+            task_id INTEGER NOT NULL REFERENCES {A}.config_scheduler_tasks(id) ON DELETE CASCADE,
+            original_file_name TEXT NOT NULL,
+            stored_file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            uploaded_by INTEGER NOT NULL REFERENCES {A}.users(id),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
 

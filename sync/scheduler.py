@@ -12,11 +12,15 @@ import sqlite3
 import os
 import glob
 import threading
+import subprocess
+import sys
+import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+from apscheduler.triggers.cron import CronTrigger
 
 from sync.sftp_client import SFTPClient
 from sync.pm_processor import (
@@ -38,6 +42,255 @@ _sync_progress = {
     'huawei_pm': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
     'metadata': {'running': False, 'stage': 'idle', 'progress': 0, 'total': 0, 'percent': 0, 'message': '', 'updated_at': None},
 }
+
+
+def pull_all_raw_master():
+    """Run scripts/pull_all_raw.py (clear + pull Huawei/Nokia/Metadata raw files)."""
+    script = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts', 'pull_all_raw.py')
+    if not os.path.isfile(script):
+        logger.error('Raw master launcher not found: %s', script)
+        _log_sync('raw_master_pull', 'all', 'error', 0, f'missing script: {script}')
+        return
+    try:
+        logger.info('Starting raw master pull launcher: %s', script)
+        proc = subprocess.run(
+            [sys.executable, script],
+            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            capture_output=True,
+            text=True,
+        )
+        if proc.stdout:
+            logger.info('raw master stdout:\n%s', proc.stdout.strip())
+        if proc.stderr:
+            logger.warning('raw master stderr:\n%s', proc.stderr.strip())
+        if proc.returncode == 0:
+            _log_sync('raw_master_pull', 'all', 'ok', 0, 'Master raw pull completed')
+            logger.info('Raw master pull completed successfully.')
+        else:
+            details = ''
+            try:
+                out_lines = [ln.strip() for ln in (proc.stdout or '').splitlines() if ln.strip()]
+                err_lines = [ln.strip() for ln in (proc.stderr or '').splitlines() if ln.strip()]
+                # Keep concise but actionable reason in sync history.
+                if err_lines:
+                    details = err_lines[-1]
+                elif out_lines:
+                    run_lines = [ln for ln in out_lines if ln.startswith('[run]')]
+                    details = run_lines[-1] if run_lines else out_lines[-1]
+            except Exception:
+                details = ''
+            msg = f'Master raw pull failed (code={proc.returncode})'
+            if details:
+                msg = f'{msg}: {details[:350]}'
+            _log_sync('raw_master_pull', 'all', 'error', 0, msg)
+            logger.error('Raw master pull failed with code %s.', proc.returncode)
+    except Exception as e:
+        _log_sync('raw_master_pull', 'all', 'error', 0, str(e))
+        logger.exception('Raw master pull failed: %s', e)
+
+
+def _all_table_row_counts(db_path: str) -> dict[str, int]:
+    if not os.path.isfile(db_path):
+        return {}
+    out: dict[str, int] = {}
+    conn = sqlite3.connect(db_path)
+    try:
+        cur = conn.cursor()
+        tables = cur.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+        ).fetchall()
+        for (tbl,) in tables:
+            try:
+                n = cur.execute(f'SELECT COUNT(*) FROM "{tbl}"').fetchone()[0]
+                out[str(tbl)] = int(n or 0)
+            except Exception:
+                # Skip objects that are not normal row tables.
+                continue
+    finally:
+        conn.close()
+    return out
+
+
+def _extract_technology_key(table_name: str) -> str:
+    low = (table_name or '').lower()
+    if '4g_tdd' in low:
+        return '4G-TDD'
+    if '4g_fdd' in low:
+        return '4G-FDD'
+    if re.search(r'(^|[^0-9a-z])5g([^0-9a-z]|$)', low):
+        return '5G'
+    if re.search(r'(^|[^0-9a-z])4g([^0-9a-z]|$)', low):
+        return '4G'
+    if re.search(r'(^|[^0-9a-z])3g([^0-9a-z]|$)', low):
+        return '3G'
+    if re.search(r'(^|[^0-9a-z])2g([^0-9a-z]|$)', low):
+        return '2G'
+    return 'all'
+
+
+def _log_loader_row_deltas(before: dict[str, dict[str, int]], after: dict[str, dict[str, int]]) -> None:
+    """Write per vendor/tech row deltas to sync_log after loader execution."""
+    bucket: dict[tuple[str, str], int] = {}
+    for db_label, after_counts in after.items():
+        before_counts = before.get(db_label, {})
+        for tbl, after_n in after_counts.items():
+            delta = int(after_n or 0) - int(before_counts.get(tbl, 0) or 0)
+            if delta <= 0:
+                continue
+            tech = _extract_technology_key(tbl)
+            key = (db_label, tech)
+            bucket[key] = bucket.get(key, 0) + delta
+
+    if not bucket:
+        _log_sync('db_loader', 'all', 'ok', 0, 'No positive row deltas detected')
+        return
+
+    for (db_label, tech), delta in sorted(bucket.items()):
+        _log_sync('db_loader', f'{db_label}:{tech}', 'ok', int(delta), 'Rows added by loader')
+
+
+def run_full_sync_cycle():
+    """End-to-end cycle: raw pull + DB loader + per vendor/tech row-delta logs."""
+    from sync_config import NOKIA_PM_DB, HUAWEI_PM_DB, NOKIA_GROUPS_DB, HUAWEI_GROUPS_DB, METADATA_DB
+
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    loader_script = os.path.join(project_root, 'scripts', 'load_raw_csv_to_databases.py')
+
+    before = {
+        'nokia_pm': _all_table_row_counts(NOKIA_PM_DB),
+        'huawei_pm': _all_table_row_counts(HUAWEI_PM_DB),
+        'nokia_groups': _all_table_row_counts(NOKIA_GROUPS_DB),
+        'huawei_groups': _all_table_row_counts(HUAWEI_GROUPS_DB),
+        'metadata': _all_table_row_counts(METADATA_DB),
+    }
+
+    pull_all_raw_master()
+
+    if not os.path.isfile(loader_script):
+        _log_sync('db_loader', 'all', 'error', 0, f'missing script: {loader_script}')
+        logger.error('DB loader script not found: %s', loader_script)
+        return
+
+    try:
+        logger.info('Starting DB loader script: %s', loader_script)
+        proc = subprocess.run(
+            [sys.executable, loader_script],
+            cwd=project_root,
+            capture_output=True,
+            text=True,
+        )
+        if proc.stdout:
+            logger.info('db loader stdout:\n%s', proc.stdout.strip())
+        if proc.stderr:
+            logger.warning('db loader stderr:\n%s', proc.stderr.strip())
+
+        if proc.returncode != 0:
+            _log_sync('db_loader', 'all', 'error', 0, f'Loader failed (code={proc.returncode})')
+            logger.error('DB loader failed with code %s', proc.returncode)
+            return
+
+        neighbor_loader = os.path.join(project_root, 'scripts', 'load_nokia_neighbor_raw_to_db.py')
+        if os.path.isfile(neighbor_loader):
+            nproc = subprocess.run(
+                [sys.executable, neighbor_loader],
+                cwd=project_root,
+                capture_output=True,
+                text=True,
+            )
+            if nproc.stdout:
+                logger.info('neighbor loader stdout:\n%s', nproc.stdout.strip())
+            if nproc.stderr:
+                logger.warning('neighbor loader stderr:\n%s', nproc.stderr.strip())
+            if nproc.returncode != 0:
+                logger.warning('Neighbor raw loader failed with code %s', nproc.returncode)
+
+        after = {
+            'nokia_pm': _all_table_row_counts(NOKIA_PM_DB),
+            'huawei_pm': _all_table_row_counts(HUAWEI_PM_DB),
+            'nokia_groups': _all_table_row_counts(NOKIA_GROUPS_DB),
+            'huawei_groups': _all_table_row_counts(HUAWEI_GROUPS_DB),
+            'metadata': _all_table_row_counts(METADATA_DB),
+        }
+        _log_loader_row_deltas(before, after)
+        logger.info('Full sync cycle completed successfully.')
+    except Exception as e:
+        _log_sync('db_loader', 'all', 'error', 0, str(e))
+        logger.exception('Full sync cycle failed during DB load: %s', e)
+
+
+def run_daily_sync_cycle():
+    """End-to-end DAILY cycle: daily raw pull + daily DB load."""
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    script = os.path.join(project_root, 'scripts', 'pull_and_load_daily.py')
+    if not os.path.isfile(script):
+        _log_sync('daily_full_sync', 'all', 'error', 0, f'missing script: {script}')
+        logger.error('Daily pipeline script not found: %s', script)
+        return
+    try:
+        proc = subprocess.run([sys.executable, script], cwd=project_root, capture_output=True, text=True)
+        if proc.stdout:
+            logger.info('daily full sync stdout:\n%s', proc.stdout.strip())
+        if proc.stderr:
+            logger.warning('daily full sync stderr:\n%s', proc.stderr.strip())
+        if proc.returncode == 0:
+            _log_sync('daily_full_sync', 'all', 'ok', 0, 'Daily full sync completed')
+            logger.info('Daily full sync completed successfully.')
+        else:
+            _log_sync('daily_full_sync', 'all', 'error', 0, f'Daily full sync failed (code={proc.returncode})')
+            logger.error('Daily full sync failed with code %s.', proc.returncode)
+    except Exception as e:
+        _log_sync('daily_full_sync', 'all', 'error', 0, str(e))
+        logger.exception('Daily full sync failed: %s', e)
+
+
+def run_manual_category_sync(category: str):
+    """
+    Run manual category sync:
+      cells-hourly | groups-hourly | cells-daily | groups-daily
+    """
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    pull_script = 'pull_all_raw.py'
+    load_args = ['--scope', 'hourly']
+    sync_type = category.replace('-', '_')
+    if category.endswith('daily'):
+        pull_script = 'pull_all_raw_daily.py'
+        load_args = ['--scope', 'daily', '--skip-kpi-db']
+    if category.startswith('cells-'):
+        load_args.extend(['--category', 'cells'])
+    elif category.startswith('groups-'):
+        load_args.extend(['--category', 'groups'])
+    else:
+        _log_sync('manual_category_sync', category, 'error', 0, 'Unknown category')
+        return
+
+    pull_path = os.path.join(project_root, 'scripts', pull_script)
+    load_path = os.path.join(project_root, 'scripts', 'load_raw_csv_to_databases.py')
+    if not os.path.isfile(pull_path) or not os.path.isfile(load_path):
+        _log_sync('manual_category_sync', category, 'error', 0, 'Required script missing')
+        return
+
+    try:
+        pull_proc = subprocess.run([sys.executable, pull_path], cwd=project_root, capture_output=True, text=True)
+        if pull_proc.stdout:
+            logger.info('%s pull stdout:\n%s', category, pull_proc.stdout.strip())
+        if pull_proc.stderr:
+            logger.warning('%s pull stderr:\n%s', category, pull_proc.stderr.strip())
+        if pull_proc.returncode != 0:
+            _log_sync(sync_type, 'all', 'error', 0, f'pull failed (code={pull_proc.returncode})')
+            return
+
+        load_proc = subprocess.run([sys.executable, load_path] + load_args, cwd=project_root, capture_output=True, text=True)
+        if load_proc.stdout:
+            logger.info('%s load stdout:\n%s', category, load_proc.stdout.strip())
+        if load_proc.stderr:
+            logger.warning('%s load stderr:\n%s', category, load_proc.stderr.strip())
+        if load_proc.returncode == 0:
+            _log_sync(sync_type, 'all', 'ok', 0, 'Manual category sync completed')
+        else:
+            _log_sync(sync_type, 'all', 'error', 0, f'load failed (code={load_proc.returncode})')
+    except Exception as e:
+        _log_sync(sync_type, 'all', 'error', 0, str(e))
+        logger.exception('Manual category sync failed (%s): %s', category, e)
 
 
 def _set_progress(job_key: str, **fields) -> None:
@@ -144,6 +397,9 @@ def _log_sync(sync_type, technology, status, rows=0, message=None):
 # ---------------------------------------------------------------------------
 
 def pull_nokia_pm():
+    _finish_progress('nokia_pm', True, 'Reset mode: Nokia PM pull disabled.')
+    logger.info('Reset mode: pull_nokia_pm is disabled.')
+    return
     from sync_config import (
         NOKIA_PM_SERVER,
         LOCAL_DOWNLOAD_DIR,
@@ -267,6 +523,9 @@ def pull_nokia_pm():
 # ---------------------------------------------------------------------------
 
 def pull_huawei_pm():
+    _finish_progress('huawei_pm', True, 'Reset mode: Huawei PM pull disabled.')
+    logger.info('Reset mode: pull_huawei_pm is disabled.')
+    return
     from sync_config import (
         HUAWEI_PM_SERVER,
         LOCAL_DOWNLOAD_DIR,
@@ -362,6 +621,9 @@ def pull_huawei_pm():
 # ---------------------------------------------------------------------------
 
 def pull_metadata():
+    _finish_progress('metadata', True, 'Reset mode: Metadata pull disabled.')
+    logger.info('Reset mode: pull_metadata is disabled.')
+    return
     from sync_config import METADATA_SERVER, LOCAL_DOWNLOAD_DIR, SYNC_DOWNLOAD_KEEP_FILES
 
     host = METADATA_SERVER['host']
@@ -419,6 +681,8 @@ def pull_metadata():
 # ---------------------------------------------------------------------------
 
 def pull_nokia_groups():
+    logger.info('Reset mode: pull_nokia_groups is disabled.')
+    return
     from sync_config import NOKIA_GROUPS_SERVER, LOCAL_DOWNLOAD_DIR, SYNC_DOWNLOAD_KEEP_FILES
 
     host = NOKIA_GROUPS_SERVER['host']
@@ -461,7 +725,43 @@ def pull_nokia_groups():
             _prune_sync_download_dir(groups_nokia_dir, f'nokia_group_{tech}_', SYNC_DOWNLOAD_KEEP_FILES)
 
 
+def run_remote_pull_watcher_once():
+    """
+    One cycle of scripts/watch_remote_new_files_and_pull.py (--once): probe remotes,
+    pull+load only when signatures change (state in databases/admin/pull_watch_state.json).
+    """
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    script = os.path.join(root, 'scripts', 'watch_remote_new_files_and_pull.py')
+    if not os.path.isfile(script):
+        logger.warning('Remote pull watcher script not found: %s', script)
+        return
+    try:
+        logger.info('Starting remote pull watcher (--once)...')
+        proc = subprocess.run(
+            [sys.executable, script, '--once'],
+            cwd=root,
+            capture_output=True,
+            text=True,
+        )
+        if proc.stdout:
+            out = proc.stdout.strip()
+            if out:
+                logger.info('pull watcher stdout:\n%s', out[:12000])
+        if proc.stderr:
+            err = proc.stderr.strip()
+            if err:
+                logger.warning('pull watcher stderr:\n%s', err[:12000])
+        if proc.returncode != 0:
+            logger.error('Remote pull watcher exited with code %s', proc.returncode)
+        else:
+            logger.info('Remote pull watcher cycle completed.')
+    except Exception as e:
+        logger.exception('Remote pull watcher failed: %s', e)
+
+
 def pull_huawei_groups():
+    logger.info('Reset mode: pull_huawei_groups is disabled.')
+    return
     from sync_config import HUAWEI_GROUPS_SERVER, LOCAL_DOWNLOAD_DIR, SYNC_DOWNLOAD_KEEP_FILES
 
     host = HUAWEI_GROUPS_SERVER['host']
@@ -510,59 +810,59 @@ def start_scheduler():
     except Exception as e:
         logger.error(f'DB migration failed: {e}')
 
-    from sync_config import PM_PULL_INTERVAL_HOURS, METADATA_PULL_INTERVAL_HOURS
+    from sync_config import (
+        RAW_PULL_INTERVAL_HOURS,
+        DAILY_PULL_HOUR,
+        PULL_WATCHER_POLL_INTERVAL_SEC,
+    )
 
     _scheduler = BackgroundScheduler(daemon=True)
 
-    # next_run_time=datetime.now() makes each job run immediately on startup
-    # (then repeat on the interval).
+    # Run immediately on startup, then every configured interval.
     _scheduler.add_job(
-        pull_nokia_pm,
-        trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
-        id='nokia_pm_pull',
-        name='Nokia PM Pull',
+        run_full_sync_cycle,
+        trigger=IntervalTrigger(hours=RAW_PULL_INTERVAL_HOURS),
+        id='raw_master_pull',
+        name='Raw + DB Full Sync',
         replace_existing=True,
         next_run_time=datetime.now()
     )
     _scheduler.add_job(
-        pull_huawei_pm,
-        trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
-        id='huawei_pm_pull',
-        name='Huawei PM Pull',
+        run_daily_sync_cycle,
+        trigger=CronTrigger(hour=DAILY_PULL_HOUR, minute=0),
+        id='daily_full_sync_7am',
+        name='Daily Raw + DB Full Sync',
         replace_existing=True,
-        next_run_time=datetime.now()
-    )
-    _scheduler.add_job(
-        pull_nokia_groups,
-        trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
-        id='nokia_groups_pull',
-        name='Nokia Groups Pull',
-        replace_existing=True,
-        next_run_time=datetime.now()
-    )
-    _scheduler.add_job(
-        pull_huawei_groups,
-        trigger=IntervalTrigger(hours=PM_PULL_INTERVAL_HOURS),
-        id='huawei_groups_pull',
-        name='Huawei Groups Pull',
-        replace_existing=True,
-        next_run_time=datetime.now()
-    )
-    _scheduler.add_job(
-        pull_metadata,
-        trigger=IntervalTrigger(hours=METADATA_PULL_INTERVAL_HOURS),
-        id='metadata_pull',
-        name='Metadata Pull',
-        replace_existing=True,
-        next_run_time=datetime.now()
     )
 
+    # Remote signature watcher (conditional pulls; not the same as full raw master sync).
+    if os.environ.get('NCM_DISABLE_PULL_WATCHER', '').strip().lower() not in ('1', 'true', 'yes'):
+        _scheduler.add_job(
+            run_remote_pull_watcher_once,
+            trigger=IntervalTrigger(seconds=int(PULL_WATCHER_POLL_INTERVAL_SEC)),
+            id='remote_pull_signature_watcher',
+            name='Remote SFTP signature watch + selective pull',
+            replace_existing=True,
+            next_run_time=datetime.now(),
+            coalesce=True,
+            max_instances=1,
+        )
+
     _scheduler.start()
-    logger.info(
-        f'Scheduler started — Nokia PM + Huawei PM every {PM_PULL_INTERVAL_HOURS}h, '
-        f'Metadata every {METADATA_PULL_INTERVAL_HOURS}h. '
-        f'First pull running now.'
-    )
+    _watcher_on = os.environ.get('NCM_DISABLE_PULL_WATCHER', '').strip().lower() not in ('1', 'true', 'yes')
+    if _watcher_on:
+        logger.info(
+            'Scheduler started — raw master every %sh, daily at %02d:00, pull watcher every %ss.',
+            RAW_PULL_INTERVAL_HOURS,
+            DAILY_PULL_HOUR,
+            PULL_WATCHER_POLL_INTERVAL_SEC,
+        )
+    else:
+        logger.info(
+            'Scheduler started — raw master every %sh, daily at %02d:00 (pull watcher disabled).',
+            RAW_PULL_INTERVAL_HOURS,
+            DAILY_PULL_HOUR,
+        )
 
 
 def get_scheduler():
@@ -575,3 +875,9 @@ def trigger_pm_now():        pull_nokia_pm(); pull_huawei_pm()
 def trigger_metadata_now():  pull_metadata()
 def trigger_nokia_groups_now(): pull_nokia_groups()
 def trigger_huawei_groups_now(): pull_huawei_groups()
+def trigger_raw_master_now(): run_full_sync_cycle()
+def trigger_daily_full_now(): run_daily_sync_cycle()
+def trigger_cells_hourly_now(): run_manual_category_sync('cells-hourly')
+def trigger_groups_hourly_now(): run_manual_category_sync('groups-hourly')
+def trigger_cells_daily_now(): run_manual_category_sync('cells-daily')
+def trigger_groups_daily_now(): run_manual_category_sync('groups-daily')

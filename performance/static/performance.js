@@ -7,6 +7,7 @@
  */
 
 const charts = {};
+let _perfChartRenderSeq = 0;
 let allCells    = [];
 let allSites    = [];
 let allClusters = [];
@@ -23,16 +24,51 @@ let KPI_HEADER_MAP = {};
 let kpiSelectedKeys = new Set();
 let _kpiColumnsSig = '';
 let allCellGroups = [];
+let lastQueryCellKeys = [];
+let lastQuerySelectionType = 'cell';
 let performanceReports = [];
 let perfBottomMode = 'kpis';
+let perfLeftPanelCollapsed = false;
+let perfPreferredPmViewMode = 'charts';
+let perfPmViewPrefPromise = null;
+
+/** Hourly chart view: chronological trend vs day-over-day (same hour-of-day across days). */
+let perfChartDisplayMode = 'trend';
+let perfDodSelectedDateSet = new Set();
+let perfDodPickerSig = '';
+let perfDodPickerNeedsReset = false;
+let perfDodBarWired = false;
+let perfDodDayChangeTimer = null;
 
 // ── PM table view state ──────────────────────────────────
 let hwCurrentPage   = 1;
 let hwCurrentSearch = '';
 let hwCurrentTech   = '';
 let hwCurrentVendor = '';
+let hwCurrentScopedCellNames = [];
+let hwCurrentScopedGroupRefs = [];
+let hwLastTablePayload = null;
 let hwSearchTimer   = null;
-const HW_PAGE_SIZE  = 100;
+const HW_PAGE_SIZE  = 20;
+
+let KPI_CATEGORY_MAP = {};
+let KPI_DISPLAY_NAMES = {};
+let META_KPI_KEYS = new Set();
+let _kpiCategoryConfigPromise = null;
+
+const DEFAULT_KPI_CATEGORY = 'Other';
+const DUPLICATE_KPI_KEYS = new Set([
+    'RH303:Handover Success Rate(%)',
+    'K3034:TCHH Traffic Volume(Erl)',
+    'Drop Call Rate',
+    'CS RAB Congestion Num',
+    'TCH raw block.1',
+    'Act HS-DSCH  end usr thp',
+    'Expect cell size',
+    'Avg PDCP cell thp UL',
+    'TRS_SLOT_PDSCH (M55308C00017)',
+]);
+const META_KPI_KEYWORD_RE = /\b(cell|site|nodeb|enodeb|nrbts|nrcel|rnc|wbts|wcel|id|index|name|integrity|duplex|indication)\b/i;
 
 const _CHART_COLORS = [
     '#3498db','#27ae60','#e74c3c','#9b59b6','#f39c12',
@@ -68,9 +104,133 @@ function _scopeMapKey(vendor, technology) {
     return `${vendor}|${technology}`;
 }
 
+function _currentDataScope() {
+    const el = document.getElementById('filter-data-scope');
+    const v = String(el?.value || 'hourly').trim().toLowerCase();
+    return v === 'daily' ? 'daily' : 'hourly';
+}
+
+function _normalizeKpiKey(k) {
+    return String(k || '').trim();
+}
+
+function _isMetadataKpiKey(k) {
+    const key = _normalizeKpiKey(k);
+    if (!key) return true;
+    if (DUPLICATE_KPI_KEYS.has(key)) return true;
+    if (META_KPI_KEYS.has(key)) return true;
+    const cat = KPI_CATEGORY_MAP[key];
+    if (String(cat || '').toLowerCase() === 'identifiers / metadata') return true;
+    return META_KPI_KEYWORD_RE.test(key);
+}
+
+function _kpiDisplayName(kpiKey) {
+    const key = _normalizeKpiKey(kpiKey);
+    return _normalizeKpiKey(KPI_DISPLAY_NAMES[key]) || key;
+}
+
+async function ensureKpiCategoryConfigLoaded() {
+    if (_kpiCategoryConfigPromise) return _kpiCategoryConfigPromise;
+    _kpiCategoryConfigPromise = (async () => {
+        const url = window.PERF_KPI_CATEGORY_MAP_URL || '/performance/static/kpi_categories.json';
+        try {
+            const res = await fetch(url, { credentials: 'same-origin' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            const cats = (data && typeof data.categories === 'object' && data.categories) ? data.categories : {};
+            const disp = (data && typeof data.display_names === 'object' && data.display_names) ? data.display_names : {};
+            KPI_CATEGORY_MAP = {};
+            KPI_DISPLAY_NAMES = {};
+            Object.keys(cats).forEach(k => {
+                const key = _normalizeKpiKey(k);
+                const cat = _normalizeKpiKey(cats[k]);
+                if (key && cat) KPI_CATEGORY_MAP[key] = cat;
+            });
+            Object.keys(disp).forEach(k => {
+                const key = _normalizeKpiKey(k);
+                const label = _normalizeKpiKey(disp[k]);
+                if (key && label) KPI_DISPLAY_NAMES[key] = label;
+            });
+            const meta = Array.isArray(data?.meta_kpis) ? data.meta_kpis : [];
+            META_KPI_KEYS = new Set(meta.map(_normalizeKpiKey).filter(Boolean));
+        } catch (e) {
+            console.warn('Failed to load KPI category map:', e);
+            KPI_CATEGORY_MAP = {};
+            KPI_DISPLAY_NAMES = {};
+            META_KPI_KEYS = new Set();
+        }
+    })();
+    return _kpiCategoryConfigPromise;
+}
+
+function _labelForQueryKey(key) {
+    const s = String(key || '');
+    if (!s) return 'Unknown';
+    if (s.includes(':raw:')) {
+        const parts = s.split(':');
+        return parts[parts.length - 1] || s;
+    }
+    const row = allCells.find(c => String(c.cell_key || c.cell_id) === s);
+    if (row) return `${row.cell_name || 'Cell'} (${row.site_name || row.site_id || ''})`;
+    const p = s.split('||');
+    if (p.length === 4) return `${p[3]} (${p[2] || 'site'})`;
+    return s;
+}
+
+function openChartConfigModal() {
+    if (!lastQueryCellKeys.length) {
+        _perfQueryUserMessage('Run Query first to configure chart objects/KPIs.');
+        return;
+    }
+    const modal = document.getElementById('chart-config-modal');
+    const objWrap = document.getElementById('chart-config-objects');
+    const kpiWrap = document.getElementById('chart-config-kpis');
+    if (!modal || !objWrap || !kpiWrap) return;
+
+    objWrap.innerHTML = lastQueryCellKeys.map(k => `
+        <label><input type="checkbox" class="cfg-obj-cb" data-key="${escAttr(String(k))}" checked> ${escHtml(_labelForQueryKey(k))}</label>
+    `).join('');
+    const allKpis = KPI_DEFS.map(d => d.key);
+    kpiWrap.innerHTML = allKpis.map(k => `
+        <label><input type="checkbox" class="cfg-kpi-cb" data-kpi="${escAttr(String(k))}" ${kpiSelectedKeys.has(k) ? 'checked' : ''}> ${escHtml(_kpiDisplayName(k))}</label>
+    `).join('');
+
+    modal.style.display = 'flex';
+}
+
+function closeChartConfigModal() {
+    const modal = document.getElementById('chart-config-modal');
+    if (!modal) return;
+    modal.style.display = 'none';
+}
+
+async function applyChartConfigModal() {
+    const objKeys = [...document.querySelectorAll('#chart-config-objects .cfg-obj-cb:checked')]
+        .map(el => String(el.getAttribute('data-key') || '').trim())
+        .filter(Boolean);
+    const kpis = [...document.querySelectorAll('#chart-config-kpis .cfg-kpi-cb:checked')]
+        .map(el => String(el.getAttribute('data-kpi') || '').trim())
+        .filter(Boolean);
+
+    if (!objKeys.length) {
+        _perfQueryUserMessage('Select at least one object.');
+        return;
+    }
+    if (!kpis.length) {
+        _perfQueryUserMessage('Select at least one KPI.');
+        return;
+    }
+    lastQueryCellKeys = objKeys;
+    kpiSelectedKeys = new Set(kpis);
+    updateKpiScopeUI();
+    closeChartConfigModal();
+    await addChartsFromLastQuery();
+}
+
 async function loadKpiHeaderMap() {
     try {
-        const res = await fetch('/api/performance/kpi_headers_map', { credentials: 'same-origin' });
+        const qs = new URLSearchParams({ data_scope: _currentDataScope() });
+        const res = await fetch('/api/performance/kpi_headers_map?' + qs.toString(), { credentials: 'same-origin' });
         const data = await res.json();
         if (data.success && data.mapping && typeof data.mapping === 'object') {
             KPI_HEADER_MAP = data.mapping;
@@ -147,7 +307,7 @@ function updateKpiScopeUI() {
         const checked = kpiSelectedKeys.has(c) ? ' checked' : '';
         return `<label class="kpi-scope-item" title="${escAttr(c)}">
             <input type="checkbox" class="kpi-scope-cb" id="kpi-cb-${i}" data-kpi-key="${escAttr(c)}"${checked}>
-            <span class="kpi-scope-item-label">${escHtml(c)}</span>
+            <span class="kpi-scope-item-label">${escHtml(_kpiDisplayName(c))}</span>
         </label>`;
     }).join('');
     updateKpiSelectAllState();
@@ -172,12 +332,14 @@ function onKpiSelectionChange() {
 
 async function loadKpiColumns() {
     try {
+        await ensureKpiCategoryConfigLoaded();
         const v = (document.getElementById('filter-vendor')?.value || '').trim();
         const t = (document.getElementById('filter-tech')?.value || '').trim();
 
         const params = new URLSearchParams();
         if (v) params.set('vendor', v);
         if (t) params.set('technology', t);
+        params.set('data_scope', _currentDataScope());
         const qs = params.toString();
         const res = await fetch('/api/performance/kpi_columns' + (qs ? '?' + qs : ''), {
             credentials: 'same-origin',
@@ -205,10 +367,14 @@ async function loadKpiColumns() {
         if (!all.length && v && t) {
             all = _kpiHeadersForScope(v, t);
         }
+        all = all
+            .map(_normalizeKpiKey)
+            .filter(Boolean)
+            .filter(col => !_isMetadataKpiKey(col));
 
         KPI_DEFS = all.map(col => ({
             key:     col,
-            label:   col,
+            label:   _kpiDisplayName(col),
             unit:    '',
             good:    null,
             warn:    null,
@@ -229,6 +395,7 @@ async function loadKpiColumns() {
 }
 
 async function onFilterTechChange() {
+    _resetObjectScopeFilters();
     await loadKpiColumns();
     await loadCellGroups();
     await maybeAutoReloadCells();
@@ -262,6 +429,202 @@ function formatTrendXLabel(raw) {
                d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
     return String(raw);
+}
+
+/** Two-line category label: time on first line, calendar day on second (Chart.js category multiline). */
+function formatTrendXLabelHierarchy(raw) {
+    if (raw == null) return [''];
+    const d = new Date(raw);
+    if (!isNaN(d.getTime())) {
+        const line1 = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const line2 = d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+        return [line1, line2];
+    }
+    return [String(raw)];
+}
+
+function _parseTrendRowMoment(row) {
+    const raw = trendXRaw(row);
+    if (raw == null) return null;
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return null;
+    return d;
+}
+
+function _dateKeyLocal(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function _uniqueSortedDateKeysFromTrend(trend) {
+    const set = new Set();
+    (trend || []).forEach((row) => {
+        const d = _parseTrendRowMoment(row);
+        if (d) set.add(_dateKeyLocal(d));
+    });
+    return [...set].sort();
+}
+
+function _perfDodSelectedDateKeysArray() {
+    return [...perfDodSelectedDateSet].sort();
+}
+
+function _isDodChartMode() {
+    return perfChartDisplayMode === 'dod' && _currentDataScope() === 'hourly';
+}
+
+function _dodHourCategoryLabels() {
+    const labels = [];
+    for (let h = 0; h < 24; h++) {
+        labels.push(`${String(h).padStart(2, '0')}:00`);
+    }
+    return labels;
+}
+
+function _buildDodDatasetsForKpi(trend, def) {
+    const sel = _perfDodSelectedDateKeysArray();
+    const labels = _dodHourCategoryLabels();
+    const datasets = [];
+    sel.forEach((dk, di) => {
+        const byHour = Array(24).fill(null);
+        (trend || []).forEach((row) => {
+            const d = _parseTrendRowMoment(row);
+            if (!d || _dateKeyLocal(d) !== dk) return;
+            const v = _toNumericOrNull(row[def.key]);
+            byHour[d.getHours()] = v;
+        });
+        const color = _CHART_COLORS[di % _CHART_COLORS.length];
+        datasets.push({
+            label: dk,
+            data: byHour,
+            borderColor: color,
+            backgroundColor: color + '18',
+            pointBackgroundColor: color,
+            pointRadius: 2,
+            pointHoverRadius: 4,
+            borderWidth: 2,
+            tension: 0.25,
+            spanGaps: true,
+            fill: false,
+        });
+    });
+    return { labels, datasets };
+}
+
+function _populatePerfDodDayCheckboxes(trend) {
+    const wrap = document.getElementById('perf-dod-days');
+    if (!wrap) return;
+    const keys = _uniqueSortedDateKeysFromTrend(trend);
+    const sig = keys.join('|');
+    if (perfDodPickerNeedsReset || sig !== perfDodPickerSig) {
+        perfDodPickerNeedsReset = false;
+        perfDodPickerSig = sig;
+        perfDodSelectedDateSet.clear();
+        const pick = keys.slice(-Math.min(3, keys.length));
+        pick.forEach((k) => perfDodSelectedDateSet.add(k));
+    }
+    wrap.innerHTML = keys.map((k) => `
+        <label class="perf-dod-day-chip">
+            <input type="checkbox" class="perf-dod-day-cb" data-date-key="${escAttr(k)}" ${perfDodSelectedDateSet.has(k) ? 'checked' : ''}>
+            ${escHtml(k)}
+        </label>
+    `).join('');
+}
+
+function _readPerfDodSelectionsFromDom() {
+    perfDodSelectedDateSet.clear();
+    document.querySelectorAll('.perf-dod-day-cb:checked').forEach((el) => {
+        const k = String(el.getAttribute('data-date-key') || '').trim();
+        if (k) perfDodSelectedDateSet.add(k);
+    });
+}
+
+function _syncPerfDodRadiosFromState() {
+    document.querySelectorAll('input[name="perf-chart-display"]').forEach((el) => {
+        el.checked = el.value === perfChartDisplayMode;
+    });
+    const daysWrap = document.getElementById('perf-dod-days-wrap');
+    if (daysWrap) {
+        daysWrap.style.display = perfChartDisplayMode === 'dod' ? 'flex' : 'none';
+    }
+}
+
+function _wirePerfDodBarOnce() {
+    if (perfDodBarWired) return;
+    const bar = document.getElementById('perf-dod-bar');
+    if (!bar) return;
+    perfDodBarWired = true;
+    bar.addEventListener('change', (e) => {
+        const t = e.target;
+        if (!t) return;
+        if (t.name === 'perf-chart-display') {
+            perfChartDisplayMode = t.value === 'dod' ? 'dod' : 'trend';
+            _syncPerfDodRadiosFromState();
+            if (Array.isArray(lastTrendData?.trend) && lastTrendData.trend.length) {
+                if (perfChartDisplayMode === 'dod') {
+                    _populatePerfDodDayCheckboxes(lastTrendData.trend);
+                }
+                renderAllCharts(lastTrendData.trend);
+            }
+            return;
+        }
+        if (t.classList && t.classList.contains('perf-dod-day-cb')) {
+            clearTimeout(perfDodDayChangeTimer);
+            perfDodDayChangeTimer = setTimeout(() => {
+                _readPerfDodSelectionsFromDom();
+                if (Array.isArray(lastTrendData?.trend) && lastTrendData.trend.length) {
+                    renderAllCharts(lastTrendData.trend);
+                }
+            }, 60);
+        }
+    });
+}
+
+function _syncPerfDodBar() {
+    const bar = document.getElementById('perf-dod-bar');
+    if (!bar) return;
+    const tView = document.getElementById('pm-table-view');
+    const chartsHidden = tView && tView.style.display === 'none';
+    const trend = lastTrendData?.trend;
+    const hourly = _currentDataScope() === 'hourly';
+    if (!chartsHidden || !hourly || !Array.isArray(trend) || !trend.length || !chartTabs.length) {
+        bar.style.display = 'none';
+        return;
+    }
+    bar.style.display = 'flex';
+    _wirePerfDodBarOnce();
+    _syncPerfDodRadiosFromState();
+    if (perfChartDisplayMode === 'dod') {
+        _populatePerfDodDayCheckboxes(trend);
+        _readPerfDodSelectionsFromDom();
+    }
+}
+
+function _perfTooltipTitleTrend(trend, items) {
+    if (!items.length) return '';
+    const i = items[0].dataIndex;
+    return formatTrendXLabel(trendXRaw(trend[i]));
+}
+
+function _perfTooltipTitleDod(items) {
+    if (!items.length) return '';
+    const ds = items[0].dataset;
+    const lab = ds && ds.label ? String(ds.label) : '';
+    const h = items[0].dataIndex;
+    const hh = String(h).padStart(2, '0');
+    return `${lab} ${hh}:00`;
+}
+
+function _perfChartXScaleOptions(trend, isDod) {
+    const n = Array.isArray(trend) ? trend.length : 0;
+    return {
+        ticks: {
+            maxTicksLimit: isDod ? 24 : Math.min(24, Math.max(10, Math.ceil(n / 6) || 10)),
+            font: { size: isDod ? 9 : 10, lineHeight: 1.25 },
+            maxRotation: 0,
+            autoSkip: !isDod,
+        },
+        grid: { color: '#f5f6fa' },
+    };
 }
 
 // ============================================================
@@ -330,8 +693,10 @@ function _captureCurrentReportConfig() {
         group_ref: (document.getElementById('filter-group')?.value || '').trim(),
         selection_mode: mode,
         selected_cell_keys: keys,
+        selected_cell_value: (document.getElementById('filter-cell')?.value || '').trim(),
+        data_scope: _currentDataScope(),
         kpi_keys: [...kpiSelectedKeys],
-        hours: (document.getElementById('filter-hours')?.value || '168').trim(),
+        hours: 'full',
     };
 }
 
@@ -402,6 +767,7 @@ async function _applyReportConfig(cfg) {
         el.value = String(val);
     };
     setVal('filter-vendor', cfg.vendor || '');
+    setVal('filter-data-scope', cfg.data_scope || 'hourly');
     await onVendorChange();
     setVal('filter-tech', cfg.technology || '');
     await onFilterTechChange();
@@ -415,6 +781,7 @@ async function _applyReportConfig(cfg) {
         setVal('filter-group', cfg.group_ref || '');
     } else {
         await applyFilters({ skipAutoChart: true, skipKpiColumns: true });
+        setVal('filter-cell', cfg.selected_cell_value || '');
         const savedMode = cfg.selection_mode === 'multiple' ? 'multiple' : 'single';
         const modeEl = document.querySelector(`input[name="perf-sel-mode"][value="${savedMode}"]`);
         if (modeEl) modeEl.checked = true;
@@ -427,8 +794,19 @@ async function _applyReportConfig(cfg) {
             const cb = leaf.querySelector('.hw-tree-cb');
             if (cb) cb.checked = hit && savedMode === 'multiple';
         });
+        // Backward/robust fallback: if no explicit tree key was saved, reuse filter-cell value.
+        if (!wanted.size && cfg.selected_cell_value) {
+            const fallbackKey = String(cfg.selected_cell_value);
+            document.querySelectorAll('#cell-list .hw-tree-leaf').forEach(leaf => {
+                const key = String(leaf.getAttribute('data-cell-key') || '');
+                const hit = key === fallbackKey;
+                leaf.classList.toggle('active', hit && savedMode === 'single');
+                const cb = leaf.querySelector('.hw-tree-cb');
+                if (cb) cb.checked = hit && savedMode === 'multiple';
+            });
+        }
     }
-    setVal('filter-hours', cfg.hours || '168');
+    // Time window is fixed to full retained duration.
     if (Array.isArray(cfg.kpi_keys) && cfg.kpi_keys.length) {
         kpiSelectedKeys = new Set(cfg.kpi_keys.map(String));
         updateKpiScopeUI();
@@ -459,6 +837,7 @@ async function loadCellGroups() {
         const qs = new URLSearchParams();
         if (vendor) qs.set('vendor', vendor);
         if (technology) qs.set('technology', technology);
+        qs.set('data_scope', _currentDataScope());
         const res = await fetch('/api/performance/groups' + (qs.toString() ? `?${qs.toString()}` : ''));
         const data = await res.json();
         if (!data.success) {
@@ -471,21 +850,73 @@ async function loadCellGroups() {
             const o = document.createElement('option');
             o.value = String(g.group_ref || '');
             const n = Number(g.cell_count || 0);
-            o.textContent = `${g.name} (${g.vendor || 'N/A'} · ${n})`;
+            const tech = String(g.technology || '').trim();
+            o.textContent = `${g.name} (${g.vendor || 'N/A'}${tech ? ' · ' + tech : ''} · ${n})`;
             sel.appendChild(o);
         });
+        if (!allCellGroups.length) {
+            const o = document.createElement('option');
+            o.value = '';
+            o.textContent = 'No groups for selected vendor/technology';
+            sel.appendChild(o);
+        }
         if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+        const selectionType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
+        if (selectionType === 'group') {
+            showGroupPicker(allCellGroups);
+        }
     } catch (_) {
         // Keep UI usable even if group DB is not ready.
     }
 }
 
-function onSelectionTypeChange() {
+async function onSelectionTypeChange() {
     const type = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
     const groupWrap = document.getElementById('group-picker-wrap');
     const cellsBody = document.getElementById('perf-cells-body');
-    if (groupWrap) groupWrap.style.display = type === 'group' ? 'flex' : 'none';
-    if (cellsBody) cellsBody.style.display = type === 'group' ? 'none' : '';
+    if (groupWrap) groupWrap.style.display = 'none';
+    if (cellsBody) cellsBody.style.display = '';
+    if (type === 'group') {
+        allCells = [];
+        activeCellId = null;
+        await loadCellGroups();
+        showGroupPicker(allCellGroups);
+        _perfQueryUserMessage('Select a group, then click Query.');
+    } else {
+        showCellPicker(allCells, { fromApply: true });
+    }
+}
+
+function showGroupPicker(groups) {
+    const list = document.getElementById('cell-list');
+    if (!list) return;
+    const g = Array.isArray(groups) ? groups : [];
+    if (!g.length) {
+        list.innerHTML = '<p class="perf-tree-empty">No groups for selected vendor/technology.</p>';
+        const badge = document.getElementById('cell-count-badge');
+        if (badge) badge.textContent = '0 groups';
+        return;
+    }
+    const rows = g
+        .slice()
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || ''), undefined, { sensitivity: 'base' }))
+        .map(gr => {
+            const ref = String(gr.group_ref || '');
+            const vendor = String(gr.vendor || '');
+            const tech = String(gr.technology || '').trim();
+            const count = Number(gr.cell_count || 0);
+            const search = `${gr.name || ''} ${vendor} ${tech}`.toLowerCase();
+            return `<div class="hw-tree-leaf hw-tree-group-leaf" role="treeitem" data-group-ref="${escAttr(ref)}" data-search="${escAttr(search)}">
+                <input type="checkbox" class="hw-tree-cb" onclick="event.stopPropagation()" aria-label="Select group">
+                <span class="hw-tree-leaf-name">${escHtml(gr.name || 'Unnamed group')}</span>
+                <span class="hw-tree-leaf-tech">${escHtml(vendor)}${tech ? ' · ' + escHtml(tech) : ''} · ${count}</span>
+            </div>`;
+        })
+        .join('');
+    list.innerHTML = `<div class="hw-tree" role="tree">${rows}</div>`;
+    const badge = document.getElementById('cell-count-badge');
+    if (badge) badge.textContent = `${g.length} groups`;
+    onPerfSelectionModeChange();
 }
 
 function _populateClusters(clusters) {
@@ -588,6 +1019,9 @@ function onSiteSearchSelect() {
 }
 
 async function onVendorChange() {
+    if (perfPmViewPrefPromise) {
+        await perfPmViewPrefPromise;
+    }
     const vendor  = document.getElementById('filter-vendor').value;
     const techSel = document.getElementById('filter-tech');
     const opt5g   = techSel.querySelector('option[value="5G"]');
@@ -602,15 +1036,54 @@ async function onVendorChange() {
     if (!vendor) {
         const tView = document.getElementById('pm-table-view');
         if (tView && tView.style.display !== 'none') switchViewMode('charts');
+    } else {
+        const mode = perfPreferredPmViewMode === 'table' ? 'table' : 'charts';
+        switchViewMode(mode);
     }
-    const areaSel = document.getElementById('filter-area');
-    const clusterSel = document.getElementById('filter-cluster');
-    if (areaSel && areaSel.tagName === 'SELECT') areaSel.value = '';
-    if (clusterSel && clusterSel.tagName === 'SELECT') clusterSel.value = '';
+    _resetObjectScopeFilters();
+    lastQueryCellKeys = [];
+    hwCurrentScopedCellNames = [];
+    hwCurrentScopedGroupRefs = [];
+    const addBtn = document.getElementById('btn-add-charts');
+    if (addBtn) addBtn.style.display = 'none';
 
     await loadKpiColumns();
     await loadCellGroups();
     await maybeAutoReloadCells();
+}
+
+async function loadPmViewPreference() {
+    try {
+        const res = await fetch('/api/profile/preferences');
+        const data = await res.json();
+        if (!data?.success) return;
+        const prefs = data.preferences || {};
+        const pmView = String(prefs.pm_view_mode || '').toLowerCase();
+        if (pmView === 'table' || pmView === 'charts') {
+            perfPreferredPmViewMode = pmView;
+            return;
+        }
+        // Backward compatibility with old preference key.
+        if (typeof prefs.compact_tables === 'boolean') {
+            perfPreferredPmViewMode = prefs.compact_tables ? 'table' : 'charts';
+        }
+    } catch (_) {
+        // Keep default if preferences cannot be loaded.
+    }
+}
+
+function _resetObjectScopeFilters() {
+    const areaSel = document.getElementById('filter-area');
+    const clusterSel = document.getElementById('filter-cluster');
+    const siteHidden = document.getElementById('filter-site');
+    const siteInput = document.getElementById('filter-site-search');
+    const cellHidden = document.getElementById('filter-cell');
+
+    if (areaSel && areaSel.tagName === 'SELECT') areaSel.value = '';
+    if (clusterSel && clusterSel.tagName === 'SELECT') clusterSel.value = '';
+    if (siteHidden) siteHidden.value = '';
+    if (siteInput) siteInput.value = '';
+    if (cellHidden) cellHidden.value = '';
 }
 
 function onClusterChange() {
@@ -720,6 +1193,7 @@ function _perfDefaultChartsTitle() {
 function _resetPerfChartStateForNewScope() {
     chartTabs = [];
     activeChartTabId = null;
+    activeKpiCategoryByTabId = {};
     lastTrendData = null;
     activeCellId = null;
     document.querySelectorAll('#cell-list .hw-tree-leaf').forEach(el => el.classList.remove('active'));
@@ -754,6 +1228,10 @@ function _perfQueryUserMessage(msg) {
     if (wrap) wrap.style.display = 'none';
     const loading = document.getElementById('loading-charts');
     if (loading) loading.style.display = 'none';
+    const catBar = document.getElementById('perf-kpi-category-tabs-bar');
+    const catStrip = document.getElementById('perf-kpi-category-tabs-strip');
+    if (catBar) catBar.style.display = 'none';
+    if (catStrip) catStrip.innerHTML = '';
 }
 
 async function maybeAutoReloadCells() {
@@ -785,37 +1263,32 @@ async function runPerformanceQuery() {
         return;
     }
 
-    if (KPI_DEFS.length && kpiSelectedKeys.size === 0) {
-        _perfQueryUserMessage('Select at least one KPI to chart.');
-        return;
-    }
-
     let keys = [];
+    let mode = document.querySelector('input[name="perf-sel-mode"]:checked')?.value || 'single';
     if (selectionType === 'group') {
-        const groupId = (document.getElementById('filter-group')?.value || '').trim();
-        if (!groupId) {
-            _perfQueryUserMessage('Select a cell group first, then click Query.');
+        let groupRefs = [];
+        if (mode === 'multiple') {
+            document.querySelectorAll('#cell-list .hw-tree-group-leaf').forEach(leaf => {
+                const cb = leaf.querySelector('.hw-tree-cb');
+                if (cb && cb.checked) {
+                    const gr = leaf.getAttribute('data-group-ref');
+                    if (gr) groupRefs.push(gr);
+                }
+            });
+        } else {
+            const active = document.querySelector('#cell-list .hw-tree-group-leaf.active');
+            const gr = active && active.getAttribute('data-group-ref');
+            if (gr) groupRefs = [gr];
+        }
+        if (!groupRefs.length) {
+            _perfQueryUserMessage(mode === 'multiple'
+                ? 'Check one or more groups, then click Query.'
+                : 'Click a group to select it, then click Query.');
             return;
         }
-        const params = new URLSearchParams();
-        if (v) params.set('vendor', v);
-        if (t) params.set('technology', t);
-        try {
-            const res = await fetch(`/api/performance/groups/${encodeURIComponent(groupId)}/cell_keys?${params.toString()}`);
-            const data = await res.json();
-            if (!data.success) {
-                _perfQueryUserMessage(data.error || 'Could not load group cells.');
-                return;
-            }
-            keys = (data.cell_keys || []).map(r =>
-                [r.vendor || '', r.technology || '', r.site_id || '', r.cell_name || ''].join('||')
-            );
-        } catch (e) {
-            _perfQueryUserMessage('Could not load group cells: ' + (e.message || String(e)));
-            return;
-        }
+        keys = [...groupRefs];
     } else {
-        const mode = document.querySelector('input[name="perf-sel-mode"]:checked')?.value || 'single';
+        mode = document.querySelector('input[name="perf-sel-mode"]:checked')?.value || 'single';
         if (mode === 'multiple') {
             document.querySelectorAll('#cell-list .hw-tree-leaf').forEach(leaf => {
                 const cb = leaf.querySelector('.hw-tree-cb');
@@ -832,28 +1305,255 @@ async function runPerformanceQuery() {
     }
 
     if (!keys.length) {
-        _perfQueryUserMessage(mode === 'multiple'
-            ? 'Check one or more cells in the tree, then click Query.'
-            : 'Click a cell in the tree to select it, then click Query.');
+        const fallbackCell = (document.getElementById('filter-cell')?.value || '').trim();
+        if (fallbackCell) {
+            keys = [fallbackCell];
+        }
+    }
+
+    if (!keys.length) {
+        if (selectionType === 'group') {
+            _perfQueryUserMessage('This group has no cells for the selected vendor/technology.');
+        } else {
+            _perfQueryUserMessage(mode === 'multiple'
+                ? 'Check one or more cells in the tree, then click Query.'
+                : 'Click a cell in the tree to select it, then click Query.');
+        }
         return;
     }
 
-    for (const k of keys) {
-        await loadCellCharts(k);
+    lastQueryCellKeys = [...keys];
+    lastQuerySelectionType = selectionType;
+    // New query = new chart session; avoid old multi-chart tabs resurfacing.
+    chartTabs = [];
+    activeChartTabId = null;
+    activeKpiCategoryByTabId = {};
+    const tabBar = document.getElementById('perf-chart-tabs-bar');
+    if (tabBar) tabBar.style.display = 'none';
+    if (selectionType === 'group') {
+        hwCurrentScopedGroupRefs = [...keys];
+        hwCurrentScopedCellNames = [];
+    } else {
+        hwCurrentScopedGroupRefs = [];
+        hwCurrentScopedCellNames = await _resolveCellNamesFromQueryKeys(keys, selectionType, v, t);
+    }
+
+    const addBtn = document.getElementById('btn-add-charts');
+    if (addBtn) addBtn.style.display = 'inline-flex';
+
+    switchViewMode('table');
+    _perfQueryUserMessage(`Loaded ${keys.length} selected object(s). Use "+ Add Charts" to visualize.`);
+    const noSel = document.getElementById('no-selection');
+    if (noSel) noSel.style.display = 'none';
+}
+
+async function addChartsFromLastQuery() {
+    if (!lastQueryCellKeys.length) {
+        _perfQueryUserMessage('Run Query first to load tabular data, then add charts.');
+        return;
+    }
+    if (KPI_DEFS.length && kpiSelectedKeys.size === 0) {
+        _perfQueryUserMessage('Select at least one KPI to chart.');
+        return;
+    }
+
+    const noSel = document.getElementById('no-selection');
+    if (noSel) noSel.style.display = 'none';
+    const wrap = document.getElementById('charts-wrap');
+    if (wrap) wrap.style.display = 'none';
+    const loading = document.getElementById('loading-charts');
+    if (loading) loading.style.display = 'flex';
+
+    chartTabs = [];
+    activeChartTabId = null;
+    activeKpiCategoryByTabId = {};
+    const tabBar = document.getElementById('perf-chart-tabs-bar');
+    if (tabBar) tabBar.style.display = 'none';
+
+    const uniqueKeys = [...new Set(lastQueryCellKeys.map(k => String(k || '').trim()).filter(Boolean))];
+    let added = 0;
+
+    for (const key of uniqueKeys) {
+        try {
+            if (key.includes(':raw:')) {
+                const params = new URLSearchParams({
+                    group_ref: key,
+                    granularity: _currentTrendGranularity(),
+                    data_scope: _currentDataScope(),
+                });
+                if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
+                    params.set('kpi', [...kpiSelectedKeys].join(','));
+                }
+                const res = await fetch(`/api/performance/group/trend?${params.toString()}`);
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error || 'Failed to load group trend');
+                const group = data.group || {};
+                const trend = Array.isArray(data.trend) ? data.trend : [];
+                if (!trend.length) continue;
+                const pseudoPayload = {
+                    cell: {
+                        cell_name: group.name || 'Group',
+                        vendor: group.vendor || '',
+                        technology: '',
+                        site_id: '',
+                        cell_key: key,
+                    },
+                    trend,
+                };
+                upsertPerfChartTab(pseudoPayload, 'full', key);
+                added++;
+            } else {
+                const data = await fetchCellTrendData(key);
+                const trend = Array.isArray(data.trend) ? data.trend : [];
+                if (!trend.length) continue;
+                upsertPerfChartTab(data, 'full', key);
+                added++;
+            }
+        } catch (_) {
+            // Skip failed object; continue with the rest.
+        }
+    }
+
+    if (loading) loading.style.display = 'none';
+
+    if (!added) {
+        _perfQueryUserMessage('No trend data found for the selected objects/KPIs.');
+        return;
+    }
+
+    switchViewMode('charts');
+    perfDodPickerNeedsReset = true;
+    const br = document.getElementById('btn-refresh');
+    if (br) br.style.display = 'inline-flex';
+}
+
+function _buildCellTrendParamsFromKey(cellId) {
+    const selected = allCells.find(c => String(c.cell_key || c.cell_id) === String(cellId));
+    const keyParts = String(cellId || '').split('||');
+    const params = new URLSearchParams({
+        granularity: _currentTrendGranularity(),
+        data_scope: _currentDataScope(),
+    });
+    if (selected) {
+        params.set('cell_name', String(selected.cell_name || ''));
+        params.set('technology', String(selected.technology || ''));
+        params.set('site_id', String(selected.site_id || ''));
+        params.set('vendor', String(selected.vendor || ''));
+    } else if (keyParts.length === 4) {
+        params.set('vendor', String(keyParts[0] || ''));
+        params.set('technology', String(keyParts[1] || ''));
+        params.set('site_id', String(keyParts[2] || ''));
+        params.set('cell_name', String(keyParts[3] || ''));
+    } else {
+        params.set('cell_name', String(cellId || ''));
+    }
+    return params;
+}
+
+async function fetchCellTrendData(cellId) {
+    const params = _buildCellTrendParamsFromKey(cellId);
+    if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
+        params.set('kpi', [...kpiSelectedKeys].join(','));
+    }
+    const res = await fetch(`/api/performance/cell/trend?${params.toString()}`);
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Failed to load trend');
+    return data;
+}
+
+async function _resolveCellNamesFromQueryKeys(keys, selectionType, vendor, technology) {
+    const out = new Set();
+    const dataScope = _currentDataScope();
+    for (const key of (keys || [])) {
+        const s = String(key || '').trim();
+        if (!s) continue;
+
+        if (selectionType === 'group' || s.includes(':raw:')) {
+            try {
+                const params = new URLSearchParams({
+                    vendor: vendor || '',
+                    technology: technology || '',
+                    data_scope: dataScope,
+                });
+                const res = await fetch(`/api/performance/groups/${encodeURIComponent(s)}/cell_keys?${params.toString()}`);
+                const data = await res.json();
+                if (data?.success && Array.isArray(data.cell_keys)) {
+                    data.cell_keys.forEach(r => {
+                        const n = String(r?.cell_name || '').trim();
+                        if (n) out.add(n);
+                    });
+                }
+            } catch (_) {
+                // Best-effort for scoped table filtering.
+            }
+            continue;
+        }
+
+        const row = allCells.find(c => String(c.cell_key || c.cell_id) === s);
+        if (row?.cell_name) {
+            out.add(String(row.cell_name).trim());
+            continue;
+        }
+        const parts = s.split('||');
+        if (parts.length === 4 && parts[3]) out.add(String(parts[3]).trim());
+    }
+    return [...out].filter(Boolean);
+}
+
+async function loadGroupCharts(groupRef) {
+    activeCellId = String(groupRef);
+    document.querySelectorAll('.hw-tree-leaf').forEach(el => {
+        const match = (el.getAttribute('data-group-ref') || '') === String(groupRef);
+        el.classList.toggle('active', match);
+    });
+
+    document.getElementById('no-selection').style.display   = 'none';
+    document.getElementById('charts-wrap').style.display    = 'none';
+    document.getElementById('loading-charts').style.display = 'flex';
+    document.getElementById('btn-export').style.display     = 'none';
+    document.getElementById('btn-refresh').style.display    = 'inline-flex';
+
+    const hours = 'full';
+    try {
+        const params = new URLSearchParams({
+            group_ref: String(groupRef || ''),
+            granularity: _currentTrendGranularity(),
+            data_scope: _currentDataScope(),
+        });
+        if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
+            params.set('kpi', [...kpiSelectedKeys].join(','));
+        }
+        const res  = await fetch(`/api/performance/group/trend?${params.toString()}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error);
+        const group = data.group || {};
+        const trend = data.trend || [];
+        const pseudoPayload = {
+            cell: { cell_name: group.name || 'Group', vendor: group.vendor || '', technology: '', site_id: '' },
+            trend,
+        };
+        upsertPerfChartTab(pseudoPayload, hours, groupRef);
+        document.getElementById('charts-title').textContent = group.name || 'Group KPI trends';
+        renderAllCharts(trend);
+        document.getElementById('loading-charts').style.display = 'none';
+        document.getElementById('charts-wrap').style.display = 'grid';
+    } catch (e) {
+        document.getElementById('loading-charts').style.display = 'none';
+        document.getElementById('no-selection').style.display   = 'flex';
+        document.getElementById('charts-title').textContent   =
+            'Error loading data: ' + (e.message || String(e));
     }
 }
 
 async function onPerfTimeWindowChange() {
-    if (!chartTabs.length) return;
-    const keys = [...new Set(chartTabs.map(t => t.treeKey).filter(Boolean))];
-    if (!keys.length) return;
-    for (const k of keys) {
-        await loadCellCharts(k);
-    }
+    // Kept for backward compatibility with template event hooks.
+    // Time window is now fixed to full retained duration.
 }
 
-/** PM data is hourly only; API always uses this granularity. */
-const PERF_TREND_GRANULARITY = 'hour';
+/** Match trend bucketing to selected data scope (hourly vs daily). */
+function _currentTrendGranularity() {
+    return _currentDataScope() === 'daily' ? 'day' : 'hour';
+}
 
 /**
  * @param {{ skipAutoChart?: boolean, skipKpiColumns?: boolean }} opts
@@ -865,6 +1565,7 @@ async function applyFilters(opts = {}) {
 
     const vendor  = document.getElementById('filter-vendor').value;
     const tech    = document.getElementById('filter-tech').value;
+    const selectionType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
     const cluster = document.getElementById('filter-cluster').value;
     const area    = document.getElementById('filter-area').value;
     const site    = document.getElementById('filter-site').value;
@@ -876,12 +1577,27 @@ async function applyFilters(opts = {}) {
         return;
     }
 
+    if (selectionType === 'group') {
+        // Groups mode should read from groups DB flow, not metadata /cells list.
+        allCells = [];
+        _resetPerfChartStateForNewScope();
+        showGroupPicker(allCellGroups);
+        const tView = document.getElementById('pm-table-view');
+        if (tView && tView.style.display !== 'none') {
+            const v = document.getElementById('filter-vendor').value;
+            const t2 = document.getElementById('filter-tech').value;
+            if (v && t2) loadPmTable(v, t2, hwCurrentSearch, 1);
+        }
+        return;
+    }
+
     const params = new URLSearchParams();
     if (vendor)  params.set('vendor',     vendor);
     if (tech)    params.set('technology', tech);
     if (cluster) params.set('cluster',    cluster);
     if (area)    params.set('area',       area);
     if (site)    params.set('site_id',    site);
+    params.set('data_scope', _currentDataScope());
 
     const res  = await fetch('/api/performance/cells?' + params);
     const data = await res.json();
@@ -973,6 +1689,18 @@ function perfSidebarToggle(btn) {
     }
     const ch = btn.querySelector('.perf-chevron');
     if (ch) ch.textContent = open ? '▶' : '▼';
+}
+
+function togglePerfLeftPanel(forceCollapsed = null) {
+    const body = document.querySelector('.perf-body');
+    const btn = document.getElementById('perf-left-panel-toggle');
+    if (!body || !btn) return;
+    const next = forceCollapsed == null ? !perfLeftPanelCollapsed : !!forceCollapsed;
+    perfLeftPanelCollapsed = next;
+    body.classList.toggle('left-collapsed', next);
+    btn.textContent = next ? '▶' : '◀';
+    btn.setAttribute('aria-expanded', next ? 'false' : 'true');
+    btn.setAttribute('title', next ? 'Expand filters' : 'Collapse filters');
 }
 
 function _rebuildGeoFiltersFromCells(cells) {
@@ -1225,7 +1953,10 @@ function perfTreeClick(e) {
 
     const leaf = e.target.closest('.hw-tree-leaf');
     if (leaf) {
-        const key = leaf.getAttribute('data-cell-key');
+        const selType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
+        const key = selType === 'group'
+            ? leaf.getAttribute('data-group-ref')
+            : leaf.getAttribute('data-cell-key');
         if (!key) return;
         const mode = document.querySelector('input[name="perf-sel-mode"]:checked')?.value || 'single';
         if (mode === 'multiple') {
@@ -1235,7 +1966,9 @@ function perfTreeClick(e) {
         }
         activeCellId = String(key);
         document.querySelectorAll('#cell-list .hw-tree-leaf').forEach(el => {
-            const match = (el.getAttribute('data-cell-key') || '') === String(key);
+            const matchCell = (el.getAttribute('data-cell-key') || '') === String(key);
+            const matchGroup = (el.getAttribute('data-group-ref') || '') === String(key);
+            const match = matchCell || matchGroup;
             el.classList.toggle('active', match);
         });
     }
@@ -1273,9 +2006,11 @@ function onPerfSelectionModeChange() {
 function _updateCellCountBadge(visible, total) {
     const badge = document.getElementById('cell-count-badge');
     if (!badge) return;
+    const selType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
+    const noun = selType === 'group' ? 'groups' : 'cells';
     badge.textContent = visible === total
-        ? `${total} cells`
-        : `${visible} / ${total} cells`;
+        ? `${total} ${noun}`
+        : `${visible} / ${total} ${noun}`;
 }
 
 // ============================================================
@@ -1285,8 +2020,10 @@ function _updateCellCountBadge(visible, total) {
 let chartTabs = [];
 let activeChartTabId = null;
 let _perfChartTabSeq = 1;
+let activeKpiCategoryByTabId = {};
 
 function _perfHoursLabel(hoursVal) {
+    if (String(hoursVal) === 'full') return 'Full';
     const h = Number(hoursVal);
     if (h === 720) return '30d';
     if (h === 336) return '14d';
@@ -1347,17 +2084,23 @@ function upsertPerfChartTab(apiData, hoursVal, treeCellId) {
 function renderPerfChartTabs() {
     const bar = document.getElementById('perf-chart-tabs-bar');
     const strip = document.getElementById('perf-chart-tabs-strip');
+    const kpiCatBar = document.getElementById('perf-kpi-category-tabs-bar');
+    const kpiCatStrip = document.getElementById('perf-kpi-category-tabs-strip');
     if (!bar || !strip) return;
 
     const tView = document.getElementById('pm-table-view');
     if (tView && tView.style.display !== 'none') {
         bar.style.display = 'none';
+        if (kpiCatBar) kpiCatBar.style.display = 'none';
+        if (kpiCatStrip) kpiCatStrip.innerHTML = '';
         return;
     }
 
     if (!chartTabs.length) {
         bar.style.display = 'none';
         strip.innerHTML = '';
+        if (kpiCatBar) kpiCatBar.style.display = 'none';
+        if (kpiCatStrip) kpiCatStrip.innerHTML = '';
         return;
     }
 
@@ -1392,6 +2135,7 @@ function switchPerfChartTab(tabId) {
 
     activeChartTabId = tabId;
     lastTrendData = tab.payload;
+    perfDodPickerNeedsReset = true;
     const cell = tab.payload.cell || {};
     const key = tab.treeKey
         || (cell.cell_key != null ? String(cell.cell_key) : '')
@@ -1399,7 +2143,8 @@ function switchPerfChartTab(tabId) {
     if (key) {
         activeCellId = key;
         document.querySelectorAll('.hw-tree-leaf').forEach(el => {
-            const match = (el.getAttribute('data-cell-key') || '') === key;
+            const match = (el.getAttribute('data-cell-key') || '') === key
+                || (el.getAttribute('data-group-ref') || '') === key;
             el.classList.toggle('active', match);
         });
     }
@@ -1412,13 +2157,6 @@ function switchPerfChartTab(tabId) {
     document.getElementById('loading-charts').style.display = 'none';
 
     renderAllCharts(tab.payload.trend || []);
-
-    const trend = tab.payload.trend;
-    if (trend && trend.length) {
-        document.getElementById('btn-export').style.display = 'inline-flex';
-    } else {
-        document.getElementById('btn-export').style.display = 'none';
-    }
 }
 
 function closePerfChartTab(tabId) {
@@ -1426,6 +2164,7 @@ function closePerfChartTab(tabId) {
     if (idx < 0) return;
 
     chartTabs.splice(idx, 1);
+    delete activeKpiCategoryByTabId[tabId];
 
     if (activeChartTabId !== tabId) {
         renderPerfChartTabs();
@@ -1439,7 +2178,15 @@ function closePerfChartTab(tabId) {
     }
 
     activeChartTabId = null;
+    delete activeKpiCategoryByTabId.__default;
     lastTrendData = null;
+    perfChartDisplayMode = 'trend';
+    perfDodPickerNeedsReset = true;
+    perfDodPickerSig = '';
+    perfDodSelectedDateSet.clear();
+    _syncPerfDodRadiosFromState();
+    const dodBar = document.getElementById('perf-dod-bar');
+    if (dodBar) dodBar.style.display = 'none';
     activeCellId = null;
     document.querySelectorAll('.hw-tree-leaf').forEach(el => el.classList.remove('active'));
 
@@ -1462,13 +2209,23 @@ function closePerfChartTab(tabId) {
 // ============================================================
 
 async function loadCellCharts(cellId) {
+    if (String(cellId || '').includes(':raw:')) {
+        await loadGroupCharts(cellId);
+        return;
+    }
     activeCellId = String(cellId);
-    const selected = allCells.find(c => String(c.cell_key || c.cell_id) === String(cellId));
-
-    document.querySelectorAll('.hw-tree-leaf').forEach(el => {
-        const match = (el.getAttribute('data-cell-key') || '') === String(cellId);
-        el.classList.toggle('active', match);
-    });
+    // Keep current UI selection if the queried cell is not present in the
+    // currently rendered tree (can happen with saved-report fallbacks).
+    const leaves = [...document.querySelectorAll('.hw-tree-leaf')];
+    const hasMatch = leaves.some(
+        el => (el.getAttribute('data-cell-key') || '') === String(cellId)
+    );
+    if (hasMatch) {
+        leaves.forEach(el => {
+            const match = (el.getAttribute('data-cell-key') || '') === String(cellId);
+            el.classList.toggle('active', match);
+        });
+    }
 
     document.getElementById('no-selection').style.display   = 'none';
     document.getElementById('charts-wrap').style.display    = 'none';
@@ -1476,28 +2233,10 @@ async function loadCellCharts(cellId) {
     document.getElementById('btn-export').style.display     = 'none';
     document.getElementById('btn-refresh').style.display    = 'inline-flex';
 
-    const hours = document.getElementById('filter-hours').value;
+    const hours = 'full';
 
     try {
-        const params = new URLSearchParams({
-            hours: String(hours),
-            granularity: PERF_TREND_GRANULARITY,
-        });
-        if (selected) {
-            params.set('cell_name', String(selected.cell_name || ''));
-            params.set('technology', String(selected.technology || ''));
-            params.set('site_id', String(selected.site_id || ''));
-            params.set('vendor', String(selected.vendor || ''));
-        } else {
-            // Backward-compatible fallback
-            params.set('cell_name', String(cellId));
-        }
-        if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
-            params.set('kpi', [...kpiSelectedKeys].join(','));
-        }
-        const res  = await fetch(`/api/performance/cell/trend?${params.toString()}`);
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error);
+        const data = await fetchCellTrendData(cellId);
 
         const cell  = data.cell;
         const trend = data.trend;
@@ -1506,11 +2245,6 @@ async function loadCellCharts(cellId) {
         document.getElementById('charts-title').textContent = cell.cell_name || 'KPI trends';
 
         renderAllCharts(trend);
-
-        // Show export button only when we have trend data
-        if (trend.length) {
-            document.getElementById('btn-export').style.display = 'inline-flex';
-        }
 
     } catch (e) {
         document.getElementById('loading-charts').style.display = 'none';
@@ -1524,7 +2258,10 @@ async function loadCellCharts(cellId) {
 // Render charts — 2 per row
 // ============================================================
 
-const CHART_X_SKIP = new Set(['id', 'cell_name', 'timestamp', 'Date', 'date']);
+const CHART_X_SKIP = new Set([
+    'id', 'cell_name', 'timestamp', 'Date', 'date',
+    'site_id', 'site_name', 'technology', 'vendor', 'cluster', 'area'
+]);
 
 function _toNumericOrNull(v) {
     if (v === null || v === undefined) return null;
@@ -1539,13 +2276,7 @@ function _toNumericOrNull(v) {
     return null;
 }
 
-function renderAllCharts(trend) {
-    Object.values(charts).forEach(c => c.destroy());
-    Object.keys(charts).forEach(k => delete charts[k]);
-
-    const wrap = document.getElementById('charts-wrap');
-    wrap.innerHTML = '';
-
+function _defsForTrendRender(trend) {
     let defs = KPI_DEFS;
     if (!defs.length && trend.length) {
         defs = Object.keys(trend[0])
@@ -1553,23 +2284,218 @@ function renderAllCharts(trend) {
             .map(col => ({ key: col, label: col, unit: '', good: null, warn: null, inverse: false, color: _colorFor(col) }));
     }
 
-    defs = (defs || []).filter(d => d && !CHART_X_SKIP.has(d.key));
+    defs = (defs || []).filter(d => d && !CHART_X_SKIP.has(d.key) && !_isMetadataKpiKey(d.key));
 
-    // Filter out columns that have no numeric values after coercion.
-    // Huawei PM rows are often strings because sheet tables are TEXT-typed.
     if (trend.length) {
-        defs = defs.filter(def => {
-            return trend.some(r => {
-                const n = _toNumericOrNull(r[def.key]);
-                return n !== null;
-            });
-        });
+        defs = defs.filter(def => trend.some(r => _toNumericOrNull(r[def.key]) !== null));
     }
 
     const scopeFromApi = KPI_DEFS.length > 0;
     if (scopeFromApi) {
         defs = defs.filter(def => kpiSelectedKeys.has(def.key));
     }
+    return { defs, scopeFromApi };
+}
+
+function _kpiCategoryForKey(kpiKey) {
+    const key = String(kpiKey || '').trim();
+    if (!key) return DEFAULT_KPI_CATEGORY;
+    const mapped = KPI_CATEGORY_MAP[key];
+    return mapped ? String(mapped).trim() : DEFAULT_KPI_CATEGORY;
+}
+
+function _kpiCategoriesFromDefs(defs) {
+    const set = new Set();
+    for (const def of (defs || [])) {
+        set.add(_kpiCategoryForKey(def.key));
+    }
+    const categories = [...set].filter(Boolean).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+    if (!categories.length) categories.push(DEFAULT_KPI_CATEGORY);
+    if (!categories.includes('All')) categories.unshift('All');
+    return categories;
+}
+
+function _activeKpiCategoryKey() {
+    return activeChartTabId || '__default';
+}
+
+function _getActiveKpiCategory() {
+    const key = _activeKpiCategoryKey();
+    return activeKpiCategoryByTabId[key] || 'All';
+}
+
+function _setActiveKpiCategory(category) {
+    const key = _activeKpiCategoryKey();
+    activeKpiCategoryByTabId[key] = String(category || 'All');
+}
+
+function renderKpiCategoryTabs(defs = []) {
+    const bar = document.getElementById('perf-kpi-category-tabs-bar');
+    const strip = document.getElementById('perf-kpi-category-tabs-strip');
+    if (!bar || !strip) return;
+
+    const tView = document.getElementById('pm-table-view');
+    if (tView && tView.style.display !== 'none') {
+        bar.style.display = 'none';
+        strip.innerHTML = '';
+        return;
+    }
+    if (!defs.length) {
+        bar.style.display = 'none';
+        strip.innerHTML = '';
+        return;
+    }
+
+    const categories = _kpiCategoriesFromDefs(defs);
+    const active = categories.includes(_getActiveKpiCategory()) ? _getActiveKpiCategory() : 'All';
+    _setActiveKpiCategory(active);
+
+    strip.innerHTML = categories.map(cat => `
+        <button type="button" class="perf-kpi-category-tab${cat === active ? ' active' : ''}"
+            data-kpi-category="${escAttr(cat)}">${escHtml(cat)}</button>
+    `).join('');
+    bar.style.display = 'flex';
+
+    strip.querySelectorAll('.perf-kpi-category-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cat = String(btn.getAttribute('data-kpi-category') || 'All').trim();
+            _setActiveKpiCategory(cat || 'All');
+            if (Array.isArray(lastTrendData?.trend) && lastTrendData.trend.length) {
+                renderAllCharts(lastTrendData.trend);
+            }
+        });
+    });
+}
+
+function _renderOneKpiChartWithOptions(canvasId, def, trend, chartType) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const dod = _isDodChartMode();
+    if (dod) {
+        _readPerfDodSelectionsFromDom();
+        if (!_perfDodSelectedDateKeysArray().length) return;
+    }
+
+    const values = trend.map(r => _toNumericOrNull(r[def.key]));
+    const existing = charts[canvasId];
+    if (existing) {
+        try { existing.destroy(); } catch (_) { /* noop */ }
+        delete charts[canvasId];
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    if (dod) {
+        const { labels, datasets } = _buildDodDatasetsForKpi(trend, def);
+        if (!datasets.length) return;
+
+        charts[canvasId] = new Chart(ctx, {
+            type: chartType,
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: datasets.length > 1,
+                        position: 'bottom',
+                        labels: { font: { size: 10 }, boxWidth: 10 },
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: items => _perfTooltipTitleDod(items),
+                            label: (ctx) => {
+                                const v = ctx.parsed.y;
+                                const day = ctx.dataset.label || '';
+                                return v !== null
+                                    ? `${day} · ${def.label}: ${Number(v).toFixed(2)}${def.unit ? ' ' + def.unit : ''}`
+                                    : 'N/A';
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    x: _perfChartXScaleOptions(trend, true),
+                    y: { ticks: { font: { size: 10 } }, grid: { color: '#f5f6fa' } },
+                },
+            },
+        });
+        return;
+    }
+
+    const labels = trend.map(r => formatTrendXLabelHierarchy(trendXRaw(r)));
+    const pointColors = values.map((v) => {
+        if (v === null || v === undefined) return '#bdc3c7';
+        const c = kpiClass(v, def);
+        return c === 'good' ? '#27ae60' : c === 'warn' ? '#f39c12' : c === 'bad' ? '#e74c3c' : def.color;
+    });
+
+    charts[canvasId] = new Chart(ctx, {
+        type: chartType,
+        data: {
+            labels,
+            datasets: [{
+                label: def.label,
+                data: values,
+                borderColor: def.color,
+                backgroundColor: def.color + '18',
+                pointBackgroundColor: pointColors,
+                pointRadius: trend.length > 48 ? 2 : 3,
+                pointHoverRadius: 5,
+                borderWidth: 2,
+                tension: 0.3,
+                fill: chartType === 'line',
+                spanGaps: true,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        title: items => _perfTooltipTitleTrend(trend, items),
+                        label: (ctx) => {
+                            const v = ctx.parsed.y;
+                            return v !== null
+                                ? `${def.label}: ${Number(v).toFixed(2)}${def.unit ? ' ' + def.unit : ''}`
+                                : 'N/A';
+                        },
+                    },
+                },
+            },
+            scales: {
+                x: _perfChartXScaleOptions(trend, false),
+                y: { ticks: { font: { size: 10 } }, grid: { color: '#f5f6fa' } },
+            },
+        },
+    });
+}
+
+function onPerfKpiChartTypeChange(selectEl) {
+    const canvasId = selectEl?.getAttribute('data-canvas-id') || '';
+    const kpiKey = selectEl?.getAttribute('data-kpi-key') || '';
+    const chartType = selectEl?.value === 'bar' ? 'bar' : 'line';
+    const trend = lastTrendData?.trend;
+    if (!canvasId || !kpiKey || !Array.isArray(trend) || !trend.length) return;
+
+    const { defs } = _defsForTrendRender(trend);
+    const def = defs.find(d => d.key === kpiKey);
+    if (!def) return;
+
+    _renderOneKpiChartWithOptions(canvasId, def, trend, chartType);
+}
+
+function renderAllCharts(trend) {
+    Object.values(charts).forEach(c => { try { c.destroy(); } catch (_) { /* noop */ } });
+    Object.keys(charts).forEach(k => delete charts[k]);
+
+    const wrap = document.getElementById('charts-wrap');
+    wrap.innerHTML = '';
+
+    const { defs, scopeFromApi } = _defsForTrendRender(trend);
 
     if (!defs.length) {
         const msg = scopeFromApi && kpiSelectedKeys.size === 0
@@ -1578,92 +2504,64 @@ function renderAllCharts(trend) {
         wrap.innerHTML = `<p style="padding:1rem;color:#888">${msg}</p>`;
         document.getElementById('loading-charts').style.display = 'none';
         wrap.style.display = 'grid';
+        _syncPerfDodBar();
         return;
     }
 
-    const labels = trend.map(r => formatTrendXLabel(trendXRaw(r)));
+    const activeCategory = _getActiveKpiCategory();
+    renderKpiCategoryTabs(defs);
+    const scopedDefs = activeCategory === 'All'
+        ? defs
+        : defs.filter(def => _kpiCategoryForKey(def.key) === activeCategory);
+    const finalDefs = scopedDefs.length ? scopedDefs : defs;
+    const chartType = 'line';
+    const renderSeq = ++_perfChartRenderSeq;
 
-    defs.forEach(def => {
+    if (_isDodChartMode()) {
+        _readPerfDodSelectionsFromDom();
+        if (!_perfDodSelectedDateKeysArray().length) {
+            wrap.innerHTML = '<p class="perf-dod-empty">Select at least one day in <strong>Compare days</strong> to plot DOD charts.</p>';
+            document.getElementById('loading-charts').style.display = 'none';
+            wrap.style.display = 'grid';
+            _syncPerfDodBar();
+            return;
+        }
+    }
+
+    finalDefs.forEach((def, idx) => {
         const values   = trend.map(r => _toNumericOrNull(r[def.key]));
-        const lastVal  = [...values].reverse().find(v => v !== null && v !== undefined);
-        const cls      = lastVal !== undefined ? kpiClass(lastVal, def) : '';
-        const dispVal  = lastVal !== undefined ? fmt(lastVal, def.unit) : 'N/A';
+        const canvasId = `chartCnv${renderSeq}_${idx}`;
 
         const card = document.createElement('div');
         card.className = 'kpi-chart-card';
         card.innerHTML = `
+            <div class="kpi-chart-top-controls">
+                <select class="perf-report-select kpi-chart-type-sel"
+                    data-canvas-id="${escAttr(canvasId)}"
+                    data-kpi-key="${escAttr(def.key)}"
+                    title="Chart type"
+                    aria-label="Chart type"
+                    onchange="onPerfKpiChartTypeChange(this)">
+                    <option value="line" selected>Line</option>
+                    <option value="bar">Bar</option>
+                </select>
+                <button type="button" class="chart-gear-btn" title="Chart settings" onclick="openChartConfigModal()">⚙</button>
+            </div>
             <div class="kpi-chart-title">
-                <span class="kpi-chart-name">${def.label}</span>
-                <span class="kpi-chart-value ${cls}">${dispVal}</span>
+                <span class="kpi-chart-name">${escHtml(def.label)}</span>
             </div>
             <div class="kpi-chart-canvas-wrap">
-                <canvas id="chart-${def.key}"></canvas>
+                <canvas id="${canvasId}"></canvas>
             </div>
         `;
         wrap.appendChild(card);
 
-        const pointColors = values.map(v => {
-            if (v === null || v === undefined) return '#bdc3c7';
-            const c = kpiClass(v, def);
-            return c === 'good' ? '#27ae60' : c === 'warn' ? '#f39c12' : c === 'bad' ? '#e74c3c' : def.color;
-        });
-
-        const ctx = document.getElementById(`chart-${def.key}`).getContext('2d');
-        charts[def.key] = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets: [{
-                    label: def.label,
-                    data: values,
-                    borderColor: def.color,
-                    backgroundColor: def.color + '18',
-                    pointBackgroundColor: pointColors,
-                    pointRadius: trend.length > 48 ? 2 : 3,
-                    pointHoverRadius: 5,
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true,
-                    spanGaps: true,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            title: items => {
-                                if (!items.length) return '';
-                                const i = items[0].dataIndex;
-                                return formatTrendXLabel(trendXRaw(trend[i]));
-                            },
-                            label: ctx => {
-                                const v = ctx.parsed.y;
-                                return v !== null
-                                    ? `${def.label}: ${Number(v).toFixed(2)}${def.unit ? ' ' + def.unit : ''}`
-                                    : 'N/A';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { maxTicksLimit: 8, font: { size: 10 }, maxRotation: 0 },
-                        grid: { color: '#f5f6fa' }
-                    },
-                    y: {
-                        ticks: { font: { size: 10 } },
-                        grid: { color: '#f5f6fa' }
-                    }
-                }
-            }
-        });
+        _renderOneKpiChartWithOptions(canvasId, def, trend, chartType);
     });
 
     document.getElementById('loading-charts').style.display = 'none';
     wrap.style.display = 'grid';
+    _syncPerfDodBar();
 }
 
 // ============================================================
@@ -1695,13 +2593,10 @@ async function refreshData() {
 // ============================================================
 
 function exportCSV() {
-    if (!lastTrendData || !lastTrendData.trend || !lastTrendData.trend.length) return;
-
-    const { cell, trend } = lastTrendData;
-
-    const skip = new Set(['id']);
-    const rowKeys = Object.keys(trend[0]).filter(k => !skip.has(k));
-    const cols = rowKeys.filter(k => CHART_X_SKIP.has(k) || kpiSelectedKeys.has(k));
+    if (!hwLastTablePayload || !Array.isArray(hwLastTablePayload.rows) || !hwLastTablePayload.rows.length) return;
+    const cols = Array.isArray(hwLastTablePayload.columns) ? hwLastTablePayload.columns : [];
+    const rows = hwLastTablePayload.rows;
+    if (!cols.length) return;
 
     const escape = v => {
         if (v === null || v === undefined) return '';
@@ -1711,20 +2606,8 @@ function exportCSV() {
     };
 
     const lines = [];
-
-    // Header comment rows
-    lines.push(`# Cell: ${cell.cell_name}`);
-    lines.push(`# Site: ${cell.site_name}  |  Vendor: ${cell.vendor}  |  Technology: ${cell.technology || ''}`);
-    if (cell.cluster || cell.area)
-        lines.push(`# Cluster: ${cell.cluster || ''}  |  Area: ${cell.area || ''}`);
-    lines.push(`# Exported: ${new Date().toISOString()}`);
-    lines.push('');
-
-    // Column headers
     lines.push(cols.map(escape).join(','));
-
-    // Data rows
-    trend.forEach(row => {
+    rows.forEach(row => {
         lines.push(cols.map(c => escape(row[c])).join(','));
     });
 
@@ -1732,7 +2615,7 @@ function exportCSV() {
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;
-    a.download = `${cell.cell_name}_kpi_trend.csv`;
+    a.download = `pm_table_export_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1767,11 +2650,18 @@ function switchViewMode(mode) {
 
     if (mode === 'table') {
         const tabBar = document.getElementById('perf-chart-tabs-bar');
+        const catBar = document.getElementById('perf-kpi-category-tabs-bar');
+        const catStrip = document.getElementById('perf-kpi-category-tabs-strip');
         if (tabBar) tabBar.style.display = 'none';
+        if (catBar) catBar.style.display = 'none';
+        if (catStrip) catStrip.innerHTML = '';
         if (noSel)     noSel.style.display     = 'none';
         if (cWrap)     cWrap.style.display     = 'none';
         if (cLoad)     cLoad.style.display     = 'none';
-        if (exportBtn) exportBtn.style.display = 'none';
+        if (exportBtn) {
+            const hasRows = !!(hwLastTablePayload && Array.isArray(hwLastTablePayload.rows) && hwLastTablePayload.rows.length);
+            exportBtn.style.display = hasRows ? 'inline-flex' : 'none';
+        }
         tView.style.display = 'flex';
         btnC && btnC.classList.remove('active');
         btnT && btnT.classList.add('active');
@@ -1784,12 +2674,13 @@ function switchViewMode(mode) {
         const vendor = document.getElementById('filter-vendor').value;
         const tech   = document.getElementById('filter-tech').value;
         if (vendor && tech) {
-            loadPmTable(vendor, tech, '', 1);
+            loadPmTable(vendor, tech, '', 1, hwCurrentScopedCellNames);
         } else {
             document.getElementById('hw-table-container').innerHTML =
                 '<p class="hw-empty-msg" style="color:#e74c3c">Select a vendor and technology first.</p>';
         }
     } else {
+        if (exportBtn) exportBtn.style.display = 'none';
         tView.style.display = 'none';
         btnC && btnC.classList.add('active');
         btnT && btnT.classList.remove('active');
@@ -1810,17 +2701,24 @@ function switchViewMode(mode) {
 /**
  * Fetch a page of PM raw data from the server and render it.
  */
-async function loadPmTable(vendor, technology, search, page) {
+async function loadPmTable(vendor, technology, search, page, scopedCellNames = null) {
     hwCurrentVendor = vendor;
     hwCurrentTech   = technology;
     hwCurrentSearch = search;
     hwCurrentPage   = page;
+    if (scopedCellNames !== null) {
+        hwCurrentScopedCellNames = Array.isArray(scopedCellNames) ? scopedCellNames.filter(Boolean) : [];
+    }
 
     const container = document.getElementById('hw-table-container');
     container.innerHTML = '<div style="padding:20px;color:#999">Loading…</div>';
+    hwLastTablePayload = null;
 
     const params = new URLSearchParams({ vendor, technology, page, page_size: HW_PAGE_SIZE });
     if (search) params.set('search', search);
+    params.set('data_scope', _currentDataScope());
+    (hwCurrentScopedCellNames || []).forEach(n => params.append('cell_name', n));
+    (hwCurrentScopedGroupRefs || []).forEach(g => params.append('group_ref', g));
 
     try {
         const res  = await fetch('/api/performance/pm-table?' + params);
@@ -1830,6 +2728,8 @@ async function loadPmTable(vendor, technology, search, page) {
     } catch (e) {
         container.innerHTML =
             `<div style="padding:20px;color:#e74c3c">Error: ${_esc(e.message)}</div>`;
+        const exportBtn = document.getElementById('btn-export');
+        if (exportBtn) exportBtn.style.display = 'none';
     }
 }
 
@@ -1841,6 +2741,7 @@ function renderPmTable(data) {
     const pagination = document.getElementById('hw-pagination');
     const countEl    = document.getElementById('hw-row-count');
 
+    hwLastTablePayload = data;
     const { columns, static_cols, column_labels, rows, total, page, page_size, cell_label } = data;
     const staticSet = new Set(static_cols);
 
@@ -1858,8 +2759,12 @@ function renderPmTable(data) {
     if (!rows.length) {
         container.innerHTML = '<div class="hw-empty-msg">No data found.</div>';
         pagination.innerHTML = '';
+        const exportBtn = document.getElementById('btn-export');
+        if (exportBtn) exportBtn.style.display = 'none';
         return;
     }
+    const exportBtn = document.getElementById('btn-export');
+    if (exportBtn) exportBtn.style.display = 'inline-flex';
 
     // Build <thead>
     const colHeaders = columns.map(col => {
@@ -1931,6 +2836,25 @@ function onHwSearch(value) {
     }, 400);
 }
 
+async function onDataScopeChange() {
+    perfChartDisplayMode = 'trend';
+    perfDodPickerNeedsReset = true;
+    perfDodPickerSig = '';
+    perfDodSelectedDateSet.clear();
+    _syncPerfDodRadiosFromState();
+
+    _resetObjectScopeFilters();
+    lastQueryCellKeys = [];
+    hwCurrentScopedCellNames = [];
+    hwCurrentScopedGroupRefs = [];
+    const addBtn = document.getElementById('btn-add-charts');
+    if (addBtn) addBtn.style.display = 'none';
+    await loadKpiHeaderMap();
+    await loadKpiColumns();
+    await loadCellGroups();
+    await maybeAutoReloadCells();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const tree = document.getElementById('cell-list');
     if (tree) tree.addEventListener('click', perfTreeClick);
@@ -1949,4 +2873,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showCellPicker([], { fromApply: false });
     onSelectionTypeChange();
     setPerfBottomMode('kpis');
+    ensureKpiCategoryConfigLoaded();
+    perfPmViewPrefPromise = loadPmViewPreference();
 });

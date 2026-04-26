@@ -115,6 +115,18 @@ _CELL_KEYWORDS = [
     'dn',
     'cell', 'name', 'trans',
 ]
+
+_DUPLICATE_KPI_NAMES = {
+    'RH303:Handover Success Rate(%)',
+    'K3034:TCHH Traffic Volume(Erl)',
+    'Drop Call Rate',
+    'CS RAB Congestion Num',
+    'TCH raw block.1',
+    'Act HS-DSCH  end usr thp',
+    'Expect cell size',
+    'Avg PDCP cell thp UL',
+    'TRS_SLOT_PDSCH (M55308C00017)',
+}
 # Timestamp column detection: put **date** before bare **time** so Huawei "Date" wins over
 # KPI columns like "Latency time" that contain 0 → pandas epoch (1970) and collapse history
 # under UNIQUE(cell_name, timestamp).
@@ -640,6 +652,15 @@ def _short_cell_label_from_dn(val: object) -> str:
     return s
 
 
+# Some Nokia/CSV exports append " DST" / " STD"; pandas treats them as TZ tokens,
+# logs FutureWarning, and will raise in a future version. We keep naive wall time.
+_PSEUDO_TZ_SUFFIX_RE = re.compile(r'\s+(DST|STD)\s*$', re.IGNORECASE)
+
+
+def _strip_pseudo_tz_suffix(s: str) -> str:
+    return _PSEUDO_TZ_SUFFIX_RE.sub('', s).strip()
+
+
 def _coerce_pm_timestamp(raw_ts):
     """
     Normalise a PM time cell to 'YYYY-MM-DD HH:MM:SS' or None if unusable.
@@ -672,6 +693,9 @@ def _coerce_pm_timestamp(raw_ts):
     s = str(raw_ts).strip()
     if not s or s.lower() in ('nan', 'nat', 'none', ''):
         return None
+    s = _strip_pseudo_tz_suffix(s)
+    if not s:
+        return None
 
     # Slash dates (Huawei PRS / regional CSV: yyyy/mm/dd or dd/mm/yyyy)
     if '/' in s and len(s) >= 8:
@@ -695,6 +719,17 @@ def _coerce_pm_timestamp(raw_ts):
             14: '%Y%m%d%H%M%S',
         }.get(len(s))
         if fmt:
+            t = pd.to_datetime(s, format=fmt, errors='coerce')
+            if not pd.isna(t) and t.year >= 2000:
+                return t.strftime('%Y-%m-%d %H:%M:%S')
+
+    # Dotted month-first datetime seen in some Nokia exports (e.g. 04.16.2026 05:00:43)
+    if '.' in s and len(s) >= 10:
+        for fmt in (
+            '%m.%d.%Y %H:%M:%S',
+            '%m.%d.%Y %H:%M',
+            '%m.%d.%Y',
+        ):
             t = pd.to_datetime(s, format=fmt, errors='coerce')
             if not pd.isna(t) and t.year >= 2000:
                 return t.strftime('%Y-%m-%d %H:%M:%S')
@@ -803,7 +838,10 @@ def _insert_df(db_path, df, technology):
     Returns (inserted, skipped).
     """
     table = pm_table_name(technology)
-    kpi_cols = [c for c in df.columns if c not in ('cell_name', 'timestamp')]
+    kpi_cols = [
+        c for c in df.columns
+        if c not in ('cell_name', 'timestamp') and c not in _DUPLICATE_KPI_NAMES
+    ]
 
     conn = sqlite3.connect(db_path, timeout=120)
     try:
@@ -944,6 +982,8 @@ def apply_pm_retention(db_path: str, days: int) -> None:
 # ---------------------------------------------------------------------------
 
 def clear_nokia_pm_tables():
+    logger.info('PM reset mode: clear_nokia_pm_tables disabled.')
+    return
     """Remove all Nokia PM rows before a new pull."""
     tables = [pm_table_name(t) for t in PM_TECHNOLOGIES]
 
@@ -973,6 +1013,8 @@ def clear_nokia_pm_tables():
     logger.info('Nokia PM: cleared %s table(s) in SQLite file.', cleared)
 
 def process_nokia_pm_file(file_path, technology):
+    logger.info('PM reset mode: process_nokia_pm_file disabled (%s, %s).', technology, file_path)
+    return 0, 0, 'PM ingest disabled (reset mode)'
     """
     Process a Nokia PM file (XLSX, XLS, or CSV).
     Auto-detects cell_name and timestamp columns.
@@ -1040,6 +1082,11 @@ def process_nokia_pm_file(file_path, technology):
 
 
 def run_nokia_pm_sync(downloaded_files, column_maps=None):
+    del column_maps
+    summary: dict = {}
+    for tech in (downloaded_files or {}):
+        summary[tech] = {'status': 'skipped', 'reason': 'PM ingest disabled (reset mode)'}
+    return summary
     """
     downloaded_files = {technology: local_path or None}
     column_maps is accepted but ignored (kept for call-site compatibility).
@@ -1136,6 +1183,13 @@ def _collect_pm_files(root_dir: str, recursive: bool = True) -> list[str]:
 
 
 def import_pm_from_directory(root_dir: str, vendor: str = 'all', recursive: bool = True) -> dict:
+    del recursive
+    return {
+        'status': 'error',
+        'path': root_dir,
+        'vendor': vendor,
+        'error': 'PM local import disabled (reset mode)',
+    }
     """
     Import all PM files found under ``root_dir``.
     Vendor can be: all | nokia | huawei.
@@ -1386,18 +1440,15 @@ def _clear_huawei_pm_tables():
 
 
 def clear_huawei_pm_tables():
-    """Public wrapper — clear Huawei hourly PM tables before a new ingest."""
-    _clear_huawei_pm_tables()
+    """Public wrapper — disabled in reset mode."""
+    logger.info('PM reset mode: clear_huawei_pm_tables disabled.')
+    return
 
 
 def _clear_huawei_pm_tables_if_full_sync():
-    """Truncate Huawei PM tables only when ``PM_SYNC_MODE`` requests a full refresh."""
-    if PM_SYNC_FULL_CLEAR:
-        _clear_huawei_pm_tables()
-    else:
-        logger.info(
-            'Huawei PM: incremental sync (PM_SYNC_MODE) — keeping existing hourly rows; upserting only.'
-        )
+    """Disabled in reset mode."""
+    logger.info('PM reset mode: _clear_huawei_pm_tables_if_full_sync disabled.')
+    return
 
 
 def huawei_pm_user_tables(db_path: str | None = None) -> list[str]:
@@ -1578,6 +1629,13 @@ def debug_huawei_pm_zip(file_path: str) -> dict:
 
 
 def process_huawei_pm_file(file_path, column_maps=None, sheet_tech_map=None, default_technology=None):
+    del column_maps, sheet_tech_map, default_technology
+    return {
+        os.path.basename(file_path) or 'file': {
+            'status': 'skipped',
+            'reason': 'Huawei PM ingest disabled (reset mode)',
+        }
+    }
     """
     Ingest Huawei PM like Nokia PM: rows go into ``2G_Hourly`` … ``5G_Hourly`` in ``huawei_pm_cells.db``.
 

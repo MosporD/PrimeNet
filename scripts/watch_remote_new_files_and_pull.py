@@ -1,0 +1,403 @@
+"""
+Poll remote PM / metadata / femto paths for newer files than last run; if changed, pull + load.
+
+Default: sleep 30 minutes (1800 s) between cycles unless overridden. Safe with incremental loaders:
+uses individual pull scripts (no raw folder wipe).
+
+Run as a long-lived service:
+  python scripts/watch_remote_new_files_and_pull.py
+
+One-shot (single probe + optional pulls):
+  python scripts/watch_remote_new_files_and_pull.py --once
+
+When the Flask app starts, ``sync.scheduler.start_scheduler`` also registers this script with
+``--once`` on the same interval (``WATCH_POLL_INTERVAL_SEC``), unless
+``NCM_DISABLE_SCHEDULER=1`` or ``NCM_DISABLE_PULL_WATCHER=1``.
+
+Environment:
+  WATCH_POLL_INTERVAL_SEC — seconds between cycles (default 1800 = 30 minutes).
+  WATCH_STATE_FILE — override JSON state path (default: databases/admin/pull_watch_state.json).
+  WATCH_ALWAYS_RUN — when true, run all pull/load pipelines every cycle (default: true).
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import stat
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import paramiko  # noqa: E402
+
+from sync_config import (  # noqa: E402
+    ADMIN_DB_DIR,
+    HUAWEI_GROUPS_DAILY_SERVER,
+    HUAWEI_GROUPS_SERVER,
+    HUAWEI_PM_DAILY_SERVER,
+    HUAWEI_PM_SERVER,
+    METADATA_SERVER,
+    NOKIA_GROUPS_DAILY_SERVER,
+    NOKIA_GROUPS_SERVER,
+    NOKIA_PM_DAILY_SERVER,
+    NOKIA_PM_SERVER,
+    PROJECT_ROOT,
+)
+
+ALLOWED = (".xlsx", ".xls", ".xlsm", ".csv", ".zip", ".tgz")
+
+# Sleep between watch cycles when not using --once (30 minutes).
+DEFAULT_WATCH_POLL_INTERVAL_SEC = 30 * 60
+
+DEFAULT_STATE = Path(ADMIN_DB_DIR) / "pull_watch_state.json"
+SCRIPTS = Path(PROJECT_ROOT) / "scripts"
+
+# Femto SFTP (same as scripts/pull_femto_raw.py)
+FEMTO_SFTP = {
+    "host": "10.253.92.68",
+    "port": 22,
+    "username": "ftpuser",
+    "password": "SmallCells@@25",
+    "remote_root": "/femto/stats/",
+}
+
+
+def _env_int(key: str, default: int) -> int:
+    try:
+        raw = os.getenv(key)
+        if raw is None or str(raw).strip() == "":
+            return default
+        return int(str(raw).strip())
+    except ValueError:
+        return default
+
+
+def _env_bool(key: str, default: bool) -> bool:
+    raw = os.getenv(key)
+    if raw is None or str(raw).strip() == "":
+        return default
+    return str(raw).strip().lower() in ("1", "true", "yes", "on")
+
+
+def _connect(host: str, port: int, username: str, password: str):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(hostname=host, port=port, username=username, password=password, timeout=30)
+    return ssh, ssh.open_sftp()
+
+
+def _search_dirs(sftp, remote_dir: str, descend: bool) -> list[str]:
+    out = [remote_dir]
+    if not descend:
+        return out
+    try:
+        entries = sftp.listdir_attr(remote_dir)
+    except OSError:
+        return out
+    subdirs = [e for e in entries if stat.S_ISDIR(e.st_mode)]
+    subdirs.sort(key=lambda e: e.st_mtime or 0, reverse=True)
+    for sd in subdirs:
+        out.append(f"{remote_dir.rstrip('/')}/{sd.filename}")
+    return out
+
+
+def _sig_latest_in_remote(
+    sftp,
+    remote_dir: str,
+    descend: bool,
+    exts: tuple[str, ...] = ALLOWED,
+) -> str:
+    best = None  # (mtime, size, relpath)
+    for d in _search_dirs(sftp, remote_dir, descend):
+        try:
+            entries = sftp.listdir_attr(d)
+        except OSError:
+            continue
+        for e in entries:
+            if stat.S_ISDIR(e.st_mode):
+                continue
+            low = e.filename.lower()
+            if not low.endswith(exts):
+                continue
+            mt = float(e.st_mtime or 0)
+            sz = int(e.st_size or 0)
+            full = f"{d.rstrip('/')}/{e.filename}"
+            if best is None or mt > best[0]:
+                best = (mt, sz, full)
+    if not best:
+        return ""
+    return f"{best[0]:.0f}|{best[2]}|{best[1]}"
+
+
+def _sig_nokia_per_tech_dirs(sftp, server_cfg: dict, dirs_key: str) -> str:
+    parts: list[str] = []
+    descend = bool(server_cfg.get("descend_into_newest_subdir", False))
+    for tech in sorted((server_cfg.get(dirs_key) or {}).keys()):
+        rd = server_cfg[dirs_key][tech]
+        parts.append(f"{tech}:{_sig_latest_in_remote(sftp, rd, descend)}")
+    return "||".join(parts)
+
+
+def _sig_metadata(sftp) -> str:
+    root_dir = METADATA_SERVER.get("root_dir", "/")
+    try:
+        entries = sftp.listdir_attr(root_dir)
+    except OSError:
+        return ""
+    subdirs = [e for e in entries if stat.S_ISDIR(e.st_mode)]
+    if not subdirs:
+        return ""
+    subdirs.sort(key=lambda e: e.st_mtime or 0, reverse=True)
+    latest = f"{root_dir.rstrip('/')}/{subdirs[0].filename}"
+    try:
+        files = sftp.listdir_attr(latest)
+    except OSError:
+        return latest
+    csvs = [e for e in files if not stat.S_ISDIR(e.st_mode) and e.filename.lower().endswith(".csv")]
+    csvs.sort(key=lambda e: e.st_mtime or 0, reverse=True)
+    top = csvs[:5]
+    tail = ":".join(f"{e.filename}:{e.st_mtime or 0}:{e.st_size or 0}" for e in top)
+    return f"{latest}|{tail}"
+
+
+def _femto_remote_tree_sig(sftp, remote_root: str) -> str:
+    """Max mtime + count of .tgz under remote_root (recursive)."""
+    from stat import S_ISDIR
+
+    best_mt = 0.0
+    count = 0
+
+    def walk(rdir: str) -> None:
+        nonlocal best_mt, count
+        try:
+            for entry in sftp.listdir_attr(rdir):
+                rp = f"{rdir.rstrip('/')}/{entry.filename}"
+                if S_ISDIR(entry.st_mode):
+                    walk(rp)
+                elif entry.filename.lower().endswith(".tgz"):
+                    count += 1
+                    best_mt = max(best_mt, float(entry.st_mtime or 0))
+        except OSError:
+            return
+
+    walk(remote_root)
+    return f"{best_mt:.0f}|n={count}"
+
+
+def _load_state(path: Path) -> dict:
+    if not path.is_file():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _save_state(path: Path, data: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def _run(script: str, args: list[str] | None = None) -> int:
+    cmd = [sys.executable, str(SCRIPTS / script)] + (args or [])
+    print(f"[watch] run: {' '.join(cmd)}")
+    proc = subprocess.run(cmd, cwd=PROJECT_ROOT)
+    return int(proc.returncode or 0)
+
+
+def _probe_all() -> dict[str, str]:
+    out: dict[str, str] = {}
+
+    # --- Hourly Huawei ---
+    h = HUAWEI_PM_SERVER
+    if str(h.get("host") or "").strip():
+        ssh, sftp = _connect(h["host"], h.get("port", 22), h.get("username", ""), h.get("password", ""))
+        try:
+            out["hourly_huawei_cells"] = _sig_latest_in_remote(
+                sftp, h["remote_dir"], bool(h.get("descend_into_newest_subdir", False))
+            )
+            g = HUAWEI_GROUPS_SERVER
+            out["hourly_huawei_groups"] = _sig_latest_in_remote(
+                sftp, g["remote_dir"], bool(g.get("descend_into_newest_subdir", False))
+            )
+        finally:
+            sftp.close()
+            ssh.close()
+
+    # --- Hourly Nokia ---
+    n = NOKIA_PM_SERVER
+    if str(n.get("host") or "").strip():
+        ssh, sftp = _connect(n["host"], n.get("port", 22), n.get("username", ""), n.get("password", ""))
+        try:
+            out["hourly_nokia_cells"] = _sig_nokia_per_tech_dirs(sftp, n, "dirs")
+            out["hourly_nokia_groups"] = _sig_nokia_per_tech_dirs(sftp, NOKIA_GROUPS_SERVER, "dirs")
+        finally:
+            sftp.close()
+            ssh.close()
+
+    # --- Metadata ---
+    m = METADATA_SERVER
+    if str(m.get("host") or "").strip():
+        ssh, sftp = _connect(m["host"], m.get("port", 22), m.get("username", ""), m.get("password", ""))
+        try:
+            out["metadata"] = _sig_metadata(sftp)
+        finally:
+            sftp.close()
+            ssh.close()
+
+    # --- Daily Huawei (reuse hourly host) ---
+    hd = HUAWEI_PM_DAILY_SERVER
+    if str(hd.get("host") or "").strip():
+        ssh, sftp = _connect(hd["host"], hd.get("port", 22), hd.get("username", ""), hd.get("password", ""))
+        try:
+            out["daily_huawei_cells"] = _sig_latest_in_remote(
+                sftp, hd["remote_dir"], bool(hd.get("descend_into_newest_subdir", False))
+            )
+            gd = HUAWEI_GROUPS_DAILY_SERVER
+            out["daily_huawei_groups"] = _sig_latest_in_remote(
+                sftp, gd["remote_dir"], bool(gd.get("descend_into_newest_subdir", False))
+            )
+        finally:
+            sftp.close()
+            ssh.close()
+
+    # --- Daily Nokia ---
+    nd = NOKIA_PM_DAILY_SERVER
+    if str(nd.get("host") or "").strip():
+        ssh, sftp = _connect(nd["host"], nd.get("port", 22), nd.get("username", ""), nd.get("password", ""))
+        try:
+            out["daily_nokia_cells"] = _sig_nokia_per_tech_dirs(sftp, nd, "dirs")
+            out["daily_nokia_groups"] = _sig_nokia_per_tech_dirs(
+                sftp, NOKIA_GROUPS_DAILY_SERVER, "dirs"
+            )
+        finally:
+            sftp.close()
+            ssh.close()
+
+    # --- Femto ---
+    fh = FEMTO_SFTP["host"]
+    if str(fh or "").strip():
+        ssh, sftp = _connect(
+            fh, int(FEMTO_SFTP.get("port", 22)), FEMTO_SFTP["username"], FEMTO_SFTP["password"]
+        )
+        try:
+            out["femto"] = _femto_remote_tree_sig(sftp, FEMTO_SFTP["remote_root"])
+        finally:
+            sftp.close()
+            ssh.close()
+
+    return out
+
+
+def _hourly_keys() -> set[str]:
+    return {k for k in (
+        "hourly_huawei_cells",
+        "hourly_huawei_groups",
+        "hourly_nokia_cells",
+        "hourly_nokia_groups",
+        "metadata",
+    )}
+
+
+def _daily_keys() -> set[str]:
+    return {k for k in (
+        "daily_huawei_cells",
+        "daily_huawei_groups",
+        "daily_nokia_cells",
+        "daily_nokia_groups",
+    )}
+
+
+def run_cycle(state_path: Path, prev: dict[str, str]) -> dict[str, str]:
+    now = _probe_all()
+    always_run = _env_bool("WATCH_ALWAYS_RUN", True)
+    changed_hourly = any(
+        now.get(k) != prev.get(k) for k in _hourly_keys() if now.get(k) or prev.get(k)
+    )
+    changed_daily = any(
+        now.get(k) != prev.get(k) for k in _daily_keys() if now.get(k) or prev.get(k)
+    )
+    changed_femto = now.get("femto") != prev.get("femto") and (now.get("femto") or prev.get("femto"))
+
+    # First run: no saved signatures yet — run full pull set once.
+    first = len(prev) == 0
+    if first:
+        changed_hourly = changed_daily = changed_femto = True
+    elif always_run:
+        changed_hourly = changed_daily = changed_femto = True
+
+    rc = 0
+    if changed_hourly or first:
+        rc |= _run("pull_huawei_raw.py")
+        rc |= _run("pull_nokia_raw.py")
+        rc |= _run("pull_metadata_raw.py")
+        rc |= _run("load_raw_csv_to_databases.py", ["--scope", "hourly"])
+
+    if changed_daily or first:
+        rc |= _run("pull_huawei_raw_daily.py")
+        rc |= _run("pull_nokia_raw_daily.py")
+        rc |= _run("load_raw_daily_to_databases.py")
+
+    if changed_femto or first:
+        rc |= _run("pull_femto_raw.py")
+        rc |= _run("load_femto_pm_to_db.py")
+
+    if rc != 0:
+        print("[watch] a subprocess failed; state file not updated (will retry next cycle).")
+        return prev
+
+    if not (changed_hourly or changed_daily or changed_femto or first):
+        print("[watch] no remote changes; state not updated.")
+        return prev
+
+    to_save = dict(now)
+    to_save["_saved_at"] = time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime())
+    _save_state(state_path, to_save)
+    return {k: v for k, v in now.items()}
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Watch remote paths and pull when files change.")
+    parser.add_argument("--once", action="store_true", help="Run a single probe/pull cycle then exit.")
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=None,
+        help=(
+            "Override poll interval in seconds (default: WATCH_POLL_INTERVAL_SEC env or "
+            f"{DEFAULT_WATCH_POLL_INTERVAL_SEC} = 30 minutes)."
+        ),
+    )
+    args = parser.parse_args()
+
+    interval = args.interval if args.interval is not None else _env_int(
+        "WATCH_POLL_INTERVAL_SEC", DEFAULT_WATCH_POLL_INTERVAL_SEC
+    )
+    state_path = Path(os.getenv("WATCH_STATE_FILE") or DEFAULT_STATE)
+    always_run = _env_bool("WATCH_ALWAYS_RUN", True)
+
+    print(f"[watch] state={state_path} interval={interval}s once={args.once} always_run={always_run}")
+
+    prev = {k: v for k, v in _load_state(state_path).items() if not k.startswith("_")}
+
+    while True:
+        try:
+            print(f"[watch] probe at {time.strftime('%H:%M:%S')}")
+            prev = run_cycle(state_path, prev)
+        except Exception as exc:
+            print(f"[watch] cycle error: {exc}", file=sys.stderr)
+
+        if args.once:
+            break
+        time.sleep(max(30, interval))
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

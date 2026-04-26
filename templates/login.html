@@ -31,13 +31,79 @@
 
                 <button type="submit" class="btn-primary">Sign In</button>
 
-                <p class="auth-link">
-                    Don't have an account? <a href="{{ url_for('auth.register_page') }}">Register here</a>
-                </p>
+                <p class="auth-link">Internal users only. Contact administrator for account support.</p>
             </form>
         </div>
     </div>
 
+    <style>
+        body {
+            overflow: hidden;
+        }
+        .auth-container {
+            transition: transform 1200ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1200ms ease;
+        }
+        .auth-container.login-slide-up {
+            transform: translateY(-130%);
+            opacity: 0;
+        }
+        .login-brand-transition {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: -100vh;
+            height: 100vh;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(180,205,224,0.98) 0%, rgba(127,166,194,0.96) 100%);
+            color: #ffffff;
+            transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1400ms ease;
+            opacity: 0.98;
+        }
+        .login-brand-transition.show {
+            transform: translateY(-100vh);
+        }
+        .login-brand-transition-logo {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.94);
+            padding: 10px;
+            margin-bottom: 14px;
+        }
+        .login-brand-transition-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: 0.01em;
+        }
+        .login-brand-transition-subtitle {
+            margin-top: 8px;
+            font-size: 1.02rem;
+            opacity: 0.96;
+        }
+        .login-brand-transition-credit {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 26px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0.92;
+            letter-spacing: 0.01em;
+        }
+    </style>
+    <div id="loginBrandTransition" class="login-brand-transition" aria-hidden="true">
+        <img src="/static/images/favicon.png?v=4" alt="PrimeNet logo" class="login-brand-transition-logo">
+        <div class="login-brand-transition-title">PrimeNet</div>
+        <div class="login-brand-transition-subtitle">Network Performance &amp; Configuration Platform</div>
+        <div class="login-brand-transition-credit">Developed by Malek Mohammad</div>
+    </div>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -45,6 +111,8 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('error-message');
+            const authContainer = document.querySelector('.auth-container');
+            const brandTransition = document.getElementById('loginBrandTransition');
             
             try {
                 const response = await fetch('/api/login', {
@@ -58,8 +126,21 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    // Redirect to main page
-                    window.location.href = '/';
+                    sessionStorage.removeItem('legalStatementAcknowledged');
+                    sessionStorage.removeItem('primenetPostLoginIntro');
+                    if (authContainer) {
+                        authContainer.classList.add('login-slide-up');
+                    }
+                    setTimeout(() => {
+                        if (brandTransition) {
+                            brandTransition.classList.add('show');
+                        }
+                    }, 1200);
+                    if (data.must_change_password) {
+                        setTimeout(() => { window.location.href = '/profile?force_password_change=1'; }, 3000);
+                    } else {
+                        setTimeout(() => { window.location.href = '/'; }, 3000);
+                    }
                 } else {
                     errorDiv.textContent = data.error || 'Login failed';
                     errorDiv.style.display = 'block';

@@ -14,20 +14,27 @@ live DB schema so no code changes are needed when the file structure changes.
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, current_app
 from functools import wraps
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 import sqlite3
 import os
 import sys
 import json
 import time
+import re
+import math
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from sync_config import (
     NOKIA_PM_DB,
     HUAWEI_PM_DB,
+    NOKIA_PM_DAILY_DB,
+    HUAWEI_PM_DAILY_DB,
     METADATA_DB,
+    KPI_HEADERS_DB,
     NOKIA_GROUPS_DB,
     HUAWEI_GROUPS_DB,
+    NOKIA_GROUPS_DAILY_DB,
+    HUAWEI_GROUPS_DAILY_DB,
     PM_TECHNOLOGIES,
     SCHEMA_HUAWEI_PM,
     pm_table_name,
@@ -36,6 +43,7 @@ from sync_config import (
 from database_enhanced import get_user_by_session, log_activity
 from sync.metadata_active_sql import perf_per_tech_union_sql, perf_per_tech_union_sql_with_activity
 from performance.kpi_catalog import KPI_HEADERS_MAP
+from performance.kpi_mapping import get_kpi_mapping_payload
 
 performance_bp = Blueprint(
     'performance', __name__,
@@ -44,7 +52,12 @@ performance_bp = Blueprint(
     static_url_path='/performance/static',
 )
 
-_FIXED_COLS = {'id', 'cell_name', 'timestamp', 'Date', 'date'}
+_FIXED_COLS = {'id', 'cell_name', 'timestamp', 'Date', 'date', 'Time', 'PERIOD_START_TIME'}
+_TIME_COL_ALIASES = ('timestamp', 'time', 'period_start_time', 'date')
+_CELL_COL_ALIASES = (
+    'cell_name', 'cell name', 'bts name', 'wcel name', 'lncel name', 'nrcel name'
+)
+_GROUP_ID_ALIASES = ('group', 'grp', 'ws_name', 'ws name')
 
 
 def _clamp_trend_hours(raw) -> int:
@@ -66,6 +79,27 @@ def _normalize_granularity(arg) -> str:
     return 'hour'
 
 
+def _normalize_data_scope(arg) -> str:
+    s = (arg or 'hourly').strip().lower()
+    if s in ('d', 'day', 'daily'):
+        return 'daily'
+    return 'hourly'
+
+
+def _pm_db_for_vendor(vendor: str, scope: str = 'hourly') -> str:
+    s = _normalize_data_scope(scope)
+    if vendor == 'Huawei':
+        return HUAWEI_PM_DAILY_DB if s == 'daily' else HUAWEI_PM_DB
+    return NOKIA_PM_DAILY_DB if s == 'daily' else NOKIA_PM_DB
+
+
+def _groups_db_for_vendor(vendor: str, scope: str = 'hourly') -> str:
+    s = _normalize_data_scope(scope)
+    if vendor == 'Huawei':
+        return HUAWEI_GROUPS_DAILY_DB if s == 'daily' else HUAWEI_GROUPS_DB
+    return NOKIA_GROUPS_DAILY_DB if s == 'daily' else NOKIA_GROUPS_DB
+
+
 def _parse_trend_ts(val):
     if val is None:
         return None
@@ -80,18 +114,35 @@ def _parse_trend_ts(val):
     s = str(val).strip()
     if not s or s.lower() in ('nan', 'nat', 'none'):
         return None
+    # Huawei PM exports may append timezone-like tokens (e.g. 'DST').
+    s = re.sub(r'\s+[A-Za-z]{2,5}$', '', s).strip()
     try:
-        if s.endswith('Z'):
-            s = s[:-1] + '+00:00'
-        if 'T' not in s and len(s) >= 10:
-            s = s.replace(' ', 'T', 1)
-        dt = datetime.fromisoformat(s.split('.')[0])
+        s_iso = s
+        if s_iso.endswith('Z'):
+            s_iso = s_iso[:-1] + '+00:00'
+        if 'T' not in s_iso and len(s_iso) >= 10:
+            s_iso = s_iso.replace(' ', 'T', 1)
+        dt = datetime.fromisoformat(s_iso.split('.')[0])
         if dt.tzinfo:
             return dt.replace(tzinfo=None)
         return dt
     except ValueError:
         pass
-    for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d'):
+    for fmt in (
+        '%Y-%m-%d %H:%M:%S',
+        '%Y-%m-%d %H:%M',
+        '%Y-%m-%d',
+        '%d/%m/%Y',
+        '%d/%m/%y',
+        '%d-%m-%Y',
+        '%d-%m-%y',
+        '%d/%m/%y %H:%M',
+        '%d/%m/%Y %H:%M',
+        '%m.%d.%Y %H:%M:%S',
+        '%m.%d.%y %H:%M:%S',
+        '%m.%d.%Y',
+        '%m.%d.%y',
+    ):
         try:
             return datetime.strptime(s[:19], fmt)
         except ValueError:
@@ -120,7 +171,24 @@ def _aggregate_trend_rows(rows: list[dict], granularity: str) -> list[dict]:
 
     buckets: dict[str, list[dict]] = defaultdict(list)
     for row in rows:
-        ts_raw = row.get('timestamp') or row.get('Date') or row.get('date')
+        # Daily/monthly exports can carry a flat "timestamp" while "Date" changes;
+        # prefer Date-like columns for non-hourly rollups to avoid point collapse.
+        if gran == 'hour':
+            ts_raw = (
+                row.get('timestamp')
+                or row.get('Time')
+                or row.get('PERIOD_START_TIME')
+                or row.get('Date')
+                or row.get('date')
+            )
+        else:
+            ts_raw = (
+                row.get('Date')
+                or row.get('date')
+                or row.get('timestamp')
+                or row.get('Time')
+                or row.get('PERIOD_START_TIME')
+            )
         dt = _parse_trend_ts(ts_raw)
         if dt is None:
             continue
@@ -148,6 +216,45 @@ def _aggregate_trend_rows(rows: list[dict], granularity: str) -> list[dict]:
                 merged[k] = sum(vals) / len(vals)
         out.append(merged)
     return out
+
+
+def _filter_trend_rows_by_hours(rows: list[dict], hours: int, granularity: str = 'hour') -> list[dict]:
+    """Keep only rows within `hours` from the latest valid timestamp."""
+    if not rows:
+        return rows
+    gran = (granularity or 'hour').lower()
+    parsed = []
+    for row in rows:
+        if gran == 'hour':
+            ts_raw = (
+                row.get('timestamp')
+                or row.get('Time')
+                or row.get('PERIOD_START_TIME')
+                or row.get('Date')
+                or row.get('date')
+            )
+        else:
+            ts_raw = (
+                row.get('Date')
+                or row.get('date')
+                or row.get('timestamp')
+                or row.get('Time')
+                or row.get('PERIOD_START_TIME')
+            )
+        dt = _parse_trend_ts(ts_raw)
+        if dt is None:
+            continue
+        parsed.append((dt, row))
+    if not parsed:
+        return []
+    parsed.sort(key=lambda x: x[0])
+    latest = parsed[-1][0]
+    try:
+        h = max(1, int(hours))
+    except Exception:
+        h = 168
+    cutoff = latest - timedelta(hours=h)
+    return [row for dt, row in parsed if dt >= cutoff]
 _VENDOR_TECH_SCOPE = {
     'Nokia': ['2G', '3G', '4G', '5G'],
     'Huawei': ['2G', '3G', '4G'],
@@ -155,7 +262,7 @@ _VENDOR_TECH_SCOPE = {
 
 
 def _kpi_headers_static_for(vendor: str, technology: str) -> list[str]:
-    return list(KPI_HEADERS_MAP.get(f'{vendor}|{technology}', []))
+    return _drop_duplicate_kpis(list(KPI_HEADERS_MAP.get(f'{vendor}|{technology}', [])))
 
 
 def _use_static_kpi_catalog() -> bool:
@@ -186,6 +293,17 @@ _PM_STATIC_COLS = {
 }
 
 _PM_EXCLUDE_COLS = {'id', 'Integrity'}
+_DUPLICATE_KPI_NAMES = {
+    'RH303:Handover Success Rate(%)',
+    'K3034:TCHH Traffic Volume(Erl)',
+    'Drop Call Rate',
+    'CS RAB Congestion Num',
+    'TCH raw block.1',
+    'Act HS-DSCH  end usr thp',
+    'Expect cell size',
+    'Avg PDCP cell thp UL',
+    'TRS_SLOT_PDSCH (M55308C00017)',
+}
 
 # Human-readable label for the cell_name column per vendor/technology
 _PM_CELL_LABEL = {
@@ -193,15 +311,55 @@ _PM_CELL_LABEL = {
     'Nokia':  {'2G': 'BTS name', '3G': 'WCEL name', '4G': 'LNCEL name', '5G': 'NRCEL name'},
 }
 
+
+def _drop_duplicate_kpis(cols: list[str]) -> list[str]:
+    return [c for c in (cols or []) if c not in _DUPLICATE_KPI_NAMES]
+
 # ---------------------------------------------------------------------------
 # Lightweight in-memory cache for cell list queries
 # ---------------------------------------------------------------------------
 _CELL_LIST_CACHE = {}
 _CELL_LIST_CACHE_TTL_SEC = 45
+_TREND_CACHE = {}
+_TREND_CACHE_TTL_SEC = 120
+_TREND_CACHE_SCHEMA_VER = "v2"
+_PM_TABLE_CACHE = {}
+_PM_TABLE_CACHE_TTL_SEC = 90
 
 
-def _cell_cache_key(vendor: str, technology: str, site_id: str, cluster: str, area: str) -> str:
+def _db_mtime_token(db_path: str) -> str:
+    try:
+        st = os.stat(db_path)
+        return str(getattr(st, "st_mtime_ns", int(st.st_mtime * 1_000_000_000)))
+    except OSError:
+        return "0"
+
+
+def _pm_data_version_token(vendor: str = "", include_metadata: bool = True, scope: str = "hourly") -> str:
+    """
+    Lightweight invalidation token based on SQLite file mtimes.
+    Any PM/metadata update changes the key namespace and stale cache entries are bypassed.
+    """
+    vendors = [vendor] if vendor in ("Nokia", "Huawei") else ["Nokia", "Huawei"]
+    parts = []
+    if include_metadata:
+        parts.append(f"meta:{_db_mtime_token(METADATA_DB)}")
+    for v in vendors:
+        db_path = _pm_db_for_vendor(v, scope)
+        parts.append(f"{v.lower()}:{_db_mtime_token(db_path)}")
+    return "|".join(parts)
+
+
+def _cell_cache_key(
+    vendor: str,
+    technology: str,
+    site_id: str,
+    cluster: str,
+    area: str,
+    version_token: str,
+) -> str:
     return '||'.join([
+        (version_token or '').strip(),
         (vendor or '').strip(),
         (technology or '').strip(),
         (site_id or '').strip(),
@@ -224,6 +382,80 @@ def _cell_cache_get(key: str):
 def _cell_cache_set(key: str, payload):
     _CELL_LIST_CACHE[key] = (time.time() + _CELL_LIST_CACHE_TTL_SEC, payload)
 
+
+def _trend_cache_key(
+    scope: str,
+    cell_ref: str,
+    vendor: str,
+    table: str,
+    hours: int,
+    granularity: str,
+    requested_kpis: list | None,
+    version_token: str,
+) -> str:
+    req = ",".join(requested_kpis or [])
+    return "||".join([
+        _TREND_CACHE_SCHEMA_VER,
+        scope,
+        version_token,
+        cell_ref or "",
+        vendor or "",
+        table or "",
+        str(int(hours or 0)),
+        granularity or "hour",
+        req,
+    ])
+
+
+def _trend_cache_get(key: str):
+    item = _TREND_CACHE.get(key)
+    if not item:
+        return None
+    expires_at, payload = item
+    if expires_at < time.time():
+        _TREND_CACHE.pop(key, None)
+        return None
+    return payload
+
+
+def _trend_cache_set(key: str, payload):
+    _TREND_CACHE[key] = (time.time() + _TREND_CACHE_TTL_SEC, payload)
+
+
+def _pm_table_cache_key(
+    vendor: str,
+    technology: str,
+    table: str,
+    search: str,
+    page: int,
+    page_size: int,
+    version_token: str,
+) -> str:
+    return "||".join([
+        version_token,
+        vendor or "",
+        technology or "",
+        table or "",
+        search or "",
+        str(int(page or 1)),
+        str(int(page_size or 100)),
+    ])
+
+
+def _pm_table_cache_get(key: str):
+    item = _PM_TABLE_CACHE.get(key)
+    if not item:
+        return None
+    expires_at, payload = item
+    if expires_at < time.time():
+        _PM_TABLE_CACHE.pop(key, None)
+        return None
+    return payload
+
+
+def _pm_table_cache_set(key: str, payload):
+    _PM_TABLE_CACHE[key] = (time.time() + _PM_TABLE_CACHE_TTL_SEC, payload)
+
 # ---------------------------------------------------------------------------
 # PM KPI column discovery (PRAGMA + per-column counts) — cache briefly
 # ---------------------------------------------------------------------------
@@ -231,11 +463,69 @@ _KPI_COLS_CACHE = {}
 _KPI_COLS_CACHE_TTL_SEC = 90
 
 
-def _pm_cols_cache_key(db_path, table: str) -> str:
+def _kpi_headers_db_available() -> bool:
+    return os.path.isfile(KPI_HEADERS_DB)
+
+
+def _kpi_scope_from_catalog(vendor: str = "", technology: str = "") -> list[str]:
+    if not _kpi_headers_db_available():
+        return []
+    where = []
+    params = []
+    if vendor:
+        where.append("vendor = ?")
+        params.append(vendor)
+    if technology:
+        where.append("technology = ?")
+        params.append(technology)
+    where_sql = f"WHERE {' AND '.join(where)}" if where else ""
+    conn = sqlite3.connect(KPI_HEADERS_DB, timeout=15)
     try:
-        m = int(os.path.getmtime(db_path))
-    except OSError:
-        m = 0
+        rows = conn.execute(
+            f"""
+            SELECT kpi_name
+            FROM kpi_scope
+            {where_sql}
+            ORDER BY kpi_name
+            """,
+            params,
+        ).fetchall()
+        return _drop_duplicate_kpis([str(r[0]) for r in rows])
+    except Exception:
+        return []
+    finally:
+        conn.close()
+
+
+def _kpi_mapping_from_catalog() -> dict[str, list[str]]:
+    if not _kpi_headers_db_available():
+        return {}
+    conn = sqlite3.connect(KPI_HEADERS_DB, timeout=15)
+    conn.row_factory = sqlite3.Row
+    try:
+        rows = conn.execute(
+            """
+            SELECT vendor, technology, kpi_name
+            FROM kpi_scope
+            ORDER BY vendor, technology, kpi_name
+            """
+        ).fetchall()
+    except Exception:
+        conn.close()
+        return {}
+    conn.close()
+    mapping: dict[str, list[str]] = {}
+    for r in rows:
+        key = f"{r['vendor']}|{r['technology']}"
+        kpi_name = str(r["kpi_name"])
+        if kpi_name in _DUPLICATE_KPI_NAMES:
+            continue
+        mapping.setdefault(key, []).append(kpi_name)
+    return mapping
+
+
+def _pm_cols_cache_key(db_path, table: str) -> str:
+    m = _db_mtime_token(str(db_path))
     return f'{os.path.abspath(str(db_path))}||{table}||{m}'
 
 
@@ -309,6 +599,64 @@ def _derive_cluster_area(site_id):
     return cluster_num, area
 
 
+def _haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
+    r = 6371.0
+    d_lat = math.radians(lat2 - lat1)
+    d_lng = math.radians(lng2 - lng1)
+    a = (
+        math.sin(d_lat / 2) ** 2
+        + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(d_lng / 2) ** 2
+    )
+    return 2 * r * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+
+def _build_site_area_index(conn: sqlite3.Connection) -> dict[str, tuple[int | None, str | None]]:
+    """
+    Build site_id -> (cluster, area), inferring unknown areas from nearest known site.
+    """
+    rows = [dict(r) for r in conn.execute(
+        'SELECT site_id, latitude, longitude FROM sites WHERE site_id IS NOT NULL'
+    ).fetchall()]
+    resolved: dict[str, dict] = {}
+    known: list[tuple[float, float, str]] = []
+    unknown_with_geo: list[tuple[str, float, float]] = []
+
+    for r in rows:
+        sid = str(r.get('site_id'))
+        cluster, area = _derive_cluster_area(r.get('site_id'))
+        resolved[sid] = {'cluster': cluster, 'area': area}
+
+        lat = r.get('latitude')
+        lng = r.get('longitude')
+        try:
+            lat_f = float(lat) if lat is not None else None
+            lng_f = float(lng) if lng is not None else None
+        except (TypeError, ValueError):
+            lat_f = None
+            lng_f = None
+        if lat_f is None or lng_f is None:
+            continue
+
+        if area:
+            known.append((lat_f, lng_f, area))
+        else:
+            unknown_with_geo.append((sid, lat_f, lng_f))
+
+    if known:
+        for sid, lat_f, lng_f in unknown_with_geo:
+            nearest_area = None
+            nearest_dist = None
+            for k_lat, k_lng, k_area in known:
+                d = _haversine_km(lat_f, lng_f, k_lat, k_lng)
+                if nearest_dist is None or d < nearest_dist:
+                    nearest_dist = d
+                    nearest_area = k_area
+            if nearest_area:
+                resolved[sid]['area'] = nearest_area
+
+    return {sid: (v.get('cluster'), v.get('area')) for sid, v in resolved.items()}
+
+
 # ---------------------------------------------------------------------------
 # Auth helpers
 # ---------------------------------------------------------------------------
@@ -346,15 +694,58 @@ def _user_id(user):
     return user.get('id') if isinstance(user, dict) else user[0]
 
 
-def _groups_db_for_vendor(vendor: str) -> str:
-    return NOKIA_GROUPS_DB if vendor == 'Nokia' else HUAWEI_GROUPS_DB
-
-
-def _groups_conn(vendor: str):
-    conn = sqlite3.connect(_groups_db_for_vendor(vendor), timeout=15)
+def _groups_conn(vendor: str, scope: str = 'hourly'):
+    conn = sqlite3.connect(_groups_db_for_vendor(vendor, scope), timeout=15)
     conn.execute('PRAGMA journal_mode=WAL')
     conn.row_factory = sqlite3.Row
     return conn
+
+
+def _has_groups_schema(conn: sqlite3.Connection) -> bool:
+    names = {
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+        ).fetchall()
+    }
+    return 'groups' in names and 'group_cells' in names
+
+
+def _table_has_column(conn: sqlite3.Connection, table: str, column: str) -> bool:
+    try:
+        cols = [r[1] for r in conn.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()]
+    except Exception:
+        return False
+    want = (column or '').strip().lower()
+    return any(str(c).strip().lower() == want for c in cols)
+
+
+def _pick_first_col(cols: list[str], keywords: tuple[str, ...]) -> str | None:
+    low_map = {c: _norm_col_name(c) for c in cols}
+    for kw in keywords:
+        for c, low in low_map.items():
+            if kw in low:
+                return c
+    return None
+
+
+def _raw_group_table_specs(conn: sqlite3.Connection) -> list[tuple[str, str, str | None, str | None, str | None]]:
+    specs: list[tuple[str, str, str | None, str | None, str | None]] = []
+    rows = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name"
+    ).fetchall()
+    for (table,) in rows:
+        cols = [r[1] for r in conn.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()]
+        if not cols:
+            continue
+        gcol = _pick_first_col(cols, ('group', 'grp', 'ws_name', 'ws name'))
+        ccol = _pick_first_col(cols, ('cell name', 'cell_name', 'cellname', 'wcel', 'lncel', 'nrcel', 'bts'))
+        if not gcol:
+            continue
+        tcol = _pick_first_col(cols, ('technology', 'tech', 'rat'))
+        scol = _pick_first_col(cols, ('site_id', 'site id', 'site'))
+        specs.append((table, gcol, ccol, tcol, scol))
+    return specs
 
 
 def _reports_conn():
@@ -399,9 +790,11 @@ def _meta_conn():
 
 def _is_huawei_pm_db(db_path: str) -> bool:
     try:
-        return os.path.normpath(os.path.abspath(db_path)) == os.path.normpath(
-            os.path.abspath(HUAWEI_PM_DB)
-        )
+        target = os.path.normpath(os.path.abspath(db_path))
+        return target in {
+            os.path.normpath(os.path.abspath(HUAWEI_PM_DB)),
+            os.path.normpath(os.path.abspath(HUAWEI_PM_DAILY_DB)),
+        }
     except Exception:
         return False
 
@@ -409,6 +802,102 @@ def _is_huawei_pm_db(db_path: str) -> bool:
 def _sqlite_ident(name: str) -> str:
     """Quote a SQLite identifier (handles embedded double quotes)."""
     return '"' + str(name).replace('"', '""') + '"'
+
+
+def _norm_col_name(name: str) -> str:
+    return str(name or '').strip().lower()
+
+
+def _table_technology(table_name: str) -> str | None:
+    t = _norm_col_name(table_name)
+    if any(x in t for x in ('5g', 'nr')):
+        return '5G'
+    if any(x in t for x in ('4g', 'lte', 'fdd', 'tdd')):
+        return '4G'
+    if any(x in t for x in ('3g', 'wcdma', 'umts')):
+        return '3G'
+    if any(x in t for x in ('2g', 'gsm')):
+        return '2G'
+    return None
+
+
+def _normalize_group_tech(tech: str) -> str:
+    t = str(tech or '').strip()
+    if t in ('4G-FDD', '4G-TDD'):
+        return '4G'
+    return t
+
+
+def _resolve_pm_axis_columns_sqlite(conn: sqlite3.Connection, table: str) -> tuple[str | None, str | None]:
+    try:
+        cols = [r[1] for r in conn.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()]
+    except sqlite3.OperationalError:
+        return None, None
+    low_to_real = {_norm_col_name(c): c for c in cols}
+    time_col = next((low_to_real.get(a) for a in _TIME_COL_ALIASES if low_to_real.get(a)), None)
+    cell_col = next((low_to_real.get(a) for a in _CELL_COL_ALIASES if low_to_real.get(a)), None)
+    return cell_col, time_col
+
+
+def _resolve_time_col_from_names(names: list[str]) -> str | None:
+    low_to_real = {_norm_col_name(c): c for c in names}
+    return next((low_to_real.get(a) for a in _TIME_COL_ALIASES if low_to_real.get(a)), None)
+
+
+def _resolve_pm_table_sqlite(
+    conn: sqlite3.Connection,
+    vendor: str,
+    technology: str,
+    cell_name: str = "",
+    preferred: str | None = None,
+) -> str | None:
+    rows = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name DESC"
+    ).fetchall()
+    tables = [r[0] for r in rows]
+    tech = '4G' if technology in ('4G-FDD', '4G-TDD') else technology
+    candidates: list[str] = []
+    for t in tables:
+        tt = _table_technology(t)
+        if tech and tt and tt != tech:
+            continue
+        c_col, t_col = _resolve_pm_axis_columns_sqlite(conn, t)
+        if c_col and t_col:
+            candidates.append(t)
+    if preferred in candidates:
+        candidates.insert(0, candidates.pop(candidates.index(preferred)))
+    if not cell_name:
+        return candidates[0] if candidates else None
+    for t in candidates:
+        c_col, _ = _resolve_pm_axis_columns_sqlite(conn, t)
+        if not c_col:
+            continue
+        q = (
+            f"SELECT 1 FROM {_sqlite_ident(t)} "
+            f"WHERE LOWER(TRIM(CAST({_sqlite_ident(c_col)} AS TEXT))) = LOWER(TRIM(?)) "
+            f"LIMIT 1"
+        )
+        try:
+            if conn.execute(q, (cell_name,)).fetchone():
+                return t
+        except sqlite3.OperationalError:
+            continue
+    # Fallback: tolerate minor naming drift (suffix/prefix/noise) via contains match.
+    for t in candidates:
+        c_col, _ = _resolve_pm_axis_columns_sqlite(conn, t)
+        if not c_col:
+            continue
+        q = (
+            f"SELECT 1 FROM {_sqlite_ident(t)} "
+            f"WHERE LOWER(TRIM(CAST({_sqlite_ident(c_col)} AS TEXT))) LIKE LOWER(TRIM(?)) "
+            f"LIMIT 1"
+        )
+        try:
+            if conn.execute(q, (f"%{cell_name}%",)).fetchone():
+                return t
+        except sqlite3.OperationalError:
+            continue
+    return candidates[0] if candidates else None
 
 
 def _pragma_table_kpi_columns(conn: sqlite3.Connection, table: str) -> list[str]:
@@ -550,7 +1039,7 @@ def _get_pm_cols(db_path, technology=None):
                         continue
             finally:
                 conn.close()
-            return sorted(result)
+            return _drop_duplicate_kpis(sorted(result))
 
         try:
             conn = sqlite3.connect(db_path, timeout=30)
@@ -562,7 +1051,7 @@ def _get_pm_cols(db_path, technology=None):
             conn.close()
         except Exception:
             pass
-        return sorted(result)
+        return _drop_duplicate_kpis(sorted(result))
 
     techs = [technology] if technology else PM_TECHNOLOGIES
     try:
@@ -576,7 +1065,7 @@ def _get_pm_cols(db_path, technology=None):
         conn.close()
     except Exception:
         pass
-    return sorted(result)
+    return _drop_duplicate_kpis(sorted(result))
 
 
 def _pm_extra_trend_time_columns(conn, table: str) -> str:
@@ -695,7 +1184,7 @@ def _get_pm_cols_for_table(db_path, table):
     return cols
 
 
-def _pm_conn(vendor=None):
+def _pm_conn(vendor=None, scope: str = 'hourly'):
     """
     Open metadata.db and ATTACH the right PM db(s).
     Returns (conn, pm_alias_or_None).
@@ -705,14 +1194,14 @@ def _pm_conn(vendor=None):
     conn.row_factory = sqlite3.Row
 
     if vendor == 'Nokia':
-        conn.execute(f"ATTACH DATABASE '{NOKIA_PM_DB}'  AS pm")
+        conn.execute(f"ATTACH DATABASE '{_pm_db_for_vendor('Nokia', scope)}'  AS pm")
         return conn, 'pm'
     elif vendor == 'Huawei':
-        conn.execute(f"ATTACH DATABASE '{HUAWEI_PM_DB}' AS pm")
+        conn.execute(f"ATTACH DATABASE '{_pm_db_for_vendor('Huawei', scope)}' AS pm")
         return conn, 'pm'
     else:
-        conn.execute(f"ATTACH DATABASE '{NOKIA_PM_DB}'  AS nokia_pm")
-        conn.execute(f"ATTACH DATABASE '{HUAWEI_PM_DB}' AS huawei_pm")
+        conn.execute(f"ATTACH DATABASE '{_pm_db_for_vendor('Nokia', scope)}'  AS nokia_pm")
+        conn.execute(f"ATTACH DATABASE '{_pm_db_for_vendor('Huawei', scope)}' AS huawei_pm")
         return conn, None
 
 
@@ -830,11 +1319,29 @@ def get_kpi_columns():
 
     vendor = (request.args.get('vendor') or '').strip()
     technology = (request.args.get('technology') or '').strip()
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
     if vendor and vendor not in ('Nokia', 'Huawei'):
         vendor = ''
     allowed_tech = {'2G', '3G', '4G', '5G'}
     if technology and technology not in allowed_tech:
         technology = ''
+
+    # Preferred source: standalone KPI catalog DB (raw/KPIs/kpi_headers.db).
+    catalog_cols = _kpi_scope_from_catalog(vendor, technology)
+    if catalog_cols:
+        payload = {
+            'success': True,
+            'columns': catalog_cols,
+            'source': 'kpi_catalog_db',
+        }
+        if vendor:
+            payload['vendor'] = vendor
+        if technology:
+            payload['technology'] = technology
+        if not vendor and not technology:
+            payload['nokia'] = _kpi_scope_from_catalog('Nokia', '')
+            payload['huawei'] = _kpi_scope_from_catalog('Huawei', '')
+        return jsonify(payload)
 
     if _use_static_kpi_catalog():
         if vendor and technology:
@@ -877,35 +1384,37 @@ def get_kpi_columns():
 
     # Dynamic scan mode (default)
     if vendor and technology:
-        db_path = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
+        db_path = _pm_db_for_vendor(vendor, data_scope)
         columns = _get_pm_cols(db_path, technology)
         return jsonify({
             'success': True,
             'columns': columns,
             'vendor': vendor,
             'technology': technology,
+            'data_scope': data_scope,
             'source': 'dynamic',
         })
 
     if vendor and not technology:
-        db_path = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
+        db_path = _pm_db_for_vendor(vendor, data_scope)
         columns = _get_pm_cols(db_path, None)
-        return jsonify({'success': True, 'columns': columns, 'vendor': vendor, 'source': 'dynamic'})
+        return jsonify({'success': True, 'columns': columns, 'vendor': vendor, 'data_scope': data_scope, 'source': 'dynamic'})
 
     if technology and not vendor:
-        n = _get_pm_cols(NOKIA_PM_DB, technology)
-        h = _get_pm_cols(HUAWEI_PM_DB, technology)
+        n = _get_pm_cols(_pm_db_for_vendor('Nokia', data_scope), technology)
+        h = _get_pm_cols(_pm_db_for_vendor('Huawei', data_scope), technology)
         columns = sorted(set(n) | set(h))
-        return jsonify({'success': True, 'columns': columns, 'technology': technology, 'source': 'dynamic'})
+        return jsonify({'success': True, 'columns': columns, 'technology': technology, 'data_scope': data_scope, 'source': 'dynamic'})
 
-    nokia = _get_pm_cols(NOKIA_PM_DB)
-    huawei = _get_pm_cols(HUAWEI_PM_DB)
+    nokia = _get_pm_cols(_pm_db_for_vendor('Nokia', data_scope))
+    huawei = _get_pm_cols(_pm_db_for_vendor('Huawei', data_scope))
     columns = sorted(set(nokia) | set(huawei))
     return jsonify({
         'success': True,
         'columns': columns,
         'nokia': nokia,
         'huawei': huawei,
+        'data_scope': data_scope,
         'source': 'dynamic',
     })
 
@@ -923,13 +1432,29 @@ def get_kpi_headers_map():
     if _use_static_kpi_catalog():
         return jsonify({'success': True, 'mapping': KPI_HEADERS_MAP, 'source': 'static'})
 
+    # Preferred source: standalone KPI catalog DB.
+    mapping_from_db = _kpi_mapping_from_catalog()
+    if mapping_from_db:
+        return jsonify({'success': True, 'mapping': mapping_from_db, 'source': 'kpi_catalog_db'})
+
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
     mapping = {}
     for vendor, techs in _VENDOR_TECH_SCOPE.items():
-        db_path = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
+        db_path = _pm_db_for_vendor(vendor, data_scope)
         for tech in techs:
             cols = _get_pm_cols(db_path, tech)
             mapping[f'{vendor}|{tech}'] = cols
-    return jsonify({'success': True, 'mapping': mapping, 'source': 'dynamic'})
+    return jsonify({'success': True, 'mapping': mapping, 'data_scope': data_scope, 'source': 'dynamic'})
+
+
+@performance_bp.route('/api/performance/kpi_mapping')
+def get_kpi_mapping():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    payload = get_kpi_mapping_payload()
+    payload['success'] = True
+    return jsonify(payload)
 
 
 @performance_bp.route('/api/performance/groups', methods=['GET'])
@@ -939,34 +1464,75 @@ def get_cell_groups():
         return jsonify({'error': 'Unauthorized'}), 401
     uid = _user_id(user)
     req_vendor = (request.args.get('vendor') or '').strip()
-    req_tech = (request.args.get('technology') or '').strip()
+    req_tech = _normalize_group_tech(request.args.get('technology') or '')
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
     vendors = [req_vendor] if req_vendor in ('Nokia', 'Huawei') else ['Nokia', 'Huawei']
     rows = []
     for vendor in vendors:
-        conn = _groups_conn(vendor)
-        where = ['(g.user_id = ? OR g.is_shared = 1)']
-        params = [uid]
-        if req_tech:
-            where.append('gc.technology = ?')
-            params.append(req_tech)
-        v_rows = [dict(r) for r in conn.execute(
-            f'''
-            SELECT g.id, g.name, g.description, g.is_shared, g.updated_at, COUNT(gc.id) AS cell_count
-            FROM groups g
-            LEFT JOIN group_cells gc ON gc.group_id = g.id
-            WHERE {' AND '.join(where)}
-            GROUP BY g.id, g.name, g.description, g.is_shared, g.updated_at
-            ORDER BY g.updated_at DESC, g.id DESC
-            ''',
-            params,
-        ).fetchall()]
-        conn.close()
-        for r in v_rows:
-            if req_tech and int(r.get('cell_count') or 0) <= 0:
+        conn = _groups_conn(vendor, data_scope)
+        if _has_groups_schema(conn):
+            try:
+                where = ['(g.user_id = ? OR g.is_shared = 1)']
+                params = [uid]
+                if req_tech and _table_has_column(conn, 'group_cells', 'technology'):
+                    where.append('(gc.technology = ? OR gc.technology = ?)')
+                    params.extend([req_tech, _normalize_group_tech(req_tech)])
+                v_rows = [dict(r) for r in conn.execute(
+                    f'''
+                    SELECT g.id, g.name, g.description, g.is_shared, g.updated_at, COUNT(gc.id) AS cell_count
+                    FROM groups g
+                    LEFT JOIN group_cells gc ON gc.group_id = g.id
+                    WHERE {' AND '.join(where)}
+                    GROUP BY g.id, g.name, g.description, g.is_shared, g.updated_at
+                    ORDER BY g.updated_at DESC, g.id DESC
+                    ''',
+                    params,
+                ).fetchall()]
+                schema_rows = []
+                for r in v_rows:
+                    if req_tech and int(r.get('cell_count') or 0) <= 0:
+                        continue
+                    r['vendor'] = vendor
+                    r['group_ref'] = f'{vendor}:{r["id"]}'
+                    schema_rows.append(r)
+                # If normalized groups schema has data, use it.
+                # If it's empty (common in legacy hourly DBs), fall back to raw tables below.
+                if schema_rows:
+                    conn.close()
+                    rows.extend(schema_rows)
+                    continue
+            except sqlite3.OperationalError:
+                # Partial schema (legacy hourly DB) — fallback to raw imported tables below.
+                pass
+
+        # Fallback: raw imported group tables without groups/group_cells schema.
+        for table, gcol, _ccol, _tcol, _scol in _raw_group_table_specs(conn):
+            table_tech = _table_technology(table) or ''
+            if req_tech and table_tech and req_tech != table_tech:
                 continue
-            r['vendor'] = vendor
-            r['group_ref'] = f'{vendor}:{r["id"]}'
-        rows.extend(v_rows)
+            sql = (
+                f'SELECT {_sqlite_ident(gcol)} AS gname, COUNT(1) AS cell_count '
+                f'FROM {_sqlite_ident(table)} '
+                f'WHERE {_sqlite_ident(gcol)} IS NOT NULL AND TRIM(CAST({_sqlite_ident(gcol)} AS TEXT)) <> "" '
+                f'GROUP BY {_sqlite_ident(gcol)} '
+                f'ORDER BY gname'
+            )
+            for r in conn.execute(sql).fetchall():
+                gname = str(r[0] or '').strip()
+                if not gname:
+                    continue
+                rows.append({
+                    'id': None,
+                    'name': gname,
+                    'description': f'Imported from {table}',
+                    'is_shared': 1,
+                    'updated_at': None,
+                    'cell_count': int(r[1] or 0),
+                    'vendor': vendor,
+                    'group_ref': f'{vendor}:raw:{table}:{gname}',
+                    'technology': table_tech or (req_tech or ''),
+                })
+        conn.close()
     rows.sort(key=lambda r: (str(r.get('updated_at') or ''), str(r.get('group_ref') or '')), reverse=True)
     return jsonify({'success': True, 'groups': rows})
 
@@ -978,16 +1544,66 @@ def get_group_cell_keys(group_ref):
         return jsonify({'error': 'Unauthorized'}), 401
     uid = _user_id(user)
     vendor = (request.args.get('vendor') or '').strip()
-    technology = (request.args.get('technology') or '').strip()
+    technology = _normalize_group_tech(request.args.get('technology') or '')
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
+    parts = group_ref.split(':', 3)
+    if not parts or parts[0] not in ('Nokia', 'Huawei'):
+        return jsonify({'error': 'Invalid group vendor'}), 400
+    source_vendor = parts[0]
+
+    conn = _groups_conn(source_vendor, data_scope)
+    if len(parts) >= 4 and parts[1] == 'raw':
+        table = parts[2]
+        group_name = parts[3]
+        specs = {t: (g, c, tc, sc) for t, g, c, tc, sc in _raw_group_table_specs(conn)}
+        if table not in specs:
+            conn.close()
+            return jsonify({'error': 'Group source table not found'}), 404
+        gcol, ccol, tcol, scol = specs[table]
+        if not ccol:
+            # Some vendor group exports (e.g. Nokia WS_NAME tables) have no per-cell column.
+            conn.close()
+            return jsonify({'success': True, 'cell_keys': []})
+        where = [f'{_sqlite_ident(gcol)} = ?']
+        params = [group_name]
+        if technology:
+            if tcol:
+                where.append(f'({_sqlite_ident(tcol)} = ? OR {_sqlite_ident(tcol)} = ?)')
+                params.extend([technology, _normalize_group_tech(technology)])
+            elif (_table_technology(table) or '') != technology:
+                conn.close()
+                return jsonify({'success': True, 'cell_keys': []})
+        sql = (
+            f'SELECT {_sqlite_ident(ccol)} AS cell_name'
+            + (f', {_sqlite_ident(tcol)} AS technology' if tcol else ', NULL AS technology')
+            + (f', {_sqlite_ident(scol)} AS site_id' if scol else ', NULL AS site_id')
+            + f' FROM {_sqlite_ident(table)} WHERE {" AND ".join(where)}'
+        )
+        rows = []
+        for r in conn.execute(sql, params).fetchall():
+            c_name = str(r[0] or '').strip()
+            if not c_name:
+                continue
+            r_tech = str(r[1] or _table_technology(table) or '').strip()
+            r_site = str(r[2] or '').strip()
+            rows.append({
+                'cell_key': '||'.join([source_vendor, r_tech, r_site, c_name]),
+                'cell_name': c_name,
+                'vendor': source_vendor,
+                'technology': r_tech,
+                'site_id': r_site,
+            })
+        conn.close()
+        rows.sort(key=lambda x: (x.get('technology') or '', x.get('site_id') or '', x.get('cell_name') or ''))
+        return jsonify({'success': True, 'cell_keys': rows})
+
     try:
-        source_vendor, raw_gid = group_ref.split(':', 1)
+        _source_vendor, raw_gid = group_ref.split(':', 1)
         group_id = int(raw_gid)
     except Exception:
+        conn.close()
         return jsonify({'error': 'Invalid group reference'}), 400
-    if source_vendor not in ('Nokia', 'Huawei'):
-        return jsonify({'error': 'Invalid group vendor'}), 400
 
-    conn = _groups_conn(source_vendor)
     owner = conn.execute('SELECT user_id, is_shared FROM groups WHERE id = ?', (group_id,)).fetchone()
     if not owner:
         conn.close()
@@ -1001,8 +1617,9 @@ def get_group_cell_keys(group_ref):
         where.append('vendor = ?')
         params.append(vendor)
     if technology:
-        where.append('technology = ?')
-        params.append(technology)
+        if _table_has_column(conn, 'group_cells', 'technology'):
+            where.append('technology = ?')
+            params.append(technology)
     rows = [dict(r) for r in conn.execute(
         f'''
         SELECT cell_key, cell_name, vendor, technology, site_id
@@ -1014,6 +1631,143 @@ def get_group_cell_keys(group_ref):
     ).fetchall()]
     conn.close()
     return jsonify({'success': True, 'cell_keys': rows})
+
+
+def _resolve_group_ref_cell_names(
+    uid: int,
+    group_ref: str,
+    vendor: str,
+    technology: str,
+    data_scope: str,
+) -> set[str]:
+    out: set[str] = set()
+    parts = (group_ref or '').split(':', 3)
+    if not parts or parts[0] not in ('Nokia', 'Huawei'):
+        return out
+    source_vendor = parts[0]
+    conn = _groups_conn(source_vendor, data_scope)
+    try:
+        if len(parts) >= 4 and parts[1] == 'raw':
+            table = parts[2]
+            group_name = parts[3]
+            specs = {t: (g, c, tc, sc) for t, g, c, tc, sc in _raw_group_table_specs(conn)}
+            if table not in specs:
+                return out
+            gcol, ccol, tcol, _scol = specs[table]
+            if not ccol:
+                return out
+            where = [f'{_sqlite_ident(gcol)} = ?']
+            params = [group_name]
+            if technology:
+                if tcol:
+                    where.append(f'({_sqlite_ident(tcol)} = ? OR {_sqlite_ident(tcol)} = ?)')
+                    params.extend([technology, _normalize_group_tech(technology)])
+                elif (_table_technology(table) or '') != technology:
+                    return out
+            sql = f'''
+                SELECT {_sqlite_ident(ccol)} AS cell_name
+                FROM {_sqlite_ident(table)}
+                WHERE {' AND '.join(where)}
+            '''
+            for r in conn.execute(sql, params).fetchall():
+                n = str(r[0] or '').strip()
+                if n:
+                    out.add(n)
+            return out
+
+        try:
+            _source_vendor, raw_gid = group_ref.split(':', 1)
+            group_id = int(raw_gid)
+        except Exception:
+            return out
+
+        owner = conn.execute('SELECT user_id, is_shared FROM groups WHERE id = ?', (group_id,)).fetchone()
+        if not owner:
+            return out
+        if int(owner['user_id']) != int(uid) and int(owner['is_shared'] or 0) != 1:
+            return out
+        where = ['group_id = ?']
+        params = [group_id]
+        if vendor:
+            where.append('vendor = ?')
+            params.append(vendor)
+        if technology and _table_has_column(conn, 'group_cells', 'technology'):
+            where.append('technology = ?')
+            params.append(technology)
+        for r in conn.execute(
+            f'''
+            SELECT cell_name
+            FROM group_cells
+            WHERE {' AND '.join(where)}
+            ''',
+            params,
+        ).fetchall():
+            n = str(r[0] or '').strip()
+            if n:
+                out.add(n)
+        return out
+    finally:
+        conn.close()
+
+
+@performance_bp.route('/api/performance/group/trend', methods=['GET'])
+def get_group_trend():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    group_ref = (request.args.get('group_ref') or '').strip()
+    granularity = _normalize_granularity(request.args.get('granularity'))
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
+    requested_kpis = _requested_trend_kpi_names()
+    if not group_ref:
+        return jsonify({'error': 'group_ref is required'}), 400
+
+    parts = group_ref.split(':', 3)
+    if len(parts) < 4 or parts[0] not in ('Nokia', 'Huawei') or parts[1] != 'raw':
+        return jsonify({'error': 'Only raw imported groups are supported'}), 400
+    source_vendor, _raw_tag, table, group_name = parts
+    conn = _groups_conn(source_vendor, data_scope)
+    try:
+        specs = {t: (g, c, tc, sc) for t, g, c, tc, sc in _raw_group_table_specs(conn)}
+        if table not in specs:
+            return jsonify({'error': 'Group source table not found'}), 404
+        gcol, _ccol, _tcol, _scol = specs[table]
+        cols = [r[1] for r in conn.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()]
+        if not cols:
+            return jsonify({'success': True, 'group': {'name': group_name, 'vendor': source_vendor}, 'trend': []})
+        tcol = _resolve_time_col_from_names(cols)
+        if not tcol:
+            return jsonify({'success': True, 'group': {'name': group_name, 'vendor': source_vendor}, 'trend': []})
+
+        kpi_exclude = {c.lower() for c in _FIXED_COLS}
+        kpi_exclude.update({str(gcol).lower(), str(tcol).lower(), '_sync_row_hash', 'dn'})
+        kpi_cols = [c for c in cols if str(c).lower() not in kpi_exclude and c not in _DUPLICATE_KPI_NAMES]
+        if requested_kpis:
+            allow = set(requested_kpis)
+            kpi_cols = [c for c in kpi_cols if c in allow]
+
+        select_cols = [f'{_sqlite_ident(tcol)} AS "timestamp"'] + [f'{_sqlite_ident(c)}' for c in kpi_cols]
+        rows = [
+            dict(r)
+            for r in conn.execute(
+                f'''
+                SELECT {", ".join(select_cols)}
+                FROM {_sqlite_ident(table)}
+                WHERE LOWER(TRIM(CAST({_sqlite_ident(gcol)} AS TEXT))) = LOWER(TRIM(?))
+                ORDER BY {_sqlite_ident(tcol)} ASC
+                ''',
+                (group_name,),
+            ).fetchall()
+        ]
+        rows = _aggregate_trend_rows(rows, granularity)
+        return jsonify({
+            'success': True,
+            'group': {'name': group_name, 'vendor': source_vendor, 'table': table},
+            'trend': rows,
+        })
+    finally:
+        conn.close()
 
 
 @performance_bp.route('/api/performance/reports', methods=['GET'])
@@ -1123,11 +1877,12 @@ def get_filters():
     conn = _meta_conn()
     union_sql = perf_per_tech_union_sql()
     raw_sites = [dict(r) for r in conn.execute(f'''
-        SELECT DISTINCT s.site_id, s.site_name, s.vendor
+        SELECT DISTINCT s.site_id, s.site_name, s.vendor, s.latitude, s.longitude
         FROM ({union_sql}) v
         JOIN sites s ON s.site_id = v.site_id
         ORDER BY s.site_name
     ''').fetchall()]
+    area_index = _build_site_area_index(conn)
     conn.close()
 
     # Derive cluster/area from site_id (same logic as network map)
@@ -1135,7 +1890,7 @@ def get_filters():
     area_pairs  = set()      # (cluster, area)
     sites = []
     for s in raw_sites:
-        cluster, area = _derive_cluster_area(s['site_id'])
+        cluster, area = area_index.get(str(s['site_id']), _derive_cluster_area(s['site_id']))
         s['cluster'] = cluster
         s['area']    = area
         sites.append(s)
@@ -1165,7 +1920,15 @@ def get_cells():
     site_id    = request.args.get('site_id', '')
     cluster    = request.args.get('cluster', '')
     area       = request.args.get('area', '')
-    cache_key = _cell_cache_key(vendor, technology, site_id, cluster, area)
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
+    cache_key = _cell_cache_key(
+        vendor,
+        technology,
+        site_id,
+        cluster,
+        area,
+        _pm_data_version_token(vendor if vendor else "", include_metadata=True, scope=data_scope),
+    )
     cached_cells = _cell_cache_get(cache_key)
     if cached_cells is not None:
         return jsonify({'success': True, 'cells': cached_cells, 'cached': True})
@@ -1174,7 +1937,7 @@ def get_cells():
     params = []
 
     if vendor:
-        where.append('v.vendor = ?')
+        where.append("LOWER(TRIM(COALESCE(v.vendor, ''))) = LOWER(TRIM(?))")
         params.append(vendor)
     if technology:
         if technology == '4G':
@@ -1186,16 +1949,17 @@ def get_cells():
         where.append('v.site_id = ?')
         params.append(site_id)
 
-    # cluster / area filtering: derive from site_id, then filter by matching site_ids
+    meta = _meta_conn()
+    area_index = _build_site_area_index(meta)
+
+    # cluster / area filtering: derive/infer from site_id, then filter by matching site_ids
     if cluster or area:
-        meta = _meta_conn()
         all_sites = [dict(r) for r in meta.execute(
-            "SELECT site_id FROM sites"
+            "SELECT site_id FROM sites WHERE site_id IS NOT NULL"
         ).fetchall()]
-        meta.close()
         matching_ids = []
         for s in all_sites:
-            c_num, a_name = _derive_cluster_area(s['site_id'])
+            c_num, a_name = area_index.get(str(s['site_id']), _derive_cluster_area(s['site_id']))
             if cluster and str(c_num) != str(cluster):
                 continue
             if area and a_name != area:
@@ -1206,13 +1970,15 @@ def get_cells():
             where.append(f'v.site_id IN ({placeholders})')
             params.extend(matching_ids)
         else:
+            meta.close()
             # No sites match — return empty
             return jsonify({'success': True, 'cells': []})
+    meta.close()
 
     where_sql = ' AND '.join(where)
     union_sql = perf_per_tech_union_sql_with_activity()
 
-    conn, _pm_alias = _pm_conn(vendor if vendor else None)
+    conn, _pm_alias = _pm_conn(vendor if vendor else None, scope=data_scope)
 
     try:
         # Fast path for cell tree loading:
@@ -1254,7 +2020,7 @@ def get_cells():
 
     # Enrich each row with derived cluster / area
     for row in rows:
-        c_num, a_name = _derive_cluster_area(row.get('site_id'))
+        c_num, a_name = area_index.get(str(row.get('site_id')), _derive_cluster_area(row.get('site_id')))
         row['cluster'] = c_num
         row['area']    = a_name
         row['cell_key'] = '||'.join([
@@ -1279,10 +2045,11 @@ def get_cell_trend(cell_id):
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    hours = _clamp_trend_hours(request.args.get('hours', 168, type=int))
     granularity = _normalize_granularity(request.args.get('granularity'))
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
 
     meta_conn = _meta_conn()
+    area_index = _build_site_area_index(meta_conn)
     cell = meta_conn.execute('''
         SELECT c.cell_id, c.cell_name, c.technology, c.vendor,
                c.frequency_band, c.azimuth, c.mechanical_tilt, c.pci,
@@ -1297,13 +2064,13 @@ def get_cell_trend(cell_id):
         return jsonify({'error': 'Cell not found'}), 404
 
     cell      = dict(cell)
-    cluster, area = _derive_cluster_area(cell.get('site_id'))
+    cluster, area = area_index.get(str(cell.get('site_id')), _derive_cluster_area(cell.get('site_id')))
     cell['cluster'] = cluster
     cell['area']    = area
     vendor    = cell.get('vendor')
     cell_name = cell['cell_name']
     cell_tech = cell.get('technology', '4G')
-    pm_db     = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
+    pm_db     = _pm_db_for_vendor(vendor or 'Nokia', data_scope)
     if vendor == 'Huawei':
         from sync.pm_processor import huawei_pm_table_for_cell
 
@@ -1311,39 +2078,76 @@ def get_cell_trend(cell_id):
     else:
         table = pm_table_name(cell_tech)
 
+    requested_kpis = _requested_trend_kpi_names()
+    trend_cache_key = _trend_cache_key(
+        "cell_id",
+        str(cell_id),
+        str(vendor or ""),
+        str(table or ""),
+        0,
+        granularity,
+        requested_kpis,
+        _pm_data_version_token(vendor or "", include_metadata=True, scope=data_scope),
+    )
+    cached_trend = _trend_cache_get(trend_cache_key)
+    if cached_trend is not None:
+        return jsonify({'success': True, 'cell': cell, 'trend': cached_trend, 'cached': True})
+
     trend = []
     try:
         if table:
-            full_kpi = _get_pm_cols_for_table(pm_db, table)
-            kpi_cols = _trend_kpi_columns(full_kpi, _requested_trend_kpi_names())
             if vendor == 'Huawei' and use_postgresql():
+                full_kpi = _get_pm_cols_for_table(pm_db, table)
+                kpi_cols = _trend_kpi_columns(full_kpi, requested_kpis)
                 trend = _fetch_huawei_trend_postgresql(table, cell_name, hours, kpi_cols)
             else:
                 pm_conn = sqlite3.connect(pm_db)
                 pm_conn.row_factory = sqlite3.Row
-                extra_time = _pm_extra_trend_time_columns(pm_conn, table)
-                if kpi_cols:
-                    col_list = 'cell_name, timestamp' + extra_time + ', ' + ', '.join(f'"{c}"' for c in kpi_cols)
+                table = _resolve_pm_table_sqlite(pm_conn, str(vendor or ''), str(cell_tech or ''), cell_name, table)
+                if table:
+                    cell_col, time_col = _resolve_pm_axis_columns_sqlite(pm_conn, table)
+                    full_kpi = _get_pm_cols_for_table(pm_db, table)
+                    kpi_cols = _trend_kpi_columns(full_kpi, requested_kpis)
                 else:
-                    col_list = 'cell_name, timestamp' + extra_time
+                    cell_col, time_col = None, None
+                if not table or not cell_col or not time_col:
+                    trend = []
+                else:
+                    extra_time = _pm_extra_trend_time_columns(pm_conn, table)
+                    base_cols = (
+                        f'{_sqlite_ident(cell_col)} AS "cell_name", '
+                        f'{_sqlite_ident(time_col)} AS "timestamp"'
+                    )
+                    if kpi_cols:
+                        col_list = base_cols + extra_time + ', ' + ', '.join(f'"{c}"' for c in kpi_cols)
+                    else:
+                        col_list = base_cols + extra_time
 
-                trend = [dict(r) for r in pm_conn.execute(f'''
-                    SELECT {col_list}
-                    FROM "{table}"
-                    WHERE cell_name = ?
-                      AND timestamp >= datetime(
-                          (SELECT MAX(timestamp) FROM "{table}" WHERE cell_name = ?),
-                          ? || ' hours'
-                      )
-                    ORDER BY timestamp ASC
-                ''', (cell_name, cell_name, f'-{hours}')).fetchall()]
+                    trend = [dict(r) for r in pm_conn.execute(f'''
+                        SELECT {col_list}
+                        FROM "{table}"
+                        WHERE LOWER(TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT))) = LOWER(TRIM(?))
+                        ORDER BY {_sqlite_ident(time_col)} ASC
+                    ''', (cell_name,)).fetchall()]
+                    if not trend:
+                        trend = [dict(r) for r in pm_conn.execute(f'''
+                            SELECT {col_list}
+                            FROM "{table}"
+                            WHERE LOWER(TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT))) LIKE LOWER(TRIM(?))
+                            ORDER BY {_sqlite_ident(time_col)} ASC
+                        ''', (f'%{cell_name}%',)).fetchall()]
+                    current_app.logger.info(
+                        "get_cell_trend(cell_id=%s) vendor=%s table=%s cell_col=%s time_col=%s rows=%s",
+                        cell_id, vendor, table, cell_col, time_col, len(trend)
+                    )
                 pm_conn.close()
     except Exception:
         current_app.logger.exception('get_cell_trend: PM query failed cell_id=%s', cell_id)
         trend = []
 
     trend = _aggregate_trend_rows(trend, granularity)
-    return jsonify({'success': True, 'cell': cell, 'trend': trend})
+    _trend_cache_set(trend_cache_key, trend)
+    return jsonify({'success': True, 'cell': cell, 'trend': trend, 'cached': False})
 
 
 @performance_bp.route('/api/performance/cell/trend', methods=['GET'])
@@ -1359,10 +2163,11 @@ def get_cell_trend_by_name():
     vendor = request.args.get('vendor', '').strip()
     if not cell_name:
         return jsonify({'error': 'cell_name is required'}), 400
-    hours = _clamp_trend_hours(request.args.get('hours', 168, type=int))
     granularity = _normalize_granularity(request.args.get('granularity'))
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
 
     meta_conn = _meta_conn()
+    area_index = _build_site_area_index(meta_conn)
     union_sql = perf_per_tech_union_sql()
     where = ['v.cell_name = ?']
     params = [cell_name]
@@ -1392,13 +2197,13 @@ def get_cell_trend_by_name():
         return jsonify({'error': 'Cell not found'}), 404
 
     cell = dict(cell)
-    cluster, area = _derive_cluster_area(cell.get('site_id'))
+    cluster, area = area_index.get(str(cell.get('site_id')), _derive_cluster_area(cell.get('site_id')))
     cell['cluster'] = cluster
     cell['area'] = area
 
     vendor = cell.get('vendor')
     tech = cell.get('technology', '4G')
-    pm_db = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
+    pm_db = _pm_db_for_vendor(vendor or 'Nokia', data_scope)
     pm_tech = '4G' if tech in ('4G-FDD', '4G-TDD') else tech
     if vendor == 'Huawei':
         from sync.pm_processor import huawei_pm_table_for_cell
@@ -1407,31 +2212,65 @@ def get_cell_trend_by_name():
     else:
         table = pm_table_name(pm_tech)
 
+    requested_kpis = _requested_trend_kpi_names()
+    trend_cache_key = _trend_cache_key(
+        "cell_name",
+        "||".join([str(cell_name), str(technology), str(site_id)]),
+        str(vendor or ""),
+        str(table or ""),
+        0,
+        granularity,
+        requested_kpis,
+        _pm_data_version_token(vendor or "", include_metadata=True, scope=data_scope),
+    )
+    cached_trend = _trend_cache_get(trend_cache_key)
+    if cached_trend is not None:
+        return jsonify({'success': True, 'cell': cell, 'trend': cached_trend, 'cached': True})
+
     trend = []
     try:
         if table:
-            full_kpi = _get_pm_cols_for_table(pm_db, table)
-            kpi_cols = _trend_kpi_columns(full_kpi, _requested_trend_kpi_names())
             if vendor == 'Huawei' and use_postgresql():
+                full_kpi = _get_pm_cols_for_table(pm_db, table)
+                kpi_cols = _trend_kpi_columns(full_kpi, requested_kpis)
                 trend = _fetch_huawei_trend_postgresql(table, cell_name, hours, kpi_cols)
             else:
                 pm_conn = sqlite3.connect(pm_db)
                 pm_conn.row_factory = sqlite3.Row
-                extra_time = _pm_extra_trend_time_columns(pm_conn, table)
-                col_list = (
-                    'cell_name, timestamp' + extra_time
-                    + (', ' + ', '.join(f'"{c}"' for c in kpi_cols) if kpi_cols else '')
-                )
-                trend = [dict(r) for r in pm_conn.execute(f'''
-                    SELECT {col_list}
-                    FROM "{table}"
-                    WHERE cell_name = ?
-                      AND timestamp >= datetime(
-                          (SELECT MAX(timestamp) FROM "{table}" WHERE cell_name = ?),
-                          ? || ' hours'
-                      )
-                    ORDER BY timestamp ASC
-                ''', (cell_name, cell_name, f'-{hours}')).fetchall()]
+                table = _resolve_pm_table_sqlite(pm_conn, str(vendor or ''), str(pm_tech or ''), cell_name, table)
+                if table:
+                    cell_col, time_col = _resolve_pm_axis_columns_sqlite(pm_conn, table)
+                    full_kpi = _get_pm_cols_for_table(pm_db, table)
+                    kpi_cols = _trend_kpi_columns(full_kpi, requested_kpis)
+                else:
+                    cell_col, time_col = None, None
+                if not table or not cell_col or not time_col:
+                    trend = []
+                else:
+                    extra_time = _pm_extra_trend_time_columns(pm_conn, table)
+                    col_list = (
+                        f'{_sqlite_ident(cell_col)} AS "cell_name", '
+                        f'{_sqlite_ident(time_col)} AS "timestamp"'
+                        + extra_time
+                        + (', ' + ', '.join(f'"{c}"' for c in kpi_cols) if kpi_cols else '')
+                    )
+                    trend = [dict(r) for r in pm_conn.execute(f'''
+                        SELECT {col_list}
+                        FROM "{table}"
+                        WHERE LOWER(TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT))) = LOWER(TRIM(?))
+                        ORDER BY {_sqlite_ident(time_col)} ASC
+                    ''', (cell_name,)).fetchall()]
+                    if not trend:
+                        trend = [dict(r) for r in pm_conn.execute(f'''
+                            SELECT {col_list}
+                            FROM "{table}"
+                            WHERE LOWER(TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT))) LIKE LOWER(TRIM(?))
+                            ORDER BY {_sqlite_ident(time_col)} ASC
+                        ''', (f'%{cell_name}%',)).fetchall()]
+                    current_app.logger.info(
+                        "get_cell_trend_by_name(cell=%r vendor=%r tech=%r table=%s cell_col=%s time_col=%s rows=%s",
+                        cell_name, vendor, pm_tech, table, cell_col, time_col, len(trend)
+                    )
                 pm_conn.close()
     except Exception:
         current_app.logger.exception(
@@ -1442,7 +2281,8 @@ def get_cell_trend_by_name():
         trend = []
 
     trend = _aggregate_trend_rows(trend, granularity)
-    return jsonify({'success': True, 'cell': cell, 'trend': trend})
+    _trend_cache_set(trend_cache_key, trend)
+    return jsonify({'success': True, 'cell': cell, 'trend': trend, 'cached': False})
 
 
 # ---------------------------------------------------------------------------
@@ -1458,13 +2298,157 @@ def get_pm_table():
     vendor     = request.args.get('vendor', '')
     technology = request.args.get('technology', '')
     search     = request.args.get('search', '').strip()
+    scoped_cell_names = [str(x).strip() for x in request.args.getlist('cell_name') if str(x).strip()]
+    scoped_group_refs = [str(x).strip() for x in request.args.getlist('group_ref') if str(x).strip()]
     page       = request.args.get('page', 1, type=int)
     page_size  = min(request.args.get('page_size', 100, type=int), 500)
+    data_scope = _normalize_data_scope(request.args.get('data_scope'))
 
     if vendor not in ('Nokia', 'Huawei'):
         return jsonify({'error': 'Vendor must be Nokia or Huawei'}), 400
     if not technology:
         return jsonify({'error': 'Technology is required'}), 400
+    uid = _user_id(user)
+
+    # -------------------------------------------------------------------
+    # Group-scope table mode:
+    # If a group is selected, table output must show group rows (not per-cell PM rows).
+    # -------------------------------------------------------------------
+    if scoped_group_refs:
+        def _pick_group_time_col(cols: list[str]) -> str | None:
+            low_to_real = {_norm_col_name(c): c for c in cols}
+            for alias in _TIME_COL_ALIASES:
+                real = low_to_real.get(alias)
+                if real:
+                    return real
+            return None
+
+        all_rows: list[dict] = []
+        merged_cols: list[str] = []
+        seen_cols: set[str] = set()
+
+        for gref in scoped_group_refs:
+            parts = gref.split(':', 3)
+            if not parts or parts[0] not in ('Nokia', 'Huawei'):
+                continue
+            source_vendor = parts[0]
+            conn_g = _groups_conn(source_vendor, data_scope)
+            try:
+                # Raw imported groups carry the actual KPI table rows.
+                if len(parts) >= 4 and parts[1] == 'raw':
+                    table = parts[2]
+                    group_name = parts[3]
+                    specs = {t: (g, c, tc, sc) for t, g, c, tc, sc in _raw_group_table_specs(conn_g)}
+                    if table not in specs:
+                        continue
+                    gcol, _ccol, tcol, _scol = specs[table]
+                    cols = [r[1] for r in conn_g.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()]
+                    if not cols:
+                        continue
+                    for c in cols:
+                        if c not in seen_cols:
+                            seen_cols.add(c)
+                            merged_cols.append(c)
+                    for extra in ('group_name', 'group_ref', 'vendor'):
+                        if extra not in seen_cols:
+                            seen_cols.add(extra)
+                            merged_cols.append(extra)
+
+                    base_where = [f'LOWER(TRIM(CAST({_sqlite_ident(gcol)} AS TEXT))) = LOWER(TRIM(?))']
+                    base_params = [group_name]
+                    where = list(base_where)
+                    params = list(base_params)
+                    applied_tech_filter = False
+                    if technology:
+                        if tcol:
+                            where.append(f'({_sqlite_ident(tcol)} = ? OR {_sqlite_ident(tcol)} = ?)')
+                            params.extend([technology, _normalize_group_tech(technology)])
+                            applied_tech_filter = True
+                        elif (_table_technology(table) or '') not in ('', technology):
+                            # Table doesn't match selected technology by name, skip this raw source.
+                            continue
+                    sql = f'''SELECT * FROM {_sqlite_ident(table)} WHERE {' AND '.join(where)}'''
+                    rows = [dict(r) for r in conn_g.execute(sql, params).fetchall()]
+                    # Be tolerant like chart flow: if tech-filtered query produced nothing,
+                    # retry by group only so table still reflects queried group rows.
+                    if not rows and applied_tech_filter:
+                        sql = f'''SELECT * FROM {_sqlite_ident(table)} WHERE {' AND '.join(base_where)}'''
+                        rows = [dict(r) for r in conn_g.execute(sql, base_params).fetchall()]
+                    for r in rows:
+                        r['group_name'] = group_name
+                        r['group_ref'] = gref
+                        r['vendor'] = source_vendor
+                        all_rows.append(r)
+                    continue
+
+                # Normalized groups schema does not include KPI rows, so expose group metadata rows.
+                try:
+                    _src_vendor, raw_gid = gref.split(':', 1)
+                    gid = int(raw_gid)
+                except Exception:
+                    continue
+                owner = conn_g.execute('SELECT user_id, is_shared, name, updated_at FROM groups WHERE id = ?', (gid,)).fetchone()
+                if not owner:
+                    continue
+                if int(owner['user_id']) != int(uid) and int(owner['is_shared'] or 0) != 1:
+                    continue
+                if 'group_name' not in seen_cols:
+                    seen_cols.add('group_name')
+                    merged_cols.append('group_name')
+                for c in ('group_ref', 'vendor', 'updated_at'):
+                    if c not in seen_cols:
+                        seen_cols.add(c)
+                        merged_cols.append(c)
+                all_rows.append({
+                    'group_name': owner['name'],
+                    'group_ref': gref,
+                    'vendor': source_vendor,
+                    'updated_at': owner['updated_at'],
+                })
+            finally:
+                conn_g.close()
+
+        if search:
+            s = search.lower()
+            all_rows = [
+                r for r in all_rows
+                if any(s in str(v).lower() for v in r.values() if v is not None)
+            ]
+
+        tcol = _pick_group_time_col(merged_cols)
+        if tcol:
+            all_rows.sort(
+                key=lambda r: (_parse_trend_ts(r.get(tcol)) is not None, _parse_trend_ts(r.get(tcol)) or datetime.min),
+                reverse=True,
+            )
+        else:
+            all_rows.sort(key=lambda r: str(r.get('group_name') or ''), reverse=False)
+
+        total = len(all_rows)
+        offset = (page - 1) * page_size
+        page_rows = all_rows[offset:offset + page_size]
+
+        static_cols = [c for c in ('group_name', 'vendor', 'group_ref') if c in merged_cols]
+        ordered_cols = static_cols + [c for c in merged_cols if c not in static_cols]
+        payload = {
+            'success': True,
+            'columns': ordered_cols,
+            'static_cols': static_cols,
+            'column_labels': {'group_name': 'Group', 'group_ref': 'Group Ref', 'vendor': 'Vendor'},
+            'rows': page_rows,
+            'total': total,
+            'page': page,
+            'page_size': page_size,
+            'cell_label': 'Group',
+            'cached': False,
+        }
+        return jsonify(payload)
+
+    if scoped_group_refs:
+        merged: set[str] = set(scoped_cell_names)
+        for gref in scoped_group_refs:
+            merged.update(_resolve_group_ref_cell_names(uid, gref, vendor, technology, data_scope))
+        scoped_cell_names = sorted(merged)
 
     static_cfg = _PM_STATIC_COLS.get(vendor, {}).get(technology, [])
     cell_label = _PM_CELL_LABEL.get(vendor, {}).get(technology, 'Cell Name')
@@ -1476,15 +2460,38 @@ def get_pm_table():
         'page': page, 'page_size': page_size, 'cell_label': cell_label,
     }
 
-    db_path = NOKIA_PM_DB if vendor == 'Nokia' else HUAWEI_PM_DB
-    if vendor == 'Huawei':
-        from sync.pm_processor import resolve_huawei_pm_table
+    db_path = _pm_db_for_vendor(vendor, data_scope)
+    table = None
+    resolved_cell_col = None
+    resolved_time_col = None
+    try:
+        pre_conn = sqlite3.connect(db_path, timeout=15)
+        table = _resolve_pm_table_sqlite(pre_conn, vendor, technology, "", None)
+        if table:
+            resolved_cell_col, resolved_time_col = _resolve_pm_axis_columns_sqlite(pre_conn, table)
+        pre_conn.close()
+    except Exception:
+        table = None
+    if not table or not resolved_cell_col or not resolved_time_col:
+        empty['cached'] = False
+        return jsonify(empty)
 
-        table = resolve_huawei_pm_table(technology, db_path)
-        if not table:
-            return jsonify(empty)
-    else:
-        table = pm_table_name(technology)
+    scoped_sig = '|'.join(sorted({n.lower() for n in scoped_cell_names}))
+    group_sig = '|'.join(sorted({g.lower() for g in scoped_group_refs}))
+    table_cache_key = _pm_table_cache_key(
+        vendor,
+        technology,
+        table,
+        f'{search}||{scoped_sig}||{group_sig}',
+        page,
+        page_size,
+        _pm_data_version_token(vendor, include_metadata=False, scope=data_scope),
+    )
+    cached_table_payload = _pm_table_cache_get(table_cache_key)
+    if cached_table_payload is not None:
+        out = dict(cached_table_payload)
+        out['cached'] = True
+        return jsonify(out)
 
     try:
         conn     = sqlite3.connect(db_path, timeout=15)
@@ -1493,6 +2500,7 @@ def get_pm_table():
 
         if not all_cols:
             conn.close()
+            empty['cached'] = False
             return jsonify(empty)
 
         # Build column order: static first (only those that exist in the table),
@@ -1511,15 +2519,22 @@ def get_pm_table():
                     break
         static_set      = set(existing_static)
         kpi_cols        = [c for c in all_cols
-                           if c not in _PM_EXCLUDE_COLS and c not in static_set]
+                           if c not in _PM_EXCLUDE_COLS and c not in static_set and c not in _DUPLICATE_KPI_NAMES]
         ordered_cols    = existing_static + kpi_cols
         col_select      = ', '.join(f'"{c}"' for c in ordered_cols)
 
-        where_clause = '1=1'
-        params       = []
+        where_parts = ['1=1']
+        params = []
         if search:
-            where_clause = 'cell_name LIKE ?'
+            where_parts.append(f'{_sqlite_ident(resolved_cell_col)} LIKE ?')
             params.append(f'%{search}%')
+        if scoped_cell_names:
+            placeholders = ','.join(['?'] * len(scoped_cell_names))
+            where_parts.append(
+                f'LOWER(TRIM(CAST({_sqlite_ident(resolved_cell_col)} AS TEXT))) IN ({placeholders})'
+            )
+            params.extend([n.lower() for n in scoped_cell_names])
+        where_clause = ' AND '.join(where_parts)
 
         total  = conn.execute(
             f'SELECT COUNT(*) FROM "{table}" WHERE {where_clause}', params
@@ -1528,7 +2543,7 @@ def get_pm_table():
         rows   = conn.execute(f'''
             SELECT {col_select} FROM "{table}"
             WHERE  {where_clause}
-            ORDER  BY timestamp DESC
+            ORDER  BY {_sqlite_ident(resolved_time_col)} DESC
             LIMIT  ? OFFSET ?
         ''', params + [page_size, offset]).fetchall()
         conn.close()
@@ -1541,7 +2556,7 @@ def get_pm_table():
                     column_labels['timestamp'] = 'Timestamp'
                 break
 
-        return jsonify({
+        payload = {
             'success':       True,
             'columns':       ordered_cols,
             'static_cols':   existing_static,
@@ -1551,9 +2566,14 @@ def get_pm_table():
             'page':          page,
             'page_size':     page_size,
             'cell_label':    cell_label,
-        })
+        }
+        _pm_table_cache_set(table_cache_key, payload)
+        payload = dict(payload)
+        payload['cached'] = False
+        return jsonify(payload)
 
     except sqlite3.OperationalError:
+        empty['cached'] = False
         return jsonify(empty)
 
 

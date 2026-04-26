@@ -6,28 +6,28 @@
     <title>PrimeNet - Network Map</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.9">
+    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.21">
 </head>
 <body class="map-page">
     <header class="map-header">
         <div class="header-left">
             <button onclick="window.location.href='/dashboard'" class="btn-dashboard">← Dashboard</button>
+        </div>
+        <div class="header-center">
             <h1>🗺️ Network Map</h1>
         </div>
-        <div class="header-center" aria-label="Sites on map">
+        <div class="header-right" aria-label="Sites on map and user">
             <div class="header-sites-stat">
                 <span class="header-sites-value" id="sites-count">0</span>
                 <span class="header-sites-label">Sites</span>
             </div>
-        </div>
-        <div class="header-right">
             <span class="user-name">{{ user.username }}</span>
             <button onclick="logout()" class="btn-logout">Logout</button>
         </div>
     </header>
 
     <div class="map-body">
-        <!-- Left overlay: tab + collapsible drawer (slides left) -->
+        <!-- Left built-in side panel -->
         <div class="left-panel-shell" id="left-panel-shell">
             <button type="button" class="left-panel-tab" id="left-panel-tab"
                     onclick="toggleMapLeftPanel()" aria-expanded="true" aria-controls="left-panel-drawer"
@@ -36,6 +36,7 @@
             </button>
             <div class="left-panel-drawer" id="left-panel-drawer">
         <div class="left-panel">
+            <div id="tech-filter" class="tech-filter"></div>
             <div class="map-controls">
                 <input type="text" id="site-search" placeholder="Search sites..." onkeyup="searchSites()">
                 <div class="coord-search-row">
@@ -53,7 +54,8 @@
                            min="0" oninput="cellCodeSearch()">
                     <button class="clear-code-btn" onclick="clearCodeSearch()" title="Clear code search">✕</button>
                 </div>
-                <select id="vendor-filter" onchange="filterByVendor()">
+                <select id="vendor-filter" onchange="filterByVendor()"
+                        title="Sites: filter by vendor. Neighbor lines: source cell only; target can be another vendor.">
                     <option value="all">All Vendors</option>
                     <option value="Nokia">Nokia</option>
                     <option value="Huawei">Huawei</option>
@@ -85,8 +87,6 @@
                 </button>
             </div>
 
-            <div id="tech-filter" class="tech-filter"></div>
-
             <div id="site-info-panel" style="display: none;"></div>
         </div>
             </div>
@@ -102,9 +102,9 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.4"></script>
+    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.23"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initializeMap();

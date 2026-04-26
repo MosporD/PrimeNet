@@ -19,6 +19,26 @@ from database_enhanced import get_user_by_session
 sync_bp = Blueprint('sync', __name__)
 
 
+def _log_sync(sync_type: str, technology: str, status: str, rows_affected: int = 0, message: str | None = None) -> None:
+    """Write one record into sync_log; never raise to callers."""
+    try:
+        conn = sqlite3.connect(NCMUSERS_DB)
+        conn.execute(
+            'INSERT INTO sync_log (sync_type, technology, status, rows_affected, message) VALUES (?,?,?,?,?)',
+            (sync_type, technology, status, int(rows_affected or 0), message),
+        )
+        conn.commit()
+        conn.close()
+    except Exception:
+        # Keep API behavior intact even if audit logging fails.
+        pass
+
+
+def _shorten(value, max_len: int = 1200) -> str:
+    text = str(value or '').strip()
+    return (text[: max_len - 3] + '...') if len(text) > max_len else text
+
+
 def admin_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -80,24 +100,27 @@ def sync_history():
     """Return recent sync log entries."""
     limit = request.args.get('limit', 50, type=int)
     day = (request.args.get('day') or '').strip()  # YYYY-MM-DD
+    sync_type = (request.args.get('sync_type') or '').strip()
     conn = sqlite3.connect(NCMUSERS_DB)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
+    where = []
+    params = []
     if day:
-        cursor.execute('''
-            SELECT sync_type, technology, status, rows_affected, message, started_at
-            FROM sync_log
-            WHERE DATE(started_at) = ?
-            ORDER BY id DESC
-            LIMIT ?
-        ''', (day, limit))
-    else:
-        cursor.execute('''
-            SELECT sync_type, technology, status, rows_affected, message, started_at
-            FROM sync_log
-            ORDER BY id DESC
-            LIMIT ?
-        ''', (limit,))
+        where.append('DATE(started_at) = ?')
+        params.append(day)
+    if sync_type:
+        where.append('sync_type = ?')
+        params.append(sync_type)
+    where_sql = ('WHERE ' + ' AND '.join(where)) if where else ''
+    params.append(limit)
+    cursor.execute(f'''
+        SELECT sync_type, technology, status, rows_affected, message, started_at
+        FROM sync_log
+        {where_sql}
+        ORDER BY id DESC
+        LIMIT ?
+    ''', tuple(params))
     rows = [dict(r) for r in cursor.fetchall()]
     conn.close()
     return jsonify({'success': True, 'history': rows})
@@ -108,12 +131,15 @@ def sync_history():
 def trigger_pm():
     """Manually trigger Nokia + Huawei PM pull."""
     try:
+        _log_sync('admin_command', 'pm', 'started', 0, 'Manual trigger requested: Nokia + Huawei PM pull')
         from sync.scheduler import trigger_pm_now
         import threading
         t = threading.Thread(target=trigger_pm_now, daemon=True)
         t.start()
+        _log_sync('admin_command', 'pm', 'ok', 0, 'Manual trigger accepted: Nokia + Huawei PM pull')
         return jsonify({'success': True, 'message': 'Nokia + Huawei PM pull triggered in background.'})
     except Exception as e:
+        _log_sync('admin_command', 'pm', 'error', 0, _shorten(e))
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -122,6 +148,7 @@ def trigger_pm():
 def trigger_nokia_pm():
     """Manually trigger Nokia cells + groups pull."""
     try:
+        _log_sync('admin_command', 'nokia_pm', 'started', 0, 'Manual trigger requested: Nokia cells + groups pull')
         from sync.scheduler import trigger_nokia_pm_now, trigger_nokia_groups_now
         import threading
         def _run():
@@ -129,8 +156,10 @@ def trigger_nokia_pm():
             trigger_nokia_groups_now()
         t = threading.Thread(target=_run, daemon=True)
         t.start()
+        _log_sync('admin_command', 'nokia_pm', 'ok', 0, 'Manual trigger accepted: Nokia cells + groups pull')
         return jsonify({'success': True, 'message': 'Nokia cells + groups pull triggered in background.'})
     except Exception as e:
+        _log_sync('admin_command', 'nokia_pm', 'error', 0, _shorten(e))
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -139,6 +168,7 @@ def trigger_nokia_pm():
 def trigger_huawei_pm():
     """Manually trigger Huawei cells + groups pull."""
     try:
+        _log_sync('admin_command', 'huawei_pm', 'started', 0, 'Manual trigger requested: Huawei cells + groups pull')
         from sync.scheduler import trigger_huawei_pm_now, trigger_huawei_groups_now
         import threading
         def _run():
@@ -146,8 +176,10 @@ def trigger_huawei_pm():
             trigger_huawei_groups_now()
         t = threading.Thread(target=_run, daemon=True)
         t.start()
+        _log_sync('admin_command', 'huawei_pm', 'ok', 0, 'Manual trigger accepted: Huawei cells + groups pull')
         return jsonify({'success': True, 'message': 'Huawei cells + groups pull triggered in background.'})
     except Exception as e:
+        _log_sync('admin_command', 'huawei_pm', 'error', 0, _shorten(e))
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -156,12 +188,79 @@ def trigger_huawei_pm():
 def trigger_metadata():
     """Manually trigger a metadata pull now."""
     try:
+        _log_sync('admin_command', 'metadata', 'started', 0, 'Manual trigger requested: metadata pull')
         from sync.scheduler import trigger_metadata_now
         import threading
         t = threading.Thread(target=trigger_metadata_now, daemon=True)
         t.start()
+        _log_sync('admin_command', 'metadata', 'ok', 0, 'Manual trigger accepted: metadata pull')
         return jsonify({'success': True, 'message': 'Metadata pull triggered in background.'})
     except Exception as e:
+        _log_sync('admin_command', 'metadata', 'error', 0, _shorten(e))
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/cells_hourly', methods=['POST'])
+@admin_required
+def trigger_cells_hourly():
+    """Manually trigger hourly cells refresh (all vendors)."""
+    try:
+        _log_sync('admin_command', 'cells_hourly', 'started', 0, 'Manual trigger requested: hourly cells refresh')
+        from sync.scheduler import trigger_cells_hourly_now
+        t = threading.Thread(target=trigger_cells_hourly_now, daemon=True)
+        t.start()
+        _log_sync('admin_command', 'cells_hourly', 'ok', 0, 'Manual trigger accepted: hourly cells refresh')
+        return jsonify({'success': True, 'message': 'Hourly cells refresh triggered in background.'})
+    except Exception as e:
+        _log_sync('admin_command', 'cells_hourly', 'error', 0, _shorten(e))
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/groups_hourly', methods=['POST'])
+@admin_required
+def trigger_groups_hourly():
+    """Manually trigger hourly groups refresh (all vendors)."""
+    try:
+        _log_sync('admin_command', 'groups_hourly', 'started', 0, 'Manual trigger requested: hourly groups refresh')
+        from sync.scheduler import trigger_groups_hourly_now
+        t = threading.Thread(target=trigger_groups_hourly_now, daemon=True)
+        t.start()
+        _log_sync('admin_command', 'groups_hourly', 'ok', 0, 'Manual trigger accepted: hourly groups refresh')
+        return jsonify({'success': True, 'message': 'Hourly groups refresh triggered in background.'})
+    except Exception as e:
+        _log_sync('admin_command', 'groups_hourly', 'error', 0, _shorten(e))
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/cells_daily', methods=['POST'])
+@admin_required
+def trigger_cells_daily():
+    """Manually trigger daily cells refresh (all vendors)."""
+    try:
+        _log_sync('admin_command', 'cells_daily', 'started', 0, 'Manual trigger requested: daily cells refresh')
+        from sync.scheduler import trigger_cells_daily_now
+        t = threading.Thread(target=trigger_cells_daily_now, daemon=True)
+        t.start()
+        _log_sync('admin_command', 'cells_daily', 'ok', 0, 'Manual trigger accepted: daily cells refresh')
+        return jsonify({'success': True, 'message': 'Daily cells refresh triggered in background.'})
+    except Exception as e:
+        _log_sync('admin_command', 'cells_daily', 'error', 0, _shorten(e))
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@sync_bp.route('/api/sync/trigger/groups_daily', methods=['POST'])
+@admin_required
+def trigger_groups_daily():
+    """Manually trigger daily groups refresh (all vendors)."""
+    try:
+        _log_sync('admin_command', 'groups_daily', 'started', 0, 'Manual trigger requested: daily groups refresh')
+        from sync.scheduler import trigger_groups_daily_now
+        t = threading.Thread(target=trigger_groups_daily_now, daemon=True)
+        t.start()
+        _log_sync('admin_command', 'groups_daily', 'ok', 0, 'Manual trigger accepted: daily groups refresh')
+        return jsonify({'success': True, 'message': 'Daily groups refresh triggered in background.'})
+    except Exception as e:
+        _log_sync('admin_command', 'groups_daily', 'error', 0, _shorten(e))
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -170,12 +269,15 @@ def trigger_metadata():
 def trigger_nokia_groups():
     """Manually trigger Nokia groups pull."""
     try:
+        _log_sync('admin_command', 'nokia_groups', 'started', 0, 'Manual trigger requested: Nokia groups pull')
         from sync.scheduler import trigger_nokia_groups_now
         import threading
         t = threading.Thread(target=trigger_nokia_groups_now, daemon=True)
         t.start()
+        _log_sync('admin_command', 'nokia_groups', 'ok', 0, 'Manual trigger accepted: Nokia groups pull')
         return jsonify({'success': True, 'message': 'Nokia groups pull triggered in background.'})
     except Exception as e:
+        _log_sync('admin_command', 'nokia_groups', 'error', 0, _shorten(e))
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -184,12 +286,15 @@ def trigger_nokia_groups():
 def trigger_huawei_groups():
     """Manually trigger Huawei groups pull."""
     try:
+        _log_sync('admin_command', 'huawei_groups', 'started', 0, 'Manual trigger requested: Huawei groups pull')
         from sync.scheduler import trigger_huawei_groups_now
         import threading
         t = threading.Thread(target=trigger_huawei_groups_now, daemon=True)
         t.start()
+        _log_sync('admin_command', 'huawei_groups', 'ok', 0, 'Manual trigger accepted: Huawei groups pull')
         return jsonify({'success': True, 'message': 'Huawei groups pull triggered in background.'})
     except Exception as e:
+        _log_sync('admin_command', 'huawei_groups', 'error', 0, _shorten(e))
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -212,8 +317,10 @@ def import_pm_path():
         recursive = bool(payload.get('recursive', True))
 
         if not root_path:
+            _log_sync('admin_command', 'pm_local_import', 'error', 0, 'Rejected: path is required')
             return jsonify({'success': False, 'error': 'path is required'}), 400
         if vendor not in ('all', 'nokia', 'huawei'):
+            _log_sync('admin_command', 'pm_local_import', 'error', 0, f'Rejected: invalid vendor "{vendor}"')
             return jsonify({'success': False, 'error': 'vendor must be all, nokia, or huawei'}), 400
 
         def _run():
@@ -232,6 +339,13 @@ def import_pm_path():
 
         t = threading.Thread(target=_run, daemon=True)
         t.start()
+        _log_sync(
+            'admin_command',
+            'pm_local_import',
+            'started',
+            0,
+            _shorten(f'Manual local import requested: path={root_path}; vendor={vendor}; recursive={recursive}'),
+        )
         return jsonify({
             'success': True,
             'message': 'PM local import started in background.',
@@ -240,6 +354,7 @@ def import_pm_path():
             'recursive': recursive,
         })
     except Exception as e:
+        _log_sync('admin_command', 'pm_local_import', 'error', 0, _shorten(e))
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -417,6 +532,14 @@ def test_connectivity():
         except Exception as e:
             results[name] = {'status': 'error', 'host': host, 'error': str(e)}
 
+    try:
+        summary = ', '.join(
+            f'{name}:{info.get("status", "unknown")}'
+            for name, info in sorted(results.items())
+        )
+        _log_sync('admin_command', 'test_connectivity', 'ok', 0, _shorten(summary))
+    except Exception:
+        pass
     return jsonify({'success': True, 'results': results})
 
 
@@ -740,6 +863,19 @@ def inspect_local():
                     }
             report['metadata'] = {'status': 'ok', 'dir': meta_dir, 'files': meta_report}
 
+    try:
+        summary_parts = []
+        for name, info in sorted(report.items()):
+            status = info.get('status', 'unknown')
+            if status == 'ok' and isinstance(info.get('files'), dict):
+                summary_parts.append(f'{name}:ok files={len(info.get("files") or {})}')
+            elif status == 'ok':
+                summary_parts.append(f'{name}:ok')
+            else:
+                summary_parts.append(f'{name}:{status}')
+        _log_sync('admin_command', 'inspect_local', 'ok', 0, _shorten('; '.join(summary_parts)))
+    except Exception:
+        pass
     return jsonify({'success': True, 'report': report})
 
 
@@ -790,4 +926,11 @@ def latest_downloads():
             'files': files[:12],
         }
 
+    try:
+        totals = []
+        for source, payload in sorted(out.items()):
+            totals.append(f'{source}:{len(payload.get("files") or [])}')
+        _log_sync('admin_command', 'latest_downloads', 'ok', 0, _shorten(f'type={requested}; counts={" ,".join(totals)}'))
+    except Exception:
+        pass
     return jsonify({'success': True, 'downloads': out})

@@ -8,7 +8,7 @@ import sqlite3
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, make_response
 from database_enhanced import (
     create_user, authenticate_user, create_session,
-    get_user_by_session, delete_session, log_activity
+    get_user_by_session, delete_session, log_activity, is_password_change_required
 )
 from sync_config import METADATA_DB
 from sync.metadata_active_sql import perf_per_tech_union_sql_with_activity
@@ -124,8 +124,8 @@ def login_page():
 
 @auth_bp.route('/register')
 def register_page():
-    """Render registration page"""
-    return render_template('register.html')
+    """Registration is disabled for internal-only deployment."""
+    return redirect(url_for('auth.login_page'))
 
 @auth_bp.route('/dashboard')
 def dashboard():
@@ -147,29 +147,8 @@ def dashboard():
 
 @auth_bp.route('/api/register', methods=['POST'])
 def register():
-    """Register a new user"""
-    try:
-        data = request.get_json()
-        username = data.get('username')
-        email = data.get('email')
-        password = data.get('password')
-
-        if not all([username, email, password]):
-            return jsonify({'error': 'All fields are required'}), 400
-
-        user_id = create_user(username, email, password)
-
-        if user_id:
-            log_activity(user_id, 'register', f'User {username} registered')
-            return jsonify({
-                'success': True,
-                'message': 'Registration successful'
-            })
-        else:
-            return jsonify({'error': 'Username or email already exists'}), 400
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    """Registration is disabled."""
+    return jsonify({'error': 'Self-registration is disabled. Contact administrator.'}), 403
 
 @auth_bp.route('/api/login', methods=['POST'])
 def login():
@@ -187,10 +166,15 @@ def login():
         if success and user:
             session_token = create_session((user.get('id') if isinstance(user, dict) else user[0]))
             log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'login', f'User {username} logged in')
+            must_change_password = bool(user.get('must_change_password')) if isinstance(user, dict) else is_password_change_required({
+                'force_password_change': user[8] if len(user) > 8 else 1,
+                'password_changed_at': user[7] if len(user) > 7 else None,
+            })
 
             response = make_response(jsonify({
                 'success': True,
                 'message': 'Login successful',
+                'must_change_password': must_change_password,
                 'user': {
                     'username': (user.get('username') if isinstance(user, dict) else user[1]),
                     'email': (user.get('email') if isinstance(user, dict) else user[2]),

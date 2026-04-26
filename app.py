@@ -3,7 +3,7 @@ Nokia Configuration Manager - Modular Application
 Main application file with Blueprint architecture
 """
 
-from flask import Flask
+from flask import Flask, jsonify, redirect, request, url_for
 import os
 import sys
 
@@ -33,6 +33,9 @@ from config_history.routes import config_history_bp             # module: config
 from network_management.routes import network_management_bp     # module: network_management/
 from reports.routes import reports_bp                           # module: reports/
 from user_profile.routes import user_profile_bp                 # module: user_profile/
+from femto_pm.routes import femto_pm_bp                         # module: femto_pm/
+from task_scheduler.routes import task_scheduler_bp             # module: task_scheduler/
+from drive_test_viewer.routes import drive_test_viewer_bp       # module: drive_test_viewer/
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(xml_parser_bp)
@@ -47,6 +50,9 @@ app.register_blueprint(config_history_bp)
 app.register_blueprint(network_management_bp)
 app.register_blueprint(reports_bp)
 app.register_blueprint(user_profile_bp)
+app.register_blueprint(femto_pm_bp)
+app.register_blueprint(task_scheduler_bp)
+app.register_blueprint(drive_test_viewer_bp)
 
 # ============================================================================
 # ERROR HANDLERS
@@ -67,6 +73,7 @@ def internal_error(error):
 # ============================================================================
 
 from database_enhanced import init_db, create_admin_user
+from database_enhanced import get_user_by_session, is_password_change_required
 
 # ============================================================================
 # DATA DB MIGRATIONS (SQLite files or PostgreSQL bootstrap)
@@ -96,7 +103,7 @@ except Exception as e:
 #   we already had, but we also allow disabling it entirely for local debugging.
 import os
 if os.environ.get('NCM_DISABLE_SCHEDULER') == '1':
-    print("[INFO] Sync scheduler disabled (NCM_DISABLE_SCHEDULER=1)")
+    print("[INFO] Sync scheduler disabled (NCM_DISABLE_SCHEDULER=1; includes remote pull watcher)")
 elif os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
     from sync.scheduler import start_scheduler
     try:
@@ -109,9 +116,40 @@ elif os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
 # MAIN
 # ============================================================================
 
+@app.before_request
+def enforce_password_rotation():
+    path = request.path or '/'
+    if path.startswith('/static/') or path.startswith('/favicon'):
+        return None
+    allowed_exact = {
+        '/login',
+        '/api/login',
+        '/api/logout',
+        '/profile',
+        '/api/profile/change-password',
+    }
+    if path in allowed_exact or path.startswith('/user_profile/static/'):
+        return None
+
+    session_token = request.cookies.get('session_token')
+    if not session_token:
+        return None
+    user = get_user_by_session(session_token)
+    if not user:
+        return None
+    if not is_password_change_required(user):
+        return None
+
+    if path.startswith('/api/'):
+        return jsonify({
+            'error': 'Password change required. Please update your password.',
+            'password_change_required': True,
+        }), 403
+    return redirect(url_for('user_profile.profile_page', force_password_change=1))
+
 if __name__ == '__main__':
     print("=" * 60)
-    print("Nokia Configuration Manager - Modular Version")
+    print("PrimeNet - Network Performance & Configuration Platform")
     print("=" * 60)
     print("Starting server...")
     print("Dashboard: http://localhost:5000/dashboard")

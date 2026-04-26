@@ -11,7 +11,10 @@
         <header>
             <div class="header-content">
                 <div class="header-left">
-                    <h1>PrimeNet</h1>
+                    <h1 class="brand-title">
+                        <img src="{{ url_for('static', filename='images/favicon.png') }}?v=4" alt="PrimeNet logo" class="brand-title-logo">
+                        <span>PrimeNet</span>
+                    </h1>
                     <p>Network Performance &amp; Configuration Platform</p>
                 </div>
                 <div class="header-right">
@@ -19,7 +22,7 @@
                         <span class="user-greeting">Welcome, <strong>{{ user.username }}</strong></span>
                         <div class="header-actions">
                             <a href="{{ url_for('user_profile.profile_page') }}" class="btn-header">Settings</a>
-                            {% if user.role == 'admin' %}
+                            {% if user.role in ['admin', 'noc_sys'] %}
                             <a href="/admin-panel" class="btn-header btn-header-admin">Admin</a>
                             {% endif %}
                             <button type="button" onclick="logout()" class="btn-header btn-header-outline">Logout</button>
@@ -75,17 +78,26 @@
                     <a href="/performance" class="function-card">
                         <div class="function-icon">📈</div>
                         <div class="function-name">Analytics</div>
-                        <div class="function-description">Cell-level KPI trends, analytics and performance monitoring</div>
                     </a>
                     <a href="/network-map" class="function-card">
                         <div class="function-icon">🗺️</div>
                         <div class="function-name">Network Map</div>
-                        <div class="function-description">Live interactive map of network sites, sectors and KPIs</div>
+                    </a>
+                    <a href="/neighbor-analysis" class="function-card">
+                        <div class="function-icon">🧭</div>
+                        <div class="function-name">Neighbor Analysis</div>
                     </a>
                     <a href="/reports" class="function-card">
                         <div class="function-icon">📊</div>
                         <div class="function-name">Report Generation</div>
-                        <div class="function-description">Generate and download Excel reports for site inventory, KPIs, and conflicts</div>
+                    </a>
+                    <a href="/conflict-map" class="function-card">
+                        <div class="function-icon">🛰️</div>
+                        <div class="function-name">Conflict Map</div>
+                    </a>
+                    <a href="/femto-pm" class="function-card">
+                        <div class="function-icon">📶</div>
+                        <div class="function-name">Femto PM</div>
                     </a>
                 </div>
             </div>
@@ -96,32 +108,22 @@
                     <a href="/parameter-dictionary" class="function-card">
                         <div class="function-icon">📚</div>
                         <div class="function-name">Parameter Dictionary</div>
-                        <div class="function-description">Browse and search network element parameter database</div>
                     </a>
                     <a href="/xml-parser" class="function-card">
                         <div class="function-icon">📄</div>
                         <div class="function-name">XML Parser</div>
-                        <div class="function-description">Parse XML files and convert to Excel format</div>
                     </a>
                     <a href="/excel-generator" class="function-card">
                         <div class="function-icon">📊</div>
-                        <div class="function-name">Excel Generator</div>
-                        <div class="function-description">Generate XML files from Excel templates</div>
+                        <div class="function-name">XML Generator</div>
                     </a>
                     <a href="/ne-comparison" class="function-card">
                         <div class="function-icon">🔍</div>
                         <div class="function-name">NE Comparison</div>
-                        <div class="function-description">Compare XML configurations between network elements</div>
                     </a>
-                    <a href="/config-history" class="function-card">
-                        <div class="function-icon">🕒</div>
-                        <div class="function-name">Config Version History</div>
-                        <div class="function-description">Upload, track, diff, and restore XML configuration versions per NE</div>
-                    </a>
-                    <a href="/network-management" class="function-card">
-                        <div class="function-icon">⚠️</div>
-                        <div class="function-name">Network Management</div>
-                        <div class="function-description">PCI/PSC/BCCH conflict detection and site cell browser</div>
+                    <a href="/config-task-scheduler" class="function-card">
+                        <div class="function-icon">🗓️</div>
+                        <div class="function-name">Configuration Task Scheduler</div>
                     </a>
                 </div>
             </div>
@@ -129,10 +131,28 @@
         </main>
 
         <footer>
-            <p>&copy; 2024 PrimeNet | Network Performance &amp; Configuration Platform</p>
+            <p>&copy; 2025 PrimeNet | Network Performance &amp; Configuration Platform</p>
         </footer>
     </div>
 
+    <div id="legalStatementModal" class="legal-modal-overlay" style="display:none">
+        <div class="legal-modal">
+            <div class="legal-modal-header">
+                <h3>Legal Statement</h3>
+            </div>
+            <div class="legal-modal-body">
+                <p>Unauthorized access to or misuse of this system is prohibited and constitutes an offense under the Computer Misuse Act 1990.</p>
+                <p>Unauthorized access to information is defined within Zain Jo Security Standard "Information Security".</p>
+                <p>If you disclose customer or network information without authority you may be sacked and prosecuted.</p>
+                <p>Best Regards,<br>Malek Mohammad</p>
+                <div class="legal-modal-actions">
+                    <button type="button" class="btn-header" onclick="acknowledgeLegalStatement()">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.6"></script>
     <script>
         function openSection(name) {
             document.querySelectorAll('.section-panel').forEach(p => {
@@ -213,6 +233,36 @@
                 refreshBtn.textContent = defaultLabel;
             }
         }
+
+        function openLegalStatement() {
+            const modal = document.getElementById('legalStatementModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function acknowledgeLegalStatement() {
+            const modal = document.getElementById('legalStatementModal');
+            if (modal) {
+                modal.style.display = 'none';
+                sessionStorage.setItem('legalStatementAcknowledged', '1');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const maybeShowLegal = () => {
+                const alreadyAcknowledged = sessionStorage.getItem('legalStatementAcknowledged') === '1';
+                if (!alreadyAcknowledged) {
+                    openLegalStatement();
+                }
+            };
+            let legalShown = false;
+            const showOnce = () => {
+                if (legalShown) return;
+                legalShown = true;
+                maybeShowLegal();
+            };
+            document.addEventListener('primenet:page-enter-done', showOnce, { once: true });
+            setTimeout(showOnce, 700);
+        });
     </script>
 </body>
 </html>

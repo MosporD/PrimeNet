@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Task Scheduler - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('task_scheduler.static', filename='task_scheduler.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>Configuration Management Task Scheduler</h1>
+                <p>Schedule and track Huawei/Nokia configuration execution tasks</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="panel page-actions">
+            <div>
+                <h2>Tasks</h2>
+                <p class="muted">Tabular view of all submitted tasks and their status.</p>
+            </div>
+            {% if can_create_tasks %}
+            <button class="btn-primary" onclick="openCreateModal()">+ Add New Task</button>
+            {% endif %}
+        </div>
+
+        <div class="panel filter-panel">
+            <input type="text" id="taskSearch" placeholder="Search by task name, creator, or vendor" oninput="onFiltersChanged()">
+            <select id="statusFilter" onchange="onFiltersChanged()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="partial_completed">Partial Completed</option>
+                <option value="failed">Failed</option>
+            </select>
+            <select id="vendorFilter" onchange="onFiltersChanged()">
+                <option value="">All Vendors</option>
+                <option value="huawei">Huawei</option>
+                <option value="nokia">Nokia</option>
+                <option value="mixed">Mixed</option>
+            </select>
+            <select id="pageSize" onchange="onPageSizeChanged()">
+                <option value="5">5 / page</option>
+                <option value="10" selected>10 / page</option>
+                <option value="20">20 / page</option>
+                <option value="50">50 / page</option>
+            </select>
+        </div>
+
+        <div class="panel table-panel">
+            <table class="tasks-table">
+                <thead>
+                <tr>
+                    <th>Task Name</th>
+                    <th>Vendor</th>
+                    <th>Schedule</th>
+                    <th>Run Mode</th>
+                    <th>Status</th>
+                    <th>Created By</th>
+                    <th>Input Files</th>
+                    <th>Result Files</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="tasksTableBody">
+                <tr><td colspan="9" class="table-empty">Loading tasks...</td></tr>
+                </tbody>
+            </table>
+            <div class="table-pagination">
+                <button class="btn-small" id="prevPageBtn" onclick="goToPage(-1)">Prev</button>
+                <span id="pageInfo">Page 1 of 1</span>
+                <button class="btn-small" id="nextPageBtn" onclick="goToPage(1)">Next</button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="createTaskModal" class="modal-overlay" style="display:none">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Create Scheduler Task</h3>
+            <button type="button" class="modal-close" onclick="closeCreateModal()">✕</button>
+        </div>
+        <form id="createTaskForm" onsubmit="submitTask(event)">
+            <div class="form-grid">
+                <label>Task Name
+                    <input type="text" id="taskName" name="task_name" placeholder="username.YYYYMMDD">
+                </label>
+                <label>Vendor
+                    <select id="vendor" name="vendor" required onchange="updateVendorPolicyHint()">
+                        <option value="mixed">Mixed (Huawei + Nokia)</option>
+                        <option value="huawei">Huawei</option>
+                        <option value="nokia">Nokia</option>
+                    </select>
+                </label>
+                <label>Schedule
+                    <select id="scheduleMode" name="schedule_mode" onchange="onScheduleModeChange()" required>
+                        <option value="run_now">Run Now</option>
+                        <option value="scheduled">Schedule Time</option>
+                    </select>
+                </label>
+                <label id="scheduledAtWrapper" class="hidden">Scheduled Time
+                    <input type="datetime-local" id="scheduledAt" name="scheduled_at">
+                </label>
+                <label>Run Type
+                    <select id="runMode" name="run_mode" required>
+                        <option value="serial">Serial</option>
+                        <option value="parallel">Parallel</option>
+                    </select>
+                </label>
+                <label>Execution Order (optional)
+                    <input type="text" id="executionOrder" name="execution_order" placeholder="e.g. file1.xml,file2.xml">
+                </label>
+            </div>
+
+            <div class="file-block">
+                <label>Input Files / XMLs</label>
+                <input type="file" id="taskFiles" name="files" multiple required onchange="renderFileOrderInputs()">
+                <div id="vendorPolicyHint" class="policy-hint"></div>
+                <div id="fileOrderContainer" class="file-order-list"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn-primary">Create Task</button>
+                <button type="button" class="btn-secondary" onclick="closeCreateModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="finishTaskModal" class="modal-overlay" style="display:none">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Finish Task</h3>
+            <button type="button" class="modal-close" onclick="closeFinishModal()">✕</button>
+        </div>
+        <form id="finishTaskForm" onsubmit="submitFinishTask(event)">
+            <input type="hidden" id="finishTaskId">
+            <label>Completion Status
+                <select id="completionStatus" required>
+                    <option value="completed">Completed</option>
+                    <option value="partial_completed">Partial Completed</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </label>
+            <label>Completion Notes
+                <textarea id="completionNotes" rows="4" placeholder="Optional notes"></textarea>
+            </label>
+            <label>Result Files
+                <input type="file" id="resultFiles" multiple>
+            </label>
+            <div id="resultPolicyHint" class="policy-hint"></div>
+            <div class="modal-actions">
+                <button type="submit" class="btn-primary">Update Task</button>
+                <button type="button" class="btn-secondary" onclick="closeFinishModal()">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.1"></script>
+<script src="{{ url_for('task_scheduler.static', filename='task_scheduler.js') }}"></script>
+<script>
+async function logout() {
+    if (confirm('Logout?')) {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+}
+</script>
+</body>
+</html>

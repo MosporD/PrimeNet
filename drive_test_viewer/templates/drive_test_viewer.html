@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drive Test Viewer - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('drive_test_viewer.static', filename='drive_test_viewer.css') }}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>Drive Test Viewer</h1>
+                <p>Upload GPX + NMFS and visualize route trace</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dt-body">
+        <aside class="dt-left-panel">
+            <div class="panel coming-soon-panel">
+                <h3>Drive Test Viewer - Coming Soon</h3>
+                <p>
+                    This module is under active development. Full NMFS payload decoding and radio KPI visualization
+                    will be available in an upcoming release.
+                </p>
+            </div>
+
+            <div class="panel upload-panel">
+                <form id="dtUploadForm">
+                    <div class="form-grid">
+                        <label>GPX File
+                            <input type="file" id="gpxFile" name="gpx_file" accept=".gpx">
+                        </label>
+                        <label>NMFS File
+                            <input type="file" id="nmfsFile" name="nmfs_file" accept=".nmfs">
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Upload & View</button>
+                    </div>
+                </form>
+                <div id="uploadStatus" class="status-message"></div>
+            </div>
+
+            <div class="panel network-panel">
+                <h3>Network Sites</h3>
+                <div class="site-toggle-row">
+                    <button type="button" id="toggleSitesBtn" class="btn-secondary" onclick="toggleSitesLayer()">Load Sites</button>
+                    <span id="siteToggleHint" class="site-toggle-hint">Optional: load site layer if needed.</span>
+                </div>
+                <div class="site-filters">
+                    <input type="search" id="siteSearch" placeholder="Search site..." oninput="renderSiteList()">
+                    <select id="siteVendorFilter" onchange="loadSites()">
+                        <option value="">All Vendors</option>
+                        <option value="Nokia">Nokia</option>
+                        <option value="Huawei">Huawei</option>
+                    </select>
+                    <select id="siteTechFilter" onchange="loadSites()">
+                        <option value="">All Technologies</option>
+                        <option value="2G-2G">2G</option>
+                        <option value="3G-3G">3G</option>
+                        <option value="4G-FDD">4G-FDD</option>
+                        <option value="4G-TDD">4G-TDD</option>
+                        <option value="5G">5G</option>
+                    </select>
+                </div>
+                <div id="siteList" class="site-list"></div>
+                <div id="siteDetails" class="section-block">
+                    <p class="placeholder">Select a site to view site details.</p>
+                </div>
+            </div>
+
+            <div class="panel info-panel">
+                <h3>Parsed Drive Test Data</h3>
+                <div id="gpxSummary" class="section-block">
+                    <p class="placeholder">No GPX loaded yet.</p>
+                </div>
+                <div id="nmfsSummary" class="section-block">
+                    <p class="placeholder">No NMFS loaded yet.</p>
+                </div>
+            </div>
+        </aside>
+
+        <section class="dt-map-panel">
+            <div id="driveTestMap"></div>
+            <div class="playback-bar">
+                <button type="button" id="playPauseBtn" class="btn-secondary" onclick="togglePlayback()" disabled>Play</button>
+                <label for="playbackSpeed">Speed</label>
+                <select id="playbackSpeed" onchange="updatePlaybackSpeed()">
+                    <option value="250">4x</option>
+                    <option value="500" selected>2x</option>
+                    <option value="1000">1x</option>
+                    <option value="1500">0.67x</option>
+                </select>
+                <input type="range" id="playbackSlider" min="0" max="0" value="0" step="1" oninput="onPlaybackSliderChange()" disabled>
+                <span id="playbackLabel">0 / 0</span>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.1"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('drive_test_viewer.static', filename='drive_test_viewer.js') }}"></script>
+<script>
+async function logout() {
+    if (confirm('Logout?')) {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+}
+</script>
+</body>
+</html>

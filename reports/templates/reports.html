@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reports - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
-    <link rel="stylesheet" href="{{ url_for('reports.static', filename='reports.css') }}">
+    <link rel="stylesheet" href="{{ url_for('reports.static', filename='reports.css') }}?v=1.3">
 </head>
 <body>
 <div class="container">
@@ -29,6 +29,24 @@
         <section class="section">
             <h2>Generate Report</h2>
             <p class="section-description">Click a report type to generate and download an Excel file instantly.</p>
+            <div class="report-options-row">
+                <label for="site-inventory-tech">Site Inventory Technology:</label>
+                <select id="site-inventory-tech">
+                    <option value="all" selected>All Technologies</option>
+                    <option value="2G">2G</option>
+                    <option value="3G">3G</option>
+                    <option value="4G">4G (FDD + TDD)</option>
+                    <option value="5G">5G</option>
+                </select>
+            </div>
+            <div class="report-options-row">
+                <label for="pci-conflict-tech">PCI Conflict Technology:</label>
+                <select id="pci-conflict-tech">
+                    <option value="4G" selected>4G</option>
+                    <option value="3G">3G</option>
+                    <option value="5G">5G</option>
+                </select>
+            </div>
             <div class="report-cards" id="reportCards">
                 <!-- Populated by JS -->
             </div>
@@ -50,7 +68,8 @@
     </main>
 </div>
 
-<script src="{{ url_for('reports.static', filename='reports.js') }}"></script>
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.6"></script>
+<script src="{{ url_for('reports.static', filename='reports.js') }}?v=1.4"></script>
 <script>
 async function logout() {
     if (confirm('Logout?')) {

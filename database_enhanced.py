@@ -72,10 +72,21 @@ def init_db():
             department TEXT,
             role TEXT DEFAULT 'user',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            password_changed_at TIMESTAMP,
+            force_password_change BOOLEAN DEFAULT 1,
             last_login TIMESTAMP,
             is_active BOOLEAN DEFAULT 1
         )
     ''')
+    # Backward-compatible upgrades for existing SQLite user tables.
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN password_changed_at TIMESTAMP')
+    except Exception:
+        pass
+    try:
+        cursor.execute('ALTER TABLE users ADD COLUMN force_password_change BOOLEAN DEFAULT 1')
+    except Exception:
+        pass
     
     # Sessions table
     cursor.execute('''
@@ -196,6 +207,50 @@ def init_db():
         )
     ''')
 
+    # Configuration task scheduler tables
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS config_scheduler_tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_name TEXT NOT NULL,
+            vendor TEXT NOT NULL DEFAULT 'mixed',
+            schedule_mode TEXT NOT NULL DEFAULT 'run_now',
+            scheduled_at TIMESTAMP,
+            run_mode TEXT NOT NULL DEFAULT 'serial',
+            execution_order TEXT,
+            status TEXT NOT NULL DEFAULT 'pending',
+            completion_notes TEXT,
+            created_by INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (created_by) REFERENCES users(id)
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS config_scheduler_task_files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_id INTEGER NOT NULL,
+            original_file_name TEXT NOT NULL,
+            stored_file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            file_order INTEGER NOT NULL DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (task_id) REFERENCES config_scheduler_tasks(id) ON DELETE CASCADE
+        )
+    ''')
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS config_scheduler_result_files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            task_id INTEGER NOT NULL,
+            original_file_name TEXT NOT NULL,
+            stored_file_name TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            uploaded_by INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (task_id) REFERENCES config_scheduler_tasks(id) ON DELETE CASCADE,
+            FOREIGN KEY (uploaded_by) REFERENCES users(id)
+        )
+    ''')
+
     conn.commit()
     conn.close()
 
@@ -230,10 +285,11 @@ def create_user(username, email, password, full_name=None, department=None, role
         user_id = _insert_return_id(
             conn,
             '''
-            INSERT INTO users (username, email, password_hash, full_name, department, role)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO users (
+                username, email, password_hash, full_name, department, role, password_changed_at, force_password_change
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''',
-            (username, email, password_hash, full_name, department, role),
+            (username, email, password_hash, full_name, department, role, datetime.now(), 1),
         )
         conn.commit()
         conn.close()
@@ -260,6 +316,7 @@ def authenticate_user(username, password):
     user = cursor.fetchone()
 
     if user and verify_password(password, user['password_hash']):
+        must_change = is_password_change_required(dict(user))
         _exec(
             cursor,
             'UPDATE users SET last_login = ? WHERE id = ?',
@@ -267,7 +324,9 @@ def authenticate_user(username, password):
         )
         conn.commit()
         conn.close()
-        return True, dict(user)
+        out = dict(user)
+        out['must_change_password'] = must_change
+        return True, out
 
     conn.close()
     return False, None
@@ -789,7 +848,7 @@ def create_admin_user():
         success, user_id = create_user(
             username='admin',
             email='admin@company.com',
-            password='admin123',
+            password='PrimeNet@1234',
             full_name='System Administrator',
             department='IT',
             role='admin'
@@ -808,3 +867,34 @@ try:
         print('✓ Database initialized successfully')
 except Exception as e:
     print(f"⚠️  Warning: Could not auto-initialize database: {e}")
+
+
+def _parse_timestamp(value):
+    if not value:
+        return None
+    if isinstance(value, datetime):
+        return value
+    text = str(value).strip()
+    if not text:
+        return None
+    text = text.replace('T', ' ')
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M:%S.%f'):
+            try:
+                return datetime.strptime(text, fmt)
+            except ValueError:
+                continue
+    return None
+
+
+def is_password_change_required(user, max_days=60):
+    if not user:
+        return True
+    if user.get('force_password_change'):
+        return True
+    changed_at = _parse_timestamp(user.get('password_changed_at'))
+    if not changed_at:
+        return True
+    return datetime.now() - changed_at >= timedelta(days=max_days)

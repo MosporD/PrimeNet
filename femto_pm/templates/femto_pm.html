@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Femto PM - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('femto_pm.static', filename='femto_pm.css') }}?v=1.8">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="femto-pm-page">
+<div class="container femto-container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>📶 Femto PM</h1>
+                <p>Femto KPI monitoring and analysis</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="femto-body">
+        <aside class="femto-filter-panel">
+            <div class="femto-selector-block">
+                <button type="button" class="femto-selector-toggle" data-target="femto-object-block" aria-expanded="true">
+                    <span>Objects</span>
+                    <span class="femto-selector-arrow">▼</span>
+                </button>
+                <div id="femto-object-block" class="femto-selector-body">
+                    <div class="femto-control">
+                        <label for="femto-object-search">Object Search</label>
+                        <input id="femto-object-search" type="search" placeholder="Filter objects...">
+                    </div>
+                    <div class="femto-select-mode" role="radiogroup" aria-label="Object selection mode">
+                        <label class="femto-radio"><input type="radio" name="femto-sel-mode" value="single" checked> Single</label>
+                        <label class="femto-radio"><input type="radio" name="femto-sel-mode" value="multiple"> Multiple</label>
+                    </div>
+                    <div class="femto-object-meta"><span id="femto-object-count"></span></div>
+                    <div id="femto-object-list" class="femto-object-list"></div>
+                </div>
+            </div>
+            <div class="femto-catalog-wrap">
+                <section class="femto-selector-block">
+                    <button type="button" class="femto-selector-toggle" data-target="femto-kpi-block" aria-expanded="false">
+                        <span>KPIs</span>
+                        <span class="femto-selector-arrow">▶</span>
+                    </button>
+                    <div id="femto-kpi-block" class="femto-selector-body" style="display:none;">
+                        <div class="femto-control">
+                            <label for="femto-kpi-search">KPI Search</label>
+                            <input id="femto-kpi-search" type="search" placeholder="Filter computed KPIs...">
+                        </div>
+                        <div class="femto-kpi-actions">
+                            <label class="femto-select-all">
+                                <input type="checkbox" id="femto-kpi-select-all">
+                                <span>Select visible KPIs</span>
+                            </label>
+                            <span id="femto-kpi-count" class="femto-kpi-count"></span>
+                        </div>
+                        <div class="femto-kpi-list-wrap">
+                            <div class="femto-kpi-list-head">Computed KPIs</div>
+                            <div id="femto-kpi-list" class="femto-kpi-list"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="femto-selector-block">
+                    <button type="button" class="femto-selector-toggle" data-target="femto-counter-block" aria-expanded="false">
+                        <span>Counters</span>
+                        <span class="femto-selector-arrow">▶</span>
+                    </button>
+                    <div id="femto-counter-block" class="femto-selector-body" style="display:none;">
+                        <div class="femto-control">
+                            <label for="femto-counter-search">Counter Search</label>
+                            <input id="femto-counter-search" type="search" placeholder="Filter counters...">
+                        </div>
+                        <div class="femto-kpi-actions">
+                            <label class="femto-select-all">
+                                <input type="checkbox" id="femto-counter-select-all">
+                                <span>Select visible counters</span>
+                            </label>
+                            <span id="femto-counter-count" class="femto-kpi-count"></span>
+                        </div>
+                        <div class="femto-kpi-list-wrap">
+                            <div class="femto-kpi-list-head">Counters</div>
+                            <div id="femto-counter-list" class="femto-kpi-list"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <button id="femto-load-btn" class="btn-query" type="button">Load Chart</button>
+        </aside>
+
+        <main class="femto-charts-area">
+            <div class="femto-chart-wrap">
+                <div id="femto-status" class="femto-status">Select device and KPI(s), then click Load Chart.</div>
+                <div id="femto-chart-tabs-bar" class="femto-chart-tabs-bar" style="display:none;">
+                    <div id="femto-chart-tabs-strip" class="femto-chart-tabs-strip" role="tablist"></div>
+                </div>
+                <div id="femto-chart-grid" class="femto-chart-grid">
+                    <div class="femto-chart-empty">Select object(s) and KPI(s), then click Load Chart.</div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+<script src="{{ url_for('femto_pm.static', filename='femto_pm.js') }}?v=1.8"></script>
+</body>
+</html>
+

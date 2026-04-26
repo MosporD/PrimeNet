@@ -14,7 +14,7 @@
                 <div class="header-left">
                     <a href="/dashboard" class="back-link">← Dashboard</a>
                     <h1>⚙️ Admin Panel</h1>
-                    <p>User management and system administration</p>
+                    <p>User administration and system operations</p>
                 </div>
                 <div class="header-right">
                     <span class="user-name">{{ user.username }}</span>
@@ -40,12 +40,17 @@
             </div>
 
             <div class="admin-pages-nav" role="tablist" aria-label="Admin sections">
+                {% if can_manage_sync %}
                 <button class="admin-page-tab active" data-page="data-sync" type="button" onclick="openAdminPage('data-sync')">Data Sync</button>
                 <button class="admin-page-tab" data-page="sync-status" type="button" onclick="openAdminPage('sync-status')">Sync Status</button>
                 <button class="admin-page-tab" data-page="sync-history" type="button" onclick="openAdminPage('sync-history')">Sync History</button>
                 <button class="admin-page-tab" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
+                {% else %}
+                <button class="admin-page-tab active" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
+                {% endif %}
             </div>
 
+            {% if can_manage_sync %}
             <div class="admin-page-panel active" data-page="data-sync">
                 <div class="sync-section">
                     <h2 class="section-title">Data Sync</h2>
@@ -53,8 +58,13 @@
                         <button class="btn-sync nokia"  onclick="triggerSync('nokia_pm')">Sync Nokia PM</button>
                         <button class="btn-sync huawei" onclick="triggerSync('huawei_pm')">Sync Huawei PM</button>
                         <button class="btn-sync meta"   onclick="triggerSync('metadata')">Sync Metadata</button>
+                        <button class="btn-sync refresh" onclick="triggerSync('cells_hourly')">Refresh Cells - Hourly</button>
+                        <button class="btn-sync refresh" onclick="triggerSync('cells_daily')">Refresh Cells - Daily</button>
+                        <button class="btn-sync refresh" onclick="triggerSync('groups_hourly')">Refresh Groups - Hourly</button>
+                        <button class="btn-sync refresh" onclick="triggerSync('groups_daily')">Refresh Groups - Daily</button>
                         <button class="btn-sync test"   onclick="testConnectivity()">Test Connectivity</button>
                         <button class="btn-sync inspect" onclick="inspectLocal()">Inspect Column Headers</button>
+                        <button class="btn-sync inspect" onclick="loadPmLatestTimestamps()">PM — latest timestamps</button>
                     </div>
                     <div class="local-import-box">
                         <h3 class="section-subtitle">Import PM From Local Path</h3>
@@ -124,7 +134,18 @@
                     <h2 class="section-title">Recent Sync History</h2>
                     <h3 class="section-subtitle">Filters
                         <input type="date" id="sync-history-day" onchange="loadSyncHistory()" title="Filter history by day">
-                        <button class="btn-history-reload" onclick="clearSyncHistoryDay()">Clear Day</button>
+                        <select id="sync-history-type" onchange="loadSyncHistory()" title="Filter history by sync type">
+                            <option value="">All Types</option>
+                            <option value="cells_hourly">Cells - Hourly (manual)</option>
+                            <option value="cells_daily">Cells - Daily (manual)</option>
+                            <option value="groups_hourly">Groups - Hourly (manual)</option>
+                            <option value="groups_daily">Groups - Daily (manual)</option>
+                            <option value="raw_master_pull">Hourly Full Pipeline</option>
+                            <option value="daily_full_sync">Daily Full Pipeline</option>
+                            <option value="db_loader">DB Loader</option>
+                            <option value="metadata">Metadata</option>
+                        </select>
+                        <button class="btn-history-reload" onclick="clearSyncHistoryFilters()">Clear Filters</button>
                         <button class="btn-history-reload" onclick="loadSyncHistory()">↻ Refresh</button>
                     </h3>
                     <table class="sync-table">
@@ -145,14 +166,17 @@
                     <div id="sync-history-pagination" class="table-pagination"></div>
                 </div>
             </div>
+            {% endif %}
 
-            <div class="admin-page-panel" data-page="user-admin">
+            <div class="admin-page-panel {% if not can_manage_sync %}active{% endif %}" data-page="user-admin">
                 <div class="search-section">
                     <input type="text" id="user-search" placeholder="Search users..." onkeyup="searchUsers()">
                     <select id="role-filter" onchange="filterUsers()">
                         <option value="">All Roles</option>
-                        <option value="admin">Admin</option>
+                        <option value="admin">{{ role_labels['admin'] }}</option>
                         <option value="user">User</option>
+                        <option value="ran_config_user">{{ role_labels['ran_config_user'] }}</option>
+                        <option value="noc_sys">{{ role_labels['noc_sys'] }}</option>
                     </select>
                     <select id="status-filter" onchange="filterUsers()">
                         <option value="">All Status</option>

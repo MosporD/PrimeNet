@@ -36,19 +36,56 @@ _load_dotenv_if_present()
 DATABASES_ROOT = os.path.join(PROJECT_ROOT, 'databases')
 CELLS_DB_DIR = os.path.join(DATABASES_ROOT, 'cells')
 GROUPS_DB_DIR = os.path.join(DATABASES_ROOT, 'groups')
+CELLS_DAILY_DB_DIR = os.path.join(DATABASES_ROOT, 'Cells Daily')
+GROUPS_DAILY_DB_DIR = os.path.join(DATABASES_ROOT, 'Groups Daily')
+METADATA_DB_DIR = os.path.join(DATABASES_ROOT, 'metadata')
+ADMIN_DB_DIR = os.path.join(DATABASES_ROOT, 'admin')
+# Nokia neighbor KPI SQLite (handover relations for map neighbor analysis)
+NOKIA_NEIGHBOR_DB_DIR = os.path.join(DATABASES_ROOT, 'nokia', 'neighbors')
+NEIGHBOR_DB_DIR = NOKIA_NEIGHBOR_DB_DIR  # alias — same path
 os.makedirs(CELLS_DB_DIR, exist_ok=True)
 os.makedirs(GROUPS_DB_DIR, exist_ok=True)
+os.makedirs(CELLS_DAILY_DB_DIR, exist_ok=True)
+os.makedirs(GROUPS_DAILY_DB_DIR, exist_ok=True)
+os.makedirs(METADATA_DB_DIR, exist_ok=True)
+os.makedirs(ADMIN_DB_DIR, exist_ok=True)
+os.makedirs(NOKIA_NEIGHBOR_DB_DIR, exist_ok=True)
 
 NOKIA_PM_DB  = os.path.join(CELLS_DB_DIR, 'nokia_pm_cells.db')
 HUAWEI_PM_DB = os.path.join(CELLS_DB_DIR, 'huawei_pm_cells.db')
-METADATA_DB  = os.path.join(CELLS_DB_DIR, 'metadata.db')
-NCMUSERS_DB  = os.path.join(CELLS_DB_DIR, 'ncm_users.db')
+NOKIA_PM_DAILY_DB  = os.path.join(CELLS_DAILY_DB_DIR, 'nokia_pm_cells_daily.db')
+HUAWEI_PM_DAILY_DB = os.path.join(CELLS_DAILY_DB_DIR, 'huawei_pm_cells_daily.db')
+METADATA_DB  = os.path.join(METADATA_DB_DIR, 'metadata.db')
+NCMUSERS_DB  = os.path.join(ADMIN_DB_DIR, 'ncm_users.db')
+NEIGHBOR_KPI_DB = os.path.join(NOKIA_NEIGHBOR_DB_DIR, 'neighbor_kpis.db')
 NOKIA_GROUPS_DB = os.path.join(GROUPS_DB_DIR, 'nokia_cell_groups.db')
 HUAWEI_GROUPS_DB = os.path.join(GROUPS_DB_DIR, 'huawei_cell_groups.db')
+NOKIA_GROUPS_DAILY_DB = os.path.join(GROUPS_DAILY_DB_DIR, 'nokia_cell_groups_daily.db')
+HUAWEI_GROUPS_DAILY_DB = os.path.join(GROUPS_DAILY_DB_DIR, 'huawei_cell_groups_daily.db')
+KPI_DB_DIR = os.path.join(PROJECT_ROOT, 'raw', 'KPIs')
+os.makedirs(KPI_DB_DIR, exist_ok=True)
+KPI_HEADERS_DB = os.path.join(KPI_DB_DIR, 'kpi_headers.db')
 
 
 def _migrate_legacy_db_names():
     """One-time migration from legacy root DB names to databases/* subfolders."""
+    def _sqlite_copy_db(src: str, dst: str) -> bool:
+        try:
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            src_conn = sqlite3.connect(src, timeout=10)
+            try:
+                dst_conn = sqlite3.connect(dst, timeout=10)
+                try:
+                    src_conn.backup(dst_conn)
+                    dst_conn.commit()
+                finally:
+                    dst_conn.close()
+            finally:
+                src_conn.close()
+            return True
+        except Exception:
+            return False
+
     def _db_has_nonzero_rows(path: str) -> bool:
         try:
             conn = sqlite3.connect(path, timeout=5)
@@ -77,6 +114,11 @@ def _migrate_legacy_db_names():
         # Metadata / app DBs
         (os.path.join(PROJECT_ROOT, 'metadata.db'), METADATA_DB),
         (os.path.join(PROJECT_ROOT, 'ncm_users.db'), NCMUSERS_DB),
+        (os.path.join(PROJECT_ROOT, 'neighbor_kpis.db'), NEIGHBOR_KPI_DB),
+        (os.path.join(CELLS_DB_DIR, 'metadata.db'), METADATA_DB),
+        (os.path.join(CELLS_DB_DIR, 'ncm_users.db'), NCMUSERS_DB),
+        (os.path.join(CELLS_DB_DIR, 'neighbor_kpis.db'), NEIGHBOR_KPI_DB),
+        (os.path.join(DATABASES_ROOT, 'neighbor_kpis', 'neighbor_kpis.db'), NEIGHBOR_KPI_DB),
         # Group DBs
         (os.path.join(PROJECT_ROOT, 'nokia_cell_groups.db'), NOKIA_GROUPS_DB),
         (os.path.join(PROJECT_ROOT, 'huawei_cell_groups.db'), HUAWEI_GROUPS_DB),
@@ -93,8 +135,9 @@ def _migrate_legacy_db_names():
         try:
             os.replace(old_path, new_path)
         except OSError:
-            # Non-fatal: app can still work if caller handles path externally.
-            pass
+            # If file is in use, fallback to SQLite backup copy.
+            if not os.path.isfile(new_path) and _db_has_nonzero_rows(old_path):
+                _sqlite_copy_db(old_path, new_path)
 
 
 _migrate_legacy_db_names()
@@ -128,11 +171,42 @@ _PM_SYNC_RAW = (os.getenv('PM_SYNC_MODE', 'full') or 'full').strip().lower()
 PM_SYNC_FULL_CLEAR = _PM_SYNC_RAW not in ('incremental', 'incr', 'merge')
 
 # After each successful PM ingest, delete PM rows with timestamp older than N calendar days.
-# Default 7; set PM_RETENTION_DAYS=0 in .env to disable.
-PM_RETENTION_DAYS = _env_int('PM_RETENTION_DAYS', 7)
+# Default 9; set PM_RETENTION_DAYS=0 in .env to disable.
+PM_RETENTION_DAYS = _env_int('PM_RETENTION_DAYS', 9)
 
 # Rows per SQLite executemany batch inside _insert_df (tune for speed vs. memory).
 PM_INSERT_BATCH_SIZE = max(200, min(20000, _env_int('PM_INSERT_BATCH_SIZE', 2500)))
+
+# Master raw pull launcher interval (hours)
+# Runs scripts/pull_all_raw.py which clears raw folders then pulls Huawei/Nokia/Metadata.
+RAW_PULL_INTERVAL_HOURS = max(1, _env_int('RAW_PULL_INTERVAL_HOURS', 2))
+# Daily cycle trigger hour (24h clock) for daily raw+load job.
+DAILY_PULL_HOUR = max(0, min(23, _env_int('DAILY_PULL_HOUR', 7)))
+# scripts/watch_remote_new_files_and_pull.py — poll remote SFTP signatures; same env as the CLI script.
+PULL_WATCHER_POLL_INTERVAL_SEC = max(60, _env_int('WATCH_POLL_INTERVAL_SEC', 30 * 60))
+# Daily PM/groups DB retention window in days.
+DAILY_RETENTION_DAYS = max(1, _env_int('DAILY_RETENTION_DAYS', 60))
+
+# Femto PM SQLite: prune rows older than N days (wide + values tables). Set FEMTO_RETENTION_DAYS=0 to disable.
+FEMTO_RETENTION_DAYS = max(0, _env_int('FEMTO_RETENTION_DAYS', 30))
+
+
+def _env_bool_loader(key: str, default: bool) -> bool:
+    """Parse RAW_LOADER_* booleans: 0/false/full/replace vs 1/true/incremental/append."""
+    raw = (os.getenv(key) or '').strip().lower()
+    if raw in ('0', 'false', 'no', 'full', 'replace'):
+        return False
+    if raw in ('1', 'true', 'yes', 'incremental', 'append', 'incr'):
+        return True
+    return default
+
+
+# scripts/load_raw_csv_to_databases.py: for PM + group DBs, append rows not seen before
+# (dedupe via stable SHA-256 over sorted columns). Metadata snapshots stay full replace.
+RAW_LOADER_INCREMENTAL = _env_bool_loader('RAW_LOADER_INCREMENTAL', True)
+
+# Prefer rows with auto-detected date/time strictly after the table MAX(), then hash-dedupe.
+RAW_LOADER_TIME_FILTER = _env_bool_loader('RAW_LOADER_TIME_FILTER', True)
 
 _pg_driver_warned = False
 _postgres_unreachable = False
@@ -204,22 +278,22 @@ def probe_postgresql_at_startup(connect_timeout: int = 5) -> None:
 
 # ── Per-technology PM tables ────────────────────────────────────────────────
 # Each PM database stores data in separate tables per technology instead of
-# a single cell_kpis table.  Table names: "2G_Hourly", "3G_Hourly", etc.
+# a single cell_kpis table.  Table names: "2G_CELLS_HOURLY", etc.
 PM_TECHNOLOGIES = ['2G', '3G', '4G', '5G']
 
 def pm_table_name(technology):
     """Map a technology label to its PM database table name.
-    '4G', '4G-FDD', '4G-TDD', 'LTE' → '4G_Hourly', etc."""
+    '4G', '4G-FDD', '4G-TDD', 'LTE' → '4G_CELLS_HOURLY', etc."""
     tech = str(technology).upper().strip()
     if '5G' in tech or 'NR' in tech:
-        return '5G_Hourly'
+        return '5G_CELLS_HOURLY'
     if '4G' in tech or 'LTE' in tech:
-        return '4G_Hourly'
+        return '4G_CELLS_HOURLY'
     if '3G' in tech or 'WCDMA' in tech or 'UMTS' in tech:
-        return '3G_Hourly'
+        return '3G_CELLS_HOURLY'
     if '2G' in tech or 'GSM' in tech:
-        return '2G_Hourly'
-    return f'{tech}_Hourly'
+        return '2G_CELLS_HOURLY'
+    return f'{tech}_CELLS_HOURLY'
 
 # ============================================================
 # SERVER 1A — Nokia PM
@@ -241,6 +315,48 @@ NOKIA_PM_SERVER = {
     # Enable recursive newest-subfolder search by default.
     'descend_into_newest_subdir': os.getenv('NOKIA_PM_DESCEND_SUBDIR', '1').strip().lower()
     in ('1', 'true', 'yes', 'on'),
+}
+
+NOKIA_PM_DAILY_SERVER = {
+    'host':     NOKIA_PM_SERVER['host'],
+    'port':     NOKIA_PM_SERVER['port'],
+    'username': NOKIA_PM_SERVER['username'],
+    'password': NOKIA_PM_SERVER['password'],
+    'dirs': {
+        '2G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Daily/2G',
+        '3G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Daily/3G',
+        '4G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Daily/4G',
+        '5G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Daily/5G',
+    },
+    'descend_into_newest_subdir': os.getenv('NOKIA_PM_DAILY_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
+}
+
+# Nokia neighbor relation exports (2G / 3G / 4G only) — same SFTP host as PM.
+# Override the whole tree with NOKIA_NEIGHBOR_ROOT, or each RAT with NOKIA_NEIGHBOR_DIR_2G / _3G / _4G.
+_NEIGHBOR_ROOT_DEFAULT = (
+    '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Neighbor'
+)
+_NEIGHBOR_ROOT = (os.getenv('NOKIA_NEIGHBOR_ROOT') or _NEIGHBOR_ROOT_DEFAULT).strip() or _NEIGHBOR_ROOT_DEFAULT
+NOKIA_NEIGHBOR_SERVER = {
+    'host': NOKIA_PM_SERVER['host'],
+    'port': NOKIA_PM_SERVER['port'],
+    'username': NOKIA_PM_SERVER['username'],
+    'password': NOKIA_PM_SERVER['password'],
+    'dirs': {
+        '2G': os.getenv('NOKIA_NEIGHBOR_DIR_2G', f'{_NEIGHBOR_ROOT}/2G').strip() or f'{_NEIGHBOR_ROOT}/2G',
+        '3G': os.getenv('NOKIA_NEIGHBOR_DIR_3G', f'{_NEIGHBOR_ROOT}/3G').strip() or f'{_NEIGHBOR_ROOT}/3G',
+        '4G': os.getenv('NOKIA_NEIGHBOR_DIR_4G', f'{_NEIGHBOR_ROOT}/4G').strip() or f'{_NEIGHBOR_ROOT}/4G',
+    },
+    'descend_into_newest_subdir': os.getenv('NOKIA_NEIGHBOR_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
+}
+
+# SQLite table names for neighbor dumps (see scripts/load_nokia_neighbor_raw_to_db.py).
+# 2G/3G use one table each; 4G raw folder is split into intra-eNB vs inter-eNB slim tables.
+NOKIA_NEIGHBOR_TECH_TABLES = {
+    '2G': 'nokia_neighbor_2g',
+    '3G': 'nokia_neighbor_3g',
 }
 
 # Nokia KPI column mappings — per-technology dicts  (XLSX header → DB field name)
@@ -380,6 +496,16 @@ HUAWEI_PM_SERVER = {
     in ('1', 'true', 'yes', 'on'),
 }
 
+HUAWEI_PM_DAILY_SERVER = {
+    'host': HUAWEI_PM_SERVER['host'],
+    'port': HUAWEI_PM_SERVER['port'],
+    'username': HUAWEI_PM_SERVER['username'],
+    'password': HUAWEI_PM_SERVER['password'],
+    'remote_dir': '/export/home/omc/objectstorage/var/prs/result_file/malek.mohammad/Performance_Project_Daily/Performance Daily',
+    'descend_into_newest_subdir': os.getenv('HUAWEI_PM_DAILY_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
+}
+
 # ============================================================
 # GROUP FILE SOURCES (same SFTP credentials as PM sources)
 # ============================================================
@@ -405,6 +531,31 @@ HUAWEI_GROUPS_SERVER = {
     'password': HUAWEI_PM_SERVER['password'],
     'remote_dir': '/export/home/omc/objectstorage/var/prs/result_file/malek.mohammad/Performance_Project_Group/Performance Groups',
     'descend_into_newest_subdir': os.getenv('HUAWEI_GROUPS_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
+}
+
+NOKIA_GROUPS_DAILY_SERVER = {
+    'host': NOKIA_PM_SERVER['host'],
+    'port': NOKIA_PM_SERVER['port'],
+    'username': NOKIA_PM_SERVER['username'],
+    'password': NOKIA_PM_SERVER['password'],
+    'dirs': {
+        '2G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Groups Daily/2G',
+        '3G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Groups Daily/3G',
+        '4G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Groups Daily/4G',
+        '5G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project Groups Daily/5G',
+    },
+    'descend_into_newest_subdir': os.getenv('NOKIA_GROUPS_DAILY_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
+}
+
+HUAWEI_GROUPS_DAILY_SERVER = {
+    'host': HUAWEI_PM_SERVER['host'],
+    'port': HUAWEI_PM_SERVER['port'],
+    'username': HUAWEI_PM_SERVER['username'],
+    'password': HUAWEI_PM_SERVER['password'],
+    'remote_dir': '/export/home/omc/objectstorage/var/prs/result_file/malek.mohammad/Performance_Project_Groups_Daily/Performance Groups Daily',
+    'descend_into_newest_subdir': os.getenv('HUAWEI_GROUPS_DAILY_DESCEND_SUBDIR', '1').strip().lower()
     in ('1', 'true', 'yes', 'on'),
 }
 

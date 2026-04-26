@@ -316,6 +316,10 @@ def _populate_legacy_tables(conn, table_name, technology):
 # ---------------------------------------------------------------------------
 
 def run_metadata_sync(downloaded_files):
+    summary = {}
+    for key in (downloaded_files or {}):
+        summary[key] = {'status': 'skipped', 'reason': 'Metadata ingest disabled (reset mode)'}
+    return summary
     """
     downloaded_files: {filename_stem: [local_path, ...]}
 
@@ -363,6 +367,8 @@ def run_metadata_sync(downloaded_files):
 # ---------------------------------------------------------------------------
 
 def seed_pm_cells_to_metadata(pm_db_path, vendor):
+    logger.info('Metadata reset mode: seed_pm_cells_to_metadata disabled (%s, %s).', pm_db_path, vendor)
+    return 0
     """
     For every cell_name in a PM database not yet in metadata.db,
     insert a placeholder site + cell so cross-DB JOINs work before a
@@ -530,6 +536,9 @@ def _lte_duplex(duplex_raw, earfcn_raw):
 
 
 def process_metadata_file(file_path, tech, col_map):
+    del col_map
+    logger.info('Metadata reset mode: process_metadata_file disabled (%s, %s).', tech, file_path)
+    return 0, 0, 'Metadata ingest disabled (reset mode)'
     """
     Import a single metadata CSV/XLSX using an explicit column map.
     Used by import_local_files.py.

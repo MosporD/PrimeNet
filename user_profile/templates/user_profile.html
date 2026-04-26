@@ -68,12 +68,13 @@
                         </select>
                     </div>
                     <div class="pref-group toggle-row">
-                        <label class="pref-label">Compact tables</label>
+                        <label class="pref-label">PM Default View</label>
                         <label class="toggle">
                             <input type="checkbox" id="prefCompact">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
+                    <small class="field-hint">Off = Charts, On = PM Database table</small>
                     <button onclick="savePreferences()" class="btn-primary full-btn">Save Preferences</button>
                     <div id="prefStatus" class="status-message"></div>
                 </div>
@@ -87,8 +88,8 @@
                     <h3>Account Information</h3>
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" id="fieldUsername" class="form-input" disabled>
-                        <small class="field-hint">Username cannot be changed</small>
+                        <input type="text" id="fieldUsername" class="form-input">
+                        <small class="field-hint">You can update your username if it is unique.</small>
                     </div>
                     <div class="form-row-2">
                         <div class="form-group">
@@ -106,6 +107,13 @@
                     </div>
                     <button onclick="updateProfile()" class="btn-primary">Update Profile</button>
                     <div id="profileStatus" class="status-message"></div>
+                    <hr style="margin:16px 0;border:none;border-top:1px solid rgba(255,255,255,0.12);">
+                    <div class="form-group">
+                        <label>Profile Picture (approval required)</label>
+                        <input type="file" id="profilePhotoFile" class="form-input" accept=".png,.jpg,.jpeg,.webp">
+                        <button type="button" onclick="submitPhotoRequest()" class="btn-secondary" style="margin-top:8px;">Upload for Approval</button>
+                        <div id="photoStatus" class="status-message"></div>
+                    </div>
                 </div>
 
                 <!-- Change password -->
@@ -133,6 +141,7 @@
                     <div id="passwordStatus" class="status-message"></div>
                 </div>
 
+                {% if user.role == 'admin' %}
                 <!-- Recent activity -->
                 <div class="form-card">
                     <h3>Recent Activity</h3>
@@ -140,12 +149,14 @@
                         <div class="loading-spinner"></div>
                     </div>
                 </div>
+                {% endif %}
 
             </div>
         </div>
     </main>
 </div>
 
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
 <script src="{{ url_for('user_profile.static', filename='user_profile.js') }}"></script>
 <script>
 async function logout() {

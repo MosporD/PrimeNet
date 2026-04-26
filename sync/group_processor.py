@@ -92,13 +92,8 @@ def _build_metadata_index(vendor: str):
 
 
 def clear_groups_db(vendor: str):
-    db = _groups_db(vendor)
-    conn = sqlite3.connect(db, timeout=30)
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.execute('DELETE FROM group_cells')
-    conn.execute('DELETE FROM groups')
-    conn.commit()
-    conn.close()
+    logger.info('Groups reset mode: clear_groups_db disabled (%s).', vendor)
+    return
 
 
 def _upsert_group(conn, user_id: int, name: str, description: str = '', is_shared: int = 1) -> int:
@@ -121,6 +116,9 @@ def _upsert_group(conn, user_id: int, name: str, description: str = '', is_share
 
 
 def process_group_file(file_path: str, vendor: str, default_technology: str = '') -> dict:
+    del default_technology
+    logger.info('Groups reset mode: process_group_file disabled (%s, %s).', vendor, file_path)
+    return {'status': 'skipped', 'reason': 'Group ingest disabled (reset mode)'}
     ext = os.path.splitext(file_path)[1].lower()
     if ext == '.zip':
         tmp_dir = tempfile.mkdtemp(prefix='group_zip_')

@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 import sqlite3
 import sys
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -43,10 +44,36 @@ def execute_query(conn, sql: str, params=None):
     sql = adapt_placeholders(sql)
     params = params or ()
     if isinstance(conn, sqlite3.Connection):
-        return conn.execute(sql, params)
+        last_exc = None
+        for _ in range(3):
+            try:
+                return conn.execute(sql, params)
+            except sqlite3.OperationalError as exc:
+                if 'database is locked' not in str(exc).lower():
+                    raise
+                last_exc = exc
+                time.sleep(0.15)
+        raise last_exc
     cur = conn.cursor()
     cur.execute(sql, tuple(params))
     return cur
+
+
+def _configure_sqlite_conn(conn: sqlite3.Connection) -> sqlite3.Connection:
+    """
+    Favor user-read resilience while background sync/watcher writes are active.
+    WAL allows readers during writes; busy timeout/retries reduce lock errors.
+    """
+    conn.row_factory = sqlite3.Row
+    try:
+        conn.execute('PRAGMA journal_mode=WAL')
+    except Exception:
+        pass
+    try:
+        conn.execute('PRAGMA busy_timeout=120000')
+    except Exception:
+        pass
+    return conn
 
 
 def connect_app():
@@ -59,9 +86,8 @@ def connect_app():
             cur.execute(f'SET search_path TO {SCHEMA_APP}')
         conn.commit()
         return conn
-    conn = sqlite3.connect(NCMUSERS_DB, timeout=15)
-    conn.row_factory = sqlite3.Row
-    return conn
+    conn = sqlite3.connect(NCMUSERS_DB, timeout=120)
+    return _configure_sqlite_conn(conn)
 
 
 def connect_metadata():
@@ -74,10 +100,8 @@ def connect_metadata():
             cur.execute(f'SET search_path TO {SCHEMA_METADATA}')
         conn.commit()
         return conn
-    conn = sqlite3.connect(METADATA_DB, timeout=30)
-    conn.row_factory = sqlite3.Row
-    conn.execute('PRAGMA journal_mode=WAL')
-    return conn
+    conn = sqlite3.connect(METADATA_DB, timeout=120)
+    return _configure_sqlite_conn(conn)
 
 
 def connect_nokia_pm():
@@ -90,10 +114,8 @@ def connect_nokia_pm():
             cur.execute(f'SET search_path TO {SCHEMA_NOKIA_PM}')
         conn.commit()
         return conn
-    conn = sqlite3.connect(NOKIA_PM_DB, timeout=30)
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.row_factory = sqlite3.Row
-    return conn
+    conn = sqlite3.connect(NOKIA_PM_DB, timeout=120)
+    return _configure_sqlite_conn(conn)
 
 
 def connect_huawei_pm():
@@ -106,10 +128,8 @@ def connect_huawei_pm():
             cur.execute(f'SET search_path TO {SCHEMA_HUAWEI_PM}')
         conn.commit()
         return conn
-    conn = sqlite3.connect(HUAWEI_PM_DB, timeout=30)
-    conn.execute('PRAGMA journal_mode=WAL')
-    conn.row_factory = sqlite3.Row
-    return conn
+    conn = sqlite3.connect(HUAWEI_PM_DB, timeout=120)
+    return _configure_sqlite_conn(conn)
 
 
 def pm_union_alias(vendor: str) -> str:
@@ -127,9 +147,8 @@ def performance_meta_pm_conn(vendor: str | None):
     (SQLite: ``'pm'``, PostgreSQL: ``nokia_pm`` / ``huawei_pm`` schema name).
     """
     if not use_postgresql():
-        conn = sqlite3.connect(METADATA_DB, timeout=15)
-        conn.execute('PRAGMA journal_mode=WAL')
-        conn.row_factory = sqlite3.Row
+        conn = sqlite3.connect(METADATA_DB, timeout=120)
+        conn = _configure_sqlite_conn(conn)
         if vendor == 'Nokia':
             conn.execute(f"ATTACH DATABASE '{NOKIA_PM_DB}'  AS pm")
             return conn, 'pm'

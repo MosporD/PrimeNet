@@ -13,13 +13,23 @@ let syncHistoryPage = 1;
 const USERS_PAGE_SIZE = 12;
 const SYNC_PAGE_SIZE = 10;
 let progressPollTimer = null;
+const ROLE_LABELS = {
+    admin: 'Owner',
+    user: 'User',
+    ran_config_user: 'RNC User',
+    noc_sys: 'NOC SYS',
+};
 
 document.addEventListener('DOMContentLoaded', () => {
-    openAdminPage('data-sync');
+    const firstTab = document.querySelector('.admin-page-tab.active');
+    const firstPage = firstTab ? firstTab.getAttribute('data-page') : 'user-admin';
+    openAdminPage(firstPage || 'user-admin');
     loadAllUsers();
-    loadSyncStatus();
-    loadSyncHistory();
-    startProgressPolling();
+    if (document.querySelector('.admin-page-tab[data-page="data-sync"]')) {
+        loadSyncStatus();
+        loadSyncHistory();
+        startProgressPolling();
+    }
 });
 
 function openAdminPage(pageName) {
@@ -133,7 +143,7 @@ function displayUsers(users) {
             <td>${user.id}</td>
             <td><strong>${user.username}</strong></td>
             <td>${user.email}</td>
-            <td><span class="role-badge ${user.role}">${user.role}</span></td>
+            <td><span class="role-badge ${user.role}">${user.role_label || ROLE_LABELS[user.role] || user.role}</span></td>
             <td><span class="status-badge ${user.is_active ? 'active' : 'inactive'}">
                 ${user.is_active ? 'Active' : 'Inactive'}
             </span></td>
@@ -142,7 +152,7 @@ function displayUsers(users) {
             <td>
                 <div class="action-buttons">
                     <button class="action-btn role" onclick="toggleRole(${user.id}, '${user.role}')">
-                        ${user.role === 'admin' ? 'Make User' : 'Make Admin'}
+                        Change Role
                     </button>
                     <button class="action-btn status" onclick="toggleStatus(${user.id}, ${user.is_active})">
                         ${user.is_active ? 'Deactivate' : 'Activate'}
@@ -165,9 +175,13 @@ function updateStats(users) {
 }
 
 async function toggleRole(userId, currentRole) {
-    const newRole = currentRole === 'admin' ? 'user' : 'admin';
-
-    if (!confirm(`Change user role to ${newRole}?`)) {
+    const rolePrompt = `Enter role for this user:\n- admin (Owner)\n- user (User)\n- ran_config_user (RNC User)\n- noc_sys (NOC SYS)\nCurrent: ${currentRole}`;
+    const newRole = (prompt(rolePrompt, currentRole) || '').trim();
+    if (!newRole || newRole === currentRole) {
+        return;
+    }
+    if (!['admin', 'user', 'ran_config_user', 'noc_sys'].includes(newRole)) {
+        showNotification('Invalid role value', 'error');
         return;
     }
 
@@ -277,7 +291,7 @@ function hideSyncMsg() {
     }
 }
 
-function showSyncMsg(text, type, fileLines = []) {
+function showSyncMsg(text, type, fileLines = [], durationMs = 15000) {
     const el = document.getElementById('sync-msg');
     if (!el) return;
 
@@ -295,7 +309,7 @@ function showSyncMsg(text, type, fileLines = []) {
     if (syncMsgTimer) clearTimeout(syncMsgTimer);
     syncMsgTimer = setTimeout(() => {
         hideSyncMsg();
-    }, 15000);
+    }, durationMs);
 }
 
 async function fetchLatestDownloadedFiles(type) {
@@ -320,17 +334,40 @@ function renderSyncRows(rows, tbodyId) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No data</td></tr>';
         return;
     }
-    tbody.innerHTML = rows.map(r => `
+    tbody.innerHTML = rows.map((r, idx) => {
+        const isError = String(r.status || '').toLowerCase() === 'error';
+        const msg = r.message || '-';
+        const safeTitle = _escapeHtml(msg);
+        const shortMsg = _escapeHtml(msg);
+        const errorBtn = isError && msg && msg !== '-'
+            ? `<button class="btn-small btn-small-secondary" style="margin-left:8px;" onclick="showSyncHistoryError(${idx}, '${tbodyId}')">View</button>`
+            : '';
+        return `
         <tr>
             <td>${r.sync_type || ''}</td>
             <td>${r.technology || ''}</td>
             <td><span class="sync-badge ${r.status}">${r.status}</span></td>
             <td>${r.rows_affected != null ? r.rows_affected : '-'}</td>
             <td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
-                title="${r.message || ''}">${r.message || '-'}</td>
+                title="${safeTitle}">${shortMsg}${errorBtn}</td>
             <td>${r.started_at || '-'}</td>
         </tr>
-    `).join('');
+    `;
+    }).join('');
+}
+
+function showSyncHistoryError(index, tbodyId) {
+    try {
+        const list = tbodyId === 'sync-history-body' ? syncHistoryRows : syncStatusRows;
+        const start = tbodyId === 'sync-history-body'
+            ? (syncHistoryPage - 1) * SYNC_PAGE_SIZE
+            : (syncStatusPage - 1) * SYNC_PAGE_SIZE;
+        const row = list[start + Number(index)];
+        const message = (row && row.message) ? String(row.message) : 'No error details available.';
+        alert(message);
+    } catch (e) {
+        alert('Could not open error details.');
+    }
 }
 
 function renderPagination(containerId, totalItems, pageSize, currentPage, callbackName) {
@@ -397,9 +434,12 @@ async function loadSyncStatus() {
 async function loadSyncHistory() {
     try {
         const dayEl = document.getElementById('sync-history-day');
+        const typeEl = document.getElementById('sync-history-type');
         const day = dayEl && dayEl.value ? dayEl.value : '';
+        const syncType = typeEl && typeEl.value ? typeEl.value : '';
         const qs = new URLSearchParams({ limit: '100' });
         if (day) qs.set('day', day);
+        if (syncType) qs.set('sync_type', syncType);
         const res  = await fetch(`/api/sync/history?${qs.toString()}`);
         const data = await res.json();
         if (data.success) {
@@ -413,18 +453,24 @@ async function loadSyncHistory() {
     }
 }
 
-function clearSyncHistoryDay() {
+function clearSyncHistoryFilters() {
     const dayEl = document.getElementById('sync-history-day');
+    const typeEl = document.getElementById('sync-history-type');
     if (dayEl) dayEl.value = '';
+    if (typeEl) typeEl.value = '';
     loadSyncHistory();
 }
 
 async function triggerSync(type) {
-    // type: 'nokia_pm' | 'huawei_pm' | 'metadata'
+    // type: 'nokia_pm' | 'huawei_pm' | 'metadata' | category refresh keys
     const endpointMap = {
         nokia_pm:  '/api/sync/trigger/nokia_pm',
         huawei_pm: '/api/sync/trigger/huawei_pm',
         metadata:  '/api/sync/trigger/metadata',
+        cells_hourly: '/api/sync/trigger/cells_hourly',
+        cells_daily: '/api/sync/trigger/cells_daily',
+        groups_hourly: '/api/sync/trigger/groups_hourly',
+        groups_daily: '/api/sync/trigger/groups_daily',
     };
 
     const endpoint = endpointMap[type] || '/api/sync/trigger/pm';
@@ -437,7 +483,9 @@ async function triggerSync(type) {
         if (data.success) {
             // Give background trigger a short head start, then show latest downloaded files.
             await new Promise(resolve => setTimeout(resolve, 2200));
-            const latestFiles = await fetchLatestDownloadedFiles(type);
+            const latestFiles = (type === 'nokia_pm' || type === 'huawei_pm' || type === 'metadata')
+                ? await fetchLatestDownloadedFiles(type)
+                : [];
             showSyncMsg(data.message || 'Sync started in background.', 'success', latestFiles);
             // Refresh status after a short delay
             setTimeout(loadSyncStatus,  4000);
@@ -447,6 +495,55 @@ async function triggerSync(type) {
         }
     } catch (e) {
         showSyncMsg('Error: ' + e.message, 'error');
+    }
+}
+
+async function loadPmLatestTimestamps() {
+    showSyncMsg('Reading PM databases…', 'info', [], 45000);
+    try {
+        const res = await fetch('/api/admin/pm-latest-timestamps');
+        const data = await res.json();
+        if (!res.ok || data.error) {
+            showSyncMsg(data.error || `HTTP ${res.status}`, 'error', [], 20000);
+            return;
+        }
+        if (!data.success) {
+            showSyncMsg(data.error || 'Request failed', 'error', [], 20000);
+            return;
+        }
+        const lines = [];
+        (data.databases || []).forEach((d) => {
+            const pathInfo = d.path ? ` (${d.path})` : (d.schema ? ` (schema ${d.schema})` : '');
+            if (d.error) {
+                lines.push(`${d.label}: error — ${d.error}${pathInfo}`);
+                return;
+            }
+            if (!d.exists) {
+                lines.push(`${d.label}: no database file yet${pathInfo}`);
+                return;
+            }
+            const ts = d.last_timestamp || 'no data / no timestamp column';
+            const tbl = d.latest_table ? ` [table: ${d.latest_table}]` : '';
+            lines.push(`${d.label}: ${ts}${tbl}`);
+
+            // Detailed breakdown per table/technology for easier validation.
+            const details = Array.isArray(d.per_table) ? d.per_table : [];
+            if (!details.length) {
+                lines.push('  - no per-table timestamps found');
+                return;
+            }
+            const sorted = [...details].sort((a, b) => {
+                const ta = String(a?.table || '').toLowerCase();
+                const tb = String(b?.table || '').toLowerCase();
+                return ta.localeCompare(tb);
+            });
+            sorted.forEach((entry) => {
+                lines.push(`  - ${entry.table}: ${entry.last_timestamp || 'n/a'}`);
+            });
+        });
+        showSyncMsg('Latest timestamp in each PM database', 'success', lines, 60000);
+    } catch (e) {
+        showSyncMsg('Error: ' + e.message, 'error', [], 20000);
     }
 }
 

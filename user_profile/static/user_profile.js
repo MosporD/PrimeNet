@@ -1,9 +1,23 @@
+let _profileRole = '';
+
 window.addEventListener('DOMContentLoaded', () => {
+    maybeShowForcedPasswordNotice();
     loadProfile();
     loadPreferences();
-    loadActivity();
+    if (document.getElementById('activityList')) {
+        loadActivity();
+    }
     document.getElementById('newPassword').addEventListener('input', updateStrength);
 });
+
+function maybeShowForcedPasswordNotice() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('force_password_change') === '1') {
+        alert('Password change required: you must update your password now before using other modules.');
+        const section = document.querySelector('.form-card:nth-of-type(2)');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
 
 // ── Profile Load ──────────────────────────────────────────────────────────────
 async function loadProfile() {
@@ -12,6 +26,7 @@ async function loadProfile() {
     if (!data.success) return;
 
     const p = data.profile;
+    _profileRole = String(p.role || '').toLowerCase();
     document.getElementById('fieldUsername').value   = p.username || '';
     document.getElementById('fieldFullName').value   = p.full_name || '';
     document.getElementById('fieldDepartment').value = p.department || '';
@@ -25,11 +40,40 @@ async function loadProfile() {
     document.getElementById('memberSince').textContent  = p.created_at ? p.created_at.slice(0, 10) : '—';
     document.getElementById('lastLogin').textContent    = p.last_login ? p.last_login.slice(0, 16) : '—';
     document.getElementById('activityCount').textContent = (p.activity_count || 0).toLocaleString();
+    applyProfileEditPermissions();
+}
+
+function applyProfileEditPermissions() {
+    const restricted = _profileRole === 'user' || _profileRole === 'ran_config_user';
+    const fields = ['fieldUsername', 'fieldFullName', 'fieldDepartment', 'fieldEmail'];
+    fields.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = restricted;
+    });
+    const btn = document.querySelector('button[onclick="updateProfile()"]');
+    if (btn) {
+        btn.disabled = restricted;
+        btn.title = restricted ? 'Profile editing is disabled for your role.' : '';
+    }
+    const el = document.getElementById('profileStatus');
+    if (restricted && el && !el.textContent) {
+        el.className = 'status-message';
+        el.textContent = 'Profile updates are disabled for your role.';
+    }
 }
 
 // ── Update Profile ────────────────────────────────────────────────────────────
 async function updateProfile() {
+    if (_profileRole === 'user' || _profileRole === 'ran_config_user') {
+        const el = document.getElementById('profileStatus');
+        if (el) {
+            el.className = 'status-message error';
+            el.textContent = 'Profile details update is disabled for your role.';
+        }
+        return;
+    }
     const payload = {
+        username:   document.getElementById('fieldUsername').value.trim(),
         full_name:  document.getElementById('fieldFullName').value.trim(),
         department: document.getElementById('fieldDepartment').value.trim(),
         email:      document.getElementById('fieldEmail').value.trim(),
@@ -48,6 +92,30 @@ async function updateProfile() {
     } else {
         el.className = 'status-message error';
         el.textContent = data.error || 'Update failed';
+    }
+}
+
+async function submitPhotoRequest() {
+    const fileInput = document.getElementById('profilePhotoFile');
+    const statusEl = document.getElementById('photoStatus');
+    const file = fileInput?.files?.[0];
+    if (!file) {
+        statusEl.className = 'status-message error';
+        statusEl.textContent = 'Please choose a picture first.';
+        return;
+    }
+    const fd = new FormData();
+    fd.append('photo', file);
+    try {
+        const res = await fetch('/api/profile/photo-request', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Upload failed');
+        statusEl.className = 'status-message success';
+        statusEl.textContent = data.message || 'Photo uploaded for approval.';
+        fileInput.value = '';
+    } catch (err) {
+        statusEl.className = 'status-message error';
+        statusEl.textContent = err.message || 'Upload failed';
     }
 }
 
@@ -72,6 +140,10 @@ async function changePassword() {
         document.getElementById('newPassword').value = '';
         document.getElementById('confirmPassword').value = '';
         updateStrength();
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('force_password_change') === '1') {
+            window.location.href = '/dashboard';
+        }
     } else {
         el.className = 'status-message error';
         el.textContent = data.error || 'Password change failed';
@@ -112,7 +184,13 @@ async function loadPreferences() {
     if (prefs.default_tab)    document.getElementById('prefDefaultTab').value    = prefs.default_tab;
     if (prefs.default_tech)   document.getElementById('prefDefaultTech').value   = prefs.default_tech;
     if (prefs.default_vendor) document.getElementById('prefDefaultVendor').value = prefs.default_vendor;
-    if (prefs.compact_tables) document.getElementById('prefCompact').checked     = prefs.compact_tables;
+    const pmView = String(prefs.pm_view_mode || '').toLowerCase();
+    if (pmView === 'table' || pmView === 'charts') {
+        document.getElementById('prefCompact').checked = pmView === 'table';
+    } else if (typeof prefs.compact_tables === 'boolean') {
+        // Backward compatibility with old key.
+        document.getElementById('prefCompact').checked = prefs.compact_tables;
+    }
 }
 
 async function savePreferences() {
@@ -120,6 +198,8 @@ async function savePreferences() {
         default_tab:    document.getElementById('prefDefaultTab').value,
         default_tech:   document.getElementById('prefDefaultTech').value,
         default_vendor: document.getElementById('prefDefaultVendor').value,
+        pm_view_mode:   document.getElementById('prefCompact').checked ? 'table' : 'charts',
+        // Keep old key so existing integrations don't break.
         compact_tables: document.getElementById('prefCompact').checked,
     };
     const res  = await fetch('/api/profile/preferences', {
@@ -156,7 +236,7 @@ async function loadActivity() {
             <span class="activity-time">${(a.timestamp || '').slice(0, 16)}</span>
             <div>
                 <div class="activity-action">${formatAction(a.action)}</div>
-                <div class="activity-details">${a.details || ''}</div>
+                <div class="activity-details"><strong>${a.username || ('User #' + (a.user_id || '?'))}</strong> — ${a.details || ''}</div>
             </div>
         </div>
     `).join('');

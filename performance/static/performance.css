@@ -22,6 +22,33 @@ body.perf-page .perf-container {
     overflow: visible;
 }
 
+.perf-left-panel-toggle {
+    align-self: stretch;
+    width: 24px;
+    border: none;
+    border-right: 1px solid #d9dee4;
+    border-left: 1px solid #d9dee4;
+    background: #eef2f7;
+    color: #4b5563;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.perf-left-panel-toggle:hover {
+    background: #dfe6ef;
+    color: #1f2937;
+}
+
+.perf-body.left-collapsed #perf-left-panel {
+    display: none;
+}
+
+.perf-body.left-collapsed .perf-left-panel-toggle {
+    width: 28px;
+    background: #e5ecf5;
+}
+
 /* ============================================================
    LEFT: Filter Panel
 ============================================================ */
@@ -815,6 +842,136 @@ a.hw-toolbar-map:hover {
     gap: 12px;
 }
 
+.charts-header-bottom {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Day-over-day (DOD) + hourly chart mode bar */
+.perf-dod-bar {
+    flex-shrink: 0;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 16px 12px;
+    background: #eef3f8;
+    border-bottom: 1px solid #d5dde6;
+}
+
+.perf-dod-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 16px;
+}
+
+.perf-dod-row--modes {
+    justify-content: space-between;
+}
+
+.perf-dod-label {
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #5a6b7d;
+}
+
+.perf-dod-mode {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    align-items: center;
+}
+
+.perf-dod-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #2c3e50;
+    cursor: pointer;
+}
+
+.perf-dod-radio input {
+    accent-color: #3498db;
+}
+
+.perf-dod-days-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.perf-dod-empty {
+    padding: 1rem 1.25rem;
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+body.dark-mode .perf-dod-empty {
+    color: #9ca3af;
+}
+
+.perf-dod-hint {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6b7c8f;
+    line-height: 1.35;
+    max-width: 720px;
+}
+
+.perf-dod-days {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    align-items: center;
+}
+
+.perf-dod-day-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid #c8d4e0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.perf-dod-day-chip input {
+    accent-color: #27ae60;
+}
+
+body.dark-mode .perf-dod-bar {
+    background: #1a2432;
+    border-bottom-color: #304158;
+}
+
+body.dark-mode .perf-dod-label {
+    color: #9eb0c4;
+}
+
+body.dark-mode .perf-dod-radio,
+body.dark-mode .perf-dod-day-chip {
+    color: #e7edf5;
+}
+
+body.dark-mode .perf-dod-day-chip {
+    background: #121b24;
+    border-color: #3a5068;
+}
+
+body.dark-mode .perf-dod-hint {
+    color: #a9b7c9;
+}
+
 .charts-header-titles {
     min-width: 0;
     flex: 1 1 auto;
@@ -835,6 +992,41 @@ a.hw-toolbar-map:hover {
     border-bottom: 1px solid #9aa0a6;
     padding: 4px 4px 0 6px;
     min-height: 36px;
+}
+
+.perf-kpi-category-tabs-bar {
+    display: flex;
+    align-items: center;
+    background: #f7f9fb;
+    border-bottom: 1px solid #dfe5eb;
+    padding: 6px 8px;
+    min-height: 36px;
+}
+
+.perf-kpi-category-tabs-strip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    flex: 1;
+    min-width: 0;
+}
+
+.perf-kpi-category-tab {
+    border: 1px solid #cfd8e3;
+    border-radius: 999px;
+    background: #fff;
+    color: #4b5563;
+    padding: 5px 12px;
+    font-size: 0.76em;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.perf-kpi-category-tab.active {
+    background: #3498db;
+    border-color: #3498db;
+    color: #fff;
 }
 
 .perf-chart-tabs-strip {
@@ -1100,14 +1292,42 @@ a.hw-toolbar-map:hover {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     padding: 16px 18px;
     min-width: 0;   /* prevent grid overflow */
+    position: relative;
 }
 
 .kpi-chart-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     gap: 8px;
+    padding-right: 122px;
+}
+
+.kpi-chart-top-controls {
+    position: absolute;
+    top: 10px;
+    right: 42px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.kpi-chart-card:hover .kpi-chart-top-controls {
+    opacity: 1;
+}
+
+.kpi-chart-top-controls .perf-report-select {
+    min-width: 66px;
+    width: 66px;
+    padding: 1px 4px;
+    font-size: 0.68rem;
+    line-height: 1.1;
+    height: 20px;
+    border-radius: 6px;
 }
 
 .kpi-chart-name {
@@ -1136,7 +1356,92 @@ a.hw-toolbar-map:hover {
 
 .kpi-chart-canvas-wrap {
     position: relative;
-    height: 170px;
+    height: 340px;
+}
+
+.chart-gear-btn {
+    position: static;
+    border: 1px solid #dce1e7;
+    background: #fff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    line-height: 24px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.chart-gear-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.perf-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.perf-modal-card {
+    width: min(760px, 92vw);
+    max-height: 88vh;
+    overflow: auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+    padding: 14px;
+}
+
+.perf-modal-card-wide { width: min(980px, 94vw); }
+
+.perf-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.perf-modal-close {
+    border: none;
+    background: transparent;
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+.perf-modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 14px;
+}
+
+.perf-config-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.perf-config-col {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.perf-config-title {
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.perf-config-list {
+    max-height: 320px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 /* Loading state */
@@ -1342,6 +1647,7 @@ a.hw-toolbar-map:hover {
 
 @media (max-width: 900px) {
     .perf-body { flex-direction: column; min-height: 0; }
+    .perf-left-panel-toggle { display: none; }
     .filter-panel {
         width: 100%;
         flex-direction: row;
@@ -1356,7 +1662,7 @@ a.hw-toolbar-map:hover {
     .filter-group { min-width: 130px; flex: 1; }
     .filter-panel.perf-filter-hw { width: 100%; }
     .charts-area {
-        min-height: min(400px, 45vh);
+        min-height: min(400px, 80vh);
         height: auto;
         align-self: stretch;
     }

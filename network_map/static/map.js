@@ -1,26 +1,33 @@
 /**
  * Network Map – Leaflet visualization
  * Sites → sector wedges drawn per cell (azimuth-aligned)
- * Tech filter: All / 2G / 3G / 4G / 4G-FDD / 4G-TDD / 5G
+ * Tech filter: All / 2G / 3G / 4G-FDD / 4G-TDD / 5G.
  */
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const TECH_COLORS = {
-    '2G':     '#7f8c8d',
-    '3G':     '#27ae60',
-    '4G-FDD': '#1a5276',
-    '4G-TDD': '#148f77',
-    '5G':     '#9b59b6',
+    '2G-2G':         '#7f8c8d',
+    '3G-3G':         '#27ae60',
+    '4G-4G Intra-eNB': '#1a5276',
+    '4G-4G Inter-eNB': '#8e44ad',
+    '4G-4G Intra':     '#1a5276',
+    '4G-4G Inter':     '#8e44ad',
+    '2G':            '#7f8c8d',
+    '3G':            '#27ae60',
+    '4G-FDD':        '#1a5276',
+    '4G-TDD':        '#148f77',
+    '5G':            '#9b59b6',
 };
 
-// Note: We intentionally do NOT expose generic "4G" in the UI.
-// Any legacy 4G rows are normalized to 4G-FDD by the backend map APIs.
 const TECH_ORDER = ['2G', '3G', '4G-FDD', '4G-TDD', '5G'];
+
+/** Sort order for cells in the site panel (actual ``technology`` field from API). */
+const CELL_TECH_SORT_ORDER = ['2G', '3G', '4G-FDD', '4G-TDD', '5G'];
 
 const DEFAULT_CENTER = [31.9539, 35.9106];   // Amman, Jordan
 const DEFAULT_ZOOM   = 10;
-const SECTOR_RADIUS_M = 600;                 // wedge radius in metres
+const SECTOR_RADIUS_M = 240;                 // wedge radius in metres (was 600; scaled to 0.4×)
 const SECTOR_BEAMWIDTH = 65;                 // 3 dB beamwidth in degrees
 
 // Cluster number → Area name  (cluster = Math.floor(site_id / 100))
@@ -50,10 +57,20 @@ let sitesData        = [];
 let siteMarkers      = [];
 let sectorLayers     = [];
 let activeTech       = 'all';
+let lastLoadedScopeKey = '';
 let highlightMarkers = [];
 let highlightLayers  = [];
 let codeSearchTimer  = null;
 let activeTechSpecific = 'all';
+let selectedSiteId = null;
+let selectedNeighborCell = '';
+let neighborEnabled = false;
+let neighborLinesLayer = null;
+let neighborLineData = [];
+let mapModule = 'site-explorer';
+/** When a site is opened: { site, wedgeCells } for redrawing wedges in Neighbor Explorer. */
+let lastNeighborSiteContext = null;
+const NEIGHBOR_ONLY_MODE = document.body.classList.contains('neighbor-only-page');
 
 // Map wedge group id -> group payload (cells + site context)
 let wedgeGroups = {};
@@ -110,6 +127,15 @@ function initializeMap() {
     if (map) { map.invalidateSize(); return; }
 
     map = L.map('network-map').setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+    neighborLinesLayer = L.layerGroup().addTo(map);
+    if (NEIGHBOR_ONLY_MODE) {
+        mapModule = 'neighbor-explorer';
+        neighborEnabled = true;
+        const modSel = document.getElementById('map-module-select');
+        if (modSel) modSel.value = 'neighbor-explorer';
+        const controls = document.getElementById('neighbor-controls');
+        if (controls) controls.style.display = '';
+    }
 
     // Base map styles
     const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -155,6 +181,7 @@ function initializeMap() {
     loadNetworkStats().then(() => {
         _showEmptyState();
         _wireInitialFilterListeners();
+        updateNeighborMetricHint();
     });
 }
 
@@ -167,7 +194,8 @@ async function loadNetworkStats() {
         if (!data.success) return;
 
         const s = data.stats;
-        document.getElementById('sites-count').textContent = s.total_sites;
+        const sitesCountEl = document.getElementById('sites-count');
+        if (sitesCountEl) sitesCountEl.textContent = s.total_sites;
 
         buildTechButtons(s.tech_counts || {});
     } catch (e) {
@@ -179,28 +207,43 @@ function buildTechButtons(counts) {
     const container = document.getElementById('tech-filter');
     if (!container) return;
 
-    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    const opts = NEIGHBOR_ONLY_MODE
+        ? [
+            { value: '2G-2G', label: '2G-2G', count: Number(counts['2G']) || 0, color: TECH_COLORS['2G'] || '#7f8c8d' },
+            { value: '3G-3G', label: '3G-3G', count: Number(counts['3G']) || 0, color: TECH_COLORS['3G'] || '#27ae60' },
+            { value: '4G-4G Intra-eNB', label: '4G-4G Intra-eNB', count: Number(counts['4G-FDD']) || 0, color: TECH_COLORS['4G-4G Intra-eNB'] || '#1a5276' },
+            { value: '4G-4G Inter-eNB', label: '4G-4G Inter-eNB', count: Number(counts['4G-FDD']) || 0, color: TECH_COLORS['4G-4G Inter-eNB'] || '#8e44ad' },
+        ]
+        : TECH_ORDER.map((tech) => ({
+            value: tech,
+            label: tech,
+            count: Number(counts[tech]) || 0,
+            color: TECH_COLORS[tech] || '#3498db',
+        }));
+
+    const total = NEIGHBOR_ONLY_MODE
+        ? (Number(counts['2G']) || 0) + (Number(counts['3G']) || 0) + (Number(counts['4G-FDD']) || 0)
+        : opts.reduce((sum, o) => sum + o.count, 0);
 
     let html = `<button class="tech-btn${activeTech === 'all' ? ' active' : ''}" data-tech="all"
                         onclick="setTechFilter('all')">
                   All <span class="tech-count">${total}</span>
                 </button>`;
 
-    TECH_ORDER.forEach(tech => {
-        if (!counts[tech]) return;
-        const color    = TECH_COLORS[tech] || '#3498db';
-        const isActive = activeTech === tech ? ' active' : '';
-        html += `<button class="tech-btn${isActive}" data-tech="${tech}"
-                         style="--tc:${color}"
-                         onclick="setTechFilter('${tech}')">
-                   ${tech} <span class="tech-count">${counts[tech]}</span>
+    opts.forEach((opt) => {
+        if (!opt.count) return;
+        const isActive = activeTech === opt.value ? ' active' : '';
+        html += `<button class="tech-btn${isActive}" data-tech="${opt.value}"
+                         style="--tc:${opt.color}"
+                         onclick="setTechFilter('${opt.value}')">
+                   ${opt.label} <span class="tech-count">${opt.count}</span>
                  </button>`;
     });
 
     container.innerHTML = html;
 }
 
-function setTechFilter(tech) {
+async function setTechFilter(tech) {
     activeTech = tech;
     activeTechSpecific = 'all';
     document.querySelectorAll('.tech-btn').forEach(btn =>
@@ -208,19 +251,23 @@ function setTechFilter(tech) {
     );
     clearSectorLayers();
     clearHighlights();
+    clearNeighborOverlay();
+    selectedNeighborCell = '';
+    selectedSiteId = null;
+    lastNeighborSiteContext = null;
     document.getElementById('site-info-panel').style.display = 'none';
 
     const codeInput = document.getElementById('cell-code-search');
     if (codeInput) {
         codeInput.placeholder =
-            tech === '3G'                             ? 'Scrambling Code...' :
-            ['4G', '4G-FDD', '4G-TDD'].includes(tech)? 'PCI...'             :
-            tech === '5G'                             ? 'PCI...'             :
-            tech === '2G'                             ? 'BCCH...'            :
-                                                        'SC / PCI / BCCH...';
+            tech === '3G-3G' ? 'Scrambling Code...' :
+            tech === '4G-4G Intra-eNB' || tech === '4G-4G Inter-eNB' ||
+            tech === '4G-4G Intra' || tech === '4G-4G Inter' ? 'PCI...' :
+            tech === '2G-2G' ? 'BCCH...' :
+            'SC / PCI / BCCH...';
     }
-    updateTechSpecificFilter();
-    _onFilterChanged();
+    await updateTechSpecificFilter();
+    _onFilterChanged(false, true);
 }
 
 // ─── Cell operational state (`activity_status` from map APIs; `status` is alias) ─
@@ -256,10 +303,10 @@ function sitePinTitle(site) {
 
 /** Leaflet divIcon size/anchor: lat/lng aligns with center of the circular pin. */
 function sitePinIconMetrics() {
-    const labelH = 14;
-    const circle = 36;
+    const labelH = 12;
+    const circle = 26;
     const h = labelH + circle;
-    const w = 44;
+    const w = 72;
     return {
         iconSize: [w, h],
         iconAnchor: [w / 2, labelH + circle / 2],
@@ -288,8 +335,8 @@ function sitePinInnerHtml(site, { highlight = false } = {}) {
 
 function enrichSites(sites) {
     return sites.map(s => {
-        const cluster = Math.floor(s.site_id / 100);
-        const area    = CLUSTER_AREA[cluster] || 'Unknown';
+        const cluster = s.cluster != null ? s.cluster : Math.floor(s.site_id / 100);
+        const area = s.area || CLUSTER_AREA[cluster] || 'Unknown';
         return Object.assign({}, s, { cluster, area });
     });
 }
@@ -297,19 +344,65 @@ function enrichSites(sites) {
 // ─── Client-side filtering ────────────────────────────────────────────────────
 
 function applyClientFilters(sites) {
-    const term    = document.getElementById('site-search').value.toLowerCase();
     const vendor  = document.getElementById('vendor-filter').value;
     const area    = document.getElementById('area-filter').value;
     const cluster = document.getElementById('cluster-filter').value;
 
     return sites.filter(s => {
-        if (term && !s.site_name.toLowerCase().includes(term) &&
-                    !String(s.site_id).includes(term)) return false;
         if (vendor  !== 'all' && s.vendor          !== vendor)  return false;
         if (area    !== 'all' && s.area            !== area)    return false;
         if (cluster !== 'all' && String(s.cluster) !== cluster) return false;
         return true;
     });
+}
+
+function _zoomToSiteSearchMatches(sites) {
+    const term = String(document.getElementById('site-search')?.value || '').trim().toLowerCase();
+    if (!term || !map || !Array.isArray(sites) || !sites.length) return;
+
+    const matches = sites.filter((s) => {
+        const name = String(s.site_name || '').toLowerCase();
+        const sid = String(s.site_id || '').toLowerCase();
+        return name.includes(term) || sid.includes(term);
+    });
+    if (!matches.length) return;
+
+    // Always pick one best match and zoom in, instead of fitting all matches
+    // (fitBounds can zoom out too much on broad terms).
+    const ranked = matches
+        .map((s) => {
+            const name = String(s.site_name || '').toLowerCase();
+            const sid = String(s.site_id || '').toLowerCase();
+            let score = 0;
+            if (sid === term || name === term) score += 100;
+            if (sid.startsWith(term) || name.startsWith(term)) score += 30;
+            score += Math.max(0, 20 - Math.min(name.indexOf(term) >= 0 ? name.indexOf(term) : 999, sid.indexOf(term) >= 0 ? sid.indexOf(term) : 999));
+            return { site: s, score };
+        })
+        .sort((a, b) => b.score - a.score);
+
+    const best = ranked[0]?.site;
+    if (!best) return;
+    const lat = Number(best.latitude);
+    const lng = Number(best.longitude);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        map.setView([lat, lng], Math.max(map.getZoom(), 17));
+    }
+    // Open the matched site context so sector wedges are shown while searching.
+    showSiteDetails(best.site_id);
+}
+
+/** Map chip (2G/3G/4G-FDD/4G-TDD/5G) vs cell.technology from API. */
+function cellMatchesMapTechFilter(c) {
+    if (activeTech === 'all') return true;
+    const t = String(c.technology || '');
+    if (activeTech === '2G-2G') return t === '2G'; // backward compatibility
+    if (activeTech === '3G-3G') return t === '3G'; // backward compatibility
+    if (
+        activeTech === '4G-4G Intra-eNB' || activeTech === '4G-4G Inter-eNB' ||
+        activeTech === '4G-4G Intra' || activeTech === '4G-4G Inter'
+    ) return t === '4G-FDD';
+    return t === activeTech;
 }
 
 function runFilters() {
@@ -319,7 +412,9 @@ function runFilters() {
     }
     const filtered = applyClientFilters(sitesData);
     displaySites(filtered);
-    document.getElementById('sites-count').textContent = filtered.length;
+    const sitesCountEl = document.getElementById('sites-count');
+    if (sitesCountEl) sitesCountEl.textContent = filtered.length;
+    _zoomToSiteSearchMatches(filtered);
 }
 
 // ─── Site loading & display ───────────────────────────────────────────────────
@@ -329,8 +424,16 @@ async function loadNetworkSites() {
         if (!_hasActiveFilters()) {
             // Keep the map empty until a filter/search is applied.
             sitesData = [];
+            lastLoadedScopeKey = '';
             displaySites([]);
             _showEmptyState();
+            return;
+        }
+
+        const scopeKey = `${activeTech}|${activeTechSpecific}`;
+        const shouldFetchFromServer = !sitesData.length || lastLoadedScopeKey !== scopeKey;
+        if (!shouldFetchFromServer) {
+            runFilters();
             return;
         }
 
@@ -347,11 +450,12 @@ async function loadNetworkSites() {
         }
 
         sitesData = enrichSites(data.sites);
+        lastLoadedScopeKey = scopeKey;
 
         runFilters();
 
-        buildClusterFilter(sitesData);
         buildAreaFilter(sitesData);
+        buildClusterFilter(sitesData);
     } catch (e) {
         console.error('Sites error:', e);
         showNotification('Failed to load network sites', 'error');
@@ -381,31 +485,63 @@ function displaySites(sites) {
 
 // ─── Site detail: draw sector wedges ─────────────────────────────────────────
 
+/** One token per cell for wedge overlay (band / UARFCN / PCI fallback by tech). */
+function _wedgeCellBandLabel(c) {
+    const tech = String(c.technology || '');
+    let t = String(c.frequency_band != null ? c.frequency_band : '').trim();
+    if (t) {
+        t = t.replace(/\s+/g, ' ').replace(/^band\s*/i, 'B').replace(/\s*MHz\s*$/i, '').trim();
+        if (t.length > 14) t = `${t.slice(0, 13)}…`;
+        return t;
+    }
+    if (c.pci != null && /4G|LTE/i.test(tech)) return `PCI${c.pci}`;
+    if (c.pci != null && tech === '3G') return `SC${c.pci}`;
+    if (c.pci != null && tech === '2G') return `ARFCN${c.pci}`;
+    return tech || '—';
+}
+
+/** Map text on wedge: cell count + slash-separated band/category per cell (e.g. ``3 · L18/L21/B3``). */
+function _wedgeMapLabelText(group) {
+    const cells = Array.isArray(group.cells) ? group.cells : [];
+    const n = cells.length;
+    if (!n) return '';
+    const parts = cells.map(_wedgeCellBandLabel);
+    return `${n} · ${parts.join('/')}`;
+}
+
 async function showSiteDetails(siteId) {
     try {
         clearSectorLayers();
+        selectedSiteId = String(siteId || '');
         const res  = await fetch(`/api/map/site/${siteId}`);
         const data = await res.json();
         if (!data.success) return;
 
         const site = data.site;
 
-        // Enrich with cluster/area so the info panel can display them
-        const cluster = Math.floor(site.site_id / 100);
-        site.cluster  = cluster;
-        site.area     = CLUSTER_AREA[cluster] || 'Unknown';
+        // Prefer backend/site-list enriched cluster+area to avoid "Unknown" when inferred.
+        const sourceSite = sitesData.find(s => String(s.site_id) === String(site.site_id));
+        if (site.cluster == null && sourceSite?.cluster != null) site.cluster = sourceSite.cluster;
+        if (!site.area && sourceSite?.area) site.area = sourceSite.area;
+        if (site.cluster == null) site.cluster = Math.floor(site.site_id / 100);
+        if (!site.area) site.area = CLUSTER_AREA[site.cluster] || 'Unknown';
 
         // Filter to active tech; keep all when 'all'
         const cells = (activeTech === 'all')
             ? site.cells
-            : site.cells.filter(c => c.technology === activeTech);
+            : site.cells.filter(cellMatchesMapTechFilter);
 
         // Wedges only for on-air cells; offline cells stay in the list panel only.
         const wedgeCells = cells.filter(cellOperational);
-        const groups = _groupCellsIntoWedges(site, wedgeCells);
-        groups.forEach(g => drawSectorWedge(site, g));
+        lastNeighborSiteContext = { site, wedgeCells };
 
         displaySiteInfo(site, cells);
+        if (neighborEnabled) {
+            await refreshNeighborOverlay();
+        } else {
+            const groups = _groupCellsIntoWedges(site, wedgeCells);
+            groups.forEach(g => drawSectorWedge(site, g));
+        }
     } catch (e) {
         console.error('Site detail error:', e);
         showNotification('Failed to load site details', 'error');
@@ -462,7 +598,7 @@ function drawSectorWedge(site, group) {
               ${group.cells.map(c => {
                   const meta = `${c.frequency_band ? ' · ' + c.frequency_band : ''}${c.pci != null ? ' · PCI/SC/BCCH: ' + c.pci : ''}`;
                   if (cellOperational(c)) {
-                      return `<button onclick='showCellKPIs(${JSON.stringify(c.cell_name)})'
+                      return `<button onclick='showCellKPIs(${JSON.stringify({ cell_name: c.cell_name, technology: c.technology, vendor: c.vendor })})'
                         style="padding:6px 10px;background:${color};
                                color:white;border:none;border-radius:6px;cursor:pointer;
                                width:100%;font-weight:600;text-align:left;">
@@ -505,7 +641,7 @@ function drawSectorWedge(site, group) {
             </table>
             ${cellCount === 1 ? (
                 cellOperational(ref)
-                    ? `<button onclick='showCellKPIs(${JSON.stringify(ref.cell_name)})'
+                    ? `<button onclick='showCellKPIs(${JSON.stringify({ cell_name: ref.cell_name, technology: ref.technology, vendor: ref.vendor })})'
                       style="margin-top:10px;padding:6px 14px;background:${color};
                              color:white;border:none;border-radius:6px;cursor:pointer;
                              width:100%;font-weight:700;">
@@ -520,6 +656,29 @@ function drawSectorWedge(site, group) {
 
     polygon.on('click', e => { L.DomEvent.stopPropagation(e); polygon.openPopup(); });
     sectorLayers.push(polygon);
+
+    const wedgeLabelText = _wedgeMapLabelText(group);
+    if (wedgeLabelText) {
+        const labelDistM = SECTOR_RADIUS_M * 0.5;
+        const rLatL = labelDistM / 111320;
+        const rLngL = labelDistM / (111320 * Math.cos(site.latitude * Math.PI / 180));
+        const rad = az * Math.PI / 180;
+        const latL = site.latitude + rLatL * Math.cos(rad);
+        const lngL = site.longitude + rLngL * Math.sin(rad);
+        const labelIcon = L.divIcon({
+            className: 'wedge-sector-label-marker',
+            html: `<div class="wedge-sector-label-inner">${escapeHtml(wedgeLabelText)}</div>`,
+            iconSize: [168, 44],
+            iconAnchor: [84, 22],
+        });
+        const labelMk = L.marker([latL, lngL], {
+            icon: labelIcon,
+            interactive: false,
+            keyboard: false,
+            zIndexOffset: 450,
+        }).addTo(map);
+        sectorLayers.push(labelMk);
+    }
 }
 
 function clearSectorLayers() {
@@ -539,8 +698,8 @@ function displaySiteInfo(site, cells) {
     });
 
     let techHtml = '';
-    TECH_ORDER.concat(
-        Object.keys(byTech).filter(t => !TECH_ORDER.includes(t))
+    CELL_TECH_SORT_ORDER.concat(
+        Object.keys(byTech).filter(t => !CELL_TECH_SORT_ORDER.includes(t))
     ).forEach(tech => {
         if (!byTech[tech]) return;
         const color = TECH_COLORS[tech] || '#34495e';
@@ -550,7 +709,7 @@ function displaySiteInfo(site, cells) {
             const onAir = cellOperational(c);
             techHtml += `
             <div class="cell-row${onAir ? '' : ' cell-row-offline'}"
-                 ${onAir ? `onclick='showCellKPIs(${JSON.stringify(c.cell_name)})'` : ''}>
+                 ${onAir ? `onclick='showCellKPIs(${JSON.stringify({ cell_name: c.cell_name, technology: c.technology, vendor: c.vendor })})'` : ''}>
                 <span class="cell-name">${c.cell_name}</span>
                 ${onAir ? '' : '<span class="cell-offline-badge">Offline</span>'}
                 <span class="cell-meta">Az: ${c.azimuth ?? '—'}°</span>
@@ -586,18 +745,55 @@ function displaySiteInfo(site, cells) {
 
 // ─── Cell KPI modal ───────────────────────────────────────────────────────────
 
+/** When wedge payload omits ``technology``, neighbor chips scope LTE to FDD on the server (no TDD in HO stats). */
+function mapChipTechnologyForKpi(tech) {
+    if (!tech || tech === 'all') return '';
+    if ([
+        '2G-2G', '3G-3G',
+        '4G-4G Intra-eNB', '4G-4G Inter-eNB',
+        '4G-4G Intra', '4G-4G Inter',
+    ].includes(tech)) return tech;
+    return '';
+}
+
 async function showCellKPIs(cellId) {
     try {
+        const cellReq = (typeof cellId === 'object' && cellId !== null)
+            ? cellId
+            : { cell_name: cellId };
+        const cellName = String(cellReq.cell_name || '');
+        const cellTechRaw = String(cellReq.technology || '').trim();
+        const cellVendor = String(cellReq.vendor || '');
+        const techForQuery = cellTechRaw || mapChipTechnologyForKpi(activeTech);
+        if (typeof cellId !== 'number') {
+            selectedNeighborCell = cellName;
+            if (neighborEnabled) await refreshNeighborOverlay();
+        }
         const url = (typeof cellId === 'number')
             ? `/api/map/cell/${cellId}/kpis`
-            : `/api/map/cell/kpis?cell_name=${encodeURIComponent(String(cellId))}`;
+            : `/api/map/cell/kpis?cell_name=${encodeURIComponent(cellName)}`
+                + (techForQuery ? `&technology=${encodeURIComponent(techForQuery)}` : '')
+                + (cellVendor ? `&vendor=${encodeURIComponent(cellVendor)}` : '');
 
-        const res  = await fetch(url);
-        const data = await res.json();
-        if (!data.success) return;
+        const res = await fetch(url);
+        let data;
+        try {
+            data = await res.json();
+        } catch (_) {
+            showNotification('Could not read KPI response', 'error');
+            return;
+        }
+        if (!data.success) {
+            showNotification(
+                data.error || (res.status === 404 ? 'Cell not found for this filter' : 'Could not load KPIs'),
+                res.status === 404 ? 'info' : 'error'
+            );
+            return;
+        }
         renderKPIModal(data.cell);
     } catch (e) {
         console.error('KPI error:', e);
+        showNotification('Could not load cell KPIs', 'error');
     }
 }
 
@@ -768,9 +964,11 @@ async function doCodeSearch() {
 
     const techParam = activeTech !== 'all'
         ? `&tech=${encodeURIComponent(activeTech)}` : '';
+    const techValue = activeTechSpecific !== 'all'
+        ? `&tech_value=${encodeURIComponent(activeTechSpecific)}` : '';
 
     try {
-        const res  = await fetch(`/api/map/search/cell-code?code=${code}${techParam}`);
+        const res  = await fetch(`/api/map/search/cell-code?code=${code}${techParam}${techValue}`);
         const data = await res.json();
         if (!data.success) return;
 
@@ -871,7 +1069,10 @@ function drawCodeSearchResults(matches, code) {
 /** Download matching cells as an Excel file. */
 function exportCodeSearch(code, tech) {
     const techParam = tech ? `&tech=${encodeURIComponent(tech)}` : '';
-    window.location.href = `/api/map/export/cell-code?code=${code}${techParam}`;
+    const techValueParam = activeTechSpecific !== 'all'
+        ? `&tech_value=${encodeURIComponent(activeTechSpecific)}`
+        : '';
+    window.location.href = `/api/map/export/cell-code?code=${code}${techParam}${techValueParam}`;
 }
 
 function drawHighlightWedge(cell) {
@@ -919,7 +1120,7 @@ function drawHighlightWedge(cell) {
                     ? `<tr><td style="color:#777;">E.Tilt</td><td>${cell.electrical_tilt}°</td></tr>` : ''}
             </table>
             ${cellOperational(cell)
-        ? `<button onclick='showCellKPIs(${JSON.stringify(cell.cell_name)})'
+        ? `<button onclick='showCellKPIs(${JSON.stringify({ cell_name: cell.cell_name, technology: cell.technology, vendor: cell.vendor })})'
                     style="margin-top:10px;padding:5px 14px;background:${techColor};
                            color:white;border:none;border-radius:5px;cursor:pointer;
                            width:100%;font-weight:600;">
@@ -941,6 +1142,409 @@ function clearHighlights() {
     siteMarkers.forEach(m => { try { m.addTo(map); } catch (_) {} });
 }
 
+function _neighborColor(rate) {
+    const r = Number(rate);
+    if (!Number.isFinite(r)) return '#7f8c8d';
+    if (r >= 95) return '#27ae60';
+    if (r >= 90) return '#2e86c1';
+    if (r >= 80) return '#f39c12';
+    return '#e74c3c';
+}
+
+/** Neighbor map metric: ``attempts_sr`` (default) or ``failures`` (API ``failures_only``). */
+function _neighborMetricMode() {
+    const el = document.getElementById('neighbor-metric-mode');
+    const v = String(el?.value || 'attempts_sr').trim();
+    return v === 'failures' ? 'failures' : 'attempts_sr';
+}
+
+function _neighborFailuresMode() {
+    return _neighborMetricMode() === 'failures';
+}
+
+function updateNeighborMetricHint() {
+    const hint = document.getElementById('neighbor-metric-hint');
+    const lab = document.querySelector('label[for="neighbor-min-attempts"]');
+    const inp = document.getElementById('neighbor-min-attempts');
+    const fm = _neighborFailuresMode();
+    if (lab) lab.textContent = fm ? 'Min failures' : 'Min attempts';
+    if (inp) {
+        inp.placeholder = fm ? 'e.g. 1' : 'e.g. 10';
+        inp.title = fm
+            ? 'Only links with estimated failures ≥ this number (default 1 hides rows with no real failures).'
+            : 'Only links with at least this many handover attempts.';
+    }
+    if (!hint) return;
+    hint.textContent = fm
+        ? 'Map shows links where estimated failures ≥ the minimum above (SR required). Thickness = failures; color = failure rate.'
+        : 'Map uses attempts (line thickness) and success rate (color). The minimum above filters by attempts.';
+}
+
+function _neighborColorGradient(rate) {
+    const r = Number(rate);
+    if (!Number.isFinite(r)) return '#95a5a6';
+    const x = Math.max(0, Math.min(1, r / 100));
+    const r0 = 0xe7, g0 = 0x4c, b0 = 0x3c;
+    const r1 = 0x27, g1 = 0xae, b1 = 0x60;
+    const rr = Math.round(r0 + (r1 - r0) * x);
+    const gg = Math.round(g0 + (g1 - g0) * x);
+    const bb = Math.round(b0 + (b1 - b0) * x);
+    return `#${rr.toString(16).padStart(2, '0')}${gg.toString(16).padStart(2, '0')}${bb.toString(16).padStart(2, '0')}`;
+}
+
+function _neighborLineColor(ln) {
+    const fo = _neighborFailuresMode();
+    if (fo && ln.ho_failure_rate_percent != null && Number.isFinite(Number(ln.ho_failure_rate_percent))) {
+        const fauxSr = 100 - Number(ln.ho_failure_rate_percent);
+        return _neighborColorGradient(fauxSr);
+    }
+    const tech = String(ln.technology || activeTech || '');
+    const u = tech.toUpperCase();
+    if (u.startsWith('3G') || u.includes('4G') || u.includes('LTE')) {
+        return _neighborColorGradient(ln.ho_success_rate);
+    }
+    return _neighborColor(ln.ho_success_rate);
+}
+
+/** Stroke width from attempts, scaled to the largest attempt in the current batch (better relative contrast). */
+function _neighborLineWeight(attempts, maxAttemptsInBatch) {
+    const a = Number(attempts);
+    const m = Number(maxAttemptsInBatch);
+    if (!Number.isFinite(a) || a <= 0) return 1.8;
+    if (!Number.isFinite(m) || m <= 0) return 2.5;
+    const r = Math.min(1, a / m);
+    const minW = 2;
+    const maxW = 14;
+    return minW + (maxW - minW) * Math.pow(r, 0.85);
+}
+
+/** Offset line endpoint along azimuth from cell coords (toward sector boresight). */
+function _neighborLineEndpoint(lat, lng, azimuthDeg, offsetM) {
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return [lat, lng];
+    const az = Number(azimuthDeg);
+    if (!Number.isFinite(az) || offsetM <= 0) return [lat, lng];
+    const rad = az * Math.PI / 180;
+    const rLat = offsetM / 111320;
+    const rLng = offsetM / (111320 * Math.cos(lat * Math.PI / 180));
+    return [lat + rLat * Math.cos(rad), lng + rLng * Math.sin(rad)];
+}
+
+function clearNeighborOverlay() {
+    neighborLineData = [];
+    if (neighborLinesLayer) neighborLinesLayer.clearLayers();
+    const panel = document.getElementById('neighbor-explorer-panel');
+    if (panel && !neighborEnabled) panel.style.display = 'none';
+}
+
+function onMapModuleChange() {
+    if (NEIGHBOR_ONLY_MODE) {
+        mapModule = 'neighbor-explorer';
+        neighborEnabled = true;
+        refreshNeighborOverlay();
+        return;
+    }
+    const sel = document.getElementById('map-module-select');
+    mapModule = String(sel?.value || 'site-explorer');
+    neighborEnabled = mapModule === 'neighbor-explorer';
+    const controls = document.getElementById('neighbor-controls');
+    if (controls) controls.style.display = neighborEnabled ? '' : 'none';
+    if (!neighborEnabled) {
+        clearNeighborOverlay();
+        const panel = document.getElementById('neighbor-explorer-panel');
+        if (panel) panel.style.display = 'none';
+        return;
+    }
+    refreshNeighborOverlay();
+}
+
+function onNeighborFiltersChanged() {
+    updateNeighborMetricHint();
+    if (neighborEnabled) refreshNeighborOverlay();
+}
+
+function _neighborMetricExplainer() {
+    if (_neighborFailuresMode()) {
+        return `
+        <div class="neighbor-explainer">
+            <strong>Failures mode</strong> — set <em>Map &amp; links show</em> to <strong>Failures (from SR)</strong> above:<br>
+            - Only links with <strong>estimated failures ≥ Min failures</strong> (default 1) are drawn — not “almost zero” from rounding.<br>
+            - <strong>Failures</strong> = Attempts × (1 − Success rate / 100) = Attempts − Successes when successes exist.<br>
+            - <strong>Line thickness</strong> ∝ failures in the current view; <strong>color</strong> = failure rate (red = worse).<br>
+            - Popups show attempts + failures + failure rate (not the SR-focused layout).
+        </div>`;
+    }
+    return `
+        <div class="neighbor-explainer">
+            <strong>Attempts &amp; success rate mode</strong> — default <em>Map &amp; links show</em> choice above:<br>
+            - <strong>Min attempts</strong> hides links with fewer than that many attempts.<br>
+            - <strong>Attempts</strong>: handover tries from source to target in the latest export/hour.<br>
+            - <strong>Success rate</strong>: (Successes / Attempts) × 100 when both exist.<br>
+            - <strong>Line thickness</strong> scales with attempts vs. the strongest link in view; <strong>color</strong> reflects success rate (green high, red low).<br>
+            - Popups emphasize attempts and success rate.
+        </div>`;
+}
+
+function _neighborIntroHtml(periodStart) {
+    return `
+        <h3 class="site-panel-title">🧭 Neighbor Explorer</h3>
+        <div class="neighbor-subtitle">Latest hour: ${periodStart || '—'}</div>
+        ${_neighborMetricExplainer()}
+    `;
+}
+
+function _neighborPanelUnavailable(reason) {
+    const panel = document.getElementById('neighbor-explorer-panel');
+    if (!panel) return;
+    panel.style.display = 'block';
+    panel.innerHTML = `${_neighborIntroHtml('—')}<div class="site-meta-row">${reason}</div>`;
+}
+
+function toggleNeighborExplorer() {
+    if (!neighborEnabled) {
+        clearNeighborOverlay();
+        const panel = document.getElementById('neighbor-explorer-panel');
+        if (panel) panel.style.display = 'none';
+        return;
+    }
+    refreshNeighborOverlay();
+}
+
+async function refreshNeighborOverlay() {
+    if (!neighborEnabled) return;
+    const vendor = document.getElementById('vendor-filter')?.value || 'all';
+    if (activeTech === 'all') {
+        showNotification('Select a technology for Neighbor Explorer', 'info');
+        clearNeighborOverlay();
+        _neighborPanelUnavailable('Select a technology, then choose a site/cell.');
+        return;
+    }
+    const minEl = document.getElementById('neighbor-min-attempts');
+    const minRaw = Number(minEl?.value);
+    const minFilterValue = Number.isFinite(minRaw)
+        ? minRaw
+        : (_neighborFailuresMode() ? 1 : 10);
+    const maxLines = Number(document.getElementById('neighbor-max-lines')?.value || 300);
+    const qs = new URLSearchParams();
+    qs.set('vendor', vendor);
+    qs.set('technology', activeTech);
+    qs.set('max_lines', String(Number.isFinite(maxLines) ? Math.max(10, maxLines) : 300));
+    if (selectedSiteId) qs.set('site_id', selectedSiteId);
+    if (selectedNeighborCell) qs.set('cell_name', selectedNeighborCell);
+    if (_neighborFailuresMode()) {
+        qs.set('failures_only', '1');
+        const mf = Number.isFinite(minRaw) ? Math.max(0, minRaw) : 1;
+        qs.set('min_failures', String(mf));
+    } else {
+        const ma = Number.isFinite(minRaw) ? Math.max(0, minRaw) : 10;
+        qs.set('min_attempts', String(ma));
+    }
+
+    try {
+        const res = await fetch(`/api/network-map/neighbors/lines?${qs.toString()}`);
+        let data;
+        try {
+            data = await res.json();
+        } catch (_) {
+            throw new Error(res.ok ? 'Invalid JSON from server' : `HTTP ${res.status}`);
+        }
+        if (!data.success) throw new Error(data.error || 'neighbors lines failed');
+        neighborLineData = Array.isArray(data.lines) ? data.lines : [];
+        renderNeighborLines(neighborLineData);
+        await refreshNeighborWedgePresentation();
+        await renderNeighborExplorerPanel(vendor, activeTech, data.period_start, minFilterValue);
+        if (data.skipped_missing_coords > 0) {
+            showNotification(
+                `Neighbor Explorer: skipped ${data.skipped_missing_coords} row(s) — could not resolve both ends to cells with coordinates in metadata (ID/name/ECI mismatch or inactive cells).`,
+                'info'
+            );
+        }
+    } catch (e) {
+        console.error('Neighbor lines error:', e);
+        showNotification('Failed to load neighbor lines', 'error');
+    }
+}
+
+async function refreshNeighborWedgePresentation() {
+    if (!neighborEnabled || !map) return;
+    clearSectorLayers();
+    wedgeGroups = {};
+
+    const norm = (n) => String(n || '').trim().toLowerCase().replace(/\s+/g, ' ');
+
+    /** Wedges for every cell a neighbor line touches (source + target), including remote sites. */
+    if (neighborLineData.length > 0) {
+        const nameSet = new Set();
+        if (selectedNeighborCell) nameSet.add(norm(selectedNeighborCell));
+        neighborLineData.forEach((ln) => {
+            nameSet.add(norm(ln.source_cell));
+            nameSet.add(norm(ln.target_cell));
+        });
+        const names = [...nameSet].filter(Boolean).slice(0, 280);
+        if (!names.length) return;
+        const qs = new URLSearchParams();
+        qs.set('technology', activeTech);
+        names.forEach((n) => qs.append('cell', n));
+        try {
+            const res = await fetch(`/api/map/cells/wedge-data?${qs.toString()}`);
+            const data = await res.json();
+            if (!data.success || !Array.isArray(data.cells)) return;
+            data.cells.forEach((row, idx) => {
+                const la = Number(row.latitude);
+                const lo = Number(row.longitude);
+                if (!Number.isFinite(la) || !Number.isFinite(lo)) return;
+                const siteStub = {
+                    site_id: row.site_id,
+                    site_name: row.site_name || row.cell_name,
+                    latitude: la,
+                    longitude: lo,
+                };
+                const az = row.azimuth != null ? Number(row.azimuth) : null;
+                const group = {
+                    groupId: `nbr-${idx}-${String(row.cell_name || '').replace(/\W+/g, '_')}`,
+                    azimuth: Number.isFinite(az) ? az : 0,
+                    technology: row.technology,
+                    cells: [{
+                        cell_name: row.cell_name,
+                        technology: row.technology,
+                        vendor: row.vendor,
+                        frequency_band: row.frequency_band,
+                        pci: row.pci,
+                        activity_status: row.activity_status,
+                        status: row.status,
+                        azimuth: row.azimuth,
+                        mechanical_tilt: row.mechanical_tilt,
+                        electrical_tilt: row.electrical_tilt,
+                    }],
+                };
+                drawSectorWedge(siteStub, group);
+            });
+        } catch (e) {
+            console.error('wedge-data error:', e);
+        }
+        return;
+    }
+
+    if (lastNeighborSiteContext) {
+        const { site, wedgeCells } = lastNeighborSiteContext;
+        const groups = _groupCellsIntoWedges(site, wedgeCells);
+        groups.forEach(g => drawSectorWedge(site, g));
+    }
+}
+
+function renderNeighborLines(lines) {
+    if (!neighborLinesLayer) return;
+    neighborLinesLayer.clearLayers();
+    const offM = Math.max(40, SECTOR_RADIUS_M * 0.55);
+    const arr = Array.isArray(lines) ? lines : [];
+    const fo = _neighborFailuresMode();
+    const maxAttempts = arr.reduce((mx, ln) => {
+        const a = fo ? Number(ln.ho_failures) : Number(ln.ho_attempts);
+        return Number.isFinite(a) && a > 0 ? Math.max(mx, a) : mx;
+    }, 0);
+    arr.forEach((ln) => {
+        const laS = Number(ln.source_lat);
+        const loS = Number(ln.source_lng);
+        const laT = Number(ln.target_lat);
+        const loT = Number(ln.target_lng);
+        if (!Number.isFinite(laS) || !Number.isFinite(loS) || !Number.isFinite(laT) || !Number.isFinite(loT)) {
+            return;
+        }
+        const src = _neighborLineEndpoint(laS, loS, ln.source_azimuth, offM);
+        const dst = _neighborLineEndpoint(laT, loT, ln.target_azimuth, offM);
+        const poly = L.polyline([src, dst], {
+            color: _neighborLineColor(ln),
+            weight: _neighborLineWeight(
+                fo ? (Number(ln.ho_failures) || 0) : ln.ho_attempts,
+                maxAttempts,
+            ),
+            opacity: 0.72,
+            pane: 'overlayPane',
+        }).addTo(neighborLinesLayer);
+        const sr = ln.ho_success_rate;
+        const srText = (sr == null || !Number.isFinite(Number(sr))) ? '—' : `${Number(sr).toFixed(2)}%`;
+        const hf = ln.ho_failures;
+        const hfText = (hf == null || !Number.isFinite(Number(hf)))
+            ? '—'
+            : Math.trunc(Number(hf)).toLocaleString();
+        const hfr = ln.ho_failure_rate_percent;
+        const hfrText = (hfr == null || !Number.isFinite(Number(hfr))) ? '—' : `${Number(hfr).toFixed(2)}%`;
+        const suc = ln.ho_successes;
+        const metricsRows = fo
+            ? `<tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Attempts</td>
+                        <td style="font-weight:600;">${Number(ln.ho_attempts || 0).toLocaleString()}</td></tr>
+                    <tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Est. failures</td>
+                        <td style="font-weight:600;">${hfText}</td></tr>
+                    <tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Failure rate</td>
+                        <td style="font-weight:600;">${hfrText}</td></tr>`
+            : `<tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Attempts</td>
+                        <td style="font-weight:600;">${Number(ln.ho_attempts || 0).toLocaleString()}</td></tr>
+                    ${(suc != null && Number.isFinite(Number(suc)))
+                ? `<tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Successes</td>
+                        <td style="font-weight:600;">${Number(suc).toLocaleString(undefined, { maximumFractionDigits: 2 })}</td></tr>`
+                : ''}
+                    <tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Success rate</td>
+                        <td style="font-weight:600;">${srText}</td></tr>`;
+        const popupHtml = `
+            <div style="font-size:12px;line-height:1.45;min-width:240px;font-family:sans-serif;">
+                <div style="font-weight:700;margin-bottom:8px;color:#2c3e50;">Handover link</div>
+                <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Source</td>
+                        <td style="font-weight:600;">${escapeHtml(String(ln.source_cell || '—'))}</td></tr>
+                    <tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Target</td>
+                        <td style="font-weight:600;">${escapeHtml(String(ln.target_cell || '—'))}</td></tr>
+                    ${metricsRows}
+                </table>
+            </div>`;
+        poly.bindPopup(popupHtml, { maxWidth: 320 });
+    });
+}
+
+async function renderNeighborExplorerPanel(vendor, technology, periodStart, minAttempts) {
+    const panel = document.getElementById('neighbor-explorer-panel');
+    if (!panel) return;
+    panel.style.display = 'block';
+    if (!selectedNeighborCell) {
+        panel.innerHTML = `${_neighborIntroHtml(periodStart)}
+            <div class="site-meta-row">Click a cell from the map panel to load outgoing/incoming ranking.</div>
+            <div class="site-meta-row">Rendered lines: ${neighborLineData.length}</div>`;
+        return;
+    }
+    const qs = new URLSearchParams({
+        vendor,
+        technology,
+        cell_name: selectedNeighborCell,
+        top_n: '10',
+        min_attempts: String(Math.max(0, Number(minAttempts) || 0)),
+    });
+    try {
+        const res = await fetch(`/api/network-map/neighbors/cell-summary?${qs.toString()}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'cell summary failed');
+        const outgoing = data.outgoing || [];
+        const incoming = data.incoming || [];
+        const mkRows = (rows) => rows.length
+            ? rows.map((r) => `
+                <div class="neighbor-row">
+                    <div class="neighbor-row-name">${escapeHtml(r.neighbor_cell)}</div>
+                    <div class="neighbor-row-attempts">${Number(r.ho_attempts || 0).toLocaleString()}</div>
+                    <div class="neighbor-row-rate">${r.ho_success_rate == null ? '—' : Number(r.ho_success_rate).toFixed(1) + '%'}</div>
+                </div>
+            `).join('')
+            : '<div class="site-meta-row">No rows in current scope.</div>';
+        panel.innerHTML = `${_neighborIntroHtml(data.period_start || periodStart)}
+            <div class="neighbor-subtitle">
+                Cell: <strong>${escapeHtml(selectedNeighborCell)}</strong><br>
+                Latest hour: ${data.period_start || periodStart || '—'}
+            </div>
+            <div class="neighbor-list-head">Outgoing neighbors</div>
+            ${mkRows(outgoing)}
+            <div class="neighbor-list-head">Incoming neighbors</div>
+            ${mkRows(incoming)}`;
+    } catch (e) {
+        panel.innerHTML = `${_neighborIntroHtml(periodStart)}<div class="site-meta-row" style="color:#e74c3c;">Failed to load cell summary.</div>`;
+    }
+}
+
 function clearCodeSearch() {
     document.getElementById('cell-code-search').value = '';
     clearHighlights();
@@ -949,10 +1553,12 @@ function clearCodeSearch() {
 
 /** Returns the human label for the active-tech code type. */
 function _codeLabel() {
-    if (activeTech === '3G') return 'SC';
-    if (['4G', '4G-FDD', '4G-TDD'].includes(activeTech)) return 'PCI';
-    if (activeTech === '5G') return 'PCI';
-    if (activeTech === '2G') return 'BCCH';
+    if (activeTech === '3G-3G') return 'SC';
+    if (
+        activeTech === '4G-4G Intra-eNB' || activeTech === '4G-4G Inter-eNB' ||
+        activeTech === '4G-4G Intra' || activeTech === '4G-4G Inter'
+    ) return 'PCI';
+    if (activeTech === '2G-2G') return 'BCCH';
     return 'Code';
 }
 
@@ -961,7 +1567,9 @@ function _codeLabel() {
 function buildClusterFilter(sites) {
     const select  = document.getElementById('cluster-filter');
     const current = select.value;
-    const clusters = [...new Set(sites.map(s => s.cluster).filter(c => c != null))]
+    const selectedArea = document.getElementById('area-filter')?.value || 'all';
+    const scopedSites = selectedArea === 'all' ? sites : sites.filter(s => s.area === selectedArea);
+    const clusters = [...new Set(scopedSites.map(s => s.cluster).filter(c => c != null))]
         .sort((a, b) => a - b);
 
     select.innerHTML = '<option value="all">All Clusters</option>';
@@ -972,6 +1580,9 @@ function buildClusterFilter(sites) {
         if (String(c) === current) opt.selected = true;
         select.appendChild(opt);
     });
+    if (current !== 'all' && !clusters.some(c => String(c) === current)) {
+        select.value = 'all';
+    }
 }
 
 function buildAreaFilter(sites) {
@@ -991,10 +1602,38 @@ function buildAreaFilter(sites) {
 
 // ─── Filter callbacks (all funnel into runFilters) ────────────────────────────
 
-function searchSites()    { runFilters(); }
-function filterByVendor() { _onFilterChanged(); }
-function filterByArea()   { _onFilterChanged(); }
-function filterByCluster(){ _onFilterChanged(); }
+function searchSites() {
+    if (!sitesData.length) {
+        loadNetworkSites();
+        return;
+    }
+    runFilters();
+}
+
+function filterByVendor() {
+    if (!sitesData.length) {
+        loadNetworkSites();
+        return;
+    }
+    runFilters();
+}
+
+function filterByArea() {
+    if (!sitesData.length) {
+        loadNetworkSites();
+        return;
+    }
+    buildClusterFilter(sitesData);
+    runFilters();
+}
+
+function filterByCluster() {
+    if (!sitesData.length) {
+        loadNetworkSites();
+        return;
+    }
+    runFilters();
+}
 
 // ─── Metadata refresh ────────────────────────────────────────────────────────
 
@@ -1212,7 +1851,13 @@ async function updateTechSpecificFilter() {
     if (!select) return;
 
     // Only show for requested technologies.
-    if (!['2G', '3G', '4G-FDD', '4G-TDD'].includes(activeTech)) {
+    const apiTech =
+        activeTech === '2G-2G' ? '2G' :
+        activeTech === '3G-3G' ? '3G' :
+        (activeTech === '4G-4G Intra-eNB' || activeTech === '4G-4G Inter-eNB' ||
+         activeTech === '4G-4G Intra' || activeTech === '4G-4G Inter') ? '4G-FDD' :
+        activeTech;
+    if (!['2G', '3G', '4G-FDD', '4G-TDD'].includes(apiTech)) {
         select.style.display = 'none';
         select.innerHTML = '<option value="all">All</option>';
         activeTechSpecific = 'all';
@@ -1220,7 +1865,7 @@ async function updateTechSpecificFilter() {
     }
 
     try {
-        const res = await fetch(`/api/map/tech-filter-options?tech=${encodeURIComponent(activeTech)}`);
+        const res = await fetch(`/api/map/tech-filter-options?tech=${encodeURIComponent(apiTech)}`);
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed to load filter values');
 
@@ -1242,11 +1887,12 @@ async function updateTechSpecificFilter() {
 function filterByTechSpecific() {
     const select = document.getElementById('tech-specific-filter');
     activeTechSpecific = (select?.value || 'all').trim() || 'all';
-    _onFilterChanged();
+    _onFilterChanged(false, true);
 }
 
 function _showEmptyState() {
-    document.getElementById('sites-count').textContent = '0';
+    const sitesCountEl = document.getElementById('sites-count');
+    if (sitesCountEl) sitesCountEl.textContent = '0';
     const panel = document.getElementById('site-info-panel');
     if (!panel) return;
     panel.innerHTML = `
@@ -1260,27 +1906,35 @@ function _showEmptyState() {
 }
 
 function _wireInitialFilterListeners() {
-    // When user starts filtering, load sites from the server.
-    const ids = ['vendor-filter', 'area-filter', 'cluster-filter'];
-    ids.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('change', _onFilterChanged);
-    });
-    const search = document.getElementById('site-search');
-    if (search) search.addEventListener('input', () => _onFilterChanged(true));
+    // UI controls already use inline handlers (onchange / onkeyup),
+    // so keep this as a no-op to avoid duplicate requests.
 }
 
 let _filterDebounce = null;
-function _onFilterChanged(isTyping = false) {
+function _onFilterChanged(isTyping = false, forceServerReload = false) {
     // Clear selections when filters change
     clearSectorLayers();
     clearHighlights();
+    clearNeighborOverlay();
+    selectedNeighborCell = '';
+    selectedSiteId = null;
+    lastNeighborSiteContext = null;
     document.getElementById('site-info-panel').style.display = 'none';
 
     if (isTyping) {
         clearTimeout(_filterDebounce);
-        _filterDebounce = setTimeout(loadNetworkSites, 250);
+        _filterDebounce = setTimeout(() => {
+            if (forceServerReload) {
+                sitesData = [];
+                lastLoadedScopeKey = '';
+            }
+            loadNetworkSites();
+        }, 250);
         return;
+    }
+    if (forceServerReload) {
+        sitesData = [];
+        lastLoadedScopeKey = '';
     }
     loadNetworkSites();
 }

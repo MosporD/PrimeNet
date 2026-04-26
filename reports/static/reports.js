@@ -1,7 +1,6 @@
 const REPORT_META = {
     site_inventory:      { icon: '🏗️', desc: 'All active sites and cells with location, azimuth, PCI, tilt, and band data.' },
-    pci_conflicts:       { icon: '⚠️', desc: 'PCI/PSC/BCCH conflicts across sites — groups of cells with duplicate identifiers.' },
-    performance_summary: { icon: '📈', desc: 'Latest hourly KPI snapshot for all cells from Nokia and Huawei PM databases.' },
+    pci_conflicts:       { icon: '⚠️', desc: 'Directional PCI/PSC conflict candidates by technology (3G/4G/5G), distance, and azimuth alignment.' },
     config_versions:     { icon: '📋', desc: 'Full log of all XML configuration versions uploaded to the version history module.' },
 };
 
@@ -37,10 +36,19 @@ async function generateReport(type, label) {
     statusEl.textContent = `Generating ${label}…`;
 
     try {
+        const payload = { report_type: type };
+        if (type === 'site_inventory') {
+            const techSel = document.getElementById('site-inventory-tech');
+            payload.technology = (techSel && techSel.value) ? techSel.value : 'all';
+        } else if (type === 'pci_conflicts') {
+            const pciTechSel = document.getElementById('pci-conflict-tech');
+            payload.technology = (pciTechSel && pciTechSel.value) ? pciTechSel.value : '4G';
+        }
+
         const res  = await fetch('/api/reports/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ report_type: type })
+            body: JSON.stringify(payload)
         });
         const data = await res.json();
 
