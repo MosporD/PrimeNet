@@ -1,0 +1,163 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify NR DU Cell CSI-RS (MOD NRDUCELLCSIRS)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_nrducellcsirs">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify NR DU Cell CSI-RS (MOD NRDUCELLCSIRS)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_nrducellcsirs"></a><a name="mod_nrducellcsirs"></a>
+
+
+<h1 class="topictitle1">Modify NR DU Cell CSI-RS (MOD NRDUCELLCSIRS)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 5G, BTS5900, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_nrducellcsirs__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the CSI-RS configuration of an NR DU cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_nrducellcsirs__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command, and therefore exercise caution when executing this command. </p>
+</div></div>
+
+<div class="mmlparam"><a name="mod_nrducellcsirs__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NRDUCellCsirs-NrDuCellId.html">NrDuCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NR DU Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an NR DU cell, which uniquely identifies the NR DU cell within a gNodeB.</p>
+<p>GUI Value Range: 0~65534</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65534</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NRDUCellCsirs-TrsPeriod.html">TrsPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TRS Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period of transmitting TRSs.</p>
+<p>If this parameter is set to MS0, TRS transmission is disabled.</p>
+<p>The values MS10, MS20, MS40, and MS80 indicate that TRSs are transmitted every 10 ms, 20 ms, 40 ms, and 80 ms, respectively.</p>
+<p>GUI Value Range: MS0(0), MS10(10), MS20(20), MS40(40), MS80(80)</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: MS0, MS10, MS20, MS40, MS80</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MS20(20)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to MS0, the gNodeB does not transmit TRSs, and the TRS overhead is 0. However, the time-frequency offset measurement result of UEs is inaccurate, and the downlink cell throughput decreases. When aperiodic CSI-RSs are configured, the QCL relationship between aperiodic CSI-RSs and TRS resources needs to be configured by using the qcl-info field, as specified in 3GPP TS 38.331. When TRS transmission is disabled, TRS resources are not configured for UEs. As a result, UEs that must verify the qcl-info field in the CSI-AssociatedReportConfigInfo message experience service drops or even fail to access the network. If this parameter is set to a value other than MS0, a smaller value of this parameter results in a shorter TRS transmission period, larger downlink resource overhead, and lower downlink cell throughput when channel conditions change slowly. When channel conditions change quickly, the time-frequency offset measurement result is more accurate, and the downlink cell throughput increases. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NRDUCellCsirs-CsiPeriod.html">CsiPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period for transmitting periodic CSI-RSs. This parameter takes effect only for UEs that initially access the network. This parameter applies only to low-frequency cells.</p>
+<p>GUI Value Range: SLOT10(10), SLOT20(20), SLOT40(40), SLOT80(80), SLOT160(160), SLOT320(320)</p>
+<p>Unit: slot</p>
+<p>Actual Value Range: SLOT10, SLOT20, SLOT40, SLOT80, SLOT160, SLOT320</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SLOT40(40)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If CsiPeriod in an NRDUCellCsirs MO is set to SLOT10, CsirsCellResourceNum in the NRDUCellCsirs MO cannot be set to 4_RESOURCE or 2_RESOURCE.</li><li>If CsiPeriod in an NRDUCellCsirs MO is set to SLOT20, CsirsCellResourceNum in the NRDUCellCsirs MO cannot be set to 4_RESOURCE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in more frequent CSI-RS transmissions and more downlink resource overhead. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: N-TDD-FR1, N-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NRDUCellCsirs-CsiAlgoSwitch.html">CsiAlgoSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI Algorithm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for the CSI algorithm.</p>
+<p>PERIODIC_CSI_SWITCH: When this option is selected, periodic CSI is configured for UEs. When this option is deselected, aperiodic CSI is configured for UEs. In high frequency bands, only aperiodic CSI is supported. Therefore, this option must be deselected.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. Although the configuration interface in this version supports synchronization and delivery of the setting of this parameter, the system does not use this parameter. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: PERIODIC_CSI_SWITCH(Periodic CSI Switch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PERIODIC_CSI_SWITCH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: PERIODIC_CSI_SWITCH:ON for low frequency bands, and PERIODIC_CSI_SWITCH:OFF for high frequency bands.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: PERIODIC_CSI_SWITCH: When this option is deselected, the PDCCH overhead increases and the PUCCH overhead decreases. When this option is selected, the PDCCH overhead decreases and the PUCCH overhead increases.</p>
+<p>Applicable Mode: N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NRDUCellCsirs-CsirsCellResourceNum.html">CsirsCellResourceNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSIRS Cell Resource Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of resources for periodic CSI-RS transmission in a cell. This parameter applies only to low-frequency TDD cells.</p>
+<p>GUI Value Range: 1_RESOURCE(1 Resource), 2_RESOURCE(2 Resources), 4_RESOURCE(4 Resources)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1_RESOURCE, 2_RESOURCE, 4_RESOURCE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 4_RESOURCE(4 Resources)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If CsiPeriod in an NRDUCellCsirs MO is set to SLOT10, CsirsCellResourceNum in the NRDUCellCsirs MO cannot be set to 4_RESOURCE or 2_RESOURCE.</li><li>If CsiPeriod in an NRDUCellCsirs MO is set to SLOT20, CsirsCellResourceNum in the NRDUCellCsirs MO cannot be set to 4_RESOURCE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 4_RESOURCE, the cell coverage is favorable, but the number of RRC connection reconfigurations in the cell is large, increasing the service drop probability. If this parameter is set to 2_RESOURCE, the cell coverage is moderate, but the number of RRC connection reconfigurations in the cell is small, reducing the service drop probability. If this parameter is set to 1_RESOURCE, the cell coverage is poor but RRC connection reconfiguration triggered by this function does not occur in the cell.</p>
+<p>Applicable Mode: N-TDD-FR1</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_nrducellcsirs__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the CSI-RS configuration of an NR DU cell with the parameters as follows: NR DU Cell ID: 77, TRS Period: 0, run the following command:
+MOD NRDUCELLCSIRS: NrDuCellId=77, TrsPeriod=MS0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

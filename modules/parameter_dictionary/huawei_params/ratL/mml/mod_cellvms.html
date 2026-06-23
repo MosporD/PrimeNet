@@ -1,0 +1,169 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell VMS Configuration (MOD CELLVMS)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellvms">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell VMS Configuration (MOD CELLVMS)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellvms"></a><a name="mod_cellvms"></a>
+
+
+<h1 class="topictitle1">Modify Cell VMS Configuration (MOD CELLVMS)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellvms__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of the cell VMS.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellvms__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellvms__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellVMS-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of a cell, which uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellVMS-VmsHoUeNumTh.html">VmsHoUeNumTh</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max UE Number for Handover Out</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of UEs that can be transferred within 10s. This parameter is used to prevent too many UEs from being transferred at a time to neighboring cells to cause significant impact on neighboring cells. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 1~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, a large number of UEs can be transferred to neighboring cells at a time, leading to a significant UE number decrease in the serving cell but a quick UE number increase and a load increase in neighboring cells. If this parameter is set to a small value, the number of UEs in the serving cell decreases slowly.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellVMS-VmsPrbDiffTh.html">VmsPrbDiffTh</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Load Difference Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of PRB usage difference between the serving cell and a neighboring cell. When the result of the PRB usage of the serving cell minus that of a neighboring cell in a cluster is greater than the parameter value, this neighboring cell can be a target cell for MLB. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 1~99</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~99</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 40</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellVMS MO, the value of VmsPrbDiffTh must be less than the value of VmsPrbLoadTh.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a larger amount of load that can be transferred within an MLB period. As a result, system throughput can be improved significantly. However, there is a higher risk that appropriate neighboring cells cannot be selected. A smaller value of this parameter results in a smaller amount of load that can be transferred within an MLB period. As a result, system throughput cannot be improved significantly.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellVMS-VmsPrbLoadTh.html">VmsPrbLoadTh</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Load Balancing Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB usage threshold for triggering MLB. MLB is triggered if the PRB usage of the serving cell is higher than this parameter value. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 1~99</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~99</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 80</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellVMS MO, the value of VmsPrbDiffTh must be less than the value of VmsPrbLoadTh.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a larger value, MLB is less prone to be triggered. Therefore, the system throughput is affected for a longer time before UE transfer because of limited resources in the serving cell. However, more gains on the system throughput can be obtained after UEs are transferred. When this parameter is set to a smaller value, MLB is more prone to be triggered. Frequent MLB triggering leads to more signaling exchanges and handovers, which increases the CPU load. In addition, limited gains on the system throughput can be obtained by UE transfer.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellVMS-VmsA3Offset.html">VmsA3Offset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VMS A3 Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset for intra-frequency handovers between the inner and outer cells in VMS scenarios. This parameter also indicates the intra-frequency handover offset between cells served by the same AAU in massive MIMO (32T32R) scenarios. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~20</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a larger amount of load that can be transferred within an MLB period. As a result, system throughput can be improved significantly. However, there is a higher risk of deterioration in the performance of transferred UEs. A smaller value of this parameter results in a smaller amount of load that can be transferred within an MLB period. As a result, system throughput cannot be improved significantly.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellvms__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of the cell VMS, local cell ID is 0, VmsHoUeNumThd is 2, run the following command:
+MOD CELLVMS: LocalCellId=0, VmsHoUeNumTh=2;
+The result is shown as follows:
++++    0        2016-08-10 15:20:01
+O&amp;M    #806354964
+%%MOD CELLVMS: LocalCellId=0, VmsHoUeNumTh=2;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

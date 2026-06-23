@@ -1,0 +1,201 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IPSECBIND">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IPSECBIND">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPSECBIND</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IPSECBIND"></a><a name="IPSECBIND"></a>
+
+
+<h1 class="topictitle1">IPSECBIND</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IPSECBIND.html"><strong>IPSECBIND</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO indicates the binding relationship between the IP Security (IPSec) policy group and the port. An IPSec tunnel is negotiated to protect the data streams on a port only after an IPSec policy group is bound to the port.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IPSECDTNL</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, in an <strong>IPSECDTNL</strong> MO, the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to ports; the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to two different <strong>IPSECBIND</strong> MOs, and the <strong>SPGN</strong> values in the two <strong>IPSECBIND</strong> MOs are the same as the <strong>SPGN</strong> values in the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>IPSECPOLICY</strong> MO associated with an <strong>IPSECBIND</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>CTRLMODE</strong> in the <strong>IPSECBIND</strong> MO must be set to the same value as <strong>CTRLMODE</strong> in the corresponding <strong>IPSECPOLICY</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ETHTRKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring an <strong>IPSECBIND</strong> MO on an <strong>ETHPORT</strong> MO, ensure that the <strong>ETHPORT</strong> MO has not been added to an <strong>ETHTRK</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before binding an <strong>IPSECPOLICY</strong> MO to an <strong>ETHTRK</strong> MO, ensure that an <strong>ETHTRKLNK</strong> MO is configured in the <strong>ETHTRK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ETHTRK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before binding an <strong>IPSECPOLICY</strong> MO to an <strong>ETHTRK</strong> MO, ensure that the <strong>ETHTRK</strong> MO is configured.</li></ul>
+</li><li>Relation with the <strong>PORTSECURITY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before adding an <strong>IPSECBIND</strong> MO, ensure that <strong>SWITCH</strong> in the <strong>PORTSECURITY</strong> MO on the bound Ethernet port is set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In one logical protection group, <strong>SN</strong> in an <strong>HAGRP</strong> MO must be the same as that in an <strong>IPSECBIND</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPSECBIND</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]One <strong>IPSECPOLICY</strong> MO can be bound to only one port.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Only one or less <strong>IPSECBIND</strong> MO can be configured on a port with <strong>CTRLMODE</strong> set to MANUAL_MODE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Only one or less <strong>IPSECBIND</strong> MO can be configured on a port with <strong>CTRLMODE</strong> set to AUTO_MODE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of six <strong>IPSECBIND</strong> MOs can be automatically created in a base station.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of six <strong>IPSECBIND</strong> MOs can be manually created in a base station.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to SLAVE and the slave and master <strong>IKEPEER</strong> MOs are configured in different <strong>IPSECPOLICY</strong> MOs, the <strong>IPSECPOLICY</strong> MO of the slave <strong>IKEPEER</strong> MO can be added to this board when the following conditions are met:</li><li>The <strong>IPSECPOLICY</strong> MO of the master <strong>IKEPEER</strong> MO to which this slave <strong>IKEPEER</strong> MO corresponds must have been added to a board.</li><li>The <strong>IPSECBIND</strong> MOs of the master and slave <strong>IKEPEER</strong> MOs must be configured in the same cabinet, subrack, and slot.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO referred by the <strong>IPSECBIND</strong> MO can be only set to IPV4.</li></ul>
+</li><li>Relation with the <strong>ACLRULE</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by <strong>IPSECBIND</strong> on a transmission board is 264.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by <strong>IPSECBIND</strong> on a main control board is 512.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>CASCADEPORT</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO or AUTO, this board cannot be configured with the <strong>IPSECBIND</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if the <strong>CASCADEPORT</strong> MO in which the <strong>PN</strong> parameter is set to 6 does not exist, this board cannot be configured with the <strong>IPSECBIND</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*40GE, and <strong>PT</strong> in the <strong>IPSECBIND</strong> MO for this board is set to ETH, <strong>PN</strong> can only be set to 0 in the <strong>IPSECBIND</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 4*10GE, and <strong>PT</strong> in the <strong>IPSECBIND</strong> MO for this board is set to ETH, <strong>PN</strong> can only be set to 0, 1, 2, or 3 in the <strong>IPSECBIND</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*100GE, and <strong>PT</strong> in the <strong>IPSECBIND</strong> MO for this board is set to ETH, <strong>PN</strong> can only be set to 0 in the <strong>IPSECBIND</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>IPSECBIND</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ETHCIPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]Before binding an <strong>IPSECPOLICY</strong> MO to an <strong>ETHCIPORT</strong> MO, ensure that the <strong>ETHCIPORT</strong> MO is configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TYPE</strong> in an <strong>MDU</strong> MO is set to MDUC, the <strong>IPSECBIND</strong> MO must meet the following conditions: Cabinet No., Subrack No., and Slot No. are set to the same values as those in the <strong>MDU</strong> MO; <strong>SBT</strong> is set to BASE_BOARD; <strong>PT</strong> is set to ETH; <strong>PN</strong> is set to a value within the range 0 to 2.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>ACLRULE</strong>, and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBIND</strong> on one board is 128.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong>, <strong>MPT</strong>, <strong>ACLRULE</strong>, and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists and the LMPT board is not in an <strong>HAGRP</strong> MO, the maximum of <strong>ACLRULE</strong> MO with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBIND</strong> MO on the LMPT board is 128.</li></ul>
+</li><li>Relation with the <strong>ACLRULE</strong>, <strong>IPSECPOLICY</strong>, <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]When the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured, the maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by <strong>IPSECBIND</strong> on one board is 128.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IPSECBIND__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPSECBIND__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IPSECBIND__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ipsecbind.html">ADD IPSECBIND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to bind an IPSec policy group to a port. IPSec tunnels are negotiated to protect the data streams flowed through a port only after an IPSec policy group is bound to the port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ikemsgstat.html">DSP IKEMSGSTAT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query statistics on Internet Key Exchange (IKE) messages.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ikesa.html">DSP IKESA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of the IKE Security Association (SA).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ikestat.html">DSP IKESTAT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query basic information about an Internet Key Exchange (IKE) Security Association (SA).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ikev1exchstat.html">DSP IKEV1EXCHSTAT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query status information about an Internet Key Exchange version 1 (IKEv1) exchange.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ikev2exchstat.html">DSP IKEV2EXCHSTAT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query status information about an Internet Key Exchange version 2 (IKEv2) exchange.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipsecsa.html">DSP IPSECSA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of the IPSec SA.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipsecsadelstat.html">DSP IPSECSADELSTAT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query statistics on an IP Security (IPSec) SA.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ipsecbind.html">LST IPSECBIND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the binding relation between the IPSECBIND MO and the port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ipsecbind.html">RMV IPSECBIND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove the binding of an IPSec policy group to a port. The execution of this command terminates the protection mechanism applied to the data streams flowed through the port.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IPSECBIND__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IPSECBIND__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IPSECBIND__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the port to which the IPSec policy group is bound.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the port to which the IPSec policy group is bound.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the port to which the IPSec policy group is bound.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board with the port to which the IPSec policy group is bound.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-PortType.html">Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of port to which the IPSec policy group is bound.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-PortNo.html">Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the port to which the IPSec policy group is bound.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-PolicyGroupName.html">Policy Group Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the IPSec policy group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object can be modified or deleted by the system. The value MANUAL_MODE means that only the user can modify or delete the object. The value AUTO_MODE means only the system can modify or delete the object.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBIND-AutoCfgFlag.html">Auto Config Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object is created by the system. MANUAL_CREATED means that the object is configured by the user manually. AUTO_CREATED means that the object is created by the system.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

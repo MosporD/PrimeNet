@@ -1,0 +1,803 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Certificate Authority (ADD CA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ca">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Certificate Authority (ADD CA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ca"></a><a name="add_ca"></a>
+
+
+<h1 class="topictitle1">Add Certificate Authority (ADD CA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_ca__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a CA. The certificate request configuration information can be customized in the multi-PKI scenario.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ca__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>System specifications: If the WMPT/UMPT/UMDU/LMPT/GTMUc is the main control board, a maximum of 6 CAs can be configured.</p>
+</li><li><p>Board specifications: A UMPT/UMDU/LMPT/GTMUc/UTRPc/UCCU/UBBPe series (except UBBPe15)/LCOP/UBBPf series/UBBPF series/UBBPg series board supports a maximum of 6 CAs.</p>
+</li><li><p>If no source IP address is specified for the base station, the base station uses the effective local OM IP address (you can run the <a href="dsp_omch.html">DSP OMCH</a> command to query this IP address) to establish a connection. When active and standby OM channels are configured for a base station, it is recommended that users ensure connectivity from the local IP addresses of both the active and standby OM channels to that of the server. If a source IP address is specified for the base station but the source IP address is not the IP address of the board specified by the CERTDEPLOY MO, the base station fails to connect to the CA server.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The URL can be either an HTTP or HTTPS URL. The IP address in the URL must be a valid IP address. The default port number is 80 for an HTTP URL or 443 for an HTTPS URL. If the port number is not specified, the default port number is automatically added to the URL upon execution of this command.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When adding a CA object, ensure that the TLSPOLICY used by CA exist on the NE.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ca__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-CAName.html">CANAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Authority Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the CA. The CA name except item "ORGANIZATIONNAME" must not contain the following invalid characters: backslash (\), slash (/), colon (:), asterisk (*), question mark (?), double quotation marks ("), left angle bracket (&lt;), right angle bracket (&gt;), bar (|) and underscore (_). Otherwise, an error occurs when you run the <a href="req_devcert.html">REQ DEVCERT</a> command to apply for a device certificate.</p>
+<p>GUI Value Range: 1~127 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~127 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-IPVersion.html">IPVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP protocol version.</p>
+<p>GUI Value Range: IPV4(IPv4), IPV6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPV4, IPV6</p>
+<p>MML Default Value: IPV4(IPv4)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, IP Version of <strong>IPVERSION</strong> and <strong>URL</strong> must be the same.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, IP Version of <strong>IPVERSION</strong> and <strong>INITREQURL</strong> must be the same.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>UPDSIP6</strong> is valid when <strong>MODE</strong> is not set to DEFAULT_MODE, <strong>UPDSIP6</strong> must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>UPDSIP</strong> is valid when <strong>MODE</strong> is not set to DEFAULT_MODE, <strong>UPDSIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 0.x.x.x or 127.x.x.x, but can be set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQSIP</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR, <strong>INITREQSIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQSIP6</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR, <strong>INITREQSIP6</strong> must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>MODE</strong> in the <strong>CA</strong> MO is set to DEFAULT_MODE, the IP version of <strong>URL</strong> must be the same as the IP version of <strong>BEAR</strong> in the <strong>OMCH</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-URL.html">URL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Authority URL</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the URL of the CA. The URL can be either an http or https URL. The IP address in the URL must be a valid IP address. The default port number is 80 for http or 443 for https.</p>
+<p>GUI Value Range: 1~128 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~128 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>URL</strong> in a <strong>CA</strong> MO must begin with http or https, the IP address must be a valid IP address, and the port number must range from 1 to 65535.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>URL</strong> must be different from <strong>SLVURL</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, IP Version of <strong>URL</strong> and <strong>SLVURL</strong> must be the same.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, IP Version of <strong>IPVERSION</strong> and <strong>URL</strong> must be the same.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-RAName.html">RANAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Registration Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of a certificate registration authority (RA). The available character set of an RA name is the same as that of a CA name. This parameter is mandatory if the certificate registration server of the customer requires that the recipient in the received certificate request message be the name of the certificate registration server.</p>
+<p>GUI Value Range: 0~127 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~127 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-SignatureAlgorithm.html">SIGNALG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Signature Algorithm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the signature algorithm for message of CMP. The signature algorithm can be Secure Hash Algorithm 1 (SHA1), Secure Hash Algorithm 256 (SHA256) or Secure Hash Algorithm 384 (SHA384).</p>
+<p>Disuse statement: In later versions, the value SHA1(SHA1) will be removed from the value range of this parameter. In the current version, this value can still be configured and take effect. Therefore, you are not advised to use the value SHA1(SHA1).</p>
+<p>GUI Value Range: SHA1(SHA1), SHA256(SHA256), SHA384(SHA384)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SHA1, SHA256, SHA384</p>
+<p>MML Default Value: SHA256(SHA256)</p>
+<p>Recommended Value: SHA256(SHA256)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-Mode.html">MODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Fetch Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: If this parameter is set to DEFAULT_MODE, the UPDSIP, INITREQURL, and INITREQSIP parameters do not need to be set. The base station uses the O&amp;M IP address and URL as the source and destination IP addresses, respectively, for routine certificate management. Routine certificate management involves certificate application and certificate update, both of which can be done performed automatically or manually. When applying for a certificate for the first time during base station deployment by PnP, the base station uses the interface IP address as the source IP address, and the URL as the destination IP address.</p>
+<p>If this parameter is set to CFG_UPD_SIP, INITREQURL and INITREQSIP do not need to be set. The base station uses UPDSIP and URL as the source and destination IP addresses, respectively, for routine certificate management. When applying for a certificate for the first time during base station deployment, the base station uses the interface IP address (during base station deployment by PnP) as the source IP address, and the URL as the destination IP address.</p>
+<p>If this parameter is set to CFG_INIT_UPD_ADDR on the base station:</p>
+<p>The base station uses UPDSIP and URL as the source and destination IP addresses, respectively, for routine certificate management.</p>
+<p>During a request for a certificate for the first time during base station deployment, the base station uses the interface IP address (during base station deployment by PnP) as the source IP address, and the value of the INITREQURL parameter as the destination IP address.</p>
+<p>GUI Value Range: DEFAULT_MODE(DEFAULT_MODE), CFG_UPD_SIP(CFG_UPD_SIP), CFG_INIT_UPD_ADDR(CFG_INIT_UPD_ADDR)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULT_MODE, CFG_UPD_SIP, CFG_INIT_UPD_ADDR</p>
+<p>MML Default Value: DEFAULT_MODE(DEFAULT_MODE)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQURL</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR, <strong>INITREQURL</strong> in a <strong>CA</strong> MO must begin with http or https, the IP address must be a valid IP address, and the port number must range from 1 to 65535.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>SLVINITREQURL</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR and <strong>SLVINITREQURL</strong> is not empty, <strong>SLVINITREQURL</strong> in a <strong>CA</strong> MO must begin with http or https, the IP address must be a valid IP address, and the port number must range from 1 to 65535.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>UPDSIP6</strong> is valid when <strong>MODE</strong> is not set to DEFAULT_MODE, <strong>UPDSIP6</strong> must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>UPDSIP</strong> is valid when <strong>MODE</strong> is not set to DEFAULT_MODE, <strong>UPDSIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 0.x.x.x or 127.x.x.x, but can be set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQSIP</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR, <strong>INITREQSIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQSIP6</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR, <strong>INITREQSIP6</strong> must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-UpdSIP.html">UPDSIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Update Source IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source address for certificate management, such as automatic certificate update, manual certificate update, and manual certificate application. If the source address for certificate application in site deployment is not configured, the address will be used as the source address for acquiring the certificate for the first time.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0.0.0.0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>UPDSIP</strong> is valid when <strong>MODE</strong> is not set to DEFAULT_MODE, <strong>UPDSIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 0.x.x.x or 127.x.x.x, but can be set to 0.0.0.0.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-InitialURL.html">INITREQURL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CA URL During Site Deployment</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the URL of the CA that is used during site deployment. The URL can be either an http or https URL. In the URL, the IP address must be a valid IP address, and the default port number is 80 for http or 443 for https. This parameter is mandatory when the CA uses different URLs during site deployment or certificate update.</p>
+<p>GUI Value Range: 1~128 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~128 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQURL</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR, <strong>INITREQURL</strong> in a <strong>CA</strong> MO must begin with http or https, the IP address must be a valid IP address, and the port number must range from 1 to 65535.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQURL</strong> must be different from <strong>SLVINITREQURL</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, IP Version of <strong>INITREQURL</strong> and <strong>SLVINITREQURL</strong> must be the same.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, IP Version of <strong>IPVERSION</strong> and <strong>INITREQURL</strong> must be the same.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-InitialReqSIP.html">INITREQSIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IP for Applying for a Certificate During Site Deployment</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IP address for the BS to access the CA and to initially obtain a certificate. This parameter is mandatory when the CA uses different URLs in the following scenarios:</p>
+<p>-The BS initially obtains a certificate during site deployment.</p>
+<p>-A certificate is updated.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQSIP</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR, <strong>INITREQSIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 0.x.x.x or 127.x.x.x.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-UpdSIP6.html">UPDSIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Update Source IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IPv6 address for certificate management, such as automatic certificate update, manual certificate update, and manual certificate application. If the source address for certificate application in site deployment is not configured, the address will be used as the source address for acquiring the certificate for the first time.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0:0:0:0:0:0:0:0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>UPDSIP6</strong> is valid when <strong>MODE</strong> is not set to DEFAULT_MODE, <strong>UPDSIP6</strong> must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-InitialReqSIP6.html">INITREQSIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IPv6 Address for Applying for a Certificate During Site Deployment</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IPv6 address for the BS to access the CA and to initially obtain a certificate. This parameter is mandatory when the CA uses different URLs in the following scenarios:</p>
+<p>-The BS initially obtains a certificate during site deployment.</p>
+<p>-A certificate is updated.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQSIP6</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR, <strong>INITREQSIP6</strong> must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-SlaveURL.html">SLVURL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave Certificate Authority URL</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slave URL of the CA. The URL can be either an HTTP or HTTPS URL. The IP address in the URL must be a valid IP address. The default port number is 80 for HTTP or 443 for HTTPS. If the certificate fails to be obtained using the CA URL, the slave CA URL can be used to obtain the certificate only when this parameter is set.</p>
+<p>GUI Value Range: 0~128 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SLVURL</strong> in a <strong>CA</strong> MO is not empty, <strong>SLVURL</strong> in a <strong>CA</strong> MO must begin with http or https, the IP address must be a valid IP address, and the port number must range from 1 to 65535.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>URL</strong> must be different from <strong>SLVURL</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, IP Version of <strong>URL</strong> and <strong>SLVURL</strong> must be the same.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-SlaveInitialURL.html">SLVINITREQURL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave CA URL During Site Deployment</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slave URL of the CA that is used during site deployment. The URL can be either an HTTP or HTTPS URL. In the URL, the IP address must be a valid IP address, and the default port number is 80 for HTTP or 443 for HTTPS. If the certificate fails to be obtained using the CA URL during site deployment, the slave CA URL during site deployment can be used to obtain the certificate only when this parameter is set.</p>
+<p>GUI Value Range: 0~128 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>SLVINITREQURL</strong> is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR and <strong>SLVINITREQURL</strong> is not empty, <strong>SLVINITREQURL</strong> in a <strong>CA</strong> MO must begin with http or https, the IP address must be a valid IP address, and the port number must range from 1 to 65535.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, <strong>INITREQURL</strong> must be different from <strong>SLVINITREQURL</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, IP Version of <strong>INITREQURL</strong> and <strong>SLVINITREQURL</strong> must be the same.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-PolicyID.html">POLICYID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Policy ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of TLS policy configured.</p>
+<p>GUI Value Range: 0~16</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~16</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>POLICYID</strong> in a <strong>CA</strong> MO must be set to a configured value of <strong>POLICYID</strong> in an <strong>TLSPOLICY</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-CertificateRequestSwitch.html">CERTREQSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Request Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch of certificate request configuration information. When this parameter is set to DEFAULT, the CA uses the request information configured in the CERTREQ MO. When this parameter is set to USERDEFINE, the CA requires the customized certificate request information.</p>
+<p>GUI Value Range: DEFAULT(DEFAULT), USERDEFINE(USERDEFINE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULT, USERDEFINE</p>
+<p>MML Default Value: DEFAULT(DEFAULT)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-CommonName.html">COMMNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Common Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the common name of the certificate request file, which can be the electronic serial number (ESN), media access control (MAC) address, or IP address of a board.</p>
+<p>GUI Value Range: ESN(ESN), MAC(MAC), IP(IP)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ESN, MAC, IP</p>
+<p>MML Default Value: ESN(ESN)</p>
+<p>Recommended Value: ESN(ESN)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-CommonNameAdditionalInfo.html">USERADDINFO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Common Name Additional Info.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the additional information about a certificate common name. The information will be added behind the value of the COMMNAME parameter to compose a complete common name for a certificate request file. The default value is .huawei.com. A space is not supported before the value of this parameter, that is, a space is not supported before the character string. However, to meet requirements of consistency checks performed by some CA servers to the certificate common name in a certificate request packet and that in a Huawei device certificate, the certificate common name in a certificate request packet is displayed as "Board ESN"+space+"Common Name Additional Info" only when the certificate common name in a Huawei device certificate is "Board ESN"+space+"Common Name Additional Info". For example, when the value of this parameter is "eNodeB" and the certificate common name in a Huawei device certificate is "ESN eNodeB", a space is automatically added before "eNodeB", that is, the certificate common name in a certificate request packet is displayed as "ESN eNodeB".</p>
+<p>GUI Value Range: 0~32 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~32 characters</p>
+<p>MML Default Value: .huawei.com</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of the <strong>USERADDINFO</strong> parameter in the <strong>CA</strong> MO must be composed of printable ASCII characters, such as upper-case letters (A to Z), lower-case letters (a to z), digits (0 to 9), left bracket ((), right bracket ()), plus sign (+), hyphens (-), full stops (.), slash (/), colon (:), and question mark (?).</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-Country.html">COUNTRY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Country</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the country where a BS is located.</p>
+<p>GUI Value Range: 0~2 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~2 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of the <strong>COUNTRY</strong> parameter in the <strong>CA</strong> MO must be composed of printable ASCII characters, such as upper-case letters (A to Z), lower-case letters (a to z), digits (0 to 9), left bracket ((), right bracket ()), plus sign (+), hyphens (-), full stops (.), slash (/), colon (:), and question mark (?).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The string length of <strong>COUNTRY</strong> in a <strong>CA</strong> MO must be 0 or 2.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-Organization.html">ORG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Organization</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the organization that owns a BS.</p>
+<p>GUI Value Range: 0~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of the <strong>ORG</strong> parameter in the <strong>CA</strong> MO must be composed of printable ASCII characters, such as upper-case letters (A to Z), lower-case letters (a to z), digits (0 to 9), left bracket ((), right bracket ()), plus sign (+), hyphens (-), full stops (.), slash (/), colon (:), and question mark (?).</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-OrganizationalUnit.html">ORGUNIT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Organizational Unit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the organization unit that owns a BS.</p>
+<p>GUI Value Range: 0~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of the <strong>ORGUNIT</strong> parameter in the <strong>CA</strong> MO must be composed of printable ASCII characters, such as upper-case letters (A to Z), lower-case letters (a to z), digits (0 to 9), left bracket ((), right bracket ()), plus sign (+), hyphens (-), full stops (.), slash (/), colon (:), and question mark (?).</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-StateorProvinceName.html">STATEPROVINCENAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">State or Province</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the state or province where a BS is located.</p>
+<p>GUI Value Range: 0~128 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of the <strong>STATEPROVINCENAME</strong> parameter in the <strong>CA</strong> MO must be composed of printable ASCII characters, such as upper-case letters (A to Z), lower-case letters (a to z), digits (0 to 9), left bracket ((), right bracket ()), plus sign (+), hyphens (-), full stops (.), slash (/), colon (:), and question mark (?).</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-Locality.html">LOCALITY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Locality</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the location of a BS.</p>
+<p>GUI Value Range: 0~128 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of the <strong>LOCALITY</strong> parameter in the <strong>CA</strong> MO must be composed of printable ASCII characters, such as upper-case letters (A to Z), lower-case letters (a to z), digits (0 to 9), left bracket ((), right bracket ()), plus sign (+), hyphens (-), full stops (.), slash (/), colon (:), and question mark (?).</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-KeyUsage.html">KEYUSAGE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Key Usage</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the usage for a key, including KEY_AGREEMENT (key negotiation), DATA_ENCIPHERMENT (data encryption), KEY_ENCIPHERMENT (key encryption), and DIGITAL_SIGNATURE (digital signature). This parameter can be set to one or multiple values.</p>
+<p>GUI Value Range: DATA_ENCIPHERMENT(DATA_ENCIPHERMENT), DIGITAL_SIGNATURE(DIGITAL_SIGNATURE), KEY_AGREEMENT(KEY_AGREEMENT), KEY_ENCIPHERMENT(KEY_ENCIPHERMENT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DATA_ENCIPHERMENT, DIGITAL_SIGNATURE, KEY_AGREEMENT, KEY_ENCIPHERMENT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DATA_ENCIPHERMENT:ON, DIGITAL_SIGNATURE:ON, KEY_AGREEMENT:ON, KEY_ENCIPHERMENT:ON</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-CertReqSignatureAlgorithm.html">CERTREQSIGNALG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Request Signature Algorithm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the signature algorithm for a certificate request file.</p>
+<p>Disuse statement: In later versions, the value SHA1(SHA1) will be removed from the value range of this parameter. In the current version, this value can still be configured and take effect. Therefore, you are not advised to use the value SHA1(SHA1).</p>
+<p>GUI Value Range: SHA1(SHA1), SHA256(SHA256), SHA384(SHA384)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SHA1, SHA256, SHA384</p>
+<p>MML Default Value: SHA256(SHA256)</p>
+<p>Recommended Value: SHA256(SHA256)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-KeyType.html">KEYTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Key Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates type of key of one certificate, which can be RSA or ECDSA.</p>
+<p>GUI Value Range: RSA(RSA), ECDSA(ECDSA)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RSA, ECDSA</p>
+<p>MML Default Value: ECDSA(ECDSA)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-KeySize.html">KEYSIZE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Key Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of a key, which can be 1024 bits, 2048 bits, 3072 bits or 4096 bits.</p>
+<p>Disuse statement: In later versions, the value KEYSIZE1024(KEYSIZE1024) will be removed from the value range of this parameter. In the current version, this value can still be configured and take effect. Therefore, you are not advised to use the value KEYSIZE1024(KEYSIZE1024).</p>
+<p>GUI Value Range: KEYSIZE1024(KEYSIZE1024), KEYSIZE2048(KEYSIZE2048), KEYSIZE3072(KEYSIZE3072), KEYSIZE4096(KEYSIZE4096)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: KEYSIZE1024, KEYSIZE2048, KEYSIZE3072, KEYSIZE4096</p>
+<p>MML Default Value: KEYSIZE2048(KEYSIZE2048)</p>
+<p>Recommended Value: KEYSIZE2048(KEYSIZE2048)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE and <strong>KEYTYPE</strong> is set to RSA.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-EccCurve.html">ECCCURVE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ECC Curve</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the elliptic curve used by the key when the certificate key type is ECDSA. The elliptic curve allows P256 (secp256r1), P384 (secp384r1), and ED25519. ED25519 indicates the EdDSA signature scheme using SHA-512 and Curve25519.</p>
+<p>GUI Value Range: P256(P256), P384(P384), ED25519(ED25519)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: P256, P384, ED25519</p>
+<p>MML Default Value: P256(P256)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE and <strong>KEYTYPE</strong> is set to ECDSA.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-LocalName.html">LOCALNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local name of a BS. This parameter is used to generate the DNS name of the subject alternative name of a certificate, so as to verify the peer's identification in IKE negotiation. If this parameter is not configured, the BS automatically uses the common name and its additional information to generate the DNS name.</p>
+<p>GUI Value Range: 0~128 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of the <strong>LOCALNAME</strong> parameter in the <strong>CA</strong> MO must be composed of printable ASCII characters, such as upper-case letters (A to Z), lower-case letters (a to z), digits (0 to 9), left bracket ((), right bracket ()), plus sign (+), hyphens (-), full stops (.), slash (/), colon (:), and question mark (?).</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-LocalIP.html">LOCALIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP address of the subject alternative name of a certificate.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0.0.0.0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>LOCALIP</strong> in a <strong>CA</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 127.x.x.x or 0.x.x.x but can be set to 0.0.0.0.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-LocalIP6.html">LOCALIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IPv6 address of the subject alternative name of a certificate. This parameter is invalid in the old transmission model.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0:0:0:0:0:0:0:0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>LOCALIP6</strong> in a <strong>CA</strong> MO must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>CERTREQSW</strong> is set to USERDEFINE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-Reqvrfidx.html">REQVRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index for Applying for a Certificate During Site Deployment</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of the VRF instance on which the IP address that is used to apply for a certificate during base station deployment depends.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>MODE</strong> is set to CFG_INIT_UPD_ADDR.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-Updvrfidx.html">UPDVRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index for Update a Certificate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of the VRF instance on which the source IP address used in routine certificate management (automatic certificate update, manual certificate update, and manual certificate application) depends.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CA</strong> MO, this parameter is valid only when <strong>MODE</strong> is set to CFG_UPD_SIP, or CFG_INIT_UPD_ADDR.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-TlsSeccsSw.html">TLSSECCSSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TLS Secure Cipher Suite Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TLS security algorithm switch. When the switch is off, it is compatible with non-AEAD (Authenticated Encryption with Associated Data) and non-PFS (Perfect Forward Secrecy) weak security algorithm sets, which poses a security risk. When the switch is turned on, TLS does not support weak security algorithm sets other than AEAD and non-PFS, and only negotiates the security algorithm set. This parameter is invalid when a WMPT serves as the main control board. If this parameter is set to ON, the switch actually takes effect from OFF.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: ON(On)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CA-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether forcible changes to CA objects are made. When this parameter is set to YES, forcible changes to CA objects are made. When this parameter is set to NO, forcible changes to the CA objects that affect associated objects are not allowed. When forcible changes are not allowed, only the local IP address is checked.</p>
+<p>The associated object is IKEPEER. This parameter is invalid when a WMPT, LMPT, GTMUb, or GTMUc serves as the main control board.</p>
+<p>Pay attention to the following when setting this parameter:</p>
+<p>1. The system checks whether forcible changes to CA objects affect associated objects based on the object configuration data instead of the actual object running status.</p>
+<p>2. If an NE is configured with an SRCIPRT, SRCIPROUTE4, PPPLNK, or MPGRP object, the system will not check whether forcible changes to CA objects affect associated objects.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ca__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a certificate authority with the parameters as follows: Certificate Authority Name: C=cn,S=sc,L=cd,O=Huawei,OU=Wireless,CN=enbca, Certificate Authority URL: http://192.168.1.167:80, Signature Algorithm: SHA256, Certificate Fetch Mode: DEFAULT_MODE, Slave Certificate Authority URL: http://192.168.1.122:80, Policy ID: 0, Certificate Request Switch: USERDEFINE, Common Name: ESN, Common Name Additional Info.: .huawei.com, Country: cn, Organization: IETF, Organizational Unit: hw, State or Province: sc, Locality: cd, Key Usage: DATA_ENCIPHERMENT-1&amp;DIGITAL_SIGNATURE-1&amp;KEY_AGREEMENT-1&amp;KEY_ENCIPHERMENT-1, Certificate Request Signature Algorithm: SHA256, Key Type: RSA, Key Size: KEYSIZE1024, run the following command:
+ADD CA: CANAME="C=cn,S=sc,L=cd,O=Huawei,OU=Wireless,CN=enbca", URL="http://192.168.1.167:80", SIGNALG=SHA256, MODE=DEFAULT_MODE, SLVURL="http://192.168.1.122:80", POLICYID=0,  CERTREQSW=USERDEFINE, COMMNAME=ESN, USERADDINFO=".huawei.com", COUNTRY="cn", ORG="IETF", ORGUNIT="hw", STATEPROVINCENAME="sc", LOCALITY="cd", KEYUSAGE=DATA_ENCIPHERMENT-1&amp;DIGITAL_SIGNATURE-1&amp;KEY_AGREEMENT-1&amp;KEY_ENCIPHERMENT-1, CERTREQSIGNALG=SHA256, KEYTYPE=RSA, KEYSIZE=KEYSIZE1024;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

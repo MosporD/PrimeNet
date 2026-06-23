@@ -1,0 +1,138 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="GTRXGROUPSECTOREQM">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="GTrxGroupSectorEqm">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>GTRXGROUPSECTOREQM</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="GTrxGroupSectorEqm"></a><a name="GTrxGroupSectorEqm"></a>
+
+
+<h1 class="topictitle1">GTRXGROUPSECTOREQM</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="GbtsFunction.html">GBTSFUNCTION</a>
+    +-<a href="GTrxGroup.html">GTRXGROUP</a>
+      +-<a href="GTrxGroupSectorEqm.html"><strong>GTRXGROUPSECTOREQM</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The GTRXGROUPSECTOREQM MO manages sector equipment for the TRX group. The sector equipment provides RF resource for the TRXs in the TRX group.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="GTrxGroup.html">GTRXGROUP</a></li><li>Relation with the <strong>GBTSPWRSHRGRP</strong> MO:<ul><li>The sector equipment used by <strong>GBTSPWRSHRGRP</strong> must have been bound to <strong>GTRXGROUPSECTOREQM</strong>.</li></ul>
+</li><li>Relation with the <strong>GTRXGROUP</strong> MO:<ul><li>If <strong>WORKMODE</strong> for <strong>GTRXGROUP</strong> is set to INTERPARFFH, a maximum of two pieces of sector equipment can be bound to the <strong>GTRXGROUP</strong>.</li><li>If <strong>WORKMODE</strong> for <strong>GTRXGROUP</strong> is set to INTERPAPS, a maximum of two pieces of sector equipment can be bound to the <strong>GTRXGROUP</strong>.</li><li>When <strong>RCVMD</strong> in <strong>GTRXGROUP</strong> is set to MAINDIVERSITY, the sector equipment referenced by <strong>GTRXGROUP</strong> using <strong>GTRXGROUPSECTOREQM</strong> under which  <strong>SERVETYPE</strong> is set to NORMAL must be configured with at least two RX antennas.</li><li>When <strong>RCVMD</strong> in <strong>GTRXGROUP</strong> is set to FOURDIVERSITY, the sector equipment referenced by <strong>GTRXGROUP</strong> using <strong>GTRXGROUPSECTOREQM</strong> under which  <strong>SERVETYPE</strong> is set to NORMAL must be configured with at least two RX antennas.</li><li>If <strong>LOCELLTYPE</strong> under <strong>GLOCELL</strong> is set to MULTISITE_CELL, the sector equipment bound to <strong>GTRXGROUP</strong> under <strong>GLOCELL</strong> cannot be used by other <strong>GLOCELL</strong>.</li><li>One <strong>GLOCELL</strong> allows only one <strong>GTRXGROUP</strong> to be bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX.</li><li>If <strong>SNDMD</strong> under <strong>GTRXGROUP</strong> is set to DIVERSITY, <strong>GTRXGROUP</strong> cannot be bound to  <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX.</li><li>When <strong>WORKMODE</strong> in <strong>GTRXGROUP</strong> is set to INTERPARFFH or INTERPAPS, <strong>GTRXGROUP</strong> cannot be bound to <strong>GTRXGROUPSECTOREQM</strong> under which  <strong>SERVETYPE</strong> is set to AUX.</li></ul>
+</li><li>Relation with the <strong>GLOCELL</strong> and <strong>GTRXGROUP</strong> MOs:<ul><li>No more than two pieces of sector equipment can be bound to the <strong>GTRXGROUP</strong> MO using the <strong>GTRXGROUPSECTOREQM</strong> MO under which <strong>SERVETYPE</strong> is set to NORMAL if both the following conditions are met:</li><li><strong>LOCELLTYPE</strong> in <strong>GLOCELL</strong> is set to NORMAL_CELL.</li><li><strong>WORKMODE</strong> in <strong>GTRXGROUP</strong> bound to <strong>GLOCELL</strong> is set to INDEPENDENT.</li><li>When <strong>LOCELLTYPE</strong> in <strong>GLOCELL</strong> is set to MULTISITE_CELL, <strong>GTRXGROUP</strong> bound to <strong>GLOCELL</strong> cannot be bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX.</li><li>When <strong>LOCELLTYPE</strong> in the <strong>GLOCELL</strong> MO is set to NORMAL_CELL, if <strong>WORKMODE</strong> in the <strong>GTRXGROUP</strong> MO referenced by the <strong>GLOCELL</strong> MO is set to INDEPENDENT and the <strong>GTRXGROUPSECTOREQM</strong> MO with <strong>SERVETYPE</strong> set to NORMAL is bound to two sets of sector equipment, <strong>SNDMD</strong> must be set to DIVERSITY and <strong>RCVMD</strong> must be set to FOURDIVERSITY in the <strong>GTRXGROUP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTRXGROUPSECTOREQM</strong> MO:<ul><li>When <strong>LOCELLTYPE</strong> in <strong>GLOCELL</strong> is set to NORMAL_CELL, the sector equipment cannot be bound to different <strong>GTRXGROUP</strong> MOs bound to <strong>GLOCELL</strong> using <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to NORMAL.</li><li>If <strong>SERVETYPE</strong> in the <strong>GTRXGROUPSECTOREQM</strong> MO is set to NORMAL, at least one TX antenna must be configured for the sector equipment to which the <strong>GTRXGROUPSECTOREQM</strong> MO is bound.</li><li>When <strong>RCVMD</strong> in <strong>GTRXGROUP</strong> is set to SINGLERECV, the sector equipment referenced by <strong>GTRXGROUP</strong> using <strong>GTRXGROUPSECTOREQM</strong> under which  <strong>SERVETYPE</strong> is set to NORMAL must be configured with at least one RX antenna.</li><li>If <strong>LOCELLTYPE</strong> for <strong>GLOCELL</strong> is set to NORMAL_CELL, <strong>SECTOREQM</strong> bound to <strong>GTRXGROUP</strong> under <strong>GLOCELL</strong> can be used by a maximum of four <strong>GTRXGROUP</strong>s.</li><li>If <strong>LOCELLTYPE</strong> for <strong>GLOCELL</strong> is set to MULTISITE_CELL, <strong>GTRXGROUP</strong> under <strong>GLOCELL</strong> cannot be bound to different pieces of sector equipment under the same sector.</li><li>If <strong>LOCELLTYPE</strong> for <strong>GLOCELL</strong> is set to MULTISITE_CELL, a maximum of 30 pieces of sector equipment can be bound to a <strong>GTRXGROUP</strong> under <strong>GLOCELL</strong>.</li><li>If <strong>LOCELLTYPE</strong> for <strong>GLOCELL</strong> is set to MULTISITE_CELL, <strong>MAXPOWER</strong> for <strong>GTRXGROUPSECTOREQM</strong> bound to <strong>GTRXGROUP</strong> must be set to 65535.</li><li>If <strong>LOCELLTYPE</strong> for <strong>GLOCELL</strong> is set to MULTISITE_CELL, sector equipment bound to all <strong>GTRXGROUP</strong>s under <strong>GLOCELL</strong> cannot be used by <strong>GBTSPWRSHRGRP</strong>.</li><li><strong>GTRXGROUP</strong> can be configured with a maximum of one <strong>GTRXGROUPSECTOREQM</strong> under which  <strong>SERVETYPE</strong> is set to AUX.</li><li>Before <strong>GTRXGROUP</strong> is bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, it must be bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to NORMAL.</li><li>Before <strong>GTRXGROUP</strong> is bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, it must be bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to NORMAL.</li><li>When <strong>GTRXGROUP</strong> is bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, the two pieces of sector equipment specified by <strong>SECTOREQM</strong> bound to <strong>GTRXGROUP</strong> belong to one sector.</li></ul>
+</li><li>Relation with the <strong>GTRXGROUP</strong> and <strong>SECTOREQM</strong> MOs:<ul><li>If <strong>WORKMODE</strong> for <strong>GTRXGROUP</strong> is set to INTERPAPS or INTERPARFFH, the RF modules where the transmit antennas for the <strong>GTRXGROUPSECTOREQM</strong>s bound to the <strong>GTRXGROUP</strong> are configured cannot be used by other <strong>GTRXGROUPSECTOREQM</strong>s.</li><li>When <strong>SNDMD</strong> under <strong>GTRXGROUP</strong> is set to DIVERSITY, transmit antennas configured for the sector equipment referenced by <strong>GTRXGROUP</strong> must be configured  on the same RF module.</li><li>When <strong>SNDMD</strong> under <strong>GTRXGROUP</strong> is set to DIVERSITY, transmit antennas configured for the sector equipment referenced by <strong>GTRXGROUP</strong> cannot be located on the same virtual antenna.</li><li>When an RF module is used by <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, <strong>GTRXGROUP</strong> of all TX antennas on the RF module must belong the one <strong>GLOCELL</strong>.</li><li>If one transmit antenna is bound to two <strong>SECTOREQM</strong> MOs, and the <strong>SECTOREQM</strong> MO is referenced by the <strong>GTRXGROUPSECTOREQM</strong> MO under which <strong>SERVETYPE</strong> is set to NORMAL, <strong>RCVMD</strong> under the two <strong>GTRXGROUP</strong> MOs referencing the <strong>SECTOREQM</strong> MO must be set to MAINDIVERSITY and FOURDIVERSITY, respectively.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong> MO:<ul><li>The transmit antenna in <strong>SECTOREQM</strong> referenced by <strong>GTRXGROUPSECTOREQM</strong> must be configured to work in master mode.</li><li><strong>SECTOREQM</strong> used by <strong>GTRXGROUPSECTOREQM</strong> must have been configured.</li><li>When <strong>WORKMODE</strong> under <strong>GTRXGROUP</strong> is set to INTERPARFFH or INTERPAPS, the transmit antennas for the two pieces of sector equipment bound to <strong>GTRXGROUP</strong> cannot be located on the same virtual antenna.</li><li>When <strong>GTRXGROUP</strong> is bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, TX antennas configured on the sector equipment referenced by <strong>GTRXGROUP</strong> must belong to the same RF module.</li><li>When <strong>GTRXGROUP</strong> is bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, TX antennas configured on the sector equipment referenced by <strong>GTRXGROUP</strong> must differ and cannot belong to the same virtual antenna.</li><li>When <strong>GTRXGROUP</strong> is bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, each piece of sector equipment bound to <strong>GTRXGROUP</strong> is configured with only one TX antenna.</li><li>One transmit antenna can be bound by a maximum of two <strong>SECTOREQM</strong> MOs. The <strong>SECTOREQM</strong> MO must be referenced by the <strong>GTRXGROUPSECTOREQM</strong> MO under which <strong>SERVETYPE</strong> is set to NORMAL.</li></ul>
+</li><li>Relation with the <strong>GBTSPWRSHRGRP</strong>, <strong>GTRXGROUP</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>The transmit antennas for <strong>SECTOREQM</strong> referenced by <strong>GBTSPWRSHRGRP</strong>, and those referenced by <strong>GTRXGROUP</strong> for which <strong>SNDMD</strong> is set to DIVERSITY cannot be located on the same virtual antenna.</li></ul>
+</li><li>Relation with the <strong>GTRXGROUP</strong>, <strong>SECTOREQM</strong>, and <strong>GLOCELL</strong> MOs:<ul><li>The four RX antennas must be configured on the same RF module if all of the following conditions are met:</li><li><strong>BASEBANDPOLICY</strong> in <strong>GLOCELL</strong> is set to EMBEDBBONLY.</li><li><strong>RCVMD</strong> in <strong>GTRXGROUP</strong> bound to <strong>GLOCELL</strong> is set to FOURDIVERSITY.</li><li>Four RX antennas are configured on <strong>SECTOREQM</strong> referenced by <strong>GTRXGROUP</strong> using <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to NORMAL.</li><li>The four RX antennas must be configured on the same RF module, or two RX antennas are configured on one RF module and the other two are configured on another RF module if all of the following conditions are met:</li><li><strong>BASEBANDPOLICY</strong> in <strong>GLOCELL</strong> is set to BBEQMFST.</li><li><strong>RCVMD</strong> in <strong>GTRXGROUP</strong> bound to <strong>GLOCELL</strong> is set to FOURDIVERSITY.</li><li>Four RX antennas are configured on <strong>SECTOREQM</strong> referenced by <strong>GTRXGROUP</strong> using <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to NORMAL.</li></ul>
+</li><li>Relation with the <strong>GBTSPWRSHRGRP</strong> and <strong>SECTOREQM</strong> MOs:<ul><li><strong>PWRSHRTYPE</strong> in <strong>GBTSPWRSHRGRP</strong> is set to GLPWRSHR, and transmit antennas of two <strong>SECTOREQM</strong>s that bound to the <strong>GBTSPWRSHRGRP</strong> are configured on different RF modules. If among the different RF modules, transmit antennas of an RF module are configured on the <strong>SECTOREQM</strong> that bound to a <strong>GTRXGROUP</strong>, transmit antennas bound to the <strong>GTRXGROUP</strong> and those bound to the <strong>GBTSPWRSHRGRP</strong> must be located on the same virtual antenna.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> and <strong>GTMU</strong> MOs:<ul><li>A maximum of 36 <strong>GTRXGROUPSECTOREQM</strong>s can be configured for a GBTS function when <strong>GTMU</strong> with <strong>TYPE</strong> set to GTMU and <strong>BRDSPEC</strong> set</li><li>to GTMUb is configured, and <strong>MPT</strong> with <strong>TYPE</strong> set to UMPT is not configured.</li><li>When there is <strong>MPT</strong> under which <strong>TYPE</strong> is set to GTMU and there is no <strong>MPT</strong> under which <strong>TYPE</strong> is set to UMPT, <strong>GTRXGROUP</strong> cannot be bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong> and <strong>GBTSPWRSHRGRP</strong> MOs:<ul><li>When <strong>GTRXGROUP</strong> is bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, the TX antenna referenced by <strong>GTRXGROUP</strong> must differ from that referenced by <strong>GBTSPWRSHRGRP</strong>, and the antennas cannot belong to the same virtual antenna.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong>, <strong>GTRXGROUP</strong>, and <strong>GLOCELL</strong> MOs:<ul><li>If one transmit antenna is bound to two <strong>SECTOREQM</strong> MOs, and the <strong>SECTOREQM</strong> MO is referenced by the <strong>GTRXGROUPSECTOREQM</strong> MO under which <strong>SERVETYPE</strong> is set to NORMAL, <strong>LOCELLTYPE</strong> under the <strong>GLOCELL</strong> MO referencing the <strong>SECTOREQM</strong> MO must be set to NORMAL_CELL.</li></ul>
+</li><li>Relation with the <strong>GLOCELL</strong>, <strong>GTRXGROUP</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>When <strong>LOCELLTYPE</strong> in the <strong>GLOCELL</strong> MO is set to NORMAL_CELL, if <strong>WORKMODE</strong> in the <strong>GTRXGROUP</strong> MO referenced by the <strong>GLOCELL</strong> MO is set to INDEPENDENT and the <strong>GTRXGROUPSECTOREQM</strong> MO with <strong>SERVETYPE</strong> set to NORMAL is bound to two sets of sector equipment, all antennas bound to <strong>GTRXGROUP</strong> must belong to the same RF module.</li><li>When <strong>LOCELLTYPE</strong> in the <strong>GLOCELL</strong> MO is set to NORMAL_CELL, if <strong>WORKMODE</strong> in the <strong>GTRXGROUP</strong> MO referenced by the <strong>GLOCELL</strong> MO is set to INDEPENDENT and the <strong>GTRXGROUPSECTOREQM</strong> MO with <strong>SERVETYPE</strong> set to NORMAL is bound to two sets of sector equipment, the sector equipment bound to <strong>GTRXGROUP</strong> must be configured with two TX antennas.</li><li>When <strong>LOCELLTYPE</strong> in the <strong>GLOCELL</strong> MO is set to NORMAL_CELL, if <strong>WORKMODE</strong> in the <strong>GTRXGROUP</strong> MO referenced by the <strong>GLOCELL</strong> MO is set to INDEPENDENT and the <strong>GTRXGROUPSECTOREQM</strong> MO with <strong>SERVETYPE</strong> set to NORMAL is bound to two sets of sector equipment, the sector equipment bound to <strong>GTRXGROUP</strong> must be configured with four RX antennas.</li><li>When <strong>LOCELLTYPE</strong> in the <strong>GLOCELL</strong> MO is set to NORMAL_CELL, if <strong>WORKMODE</strong> in the <strong>GTRXGROUP</strong> MO referenced by the <strong>GLOCELL</strong> MO is set to INDEPENDENT and the <strong>GTRXGROUPSECTOREQM</strong> MO with <strong>SERVETYPE</strong> set to NORMAL is bound to two sets of sector equipment, the two sets of sector equipment bound to <strong>GTRXGROUP</strong> must belong to different sectors.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#GTrxGroupSectorEqm__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="GTrxGroupSectorEqm__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="GTrxGroupSectorEqm__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_gtrxgroupsectoreqm.html">ADD GTRXGROUPSECTOREQM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add sector equipment for the TRX group. The sector equipment provides RF resource for the TRXs in the TRX group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_gtrxgroupsectoreqm.html">LST GTRXGROUPSECTOREQM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the information about the TRX group sector equipment.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_gtrxgroupsectoreqm.html">MOD GTRXGROUPSECTOREQM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the attributes of the TRX group sector equipment.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_gtrxgroupsectoreqm.html">RMV GTRXGROUPSECTOREQM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove sector equipment from the TRX group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#GTrxGroupSectorEqm__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="GTrxGroupSectorEqm__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="GTrxGroupSectorEqm__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTrxGroupSectorEqm-gTrxGroupId.html">TRX Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the identity of a TRX group. It uniquely identifies a TRX group served by a GBTS function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTrxGroupSectorEqm-sectorEqmId.html">Sector Equipment ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the identity of sector equipment served by a TRX group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTrxGroupSectorEqm-maxPower.html">Maximum Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum power provided for the TRX group by the sector equipment which needs to share the antenna system with the logical cell in the same mode provided by other operators. 65535 indicates that the maximum allowed transmitting power provided by the sector equipment.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTrxGroupSectorEqm-serveType.html">Serve Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the serving type of the sector equipment bound to the TRX group. When this parameter is set to NORMAL, a TRX group is bound to sector equipment. When this parameter is set to AUX, a TRX group is bound to auxiliary sector equipment for power increase.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

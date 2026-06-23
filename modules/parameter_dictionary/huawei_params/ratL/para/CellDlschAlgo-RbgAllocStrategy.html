@@ -1,0 +1,385 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="RBG Resource Allocation Strategy">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellDlschAlgo-RbgAllocStrategy">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>RBG Resource Allocation Strategy</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellDlschAlgo-RbgAllocStrategy"></a><a name="CellDlschAlgo-RbgAllocStrategy"></a>
+
+
+  <h1 class="topictitle1">RBG Resource Allocation Strategy</h1>
+
+  <div>
+    <div class="section">
+      
+<div class="tablenoborder"><table cellpadding="4" cellspacing="0" summary="" frame="border" border="1" rules="all">
+          
+          
+          <tbody>
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.1.1">MO</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.1.1 ">
+                <a href="../mo/CellDlschAlgo.html">CellDlschAlgo</a>
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.2.1">Parameter ID</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.2.1 ">RbgAllocStrategy</td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.3.1">Parameter Name</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.3.1 ">
+                <p>RBG Resource Allocation Strategy</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.4.1">NE</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.4.1 ">
+                <p>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.5.1">MML Command</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.5.1 ">
+                <p>MOD CELLDLSCHALGO</p>
+
+                <p>LST CELLDLSCHALGO</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.6.1">Meaning</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.6.1 ">
+                <p>For services whose QoS class identifier (QCI) is not 1:</p>
+
+                <p>When this parameter is set to ROUND_DOWN: (1) If the number of required resource block groups (RBGs) is less than 1, the actual required number of RBs are allocated to UEs in the current transmission time interval (TTI); (2) If the number of required RBGs is greater than N but less than N+1 (N is an integer greater than or equal to 1), N RBGs are allocated to UEs in the current TTI and the other required RBs are allocated to UEs in subsequent TTIs. Setting this parameter to ROUND_DOWN ensures full utilization of RBs, but increases scheduling times and decreases the downlink UE data rate.</p>
+
+                <p>When this parameter is set to ROUND_UP and the number of required RBGs is greater than N but less than N+1 (N is an integer greater than or equal to 0), N+1 RBGs are allocated to UEs in the current TTI. Setting this parameter to ROUND_UP wastes a few RBs, but decreases scheduling times and increases the downlink UE data rate.</p>
+
+                <p>When this parameter is set to ADAPTIVE: (1) If the number of required RBGs is less than 1, the actual required number of RBs are allocated to UEs in the current TTI; (2) If the number of required RBGs is greater than N but less than N+1 (N is an integer greater than or equal to 1), N+1 RBGs are allocated to UEs in the current TTI. Compared with setting this parameter to ROUND_UP, setting this parameter to ADAPTIVE avoids wasting RBs when the number of required RBGs is less than 1.</p>
+
+                <p>When this parameter is set to TYPE1_FIRST and the number of required RBs is less than or equal to the maximum number of RBs that can be allocated using resource allocation type 1, resource allocation type 1 is preferentially used to allocate RBs. If the conditions for using resource allocation type 1 are not met, the parameter value ADAPTIVE takes effect. This value applies only to LTE TDD.</p>
+
+                <p>For services whose QCI is 1 (such as VoIP services):</p>
+
+                <p>When this parameter is set to ROUND_DOWN: (1) If the number of required RBGs is less than 1, the actual required number of RBs are allocated to UEs in the current TTI; (2) If the number of required RBGs is greater than N but less than N+1 (N is an integer greater than or equal to 1), N+1 RBGs are allocated to UEs in the current TTI.</p>
+
+                <p>If this parameter is set to ROUND_UP or ADAPTIVE, RBs are allocated to UEs in the same way as they are allocated when this parameter is set to ROUND_UP or ADAPTIVE for non-QCI-1 services, respectively.</p>
+
+                <p>If this parameter is set to TYPE1_FIRST, RBs are allocated to UEs in the same way as they are allocated when this parameter is set to ADAPTIVE.</p>
+
+                <p>For ping services:</p>
+
+                <p>If this parameter is set to ROUND_DOWN, ROUND_UP, or ADAPTIVE and the number of required RBs is greater than N but less than N+1 RBGs (N is an integer greater than or equal to 0), N+1 RBGs are allocated to UEs in the current TTI.</p>
+
+                <p>If this parameter is set to TYPE1_FIRST, RBs are allocated to UEs in the same way as they are allocated when this parameter is set to TYPE1_FIRST for non-QCI-1 services.</p>
+
+                <p>This parameter applies only to LTE FDD and LTE TDD.</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.7.1">IsKey</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.7.1 ">
+                <p>NO</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.8.1">Mandatory</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.8.1 ">
+                <p>NO</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.9.1">Dynamic Attribute</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.9.1 ">
+                <p>NO</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.10.1">Feature ID/Feature Name</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.10.1 ">
+                <p>LBFD-002025/TDLBFD-002025 Basic Scheduling</p>
+
+                <p>LBFD-00101502/TDLBFD-00101502 Dynamic Scheduling</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.11.1">Value Type</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.11.1 ">
+                <p>Enumeration Type</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.12.1">GUI Value Range</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.12.1 ">
+                <p>ROUND_DOWN(Round Down), ROUND_UP(Round Up), ADAPTIVE(Adaptive), TYPE1_FIRST(Type1 First)</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.13.1">Enumeration Number/Bit</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.13.1 ">
+                <p>ROUND_DOWN~0, ROUND_UP~1, ADAPTIVE~2, TYPE1_FIRST~3</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.14.1">Unit</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.14.1 ">
+                <p>None</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.15.1">Actual Value Range</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.15.1 ">
+                <p>ROUND_DOWN, ROUND_UP, ADAPTIVE, TYPE1_FIRST</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.16.1">Default Value</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.16.1 ">
+                <p>ADAPTIVE(Adaptive)</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.17.1">Recommended Value</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.17.1 ">
+                <p>ADAPTIVE(Adaptive)</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.18.1">Initial Value Setting Source</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.18.1 ">
+                <p>Default/Recommended Value</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.19.1">Impact</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.19.1 ">
+                <p>CellDlschAlgo</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.20.1">Parameter Relationship</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.20.1 ">
+                <p>None</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.21.1">Access</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.21.1 ">
+                <p>Read &amp; Write</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.22.1">Service Interrupted After Modification</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.22.1 ">
+                <p>No (And no impact on the UE in idle mode)</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.23.1">Interruption Scope</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.23.1 ">
+                <p>N/A</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.24.1">Interruption Duration (min)</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.24.1 ">
+                <p>N/A</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.25.1">Caution</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.25.1 ">
+                <p>None</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.26.1">Validation of Modification</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.26.1 ">
+                <p>The parameter modification takes effect immediately.</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.27.1">Impact on Radio Network Performance</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.27.1 ">
+                <p>If this parameter is set to ROUND_DOWN, all allocated RBs are fully utilized, spectral efficiency is high, but throughput is relatively low.</p>
+
+                <p>If this parameter is set to ROUND_UP, a few allocated RBs are not utilized, spectral efficiency is low, but throughput is relatively high.</p>
+
+                <p>Compared with setting this parameter to ROUND_UP, setting this parameter to ADAPTIVE does not waste RBs when the number of required RBGs is less than 1.</p>
+
+                <p>Setting this parameter to TYPE1_FIRST minimizes the number of wasted RBs and maximizes spectral efficiency.</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.28.1">Introduced in Version...</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.28.1 ">
+                <p>BTS3900 LTE: V100R008C00</p>
+
+                <p>BTS3900: V100R008C00</p>
+
+                <p>BTS5900 LTE: V100R013C00</p>
+
+                <p>BTS5900: V100R013C00</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.29.1">Attribute</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.29.1 ">
+                <p>Radio</p>
+
+              </td>
+
+            </tr>
+
+            <tr>
+              <th class="firstcol" valign="top" width="22.5%" id="mcps1.3.1.1.1.3.30.1">Applicable Mode</th>
+
+              <td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.1.1.1.3.30.1 ">
+                <p>L-FDD, L-TDD</p>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+</div>
+
+    </div>
+
+  </div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,291 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display CPRI Line Bit Rate (DSP CPRILBR)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_cprilbr">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display CPRI Line Bit Rate (DSP CPRILBR)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_cprilbr"></a><a name="dsp_cprilbr"></a>
+
+
+<h1 class="topictitle1">Display CPRI Line Bit Rate (DSP CPRILBR)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_cprilbr__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the current line rate of the specified chain/ring and the maximum line rates of the remote equipment controller (REC) and each remote equipment (RE).</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_cprilbr__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]For a trunk chain, the maximum bit rates of the BBP ports are displayed in the ascending order of the logical port number of the chain. The following values indicate the maximum bit rates of board ports which connect to the BBP ports in the same order. If the connection information cannot be obtained, the values of Port No., Subport No., and Max bit rate of the board are displayed as NULL.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The line rates of all UBBPei ports must be the same due to the hardware capability limitations. If the line rate of a UBBPei port is set to a fixed rate, all the UBBPei ports work at the fixed rate.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]In a separate-MPT base station deployed with CPRI MUX, when the converged board is an LBBP or WBBP and the CPRI line rates of the ports connecting to a trunk chain on the converging party are set to AUTO: </p>
+<p>- If the converging board is not a UBBPei, the CPRI line rates must not exceed 9.8 Gbit/s. </p>
+<p>- If the converging board is a UBBPei, the CPRI line rates must not exceed 39.2 Gbit/s. </p>
+<p>If links cannot be set up for the associated boards or links cannot work at the expected CPRI line rate, a negotiation for the CPRI line rate should be manually started. For details, see the help of the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If multiple modes of a separate-MPT base station share an RMU, the chains/rings connecting to the RMU work at the same line rate as the chain/ring with the maximum number of board cascading levels. If links cannot be set up for the associated boards or links cannot work at the expected CPRI line rate, run the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command to initiate a CPRI line rate negotiation.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]In auto-negotiation mode, the settings of the user-defined rate negotiation switch and the bit rate set do not take effect immediately after they are modified. The settings take effect from the next rate negotiation. To make the settings take effect immediately, you can manually initiate a negotiation. For details, see the help of the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_cprilbr__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-RRUChainId.html">RCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Chain No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the RRU chain/ring. It uniquely identifies a chain within a base station.</p>
+<p>GUI Value Range: 0~249</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~249</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_cprilbr__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To query the CPRI line rate with the parameter as follows: Chain No.: 1, run the following command:
+DSP CPRILBR: RCN=1;
+The result is shown as follows:
++++    0        2009-12-07 20:24:44
+O&amp;M    #5133
+%%DSP CPRILBR: RCN=1;%%
+RETCODE = 0  Operation succeeded.
+
+Display CPRI Line Bit Rate
+--------------------------
+          Current line bit rate  =  2.5G
+     Current head line bit rate  =  2.5G
+Current head negotiation status  =  Negotiated
+(Number of results = 1)
+
+Max bit rate
+------------
+Cabinet No.  Subrack No.  Slot No.  Node  Max bit rate              Multirate cascading capability
+
+0            0            1         Head  2.5G                      NULL                          
+0            60           0         0     2.5G                      UNSUPPORTED                   
+0            61           0         1     Slave:2.5G &amp; Master:4.9G  UNSUPPORTED                   
+(Number of results = 3)
+
+
+---    END
+
+Example 2: To query the CPRI line bit rate of the trunk chain with the parameter as follows: Chain No.: 1, run the following command:
+DSP CPRILBR: RCN=2;
+The result is shown as follows:
++++    0        2016-03-27 14:50:28
+O&amp;M    #710
+%%DSP CPRILBR: RCN=2;%%
+RETCODE = 0  Operation succeeded.
+
+Display CPRI Line Bit Rate
+--------------------------
+            Current line bit rate  =  9.8G &amp; 4.9G
+     Current port 1 line bit rate  =  9.8G
+Current port 1 negotiation status  =  USERCONFIG
+     Current port 2 line bit rate  =  4.9G
+Current port 2 negotiation status  =  USERCONFIG
+     Current port 3 line bit rate  =  9.8G
+Current port 3 negotiation status  =  USERCONFIG
+     Current port 4 line bit rate  =  4.9G
+Current port 4 negotiation status  =  USERCONFIG
+(Number of results = 1)
+
+Max bit rate
+------------
+Cabinet No.  Subrack No.  Slot No.  Port No.  Subport No.  Node  Max bit rate  Multirate cascading capability
+
+0            0            4         0         0            Head  9.8G          NULL         
+0            0            4         1         0            Head  9.8G          NULL         
+0            0            4         2         0            Head  9.8G          NULL         
+0            0            4         3         0            Head  9.8G          NULL         
+0            100          0         0         1            0     10.1G         UNSUPPORTED              
+0            100          0         0         0            0     10.1G         UNSUPPORTED           
+0            100          0         1         0            0     10.1G         UNSUPPORTED           
+0            100          0         1         1            0     10.1G         UNSUPPORTED          
+(Number of results = 8)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_cprilbr__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current line bit rate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the current Common Public Radio Interface (CPRI) line rate of the RRU chain/ring.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current head line bit rate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the current CPRI line rate at the head of the RRU chain/ring. In auto-negotiation mode, the rate specified by this parameter is the optimal one among the rate set supported by this port, the rate set supported by the RRU/RFU/CXU/AAS, and the rate set for automatic rate negotiation.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current head negotiation status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the negotiation state of the CPRI port, which can be NOTREADY(Not Ready), NEGOTIATING(Negotiating), NEGOTIATED(Negotiated), TIMEOUT(Timeout), or USERCONFIG(User Configured). The value NOTREADY(Not Ready) indicates that the rate negotiation has not been started. The value NEGOTIATING(Negotiating) indicates that the rate is being negotiated. The value NEGOTIATED(Negotiated) indicates that the rate negotiation is complete. The value TIMEOUT(Timeout) indicates that the rate negotiation timed out due to a software or hardware fault during the negotiation. The value USERCONFIG(USERCONFIG) indicates that the rate is configured by users and does not support negotiation.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current tail line bit rate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the current CPRI line rate at the tail of the RRU chain/ring. In auto-negotiation mode, the rate specified by this parameter is the optimal one among the rate set supported by this port, the rate set supported by the RRU/RFU/CXU/AAS, and the rate set for automatic rate negotiation.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current tail negotiation status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the negotiation state at the tail of the CPRI ring, which can be NOTREADY(Not Ready), NEGOTIATING(Negotiating), NEGOTIATED(Negotiated), TIMEOUT(Timeout), or USERCONFIG(User Configured). The value NOTREADY(Not Ready) indicates that rate negotiation has not been started. The value NEGOTIATING(Negotiating) indicates that the rate is being negotiated. The value NEGOTIATED(Negotiated) indicates that the rate negotiation is complete. The value TIMEOUT(Timeout) indicates that the rate negotiation timed out due to a software or hardware fault during the negotiation. The value USERCONFIG(User Configured) indicates that the rate is configured by users and does not support negotiation.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Node</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of an RRU/RFU/CXU/AAS on the RRU chain/ring. The RRUs/RFUs/CXUs/AASs are numbered from 0 in ascending order. The value Head indicates the port on the baseband processing board connecting to the first RRU/RFU/CXU/AAS on the RRU chain/ring. The value Tail indicates the port on the baseband processing board connecting to the last board on the RRU chain/ring.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Max bit rate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum bit rate at the Common Public Radio Interface (CPRI) port. If the maximum bit rate is NULL, the RF module or baseband processing board does not support the rate negotiation, or the rate negotiation fails. If the maximum bit rates of two ports on the RRU/RFU are the same, only one rate is displayed. When the maximum bit rates of two ports on the RRU/RFU are different, two rates are displayed.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Multirate cascading capability</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the capability of multirate cascading. SUPPORTED indicates two ports of the RF module can work at different rates.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current port 1 line bit rate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the current CPRI line rate at port 1 of the RRU trunk chain.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current port 1 negotiation status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the negotiation state at port 1 of the CPRI trunk chain which can be NOTREADY(Not Ready), NEGOTIATING(Negotiating), NEGOTIATED(Negotiated), TIMEOUT(Timeout), or USERCONFIG(User Configured). The value NOTREADY(Not Ready) indicates that rate negotiation has not been started. The value NEGOTIATING(Negotiating) indicates that the rate is being negotiated. The value NEGOTIATED(Negotiated) indicates that the rate negotiation is complete. The value TIMEOUT(Timeout) indicates that the rate negotiation timed out due to a software or hardware fault during the negotiation. The value USERCONFIG(User Configured) indicates that rate is configured by users and does not support negotiation.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current port 2 line bit rate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the current CPRI line rate at port 2 of the RRU trunk chain.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current port 2 negotiation status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the negotiation state at port 2 of the CPRI trunk chain which can be NOTREADY(Not Ready), NEGOTIATING(Negotiating), NEGOTIATED(Negotiated), TIMEOUT(Timeout), or USERCONFIG(User Configured). The value NOTREADY(Not Ready) indicates that rate negotiation has not been started. The value NEGOTIATING(Negotiating) indicates that the rate is being negotiated. The value NEGOTIATED(Negotiated) indicates that the rate negotiation is complete. The value TIMEOUT(Timeout) indicates that the rate negotiation timed out due to a software or hardware fault during the negotiation. The value USERCONFIG(User Configured) indicates that rate is configured by users and does not support negotiation.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current port 3 line bit rate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the current CPRI line rate at port 3 of the RRU trunk chain.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current port 3 negotiation status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the negotiation state at port 3 of the CPRI trunk chain which can be NOTREADY(Not Ready), NEGOTIATING(Negotiating), NEGOTIATED(Negotiated), TIMEOUT(Timeout), or USERCONFIG(User Configured). The value NOTREADY(Not Ready) indicates that rate negotiation has not been started. The value NEGOTIATING(Negotiating) indicates that the rate is being negotiated. The value NEGOTIATED(Negotiated) indicates that the rate negotiation is complete. The value TIMEOUT(Timeout) indicates that the rate negotiation timed out due to a software or hardware fault during the negotiation. The value USERCONFIG(User Configured) indicates that rate is configured by users and does not support negotiation.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current port 4 line bit rate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the current CPRI line rate at port 4 of the RRU trunk chain.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current port 4 negotiation status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the negotiation state at port 4 of the CPRI trunk chain which can be NOTREADY(Not Ready), NEGOTIATING(Negotiating), NEGOTIATED(Negotiated), TIMEOUT(Timeout), or USERCONFIG(User Configured). The value NOTREADY(Not Ready) indicates that rate negotiation has not been started. The value NEGOTIATING(Negotiating) indicates that the rate is being negotiated. The value NEGOTIATED(Negotiated) indicates that the rate negotiation is complete. The value TIMEOUT(Timeout) indicates that the rate negotiation timed out due to a software or hardware fault during the negotiation. The value USERCONFIG(User Configured) indicates that rate is configured by users and does not support negotiation.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the port number of the node on a CPRI link. The value NULL indicates that obtaining the port number fails.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subport No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the sub-port number of the node on a CPRI link. The value NULL indicates that there are no subport on the connected port.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

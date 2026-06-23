@@ -1,0 +1,103 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify TCP MSS Control Algorithm Parameter (MOD TCPMSSCTRL)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_tcpmssctrl">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify TCP MSS Control Algorithm Parameter (MOD TCPMSSCTRL)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_tcpmssctrl"></a><a name="mod_tcpmssctrl"></a>
+
+
+<h1 class="topictitle1">Modify TCP MSS Control Algorithm Parameter (MOD TCPMSSCTRL)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_tcpmssctrl__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the TCP MSS control algorithm.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_tcpmssctrl__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_tcpmssctrl__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TcpMssCtrl-TcpMssCtrlSwitch.html">TcpMssCtrlSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TCP MSS Control Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch used to enable or disable the TCP MSS function. If this switch is turned off, TCP packets are transparently transmitted without being processed. If this switch is turned on, the value of the MSS field in each packet for TCP link setups can be modified. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>DisuseStatement: This parameter will be deleted in later versions. Although the configuration interface in this version supports synchronization and delivery of the setting of this parameter, the system does not use this parameter. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this switch is turned on, the TCP MSS function is enabled, which means users can specify MSS parameters for TCP services. In scenarios where packet loss occurs when fragmentation is performed, turning on this switch avoids packet fragmentation and decreases the number of lost packets. When this switch is turned off, there is no impact on radio network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TcpMssCtrl-TcpMssThd.html">TcpMssThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TCP MSS Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for the value of the MSS field in packets for TCP link setups. If the TCP MSS function is enabled, the eNodeB first checks the MSS field in each packet for TCP link setups. If the value of the MSS field is greater than the predefined threshold, the eNodeB changes the value of the MSS field to the predefined threshold. Then, the eNodeB recalculates the TCP checksum and retransmits the packet with modified fields. For other packets, the eNodeB transparently transmits them.</p>
+<p>DisuseStatement: This parameter will be deleted in later versions. Although the configuration interface in this version supports synchronization and delivery of the setting of this parameter, the system does not use this parameter. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 1~1460</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 1~1460</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: When MTU is set to 1500 and no security tunnel is set up, the recommended value is 1420.</p>
+<p>When MTU is set to 1500 and a security tunnel is set up, the recommended value is 1342, where 78 bytes are used by security tunnel header by default. In other scenarios, set the recommended value based on the description in Caution.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter indicates a smaller MSS field value in packets for TCP link setups. If this parameter value is too small, transmission efficiency decreases and the throughput is reduced. If this parameter value is too large, the MSS control function does not take effect.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_tcpmssctrl__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of TCP MSS control algorithm with the parameters as follows:TCP MSS Control Switch:ON, TCP MSS Threshold:1230, run the following command:
+MOD TCPMSSCTRL: TcpMssCtrlSwitch=ON, TcpMssThd=1230;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

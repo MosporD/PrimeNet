@@ -1,0 +1,546 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Transmission Resource Group (ADD RSCGRP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_rscgrp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Transmission Resource Group (ADD RSCGRP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_rscgrp"></a><a name="add_rscgrp"></a>
+
+
+<h1 class="topictitle1">Add Transmission Resource Group (ADD RSCGRP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_rscgrp__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a transmission resource group.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_rscgrp__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Before running this command, ensure that the physical port on which the transmission resource group is to be carried has already been configured.</p>
+</li><li><p>The effect of running this command on boards that do not support dual rates is the same as that on boards that support only a single rate. Currently, the UMPT, UMDU, LMPT, and UTRPc support dual rates.</p>
+</li><li><p>Board specifications: A maximum of 27 transmission resource groups can be configured on a WMPT. A maximum of 19 transmission resource groups can be configured on an LMPT. A maximum of 36 transmission resource groups can be configured on a UMPTa/UMPTb/UMDU. A maximum of 22 transmission resource groups can be configured on a UMPTe/UMPTg/UMPTga. If the GTMUb/GTMUc is the main control board, a maximum of 8 transmission resource groups can be configured on a GTMUb/GTMUc. If the GTMUb is the evolution scenario board, a maximum of 8 transmission resource groups can be configured on a GTMUb. If the GTMUc is the evolution scenario board, a maximum of 12 transmission resource groups can be configured on a GTMUc. A maximum of 24 transmission resource groups can be configured on a UTRPc. A maximum of 20 transmission resource groups can be configured on a UCCU. A maximum of 12 transmission resource groups can be configured on a UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/UBBPf0/LCOP/UBBPex2/UBBPf1/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. A maximum of 10 transmission resource groups can be configured on a UTRP (subboard type: UEOC). A maximum of 12 transmission resource groups can be configured on a UTRP (subboard type: UQEC). A maximum of 24 transmission resource groups can be configured on a UTRP (subboard type: UAEC). A maximum of 24 transmission resource groups can be configured on a UTRP (subboard type: UIEC). A maximum of 16 transmission resource groups can be configured on a UTRP (subboard type: UUAS).</p>
+</li><li><p>System specifications: If the WMPT is the main control board, a maximum of 64 transmission resource groups can be configured. If the LMPT/UMPT is the main control board, a maximum of 464 transmission resource groups can be configured. If the UMDU is the main control board, a maximum of 36 transmission resource groups can be configured. If the GTMUb/GTMUc is the main control board, a maximum of 16 transmission resource groups can be configured.</p>
+</li><li><p>Bandwidth-related parameters of an adaptive port transmission resource group cannot be modified, they take effect as the default values according to the board capacity. To remove the adaptive port transmission resource group and add a default port transmission resource group are needed in order to modify the bandwidth-related parameters.</p>
+</li><li><p>Transmission resource groups cannot be configured on a downlink tunnel.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s TX bandwidth, 1 Gbit/s RX bandwidth, 1 Gbit/s TX committed burst size, 1 Gbit/s TX excessive burst size, 1 Gbit/s TX committed information rate, 1 Gbit/s RX committed information rate, 1 Gbit/s TX peak information rate, 1 Gbit/s RX peak information rate, and 1 Gbit/s TX peak burst size. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If the UMPT/UMDU is the main control board, a maximum of two uplink tunnels can be configured with transmission resource groups. If the LMPT/WMPT is the main control board, a maximum of one uplink tunnel can be configured with transmission resource groups. For other transmission boards, no tunnel can be configured with transmission resource groups.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]Currently, the base station supports a maximum of four modes, and therefore tunnel-based transmission resource groups are used only for rate limitation on uplink data streams. It is recommended that each base station with an uplink tunnel be configured with a tunnel-based transmission resource group whose rate configurations are the same as line rates.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The UMPTe/UMPTga can be configured with a maximum of 10 Gbit/s TX bandwidth, 10 Gbit/s RX bandwidth, 10 Gbit/s TX committed burst size, 10 Gbit/s TX excessive burst size, 10 Gbit/s TX committed information rate, 10 Gbit/s RX committed information rate, 10 Gbit/s TX peak information rate, 10 Gbit/s RX peak information rate, and 10 Gbit/s TX peak burst size. The UMPTg can be configured with a maximum of 25 Gbit/s TX bandwidth, 25 Gbit/s RX bandwidth, 25 Gbit/s TX committed burst size, 25 Gbit/s TX excessive burst size, 25 Gbit/s TX committed information rate, 25 Gbit/s RX committed information rate, 25 Gbit/s TX peak information rate, 25 Gbit/s RX peak information rate, and 25 Gbit/s TX peak burst size. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/UBBPf0/LCOP/UBBPex2/UBBPg1 can be configured with a maximum of 40 Gbit/s TX bandwidth, 40 Gbit/s RX bandwidth, 40 Gbit/s TX committed burst size, 40 Gbit/s TX excessive burst size, 40 Gbit/s TX committed information rate, 40 Gbit/s RX committed information rate, 40 Gbit/s TX peak information rate, 40 Gbit/s RX peak information rate, and 40 Gbit/s TX peak burst size. The UBBPf1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9 can be configured with a maximum of 100 Gbit/s TX bandwidth, 100 Gbit/s RX bandwidth, 100 Gbit/s TX committed burst size, 100 Gbit/s TX excessive burst size, 100 Gbit/s TX committed information rate, 100 Gbit/s RX committed information rate, 100 Gbit/s TX peak information rate, 100 Gbit/s RX peak information rate, and 100 Gbit/s TX peak burst size. The value is set to the maximum value supported by the board when it bigger than the maximum one. The default values of these parameters are 1 Gbit/s. If the resource group is configured on a UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9, the bandwidth and rate need to be increased based on the actual networking.</p>
+</li><li><p>[NodeB,eNodeB,gNodeB]The bandwidth and rate of a transmission resource group are calculated based on the data link layer statistics.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB]The UCCU can be configured with a maximum of 10 Gbit/s TX bandwidth, 10 Gbit/s RX bandwidth, 10 Gbit/s TX committed burst size, 10 Gbit/s TX excessive burst size, 10 Gbit/s TX committed information rate, 10 Gbit/s RX committed information rate, 10 Gbit/s TX peak information rate, 10 Gbit/s RX peak information rate, and 10 Gbit/s TX peak burst size. The value is set to the maximum value supported by the board when it bigger than the maximum one. The default values of these parameters are 1 Gbit/s. If the resource group is configured on a UCCU, the bandwidth and rate need to be increased based on the actual networking.</p>
+</li><li><p>[NodeB,eNodeB,gNodeB]In multi-mode scenarios, it is recommended that transmission resource groups whose PT is set to TUNNEL be configured for uplink tunnels.</p>
+</li><li><p>[Co-MPT,NodeB]The UTRP can be configured with a maximum of 300 Mbit/s TX bandwidth and 300 Mbit/s RX bandwidth. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>[Co-MPT,eNodeB]The LMPT board can be configured with a maximum of 360 Mbit/s TX bandwidth, 540 Mbit/s RX bandwidth, 400 Mbit/s TX committed burst size, 450 Mbit/s TX excessive burst size, 360 Mbit/s TX committed information rate, 540 Mbit/s RX committed information rate, 360 Mbit/s TX peak information rate, 540 Mbit/s RX peak information rate, and 400 Mbit/s TX peak burst size. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>[Co-MPT,eGBTS]In the GTMUb/GTMUc board, the default port resource group of PPP link and MP group type does not support bandwidth restriction.</p>
+</li><li><p>[Co-MPT,eGBTS]A maximum of two user-defined transmission resource groups with Bearing Port Type set to PPP (PPP Link) and MPGRP (Multi-link PPP Group) can be configured when a GTMUb board serves as the main control board. A maximum of four user-defined transmission resource groups with Bearing Port Type set to PPP (PPP Link) and MPGRP (Multi-link PPP Group) can be configured when a GTMUb board serves as a converted board.</p>
+</li><li><p>[Co-MPT,eGBTS]The maximum specifications of a GTMUb are as follows: transmit bandwidth: 300 Mbit/s; receive bandwidth: 300 Mbit/s; transmit committed burst size: 600 Mbit/s; transmit excessive burst size: 600 Mbit/s; transmit committed information rate: 300 Mbit/s; transmit peak information rate: 300 Mbit/s; transmit peak burst size: 300 Mbit/s. If this parameter is set to a value greater than the maximum specifications, the maximum specifications take effect.</p>
+</li><li><p>[Co-MPT,eGBTS]The maximum specifications of a GTMUc are as follows: transmit bandwidth: 300 Mbit/s; receive bandwidth: 300 Mbit/s; transmit committed burst size: 600 Mbit/s; transmit excessive burst size: 600 Mbit/s; transmit committed information rate: 300 Mbit/s; transmit peak information rate: 300 Mbit/s; transmit peak burst size: 300 Mbit/s. If this parameter is set to a value greater than the maximum specifications, the maximum specifications take effect.</p>
+</li><li><p>[Co-MPT,NodeB]For UMTS, the system can perform flow control on a maximum of eight transmission resource groups.</p>
+</li><li><p>[NodeB]When configuring a transmission resource group whose bearing port type is Ethernet port or Ethernet trunk on a WMPT, set both the maximum TX and RX bandwidths of the transmission resource group to 100 Mbit/s. When configuring a transmission resource group whose bearing port type is TUNNEL on a WMPT, set both the maximum TX and RX bandwidths of the transmission resource group to 300 Mbit/s.</p>
+</li><li><p>[NodeB]If a physical port is configured with an AAL2 path with the JNRSCGRP parameter set to DISABLE, no transmission resource group can be configured on the physical port.</p>
+</li><li><p>[NodeB]The rate unit of the transmission resource group to be added must be the same as those of other ATM-type transmission objects.</p>
+</li><li><p>[NodeB]The WMPT can be configured with a maximum of 300 Mbit/s TX bandwidth and 300 Mbit/s RX bandwidth, 600 Mbit/s TX committed burst size, 600 Mbit/s TX excessive burst size. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>[eNodeB]When the main control board is an LMPT and the port type is set to PPP or MPGRP, a transmission resource group can be successfully added but the configuration cannot take effect.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_rscgrp__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses the board where a transmission resource group is established.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses the board where a transmission resource group is established.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot corresponding to the board where a transmission resource group is established.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-BearType.html">BEAR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Resource Group Bear Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bearer type of the transmission group. The LTE and NR do not support ATM.</p>
+<p>Disuse statement: In later versions, the value IP of this parameter will be deleted. In the current version, this value can be set and take effect when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, and cannot be set when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: ATM(ATM), IP(IP)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ATM, IP</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the transmission group. The LTE and NR do not support UNCHANNELLED_COVERBOARD.</p>
+<p>Disuse statement: In later versions, the value ETH_COVERBOARD of this parameter will be deleted. In the current version, this value can be set and take effect when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, and cannot be set when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: E1_COVERBOARD(E1 Cover Board), UNCHANNELLED_COVERBOARD(Unchannelled Cover Board), ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board), BACK_BOARD(Back Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E1_COVERBOARD, UNCHANNELLED_COVERBOARD, ETH_COVERBOARD, BASE_BOARD, BACK_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5 and <strong>BEAR</strong> is set to ATM, this parameter can be set to E1_COVERBOARD or UNCHANNELLED_COVERBOARD.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5 and <strong>BEAR</strong> is set to IP, this parameter can be set to E1_COVERBOARD or ETH_COVERBOARD.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7 and <strong>BEAR</strong> is set to ATM, this parameter can be set to BASE_BOARD, BACK_BOARD.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7 and <strong>BEAR</strong> is set to IP, this parameter can be set to BASE_BOARD, BACK_BOARD, or ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-PhyPortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearing Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of port where a transmission resource group is carried. The LTE and NR do not support STM1, IMA, UNI, or FRAATM.</p>
+<p>Disuse statement: In later versions, the values PPP, MPGRP, ETH, ETHTRK, and TUNNEL of this parameter will be deleted. In the current version, these values can be set and take effect when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, and cannot be set when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: STM1(STM1), IMA(IMA Group), UNI(UNI Link), FRAATM(FRAATM Link), PPP(PPP Link), MPGRP(Multi-link PPP Group), ETH(Ethernet Port), ETHTRK(Ethernet Trunk), TUNNEL(Tunnel)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: STM1, IMA, UNI, FRAATM, PPP, MPGRP, ETH, ETHTRK, TUNNEL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[gNodeB]The value of <strong>PT</strong> in an <strong>RSCGRP</strong> MO cannot be set to PPP.</li><li>[gNodeB]The value of <strong>PT</strong> in an <strong>RSCGRP</strong> MO cannot be set to MPGRP.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>BEAR</strong> is set to ATM and <strong>SBT</strong> is set to BASE_BOARD or E1_COVERBOARD, this parameter can be set to IMA, UNI, or FRAATM.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>BEAR</strong> and <strong>SBT</strong> are set to ATM and BACK_BOARD, respectively, this parameter can be set to UNI or FRAATM. </li><li>In the <strong>RSCGRP</strong> MO, if <strong>BEAR</strong> and <strong>SBT</strong> are set to ATM and UNCHANNELLED_COVERBOARD, respectively, this parameter must be set to STM1.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>BEAR</strong> and <strong>SBT</strong> are set to IP and BASE_BOARD, respectively, this parameter can be set to PPP, MPGRP, ETH or ETHTRK.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>BEAR</strong> and <strong>SBT</strong> are set to IP and BACK_BOARD, respectively, this parameter can be set to PPP or TUNNEL.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>BEAR</strong> and <strong>SBT</strong> are set to IP and E1_COVERBOARD, respectively, this parameter can be set to PPP or MPGRP.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>BEAR</strong> and <strong>SBT</strong> are set to IP and ETH_COVERBOARD, respectively, this parameter can be set to ETH or ETHTRK.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-PhyPortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearing Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the port where the transmission resource group is configured.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to BASE_BOARD and IMA, respectively, this parameter can be set to 0 or 1.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to E1_COVERBOARD and IMA, respectively, this parameter can be set to any value in the range of 0 to 3.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD or BACK_BOARD and <strong>PT</strong> is set to UNI, this parameter can be set to any value in the range of 0 to 3.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to E1_COVERBOARD and UNI, respectively, this parameter can be set to any value in the range of 0 to 7.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD or BACK_BOARD and <strong>PT</strong> is set to FRAATM, this parameter can be set to any value in the range of 0 to 3.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to E1_COVERBOARD and FRAATM, respectively, this parameter can be set to any value in the range of 0 to 7.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to STM1, this parameter must be set to 0.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD or BACK_BOARD and <strong>PT</strong> is set to PPP, this parameter can be set to any value in the range of 0 to 15.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to E1_COVERBOARD and PPP, respectively, this parameter can be set to any value in the range of 0 to 15.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to BASE_BOARD and MPGRP, respectively, this parameter can be set to any value in the range of 0 to 3.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to E1_COVERBOARD and MPGRP, respectively, this parameter can be set to any value in the range of 0 to 3.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to BASE_BOARD and ETH, respectively, this parameter can be set to 0 to 3.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to BASE_BOARD and ETHTRK, respectively, this parameter can be set to 0 or 1.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to ETH_COVERBOARD and ETH, respectively, this parameter can be set to any value in the range of 0 to 5.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to ETH_COVERBOARD and ETHTRK, respectively, this parameter can be set to 0 to 2.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 0 to 14.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-RscGrpNo.html">RSCGRPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a transmission resource group. When you use an MML command to add a PPP link, an MP group, an Ethernet port, an Ethernet trunk, a tunnel, or a PPPoE link, the system automatically creates a transmission resource group with Transmission Resource Group ID set to DEFAULTPORT(Default Port). When you remove any of the preceding objects, the system automatically removes the transmission resource group. When you add a PPP link, an MP group, an Ethernet port, an Ethernet trunk, or an uplink tunnel on the MAE-Deployment, if the default transmission resource group does not exist, the system automatically creates a transmission resource group with Transmission Resource Group ID set to AUTOPORT(Autoport Port). When you remove any of the preceding objects, the system automatically removes the transmission resource group.</p>
+<p>GUI Value Range: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, AUTOPORT(Auto Port), DEFAULTPORT(Default Port)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, AUTOPORT, DEFAULTPORT</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to STM1, IMA, UNI or FRAATM, this parameter can be set to 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 or 15.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to PPP, MPGRP, ETH, ETHTRK or TUNNEL, this parameter can be set to 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, AUTOPORT or DEFAULTPORT.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-RateUnit.html">RU</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rate Unit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rate unit of the TX bandwidth, RX bandwidth, TX CIR, RX CIR, TX PIR and RX PIR of the transmission resource group. The LTE and NR do not support CELL/S.</p>
+<p>GUI Value Range: KBPS(kbit/s), CELL/S(cell/s)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: KBPS, CELL/S</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, this parameter must be set to KBPS if <strong>BEAR</strong> is set to IPV4.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-TxBw.html">TXBW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Tx Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum uplink bandwidth of a transmission resource group at the MAC layer when the transmission resource group is carried over IP. This parameter value is used as the uplink transport admission bandwidth and TX traffic shaping bandwidth. The minimum rate supported by the UMPTa, UMPTb, UMDU, GTMUb or GTMUc is 64 kbit/s. The LMPT can be configured with a maximum of 360 Mbit/s TX bandwidth. The WMPT, GTMUb or GTMUc can be configured with a maximum of 300 Mbit/s TX bandwidth. The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s TX bandwidth. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s TX bandwidth. The UMPTg can be configured with a maximum of 25 Gbit/s TX bandwidth. The UBBPe(excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s TX bandwidth. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s TX bandwidth. If the parameter is set to a value greater than the maximum TX bandwidth supported by a board, the maximum TX bandwidth supported by the board takes effect. For a WMPT and a UTRP (excluding UTRPa), this parameter does not specify the TX traffic shaping bandwidth of the transmission resource group that is carried on the PPP link.</p>
+<p>GUI Value Range: 32~100000000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 32~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 15800 if <strong>PT</strong> is set to IMA, UNI, or FRAATM and <strong>RU</strong> is set to KBPS.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 76 to 37265 if <strong>PT</strong> is set to IMA, UNI, or FRAATM and <strong>RU</strong> is set to CELL/S.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 21000 if <strong>PT</strong> is set to STM1 and <strong>RU</strong> is set to KBPS.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 76 to 49529 if <strong>PT</strong> is set to STM1 and <strong>RU</strong> is set to CELL/S.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 1984 if <strong>PT</strong> is set to PPP.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 31744 if <strong>PT</strong> is set to MPGRP.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 100000000 if <strong>SN</strong> is set to 0~5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 10000000 if <strong>SN</strong> is set to 6~7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 25000000 if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 100000000 if <strong>PT</strong> is set to TUNNEL.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter value is greater than the available transport bandwidth, the transport network may be congested, affecting the QoS.</p>
+<p>If this parameter value is smaller than the available transport bandwidth, the transport network may incur a waste of bandwidth, affecting the number of admitted services and throughput.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-RxBw.html">RXBW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rx Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RX bandwidth of a transmission resource group. To LTE, this parameter value is also used as the downlink transport admission bandwidth. The LMPT can be configured with a maximum of 540 Mbit/s RX bandwidth. The WMPT, GTMUb or GTMUc can be configured with a maximum of 300 Mbit/s RX bandwidth. The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s RX bandwidth. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s RX bandwidth. The UMPTg can be configured with a maximum of 25 Gbit/s RX bandwidth. The UBBPe(excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s RX bandwidth. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s RX bandwidth. The value of RX bandwidth is set to the maximum value of RX bandwidth supported by the board when it bigger than the maximum one.</p>
+<p>GUI Value Range: 32~100000000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 32~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 15800 if <strong>PT</strong> is set to IMA, UNI, or FRAATM and <strong>RU</strong> is set to KBPS.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 76 to 37265 if <strong>PT</strong> is set to IMA, UNI, or FRAATM and <strong>RU</strong> is set to CELL/S.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 55000 if <strong>PT</strong> is set to STM1 and <strong>RU</strong> is set to KBPS.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 76 to 129717 if <strong>PT</strong> is set to STM1 and <strong>RU</strong> is set to CELL/S.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 1984 if <strong>PT</strong> is set to PPP.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 31744 if <strong>PT</strong> is set to MPGRP.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 100000000 if <strong>SN</strong> is set to 0~5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 10000000 if <strong>SN</strong> is set to 6~7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 25000000 if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK.</li><li>In the <strong>RSCGRP</strong> MO, this parameter can be set to any value within the range of 32 to 100000000 if <strong>PT</strong> is set to TUNNEL.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The parameter only has impacts on LTE. The impacts are as follows:</p>
+<p>If this parameter value is greater than the available transport bandwidth, the number of admission services increases, affecting the QoS.</p>
+<p>If this parameter value is smaller than the available transport bandwidth, the transport network may incur a waste of bandwidth, decreasing the number of admitted services.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-TxCBS.html">TXCBS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Committed Burst Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TX committed burst size of a transmission resource group. The LMPT can be configured with a maximum of 400 Mbit/s TX committed burst size. The WMPT can be configured with a maximum of 600 Mbit/s TX committed burst size. The WMPT, GTMUb or GTMUc can be configured with a maximum of 600 Mbit/s TX committed burst size. The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s TX committed burst size. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s TX committed burst size. The UMPTg can be configured with a maximum of 25 Gbit/s TX committed burst size. The UBBPe(excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s TX committed burst size. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s TX committed burst size. The value of TX committed burst size is set to the maximum value of TX committed burst size supported by the board when it bigger than the maximum one.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: kbit</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The recommended value is 1.5 to 2 times of the TX bandwidth.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RSCGRP</strong> MO, <strong>TXPBS</strong> must be greater than or equal to <strong>TXCBS</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 10000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 25000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to PPP, this parameter can be set to any value in the range of 64 to 3968.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to MPGRP, this parameter can be set to any value in the range of 64 to 63488.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The parameter only has impacts on LTE. The impacts are as follows:</p>
+<p>A smaller parameter value indicates a lower tolerance for data burst, which results in packet loss.</p>
+<p>A larger parameter value indicates higher consumption of system resources, which results in a waste of resources.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-TxEBS.html">TXEBS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Excessive Burst Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TX excessive burst size of a transmission resource group. The LMPT can be configured with a maximum of 450 Mbit/s TX excessive burst size. The WMPT, GTMUb or GTMUc can be configured with a maximum of 600 Mbit/s TX excessive burst size. The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s TX excessive burst size. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s TX excessive burst size. The UMPTg can be configured with a maximum of 25 Gbit/s TX excessive burst size. The UBBPe(excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s TX excessive burst size. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s TX excessive burst size. The value of TX excessive burst size is set to the maximum value of TX excessive burst size supported by the board when it bigger than the maximum one.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: kbit</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The recommended value is twice the TX bandwidth.</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 10000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 25000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to PPP, this parameter can be set to any value in the range of 64 to 3968.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to MPGRP, this parameter can be set to any value in the range of 64 to 63488.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-OperatorID.html">OID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of the operator. This parameter is used to differentiate between operators. This parameter is reserved for future extension and does not take effect currently.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, this parameter is valid only when <strong>BEAR</strong> is set to IP.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-SchedulerWeight.html">WEIGHT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Scheduling Weight</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the scheduling weight of a transmission resource group. This parameter is used in calculating the bandwidth scheduled to a resource group, which helps achieve the user admission control.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 100</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, this parameter is valid only when <strong>BEAR</strong> is set to IP.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter brings a higher precision of traffic adjustment and smaller service rate fluctuation.</p>
+<p>A greater value of this parameter brings a lower precision of traffic adjustment and larger service rate fluctuation.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-TxCir.html">TXCIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Committed Information Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmit CIR of the transmission resource group. The LMPT can be configured with a maximum of 360 Mbit/s TX committed information rate. The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s TX committed information rate. The GTMUb or GTMUc can be configured with a maximum of 300 Mbit/s TX committed information rate. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s TX committed information rate. The UMPTg can be configured with a maximum of 25 Gbit/s TX committed information rate. The UBBPe(excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s TX committed information rate. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s TX committed information rate. The value of TX committed information rate is set to the maximum value of TX committed information rate supported by the board when it bigger than the maximum one.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: 1000000</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RSCGRP</strong> MO, <strong>TXPIR</strong> must be greater than or equal to <strong>TXCIR</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 10000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 25000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 64 to 100000000.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter value is greater than the guaranteed transport bandwidth for uplink, packet loss is easy to occur on non-flow-control services, affecting the QoS of these services.</p>
+<p>If this parameter value is smaller than the guaranteed transport bandwidth for uplink, bandwidth waste may occur on the transport network, affecting the number of admitted non-flow-control services and the BS throughput in the uplink.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-RxCir.html">RXCIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RX Committed Information Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the receive CIR of the transmission resource group. This parameter value is used as the downlink transport admission bandwidth for non-flow-control services. The LMPT can be configured with a maximum of 540 Mbit/s RX committed information rate. The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s RX committed information rate. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s RX committed information rate. The UMPTg can be configured with a maximum of 25 Gbit/s RX committed information rate. The UBBPe (excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s RX committed information rate. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s RX committed information rate. The value of RX committed information rate is set to the maximum value of RX committed information rate supported by the board when it bigger than the maximum one. Only the LTE supports this function currently.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: 1000000</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RSCGRP</strong> MO, <strong>RXPIR</strong> must be greater than or equal to <strong>RXCIR</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 10000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 25000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 64 to 100000000.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter value is greater than the available transport bandwidth, the number of non-flow-control admission services increases, affecting the QoS.</p>
+<p>If this parameter value is smaller than the available transport bandwidth, the transport network may incur a waste of bandwidth, decreasing the number of admitted non-flow-control services.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-TxPir.html">TXPIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Peak Information Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmit PIR of the transmission resource group. The LMPT can be configured with a maximum of 360 Mbit/s TX peak information rate. The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s TX peak information rate. The GTMUb or GTMUc can be configured with a maximum of 300 Mbit/s TX peak information rate. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s TX peak information rate. The UMPTg can be configured with a maximum of 25 Gbit/s TX peak information rate. The UBBPe(excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s TX peak information rate. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s TX peak information rate. The value of TX peak information rate is set to the maximum value of TX peak information rate supported by the board when it bigger than the maximum one.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: 1000000</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RSCGRP</strong> MO, <strong>TXPIR</strong> must be greater than or equal to <strong>TXCIR</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 10000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 25000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 64 to 100000000.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter value is greater than the maximum transport bandwidth for uplink, packet loss is easy to occur on the transport network, affecting the QoS of services.</p>
+<p>If this parameter value is smaller than the maximum transport bandwidth for uplink, bandwidth waste may occur on the transport network, affecting the number of admitted services and the BS throughput in the uplink.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-RxPir.html">RXPIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RX Peak Information Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the receive PIR of the transmission resource group. This parameter value is used as the downlink transport admission bandwidth. The LMPT can be configured with a maximum of 540 Mbit/s RX peak information rate. The UMPTa, UMPTb, UMDU or URTPc can be configured with a maximum of 1 Gbit/s RX peak information rate. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s RX peak information rate. The UMPTg can be configured with a maximum of 25 Gbit/s RX peak information rate. The UBBPe(excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s RX peak information rate. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s RX peak information rate. The value of RX peak information rate is set to the maximum value of RX peak information rate supported by the board when it bigger than the maximum one. Only the LTE supports this function currently.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: 1000000</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RSCGRP</strong> MO, <strong>RXPIR</strong> must be greater than or equal to <strong>RXCIR</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 10000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 25000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 64 to 100000000.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter value is greater than the available transport bandwidth, the number of admission services increases, affecting the QoS.</p>
+<p>If this parameter value is smaller than the available transport bandwidth, the transport network may incur a waste of bandwidth, decreasing the number of admitted services.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-TxPBS.html">TXPBS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Peak Burst Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the size of the peak burst transmitted from the transmission resource group. The LMPT can be configured with a maximum of 540 Mbit/s TX peak burst size. The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s TX peak burst size. The GTMUb or GTMUc can be configured with a maximum of 300 Mbit/s TX peak burst size. The UMPTe, UMPTga or UCCU can be configured with a maximum of 10 Gbit/s TX peak burst size. The UMPTg can be configured with a maximum of 25 Gbit/s TX peak burst size. The UBBPe(excluding UBBPe15), UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf0 or UBBPg1 can be configured with a maximum of 40 Gbit/s TX peak burst size. The UBBPf1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 or UBBPg9 can be configured with a maximum of 100 Gbit/s TX peak burst size. If the parameter is set to a value greater than the maximum TX peak burst size supported by a board, the maximum TX peak burst size supported by the board takes effect.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: kbit</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: 1000000</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RSCGRP</strong> MO, <strong>TXPBS</strong> must be greater than or equal to <strong>TXCBS</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 100000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7, <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 10000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH or ETHTRK, this parameter can be set to any value in the range of 64 to 25000000.</li><li>In the <strong>RSCGRP</strong> MO, if <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 64 to 100000000.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger parameter value indicates a greater amount of permitted burst data.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RSCGRP-UserLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-defined information about a transmission group.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_rscgrp__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a transmission resource group with the parameters as follows: Slot No.: 6, Transmission Resource Group Bear Type: IP, Subboard Type: Base Board, Bearing Port Type: Ethernet Port, Transmission Resource Group ID: 0, Rate Unit: KBPS, run the following command:
+ADD RSCGRP: SN=6, BEAR=IP, SBT=BASE_BOARD, PT=ETH, RSCGRPID=0, RU=KBPS;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,136 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NRDUCellTrpBeam">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NRDUCellTrpBeam">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NRDUCellTrpBeam</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NRDUCellTrpBeam"></a><a name="NRDUCellTrpBeam"></a>
+
+
+<h1 class="topictitle1">NRDUCellTrpBeam</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="NRDUCellTrp.html">NRDUCellTrp</a>
+    +-<a href="NRDUCellTrpBeam.html"><strong>NRDUCellTrpBeam</strong></a>
+      +-<a href="NRDUCellTrpCustBeam.html">NRDUCellTrpCustBeam</a>[0~8]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO is used to configure beam-related parameters such as tilt angles and coverage scenarios. It applies only to low-frequency cells.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NRDUCellTrp.html">NRDUCellTrp</a></li><li><p>Possible children:</p>
+<a href="NRDUCellTrpCustBeam.html">NRDUCellTrpCustBeam</a>[0~8]</li><li>Relation with the <strong>NRDUCellTrp</strong> and <strong>NRDUCell</strong> MOs:<ul><li>When the <strong>NRDUCell</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCellTrp</strong> MO is configured and <strong>FrequencyBand</strong> in the <strong>NRDUCell</strong> MO is set to N41, N77, N78, or N79, <strong>CoverageScenario</strong> in the <strong>NRDUCellTrpBeam</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO must be set to DEFAULT, SCENARIO_1 to SCENARIO_16, EXPAND_SCENARIO_1 to EXPAND_SCENARIO_6, or CUSTOMIZED_BEAM_SCENARIO. When <strong>FrequencyBand</strong> in the <strong>NRDUCell</strong> MO is set to other values for low frequencies, <strong>CoverageScenario</strong> in the <strong>NRDUCellTrpBeam</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO must be set to DEFAULT.</li></ul>
+</li><li>Relation with the <strong>NRDUCellTrp</strong>, <strong>NRDUCell</strong>, and <strong>NRDUCellTrpCustBeam</strong> MOs:<ul><li>When <strong>CoverageScenario</strong> in the <strong>NRDUCellTrpBeam</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO is set to CUSTOMIZED_BEAM_SCENARIO and <strong>SlotAssignment</strong> in the <strong>NRDUCell</strong> MO is set to 4_1_DDDSU or 7_3_DDDSUDDSUU, <strong>BeamId</strong> with the value range from 0 to 6 corresponding to <strong>NrDuCellTrpId</strong> in the <strong>NRDUCellTrpCustBeam</strong> MO must already be configured.</li><li>When <strong>CoverageScenario</strong> in the <strong>NRDUCellTrpBeam</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO is set to CUSTOMIZED_BEAM_SCENARIO and <strong>SlotAssignment</strong> in the <strong>NRDUCell</strong> MO is set to 8_2_DDDDDDDSUU, <strong>BeamId</strong> with the value range from 0 to 7 corresponding to <strong>NrDuCellTrpId</strong> in the <strong>NRDUCellTrpCustBeam</strong> MO must already be configured.</li><li>If <strong>CoverageScenario</strong> in the <strong>NRDUCellTrpBeam</strong> MO under an <strong>NRDUCellTrp</strong> MO is set to CUSTOMIZED_BEAM_SCENARIO and <strong>SlotAssignment</strong> in the associated <strong>NRDUCell</strong> MO is set to 8_2_DDDSUUDDDD, <strong>BeamId</strong> with IDs from 0 to 5 corresponding to <strong>NrDuCellTrpId</strong> in the <strong>NRDUCellTrpCustBeam</strong> MO must already be configured.</li></ul>
+</li><li>Relation with the <strong>NRDUCellAlgoSwitch</strong> and <strong>NRDUCellTrp</strong> MOs:<ul><li>If the SSB_PA_SW option of <strong>FullChannelCovEnhSwitch</strong> in an <strong>NRDUCellAlgoSwitch</strong> MO is selected and <strong>MaxSsbPwrOffset</strong> in the <strong>NRDUCellTrpBeam</strong> MO is set to a value greater than 0, the RF_SHUTDOWN_SW option of <strong>PowerSavingSwitch</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO under the same cell must be deselected.</li><li>If the RIM_ADAPT_AVOID_SW option of <strong>RimAlgoSwitch</strong> in an <strong>NRDUCellAlgoSwitch</strong> MO is selected, <strong>CoverageScenario</strong> in the <strong>NRDUCellTrpBeam</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO must be set to DEFAULT, SCENARIO_6, or SCENARIO_12.</li></ul>
+</li><li>Relation with the <strong>NRDUCellAlgoSwitch</strong>, <strong>NRDUCellTrp</strong>, and <strong>NRDUCell</strong> MOs:<ul><li>If <strong>LampSiteCellFlag</strong> in an <strong>NRDUCell</strong> MO is set to NO and the RF_SHUTDOWN_SW option of <strong>PowerSavingSwitch</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO is selected, <strong>CoverageScenario</strong> parameter in the associated <strong>NRDUCellTrpBeam</strong> MO must be set to DEFAULT, SCENARIO_1, SCENARIO_6, SCENARIO_12, SCENARIO_3, SCENARIO_13 or EXPAND_SCENARIO_1.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong> and <strong>NRDUCellTrp</strong> MOs:<ul><li>If <strong>SlotStructure</strong> in an <strong>NRDUCell</strong> MO is set to SS18, SS518, SS1017, or SS818, <strong>CoverageScenario</strong> in the <strong>NRDUCellTrpBeam</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO must be set to DEFAULT, SCENARIO_6, or SCENARIO_12.</li></ul>
+</li><li>Relation with the <strong>NRCell</strong>, <strong>NRDUCell</strong>, <strong>NRDUCellTrp</strong>, <strong>NRDUCellTrpMmwavBeam</strong>, and <strong>NRDUFddCellTrpBeam</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is CELL_ACTIVE and <strong>FrAndDuplexMode</strong> in the <strong>NRDUCellTrp</strong> MO is set to FR1_TDD, the <strong>NRDUCellTrpBeam</strong> MO corresponding to <strong>NrDuCellTrpId</strong> associated with <strong>CellId</strong> corresponding to <strong>NrCellId</strong> in the <strong>NRCell</strong> MO must already be configured.</li><li>If <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is CELL_ACTIVE and <strong>FrAndDuplexMode</strong> in the <strong>NRDUCellTrp</strong> MO is set to FR2_TDD, the <strong>NRDUCellTrpMmwavBeam</strong> MO corresponding to <strong>NrDuCellTrpId</strong> associated with <strong>CellId</strong> corresponding to <strong>NrCellId</strong> in the <strong>NRCell</strong> MO must already be configured.</li><li>If <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is CELL_ACTIVE and <strong>FrAndDuplexMode</strong> in the <strong>NRDUCellTrp</strong> MO is set to FDD, the <strong>NRDUFddCellTrpBeam</strong> MO corresponding to <strong>NrDuCellTrpId</strong> associated with <strong>CellId</strong> corresponding to <strong>NrCellId</strong> in the <strong>NRCell</strong> MO must already be configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NRDUCellTrpBeam__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NRDUCellTrpBeam__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellTrpBeam__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nrducelltrpbeam.html">LST NRDUCELLTRPBEAM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the TRP beam configuration of a TDD NR DU cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nrducelltrpbeam.html">MOD NRDUCELLTRPBEAM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the TRP beam configuration of a TDD NR DU cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NRDUCellTrpBeam__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NRDUCellTrpBeam__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellTrpBeam__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellTrpBeam-NrDuCellTrpId.html">NR DU Cell TRP ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a TRP for an NR DU cell, which uniquely identifies the TRP for the NR DU cell within a DU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellTrpBeam-CoverageScenario.html">Coverage Scenario</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the coverage scenario of antennas. The system adjusts beam patterns based on the setting of this parameter. You can run the DSP NRDUCELLTRP command to query the coverage scenario supported by different AAU types. This parameter applies only to low-frequency TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellTrpBeam-Tilt.html">Tilt</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the configured downtilt angle mapping a weight for beamforming. This parameter applies only to low-frequency TDD cells. If this parameter is set to 255, the default downtilt angle supported by the hardware is used. The DSP NRDUCELLTRP command can be executed to query the tilt angle adjustment range supported by different types of AAUs.</p>
+<p>Before a cell is set up, if the value range of the tilt angle is beyond the range supported by the AAU, the cell fails to be set up. After the cell is set up, if the tilt angle of the cell exceeds the range supported by the AAU, the value configured last time takes effect.</p>
+<p>When multiple cells are configured on an AAU with an RET system, the downtilt angles of all cells must be the same. Otherwise, cell setup fails.</p>
+<p>If the CoverageScenario parameter is set to CUSTOMIZED_BEAM_SCENARIO, this parameter must be set to 0, and the tilt that takes effect is the NRDUCellTrpCustBeam.Tilt parameter value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellTrpBeam-Azimuth.html">Azimuth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the configured horizontal azimuth mapping a weight for beamforming. This parameter applies only to low-frequency TDD cells. The DSP NRDUCELLTRP command can be executed to query the azimuth adjustment range supported by different types of AAUs.</p>
+<p>If the CoverageScenario parameter is set to CUSTOMIZED_BEAM_SCENARIO, this parameter must be set to 0, and the azimuth that takes effect is the NRDUCellTrpCustBeam.Azimuth parameter value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellTrpBeam-MaxSsbPwrOffset.html">Max SSB Power Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum offset of the power used for sending all SSBs of the specific TRP for a specific cell relative to the reference power. If the configured value exceeds the maximum aggregation capability, the actual value is determined by the maximum aggregation capability. This parameter applies only to low-frequency TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellTrpBeam-ScenarioBeamAlgoSw.html">Scenario Beam Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch of the scenario-based beam algorithm. SCENARIO_BEAM_DENSIFY_ALGO_SW: Indicates whether to enable beam densification (broadcast/RMSI beam densification). This parameter applies only to low-frequency TDD cells.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

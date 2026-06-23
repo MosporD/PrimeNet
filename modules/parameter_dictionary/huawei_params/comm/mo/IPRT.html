@@ -1,0 +1,242 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IPRT">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+<meta name="Mode" content="RFA">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IPRT">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPRT</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IPRT"></a><a name="IPRT"></a>
+
+
+<h1 class="topictitle1">IPRT</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IPRT.html"><strong>IPRT</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The IPRT MO refers to the routing table, which is used for data forwarding. It can be manually configured.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>IPRT</strong> MO and a <strong>DEVIP</strong> MO are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO must be different from <strong>IP</strong> in the <strong>DEVIP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>IPRT</strong> MO and a <strong>DEVIP</strong> MO are on the same network segment and are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO cannot be set to the broadcast IP address for the <strong>DEVIP</strong> MO. That is, in the IP address consisting of <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO and <strong>MASK</strong> in the <strong>DEVIP</strong> MO, the network IDs cannot be all 0s and the host IDs cannot be all 1s.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the <strong>IPRT</strong> MO must be different from <strong>IP</strong> in a <strong>DEVIP</strong> MO in the same routing domain.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, the logical AND-operation result of <strong>DSTIP</strong> and <strong>DSTMASK</strong> in the <strong>IPRT</strong> MO must be different from <strong>IP</strong> in a <strong>DEVIP</strong> MO in the same routing domain and from the logical AND-operation result of <strong>IP</strong> and <strong>MASK</strong> in a <strong>DEVIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>IFIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION and an <strong>IPRT</strong> MO and a <strong>DEVIP</strong> MO whose <strong>PT</strong> is set to ETH, ETHTRK, SUBIF, or ETHCI are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO must be on the same network segment as <strong>IP</strong> in the <strong>DEVIP</strong> MO. In addition, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>DEVIP</strong> MO must be the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>IPRT</strong> MO, respectively. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW and an <strong>IPRT</strong> MO and an <strong>IFIP</strong> MO whose <strong>PT</strong> is set to ETH, ETHTRK, SUBIF, or ETHCI are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO must be on the same network segment as <strong>IP</strong> in the <strong>IFIP</strong> MO. In addition, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>IFIP</strong> MO must be the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>IPRT</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>IFIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>IPRT</strong> MO and an <strong>IFIP</strong> MO are on the same network segment and are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO cannot be set to the broadcast IP address for the <strong>IFIP</strong> MO. That is, in the IP address consisting of <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO and <strong>MASK</strong> in the <strong>IFIP</strong> MO, the network ID cannot be all 0 and the host ID cannot be all 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the <strong>IPRT</strong> MO must be different from <strong>IP</strong> in an <strong>IFIP</strong> MO in the same routing domain.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, the logical AND-operation result of <strong>DSTIP</strong> and <strong>DSTMASK</strong> in the <strong>IPRT</strong> MO must be different from <strong>IP</strong> in an <strong>IFIP</strong> MO in the same routing domain and from the logical AND-operation result of <strong>IP</strong> and <strong>MASK</strong> in an <strong>IFIP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>IPRT</strong> MO and an <strong>IFIP</strong> MO are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO must be different from <strong>IP</strong> in the <strong>IFIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, a maximum of one <strong>IPRT</strong> MO whose <strong>DSTIP</strong> and <strong>DSTMASK</strong> are both set to 0.0.0.0 can be configured on a BS.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of 150 <strong>IPRT</strong> MOs can be configured on a board.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Each <strong>IPRT</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, <strong>VRFIDX</strong>, <strong>DSTIP</strong>, <strong>DSTMASK</strong>, <strong>RTTYPE</strong>, <strong>IFT</strong>, <strong>IFNO</strong>, and <strong>NEXTHOP</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, a maximum of two <strong>IPRT</strong> MO whose <strong>DSTIP</strong>, <strong>DSTMASK</strong>, and <strong>PREF</strong> are the same can be configured on a BS.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>IPRT</strong> MO and an <strong>OMCH</strong> MO are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO must be different from <strong>IP</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BRT</strong> in an <strong>OMCH</strong> MO is set to YES, before configuring the <strong>RTIDX</strong> in this <strong>OMCH</strong> MO, ensure that the <strong>IPRT</strong> MO in the same routing domain for the <strong>OMCH</strong> MO have been configured. That is, in the same routing domain, the <strong>IPRT</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>RTIDX</strong> in the <strong>OMCH</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BINDSECONDARYRT</strong> in an <strong>OMCH</strong> MO is set to YES, before configuring the <strong>SECONDARYRTIDX</strong> in this <strong>OMCH</strong> MO, ensure that the <strong>IPRT</strong> MO in the same routing domain for the <strong>OMCH</strong> MO have been configured. That is, in the same routing domain, the <strong>IPRT</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, <strong>DSTIP</strong> in an <strong>IPRT</strong> MO must be different from <strong>IP</strong> in an <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BEAR</strong> is set to IPv4 and <strong>BRT</strong> is set to YES in an <strong>OMCH</strong> MO, in the same routing domain, the <strong>IPRT</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>RTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. If the <strong>RTTYPE</strong> is set to IF, the <strong>IFT</strong> cannot be set to IPOA.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BEAR</strong> is set to IPv4 and <strong>BINDSECONDARYRT</strong> is set to YES in an <strong>OMCH</strong> MO, in the same routing domain, the <strong>IPRT</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. If the <strong>RTTYPE</strong> is set to IF, the <strong>IFT</strong> cannot be set to IPOA.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>IFT</strong> in the <strong>IPRT</strong> MO bound to an <strong>OMCH</strong> MO cannot be AIRLNK.</li><li>[Co-MPT, NodeB]If <strong>BEAR</strong> is set to ATM and <strong>BRT</strong> is set to YES in an <strong>OMCH</strong> MO, there must be an <strong>IPRT</strong> MO in the same routing domain with the <strong>OMCH</strong> MO, the combination of <strong>RTIDX</strong>, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong> and <strong>SBT</strong> in this <strong>IPRT</strong> MO must be the same as the combination of <strong>RTIDX</strong>, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong> and <strong>SBT</strong> in the <strong>OMCH</strong> MO. The <strong>RTTYPE</strong> must be set as IF and <strong>IFT</strong> must be set to IPOA in the <strong>IPRT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> are set to IF and TUNNEL, respectively in an <strong>IPRT</strong> MO, <strong>IFNO</strong> in the <strong>IPRT</strong> MO must be the same as <strong>TUNNELID</strong> in the associated <strong>TUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, <strong>DSTIP</strong> in an <strong>IPRT</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>PPPLNK</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> are set to IF and PPP, respectively in an <strong>IPRT</strong> MO, <strong>IFNO</strong> in the <strong>IPRT</strong> MO must be the same as <strong>PPPLNKN</strong> in the associated <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, <strong>DSTIP</strong> in an <strong>IPRT</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> are set to IF and MPGRP, respectively in an <strong>IPRT</strong> MO, <strong>IFNO</strong> in the <strong>IPRT</strong> MO must be the same as <strong>MPGRPN</strong> in the associated <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>IPRT</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, the <strong>IPRT</strong> MO must meet the following conditions: <strong>RTIDX</strong> is set to a value in the range of 0 to 127; <strong>RTTYPE</strong> is set to NEXTHOP.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>GTMU</strong>, and <strong>OMCH</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When a <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, and only one <strong>OMCH</strong> MO exists, for any two <strong>IPRT</strong> MOs of a base station in the same routing domain, if their <strong>RTIDX</strong> is set to a value different from that of <strong>RTIDX</strong> or <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO, and <strong>RTTYPE</strong> and <strong>IFT</strong> in any one of the <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPRT</strong> MOs must be set to different values.</li><li>When a <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, and more than one <strong>OMCH</strong> MO exists, for any two <strong>IPRT</strong> MOs of a base station in the same routing domain, if their <strong>RTIDX</strong> is set to a value different from that of <strong>RTIDX</strong> or <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO with <strong>FLAG</strong> set to MASTER and is set to a value different from that of <strong>RTIDX</strong> or <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO with <strong>FLAG</strong> set to SLAVE, and <strong>RTTYPE</strong> and <strong>IFT</strong> in any one of the <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPRT</strong> MOs must be set to different values.</li><li>When a <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU does not exists, or an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT exists, or an <strong>OMCH</strong> MO does not exist, for any two <strong>IPRT</strong> MOs of a base station in the same routing domain, if <strong>RTTYPE</strong> and <strong>IFT</strong> in any one of the <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPRT</strong> MOs must be set to different values.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>IPRT</strong> MOs must be less than or equal to 132 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> and <strong>OMCH</strong> MOs:<ul><li>[gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT exists, or an <strong>OMCH</strong> MO does not exist, for any two <strong>IPRT</strong> MOs of a base station in the same routing domain, if <strong>RTTYPE</strong> and <strong>IFT</strong> in any one of the <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPRT</strong> MOs must be set to different values.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IPRT__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPRT__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IPRT__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_iprt.html">ADD IPRT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a static IP route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_iprt.html">DSP IPRT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the information about all IP routes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_iprt.html">LST IPRT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the information about all the static IP routes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_iprt.html">MOD IPRT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of an IP route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_iprt.html">RMV IPRT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a static IP route.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IPRT__tab2">Table 2</a> and <a href="#IPRT__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IPRT__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IPRT__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-RTID.html">Route Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of an IP route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board where the IP route is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board where the IP route is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board where the IP route is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where the IP route is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-PortType.html">Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port type.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-PortNo.html">Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port number.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-RouteType.html">Route Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of route. If this parameter is set to NEXTHOP, all the IP packets that meet the route direction are first forwarded to the specified next hop IP address. If this parameter is set to IF, all the IP packets that meet the route direction are first forwarded to the specified egress port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-DstIP.html">Destination IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination IP address of the route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-Mask.html">Mask</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subnet mask for the destination IP address of the route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-NextHopIP.html">Next Hop IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP address of the next hop.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-PeerIP.html">Peer IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer IP address of the link on the air interface. Only the UMPT, LMPT and UMDU support IP routes whose Port Type is Air Link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-MTUSwitch.html">MTU Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for configuring the maximum transmission unit (MTU).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-MaximumTransmissionUnit.html">Maximum Transmission Unit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MTU on a link. The smaller one between this value and the MTU on the Ethernet port takes effect for the base station.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-RoutePriority.html">Preference</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of the routing entry. A smaller parameter value indicates a higher priority.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPRT-Description.html">Description Info</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the description about the destination of the route.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IPRT__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IPRT__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPRT-RTRouteType.html">Protocol</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of the IP route. A static host route is a manually configured route with the subnet mask set to 255.255.255.255. A static gateway route is a manually configured route, in which the subnet mask is not set to 255.255.255.255. A dynamic host route is a dynamically generated route with the subnet mask set to 255.255.255.255. A dynamic gateway route is a dynamically generated route, in which the subnet mask is not set to 255.255.255.255.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPRT-ActualPortType.html">Actual Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the port type.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPRT-ActualPortNo.html">Actual Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual port number.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

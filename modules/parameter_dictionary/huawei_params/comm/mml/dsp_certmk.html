@@ -1,0 +1,199 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display Device Certificate (DSP CERTMK)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_certmk">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display Device Certificate (DSP CERTMK)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_certmk"></a><a name="dsp_certmk"></a>
+
+
+<h1 class="topictitle1">Display Device Certificate (DSP CERTMK)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_certmk__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the status of device certificates.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_certmk__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>If the <a href="lst_certdeploy.html">LST CERTDEPLOY</a> command output shows that the value of the Certification Deploy Position Type parameter is NULL, the output of this command shows the contents of the certificate specified by the Certificate File Name parameter in the <a href="lst_sslconf.html">LST SSLCONF</a> command.</p>
+</li><li><p>This command performs operations to files, which may cause query failures when the system is busy. In this case, try again later.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_certmk__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CERTMK-DeviceCertificate.html">APPCERT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name of a device certificate. The file name cannot include any of the following characters: backslash (\), slash (/), colon (:), asterisk (*), question mark (?), double quotation marks ("), left angle bracket (&lt;), right angle bracket (&gt;), and bar (|).</p>
+<p>GUI Value Range: 1~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>APPCERT</strong> in a <strong>CERTMK</strong> MO is recommended to enter ASCII characters. The name cannot be composed of only space characters (including space and tab) or contain the following characters: \ / : * ? " &lt; &gt; |.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When a <strong>CERTMK</strong> MO is being added, the <strong>APPCERT</strong> is case-insensitive; but when a <strong>CERTMK</strong> MO is referenced, the <strong>APPCERT</strong> is case-sensitive.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>CERTMK</strong> MO with <strong>APPCERT</strong> set to appcert.pem defines a certificate configured on an NE before delivery. There is only one such MO on an NE and this MO cannot be added or removed.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_certmk__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query the information about all the matched certificate files, run the following command:
+DSP CERTMK:;
+The result is shown as follows:
++++    0        2013-11-08 12:59:22
+O&amp;M    #91
+%%DSP CERTMK:;%%
+RETCODE = 0  Operation succeeded.
+
+Display Device Certificate
+--------------------------
+Certificate File Name  Issuer                              Common Name                      Serial Number                                       Effective Date       Expiration Date      Key Type  Key Size     ECC Curve  Status  CA URL Last Used        Last Update Time of Certificate  CA Switch  Certificate Authority Name
+
+appcert.pem            Huawei Wireless Network Product CA  210305394710C2000064.huawei.com  76:61:1e:45:0b:57:4f:27:a8:e7:e9:c9:cc:c6:e2:17:72  2012-05-24 01:20:23  2027-05-21 01:20:23  RSA       KEYSIZE2048  NULL       Normal  NULL                    NULL                             OFF        NULL
+test.cer               enbca                               210305394710C2000064.huawei.com  89:ab:69:c9                                         2013-09-27 12:44:30  2021-05-03 19:53:44  ECDSA     NULL         P256       Normal  http://172.16.81.122:80 2013-09-28 12:42:53              ON         C=cn,S=sc,L=cd,O=Huawei,OU=Wireless,CN=enbca
+(Number of results = 2)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_certmk__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Certificate File Name</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the file name of a device certificate. The file name cannot include any of the following characters: backslash (\), slash (/), colon (:), asterisk (*), question mark (?), double quotation marks ("), left angle bracket (&lt;), right angle bracket (&gt;), and bar (|).</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Issuer</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the issuer of a device certificate.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Common Name</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the common name of a device certificate.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Serial Number</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the serial number of a device certificate.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Effective Date</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the date when a device certificate begins to take effect.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Expiration Date</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the expiration date of a device certificate.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Key Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates type of key of one certificate, which can be RSA or ECDSA.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Key Size</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the key length, which can be 1024 bits, 2048 bits, 3072 bits or 4096 bits. The key length of 1024 bits is not recommended. Otherwise, the security is undermined. If this parameter is set to KEYSIZE1024, the RRU still uses the value KEYSIZE2048 as the key length.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ECC Curve</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the name of the elliptic curve used by the key when the certificate key type is ECDSA. The elliptic curve allows P256 (secp256r1), P384 (secp384r1), ED25519 and P521(secp521r1). ED25519 indicates the EdDSA signature scheme using SHA-512 and Curve25519.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the status of a device certificate.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>CA URL Last Used</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the CA URL used to successfully obtain the certificate for the last time. After a system reset, version upgrade, or manual configuration of the device certificate, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Last Update Time of Certificate</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the time when the certificate is successfully obtained for the last time. After a system reset, version upgrade, or manual configuration of the device certificate, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>CA Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether a CA server is specified for a device certificate. When this parameter is set to OFF, only one CA is configured or no CA is configured (the device certificate can be configured only in the offline mode). When this parameter is set to ON, a CA needs to be specified.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Certificate Authority Name</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the name of the CA server specified by the certificate.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

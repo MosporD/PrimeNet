@@ -1,0 +1,293 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellRacThd">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellRacThd">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellRacThd</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellRacThd"></a><a name="CellRacThd"></a>
+
+
+<h1 class="topictitle1">CellRacThd</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellRacThd.html"><strong>CellRacThd</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellRacThd MO consists of the parameters related to admission and load control algorithms for different types of services in a cell. Admission control algorithm is mainly used for the eNodeB to determine whether to accept the radio bearer (RB) setup request initiated by a UE. The load control algorithm is used for the eNodeB to determine whether a cell is congested, based on which corresponding actions are performed.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>CellCapacityMode</strong> in the <strong>CellRacThd</strong> MO is set to SMALLCAPACITY, <strong>FddTddInd</strong>, <strong>MultiRruCellFlag</strong>, and <strong>MultiRruCellMode</strong> in the related <strong>Cell</strong> MO must be set to CELL_FDD, BOOLEAN_TRUE, and SFN or MPRU_AGGREGATION, respectively.</li></ul>
+</li><li>Relation with the <strong>CellQciPara</strong> MO:<ul><li>When the QCI is set to 1, 2, 3, or 4, the sum of the value of the <strong>HandoverAdmissionThreshold</strong> parameter in a <strong>CellQciPara</strong> MO for the corresponding QCI and the value of the <strong>NewIronServiceOffset</strong> parameter in the <strong>CellRacThd</strong> MO must be less than or equal to 100.</li><li>When the QCI is set to 1, 2, 3, or 4, the sum of the value of the <strong>CongestionThreshold</strong> parameter in a <strong>CellQciPara</strong> MO for the corresponding QCI and the value of the <strong>CongRelOffset</strong> parameter in the <strong>CellRacThd</strong> MO must be less than the value of the <strong>HandoverAdmissionThreshold</strong> parameter in a <strong>CellQciPara</strong> MO.</li><li>When the QCI is set to 3, the sum of the value of the <strong>CongestionThreshold</strong> parameter in a <strong>CellQciPara</strong> MO for this QCI and the value of the <strong>CongRelOffset</strong> parameter in the <strong>CellRacThd</strong> MO must be less than the value of the <strong>HandoverAdmissionThreshold</strong> parameter in a <strong>CellQciPara</strong> MO for QCI-75 services.</li><li>When the QCI is set to 75, the sum of the value of the <strong>HandoverAdmissionThreshold</strong> parameter in a <strong>CellQciPara</strong> MO for this QCI and the value of the <strong>NewIronServiceOffset</strong> parameter in the <strong>CellRacThd</strong> MO must be less than or equal to 100.</li></ul>
+</li><li>Relation with the <strong>CellQciPara</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>When the McpttCongCtrlSwitch option of the <strong>McpttSwitch</strong> parameter in a <strong>CellAlgoSwitch</strong> MO is selected, the sum of the <strong>HandoverAdmissionThreshold</strong> parameter in the <strong>CellQciPara</strong> MO for QCI-65 services and the value of the <strong>NewIronServiceOffset</strong> parameter in the <strong>CellRacThd</strong> MO must be less than or equal to 100.</li><li>When the McpttCongCtrlSwitch option of the <strong>McpttSwitch</strong> parameter in a <strong>CellAlgoSwitch</strong> MO is selected, the sum of the <strong>HandoverAdmissionThreshold</strong> parameter in the <strong>CellQciPara</strong> MO for QCI-66 services and the value of the <strong>NewIronServiceOffset</strong> parameter in the <strong>CellRacThd</strong> MO must be less than or equal to 100.</li><li>When the McpttCongCtrlSwitch option of the <strong>McpttSwitch</strong> parameter in a <strong>CellAlgoSwitch</strong> MO is selected, the sum of the <strong>CongestionThreshold</strong> parameter in the <strong>CellQciPara</strong> MO for QCI-1 services and the value of the <strong>CongRelOffset</strong> parameter in the <strong>CellRacThd</strong> MO must be less than the value of the <strong>HandoverAdmissionThreshold</strong> parameter in the <strong>CellQciPara</strong> MO for QCI-66 services.</li><li>When the McpttCongCtrlSwitch option of the <strong>McpttSwitch</strong> parameter in a <strong>CellAlgoSwitch</strong> MO is selected, the sum of the <strong>CongestionThreshold</strong> parameter in the <strong>CellQciPara</strong> MO for QCI-65 services and the value of the <strong>CongRelOffset</strong> parameter in the <strong>CellRacThd</strong> MO must be less than the value of the <strong>HandoverAdmissionThreshold</strong> parameter in the <strong>CellQciPara</strong> MO for QCI-65 services.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellRacThd__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellRacThd__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellRacThd__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellracthd.html">LST CELLRACTHD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the thresholds for admission and load control.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellracthd.html">MOD CELLRACTHD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of the thresholds for admission and load control.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellRacThd__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellRacThd__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellRacThd__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local cell ID. It uniquely identifies a cell within a BS. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-GoldServiceArpThd.html">Gold service arp threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Allocation and Retention Priority (ARP) threshold for the Gold-level services. A service is defined as a Gold-level service if its ARP value is smaller than or equal to this threshold. The service priority has a negative correlation with the ARP value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-SilverServiceArpThd.html">Silver service arp threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ARP threshold of silver-level services. An ARP value less than or equal to this threshold but greater than the ARP threshold of gold-level services corresponds to silver-level services. A smaller ARP value indicates a higher priority. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-NewGoldServiceOffset.html">Gold new service admission threshold offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for admission of new gold-level services. This parameter applies to both downlink and uplink. New gold-level services with QCI N are admitted if both the following conditions are met: (1) The satisfaction rate of services with QCI N is higher than or equal to the sum of this offset and the admission threshold for the handed-over services with QCI N. (2) The satisfaction rate of services with any other QCI is higher than or equal to the corresponding admission threshold for the handed-over services with that QCI. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-NewSilverServiceOffset.html">Silver new service admission threshold offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for admission of new silver-level services. This parameter applies to both downlink and uplink. New silver-level services with QCI N are admitted if both the following conditions are met: (1) The satisfaction rate of services with QCI N is higher than or equal to the sum of this offset and the admission threshold for the handed-over services with QCI N. (2) The satisfaction rate of services with any other QCI is higher than or equal to the corresponding admission threshold for the handed-over services with that QCI. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-NewCopperServiceOffset.html">Bronze new service admission threshold offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for admission of new bronze-level services. This parameter applies to both downlink and uplink. New bronze-level services with QCI N are admitted if both the following conditions are met: (1) The satisfaction rate of services with QCI N is higher than or equal to the sum of this offset and the admission threshold for the handed-over services with QCI N. (2) The satisfaction rate of services with any other QCI is higher than or equal to the corresponding admission threshold for the handed-over services with that QCI. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CongRelOffset.html">Offset for service congest relieving</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the congestion release offset. The service of a specific QCI exits the congestion state if the satisfaction rate of the service exceeds the sum of this congestion release offset and the congestion threshold for the QCI. The service retains the congestion state if the satisfaction rate is below or equal to the sum of this congestion release offset and the congestion threshold for the QCI. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-UlRbHighThd.html">High RB Usage Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for deciding on whether the UL and DL RB usages are high. This threshold applies to UL and DL admission decision. If the UL RB usage reported by the MAC layer is above this threshold, the UL RB usage is assumed to be high. If the DL RB usage reported by the MAC layer is above this threshold, the DL RB usage is assumed to be high. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-UlRbLowThd.html">Low RB Usage Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for deciding on whether the UL and DL RB usages are low. It applies to UL and DL admission decision. If the UL RB usage reported by the MAC layer is below this threshold, the UL RB usage is assumed to be low. If the DL RB usage reported by the MAC layer is below this threshold, the DL RB usage is assumed to be low. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-AcReservedUserNumber.html">Admission Control Reserved User Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE number reserved for UEs initiating emergency calls and high-priority UEs. If this parameter is set to 0, no UE number is reserved for UEs initiating emergency calls and high-priority UEs. A non-zero value of this parameter represents the maximum UE number reserved for UEs initiating emergency calls and high-priority UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-VolteReservedNumber.html">VoLTE Reserved Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the reserved number of VoLTE UEs that can be preferentially admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-VoltePrefAdmissionTimer.html">VoLTE Preferential Admission Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates a timer used for determining whether a user is a VoLTE user. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CellCapacityMode.html">Cell Capacity Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell capacity mode, which is used to set the maximum number of UEs that can access a single cell. The parameter value can be SMALLCAPACITY, NORMALCAPACITY, or LARGECAPACITY, indicating the number of UEs that can access a cell in ascending order. This parameter applies only to LTE FDD.</p>
+<p>The SMALLCAPACITY value applies to FDD SFN or LampSite cells. A cell with a bandwidth of 5 MHz or lower supports a maximum of 200 UEs and a cell with a bandwidth of 10 MHz or higher supports a maximum of 400 UEs.</p>
+<p>The NORMALCAPACITY value indicates that an FDD cell with a bandwidth of 5 MHz or lower supports a maximum of 600 UEs and a cell with a bandwidth of 10 MHz or higher supports a maximum of 1200 UEs.</p>
+<p>The LARGECAPACITY value indicates that an FDD cell supports a maximum of 1800 UEs if the cell meets the following conditions: (1) The cell bandwidth is 10 MHz or higher. (2) The cell is a low-speed cell. (3) Normal CP is configured for the cell. If any of the preceding conditions is not met, the NORMALCAPACITY value applies. For a common cell, the LARGECAPACITY value applies when the following conditions are met: (1) The cell is an intra-BBP cell. (2) The CPU that serves the cell does not serve any SFN cells. (3) The PucchPeriodicCqiOptSwitch parameter is set to ON. (4) The cell is not established on the LBBPc/LBBPd/UBBPd3/UBBPd4 board. If any of the preceding conditions is not met, the NORMALCAPACITY value applies. If this parameter is set to LARGECAPACITY for an SFN cell whose physical cells are established on the LBBPc/LBBPd/UBBPd/UBBPea board, these physical cells cannot be activated. The LARGECAPACITY value does not apply to 2T8R and 4T8R cells. If this parameter is set to LARGECAPACITY for a 2T8R or 4T8R cell, the NORMALCAPACITY value takes effect for the cell. If the TYPE parameter in the MDU MO is set to MDUC, the number of UEs supported by a cell with a specific bandwidth when this parameter is set to LARGECAPACITY is the same as when this parameter is set to NORMALCAPACITY.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-LoadHoAdmitOffset.html">Load-based Handover Admission Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates load-based handover admission offset. If the satisfaction rate of a service with a QCI is greater than or equal to the sum of the LoadHoAdmitOffset parameter value and the corresponding admission threshold of handover services with the QCI, load-based handover services with the QCI are admitted; otherwise, load-based handover services with the QCI are rejected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-VoipOverAdmitOffset.html">VoIP Over Admission Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for excessive admission of VoIP services. When the VoIPOffloadSwitch option is selected, if the satisfaction rate of VoIP is greater than or equal to the value of the admission threshold of new VoIP services minus this parameter value, the new VoIP services are admitted; if the satisfaction rate of VoIP is greater than or equal to the value of the admission threshold of VoIP service handover minus this parameter value, non-load-based incoming VoIP service handovers are admitted; if the satisfaction rate of VoIP is greater than or equal to the value of the admission threshold of load-based incoming VoIP service handovers minus this parameter value, load-based incoming VoIP service handovers are admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-AcUserNumber.html">Admission Control User Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of UEs that can be admitted to the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-MoSigArpOverride.html">MO Signaling ARP Override</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to modify the ARP value of a bearer that is requested to be set up as indicated in the initial UE context setup request message for a UE that attempts to access a cell with the cause value of "mo-Signalling". If this parameter is set to 0, the ARP value is not to be changed. If this parameter is set to a non-zero value, the ARP value can be changed to the parameter value and services with the ARP can preempt but cannot be preempted when the following conditions are met:</p>
+<p>1. The maximum number of RRC connections that can be set up is insufficient.</p>
+<p>2. The ARP value delivered from the MME is greater than the parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CceUsageThd.html">CCE Usage Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the high CCE usage threshold used in resource-based admission for high-priority UEs. When this parameter is set to 0, PRB- and CCE-based admission does not take effect, and the UlRbHighThd and UlRbLowThd parameters in the CellRacThd MO are used only to specify the high and low RB usage thresholds for uplink admission. When this parameter is set to a value other than 0, PRB- and CCE-based admission takes effect. If the CCE usage of high-priority UEs in the cell is greater than the value of this parameter, the CCE usage in the cell is high. If the CCE usage of high-priority UEs in the cell is less than the value of this parameter and the related offset, the CCE usage in the cell is low. In this case, the UlRbHighThd and UlRbLowThd parameters in the CellRacThd MO are used to specify the high and low RB usage thresholds for uplink and downlink admission. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-PreResNeedTuningFactor.html">Preempt Resource Need Tuning Factor</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the tuning factor used to determine whether to allow high-priority UEs to preempt resources of low-priority UEs when the resources that can be provided by low-priority UEs in the cell are insufficient. If the result of the amount of resources required by a high-priority UE that has initiated preemption multiplied by this parameter value is less than or equal to the amount of resources that can be provided by low-priority UEs, the preemption is allowed. Otherwise, the preemption is not allowed. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CceAlFailHighThd.html">CCE Allocation Failure High Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the CCE allocation failure rate for determining resource congestion in the uplink and downlink. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>If the CCE allocation failure rate of the cell is greater than or equal to this threshold, CCE resources of the cell are congested.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CqiFarThd.html">CQI Threshold for Far Users</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CQI threshold for identifying UEs at the cell edge in both uplink and downlink.</p>
+<p>If the CQI of a UE exceeds or equals this threshold, the UE is near the cell center. If the CQI of the UE is smaller than this threshold, the UE is at the cell edge. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-DlExperienceThd.html">DL Experience Rate Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the downlink user-experienced rate. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>If the downlink user-experienced rate is lower than this threshold and resources are congested in the cell, the cell is congested in the downlink.</p>
+<p>If the downlink experience rate is greater than or equal to this threshold, cell congestion is relieved in the downlink.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-RbCongHighThd.html">RB Congestion High Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the RB usage for determining resource congestion in the uplink and downlink. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>If the uplink RB usage exceeds or equals this threshold, cell resources are congested in the uplink.</p>
+<p>If the downlink RB usage exceeds or equals this threshold, cell resources are congested in the downlink.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-UlExperienceThd.html">UL Experience Rate Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the uplink user-experienced rate. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>If the uplink user-experienced rate is lower than this threshold and resources are congested in the cell, the cell is congested in the uplink.</p>
+<p>If the uplink experience rate equals or exceeds this threshold, uplink cell congestion is relieved.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-VolteArpOverride.html">VoLTE UE ARP Override</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to change the ARP in an initial context setup request for bearer setup for a UE with an RRC connection setup cause of mo-VoiceCall-v1280. The ARP will be changed to the value of this parameter when the cell capacity in terms of the number of UEs is limited and the MME-delivered ARP is greater than the value of this parameter. If this parameter is set to 0, the ARP will not be changed. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CceThdforVolteLoadAmrc.html">CCE Usage Thld for VoLTE Load Rate Control</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the CCE usage for GBR services in the cell. If the value of this parameter is less than or equal to 10, the threshold does not take effect. If the value is greater than 10 and the CCE usage for GBR services exceeds this threshold or if the RB usage for uplink GBR services exceeds the UlRbThdforVolteLoadAmrc parameter in the CellRacThd MO, the uplink cell load over the air interface is considered high. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-UlRbThdforVolteLoadAmrc.html">UL RB Usage Thld for VoLTE Load Rate Control</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the RB usage for uplink GBR services in the cell. If the value of this parameter is less than or equal to 10, the threshold does not take effect. If the value is greater than 10 and the RB usage for uplink GBR services in the cell exceeds this threshold or if the CCE usage for GBR services exceeds the CceThdforVolteLoadAmrc parameter in the CellRacThd MO, the uplink cell load over the air interface is considered high. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CongBearRelPeriod.html">Congestion Bearer Release Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the bearer releasing period during congestion control. This parameter takes effect only when both the MCPTT QoS Management and Congestion Control for Public Safety features are enabled. Otherwise, the parameter value is 15. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-PreemptableBearerNum.html">Preemptable Bearer Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of bearers that can be preempted per second after satisfaction-rate-based admission fails. This number is shared among all operators in this cell. The setting of this parameter takes effect only when both the MCPTT QoS Management and Congestion Control for Public Safety features are enabled. If the average number of bearers that can be preempted by each operator is smaller than 10 or if the parameter does not take effect, the eNodeB reports 10 bearers for each operator. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CongestionBearerRelCount.html">Congestion Bearer Release Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of low-priority bearers that can be released per period during congestion control.</p>
+<p>The setting of this parameter takes effect only when both MCPTT QoS management and congestion control for public safety are enabled. Otherwise, the number of bearers to be released due to congestion is permanently 1.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-CopperServiceArpThld.html">Copper Service ARP Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ARP threshold of copper-level services. An ARP value less than or equal to this threshold but greater than the ARP threshold of silver-level services corresponds to copper-level services. An ARP value greater than this threshold corresponds to iron-level services. A smaller ARP value indicates a higher priority. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-NewIronServiceOffset.html">Iron New Service Admission Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the admission threshold offset of new iron-level services. This offset applies to both the uplink and downlink. When the satisfaction rate for services with a QCI is greater than or equal to the sum of this parameter value and the handover admission threshold for services with the QCI, and satisfaction rates for services with other QCIs are all greater than or equal to corresponding handover admission thresholds, new iron-level services with the QCI are admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-EmtcAdmissionControlUeCnt.html">eMTC Admission Control UE Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of eMTC UEs that can be admitted to the cell. An eMTC UE is admitted if an RRC connection is successfully set up for this UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-HoReservedUeNumber.html">UE Number Reserved for Handover</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the reserved number of UEs that can be admitted in incoming RRC connection reestablishments and necessary incoming handovers. Necessary handovers include coverage-based intra-frequency handovers, coverage-based inter-frequency handovers, uplink-quality-based inter-frequency handovers, and distance-based inter-frequency handovers. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-AdmissionControlPolicy.html">Admission Control Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the radio access control policy.</p>
+<p>VOLTE_UNCONDITIONAL_ADMISSION: Indicates whether to allow unconditional VoLTE service admission when the service admission function is enabled. If this option is selected, VoLTE services are admitted unconditionally. If network congestion occurs due to VoLTE service admission, low-priority services will be released. If this option is deselected, VoLTE services are admitted following the normal admission procedure. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRacThd-NsaArpOverride.html">NSA User ARP Override</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to change the ARP value of a bearer that is requested to be set up as indicated in the initial UE context setup request message for a UE that supports NSA networking. If this parameter is set to 0, the ARP value will not be changed. If this parameter is set to a value in the range of 1 to 15, the ARP value will be changed to the value of this parameter or the ARP value delivered by the MME, whichever is smaller. In addition, the pre-emption vulnerability is "not pre-emptable", and the pre-emption capability is "may trigger preemption". If this parameter is set to a value in the range of 16 to 30, the ARP value will be changed to the ARP value delivered by the MME or the result of the value of this parameter minus 15, whichever is smaller. In addition, the pre-emption vulnerability is "not pre-emptable", and the pre-emption capability is "may trigger preemption" regardless of the pre-emption vulnerability setting of other UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

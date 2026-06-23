@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet — Network Health</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=4.5">
+</head>
+<body class="nh-page nh-select-page">
+    <header class="nh-select-header">
+        <a href="/dashboard" class="nh-home-link" title="Dashboard">&#8962;</a>
+        <h1 class="nh-select-title">Network Health</h1>
+        <span class="nh-stage-badge">{{ stage_label }}</span>
+        <span class="nh-user nh-select-user">{{ user.username }}</span>
+    </header>
+
+    <main class="nh-select-main">
+        <section class="nh-select-section" aria-labelledby="nh-vendor-heading">
+            <h2 id="nh-vendor-heading" class="nh-select-section-title">Vendor</h2>
+            <div class="nh-vendor-grid" id="nh-vendor-grid" role="radiogroup" aria-label="Vendor">
+                {% for v in vendors %}
+                <button type="button"
+                        class="nh-vendor-card{% if v.key == default_vendor %} selected{% endif %}"
+                        data-vendor="{{ v.key }}"
+                        aria-pressed="{{ 'true' if v.key == default_vendor else 'false' }}">
+                    <img src="/parameter_dictionary/static/images/{{ v.key }}_logo.png"
+                         alt="{{ v.label }}" class="nh-vendor-logo">
+                    <span>{{ v.label }}</span>
+                </button>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="nh-select-section" aria-labelledby="nh-rat-heading">
+            <h2 id="nh-rat-heading" class="nh-select-section-title">Radio Access Technology</h2>
+            <div class="nh-rat-grid" id="nh-rat-grid" role="radiogroup" aria-label="RAT">
+                {% for r in rats %}
+                <button type="button"
+                        class="nh-rat-card{% if r.key == default_rat %} selected{% endif %}"
+                        data-rat="{{ r.key }}"
+                        aria-pressed="{{ 'true' if r.key == default_rat else 'false' }}">
+                    <span class="nh-rat-label">{{ r.label }}</span>
+                </button>
+                {% endfor %}
+            </div>
+        </section>
+
+        <div class="nh-select-actions">
+            <button type="button" class="nh-continue-btn" id="nh-continue-btn">Continue</button>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.6"></script>
+    <script src="{{ url_for('network_health.static', filename='network_health_select.js') }}?v=1.1"></script>
+</body>
+</html>

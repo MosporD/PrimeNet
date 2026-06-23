@@ -1,0 +1,280 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start Cross Feeder Test (STR CROSFEEDTST)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_crosfeedtst">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start Cross Feeder Test (STR CROSFEEDTST)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_crosfeedtst"></a><a name="str_crosfeedtst"></a>
+
+
+<h1 class="topictitle1">Start Cross Feeder Test (STR CROSFEEDTST)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="str_crosfeedtst__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to detect a crossed feeder connection. Crossed feeder connection is a wiring error in twisted pair cabling where both the main and diversity in a sector are incorrectly connected to different antennas at both sides.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_crosfeedtst__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>This command applies to the scenario where RF modules are in 2T2R mode. If this command is executed in other scenarios, the result may be incorrect.</p>
+</li><li><p>This command does not apply to the scenario where all antennas of one sector are connected to another sector.</p>
+</li><li><p>This test is an offline test and the execution of this command interrupts services. Running this command on a multi-mode RF module of a multi-mode BS or on RF modules of different modes that share the antenna system will interrupt services of both modes.</p>
+</li><li><p>The VSWR test has a great impact on the precision of this test because the VSWR will cause a gain loss. You are advised to perform a high-precision VSWR test before running this command. If the VSWR is greater than 2.5, you are not advised to run this command.</p>
+</li><li><p>In the scenario where a filter is configured in the antenna system, the STFREQ and ETFREQ parameters in this command must be set to the start frequency and end frequency of the filter, respectively.</p>
+</li><li><p>1. A crossed feeder connection test must involve two or more sectors (cells) working in the same frequency band and the total number of antennas in these sectors must be greater than or equal to 3. </p>
+<p>(1) The crossed feeder connection test is not supported if only one or no sector in the specified list has been configured. </p>
+<p>(2) The crossed feeder connection test is not supported if an omnidirectional antenna is configured in the base station.</p>
+<p>(3) A crossed feeder connection test does not involve cells served by multiple RRUs/RFUs or distributed cells.</p>
+<p>(4) A crossed feeder connection test does not involve sectors with their equipment configured in beam mode.</p>
+<p>(5) A crossed feeder connection test does not involve a frequency band if the involved sectors are configured with different numbers of antennas working in the same frequency band.</p>
+<p>(6) A crossed feeder connection test does not involve unavailable RF modules.</p>
+<p>(7) A crossed feeder connection test does not involve RF modules which do not support crossed feeder connection tests. </p>
+<p>(8) A crossed feeder connection test involves an antenna only if the channel of the antenna can both transmit and receive data.</p>
+</li><li><p>If the user specifies the start frequency and end frequency, the base station selects frequencies in the intersection of the RF module capability and the frequency band (between the start frequency and end frequency) to perform tests. If a specific frequency is not manually specified, the BTS selects a frequency to perform a test according to the intersection set of the RF module support capability and the preconfigured granted downlink frequency band. You can run the <a href="add_authdlfreqrange.html">ADD AUTHDLFREQRANGE</a> command to configure the granted downlink frequency band. If the granted downlink frequency band is not configured, the BTS selects a frequency to perform a test according to the RF module support capability. However, this may cause the BTS to use an ungranted frequency to perform a test.</p>
+</li><li><p>A crossed feeder connection test fails if the transmit power of an RF module is abnormal.</p>
+</li><li><p>If crossed feeder connections are detected, you need to check whether an external filter or narrowband filter equipment exists in the antenna system first.</p>
+</li><li><p>"Unknown" in the cross feeder test result means that indicates that the system cannot determine whether the cross feeder connection exists. In this case, you need to manually check the connection.</p>
+</li><li><p>[eNodeB,gNodeB]This command does not apply to RRU working in TDL_IR protocol.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="str_crosfeedtst__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TxBranch-TxMinTestFreq.html">STFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Start Test Frequency</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimal test frequency.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: 0.1MHz</p>
+<p>Actual Value Range: 0~6553.5, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TxBranch-TxMaxTestFreq.html">ETFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">End Test Frequency</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximal test frequency. .</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: 0.1MHz</p>
+<p>Actual Value Range: 0~6553.5, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TxBranch-SecLst.html">SecLst</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector List</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the list of sectors where cross feeder tests need to be performed. The sectors are separated by &amp;. For example, value 1&amp;2&amp;3 means that cross feeder tests are to be started in sectors 1, 2, and 3.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_crosfeedtst__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start a cross feeder test, run the following command:
+STR CROSFEEDTST:; 
+The result is shown as follows:
++++    0        2012-01-31 18:50:30
+O&amp;M    #234
+%%STR CROSFEEDTST:;%%
+RETCODE = 0  Operation succeeded.
+
+Session ID  =  65539
+(Number of results = 1)
+
+
+---    END
+
++++    0        2012-01-31 18:50:30
+O&amp;M    #233
+%%STR CROSFEEDTST:;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Cross Feeder Test Progress
+     Status  =  Start
+ Session ID  =  65539
+
+---    END
+
++++    0        2012-01-31 18:50:40
+O&amp;M    #233
+%%STR CROSFEEDTST:;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Cross Feeder Test Progress
+     Status  =  Progressing
+   Progress  =  25%
+ Session ID  =  65539
+
+---    END
+
++++    0        2012-01-31 18:50:43
+O&amp;M    #233
+%%STR CROSFEEDTST:;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Cross Feeder Test Progress
+     Status  =  Progressing
+   Progress  =  50%
+ Session ID  =  65539
+
+---    END
+
++++    0        2012-01-31 18:50:46
+O&amp;M    #233
+%%STR CROSFEEDTST:;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Cross Feeder Test Progress
+     Status  =  Progressing
+   Progress  =  75%
+ Session ID  =  65539
+
+---    END
+
++++    0        2012-01-31 18:50:49
+O&amp;M    #233
+%%STR CROSFEEDTST:;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Cross Feeder Test Progress
+     Status  =  Success
+ Session ID  =  65539
+
+Cross Feeder Test Result
+------------------------
+Sector No.  RESULT 
+
+0           Normal
+1           Normal
+(Number of results = 2)
+
+Test Results of Each Frequency Band
+-----------------------------------
+Frequency Band  Sector No.  RESULT 
+
+BAND3_1800M     0           Normal
+BAND3_1800M     1           Normal
+(Number of results = 2)
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="str_crosfeedtst__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Sector No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the sector. If sectors are not configured, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>RESULT</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the result of the cross feeder test.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Frequency Band</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the frequency band supported by sector antennas.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the RRU or RFU where the TX channel is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the RRU or RFU where the TX channel is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the RRU or RFU where the TX channel is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>TX Channel No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the TX channel of the RRU or RFU.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

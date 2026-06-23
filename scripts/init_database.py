@@ -23,11 +23,10 @@ print()
 # Import database module
 try:
     from database_enhanced import init_db, create_admin_user, DATABASE
-    from db.runtime import is_postgresql
-    from sync.db_migration import run_migrations
+    from modules.sync.db_migration import run_migrations
 
     print("✓ Database module loaded")
-    print(f"✓ SQLite app DB path (ignored in PostgreSQL mode): {DATABASE}")
+    print(f"✓ SQLite app DB path: {DATABASE}")
     print()
 except Exception as e:
     print("✗ ERROR: Failed to import database module")
@@ -37,9 +36,9 @@ except Exception as e:
 
 # Initialize database
 try:
-    print("Running migrations (SQLite files or PostgreSQL bootstrap)...")
+    print("Running migrations (SQLite files under databases/)...")
     run_migrations()
-    print("Creating app tables (SQLite only; PostgreSQL already migrated)...")
+    print("Creating app tables (ncm_users.db)...")
     init_db()
     print("✓ Database tables created")
 except Exception as e:
@@ -67,7 +66,7 @@ except Exception as e:
     sys.exit(1)
 
 # Verify database was created
-if is_postgresql() or os.path.exists(DATABASE):
+if os.path.exists(DATABASE):
     print()
     print("=" * 50)
     print("SUCCESS! Database initialized")
@@ -77,26 +76,30 @@ if is_postgresql() or os.path.exists(DATABASE):
     print(f"File size: {os.path.getsize(DATABASE)} bytes")
     print()
     
-    # Show admin credentials
-    print("Default Admin Login:")
-    print("  Username: admin")
-    print("  Password: admin123")
+    bootstrap_user = (os.getenv('NCM_BOOTSTRAP_ADMIN_USERNAME') or 'admin').strip()
+    has_bootstrap_pw = bool((os.getenv('NCM_BOOTSTRAP_ADMIN_PASSWORD') or '').strip())
+    print("Bootstrap Admin Login:")
+    print(f"  Username: {bootstrap_user}")
+    print(f"  Password source: {'NCM_BOOTSTRAP_ADMIN_PASSWORD (set)' if has_bootstrap_pw else 'NOT SET'}")
     print()
-    print("⚠️  IMPORTANT: Change the admin password after first login!")
+    print("⚠️  IMPORTANT: Set NCM_BOOTSTRAP_ADMIN_PASSWORD in your .env before first login.")
     print()
     
     # Test admin login
     try:
         from database_enhanced import authenticate_user
-        print("Testing admin login...")
-        success, user = authenticate_user('admin', 'admin123')
-        if success:
-            print("✓ Admin login works!")
-            print(f"  User ID: {user['id']}")
-            print(f"  Username: {user['username']}")
-            print(f"  Email: {user['email']}")
+        if has_bootstrap_pw:
+            print("Testing bootstrap admin login...")
+            success, user = authenticate_user(bootstrap_user, os.getenv('NCM_BOOTSTRAP_ADMIN_PASSWORD'))
+            if success:
+                print("✓ Admin login works!")
+                print(f"  User ID: {user['id']}")
+                print(f"  Username: {user['username']}")
+                print(f"  Email: {user['email']}")
+            else:
+                print("✗ Admin login failed - check NCM_BOOTSTRAP_ADMIN_* values")
         else:
-            print("✗ Admin login failed - something is wrong")
+            print("ℹ️  Skipped admin login test (bootstrap password not set)")
     except Exception as e:
         print(f"✗ Error testing login: {e}")
     

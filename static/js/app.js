@@ -7,6 +7,19 @@
 // SECTION 1: BASIC TAB & AUTH FUNCTIONALITY
 // ============================================================================
 
+function escHtml(v) {
+    return String(v ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function escJsStr(v) {
+    return String(v ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
 function openTab(evt, tabName) {
     // Hide welcome screen
     const welcomeScreen = document.getElementById('welcome');
@@ -582,18 +595,18 @@ function displayProfileCards(profiles) {
         const createdDate = new Date(profile.created_at).toLocaleDateString();
         
         return `
-            <div class="profile-card" onclick="selectProfile(${profile.id})">
+            <div class="profile-card" onclick="selectProfile(${Number(profile.id)})">
                 <div class="profile-card-header">
-                    <h3>${profile.profile_name}</h3>
+                    <h3>${escHtml(profile.profile_name)}</h3>
                     ${profile.is_shared ? '<span class="profile-shared-badge">🌐 Shared</span>' : ''}
                 </div>
                 <div class="profile-card-body">
-                    <p class="profile-description">${profile.description || 'No description'}</p>
+                    <p class="profile-description">${escHtml(profile.description || 'No description')}</p>
                     <div class="profile-stats">
-                        <span class="profile-stat">📊 ${moCount} MO classes</span>
-                        <span class="profile-stat">📋 ${paramCount} parameters</span>
+                        <span class="profile-stat">📊 ${escHtml(moCount)} MO classes</span>
+                        <span class="profile-stat">📋 ${escHtml(paramCount)} parameters</span>
                     </div>
-                    <div class="profile-date">Created: ${createdDate}</div>
+                    <div class="profile-date">Created: ${escHtml(createdDate)}</div>
                 </div>
             </div>
         `;
@@ -693,7 +706,7 @@ async function loadAllUsers() {
         console.error('Error loading users:', error);
         document.getElementById('users-table-body').innerHTML = `
             <tr><td colspan="8" style="text-align: center; color: #e74c3c;">
-                Error loading users: ${error.message}
+                Error loading users: ${escHtml(error.message)}
             </td></tr>
         `;
     }
@@ -709,14 +722,14 @@ function displayUsers(users) {
     
     tbody.innerHTML = users.map(user => `
         <tr>
-            <td><strong>${user.username}</strong></td>
-            <td>${user.full_name || '-'}</td>
-            <td>${user.email}</td>
-            <td>${user.department || '-'}</td>
+            <td><strong>${escHtml(user.username)}</strong></td>
+            <td>${escHtml(user.full_name || '-')}</td>
+            <td>${escHtml(user.email)}</td>
+            <td>${escHtml(user.department || '-')}</td>
             <td>
-                <span class="role-badge role-${user.role}">
+                <span class="role-badge role-${escHtml(user.role)}">
                     ${user.role === 'admin' ? '🔑' : user.role === 'config_team' ? '⚙️' : '👤'} 
-                    ${user.role}
+                    ${escHtml(user.role)}
                 </span>
             </td>
             <td>
@@ -724,12 +737,12 @@ function displayUsers(users) {
                     ${user.is_active ? '✅ Active' : '❌ Inactive'}
                 </span>
             </td>
-            <td>${user.last_login ? formatDate(user.last_login) : 'Never'}</td>
+            <td>${escHtml(user.last_login ? formatDate(user.last_login) : 'Never')}</td>
             <td>
-                <button onclick="editUserRole(${user.id}, '${user.username}', '${user.role}')" class="btn-small btn-edit">Edit Role</button>
+                <button onclick="editUserRole(${Number(user.id)}, '${escJsStr(user.username)}', '${escJsStr(user.role)}')" class="btn-small btn-edit">Edit Role</button>
                 ${user.is_active ? 
-                    `<button onclick="deactivateUser(${user.id})" class="btn-small btn-danger">Deactivate</button>` :
-                    `<button onclick="activateUser(${user.id})" class="btn-small btn-success">Activate</button>`
+                    `<button onclick="deactivateUser(${Number(user.id)})" class="btn-small btn-danger">Deactivate</button>` :
+                    `<button onclick="activateUser(${Number(user.id)})" class="btn-small btn-success">Activate</button>`
                 }
             </td>
         </tr>
@@ -927,7 +940,7 @@ async function searchMoDatabase() {
 
         displaySearchResults(data);
     } catch (error) {
-        resultsList.innerHTML = `<div class="mo-error">Error: ${error.message}</div>`;
+        resultsList.innerHTML = `<div class="mo-error">Error: ${escHtml(error.message)}</div>`;
     }
 }
 
@@ -942,7 +955,7 @@ function displaySearchResults(data) {
         resultsList.innerHTML = `
             <div class="mo-empty-state">
                 <div class="mo-empty-icon">🔍</div>
-                <p>No results found for "${data.query}"</p>
+                <p>No results found for "${escHtml(data.query)}"</p>
                 <p class="mo-hint">Try a different search term</p>
             </div>
         `;
@@ -957,14 +970,14 @@ function displaySearchResults(data) {
         html += '<h4 class="mo-section-title">MO Classes</h4>';
         for (const mo of data.results.mos) {
             html += `
-                <div class="mo-result-item mo-class-item" onclick="showMoInfo('${mo.name}')">
+                <div class="mo-result-item mo-class-item" onclick="showMoInfo('${encodeURIComponent(mo.name)}')">
                     <div class="mo-result-icon">📦</div>
                     <div class="mo-result-content">
                         <div class="mo-result-name">${highlightMatch(mo.name, data.query)}</div>
-                        <div class="mo-result-desc">${mo.description}</div>
+                        <div class="mo-result-desc">${escHtml(mo.description)}</div>
                         <div class="mo-result-meta">
-                            <span class="mo-result-category">${mo.category}</span>
-                            <span class="mo-result-count">${mo.param_count} parameters</span>
+                            <span class="mo-result-category">${escHtml(mo.category)}</span>
+                            <span class="mo-result-count">${escHtml(mo.param_count)} parameters</span>
                         </div>
                     </div>
                 </div>
@@ -979,13 +992,13 @@ function displaySearchResults(data) {
         html += '<h4 class="mo-section-title">Parameters</h4>';
         for (const param of data.results.params) {
             html += `
-                <div class="mo-result-item mo-param-item" onclick="showParamInfo('${param.name}')">
+                <div class="mo-result-item mo-param-item" onclick="showParamInfo('${encodeURIComponent(param.name)}')">
                     <div class="mo-result-icon">⚙️</div>
                     <div class="mo-result-content">
                         <div class="mo-result-name">${highlightMatch(param.name, data.query)}</div>
-                        <div class="mo-result-desc">${truncateText(param.description, 150)}</div>
+                        <div class="mo-result-desc">${escHtml(truncateText(param.description, 150))}</div>
                         <div class="mo-result-meta">
-                            <span class="mo-result-count">Used in ${param.mo_count} MO(s)</span>
+                            <span class="mo-result-count">Used in ${escHtml(param.mo_count)} MO(s)</span>
                         </div>
                     </div>
                 </div>
@@ -997,9 +1010,15 @@ function displaySearchResults(data) {
     resultsList.innerHTML = html;
 }
 
+function _escapeRegExp(s) {
+    return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 function highlightMatch(text, query) {
-    const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<mark>$1</mark>');
+    const safeText = escHtml(text || '');
+    const q = String(query || '').trim();
+    if (!q) return safeText;
+    const regex = new RegExp(`(${_escapeRegExp(escHtml(q))})`, 'gi');
+    return safeText.replace(regex, '<mark>$1</mark>');
 }
 
 function truncateText(text, maxLength) {
@@ -1008,7 +1027,8 @@ function truncateText(text, maxLength) {
     return text.substring(0, maxLength) + '...';
 }
 
-async function showMoInfo(moName) {
+async function showMoInfo(moNameEncoded) {
+    const moName = decodeURIComponent(moNameEncoded);
     const infoContent = document.getElementById('mo-info-content');
     infoContent.innerHTML = '<div class="mo-loading">Loading...</div>';
 
@@ -1026,7 +1046,7 @@ async function showMoInfo(moName) {
 
         displayMoInfo(data.mo);
     } catch (error) {
-        infoContent.innerHTML = `<div class="mo-error">Error: ${error.message}</div>`;
+        infoContent.innerHTML = `<div class="mo-error">Error: ${escHtml(error.message)}</div>`;
     }
 }
 
@@ -1038,9 +1058,9 @@ function displayMoInfo(mo) {
         paramsHtml = '<div class="mo-params-list">';
         for (const param of mo.parameters) {
             paramsHtml += `
-                <div class="mo-param-item-info" onclick="showParamInfo('${param.name}')">
-                    <div class="mo-param-name">${param.name}</div>
-                    <div class="mo-param-desc">${truncateText(param.description, 100)}</div>
+                <div class="mo-param-item-info" onclick="showParamInfo('${encodeURIComponent(param.name)}')">
+                    <div class="mo-param-name">${escHtml(param.name)}</div>
+                    <div class="mo-param-desc">${escHtml(truncateText(param.description, 100))}</div>
                 </div>
             `;
         }
@@ -1050,23 +1070,24 @@ function displayMoInfo(mo) {
     infoContent.innerHTML = `
         <div class="mo-info-details">
             <div class="mo-info-type">MO Class</div>
-            <h2 class="mo-info-name">${mo.name}</h2>
-            <div class="mo-info-category-badge">${mo.category}</div>
+            <h2 class="mo-info-name">${escHtml(mo.name)}</h2>
+            <div class="mo-info-category-badge">${escHtml(mo.category)}</div>
 
             <div class="mo-info-section">
                 <h4>Description</h4>
-                <p class="mo-info-description">${mo.description}</p>
+                <p class="mo-info-description">${escHtml(mo.description)}</p>
             </div>
 
             <div class="mo-info-section">
-                <h4>Parameters (${mo.param_count})</h4>
+                <h4>Parameters (${escHtml(mo.param_count)})</h4>
                 ${paramsHtml || '<p class="mo-no-params">No parameters found</p>'}
             </div>
         </div>
     `;
 }
 
-async function showParamInfo(paramName) {
+async function showParamInfo(paramNameEncoded) {
+    const paramName = decodeURIComponent(paramNameEncoded);
     const infoContent = document.getElementById('mo-info-content');
     infoContent.innerHTML = '<div class="mo-loading">Loading...</div>';
 
@@ -1086,7 +1107,7 @@ async function showParamInfo(paramName) {
 
         displayParamInfo(data.param);
     } catch (error) {
-        infoContent.innerHTML = `<div class="mo-error">Error: ${error.message}</div>`;
+        infoContent.innerHTML = `<div class="mo-error">Error: ${escHtml(error.message)}</div>`;
     }
 }
 
@@ -1098,8 +1119,8 @@ function displayParamInfo(param) {
         mosHtml = '<div class="mo-mos-list">';
         for (const mo of param.mos) {
             mosHtml += `
-                <div class="mo-mo-item-info" onclick="showMoInfo('${mo}')">
-                    <span class="mo-mo-name">${mo}</span>
+                <div class="mo-mo-item-info" onclick="showMoInfo('${encodeURIComponent(mo)}')">
+                    <span class="mo-mo-name">${escHtml(mo)}</span>
                 </div>
             `;
         }
@@ -1109,15 +1130,15 @@ function displayParamInfo(param) {
     infoContent.innerHTML = `
         <div class="mo-info-details">
             <div class="mo-info-type">Parameter</div>
-            <h2 class="mo-info-name">${param.name}</h2>
+            <h2 class="mo-info-name">${escHtml(param.name)}</h2>
 
             <div class="mo-info-section">
                 <h4>Description</h4>
-                <p class="mo-info-description">${param.description}</p>
+                <p class="mo-info-description">${escHtml(param.description)}</p>
             </div>
 
             <div class="mo-info-section">
-                <h4>Used in MO Classes (${param.mo_count})</h4>
+                <h4>Used in MO Classes (${escHtml(param.mo_count)})</h4>
                 ${mosHtml || '<p class="mo-no-params">No MO classes found</p>'}
             </div>
         </div>

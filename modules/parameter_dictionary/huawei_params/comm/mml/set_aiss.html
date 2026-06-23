@@ -1,0 +1,152 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Air Interface Soft Synchronization Parameters (SET AISS)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_aiss">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Air Interface Soft Synchronization Parameters (SET AISS)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_aiss"></a><a name="set_aiss"></a>
+
+
+<h1 class="topictitle1">Set Air Interface Soft Synchronization Parameters (SET AISS)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_aiss__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set parameters related to air interface soft synchronization.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_aiss__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Only LMPT and UMPT as the main control board in LTE FDD mode support the air interface soft synchronization function.</p>
+</li><li><p>The air interface soft synchronization phase lock function cannot be enabled on the GSM and LTE FDD sides simultaneously.</p>
+</li><li><p>The air interface soft synchronization phase lock function can take effect on the GSM side only when the E1T1 or SYNCETH shared by the peer standard, E1T1, or SYNCETH is used as the system clock.</p>
+</li><li><p>The air interface soft synchronization phase lock function can take effect on the LTE FDD side only when the SYNCETH shared by the peer standard or SYNCETH is used as the system clock.</p>
+</li><li><p>The LMPT board supports the air interface soft synchronization phase lock function only for LTE FDD. The GTMU and UMDU boards support the air interface soft synchronization phase lock function only for GSM. The WMPT does not support the air interface soft synchronization phase lock function.</p>
+</li><li><p>Enabling air interface soft synchronization will increase the filtering period that is invisible to users, which affects the time the ALM-26262 External Clock Reference Problem alarm is reported. In co-MPT scenarios, enabling air interface soft synchronization will affect the filtering periods of all modes deployed on the main control board.</p>
+</li><li><p>If air interface soft synchronization switch is set to OFF, the air interface soft synchronization function will become unavailable.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]Only GSM and LTE FDD support the air interface soft synchronization function.</p>
+</li><li><p>[Co-MPT,eGBTS]The air interface soft synchronization phase lock function cannot be enabled when the current system clock is changed from E1T1, SYNCETH, or E1T1 or SYNCETH shared by the peer standard to other clock sources.</p>
+</li><li><p>[Co-MPT,eGBTS]The air interface soft synchronization phase lock function can take effect only when frequency synchronization is used and the current system clock source is E1T1, SYNCETH, or E1T1 or SYNCETH shared by the peer standard, the NR currently does not support this function.</p>
+</li><li><p>[Co-MPT,eGBTS]The air interface soft synchronization phase lock function cannot take effect when the clock synchronization mode is changed from frequency synchronization to time synchronization.</p>
+</li><li><p>[Co-MPT]When air interface soft synchronization enhancement is enabled, the <a href="str_freqdiffchk.html">STR FREQDIFFCHK</a> and <a href="dsp_freqdiffrslt.html">DSP FREQDIFFRSLT</a> commands are not supported and the faults related to a large offset of the reference clock source cannot be detected.</p>
+</li><li><p>[Co-MPT]When air interface soft synchronization enhancement is enabled, the <a href="str_clktst.html">STR CLKTST</a>, <a href="stp_clktst.html">STP CLKTST</a>, and <a href="dsp_clktst.html">DSP CLKTST</a> commands are not supported and clock quality cannot be monitored using MML commands or on the monitoring interface.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_aiss__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-AissOp.html">FLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Air Interface Soft Synchronization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the Air interface Soft synchronization Phase Lock function is enabled on the NE, which can be set to ON or OFF. ON indicates that the switch for the Air interface soft synchronization phase lock function is set to on and OFF indicates that the Air interface soft synchronization phase lock function is set to off.</p>
+<p>GUI Value Range: ON(On), OFF(Off)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: OFF(Off)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L-FDD, R, N-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-AissStandard.html">STANDARD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Air Interface Soft Synchronization Standard</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the standard where the Air interface soft synchronization function is enabled.</p>
+<p>GUI Value Range: GSM(GSM), LTE(LTE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: GSM, LTE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-AissNetMode.html">NETMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Soft-Synchronized Network Adaption Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the adaption mode of the soft synchronous transport network. The value of this parameter depends on the synchronous status of the transport network.</p>
+<p>GUI Value Range: GEN(General Mode), ENH(Enhanced Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: GEN, ENH</p>
+<p>MML Default Value: GEN(General Mode)</p>
+<p>Recommended Value: If the network jitter is large, this parameter is set to AissNetModeEnh. Otherwise, this parameter is set to AissNetModeGen.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-AissFreq.html">FREQUENCE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Air Soft Syn Phase Adjustment Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the adjustment period of the frame clock phase when the Air interface soft synchronization Phase Lock function is enabled on the NE.</p>
+<p>GUI Value Range: 300SEC(300 Seconds), 480SEC(480 Seconds)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 300SEC, 480SEC</p>
+<p>MML Default Value: 300SEC(300 Seconds)</p>
+<p>Recommended Value: It is recommended that this parameter be set to its default value, 300 seconds, in normal conditions. If the network jitter is large, set this parameter to 480 seconds and the Soft-synchronized Network Adaption Mode parameter to ENH.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_aiss__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set set parameters related to Air interface soft synchronization with parameters as follows: Air Interface Soft Synchronization Switch: On, Air Interface Soft Synchronization standard: GSM, Soft-synchronized Network Adaption Mode: Enhanced Mode, Air Soft Syn Phase Adjustment Period: 480 Seconds, run the following command:
+SET AISS: FLAG=ON, STANDARD=GSM, NETMODE=ENH, FREQUENCE=480SEC;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

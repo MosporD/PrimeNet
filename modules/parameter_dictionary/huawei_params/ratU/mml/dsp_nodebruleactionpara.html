@@ -1,0 +1,210 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display Rule Activation Status and Active Value (DSP NODEBRULEACTIONPARA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_nodebruleactionpara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display Rule Activation Status and Active Value (DSP NODEBRULEACTIONPARA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_nodebruleactionpara"></a><a name="dsp_nodebruleactionpara"></a>
+
+
+<h1 class="topictitle1">Display Rule Activation Status and Active Value (DSP NODEBRULEACTIONPARA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="dsp_nodebruleactionpara__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>This command is used to query the activation status of a rule for a specified cell or all cells and the active value of the parameter associated with the rule.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_nodebruleactionpara__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>If no local cell ID is specified, this command is executed to get the summarized information of all the local cells using the specified rule under the NodeB. If a local cell ID is specified and the local cell exists, this command is executed to get the detailed information of the specified local cell using the specified rule.</p>
+</div></div>
+
+<div class="mmlparam"><a name="dsp_nodebruleactionpara__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBRuleActionPara-ruleId.html">RULEID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rule ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a rule. The parameter value range extends with the rule quantity. Rule IDs 0 and 1 indicate that the SIB7RTWPOPTSW and SIB7MAXRTWP parameters must be configured. Rule IDs 2 and 3 indicate that the RTWPSIRTGTADJSW parameter must be configured. Rule ID 4 indicates ICMODE parameter must be configured. Rule IDs 5 and 6 indicate that the EXTRAPOWER parameter must be configured. Rule ID 7 indicates that TURBOIC parameter must be configured. Rule ID 8 indicates that DPCHMAXTXPWRRESTRSW parameter must be configured. Rule ID 9 indicates that RADIOQUALITYDPCHPCSW parameter must be configured. Rule ID 10 indicates that DPCHTPCPOADJSW parameter must be configured.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBRuleActionPara-uLoCellId.html">ULOCELLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local cell ID.</p>
+<p>GUI Value Range: 0~268435455</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~268435455</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_nodebruleactionpara__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">1. Query the activation status of rule 5 for all local cells and the active value of the parameter associated with the rule:
+DSP NODEBRULEACTIONPARA: RULEID=5;
+The result is shown as follows:
++++    0        2015-04-13 15:04:45
+O&amp;M    #537920366
+%%DSP NODEBRULEACTIONPARA: RULEID=5;%%
+RETCODE = 0  Operation succeeded.
+
+Display Rule Activation Status and Active Value
+-----------------------------------------------
+Rule ID  Local Cell ID  Local Cell Status     Local Cell Administration Status  Cell ID  Rule Active Status
+
+5        1400           Local Cell Available  Unblocked                         1400     Active            
+5        1401           Local Cell Available  Unblocked                         NULL     Inactive          
+(Number of results = 2)
+
+
+---    END
+
+2. Query the activation status of rule 5 for local cell 1400 and the active value of the parameter associated with the rule:
+DSP NODEBRULEACTIONPARA: RULEID=5, ULOCELLID=1400;
+The result is shown as follows:
++++    0        2015-04-13 14:20:06
+TRAFFIC    #537920109
+%%DSP NODEBRULEACTIONPARA: RULEID=5, ULOCELLID=1400;%%
+RETCODE = 0  Operation succeeded.
+
+Display Rule Activation Status and Active Value
+-----------------------------------------------
+                         Rule ID  =  5
+                   Local Cell ID  =  1400
+               Local Cell Status  =  Local Cell Available
+Local Cell Administration Status  =  Unblocked
+                         Cell ID  =  1400
+              Rule Active Status  =  Active
+(Number of results = 1)
+
+Display Rule Activation Status and Active Value
+-----------------------------------------------
+              MO Name  =  Local Cell Mac-hs Para
+       Parameter Name  =  Extra Power
+Active Interval Value  =  12
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_nodebruleactionpara__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Rule ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of a rule. The parameter value range extends with the rule quantity. Rule IDs 0 and 1 indicate that the SIB7RTWPOPTSW and SIB7MAXRTWP parameters must be configured. Rule IDs 2 and 3 indicate that the RTWPSIRTGTADJSW parameter must be configured. Rule ID 4 indicates ICMODE parameter must be configured. Rule IDs 5 and 6 indicate that the EXTRAPOWER parameter must be configured. Rule ID 7 indicates that TURBOIC parameter must be configured. Rule ID 8 indicates that DPCHMAXTXPWRRESTRSW parameter must be configured. Rule ID 9 indicates that RADIOQUALITYDPCHPCSW parameter must be configured. Rule ID 10 indicates that DPCHTPCPOADJSW parameter must be configured.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Cell ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the local cell ID.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Cell Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the local cell status. Value range: Local Cell Unavailable, Local Cell Unavailable-RF and Baseband Resource Fault, Local Cell Unavailable-RF Resource Fault, Local Cell Unavailable-Baseband Resource Fault, Local Cell Unavailable-License Limited, Local Cell Unavailable-Baseband Resource Fault and License Limited, Local Cell Unavailable-RF, Baseband Resource Fault and License Limited, Local Cell Unavailable-RF Resource Fault and License Limited, Local Cell Available-NCP Fault, Local Cell Unavailable-NCP Fault and License Limited, Local Cell Unavailable-Available Local Cells Reached Upper Limit, Local Cell Unavailable-Baseband Resource Fault and Available Local Cells Reached Upper Limit, Local Cell Unavailable-Available Local Cells Reached Upper Limit and RF Resource Fault, Local Cell Unavailable-NCP Fault and Available Local Cells Reached Upper Limit, Local Cell Unavailable-Available Local Cells Reached Upper Limit and License Limited, Local Cell Unavailable-RF, Baseband Resource Fault and Available Local Cells Reached Upper Limit, Local Cell Unavailable-Baseband Resource Fault, License Limited and Available Local Cells Reached Upper Limit, Local Cell Unavailable-RF Resource Fault, License Limited and Available Local Cells Reached Upper Limit, Local Cell Unavailable-RF, Baseband Resource Fault, License Limited and Available Local Cells Reached Upper Limit, Local Cell Unavailable-pRRU Deep Dormancy, Local Cell Unavailable-Beam Cell Group Not Configured or Configuration Incomplete, Local Cell Unavailable-Main Control Board Not Supported, Local Cell Available.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Cell Administration Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the local cell administration status. Blocked: The previous services in the cell are released and the cell is unavailable. Shutting down: Non-high-priority cells are selected but the cells do not meet the blocking condition. UNBLOCKED: The local cell is not blocked. The local cell administration status can be modified by running the <a href="blk_ulocell.html">BLK ULOCELL</a> and <a href="ubl_ulocell.html">UBL ULOCELL</a> commands.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cell ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the logical cell ID.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Rule Active Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the active status of a rule.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>MO Name</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the name of an MO whose parameters are associated with a rule.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Parameter Name</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the name of a parameter associated with a rule.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Active Interval Value</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the active value of an interval-type parameter associated with a rule.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

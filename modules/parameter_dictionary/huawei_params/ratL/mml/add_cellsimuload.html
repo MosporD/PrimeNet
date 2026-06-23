@@ -1,0 +1,152 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Configuration of Cell Simulated Load (ADD CELLSIMULOAD)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_cellsimuload">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Configuration of Cell Simulated Load (ADD CELLSIMULOAD)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_cellsimuload"></a><a name="add_cellsimuload"></a>
+
+
+<h1 class="topictitle1">Add Configuration of Cell Simulated Load (ADD CELLSIMULOAD)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="add_cellsimuload__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to start a cell simulated load control configuration.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_cellsimuload__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Cell load simulation is generally used to test interference, not to test the maximum transmit power.</p>
+</li><li><p>When the number of activated UEs in a cell exceeds 6, this function is not recommended because the scheduling performance of load simulation UEs cannot be ensured.</p>
+</li><li><p>For a 1T1R FDD cell, 1T2R FDD cell, or an FDD cell configured with one CRS port, the transmission mode must be set to TM1 for simulated load in the cell. For an FDD cell with a TX/RX mode other than 1T1R and 1T2R or an FDD cell configured with more than one CRS port, the transmission mode must be set to a transmission mode other than TM1 (for example, TM2) for simulated load in the cell.</p>
+</li><li><p>Cell load simulation is not supported in FDD massive MIMO cells in which DDB is enabled.</p>
+</li><li><p>In spectrum sharing scenarios, this function is not recommended because the scheduling performance of load simulation UEs cannot be ensured.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_cellsimuload__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSimuLoad-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSimuLoad-SimLoadCfgIndex.html">SimLoadCfgIndex</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Configure Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a simulated load configuration. One eNodeB can store a maximum of 10 simulated load configurations. They are identified by indexes ranging from 0 to 9 and correspond to RB usage thresholds (specified by the SimuLoadRbThd parameter) 10% to 100% at a step of 10%. For example, the RB usage thresholds for simulated load configurations 1 and 4 are 20% and 50%, respectively. Alternatively, you can also manually specify the RB usage threshold for a simulated load configuration by setting the SimuLoadRbThd parameter.</p>
+<p>GUI Value Range: 0~9</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~9</p>
+<p>MML Default Value: 4</p>
+<p>Recommended Value: 4</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSimuLoad-SimuLoadTransMode.html">SimuLoadTransMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SimuLoad transmission mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission mode adopted by the simulated load configuration, including:</p>
+<p>TM1: indicates transmission mode 1 for the simulated load configuration.</p>
+<p>TM2: indicates transmission mode 2 for the simulated load configuration.</p>
+<p>TM4: indicates transmission mode 4 for the simulated load configuration.</p>
+<p>TM7: indicates transmission mode 7 for the simulated load configuration.</p>
+<p>TM8: indicates transmission mode 8 for the simulated load configuration.</p>
+<p>TM9: indicates transmission mode 9 for the simulated load configuration.</p>
+<p>Load simulation for TM4 and TM9 is used in 4T/8T MIMO cells to simulate interference for 4T/8T transmissions.</p>
+<p>GUI Value Range: TM1(TM1), TM2(TM2), TM4(TM4), TM7(TM7), TM8(TM8), TM9(TM9)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TM1, TM2, TM4, TM7, TM8, TM9</p>
+<p>MML Default Value: TM2(TM2)</p>
+<p>Recommended Value: TM2(TM2)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSimuLoad-AutoRmvTime.html">AutoRmvTime</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Simuload Automatic Remove Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period of time exceeding which the cell simulated load is automatically removed. After this parameter value is changed, the time for automatically removing the cell simulated load restarts. If this parameter is changed to a value the same as the previous value of this parameter, the time does not restart. If this parameter is set to 0, the cell simulated load will not be automatically removed.</p>
+<p>GUI Value Range: 0~70560</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 0~70560</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (The parameter modification has no impact on the equipment.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_cellsimuload__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To add a cell simulated load control configuration with the parameters as follows: Local cell ID: 0, Configure Index: 2, run the following command:
+ADD CELLSIMULOAD: LocalCellId=0, SimLoadCfgIndex=2;
+Example 2: To add a cell simulated load control configuration with the parameters as follows: Local cell ID: 0, Configure Index: 4, run the following command:
+ADD CELLSIMULOAD: LocalCellId=0, SimLoadCfgIndex=4;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

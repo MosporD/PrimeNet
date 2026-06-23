@@ -1,0 +1,279 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify User Plane Peer (MOD USERPLANEPEER)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_userplanepeer">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify User Plane Peer (MOD USERPLANEPEER)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_userplanepeer"></a><a name="mod_userplanepeer"></a>
+
+
+<h1 class="topictitle1">Modify User Plane Peer (MOD USERPLANEPEER)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_userplanepeer__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of a peer end on the user plane.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_userplanepeer__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If one or more of the following parameters in a USERPLANEPEER object are modified, the link objects that are automatically created for the USERPLANEPEER object will be modified, or removed and then added: Peer IP Address, IPSec Auto Configure Switch, Security Peer ID, and VRF Index. Link objects include ACL, ACLRULE, IKEPEER, IPSECBIND or IPSECBINDITF, and IPSECPOLICY.</p>
+</li><li><p>If the following conditions are met, the system will remove the ACL, ACLRULE, IPSECBIND or IPSECBINDITF, and IPSECPOLICY objects that are automatically configured for a user-plane link: </p>
+<p>- The value of IPSec Auto Configure Switch is changed from to ENABLE(Enable) to DISABLE(Disable) for the USERPLANEPEER object. </p>
+<p>- IPSec Auto Configure Switch is set to ENABLE(Enable) for the USERPLANEHOST object in the same end point group. </p>
+<p>- SeGW Switch is set to ENABLE(Enable) for the SECURITYHOST, SECURITYPEER, and SECURITYTEMPLATE objects. </p>
+<p>If the following conditions are met, the system will remove the ACL, ACLRULE, IPSECPOLICY, IPSECBIND or IPSECBINDITF, and IKEPEER objects that are automatically configured for a user-plane link: </p>
+<p>- The value of IPSec Auto Configure Switch is changed from to ENABLE(Enable) to DISABLE(Disable) for the USERPLANEPEER object. </p>
+<p>- IPSec Auto Configure Switch is set to ENABLE(Enable) for the USERPLANEHOST object in the same end point group. </p>
+<p>- SeGW Switch is set to DISABLE(Disable) for the SECURITYHOST, SECURITYPEER, and SECURITYTEMPLATE objects.</p>
+</li><li><p>A user-plane peer that is automatically created by the system will be written into the database two minutes after it takes effect. During this period, if a user-plane peer is manually modified with the same peer IP address as the user-plane peer to be written into the database, the system deletes the user-plane peer that is automatically created and releases the services carried on the user-plane peer. Then the manually modified user-plane peer data takes effect.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]Modifying any of the following parameters interrupts service that references the user plane peer: Peer IP Address, Peer IPv6 Address, IPSec Auto Configure Switch, Security Peer ID and VRF Index.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]A user-plane peer that is automatically created by the system will be written into the database two minutes after it takes effect. During this period, if a user-plane peer is manually modified with the same peer IPv6 address as the user-plane peer to be written into the database, the system deletes the user-plane peer that is automatically created and releases the services carried on the user-plane peer. Then the manually modified user-plane peer data takes effect.</p>
+</li><li><p>[NodeB,eGBTS]Modifying any of the following parameters interrupts service that references the user plane peer: Peer IP Address, IPSec Auto Configure Switch, Security Peer ID and VRF Index.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_userplanepeer__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-UserPlanePeerID.html">UPPEERID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Plane Peer ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the user-plane peer. The value of UPPEERID in the user-plane peer configured by users ranges from 0 to 65535. The value of UPPEERID in the USERPLANEPEER MOs configured by the system ranges from 70000 to 79999.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535,70000~79999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>UPPEERID</strong> is set to a value in the range of 0 to 65535, <strong>CTRLMODE</strong> must be set to MANUAL_MODE, and <strong>AUTOCFGFLAG</strong> must be set to MANUAL_CREATED. If <strong>UPPEERID</strong> is set to a value in the range of 70000 to 79999, <strong>CTRLMODE</strong> must be set to AUTO_MODE, and <strong>AUTOCFGFLAG</strong> must be set to AUTO_CREATED.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>USERPLANEPEER</strong> MO, if <strong>IPVERSION</strong> is set to IPv4 and <strong>VRFIDX</strong> is set to any value in the range of 1 to 7, <strong>IPSECSWITCH</strong> cannot be set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-IPVersion.html">IPVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the version of the user-plane peer IP address.</p>
+<p>GUI Value Range: IPv4(IPv4), IPv6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPv4, IPv6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>USERPLANEPEER</strong> MO, if <strong>IPVERSION</strong> is set to IPv4 and <strong>VRFIDX</strong> is set to any value in the range of 1 to 7, <strong>IPSECSWITCH</strong> cannot be set to ENABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>USERPLANEPEER</strong> MO, if <strong>IPVERSION</strong> is set to IPv6 and <strong>CTRLMODE</strong> is set to MANUAL_MODE, <strong>IPSECSWITCH</strong> must be set to DISABLE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-PeerIPv4.html">PEERIPV4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peer IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IPv4 Address of the user plane peer.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>USERPLANEPEER</strong> MO, <strong>PEERIPV4</strong> must be a valid IP address of Class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-PeerIPv6.html">PEERIPV6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peer IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IPv6 Address of the user plane peer. This parameter takes effect only in LTE and NR.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In the <strong>USERPLANEPEER</strong> MO, <strong>PEERIPV6</strong> must be set to a globally scoped unicast address.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-IPSecSwitch.html">IPSECSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Auto Configure Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable automatic user-plane IPsec tunnel setup based on the parameter values in the SECURITYHOST and SECURITYPEER MOs. If this parameter is set to ENABLE, an IPsec tunnel is automatically set up to encrypt transmitted data. If this parameter is set to DISABLE, no IPsec tunnel is automatically set up. If the value of this parameter is changed from ENABLE to DISABLE using the <a href="mod_userplanepeer.html">MOD USERPLANEPEER</a> command, the system deletes the automatically set up IPsec tunnel.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the networking mode does not support IPSec or IPSec tunnels are to be set up by manually configuring IPSec MOs, this parameter must be set to DISABLE.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>USERPLANEPEER</strong> MO, if <strong>IPVERSION</strong> is set to IPv4 and <strong>VRFIDX</strong> is set to any value in the range of 1 to 7, <strong>IPSECSWITCH</strong> cannot be set to ENABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>USERPLANEPEER</strong> MO, if <strong>IPVERSION</strong> is set to IPv6 and <strong>CTRLMODE</strong> is set to MANUAL_MODE, <strong>IPSECSWITCH</strong> must be set to DISABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The base station cannot access the network if this parameter is set to DISABLE and no IPSec tunnel has been set up between the user-plane host and user-plane peer for the internal user-plane paths in an IPSec-protected network.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-SecurityPeerID.html">SECPEERID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Security Peer ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the security peer ID used by the user-plane peer.</p>
+<p>GUI Value Range: 0~65535,70000~89999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535,70000~89999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-RemoteID.html">REMOTEID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Remote ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the remote ID. This parameter is used by the system during the automatic configuration of this MO. If this parameter is manually configured, the system may fail to automatically modify or delete the MO.</p>
+<p>GUI Value Range: 0~127 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~127 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-LinkStaticChk.html">STATICCHK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Static Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the GTP-U static detection function for a link. When this parameter is set to ENABLE, the GTP-U static detection function is enabled for a link. When this parameter is set to DISABLE, the GTP-U static detection function is disabled for a link. When this parameter is set to FOLLOW_GLOBAL, the setting of the switch for the GTP-U static detection function is the same as that of the base station-level GTP-U detection switch. This parameter is valid only when <strong>STATICCHKMODE</strong> is set to UPPEERSTATICCHK(User-Plane Peer Static Check) in the <strong>GEPMODELPARA</strong> MO. This parameter takes effect only in LTE and NR.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable), FOLLOW_GLOBAL(Same as the GTP-U static detection switch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE, FOLLOW_GLOBAL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FOLLOW_GLOBAL(Same as the GTP-U static detection switch)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEPEER-UserLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the information about a user-plane peer.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_userplanepeer__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of a user-plane peer with the parameters as follows: User Plane Peer ID: 0, IP Version: IPv4, Peer IP Address: 192.168.1.29, run the following command:
+MOD USERPLANEPEER: UPPEERID=0, IPVERSION=IPv4, PEERIPV4="192.168.1.29";
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

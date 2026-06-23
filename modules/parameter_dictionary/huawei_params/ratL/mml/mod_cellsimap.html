@@ -1,0 +1,790 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell SIB-to-SI Mapping (MOD CELLSIMAP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellsimap">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell SIB-to-SI Mapping (MOD CELLSIMAP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellsimap"></a><a name="mod_cellsimap"></a>
+
+
+<h1 class="topictitle1">Modify Cell SIB-to-SI Mapping (MOD CELLSIMAP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellsimap__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the SIB-to-SI mapping.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellsimap__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>Sib6Switch and Sib7Switch are set to On by default. Set Sib6Switch (or Sib7Switch) to Off only when it is desired that UEs in E-UTRAN cells do not reselect UTRAN (or GERAN) cells, for example, during UTRAN (or GERAN) reconstruction.</p>
+</li><li><p>The LTE cell resets when the DlOnlyCellSiSwitch parameter or ForbidCellSiSwitch parameter is modified.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellsimap__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-SiMapSwitch.html">SiMapSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB mapping SI algorithm switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the mapping from SIBs to SI messages is enabled. If it is disabled, a fixed configuration is used for the mapping from SIBs to SI messages and the SI window size. If it is enabled, the mapping from SIBs to SI messages and the SI window size are determined based on the transmission period, quantity, and data traffic of SIBs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_TRUE(True)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to BOOLEAN_FALSE and SI messages contain a large amount of data to transmit, system information may not be broadcast to each UE in the cell coverage, that is, cell edge users may not correctly receive system information.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib2Period.html">Sib2Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB2 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 2 (SIB2). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF16(RF16)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib3Period.html">Sib3Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB3 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 3 (SIB3). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF16(RF16)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib4Period.html">Sib4Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB4 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 4 (SIB4). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF32( RF32)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib5Period.html">Sib5Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB5 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 5 (SIB5). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF32( RF32)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib6Period.html">Sib6Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB6 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 6 (SIB6). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF64( RF64)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib7Period.html">Sib7Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB7 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 7 (SIB7). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF64( RF64)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib8Period.html">Sib8Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB8 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 8 (SIB8). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF64( RF64)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib10Period.html">Sib10Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB10 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 10 (SIB10). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF16(RF16)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib11Period.html">Sib11Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB11 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 11 (SIB11). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF32( RF32)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-EtwsPnDuration.html">EtwsPnDuration</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ETWS PN message duration time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration of the primary notification (PN) broadcast for the Earthquake and Tsunami Warning System (ETWS). This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~300</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~300</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 6</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-EtwsSnOverlapPolicy.html">EtwsSnOverlapPolicy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ETWS SN message overlap policy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the policy of processing repeated secondary notification (SN) broadcasts for the Earthquake and Tsunami Warning System (ETWS). A repeated SN is a second SN that has the same IEs Message Identifier and Serial Number as those in the first SN. The value MERGE indicates that the eNodeB stops broadcasting the first SN and then broadcasts the second SN. The value DISCARD indicates that the eNodeB ignores the second SN and continues broadcasting the first SN. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: MERGE, DISCARD</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MERGE, DISCARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DISCARD</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-EtwsPnOverlapPolicy.html">EtwsPnOverlapPolicy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ETWS PN message overlap policy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the policy of processing repeated primary notification (PN) broadcasts for the Earthquake and Tsunami Warning System (ETWS). A repeated PN is a second PN that has the same Message Identifier and Serial Number IEs as those in the first PN. If this parameter is set to MERGE, the eNodeB stops broadcasting the first PN and starts broadcasting the second PN. If this parameter is set to DISCARD, the eNodeB discards the second PN and continues broadcasting the first PN. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: MERGE, DISCARD</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MERGE, DISCARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DISCARD</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib12Period.html">Sib12Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB12 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 12 (SIB12). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF32( RF32)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-SiTransEcr.html">SiTransEcr</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Effective code rate for SI transmission</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the code rate of system information transmission. For details about this parameter, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 27~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0.027~1, step: 0.001</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the bandwidth is 1.4 MHz, set this parameter to 83.</p>
+<p>If the bandwidth is 3 MHz, 5 MHz, 10 MHz, 15 MHz, or 20 MHz, set this parameter to 27.</p>
+<p>In peak rate tests, when four transmit antennas and 20 MHz bandwidth are configured, the recommended value is 54.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value leads to larger cell coverage but increased overhead in the PDSCH. A larger value leads to opposite effects. If this parameter is set to an excessively small value, the code rate of system information transmission cannot be met for a cell working on small bandwidth.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib13Period.html">Sib13Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB13 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 13 (SIB13). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF32( RF32)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib15Period.html">Sib15Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB15 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 15 (SIB15). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF32( RF32)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib16Period.html">Sib16Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB16 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 16 (SIB16). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF64( RF64)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-SibTransCtrlSwitch.html">SibTransCtrlSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB Transmission Control Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the eNodeB uses a new mechanism to send system information block (SIB) messages. When this parameter is set to OFF, the eNodeB uses the default mechanism to send SIB messages. When this parameter is set to ON, the eNodeB uses the new mechanism to send SIB messages. In this case, the probability of SIB repetitions decreases. As a result, fewer PDCCH resources are consumed for FDD and TDD and fewer downlink resources are consumed for NB-IoT.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: For an FDD or TDD cell: If this parameter is set to ON, fewer PDCCH resources are consumed and downlink throughput increases. However, the target bit rate may not be met, especially for a cell with a small bandwidth. You are advised to set this parameter to ON in comparison tests. For an NB-IoT cell: If this parameter is set to ON, downlink resource consumption is reduced and throughput is increased, but the NB-IoT cell coverage is reduced. You are advised to set this parameter to ON in comparison tests.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-SiSwitch.html">SiSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell System Information Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the system information broadcast policy for the cell.</p>
+<p>DlOnlyCellSiSwitch(DlOnlyCellSiSwitch): Indicates whether to broadcast system information in the cell if the WorkMode parameter in the Cell MO is not set to UL_DL for the cell. System information is broadcast in the cell only if this option is selected. This option applies only to cells for which the WorkMode parameter is not set to UL_DL. This option applies only to LTE FDD.</p>
+<p>Sib6Switch(Sib6Switch): Indicates whether to broadcast SIB6. If this option is deselected, SIB6 is not broadcast. If this option is selected and the CELLRESELUTRAN MO is created, SIB6 is broadcast. For details about the contents of SIB6, see 3GPP TS 36.331. This option applies only to LTE FDD and LTE TDD.</p>
+<p>Sib7Switch(Sib7Switch): Indicates whether to broadcast SIB7. If this option is deselected, SIB7 is not broadcast. If this option is selected and the CELLRESELGERAN MO is created, SIB7 is broadcast. For details about the contents of SIB7, see 3GPP TS 36.331. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ForbidCellSiSwitch: Indicates the information broadcast in the system information of a cell with the WorkMode parameter in the Cell MO being not set to DL_ONLY and related handling for the cell. If this option is deselected, system information is normally broadcast in the cell. If this option is selected, system information broadcast in the cell indicates that the cell is in the barred state, preventing UEs from camping on the cell. In addition, the system does not allow handovers to the cell. This option applies only to LTE FDD and LTE TDD.</p>
+<p>Sib24Switch(Sib24Switch): Indicates whether to broadcast SIB24. If this option is deselected, SIB24 is not broadcast. If this option is selected and the CELLRESELTONR MO is created, SIB24 is broadcast. For details about the contents of SIB24, see 3GPP TS 36.331. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: DlOnlyCellSiSwitch(DlOnlyCellSiSwitch), Sib6Switch(Sib6Switch), Sib7Switch(Sib7Switch), ForbidCellSiSwitch(ForbidCellSiSwitch), Sib24Switch(Sib24Switch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DlOnlyCellSiSwitch, Sib6Switch, Sib7Switch, ForbidCellSiSwitch, Sib24Switch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DlOnlyCellSiSwitch:Off, Sib6Switch:On, Sib7Switch:On, ForbidCellSiSwitch:Off, Sib24Switch:On</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Sib6Switch(Sib6Switch): If this option is deselected, UEs cannot be reselected to UTRAN cells. As a result, more UEs with poor signal quality exist on the LTE network, causing deterioration in the random access success rate, RRC connection setup success rate, E-RAB setup success rate, service drop rate, RRC connection reestablishment success rate, cell throughput, user throughput, IBLER, RBLER, packet loss rate, MOS, idle-to-active delay, attach delay, and other delay (including web browsing delay and FTP download delay). This may increase the number of online UEs and PRB usage. If this option is selected, UEs can be transferred to UTRAN cells by cell reselection, avoiding deterioration in the preceding performance indicators.</p>
+<p>Sib7Switch(Sib7Switch): If this option is deselected, UEs cannot be reselected to GERAN cells. As a result, more UEs with poor signal quality exist on the LTE network, causing deterioration in the random access success rate, RRC connection setup success rate, E-RAB setup success rate, service drop rate, RRC connection reestablishment success rate, cell throughput, user throughput, IBLER, RBLER, packet loss rate, MOS, idle-to-active delay, attach delay, and other delay (including web browsing delay and FTP download delay). This may increase the number of online UEs and PRB usage. If this option is selected, UEs can be transferred to GERAN cells by cell reselection, avoiding deterioration in the preceding performance indicators.</p>
+<p>Sib24Switch(Sib24Switch): If this option is deselected, UEs cannot reselect NR cells. As a result, more UEs with poor signal quality exist on the LTE network, causing deterioration in the random access success rate, RRC connection setup success rate, E-RAB setup success rate, service drop rate, RRC connection reestablishment success rate, cell throughput, user throughput, IBLER, RBLER, packet loss rate, MOS, idle-to-active delay, attach delay, and other delays (including web browsing delay and FTP download delay). This may increase the number of online UEs and PRB usage. If this option is selected, UEs can be transferred to NR cells by cell reselection, avoiding deterioration in the preceding performance indicators.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-SiSchResRatio.html">SiSchResRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">System Information Scheduling Resource Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the resource proportion in SI scheduling and controls whether SI-based gap-assisted measurement optimization takes effect. If this parameter is set to 0 (corresponding to the actual value 0), the specified resource proportion in SI scheduling does not take effect and SI-based gap-assisted measurement optimization does not take effect. If this parameter is set to a value within the range of 40 to 100 (corresponding to the actual value within the range of 0.4 to 1.0), the specified resource proportion in SI scheduling and SI-based gap-assisted measurement optimization takes effect to guarantee SI demodulation performance. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0,40~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0,0.4~1, step: 0.01</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100(Weak SI Demodulation Performance)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in more SI scheduling times, higher bit rate for SI transmissions at a single time, and weaker SI demodulation performance of UEs at a single time.</p>
+<p>A larger value of this parameter results in the opposite effects.</p>
+<p>If this parameter is set to 0, SI-based gap-assisted measurement optimization is disabled, and the impact of gap-assisted measurements on SI is relatively small due to possible multiple SI transmissions.</p>
+<p>If this parameter is set to a value within the range of 40 to 100, SI-based gap-assisted measurement optimization is enabled so that each UE performs gap-assisted measurements and demodulates SI at different times. The impact of gap-assisted measurements on SI decreases and SI demodulation performance of UEs increases. However, the transmission times of SRI/SRS/CQI may be affected, and related network performance (including uplink throughput, downlink throughput, and MOS) deteriorates.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-SibUpdOptSwitch.html">SibUpdOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB Update Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the optimization scheme switch that controls SIB message update.</p>
+<p>SibPagingOptCtrlSwitch: Indicates whether to enable the optimization of paging triggered by system information update. If this option is selected, the optimization scheme takes effect, and the paging cycle is the same as the BCCH modification period. If this option is deselected, the optimization scheme does not take effect, and the paging cycle is occasionally less than the BCCH modification period. This option applies only to LTE FDD and LTE TDD.</p>
+<p>Sib12BroadcastOptSwitch: Indicates whether SIB12 messages are broadcast over the air interface during CMAS paging. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: SibPagingOptCtrlSwitch(SibPagingOptCtrlSwitch), Sib12BroadcastOptSwitch(Sib12BroadcastOptSwitch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SibPagingOptCtrlSwitch, Sib12BroadcastOptSwitch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SibPagingOptCtrlSwitch: On if both LTE cells and CDMA cells are deployed on the network, and Off for other scenarios</p>
+<p>Sib12BroadcastOptSwitch:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: SibPagingOptCtrlSwitch:</p>
+<p>If this option is selected, the success rate of system information update increases in the scenario where both LTE cells and CDMA cells are deployed. As a result, the RRC connection setup success rate increases. However, if the LBBPc is used, it is more likely that RRC connection setup success rate decreases in large traffic scenarios.</p>
+<p>If this option is deselected, there is a possibility that system information update fails in the scenario where both LTE cells and CDMA cells are deployed, which leads to a decrease in the RRC connection setup success rate.</p>
+<p>Sib12BroadcastOptSwitch:</p>
+<p>When this option is selected, UEs that receive CMAS paging messages earlier than other UEs receive CMAS messages earlier. The reception delay of the UEs is shorter. However, the number of SIB12 messages broadcast by the eNodeB is large, and therefore a large amount of air interface resources are occupied.</p>
+<p>When this option is deselected, all UEs receive CMAS messages after CMAS paging is complete. The reception delay of UEs is long, but the number of SIB12 messages broadcast by the eNodeB is small, and therefore a small amount of air interface resources are occupied.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib14Period.html">Sib14Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB14 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 14 (SIB14). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF16(RF16)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of the parameter indicates a smaller number of SIB transmissions in a unit of time and also a smaller amount of system resources occupied by the transmissions. This, however, results in a longer delay for UEs to receive the SIB.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-NbSib1RepetitionNum.html">NbSib1RepetitionNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT SIB1 Repetition Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of current cell's NB-IoT SIB1 repetition times within the period. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 4(4), 8(8), 16(16)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4, 8, 16</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 16</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a higher demodulation correctness rate. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-NbSib2Period.html">NbSib2Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT SIB2 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the current cell's NB-IoT SIB2 transmission period. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512), RF1024(RF1024), RF2048(RF2048), RF4096(RF4096)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF64, RF128, RF256, RF512, RF1024, RF2048, RF4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF512</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of the parameter indicates a smaller number of SIB transmissions in a unit of time and also a smaller amount of system resources occupied by the transmissions. This, however, may result in a longer delay for UEs to receive the SIBs. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-NbSib3Period.html">NbSib3Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT SIB3 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the current cell's NB-IoT SIB3 transmission period. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512), RF1024(RF1024), RF2048(RF2048), RF4096(RF4096)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF64, RF128, RF256, RF512, RF1024, RF2048, RF4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF512</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of the parameter indicates a smaller number of SIB transmissions in a unit of time and also a smaller amount of system resources occupied by the transmissions. This, however, may result in a longer delay for UEs to receive the SIBs. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-NbSib4Period.html">NbSib4Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT SIB4 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the current cell's NB-IoT SIB4 transmission period. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512), RF1024(RF1024), RF2048(RF2048), RF4096(RF4096)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF64, RF128, RF256, RF512, RF1024, RF2048, RF4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF2048</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of the parameter indicates a smaller number of SIB transmissions in a unit of time and also a smaller amount of system resources occupied by the transmissions. This, however, may result in a longer delay for UEs to receive the SIBs. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-NbSib5Period.html">NbSib5Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT SIB5 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the current cell's NB-IoT SIB5 transmission period. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512), RF1024(RF1024), RF2048(RF2048), RF4096(RF4096)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF64, RF128, RF256, RF512, RF1024, RF2048, RF4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF2048</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of the parameter indicates a smaller number of SIB transmissions in a unit of time and also a smaller amount of system resources occupied by the transmissions. This, however, may result in a longer delay for UEs to receive the SIBs. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-NbSib14Period.html">NbSib14Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT SIB14 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the current cell's NB-IoT SIB14 transmission period. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512), RF1024(RF1024), RF2048(RF2048), RF4096(RF4096)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF64, RF128, RF256, RF512, RF1024, RF2048, RF4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF512</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit of time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-NbSib16Period.html">NbSib16Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT SIB16 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the current cell's NB-IoT SIB16 transmission period. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512), RF1024(RF1024), RF2048(RF2048), RF4096(RF4096)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF64, RF128, RF256, RF512, RF1024, RF2048, RF4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF2048</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of the parameter indicates a smaller number of SIB transmissions in a unit of time and also a smaller amount of system resources occupied by the transmissions. This, however, may result in a longer delay for UEs to receive the SIBs. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-SidelinkV2xSib21Period.html">SidelinkV2xSib21Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sidelink V2X SIB21 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SIB21 transmission period for sidelink V2X. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF16(RF16)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter leads to a small number of SIB21 transmissions per unit time and a small amount of system resources consumed for the transmissions. This, however, results in a longer delay for UEs to receive SIB21. A small value of this parameter leads to a large number of SIB21 transmissions per unit time and a large amount of system resources consumed for the transmissions. This, however, results in a shorter delay for UEs to receive SIB21.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-MibRepetitionCtrlOptSwitch.html">MibRepetitionCtrlOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MIB Repetition Control Opt Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable optimization of repeated MIB transmission. If this parameter is set to OFF, the optimization is disabled. For LTE FDD cells, the eNodeB repeatedly transmits MIBs in subframes 0 and 9. For LTE TDD cells, the eNodeB repeatedly transmits MIBs in subframes 0 and 5. If this parameter is set to ON, the optimization is enabled, and the eNodeB transmits MIBs only in subframe 0. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(On)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, the eNodeB repeatedly transmits MIBs in subframes 0 and 9 for LTE FDD cells, and in subframes 0 and 5 for LTE TDD cells. In this case, eMTC coverage enhancement is supported. However, repeated MIB transmission consumes extra downlink PRB resources, lowering the peak LTE cell throughput and user-perceived throughput. If this parameter is set to ON, optimization of repeated MIB transmission is enabled, and the eNodeB transmits MIBs only in subframe 0. In this case, eMTC coverage gains are limited, and the peak LTE cell throughput and user-perceived throughput are not affected.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-NbSib22Period.html">NbSib22Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT SIB22 Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the NB-IoT SIB22 broadcast period in the current cell. For details, see 3GPP TS 36.331. This option applies only to NB-IoT.</p>
+<p>GUI Value Range: RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512), RF1024(RF1024), RF2048(RF2048), RF4096(RF4096)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF64, RF128, RF256, RF512, RF1024, RF2048, RF4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF512(RF512)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And affects the access and paging on non-anchor carriers for UEs in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of the parameter indicates a smaller number of SIB transmissions in a unit of time and also a smaller amount of system resources occupied by the transmissions. This, however, may lead to a longer delay for UEs to receive the SIBs, increasing the access failure possibility. A smaller value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib24Period.html">Sib24Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB24 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission period for system information block type 24(SIB24). For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RF64(RF64)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller number of transmissions in a unit time and a smaller amount of occupied system resources, but it may also lead to a longer delay in UE's acquisition of the system information. A smaller value of this parameter leads to an opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-HighPrecisionTimeServingSw.html">HighPrecisionTimeServingSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">High Precision Time Serving Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to broadcast high-precision time. This parameter specifies the policy of broadcasting time information in SIB16 over the air interface. If this parameter is set to ON, the system broadcasts the time obtained from the clock system. If this parameter is set to OFF, the system broadcasts the local time. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellSiMap-Sib25Period.html">Sib25Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SIB25 period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to broadcast SIB25. This parameter is also used to specify the SIB25 transmission period. If this parameter is set to OFF, the eNodeB does not broadcast SIB25. If this parameter is set to a value other than OFF, the eNodeB broadcasts SIB25 and the transmission period is indicated by the value of this parameter. For details about the period, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RF8(RF8), RF16(RF16), RF32(RF32), RF64(RF64), RF128(RF128), RF256(RF256), RF512(RF512), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RF8, RF16, RF32, RF64, RF128, RF256, RF512, OFF</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of the parameter leads to a smaller number of SIB transmissions in a unit of time, a smaller amount of system resources occupied by the transmissions, but a longer delay for UEs to receive the SIB. A smaller value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellsimap__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To modify the cell system information mapping with the parameters as follows: Local cell ID: 0, SIBs Period Configure Indication: CFG, SIB2 period: RF8, SIB3PERIOD: RF32, SI Map Information Configure Indication: CFG, run the following command: 
+MOD CELLSIMAP: LocalCellId=0, SiMapSwitch=BOOLEAN_TRUE, Sib2Period=RF8, Sib3Period=RF32;
+Example 2: To modify the cell system information mapping with the parameters as follows: Local cell ID: 0, SIBs Period Configure Indication: CFG, SI Map Information Configure Indication: NOT_CFG, run the following command:
+MOD CELLSIMAP: LocalCellId=0, SiMapSwitch=BOOLEAN_FALSE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

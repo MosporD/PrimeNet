@@ -1,0 +1,537 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="OMCH">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+<meta name="Mode" content="RFA">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="OMCH">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>OMCH</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="OMCH"></a><a name="OMCH"></a>
+
+
+<h1 class="topictitle1">OMCH</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="OMCH.html"><strong>OMCH</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An OMCH MO consists of the parameters related to a remote maintenance channel through which the MAE manages and maintains the BS. The OMCH MO has one active channel and one standby channel. If the active channel is interrupted, the BS switches services to the other channel according to instructions from the MAE.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>PACKETFILTERING</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>OMCH</strong> MO must be configured before the ACL auto-setup function is enabled for packet filtering. The <strong>ACLAUTOSWITCH</strong> parameter is set to ON in the <strong>PACKETFILTERING</strong> MO for enabling the ACL auto-setup function for packet filtering.</li></ul>
+</li><li>Relation with the <strong>BFDSESSION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If a <strong>BFDSESSION</strong> MO and an <strong>OMCH</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO must be different from <strong>IP</strong> in the <strong>OMCH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SRCIPRT</strong> and <strong>SRCIPROUTE4</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>OMCH</strong> MO, if <strong>CHECKTYPE</strong> is set to AUTO_UDPSESSION, <strong>IP</strong> must be configured with the corresponding <strong>SRCIPRT</strong> or <strong>SRCIPROUTE4</strong> MO.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CHECKTYPE</strong> in the active <strong>OMCH</strong> MO is set to AUTO_UDPSESSION, <strong>CHECKTYPE</strong> in the standby <strong>OMCH</strong> MO must be set to NONE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CHECKTYPE</strong> in an <strong>OMCH</strong> MO is set to UDPSESSION, the <strong>UDPSN</strong> in this <strong>OMCH</strong> MO must be different from <strong>UDPSN</strong> in any other <strong>OMCH</strong> MOs whose <strong>CHECKTYPE</strong> is set to UDPSESSION.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>CHECKTYPE</strong> parameters are set to UDPSESSIONGRP in two <strong>OMCH</strong> MOs, the values of the <strong>UDPSESSIONGRPID</strong> parameters in the MOs must be different.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>CHECKTYPE</strong> parameter is set to UDPSESSIONGRP in one <strong>OMCH</strong> MO, the <strong>CHECKTYPE</strong> parameter in the other <strong>OMCH</strong> MO must also be set to UDPSESSIONGRP.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PEERIP</strong> and <strong>IP</strong> in an <strong>OMCH</strong> MO must be different from <strong>IP</strong> and <strong>PEERIP</strong> in another <strong>OMCH</strong> MO, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV4 or ATM and <strong>BRT</strong> in an <strong>OMCH</strong> MO is set to YES, <strong>RTIDX</strong> in any two <strong>OMCH</strong> MOs cannot be set to the same value.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV4 or ATM and <strong>BINDSECONDARYRT</strong> in an <strong>OMCH</strong> MO is set to YES, <strong>SECONDARYRTIDX</strong> in any two <strong>OMCH</strong> MOs cannot be set to the same value.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV4 or ATM, the <strong>RTIDX</strong> in this <strong>OMCH</strong> MO must be different from <strong>SECONDARYRTIDX</strong> in <strong>OMCH</strong> MOs whose <strong>BINDSECONDARYRT</strong> is set to YES.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV4 or ATM, the <strong>SECONDARYRTIDX</strong> in this <strong>OMCH</strong> MO must be different from <strong>RTIDX</strong> in any other <strong>OMCH</strong> MOs whose <strong>BRT</strong> is set to YES.</li><li>[Co-MPT, eNodeB, gNodeB]Each <strong>OMCH</strong> MO must have a unique <strong>IP</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>IP</strong> in any two <strong>OMCH</strong> MOs must be on different network segments.</li><li>[Co-MPT, eNodeB, gNodeB]Any two <strong>OMCH</strong> MOs must have the same <strong>VRFIDX</strong> value.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, if <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV6, each <strong>OMCH</strong> MO must have a unique <strong>IP6</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>BEAR</strong> in the <strong>OMCH</strong> MO is set to IPV6 and <strong>FLAG</strong> is set to SLAVE, the <strong>OMCH</strong> MO with <strong>FLAG</strong> set to MASTER must be configured.</li><li>[Co-MPT, eNodeB, gNodeB]The number of <strong>OMCH</strong> MOs must be less than or equal to 2, when <strong>BEAR</strong> in the <strong>OMCH</strong> MO is set to IPV6.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV6 and <strong>BRT</strong> in an <strong>OMCH</strong> MO is set to YES, <strong>RTIDX</strong> in any two <strong>OMCH</strong> MOs cannot be set to the same value.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV6 and <strong>BINDSECONDARYRT</strong> in an <strong>OMCH</strong> MO is set to YES, <strong>SECONDARYRTIDX</strong> in any two <strong>OMCH</strong> MOs cannot be set to the same value.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV6, the <strong>RTIDX</strong> in this <strong>OMCH</strong> MO must be different from <strong>SECONDARYRTIDX</strong> in <strong>OMCH</strong> MOs whose <strong>BINDSECONDARYRT</strong> is set to YES.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV6, the <strong>SECONDARYRTIDX</strong> in this <strong>OMCH</strong> MO must be different from <strong>RTIDX</strong> in any other <strong>OMCH</strong> MOs whose <strong>BRT</strong> is set to YES.</li><li>[Co-MPT, NodeB]If <strong>BEAR</strong> is set to ATM in two <strong>OMCH</strong> MOs, the two MOs cannot use <strong>VPI</strong> and <strong>VCI</strong> for the same link.</li><li>[NodeB, eGBTS]Each <strong>OMCH</strong> MO must have a unique <strong>IP</strong>.</li><li>[NodeB, eGBTS]<strong>IP</strong> in any two <strong>OMCH</strong> MOs must be on different network segments.</li><li>[Co-MPT, NodeB]<strong>OMIP</strong> in one <strong>OMCH</strong> MO and <strong>IP</strong> in another <strong>OMCH</strong> MO must be on different network segments.</li><li>[Co-MPT, NodeB]<strong>OMIP</strong> in one <strong>OMCH</strong> MO must be set to a different value from <strong>IP</strong> in another <strong>OMCH</strong> MO.</li><li>[Co-MPT]When <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to ATM and <strong>BEAR</strong> in another <strong>OMCH</strong> MO is set to IPV6, the active and standby <strong>OMCH</strong> MOs cannot be supported in this case.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CHECKTYPE</strong> in the active <strong>OMCH</strong> MO is set to AUTO_UDPSESSION, <strong>OMCHSWITCHBACK</strong> in the <strong>GTRANSPARA</strong> MO must be set to ENABLE.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>VRFIDX</strong> in <strong>OMCH</strong> MO must be set to 0.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>VRFIDX</strong> in an <strong>OMCH</strong> MO is not set to 0, <strong>ONLYOMIP</strong> in a <strong>GTRANSPARA</strong> MO must be set to ENABLE.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>OMCH</strong> MO whose <strong>BEAR</strong> is set to IPV6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>BFD</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If a <strong>BFD</strong> MO and an <strong>OMCH</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFD</strong> MO must be different from <strong>IP</strong> in the <strong>OMCH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>IPRT</strong> MO and an <strong>OMCH</strong> MO are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO must be different from <strong>IP</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BRT</strong> in an <strong>OMCH</strong> MO is set to YES, before configuring the <strong>RTIDX</strong> in this <strong>OMCH</strong> MO, ensure that the <strong>IPRT</strong> MO in the same routing domain for the <strong>OMCH</strong> MO have been configured. That is, in the same routing domain, the <strong>IPRT</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>RTIDX</strong> in the <strong>OMCH</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BINDSECONDARYRT</strong> in an <strong>OMCH</strong> MO is set to YES, before configuring the <strong>SECONDARYRTIDX</strong> in this <strong>OMCH</strong> MO, ensure that the <strong>IPRT</strong> MO in the same routing domain for the <strong>OMCH</strong> MO have been configured. That is, in the same routing domain, the <strong>IPRT</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, <strong>DSTIP</strong> in an <strong>IPRT</strong> MO must be different from <strong>IP</strong> in an <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BEAR</strong> is set to IPv4 and <strong>BRT</strong> is set to YES in an <strong>OMCH</strong> MO, in the same routing domain, the <strong>IPRT</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>RTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. If the <strong>RTTYPE</strong> is set to IF, the <strong>IFT</strong> cannot be set to IPOA.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BEAR</strong> is set to IPv4 and <strong>BINDSECONDARYRT</strong> is set to YES in an <strong>OMCH</strong> MO, in the same routing domain, the <strong>IPRT</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. If the <strong>RTTYPE</strong> is set to IF, the <strong>IFT</strong> cannot be set to IPOA.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>IFT</strong> in the <strong>IPRT</strong> MO bound to an <strong>OMCH</strong> MO cannot be AIRLNK.</li><li>[Co-MPT, NodeB]If <strong>BEAR</strong> is set to ATM and <strong>BRT</strong> is set to YES in an <strong>OMCH</strong> MO, there must be an <strong>IPRT</strong> MO in the same routing domain with the <strong>OMCH</strong> MO, the combination of <strong>RTIDX</strong>, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong> and <strong>SBT</strong> in this <strong>IPRT</strong> MO must be the same as the combination of <strong>RTIDX</strong>, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong> and <strong>SBT</strong> in the <strong>OMCH</strong> MO. The <strong>RTTYPE</strong> must be set as IF and <strong>IFT</strong> must be set to IPOA in the <strong>IPRT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IFIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>IP</strong> in an <strong>IFIP</strong> MO in the same routing domain.</li><li>[Co-MPT, NodeB]In the same routing domain, if <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to ATM, <strong>IP</strong> in the <strong>OMCH</strong> MO must be different from <strong>IP</strong> in an <strong>IFIP</strong> MO.</li><li>[Co-MPT, NodeB]In the same routing domain, if <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to ATM, <strong>IP</strong> in the <strong>OMCH</strong> MO must be on a different network segment from <strong>IP</strong> in an <strong>IFIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>LOCALIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>IP</strong> in a <strong>LOCALIP</strong> MO must be different from <strong>IP</strong> in an <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>IP</strong> in a <strong>LOCALIP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>IP</strong> in a <strong>LOCALIP</strong> MO and <strong>IP</strong> in an <strong>OMCH</strong> MO must be on different network segments.</li><li>[Co-MPT, NodeB]<strong>IP</strong> in the <strong>LOCALIP</strong> MO must be set to a different value from <strong>OMIP</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB]<strong>IP</strong> in the <strong>LOCALIP</strong> MO and <strong>OMIP</strong> in the <strong>OMCH</strong> MO must be on different network segments.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>IP</strong> in a <strong>DEVIP</strong> MO in the same routing domain.</li><li>[Co-MPT, NodeB]In the same routing domain, if <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to ATM, <strong>IP</strong> in the <strong>OMCH</strong> MO must be different from <strong>IP</strong> in a <strong>DEVIP</strong> MO.</li><li>[Co-MPT, NodeB]In the same routing domain, if <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to ATM, <strong>IP</strong> in the <strong>OMCH</strong> MO must be on a different network segment from <strong>IP</strong> in a <strong>DEVIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, <strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>LOCIP</strong> and <strong>SECLOCIP</strong> in an <strong>SCTPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>PT</strong> in an <strong>IPROUTE4</strong> MO are set to IF and TUNNEL, <strong>DSTIP</strong> in an <strong>IPROUTE4</strong> MO must be different from <strong>IP</strong> in an <strong>OMCH</strong> MO in the same routing domain.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PT</strong> in the <strong>IPROUTE4</strong> MO bound to an <strong>OMCH</strong> MO cannot be AIRLNK.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>IPROUTE4</strong> MO and an <strong>OMCH</strong> MO are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPROUTE4</strong> MO must be different from <strong>IP</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BRT</strong> in an <strong>OMCH</strong> MO is set to YES, before configuring the <strong>RTIDX</strong> in this <strong>OMCH</strong> MO, ensure that the <strong>IPROUTE4</strong> MO in the same routing domain for the <strong>OMCH</strong> MO have been configured. That is, in the same routing domain, the <strong>IPROUTE4</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>RTIDX</strong> in the <strong>OMCH</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BINDSECONDARYRT</strong> in an <strong>OMCH</strong> MO is set to YES, before configuring the <strong>SECONDARYRTIDX</strong> in this <strong>OMCH</strong> MO, ensure that the <strong>IPROUTE4</strong> MO in the same routing domain for the <strong>OMCH</strong> MO have been configured. That is, in the same routing domain, the <strong>IPROUTE4</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BEAR</strong> is set to IPv4 and <strong>BRT</strong> is set to YES in an <strong>OMCH</strong> MO, in the same routing domain, the <strong>IPROUTE4</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>RTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. If the <strong>RTTYPE</strong> is set to IF, the <strong>PT</strong> cannot be set to IPOA.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BEAR</strong> is set to IPv4 and <strong>BINDSECONDARYRT</strong> is set to YES in an <strong>OMCH</strong> MO, in the same routing domain, the <strong>IPROUTE4</strong> MOs whose <strong>RTIDX</strong> is the same as <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. If the <strong>RTTYPE</strong> is set to IF, the <strong>PT</strong> cannot be set to IPOA.</li><li>[Co-MPT, NodeB]If <strong>BEAR</strong> is set to ATM and <strong>BRT</strong> is set to YES in an <strong>OMCH</strong> MO, there must be an <strong>IPROUTE4</strong> MO in the same routing domain with the <strong>OMCH</strong> MO, the <strong>RTIDX</strong> in this <strong>IPROUTE4</strong> MO must be the same as the <strong>RTIDX</strong> in the <strong>OMCH</strong> MO. The <strong>RTTYPE</strong> must be set as IF and <strong>PT</strong> must be set to IPOA in the <strong>IPROUTE4</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IP</strong> of any <strong>OMCH</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>PEERIPV6</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IP6</strong> of any <strong>OMCH</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>OMCH</strong> MO must be configured before the ACL auto-setup function is enabled for packet filtering. The <strong>ACLAUTOSWITCH</strong> parameter is set to ON in the <strong>PACKETFILTER</strong> MO for enabling the ACL auto-setup function for packet filtering.</li></ul>
+</li><li>Relation with the <strong>SRCIPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a default routing domain, <strong>IP</strong> in an <strong>OMCH</strong> MO must be different from <strong>NEXTHOP</strong> in an <strong>SRCIPRT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>IP</strong> in an <strong>IPADDR4</strong> MO in the same routing domain.</li><li>[Co-MPT, NodeB]In the same routing domain, if <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to ATM, <strong>IP</strong> in the <strong>OMCH</strong> MO must be different from <strong>IP</strong> in an <strong>IPADDR4</strong> MO.</li><li>[Co-MPT, NodeB]In the same routing domain, if <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to ATM, <strong>IP</strong> in the <strong>OMCH</strong> MO must be on a different network segment from <strong>IP</strong> in an <strong>IPADDR4</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, <strong>IP</strong> in an <strong>OMCH</strong> MO must be different from <strong>NEXTHOP</strong> in an <strong>SRCIPROUTE4</strong> MO.</li></ul>
+</li><li>Relation with the <strong>UDPSESSION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>PEERIP</strong> in a <strong>UDPSESSION</strong> MO must be different from <strong>IP</strong> in an <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>CHECKTYPE</strong> in an <strong>OMCH</strong> MO is set to UDPSESSION, before configuring the <strong>UDPSN</strong> in this <strong>OMCH</strong> MO, ensure that the <strong>UDPSESSION</strong> MO for the <strong>OMCH</strong> MO have been configured. That is, the <strong>UDPSESSION</strong> MOs whose <strong>UDPSN</strong> is the same as <strong>UDPSN</strong> in the <strong>OMCH</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If the <strong>CHECKTYPE</strong> parameter is set to UDPSESSIONGRP, the <strong>UDPSESSIONGRPID</strong> parameter must be configured in the <strong>UDPSESSION</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>IFIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, and <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> MO is set to TRADITION, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> MO is set to HOSTGW, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>IFIP</strong> MO, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>WLOCALIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be different from <strong>IP</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be different from <strong>PEERIP</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be in different network segments from <strong>IP</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be different from <strong>OMIP</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, NodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be in different network segments from <strong>OMIP</strong> in the <strong>OMCH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, and <strong>DHCPRELAYIPSW</strong> of <strong>DHCPSVRIP</strong> is set to ENABLE, <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO in the same routing domain, <strong>IP</strong> in <strong>IPADDR4</strong> MO in the same routing domain, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO in the same routing domain, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>IP</strong> in an <strong>OMCH</strong> MO must be different from <strong>PEERIP</strong> in a <strong>PPPLNK</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>IP</strong> in an <strong>OMCH</strong> MO must be different from <strong>PEERIP</strong> in an <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPRT</strong>, <strong>MPT</strong>, and <strong>GTMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When a <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, and only one <strong>OMCH</strong> MO exists, for any two <strong>IPRT</strong> MOs of a base station in the same routing domain, if their <strong>RTIDX</strong> is set to a value different from that of <strong>RTIDX</strong> or <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO, and <strong>RTTYPE</strong> and <strong>IFT</strong> in any one of the <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPRT</strong> MOs must be set to different values.</li><li>When a <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, and more than one <strong>OMCH</strong> MO exists, for any two <strong>IPRT</strong> MOs of a base station in the same routing domain, if their <strong>RTIDX</strong> is set to a value different from that of <strong>RTIDX</strong> or <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO with <strong>FLAG</strong> set to MASTER and is set to a value different from that of <strong>RTIDX</strong> or <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO with <strong>FLAG</strong> set to SLAVE, and <strong>RTTYPE</strong> and <strong>IFT</strong> in any one of the <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPRT</strong> MOs must be set to different values.</li><li>When a <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU does not exists, or an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT exists, or an <strong>OMCH</strong> MO does not exist, for any two <strong>IPRT</strong> MOs of a base station in the same routing domain, if <strong>RTTYPE</strong> and <strong>IFT</strong> in any one of the <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPRT</strong> MOs must be set to different values.</li></ul>
+</li><li>Relation with the <strong>DNSSRV</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]The <strong>DNSSIP4</strong> parameter in the <strong>DNSSRV</strong> MO must be different from the <strong>IP</strong> parameter in the <strong>OMCH</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]The <strong>DNSSIP6</strong> parameter in the <strong>DNSSRV</strong> MO must be different from the <strong>IP6</strong> parameter in the <strong>OMCH</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>TYPE</strong> in an <strong>MDU</strong> MO is set to MDUC, <strong>BEAR</strong> in the <strong>OMCH</strong> MO must be set to IPV4.</li></ul>
+</li><li>Relation with the <strong>DFUMLCLIENT</strong> and <strong>IPADDR4</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>IPVERSION</strong> in a <strong>DFUMLCLIENT</strong> MO is set to IPV4, <strong>IPVERSION</strong> in the <strong>DFUMLCLIENT</strong> MO must be set to the same value as <strong>IP</strong> in the <strong>OMCH</strong> MO or as <strong>IP</strong> in an <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>DFUMLCLIENT</strong> and <strong>DEVIP</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> is set to OLD, and <strong>IPVERSION</strong> in a <strong>DFUMLCLIENT</strong> MO is set to IPV4, <strong>IPVERSION</strong> in the <strong>DFUMLCLIENT</strong> MO must be set to the same value as <strong>IP</strong> in the <strong>OMCH</strong> MO or as <strong>IP</strong> in an <strong>DEVIP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPPATHRT</strong> MO:<ul><li>[Co-MPT, eGBTS, eNodeB]In the same routing domain, <strong>IP</strong> in an <strong>OMCH</strong> MO must be different from <strong>NEXTHOPIP</strong> in an <strong>IPPATHRT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>VRF</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]The <strong>VRF</strong> MO instance used by an <strong>OMCH</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPROUTE6</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in both the active and standby <strong>OMCH</strong> MOs is set to IPV6 and <strong>BRT</strong> in either <strong>OMCH</strong> MO references an <strong>IPROUTE6</strong> MO in which <strong>RTTYPE</strong> is set to IF, <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO cannot be set to ETH or ETHTRK.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in both the active and standby <strong>OMCH</strong> MOs is set to IPV6 and <strong>BINDSECONDARYRT</strong> in either <strong>OMCH</strong> MO references an <strong>IPROUTE6</strong> MO in which <strong>RTTYPE</strong> is set to IF, <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO cannot be set to ETH or ETHTRK.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> and <strong>HAGRP</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If the number of <strong>MPT</strong> MOs in the same subrack is greater than 1 and <strong>HAGRAP</strong> MO has not been configured, the <strong>VRFIDX</strong> in <strong>OMCH</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPV6, the value of <strong>NEXTHOP</strong> in an <strong>SRCIPROUTE6</strong> MO in the same routing domain must be different from the value of <strong>IP6</strong> in the <strong>OMCH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, if an <strong>IPV6</strong> in the <strong>IPADDR6</strong> MOs is on the same network segment as the <strong>IP6</strong> in the <strong>OMCH</strong> MO, one of the <strong>IPV6</strong> in the <strong>IPADDR6</strong> MOs must be the same as the <strong>IP6</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, if the <strong>IPV6</strong> in the <strong>IPADDR6</strong> MO is the same with the <strong>IP6</strong> in the <strong>OMCH</strong> MO, the <strong>IP6</strong> of the active and standby <strong>OMCH</strong> MOs cannot be on the same network segment.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>PEERIP6</strong> in an <strong>OMCH</strong> MO must be different from <strong>IPV6</strong> in an <strong>IPADDR6</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SECURITYPEER</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>PEERIKEIPV6</strong> in a <strong>SECURITYPEER</strong> MO must be different from <strong>IP6</strong> in a configured <strong>OMCH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TUNNELITF</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>REMOTEIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be different from <strong>IP6</strong> in an <strong>OMCH</strong> MO with <strong>BEAR</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>IPROUTE6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPv6 and <strong>BRT</strong> in the <strong>OMCH</strong> MO is set to YES, <strong>RTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. That is, the value of <strong>RTIDX</strong> in an <strong>OMCH</strong> MO is the same as the value of <strong>RTIDX</strong> in an <strong>IPROUTE6</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPv6 and <strong>BINDSECONDARYRT</strong> in the <strong>OMCH</strong> MO is set to YES, <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. That is, the value of <strong>SECONDARYRTIDX</strong> in an <strong>OMCH</strong> MO is the same as the value of <strong>RTIDX</strong> in an <strong>IPROUTE6</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPv6, the value of <strong>NEXTHOP</strong> in an <strong>IPROUTE6</strong> MO in the same routing domain must be different from the value of <strong>IP6</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPv6 and <strong>BRT</strong> in the <strong>OMCH</strong> MO is set to YES, the address specified by <strong>PEERIP6</strong> in the <strong>OMCH</strong> MO must be on the same network segment as the address specified by <strong>DSTIP</strong> in the bound active <strong>IPROUTE6</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TREELNKPVC</strong> MO:<ul><li>[Co-MPT, NodeB]A <strong>TREELNKPVC</strong> MO and an <strong>OMCH</strong> MO cannot use the same path with the same combination of <strong>VPI</strong> and <strong>VCI</strong> on one link.</li></ul>
+</li><li>Relation with the <strong>SAALLNK</strong> MO:<ul><li>[Co-MPT, NodeB]An <strong>SAALLNK</strong> MO and an <strong>OMCH</strong> MO cannot use the same path with the same combination of <strong>VPI</strong> and <strong>VCI</strong> on one link.</li></ul>
+</li><li>Relation with the <strong>AAL2PATH</strong> MO:<ul><li>[Co-MPT, NodeB]An <strong>AAL2PATH</strong> MO and an <strong>OMCH</strong> MO cannot use the same path with the same combination of <strong>VPI</strong> and <strong>VCI</strong> on one link.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>BEAR</strong>, <strong>JNRSCGRP</strong>, and <strong>PT</strong> are set to ATM, DISABLE, and IMA, respectively in an <strong>OMCH</strong> MO, the <strong>IMAGRP</strong> MO whose <strong>IMAGRPN</strong> is the same as <strong>PN</strong> in the <strong>OMCH</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>UNILNK</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>BEAR</strong>, <strong>JNRSCGRP</strong>, and <strong>PT</strong> are set to ATM, DISABLE, and UNI, respectively in an <strong>OMCH</strong> MO, the <strong>UNILNK</strong> MO whose <strong>UNILNKN</strong> is the same as <strong>PN</strong> in the <strong>OMCH</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>FRAATM</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>BEAR</strong>, <strong>JNRSCGRP</strong>, and <strong>PT</strong> are set to ATM, DISABLE, and FRAATM, respectively in an <strong>OMCH</strong> MO, the <strong>FRAATM</strong> MO whose <strong>FRAATM</strong> is the same as <strong>PN</strong> in the <strong>OMCH</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>IMALNK</strong>, and <strong>E1T1</strong> MOs:<ul><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>E1T1</strong> MO:<ul><li>[Co-MPT, NodeB]In a <strong>UNILNK</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>UNILNK</strong> MO.</li><li>[Co-MPT, NodeB]In an <strong>FRAATM</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>FRAATM</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB]In an <strong>RSCGRP</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> and <strong>OMCH</strong> MOs cannot exceed the transmit bandwidth for the <strong>RSCGRP</strong> MO.</li><li>[Co-MPT, NodeB]If <strong>BEAR</strong> and <strong>JNRSCGRP</strong> are set to ATM and ENABLE, respectively in an <strong>OMCH</strong> MO, the associated <strong>RSCGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>OMCH</strong> MOs with <strong>CHECKTYPE</strong> set to AUTO_UDPSESSION is 0 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li><li>[Co-MPT, eGBTS]The number of <strong>OMCH</strong> MOs whose bearer type is IPV6 is 0 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li><li>[Co-MPT, eGBTS]The number of <strong>OMCH</strong> MOs with <strong>BEAR</strong> set to ATM is 0 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB]In one logical protection group, <strong>SN</strong> in an <strong>HAGRP</strong> MO must be the same as that in an <strong>OMCH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SINGLEIPSWITCH</strong> MO:<ul><li>[NodeB]If <strong>SINGLEIPSW</strong> in a <strong>SINGLEIPSWITCH</strong> MO is set to ENABLE, <strong>GPEERIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO must be different from <strong>IP</strong> in any <strong>OMCH</strong> MO in the same routing domain.</li><li>[NodeB]If <strong>SINGLEIPSW</strong> in a <strong>SINGLEIPSWITCH</strong> MO is set to ENABLE, <strong>GIIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO must be different from <strong>IP</strong> in any <strong>OMCH</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>IPADDR4</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO in the same routing domain, <strong>IP</strong> in <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPRT</strong> and <strong>MPT</strong> MOs:<ul><li>[gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT exists, or an <strong>OMCH</strong> MO does not exist, for any two <strong>IPRT</strong> MOs of a base station in the same routing domain, if <strong>RTTYPE</strong> and <strong>IFT</strong> in any one of the <strong>IPRT</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPRT</strong> MOs must be set to different values.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>DEVIP</strong>, <strong>IFIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>DEVIP</strong> MO. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>IFIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong> and <strong>MPT</strong> MOs:<ul><li>[gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT exists, or an <strong>OMCH</strong> MO does not exist, for any two <strong>IPROUTE4</strong> MOs of a base station in the same routing domain, if <strong>RTTYPE</strong> and <strong>PT</strong> in any one of the <strong>IPROUTE4</strong> MO are set to IF and TUNNEL, respectively, <strong>DSTIP</strong> in the two <strong>IPROUTE4</strong> MOs must be set to different values.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#OMCH__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="OMCH__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="OMCH__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_omch.html">ADD OMCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_dhcprslt.html">DSP DHCPRSLT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the automatically obtained results after automatic establishment of the remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_dhcptst.html">DSP DHCPTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the E2E DHCP capability test result for the entire system.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_omch.html">DSP OMCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_omch.html">LST OMCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of both remote maintenance channels.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_omch.html">MOD OMCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_omch.html">RMV OMCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_dhcptst.html">STR DHCPTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to enable the E2E DHCP availability test for the entire system.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#OMCH__tab2">Table 2</a> and <a href="#OMCH__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="OMCH__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="OMCH__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-MasterFlag.html">Standby Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the master/slave flag of the remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-LocalIP6.html">Local IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IPv6 address of an OM channel. This address must be a globally scoped unicast address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-PeerIP6.html">Peer IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer IPv6 address of an OM channel. This address must be a globally scoped unicast address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-PeerIP6PfxLen.html">Peer IPv6 Address Prefix Length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the prefix length of the peer IPv6 address of an OM channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-LocalIP.html">Local IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IP address of a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-LocalMask.html">Local Mask</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local subnet mask of a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-PeerIP.html">Peer IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer IP address of the remote maintenance channel. Indicates the IP address of the MAE in an IP network and the device IP address of the RNC in an ATM network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-PeerMask.html">Peer Mask</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subnet mask of the peer IP address for the remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board where the remote maintenance channel is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board where the remote maintenance channel is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board where the remote maintenance channel is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-BearType.html">Bearer Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the bearer type of an OM channel. If this parameter is set to ATM, the element management system (EMS) uses the ATM-based transmission network to maintain the device. If this parameter is set to IPV4, the EMS uses the IPv4-based transmission network to maintain the device. If this parameter is set to IPV6, the EMS uses the IPv6-based transmission network to maintain the device. ATM does not apply to LTE and NR networks. IPv6 does not apply to GSM and UMTS networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-JoinATMLogicPort.html">Join Transmission Resource Group</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to add a remote maintenance channel to a transmission resource group.</p>
+<p>If a remote maintenance channel is added to a resource group, bandwidth management of the remote maintenance channel is subject to the bandwidth of the resource group.</p>
+<p>If a remote maintenance channel is not added to any resource group, bandwidth management of the remote maintenance group is subject to the physical bandwidth.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-ATMLogicPortNo.html">Transmission Resource Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the transmission resource group to which a remote maintenance channel is added.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-ATMPortType.html">Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of physical port that carries a remote maintenance channel.</p>
+<p>According to the configuration of the physical layer, a remote maintenance channel can be carried on the STM-1 optical port, IMA group, UNI link, or fractional ATM link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-ATMPortNo.html">Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the port carrying the link on which a remote maintenance channel is carried.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-ServiceType.html">Service Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the service type of data carried on a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-VPI.html">VPI</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Virtual Path Identifier (VPI) of a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-VCI.html">VCI</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Virtual Channel Identifier (VCI) of a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-SustainCellRate.html">Sustainable Cell Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Sustainable Cell Rate (SCR) of a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-PeakCellRate.html">Peak Cell Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Peak Cell Rate (PCR) of the remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-MininumCellRate.html">Min Cell Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Minimum Cell Rate (MCR) of a remote maintenance channel. If the cell rate of the remote maintenance channel is less than the MCR, a cell rate error alarm is reported.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-BindingRoute.html">Binding Route</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether a route is bound to the remote maintenance channel. If the peer IP address of the remote maintenance channel and device IP addresses are not in the same network segment and the network segment of the device IP address cannot cover that of the peer IP address, run the <a href="../mml/add_iprt.html">ADD IPRT</a> or <a href="../mml/add_iproute4.html">ADD IPROUTE4</a> command to add a route to the remote maintenance channel. If the peer IPv6 address of the remote maintenance channel and IPv6 addresses are not in the same network segment and the network segment of the IPv6 address cannot cover that of the peer IPv6 address, run the <a href="../mml/add_iproute6.html">ADD IPROUTE6</a> command to add a route to the remote maintenance channel.</p>
+<p>If this parameter is set to YES, a route is bound to the remote maintenance channel and the route does not take effect when the remote maintenance channel does not take effect (except when an OMCH whose bearer type is IPv4 and an OMCH whose bearer type is IPv6 form an active/standby relationship). If this parameter is set to NO, no route is bound to the remote maintenance channel, and a remote maintenance channel switchover does not trigger a route status switchover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where a remote maintenance channel is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-RateUnit.html">Rate Unit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the rate unit of the peak cell rate (PCR), minimum cell rate (MCR), and sustain cell rate (SCR). If the rate unit is set to kbit/s, it cannot be changed to cell/s. 1 cell/s is equal to 0.424 kbit/s. The rate is converted from cell/s to kbit/s. The converted value needs to be rounded down. For example, 73 cell/s is converted to 30 kbit/s.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-OMIPSWITCH.html">OMIP Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to set the OMIP as the remote maintenance IP address when the remote maintenance channel uses ATM transport channel. If this parameter is set to ON, the OMIP will be set as the remote maintenance IP address. That time the remote maintenance channel auto-setup function will not be enabled. If this parameter is set to OFF, the Local IP will be set as the remote maintenance IP address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-OMIP.html">OMIP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the remote maintenance IP address when the remote maintenance channel uses ATM transport channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-OMIPMASK.html">OMIP MASK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates mask of the remote maintenance IP address when the remote maintenance channel uses ATM transport channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-IPRouteIdx.html">Route Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of the active route bound to the remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-BindSecondaryRoute.html">Binding Secondary Route</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether a standby route needs to be bound to the remote maintenance channel. If the remote HA system is applied to the MAE and no destination IP address network segment for the route covers the MAE destination IP address network segment, run the <a href="../mml/add_iprt.html">ADD IPRT</a>, <a href="../mml/add_iproute4.html">ADD IPROUTE4</a>, or <a href="../mml/add_iproute6.html">ADD IPROUTE6</a> command to add a route to the MAE.</p>
+<p>If this parameter is set to YES, a standby route is bound to the remote maintenance channel and the route does not take effect when the remote maintenance channel does not take effect (except when an OMCH whose bearer type is IPv4 and an OMCH whose bearer type is IPv6 form an active/standby relationship). If this parameter is set to NO, no route is bound to the remote maintenance channel, and a remote maintenance channel switchover does not trigger a route status switchover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-SecondaryRouteIdx.html">Secondary Route Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of the standby route bound to the remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-Checktype.html">Check Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of detection mechanism bound to the remote maintenance channel. If this parameter is set to NONE, no detection mechanism is bound to the remote maintenance channel and an active/standby remote maintenance channel switchover is triggered by switchover message sent by the MAE. If this parameter is set to UDPSESSION, the UDP ping detection is bound to the remote maintenance channel and an active/standby remote maintenance channel switchover depends on the UDP session detection, only GSM currently supports this function. If this parameter is set to UDPSESSIONGRP, the UDP ping detection is bound to the remote maintenance channel and an active/standby remote maintenance channel switchover depends on the UDP session group detection, only GSM currently supports this function. If this parameter is set to AUTO_UDPSESSION, automatic UDP session detection is performed on the OM channel. When the standby OM channel is connected to the EMS, the base station automatically creates a UDP session from the local IP address of the active OM channel to the EMS. If the OM channel switchback function is required, set CHECKTYPE for the active OM channel to AUTO_UDPSESSION.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-UDPSessionID.html">UDP Session ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the session number of the UDP ping detection bound to the remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-UDPSessionGrpID.html">UDP Session Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the session group number of the UDP ping detection bound to the remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-UserLabel.html">User Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the user-defined information about a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/OMCH-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="OMCH__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="OMCH__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/OMCH-Status.html">OM Channel Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of a remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/OMCH-UsedState.html">Used State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether the remote maintenance channel is being used.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#OMCH__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="OMCH__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="OMCH__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455826.html">VS.OMCH.RxTotalPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total Number of Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455827.html">VS.OMCH.RxInSeqPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of In-Order Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455828.html">VS.OMCH.RxWndProbePkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Window Probe Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455829.html">VS.OMCH.RxWndUpdatePkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Window Size Update Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455833.html">VS.OMCH.RxDupPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Fully Duplicate Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455834.html">VS.OMCH.RxPartDupPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Partially Duplicate Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455835.html">VS.OMCH.RxOutOfOrderPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Out-of-Order Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455836.html">VS.OMCH.RxAfterWndPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets Beyond the Receive Window of an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455837.html">VS.OMCH.RxAfterClosePkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets Received by an OM Channel After the Connection Is Released</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455838.html">VS.OMCH.RxAckPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of ACK Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455839.html">VS.OMCH.RxDupAckPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Duplicate ACK Packets Received by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455840.html">VS.OMCH.RxTooMuchAckPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Received ACK Packets for Non-Transmitted Data by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455841.html">VS.OMCH.TxTotalPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total Number of Packets Transmitted by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455842.html">VS.OMCH.TxUrgentPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Urgent Data Packets Transmitted by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455843.html">VS.OMCH.TxCtrlPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Control Packets Transmitted by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455844.html">VS.OMCH.TxWndProbePkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Window Probe Packets Transmitted by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455845.html">VS.OMCH.TxWndUpdatePkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Window Size Update Packets Transmitted by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455846.html">VS.OMCH.TxDataPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Data Packets Transmitted by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455847.html">VS.OMCH.TxDataRexntPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets Retransmitted by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455848.html">VS.OMCH.TxAckOnlyPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of ACK Packets Transmitted by an OM Channel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455905.html">VS.IPOAAAL5.RxPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of packets received on the IPOA AAL5 link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455905.html">VS.IPOAAAL5.TxPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of packets transmitted on the IPOA AAL5 link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455905.html">VS.IPOAAAL5.RxDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of discarded packets received on the IPOA AAL5 link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455905.html">VS.IPOAAAL5.TxDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of discarded packets transmitted on the IPOA AAL5 link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455909.html">VS.IPOAAAL5.TxCells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of cells transmitted on the IPOA AAL5 link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455909.html">VS.IPOAAAL5.RxCells </a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of cells received on the IPOA AAL5 link</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

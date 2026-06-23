@@ -1,0 +1,150 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display the dynamic SCC cell list of PCC (DSP PCCSCELLLIST)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_pccscelllist">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display the dynamic SCC cell list of PCC (DSP PCCSCELLLIST)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_pccscelllist"></a><a name="dsp_pccscelllist"></a>
+
+
+<h1 class="topictitle1">Display the dynamic SCC cell list of PCC (DSP PCCSCELLLIST)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="dsp_pccscelllist__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the secondary serving cells (SCells) that are dynamically configured for the primary serving cells (PCells) on one primary component carrier (PCC) or all PCCs under the eNodeB. If the PccDlEarfcn parameter is set, SCells for PCells on the frequency specified by the PccDlEarfcn parameter are queried. If the PccDlEarfcn parameter is not set, SCells for PCells on all candidate PCCs in the eNodeB are queried. When the operating frequencies of the queried PCells or the SCells dynamically configured for the PCells belong to multiple bands, multiple downlink ARFCNs corresponding to the cell are displayed.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_pccscelllist__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>Use this command to query the routes that are established in static mode for adaptive FCA under the eNodeB.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_pccscelllist__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PccFreqCfg-PccDlEarfcn.html">PccDlEarfcn</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PCC Downlink EARFCN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink E-UTRA absolute radio frequency channel number (EARFCN) of the candidate PCC. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~70545,229376~229575</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~70545,229376~229575</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>PccDlEarfcn in a PccFreqCfg MO must be a valid frequency.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_pccscelllist__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query the dynamically configured SCells, run the following command: :
+DSP PCCSCELLLIST:;
+The result is shown as follows:
++++    0        2014-05-26 17:31:13
+O&amp;M    #806355081
+%%DSP PCCSCELLLIST: PccDlEarfcn=3300;%%
+RETCODE = 0  Operation succeeded.
+
+Query the settings of dynamic parameters of the PCC frequency configuration
+------------------
+PCC Downlink EARFCN  PCC Local Cell ID  PCC eNodeB ID  PCC Cell FDD TDD Indication  SCC Downlink EARFCN  SCC eNodeB ID  SCC Local Cell ID  SCC Cell FDD TDD Indication  Path RTD Delay(0.1microsecond)
+
+3300                 0                  221139         FDD                          3400                 34587          1                FDD                          0                                 
+3300                 0                  221139         FDD                          2850                 34587          2                FDD                          0                                 
+(Number of results = 2)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_pccscelllist__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody"><table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder"><tr><th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>PCC Downlink EARFCN</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the downlink E-UTRA absolute radio frequency channel number (EARFCN) of the PCell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>SCC Downlink EARFCN</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the downlink E-UTRA absolute radio frequency channel number (EARFCN) of an SCell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>PCC eNodeB ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of the eNodeB that provides the primary component carrier (PCC).</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>PCC Local Cell ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the local ID of the primary serving cell (PCell).</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>SCC eNodeB ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of the eNodeB that serves the secondary serving cell (SCell).</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>SCC Local Cell ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the local ID of the SCell.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Path RTD Delay(0.1microsecond)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the inter-cell round-trip delay. The parameter value is expressed in the unit of 0.1 microsecond. In inter-eNodeB CA in centralized or distributed multi-BBU interconnection scenarios or relaxed backhaul scenarios, the RTD between the inter-eNodeB cells is measured at high precision of 0.1 microsecond and the reported and displayed value is the actual measurement result. The displayed value is 0 if the cells involved are intra-eNodeB intra-BBU cells or eX2 (or X2) interfaces are not required between the cells. The displayed value is NULL in the following situations: (1) A related eX2 or X2 interface is down or a port fault occurs. (2) An eX2 or X2 interface is being set up. (3) The RTD is being measured. In other situations, a number indicating the RTD over the eX2 or X2 interface is displayed.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>PCC Cell FDD TDD Indication</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the duplex mode of a primary serving cell (PCell). The value FDD indicates an FDD cell, the value TDD indicates a TDD cell, and the value UNKNOWN indicates an unknown cell.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>SCC Cell FDD TDD Indication</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the duplex mode of a secondary serving cell (SCell). The value FDD indicates an FDD cell, the value TDD indicates a TDD cell, and the value UNKNOWN indicates an unknown cell.</p>
+</td>
+</tr>
+</table>
+</div></div>
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

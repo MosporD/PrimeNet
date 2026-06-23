@@ -1,0 +1,324 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="TWAMPRESPONDER">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="TWAMPRESPONDER">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>TWAMPRESPONDER</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="TWAMPRESPONDER"></a><a name="TWAMPRESPONDER"></a>
+
+
+<h1 class="topictitle1">TWAMPRESPONDER</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="TWAMPRESPONDER.html"><strong>TWAMPRESPONDER</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A TWAMPRESPONDER MO is used to respond to TWAMP negotiation packets and TWAMP measurement packets.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>DEVIP</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD and <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv4, <strong>LOCALIP</strong> in the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIP</strong> is from <strong>IP</strong> in a <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in a <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv4, <strong>LOCALIP</strong> in the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIP</strong> of the <strong>TWAMPRESPONDER</strong> MO is from <strong>IP</strong> in an <strong>IPADDR4</strong> MO, <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPRESPONDER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the same routing domain, if <strong>IPVERSION</strong> and <strong>TWAMPARCH</strong> in two <strong>TWAMPRESPONDER</strong> MOs are set to IPv4 and FULL respectively, their <strong>LOCALIP</strong> must be set to different values.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the same routing domain, if <strong>IPVERSION</strong> and <strong>TWAMPARCH</strong> in two <strong>TWAMPRESPONDER</strong> MOs are set to IPv4 and LIGHT respectively, their <strong>LOCALIP</strong> or <strong>LIGHTLOCALUDPPORT</strong> must be set to different values.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the same routing domain, if <strong>IPVERSION</strong> in two <strong>TWAMPRESPONDER</strong> MOs is set to IPv4, and <strong>TWAMPARCH</strong> of the two <strong>TWAMPRESPONDER</strong> MOs are set to FULL and LIGHT respectively, their <strong>LOCALIP</strong> must be set to different values.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, if <strong>IPVERSION</strong> and <strong>TWAMPARCH</strong> in two <strong>TWAMPRESPONDER</strong> MOs are set to IPv6 and LIGHT respectively, their <strong>LOCALIP</strong> or <strong>LIGHTLOCALUDPPORT</strong> must be set to different values.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv6, <strong>LOCALIPV6</strong> in the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIPV6</strong> is <strong>IPV6</strong> of an <strong>IPADDR6</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, <strong>LOCALIP</strong> in a <strong>TWAMPRESPONDER</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> is <strong>IP</strong> of a <strong>DEVIP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv4, <strong>LOCALIP</strong> of the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIP</strong> of the <strong>TWAMPRESPONDER</strong> MO is <strong>IP</strong> of an <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#TWAMPRESPONDER__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="TWAMPRESPONDER__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="TWAMPRESPONDER__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_twampresponder.html">ADD TWAMPRESPONDER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_twampresponder.html">DSP TWAMPRESPONDER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the negotiation results and statistics of measurement packets for TWAMP responders.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_twamprespondersta.html">DSP TWAMPRESPONDERSTA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the statistics of negotiation packets for TWAMP responders. This command takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_twampresponder.html">LST TWAMPRESPONDER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration about a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_twampresponder.html">MOD TWAMPRESPONDER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_twampresponder.html">RMV TWAMPRESPONDER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a TWAMP responder.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#TWAMPRESPONDER__tab2">Table 2</a> and <a href="#TWAMPRESPONDER__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="TWAMPRESPONDER__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="TWAMPRESPONDER__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-ResponderId.html">Responder Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TWAMPARCH.html">TWAMP Architecture</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the architecture of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-IPVersion.html">IP Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP version of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-LocalIp.html">Local IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IPv4 address of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-Dscp.html">DSCP for TCP Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DSCP of TCP negotiation packets sent by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-RefWait.html">Measurement Wait Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the measurement wait time of a TWAMP responder. The REFWAIT timer is started to monitor the status of a measurement session between the server and client. When this timer expires, the server releases the measurement session and returns to the link establishment state.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-ServWait.html">Negotiation Wait Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the negotiation wait time of a TWAMP responder. The SERVWAIT timer is started to monitor the establishment status of a control connection between the server and client. When this timer expires, the server releases the control connection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-LocalIpv6.html">Local IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IPv6 address of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-LocalTcpPort.html">Local TCP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local TCP port number of a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-LIGHTLOCALUDPPORT.html">Light Architecture Local UDP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local UDP port number used when TWAMP responders work in light-architecture mode. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to LIGHT. This parameter is invalid when the parameter is set to 4294967295.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPRESPONDER-LightArchitectureMode.html">Light Architecture Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the working mode of a TWAMP responder deployed in the light architecture. The working mode of the TWAMP responder must be the same as that of the TWAMP sender. This parameter takes effect only when the TWAMP responder is deployed in the light architecture.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="TWAMPRESPONDER__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="TWAMPRESPONDER__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-NegoStatus.html">Negotiation Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation status of a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-PeerIp.html">Peer IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the peer IPv4 address of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-PeerIpv6.html">Peer IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the peer IPv6 address of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-Mode.html">Negotiated Working Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiated working mode of a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-LocalUdpPort.html">Local UDP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the local UDP port number of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-StartTime.html">Session Start Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the start time of a session for a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-PeerTcpPort.html">Peer TCP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the peer TCP port number of a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-PreDscp.html">Initial DSCP Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the DSCP value of a TWAMP responder in light-architecture mode or the initial DSCP value of a TWAMP responder in full-architecture mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-PeerUdpPort.html">Peer UDP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the peer UDP port number of a TWAMP responder.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-RemarkDscp.html">Changed DSCP Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the changed DSCP value of a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL. If the DSCP value has not been changed, the value of this parameter is displayed as NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxRejConnNum.html">Number of TCP Rejection Packets Sent</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets sent by a TWAMP responder to reject TCP connection requests. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-RxConnNum.html">Number of TCP Setup Request Packets Received</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of TCP packets received by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxGreetingNum.html">Number of Greeting Message Packets Sent</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Greeting Message packets sent by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-RxSetupNum.html">Number of Set-up-response Packets Received</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Set-up-response packets received by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxRejSetupNum.html">Number of Set-up-response Rejection Packets Sent</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets sent by a TWAMP responder to reject Set-up-response packets. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxServerStartNum.html">Number of Server-start Packets Sent</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Server-start packets sent by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-RxReqNum.html">Number of Request-TW-Session Packets Received</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Request-TW-Session packets received by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxRejReqNum.html">Number of Request-TW-Session Rejection Packets Sent</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets sent by a TWAMP responder to reject Request-TW-Session packets. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxAcceptNum.html">Number of Accept-Session Packets Sent</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Accept-Session packets sent by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-RxStartSessionNum.html">Number of Start-Session Packets Received</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Start-Session packets received by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-RxStopSessionNum.html">Number of Stop-Session Packets Received</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Stop-Session packets received by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxRejStartSeesionNum.html">Number of Start-Session Rejection Packets Sent</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets sent by a TWAMP responder to reject Start-Session packets. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxStartAckNum.html">Number of Start-session Ack Packets Sent</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Start-session Ack packets sent by a TWAMP responder. This parameter takes effect only when TWAMPARCH for TWAMP responders is set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-RxUdpPktNum.html">Number of Received Measurement Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of UDP packets received by a TWAMP responder from measurement session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPRESPONDER-TxUdpPktNum.html">Number of Sent Measurement Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of UDP packets sent by a TWAMP responder to measurement session.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

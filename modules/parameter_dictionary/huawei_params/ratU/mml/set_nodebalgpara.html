@@ -1,0 +1,1107 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify NodeB Algorithm Parameter (SET NODEBALGPARA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_nodebalgpara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify NodeB Algorithm Parameter (SET NODEBALGPARA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_nodebalgpara"></a><a name="set_nodebalgpara"></a>
+
+
+<h1 class="topictitle1">Modify NodeB Algorithm Parameter (SET NODEBALGPARA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="set_nodebalgpara__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>The command is used to modify NodeB algorithm parameter.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_nodebalgpara__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li>After Power Configuration Check Switch is turned on, alarms will be generated when the actual system power exceeds the power configuration.</li><li>When the logical cell is available,  the UL Resource Work Mode can not be modified.</li><li>If the logical cell is available and MC Inter-Board Joint Scheduling Switch is turned off, running this command interrupts ongoing services for less than 1 minute.</li><li>If the MC Inter-Board Joint Scheduling Switch parameter is changed from OFF to ON, it is good practice to manually run the <a href="str_realloclocell.html">STR REALLOCLOCELL</a> command to enable the cell configurations. If the command is not manually executed, the NodeB automatically restarts all local cells based on the settings of <strong>CSUSERNUM</strong> and <strong>PSUSERNUM</strong> under <strong>NODEBRESALLOCRULE</strong> to enable the cell configurations.</li><li>The Mixed-Multi-RRU cell and the distributed cell do not report the Cell RTWP Excessive alarm. The values of <strong>CELLRTWPEXCESSALMSW</strong> and <strong>CELLRTWPEXCESSALMTHD</strong> are invalid for the Mixed-Multi-RRU cell and the distributed cell.</li><li>If <strong>UX2SONSETUPSW</strong> is set to OFF, the uX2 link that is automatically set up will be automatically deleted, interrupting services on the uX2 link.</li><li>The value of parameter <strong>RTWPIMBALANCEALMTHD</strong> is invalid for the RF unit configured in DCU.</li><li>If the value of parameter <strong>UTRPCEXTCNBAPCAP</strong> changes, the base station needs to be manually reset.</li></ul>
+</div></div>
+
+<div class="mmlparam"><a name="set_nodebalgpara__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ceRsvFor2msUser.html">CERSVFOR2MSUSER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">2ms User Minimum Admission CE</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum number of CEs for admitting 2 ms users when CE Overbooking is enabled.</p>
+<p>GUI Value Range: 1~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter may lead to an excess of 2 ms TTI users admitted to the NodeB. In this situation, users may experience call drops during concurrent data transmission due to insufficient CEs. A large value of this parameter does not lead to an obvious increase in 2 ms TTI users admitted to the NodeB. However, user experience is favorable and there is a low probability that the call drop rate increases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-hspaL2PoolSw.html">HSDPASCHPOOLSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Hsdpa Scheduler Pool Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable HSDPA scheduler pool.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>NODEBALGPARA</strong> MO, if <strong>HSUPASCHPOOLSW</strong> is set to ON, <strong>HSDPASCHPOOLSW</strong> must be ON.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BLADEBBU or BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-pwrChkSw.html">PWRCHKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power Configuration Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the power configuration check.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ccpicPh2SirTarModSw.html">CCPICPH2SIRTARMODSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CCPIC Phase SIR Target Correction SW</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to correct the SIR outer loop power control target value when CCPIC is enabled. If CCPIC Phase 2 is enabled, this parameter controls only the value corresponding to CCPIC phase 2. If CCPIC Phase 3 is enabled, this parameter controls both the value corresponding to CCPIC phase 2 and the value corresponding to CCPIC phase 3.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BLADEBBU or BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If CCPIC Phase 2 or 3 is enabled and this parameter is set to ON:</p>
+<p>1. In Burst service only scenarios, the RTWP decreases.</p>
+<p>2. In the coexistence of Fullbuffer services and Burst services, the Fullbuffer services also benefit from the gains provided to Burst service, which increases the throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-utrpcExtCnbapCap.html">UTRPCEXTCNBAPCAP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CNBAP Capacity Extension Using UTRPc</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to extend the CNBAP capacity using the UTRPc. When the value of this parameter changes, the base station needs to be manually reset.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BLADEBBU or BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-rtwpScalePrecisionOpt.html">RTWPSCALEPRECISIONOPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RTWP Quantitative Accuracy Optimization</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RTWP quantitative accuracy optimization switch. It improves RTWP accuracy for multicarrier RRU3804 modules or WRFUs. This parameter is recommended to set to OFF when RTWP values are similar among carriers.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ceDetectPeriodLevel.html">CEDETECTPERIODLEVEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">2ms TTI HSUPA Users CE Callback Detect Period Level</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the callback detection period of CEs for 2 ms TTI HSUPA users.</p>
+<p>GUI Value Range: LONG(48ms), MIDDLE(32ms), SHORT(20ms)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LONG, MIDDLE, SHORT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: LONG(48ms)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ulResWorkMode.html">ULRESWORKMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Resource Work Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink resource allocation mode of a NodeB. If NORMAL is selected, the same uplink resources are allocated to one set of uplink baseband equipment. If AUTO_CHAIN is selected, the uplink resources allocated to one set of uplink baseband equipment are connected in chain mode to share the resources. If MANUAL_CHAIN is selected, the uplink resources can be manually specified for the uplink baseband equipment. If Normal Extension is selected, cell specifications can be expanded in the uplink baseband equipment configured with both the UBBP board in UMTS mode and the WBBP board.</p>
+<p>GUI Value Range: NORMAL(Normal), MANUAL_CHAIN(Manual Chain), AUTO_CHAIN(Auto Chain), NORMAL_EXTENSION(Normal Extension)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL, MANUAL_CHAIN, AUTO_CHAIN, NORMAL_EXTENSION</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NORMAL(Normal)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>If BLADEBBU or BBU3910C is configured, this parameter can only be set to NORMAL.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ccpicPhaseSwCtrl.html">CCPICPHASESWCTRL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CCPIC Phase Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for selecting the CCPIC phase. The value DEFAULT indicates that CCPIC Phase 3 and CCPIC Phase 4 are disabled. The value CCPICPHASE3 indicates that CCPIC Phase 3 is enabled and CCPIC Phase 4 is disabled. The value CCPICPHASE4 indicates that CCPIC Phase 3 and CCPIC Phase 4 is enabled.</p>
+<p>GUI Value Range: DEFAULT(CCPIC Phase 3 and Phase 4 OFF), CCPICPHASE3(CCPIC Phase 3), CCPICPHASE4(CCPIC Phase 4)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULT, CCPICPHASE3, CCPICPHASE4</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>If the BLADEBBU or BBU3910C is configured, CCPICPHASESWCTRL is invalid.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to CCPICPHASE3, CCPIC phase 3 is enabled, or if this parameter is set to CCPICPHASE4, CCPIC phase 3 and CCPIC phase 4 is enabled, which decreases the uplink load of users and improves cell throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ulHiThpMaceSw.html">ULHITHPMACESW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HSUPA High throughput Scheduling SW</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for scheduling HSUPA services.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is turned on, the throughput of HSUPA services (with the data rate higher than 3 Mbit/s) increases, but RTWP reduction in the event of air-interface overload in the uplink is delayed by not more than 1s.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ceImprovement2msSw.html">CEIMPROVEMENT2MSSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HSUPA 2ms CE Efficiency Improvement Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for CE efficiency improvement for 2 ms TTI HSUPA users.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is turned on and the license for CE efficiency improvement for 2 ms TTI HSUPA users is activated, the CE consumption of 2 ms TTI HSUPA users decreases on the NodeB and RNC sides. Therefore, more users can be admitted when the number of available CEs is restricted. If Initial Single HARQ Switch for 2 ms HSUPA Users is also turned on, the HSUPA throughput increases and CE consumption decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-initSingleHarqSw.html">INITSINGLEHARQSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Initial Single HARQ Switch for 2ms HSUPA Users</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for initial activation of single HARQ for 2 ms TTI HSUPA users. If this switch is turned on, single HARQ takes effect on newly admitted users.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If CE efficiency improvement for 2 ms TTI HSUPA users is activated, turning on this switch reduces the actual CE consumption of HSUPA users and improves the HSUPA throughput. However, the HSUPA service delay increases, causing user experience to deteriorate.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-kpiFaultDetect.html">KPIFAULTDETECT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">KPI Fault Detection</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for potential KPI fault detection and reporting of related alarms. The items to be detected include the baseband resource R99 user BLER, baseband resource HSUPA user BLER, cell R99 user BLER, cell HSUPA user BLER, cell HSDPA user BLER, and Iub interface failure rate. If an option under this parameter is set to ON, the NodeB performs fault detection on the related detection item and reports related alarms. If an option under this parameter is set to OFF, the NodeB does not perform fault detection on the related detection item or report related alarms.</p>
+<p>GUI Value Range: BBRESOURCER99USERBLERDET(Baseband RES R99 User BLER Detect), CELLR99USERBLERDET(Cell R99 User BLER Detect), BBRESOURCEUPAUSERBLERDET(Baseband RES HSUPA User BLER Detect), CELLUPAUSERBLERDET(Cell HSUPA User BLER Detect), CELLDPAUSERBLERDET(Cell HSDPA User BLER Detect), IUBFAILRATIODET(Iub Failure Rate Detect)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BBRESOURCER99USERBLERDET, CELLR99USERBLERDET, BBRESOURCEUPAUSERBLERDET, CELLUPAUSERBLERDET, CELLDPAUSERBLERDET, IUBFAILRATIODET</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: After this switch is set to ON, the NodeB automatically detects potential KPI faults and reports related alarms, prompting users to rectify faults and restore services.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-kpiFaultAutoRcvRmThd.html">KPIFAULTAUTORCVRMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">KPI Fault auto Recover Para</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the self-healing level of potential KPI faults. Self-healing operations vary with the value of this parameter.If this parameter is set to NONE(NONE), the NodeB does not perform any operations. If this parameter is set to BBRESOURCERESET(BBRESOURCERESET), the NodeB supports self-healing at the BBRESOURCERESET(BBRESOURCERESET) level. Currently, self-healing operations at the CELLRESTART(BBRESOURCERESET) and CELLRFMODULERESET(BBRESOURCERESET) levels are unavailable. Therefore, do not use these functions.</p>
+<p>GUI Value Range: NONE(No Operation), CELLRESTART(Cell Reestablishment), CELLRFMODULERESET(Cell-related RF Module Restart), BBRESOURCERESET(Intra-Baseband Board Resource Restart), BBOARDRESET(Baseband Board Restart)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, CELLRESTART, CELLRFMODULERESET, BBRESOURCERESET, BBOARDRESET</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>If an option under the KPIFAULTDETECT parameter is selected, this parameter takes effect. Only the self-healing operations related to the selected option under the KPIFAULTDETECT parameter are allowed.</li><li>The BLADEBBU and BBU3910C do not support BBOARDRESET.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Based on the self-healing level specified by this parameter, the NodeB automatically performs self-healing in the event of potential KPI faults after KPI Fault Detection Switch is set to ON. The self-healing operation interrupts services carried on the board and in the local cell.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-fixedCeRsvFor2ms.html">FIXEDCERSVFOR2MS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Fixed CE Reserved for HSUPA 2ms TTI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the fixed number of CEs reserved for each 2 ms TTI user if CE Overbooking is enabled. Value 0 indicates that CE Overbooking takes effect separately and CE reservation for 2 ms TTI users does not take effect. A value ranging from 1 to 8 indicates that CE reservation for 2 ms TTI users takes effect and the corresponding parameter values specifies the fixed number of CEs reserved for each 2 ms TTI user.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 0, CE Reserve for HSUPA 2 ms TTI users does not take effect. If this parameter is approaching 1, the CE occupancy for HSUPA 2 ms TTI users decreases and consequently the number of admitted users may increase. However, if too many users are admitted, the probability of call drop increases due to insufficient CEs. If this parameter is approaching 8, the CE occupancy for HSUPA 2 ms TTI users increases and consequently the number of admitted users may decrease. However, the QoS of admitted users is better guaranteed.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-dlTxPwrMeasPeriod.html">DLTXPWRMEASPERIOD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Carrier Transmit Pwr Measurement Prd</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period of measuring the average downlink transmit carrier power and average downlink non-HSPA transmit carrier power in the power congestion-based E2E flow control algorithm.</p>
+<p>GUI Value Range: 10(10), 100(100)</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 10, 100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>When <strong>PWRCNGCACSW</strong> in <strong>ULOCELLR99ALGPARA</strong> is set to ON, <strong>DLTXPWRMEASPERIOD</strong> is valid.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 10 ms, the period of measuring downlink power is short and consequently the fluctuation in downlink power is reflected promptly. This prevents downlink power pulse due to user access and may decrease the access success rate.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-pwrPredictSwForCac.html">PWRPREDICTSWFORCAC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Pwr Predict Switch for CAC</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch used to predict the power of power congestion-based E2E flow control users. This parameter is valid when the power congestion-based E2E flow control algorithm takes effect. If this switch is turned on, admission decision is based on a comparison between the sum of access user initial power and measured cell power in the measurement period and the threshold. If this switch is turned off, admission decision is based on a comparison between the measured cell power and the threshold.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>When <strong>PWRCNGCACSW</strong> in <strong>ULOCELLR99ALGPARA</strong> is set to ON, <strong>PWRPREDICTSWFORCAC</strong> is valid.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is turned on, the decision on cell downlink power congestion becomes strict, effectively preventing a short-time increase in cell downlink power. In addition, user admission decision becomes strict and consequently the RRC access success rate may decrease. The probability where this scenario exists in the live network is low and therefore there is a small impact on KPIs.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-dlFpWinAdjSw.html">DLFPWINADJSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink FP Window Adjustment Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch used to adjust the FP window. The soft handover success rate between a Huawei NodeB and few neighboring vendor's NodeBs is low because the vendors' NodeBs have poor performance. Turning on this switch increases the soft handover success rate.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: In scenarios where the problem exists, turning on this switch increases the soft handover success rate. In scenarios where the problem does not exist, turning on this switch slightly decreases KPI performance.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-hspaMcInterBrdSchSw.html">HSPAMCINTERBRDSCHSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MC Inter-Board Joint Scheduling Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the HSDPA multicarrier cell supports inter-board joint scheduling. If this parameter is set to ON, the HSDPA multicarrier cell supports inter-board joint scheduling, thereby improving the balance of baseband resources between boards and reducing the number of capability decline alarms for the following features: DC-HSDPA, DC-HSDPA+MIMO, Flexible Dual Carrier HSDPA, MC-HSDPA+MIMO, DB-HSDPA+MIMO, DB-HSDPA, 3C-HSDPA, 4C-HSDPA, and Macro-Micro DC-HSDPA.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BLADEBBU or BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the delay of burst services for DC-HSDPA users or MC-HSDPA users slightly increases, but there is no obvious impact on user experience.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-pdMeasMSw.html">PDMEASMSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Propagation Delay Measure Matrix Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to collect the propagation delay measurement matrix for the CCO feature.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ulcchOLPCMinSirTarget.html">ULCCHOLPCMINSIRTARGET</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Control Channel OLPC Minimum SIR Target</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum SIR target for uplink control channel-based OLPC. Relationship between the GUI value and actual value: Actual value = (GUI value - 40) x 0.1.</p>
+<p>GUI Value Range: 0~80</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: -4.0~4.0, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter indicates a low BLER of SRBs and a small impact on the call drop rate. However, the gain yielded by uplink control channel-based OLPC decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-hsupaSchPoolSw.html">HSUPASCHPOOLSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Hsupa Scheduler Pool Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable HSUPA Scheduler Pool.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>NODEBALGPARA</strong> MO, if <strong>HSUPASCHPOOLSW</strong> is set to ON, <strong>HSDPASCHPOOLSW</strong> must be ON.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BLADEBBU or BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: After the resource pool switch is turned on, if the board serving newly admitted HSUPA users is overloaded, the corresponding HSUPA scheduler will be deployed on another lightly loaded board in the BBU.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ulCovExpCfgMod.html">ULCOVEXPCFGMOD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Coverage Expansion Neighbour Cell Configure Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode to establish neighboring cells (coordinating cells) when the Coverage Expansion Under Interference feature is enabled. If this parameter is set to AUTOMATIC, the coordination relationship is automatically identified by the NodeB and does not need to be configured. If this parameter is set to MANUAL, the coordination relationship must be manually configured.</p>
+<p>GUI Value Range: AUTOMATIC(AUTOMATIC), MANUAL(MANUAL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AUTOMATIC, MANUAL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-pwrCfgProtect.html">PWRCFGPROTECT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power Configuration Protection Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable power configuration protection. If this switch is turned on, the RRU checks the sum of power on the carrier served by the RRU. If the check fails, the power configuration will be limited to be below the power specifications, and the carrier fails to be set up.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-upCeImproveForAmrWbSw.html">UPCEIMPROVEFORAMRWBSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink CE Improvement for AMR-WB Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable uplink CE efficiency improvement for AMR-WB.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON, uplink CE efficiency improves for AMR-WB users. AMR-WB services having a rate of 23.85 kbit/s or lower consume one CE.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-nbisAdaptiveSw.html">NBISADAPTIVESW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NBIS Adaptive Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the adaptive NBIS switch.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON, the NodeB automatically checks narrowband interference in served cells, and activates or deactivates NBIS in the early morning every day depending on the check result. Activating NBIS for cells suffering narrowband interference helps improve network performance. Changing the NBIS state by activating or deactivating NBIS may result in call drops.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-nbisIniActThd.html">NBISINIACTTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NBIS Initial Startup Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the NBIS initial startup threshold when NBIS Adaptive Switch is set to ON. If the average no-service RTWP of all cells working on a frequency within half an hour is greater than the threshold, NBIS is started. Otherwise, NBIS is not started.</p>
+<p>GUI Value Range: -106~-50</p>
+<p>Unit: dBm</p>
+<p>Actual Value Range: -106~-50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the threshold is too high, NBIS is less likely to take effect, reducing the NBIS gains. If the threshold is too low, the NBIS function switch may be turned on and off repeatedly when there is slight network interference that does not affect network coverage or capacity.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-nbisReselPeriod.html">NBISRESELPERIOD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NBIS Reselection Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the reselection period of Narrowband Interference Suppression (NBIS). When this parameter is set to a proper value, the NodeB disables the NBIS function on the current carrier and checks whether the narrowband interference is cleared on the current carrier or choose another carrier to perform the NBIS function. When this parameter is set to 0, the NodeB does not perform the reselection of NBIS.</p>
+<p>GUI Value Range: 0~31</p>
+<p>Unit: day</p>
+<p>Actual Value Range: 0~31</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that this parameter be set to 7 if NBIS reselection needs to be enabled.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Service drops may occur at the moment of enabling or disabling the NBIS function. A smaller value of this parameter indicates shorter reselection periods and more frequent NBIS function changes and therefore more service drops. A larger value of this parameter indicates longer reselection periods and less frequent NBIS function changes and therefore fewer service drops, however, this setting causes delayed disabling the NBIS function on the carrier without function benefits or enabling the NBIS function on the carrier with more function benefits.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-uX2SonSetupSw.html">UX2SONSETUPSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">uX2 SON Setup Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the uX2 automatic setup function. If this parameter is set to ON, the NodeB supports automatic uX2 setup by the OSS. If this parameter is set to OFF, uX2 links must be manually set up.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter takes effect only when a uX2 object has been configured. The <a href="lst_ux2.html">LST UX2</a> command can be used to query uX2 object configurations.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-sleepingCellAlarmSw.html">SLEEPINGCELLALARMSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sleeping Cell Alarm Report Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the sleeping cell alarm report function.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-sleepingCellDetectOption.html">SLEEPINGCELLDETECTOPTION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sleeping Cell Detection Option</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the scope of detecting sleeping cells.</p>
+<p>GUI Value Range: ULCOMPHYCHANNELDETECT(Uplink Common Channel Detection), ULDEDPHYCHANNELDETECT(Uplink Dedicated Channel Detection), DLCOMPHYCHANNELDETECT(Downlink Common Channel Detection), DLDEDPHYCHANNELDETECT(Downlink Dedicated Channel Detection), IUBDATADETECT(Iub User Plane Detection), IUBSIGNALDETECT(Iub Control Plane Detection)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ULCOMPHYCHANNELDETECT, ULDEDPHYCHANNELDETECT, DLCOMPHYCHANNELDETECT, DLDEDPHYCHANNELDETECT, IUBDATADETECT, IUBSIGNALDETECT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-cpcFdpchDtxSw.html">CPCFDPCHDTXSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CPC F-DPCH DTX Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the CPC F-DPCH DTX function.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the NodeB discontinuously sends TPC data on the F-DPCH for CPC users for which the CPC F-DPCH DTX function takes effect, decreasing the transmit power on the F-DPCH and increasing HSDPA throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-iubCongestKpiImproveSw.html">IUBCONGESTKPIIMPROVESW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Iub Congestion KPI Improvement Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for improving the RRC connection setup success rate in transmission congestion scenarios. When this parameter is set to ON, the RRC connection setup success rate increases in transmission congestion scenarios.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the following conditions are met, it is recommended that this parameter be set to ON:</p>
+<p>1. In transmission pool networking, transmission bandwidth is configured on intermediate transport network nodes for real-time services.</p>
+<p>2. The RRC connection setup success rate decreases in heavy traffic scenarios.</p>
+<p>3. The value of the RNC counter VS.RRC.Rej.NodeBResUnavail increases dramatically.</p>
+<p>4. T315 is set to 0 (the value can be queried by running the LST UCONNMODETIMER command on the RNC).</p>
+<p>When this parameter is set to ON, it is recommended that this parameter be set to OFF if the following conditions are met:</p>
+<p>1. The RRC connection setup success rate returns to normal in heavy traffic scenarios.</p>
+<p>2. The value of the RNC counter VS.RRC.Rej.NodeBResUnavail returns to normal.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON, the RRC connection setup success rate in transmission congestion scenarios improves but the call drop rate will increase.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-hsdpaSerCellChOptSw.html">HSDPASERCELLCHOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HSDPA Serving Cell Change Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for HSDPA serving cell change optimization. When this switch is turned on, the data transmission policy during the HSDPA serving cell change is improved, increasing the user throughput and user experience. When this switch is turned off, the original algorithm applies.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this switch is turned on, the HSDPA serving cell change procedure is optimized, increasing the HSDPA user throughput during the serving cell change and enhancing user experience. When this switch is turned off, the original algorithm applies.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-cellRtwpExcessAlmSw.html">CELLRTWPEXCESSALMSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell RTWP Excessive Alarm Report Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the Cell RTWP Excessive alarm report function.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-cellRtwpExcessAlmThd.html">CELLRTWPEXCESSALMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell RTWP Excessive Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Cell RTWP Excessive alarm threshold. When Cell RTWP Excessive Alarm Report Switch is set to ON, the NodeB measures the RTWP of each uplink channel in a cell every second. In the alarm reporting period (2 hours), if more than 80% of the measured value on the uplink channel is higher than or equal to the threshold, the Cell RTWP Excessive alarm is reported. After the alarm is reported, in the alarm clearing period (3 minutes), if more than 80% of measured value on the cell uplink channel is lower than the threshold, the alarm is cleared. If the desensitization parameter is configured, the measured value on the uplink channel is modified based on the cell-level desensitization intensity. If the cell is enabled with GU@5 MHz, the threshold is modified based on the GU@5 MHz configurations.</p>
+<p>GUI Value Range: -90~-50</p>
+<p>Unit: dBm</p>
+<p>Actual Value Range: -90~-50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-dlAutoReshuffleSw.html">DLAUTORESHUFFLESW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Cell Auto Reshuffle Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for automatic downlink hitless cell reshuffling.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BLADEBBU or BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: After this switch is turned on, hitless cell reshuffling automatically migrates some cells served by the downlink baseband equipment to idle boards when boards in the downlink baseband equipment are intermittently disconnected or some boards become idle after capacity expansion.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-adpEtAdjFlag.html">ADPETADJFLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Adjusting E-Tilt Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the electrical tilt of the antenna can be adjusted automatically.</p>
+<p>GUI Value Range: AUTOADJ(Adjusting E-Tilt Allowed), NOTAUTOADJ(Adjusting E-Tilt Not Allowed)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AUTOADJ, NOTAUTOADJ</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: AUTOADJ(Adjusting E-Tilt Allowed)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-amrTxBandWidthCompSw.html">AMRTRANSBWCOMP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AMR Transmission Bandwidth Compression</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates AMR transmission bandwidth compression switch. When this switch is turned on, the AMR transmission bandwidth compression function is enabled for all cells served by a NodeB. When this switch is turned off, the AMR transmission bandwidth compression function is disabled for all cells served by a NodeB. It is good practice to turn on this switch in satellite transmission over Iub scenarios.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When the parameter is set to ON, the AMR transmission bandwidth compression function is enabled, saving the NodeB transmission bandwidth. However, the E2E delay for CS services increases by 100 ms at most and the MOS decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-sfsSwitch.html">SFSSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Soft Fault Self-healing Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable soft failure self-healing. If BBPRESETSWITCH is set to ON, the NodeB determines whether a soft failure occurs based on the baseband processing unit check result and the number of random access messages. If the soft failure affects services, the baseband processing unit is restarted to recover services. When BBPRESETSWITCH is set to ON, if BBPRESETDELAYSWITCH is set to ON, the baseband processing unit is postponed to restart at 03:00 in the early morning to recover services upon detecting soft failures and service exceptions; if BBPRESETDELAYSWITCH is set to OFF, the baseband processing unit restarts immediately upon detecting soft failures and service exceptions. If RFRESETSWITCH is set to ON, the NodeB determines whether a soft failure occurs based on the RF unit check result and the number of random access messages. If the soft failure affects services, the RF unit is restarted to recover services. When RFRESETSWITCH is set to ON, if RFRESETDELAYSWITCH is set to ON, the RF unit is postponed to restart at 03:00 in the early morning to recover services upon detecting soft failures and service exceptions; if RFRESETDELAYSWITCH is set to OFF, the RF unit restarts immediately upon detecting soft failures and service exceptions. If BBSFRESHUFFLESWITCH is set to ON, the NodeB attempts to relocate cells served by the faulty baseband module to other baseband modules and restart the faulty module for self-healing after detecting a soft failure on the baseband module. If BBSFCORRECTSWITCH is set to ON, the NodeB attempts to correct the soft failure. This reduces the frequency of restarting the baseband module.</p>
+<p>GUI Value Range: BBPRESETSWITCH(BBP Reset Switch), RFRESETSWITCH(RF Reset Switch), BBPRESETDELAYSWITCH(BBP Reset Delay Switch), RFRESETDELAYSWITCH(RF Reset Delay Switch), BBSFRESHUFFLESWITCH(Baseband Unit Soft Fault Reshuffle), BBSFCORRECTSWITCH(Baseband Unit Soft Fault Correction)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BBPRESETSWITCH, RFRESETSWITCH, BBPRESETDELAYSWITCH, RFRESETDELAYSWITCH, BBSFRESHUFFLESWITCH, BBSFCORRECTSWITCH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-rruIntelDorFreqBand.html">RRUINTELDORFEQBAND</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Intelligent Dormancy Frequency Band</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Frequency band that supports RRU Intelligent Dormancy. If this option is selected for all the frequency bands supported by the RRU or RFU, the RRU or RFU supports RRU Intelligent Dormancy.</p>
+<p>GUI Value Range: BAND1(Frequency band 1), BAND2(Frequency band 2), BAND3(Frequency band 3), BAND4(Frequency band 4), BAND5(Frequency band 5), BAND6(Frequency band 6), BAND7(Frequency band 7), BAND8(Frequency band 8), BAND9(Frequency band 9)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BAND1, BAND2, BAND3, BAND4, BAND5, BAND6, BAND7, BAND8, BAND9</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-operatorShareCeMode.html">OPERATORSHARECEMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mode of the CE Sharing for the Operator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CE sharing mode of the common group when MOCN is enabled. When this parameter is set to FULLSHARE, private operators can use the CE resources in the common group. When this parameter is set to OPTIONALSHARE, whether private operators can use the CE resources in the common group depends on the settings of the OPERATORINDEXSELECTION parameter.</p>
+<p>GUI Value Range: FULLSHARE(FULLSHARE), OPTIONALSHARE(OPTIONALSHARE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FULLSHARE, OPTIONALSHARE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When OPERATORSHARECEMODE is set to OPTIONALSHARE and the private operator index is specified by OPERATORINDEXSELECTION, the private operator cannot use the CE resources in the common group. In this situation, CE resources must be properly allocated. If CE resources are insufficient for an operator, users cannot access the network.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-operatorIndexSelection.html">OPERATORINDEXSELECTION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Selection of the Operator Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of operators not allowed to use the license CE resources in the common group. When MOCN is enabled and OPERATORSHARECEMODE is set to OPTIONALSHARE, the operator specified by this parameter cannot use the license CE resources in the common group.</p>
+<p>GUI Value Range: PRIOPERATERINDEX0(PRIOPERATERINDEX0), PRIOPERATERINDEX1(PRIOPERATERINDEX1), PRIOPERATERINDEX2(PRIOPERATERINDEX2), PRIOPERATERINDEX3(PRIOPERATERINDEX3)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PRIOPERATERINDEX0, PRIOPERATERINDEX1, PRIOPERATERINDEX2, PRIOPERATERINDEX3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When OPERATORSHARECEMODE is set to OPTIONALSHARE and the private operator index is specified by OPERATORINDEXSELECTION, the private operator cannot use the CE resources in the common group. In this situation, CE resources must be properly allocated. If CE resources are insufficient for an operator, users cannot access the network.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-rtwpImbalanceAlmThd.html">RTWPIMBALANCEALMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RTWP Imbalance Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RTWP imbalance alarm threshold. When the difference between the RTWP of the uplink channel of RRU and the RTWP of the uplink channel of the RFU exceeds the threshold, ALM-26522 RF Unit RX Channel RTWP/RSSI Unbalanced is reported.</p>
+<p>GUI Value Range: 100~320</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: 10~32, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, ALM-26522 RF Unit RX Channel RTWP/RSSI Unbalanced is less likely to be reported.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-priOperatorLicAlm.html">PRIOPERATORLICALMPOLICY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Private Operator License Alarm Policy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to optimize reporting of ALM-26812 System Dynamic Traffic Exceeding Licensed Limit for a private operator. With the optimization, ALM-26812 System Dynamic Traffic Exceeding Licensed Limit is reported when the number of licenses used by the private operator exceeds the total licensed threshold for the private operator and the common operator. This threshold is specified using the SET NODEBLICENSEALMTH command. Without the optimization, this alarm is reported when the number of licenses used by the private operator exceeds the licensed threshold for the private operator.</p>
+<p>GUI Value Range: PRIOPERATOR0LICALMOPT(Operator 0 License Alarm Optimization), PRIOPERATOR1LICALMOPT(Operator 1 License Alarm Optimization), PRIOPERATOR2LICALMOPT(Operator 2 License Alarm Optimization), PRIOPERATOR3LICALMOPT(Operator 3 License Alarm Optimization)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PRIOPERATOR0LICALMOPT, PRIOPERATOR1LICALMOPT, PRIOPERATOR2LICALMOPT, PRIOPERATOR3LICALMOPT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ackFldDecThldOptSw.html">ACKFLDDECTHLDOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ACK Field Detect Threshold Opt Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable ACK field detection threshold optimization. When this switch is turned on, the NodeB optimizes the detection threshold of the ACK field. When this switch is turned off, the NodeB does not optimize the detection threshold of the ACK field.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this switch is turned on, the HSDPA throughput of cell edge users increases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-smartScheLearnMode.html">SMARTSCHELEARNMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Smart Scheduling Learning Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the machine leaning mode for smart scheduling. If this parameter is set to LEARNING, the NodeB performs real-time machine learning and activates the Machine Learning based Scheduling feature. If this parameter is set to HOLD, the NodeB suspends the learning and uses the current optimal learning result to activate the Machine Learning based Scheduling feature.</p>
+<p>GUI Value Range: LEARNING(Learning for Smart Scheduling), HOLD(Hold Smart Scheduling)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LEARNING, HOLD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>If <strong>SM</strong> is set to EPF_SMART, <strong>SMARTSCHELEARNMODE</strong> is valid.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to HOLD, the NodeB always uses the current optimal learning result and cannot adapt well to network changes, possibly reducing the throughput. When this parameter is set to LEARNING, the NodeB performs reinforced learning and updates the optimal learning result in real time.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-ulPwrShareTm.html">ULPWRSHARETM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UMTS and LTE Dynamic Power Sharing Time Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time period in which the UMTS and LTE Dynamic Power Sharing feature is effective on a multimode base station.</p>
+<p>GUI Value Range: TIME0(Time Period 0(00:00 to 00:59)), TIME1(Time Period 1(01:00 to 01:59)), TIME2(Time Period 2(02:00 to 02:59)), TIME3(Time Period 3(03:00 to 03:59)), TIME4(Time Period 4(04:00 to 04:59)), TIME5(Time Period 5(05:00 to 05:59)), TIME6(Time Period 6(06:00 to 06:59)), TIME7(Time Period 7(07:00 to 07:59)), TIME8(Time Period 8(08:00 to 08:59)), TIME9(Time Period 9(09:00 to 09:59)), TIME10(Time Period 10(10:00 to 10:59)), TIME11(Time Period 11(11:00 to 11:59)), TIME12(Time Period 12(12:00 to 12:59)), TIME13(Time Period 13(13:00 to 13:59)), TIME14(Time Period 14(14:00 to 14:59)), TIME15(Time Period 15(15:00 to 15:59)), TIME16(Time Period 16(16:00 to 16:59)), TIME17(Time Period 17(17:00 to 17:59)), TIME18(Time Period 18(18:00 to 18:59)), TIME19(Time Period 19(19:00 to 19:59)), TIME20(Time Period 20(20:00 to 20:59)), TIME21(Time Period 21(21:00 to 21:59)), TIME22(Time Period 22(22:00 to 22:59)), TIME23(Time Period 23(23:00 to 23:59))</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TIME0, TIME1, TIME2, TIME3, TIME4, TIME5, TIME6, TIME7, TIME8, TIME9, TIME10, TIME11, TIME12, TIME13, TIME14, TIME15, TIME16, TIME17, TIME18, TIME19, TIME20, TIME21, TIME22, TIME23</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-shutdownFaultDetectSw.html">SHUTDOWNFAULTDETECTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Shutdown Fault Detection Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the NodeB shutdown fault identification function is enabled. When this parameter is set to ON, the cause of the NodeB shutdown fault can be promptly identified.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-interBrdFaultDetectSw.html">INTERBRDFAULTDETECTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Inter Board Fault Detect Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to perform inter-board service link failure detection and report ALM-26215 Inter-Board Service Link Failure. When this switch is turned on, inter-board link failure detection is required. If an exception occurs, ALM-26215 Inter-Board Service Link Failure is reported. When this switch is turned off, inter-board link failure detection is not required. This parameter is valid only when the main control board is UMPT and the baseband board is WBBPa, WBBPb, or WBBPd.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-rlDetectDemodulateOptSw.html">RLDETECTDEMODULATEOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RL Detection and Demodulation Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable RL detection and demodulation algorithm optimization. When this switch is turned on, the RL detection and demodulation functions are optimized to ensure that the SIR estimation is more accurate when the CS Voice Precise Power Control feature takes effect. When this switch is turned off, the RL detection and demodulation algorithm optimization does not take effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: After this switch is turned on, the function of RL detection and demodulation algorithm optimization takes effect. This prevents the significant increase in the ratio of AMR services whose SIR target reaches the maximum value after the CS Voice Precise Power Control feature is enabled.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-powerCtlPerfOptSw.html">POWERCTLPERFOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power Control Performance Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable power control performance optimization in a cell. When this parameter is set to ON(ON), the power control performance in the cell on the board where this function takes effect improves. Currently, this parameter takes effect only on the UBBPg board.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBAlgPara-tfciDemOptiSw.html">TFCIDEMOPTISW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Switch of Invalid TFCI Demodulation and Decoding Optimization Algorithm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the TFCI demodulation and decoding optimization algorithm does not take effect. If this parameter is set to ON(ON), the demodulation and decoding optimization algorithm does not take effect. If this parameter is set to OFF(OFF), the demodulation and decoding optimization algorithm takes effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF(OFF), the uplink TFCI demodulation and decoding performance improves.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_nodebalgpara__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Modify NodeB algorithm parameter:
+SET NODEBALGPARA: CERSVFOR2MSUSER=8, HSDPASCHPOOLSW=ON, PWRCHKSW=ON, CCPICPH2SIRTARMODSW=ON, UTRPCEXTCNBAPCAP=ON, RTWPSCALEPRECISIONOPT=OFF, CEDETECTPERIODLEVEL=LONG, ULRESWORKMODE=NORMAL, CCPICPHASESWCTRL=DEFAULT, ULHITHPMACESW=ON, CEIMPROVEMENT2MSSW=ON, INITSINGLEHARQSW=ON, KPIFAULTAUTORCVRMTHD=BBRESOURCERESET,  HSPAMCINTERBRDSCHSW=ON, ULCCHOLPCMINSIRTARGET=40, HSUPASCHPOOLSW=ON;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

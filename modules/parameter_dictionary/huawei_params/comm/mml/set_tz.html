@@ -1,0 +1,416 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Time Zone and DST Parameter (SET TZ)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_tz">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Time Zone and DST Parameter (SET TZ)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_tz"></a><a name="set_tz"></a>
+
+
+<h1 class="topictitle1">Set Time Zone and DST Parameter (SET TZ)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_tz__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the time zone and the daylight saving time (DST) information about the NE.</p>
+<p>This command can also be used to set the time zone and DST information about the southern hemisphere. That is, the start time can be later than the end time.</p>
+<p>The start time and the end time can be specified in different formats while setting DST information.</p>
+<p>The command can be used to self-define a time zone precise to the minute.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_tz__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The DST start month and end month must be different and separate.</p>
+</li><li><p>If the DST start date is later than the end date, it indicates that DST ends in the next year. For example, when the start date is June 1 and the end date is August 1, the DST is from June 1 to August 1 every year. When the start date is August 1 and the end date is June 1, the DST is from August 1 of one year to June 1 of the next year. The period between June 1 and August 1 every year is not the DST.</p>
+</li><li><p>The time zone or DST information can be set separately.</p>
+</li><li><p>If both the date and the day of the week are specified, the DST start day is determined as follows: If the specified date falls on the specified day of the week, DST starts on that date. Otherwise, DST starts on the first specified day of the week after the date. For example, when the specified date and day of the week are January 5 and Wednesday, respectively, DST starts on January 5 if it is Wednesday on that date, or starts on the first Wednesday after January 5 if January 5 does not fall on Wednesday.</p>
+</li><li><p>If the DST start day or end day is specified in the mode of date plus day of the week, the specified date plus six days cannot be later than the last day of the month. That is, the start date or end date must be in the same month as the specified date. Note that February 28 is the last day of February.</p>
+</li><li><p>The start time specified by running this command observes standard time, and the end time observes DST. For example, if the DST end time is set to 03:00 and the difference between standard time and DST is 60 minutes, then the local time jumps to 02:00 standard time when DST ends at 03:00.</p>
+</li><li><p>Neither the start date nor the end date of the DST can be set to February 29 in DATE or DATEWEEK mode. If the DST start date or end date is set to February 29, the local time cannot jump based on the DST start day or end day. This is because there is February 29 only in a leap year.</p>
+</li><li><p>The standard time to which the local time jumps when DST ends must be in the same year.</p>
+</li><li><p>If SM of the DST is set to WEEK, SWSEQ and SWEEK indicate the week and the day, respectively. For example, if SWSEQ is set to LAST and SWEEK is set to MON, they indicate the last Monday in a month instead of Monday of the last week. If EM is set to WEEK, the same principle applies to this case.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_tz__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-Zonet.html">ZONET</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Time Zone</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time zone of the NE.</p>
+<p>GUI Value Range: GMT-1200(GMT-12:00), GMT-1100(GMT-11:00), GMT-1000(GMT-10:00), GMT-0930(GMT-09:30), GMT-0900(GMT-09:00), GMT-0800(GMT-08:00), GMT-0700(GMT-07:00), GMT-0600(GMT-06:00), GMT-0500(GMT-05:00), GMT-0430(GMT-04:30), GMT-0400(GMT-04:00), GMT-0330(GMT-03:30), GMT-0300(GMT-03:00), GMT-0200(GMT-02:00), GMT-0100(GMT-01:00), GMT(GMT), GMT+0100(GMT+01:00), GMT+0200(GMT+02:00), GMT+0300(GMT+03:00), GMT+0330(GMT+03:30), GMT+0400(GMT+04:00), GMT+0430(GMT+04:30), GMT+0500(GMT+05:00), GMT+0530(GMT+05:30), GMT+0545(GMT+05:45), GMT+0600(GMT+06:00), GMT+0630(GMT+06:30), GMT+0700(GMT+07:00), GMT+0800(GMT+08:00), GMT+0845(GMT+08:45), GMT+0900(GMT+09:00), GMT+0930(GMT+09:30), GMT+1000(GMT+10:00), GMT+1030(GMT+10:30), GMT+1100(GMT+11:00), GMT+1130(GMT+11:30), GMT+1200(GMT+12:00), GMT+1245(GMT+12:45), GMT+1300(GMT+13:00), GMT+1400(GMT+14:00), CUSTOM(Custom time zone)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: GMT-1200, GMT-1100, GMT-1000, GMT-0930, GMT-0900, GMT-0800, GMT-0700, GMT-0600, GMT-0500, GMT-0430, GMT-0400, GMT-0330, GMT-0300, GMT-0200, GMT-0100, GMT, GMT+0100, GMT+0200, GMT+0300, GMT+0330, GMT+0400, GMT+0430, GMT+0500, GMT+0530, GMT+0545, GMT+0600, GMT+0630, GMT+0700, GMT+0800, GMT+0845, GMT+0900, GMT+0930, GMT+1000, GMT+1030, GMT+1100, GMT+1130, GMT+1200, GMT+1245, GMT+1300, GMT+1400, CUSTOM</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: GMT+0800(GMT+08:00)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-TimeDiff.html">TIMEDIFF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Time Difference</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of time zone. This parameter can be set to a negative value.</p>
+<p>GUI Value Range: -720~840</p>
+<p>Unit: min</p>
+<p>Actual Value Range: -720~840</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-Dst.html">DST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST Tag Information</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether DST is enabled.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-SM.html">SM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST Start Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode in which the DST start date is specified. There are three formats:</p>
+<p>date format, for example, April 1st;</p>
+<p>week format, for example, the first Sunday in April;</p>
+<p>date and week format, for example, April 1st and Sunday. If it is Sunday on April 1st, April 1st is the date. Otherwise, the first Sunday after April 1st is the date.</p>
+<p>GUI Value Range: DATE(Date mode), WEEK(Week mode), DATEWEEK(Date and week mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DATE, WEEK, DATEWEEK</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DATE(Date mode)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-SMonth.html">SMONTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST Start Month</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the month in which the NE DST starts.</p>
+<p>GUI Value Range: JAN(January), FEB(February), MAR(March), APR(April), MAY(May), JUN(June), JUL(July), AUG(August), SEP(September), OCT(October), NOV(November), DEC(December)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: JAN(January)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES, <strong>SMONTH</strong> and <strong>EMONTH</strong> are not allowed to be identical.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>SM</strong> is DATEWEEK, DATE, or WEEK.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-SDay.html">SDAY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST Start Day</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the day on which the NE DST starts.</p>
+<p>GUI Value Range: 1~31</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~31</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>SM</strong> is DATEWEEK, <strong>SDAY</strong> plus 6 should not be beyond the end of the month specified by <strong>SMONTH</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>SM</strong> is DATE, if <strong>SMONTH</strong> is FEB, then <strong>SDAY</strong> should not be greater than 28.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>SM</strong> is DATE,  <strong>SDAY</strong> should not be greater than normal day.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>SM</strong> is DATEWEEK or DATE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-SWSeq.html">SWSEQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST Start Week Sequence</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates in which week the NE DST starts.</p>
+<p>GUI Value Range: LAST(Last), FIRST(First), SECOND(Second), THIRD(Third), FOURTH(Fourth)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LAST, FIRST, SECOND, THIRD, FOURTH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FIRST(First)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>SM</strong> is WEEK.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-SWeek.html">SWEEK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST Start Weekday</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the week in which the NE DST starts.</p>
+<p>GUI Value Range: MON(Monday), TUE(Tuesday), WED(Wednesday), THU(Thursday), FRI(Friday), SAT(Saturday), SUN(Sunday)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MON, TUE, WED, THU, FRI, SAT, SUN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MON(Monday)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>SM</strong> is DATEWEEK or WEEK.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-ST.html">ST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST Start Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time when the NE DST starts. The value of this parameter observes the standard time.</p>
+<p>GUI Value Range: 00:00:00~23:59:59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00:00:00~23:59:59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-EM.html">EM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST End Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the end date mode of the NE DST. There are three formats:</p>
+<p>date format, for example, April 1st;</p>
+<p>week format, for example, the first Sunday in April;</p>
+<p>date and week format, for example, April 1st and Sunday. If it is Sunday on April 1st, April 1st is the date. Otherwise, the first Sunday after April 1st is the date.</p>
+<p>GUI Value Range: DATE(Date mode), WEEK(Week mode), DATEWEEK(Date and week mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DATE, WEEK, DATEWEEK</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DATE(Date mode)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-EMonth.html">EMONTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST End Month</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the month in which the NE DST ends.</p>
+<p>GUI Value Range: JAN(January), FEB(February), MAR(March), APR(April), MAY(May), JUN(June), JUL(July), AUG(August), SEP(September), OCT(October), NOV(November), DEC(December)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: JAN(January)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES, <strong>SMONTH</strong> and <strong>EMONTH</strong> are not allowed to be identical.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>EM</strong> is DATEWEEK, DATE, or WEEK.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-EDay.html">EDAY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST End Day</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the day on which the NE DST ends.</p>
+<p>GUI Value Range: 1~31</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~31</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>EM</strong> is DATEWEEK, <strong>EDAY</strong> plus 6 should not be beyond the end of the month specified by <strong>EMONTH</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>EM</strong> is DATE, if <strong>EMONTH</strong> is FEB, then <strong>EDAY</strong> should not be greater than 28.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>EM</strong> is DATE,  <strong>EDAY</strong> should not be greater than normal day.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>EM</strong> is DATEWEEK or DATE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-EWSeq.html">EWSEQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST End Week Sequence</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the week in which DST ends.</p>
+<p>GUI Value Range: LAST(Last), FIRST(First), SECOND(Second), THIRD(Third), FOURTH(Fourth)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LAST, FIRST, SECOND, THIRD, FOURTH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FIRST(First)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>EM</strong> is WEEK.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-EWeek.html">EWEEK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST End Weekday</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the week in which the NE DST ends.</p>
+<p>GUI Value Range: MON(Monday), TUE(Tuesday), WED(Wednesday), THU(Thursday), FRI(Friday), SAT(Saturday), SUN(Sunday)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MON, TUE, WED, THU, FRI, SAT, SUN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MON(Monday)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>DST</strong> in the <strong>TZ</strong> MO is set to YES and <strong>EM</strong> is DATEWEEK or WEEK.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-ET.html">ET</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST End Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time when the DST of the NE ends. The value of this parameter observes DST.</p>
+<p>GUI Value Range: 00:00:00~23:59:59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00:00:00~23:59:59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TZ-Adjt.html">TO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DST Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DST time offset of the NE. This parameter can be set to a negative value. A negative value indicates that the NE time is earlier than the DST time, and a positive value indicates that the NE time is later than the DST time.</p>
+<p>GUI Value Range: -120~120</p>
+<p>Unit: min</p>
+<p>Actual Value Range: -120~120</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_tz__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To set the time zone and DST information with the parameters as follows: Time Zone: GMT+0800, DST Tag Information: NO, run the following command: 
+SET TZ: ZONET=GMT+0800, DST=NO;
+
+Example 2: To set the time zone and DST information with the parameters as follows: Time Zone: GMT+0800, DST Tag Information: YES, DST Start Mode: DATE, DST Start Month: JAN, DST Start Day: 2, DST Start Time: 10&amp;49&amp;00, DST End Mode: DATE, DST End Month: FEB, DST End Day: 26, DST End Time: 10&amp;49&amp;00, DST Offset: 30, run the following command: 
+SET TZ: ZONET=GMT+0800, DST=YES, SM=DATE, SMONTH=JAN, SDAY=2, ST=10&amp;49&amp;00, EM=DATE, EMONTH=FEB, EDAY=26, ET=10&amp;49&amp;00, TO=30;
+
+Example 3: To set the time zone and DST information with the parameters as follows: Time Zone: GMT+0800, DST Tag Information: YES, DST Start Mode: WEEK, DST Start Month: JAN, DST Start Week Sequence: LAST, DST Start Weekday: TUE, DST Start Time: 10&amp;49&amp;00, DST End Mode: DATE, DST End Month: FEB, DST End Day: 26, DST End Time: 10&amp;49&amp;00, DST Offset: 30, run the following command: 
+SET TZ: ZONET=GMT+0800, DST=YES, SM=WEEK, SMONTH=JAN, SWSEQ=LAST, SWEEK=TUE, ST=10&amp;49&amp;00, EM=DATE, EMONTH=FEB, EDAY=26, ET=10&amp;49&amp;00, TO=30;
+
+Example 4: To set the time zone and DST information with the parameters as follows: Time Zone: GMT+0800, DST Tag Information: YES, DST Start Mode: DATEWEEK, DST Start Month: JAN, DST Start Day: 1, DST Start Weekday: TUE, DST Start Time: 10&amp;49&amp;00, DST End Mode: DATE, DST End Month: FEB, DST End Day: 26, DST End Time: 10&amp;49&amp;00, DST Offset: 30, run the following command: 
+SET TZ: ZONET=GMT+0800, DST=YES, SM=DATEWEEK, SMONTH=JAN, SDAY=1, SWEEK=TUE, ST=10&amp;49&amp;00, EM=DATE, EMONTH=FEB, EDAY=26, ET=10&amp;49&amp;00, TO=30;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

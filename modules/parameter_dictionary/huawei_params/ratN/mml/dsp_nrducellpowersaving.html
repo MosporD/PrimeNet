@@ -1,0 +1,142 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display NR DU Cell Power Saving (DSP NRDUCELLPOWERSAVING)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_nrducellpowersaving">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display NR DU Cell Power Saving (DSP NRDUCELLPOWERSAVING)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_nrducellpowersaving"></a><a name="dsp_nrducellpowersaving"></a>
+
+
+<h1 class="topictitle1">Display NR DU Cell Power Saving (DSP NRDUCELLPOWERSAVING)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 5G, BTS5900, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_nrducellpowersaving__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the power saving information about an NR DU cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_nrducellpowersaving__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>None.</p>
+</div></div>
+
+<div class="mmlparam"><a name="dsp_nrducellpowersaving__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NRDUCellPowerSaving-NrDuCellId.html">NrDuCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NR DU Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an NR DU cell. It uniquely identifies an NR DU cell within a gNodeB.</p>
+<p>GUI Value Range: 0~65534</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65534</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The time difference between NRDUCellPowerSaving MO instances with the same NrDuCellId and PowerSavingType must be greater than 5 minutes.</li><li>The time segment of an NRDUCellPowerSaving MO instance with PowerSavingType set to TIMING_CARRIER_SHUTDOWN must not overlap with the time segments of other NRDUCellPowerSaving MO instances associated with the same NrDuCellId as this MO instance.</li><li>If an NRDUCellPowerSaving MO with PowerSavingType set to LNR_BUNDLED_SCHEDULING exists, an NRDUCellPowerSaving MO with PowerSavingType set to POWER_SAVING_SCHEDULE must exist for the cell. In addition, the time range in the record with PowerSavingType set to LNR_BUNDLED_SCHEDULING in the NRDUCellPowerSaving MO corresponding to the cell must be within the time range in the record with PowerSavingType set to POWER_SAVING_SCHEDULE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_nrducellpowersaving__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query the information of an NR DU Cell Powersaving, run the following command:
+DSP NRDUCELLPOWERSAVING:;
+The result is shown as follows:
++++    71_5_134_21        2019-10-15 16:33:45
+O&amp;M    #2685403202
+%%DSP NRDUCELLPOWERSAVING:;%%
+RETCODE = 0  Operation succeeded.
+
+NR DU Cell Powersaving information
+----------------------------------
+NR DU Cell ID  Power Saving Type           Current State  Current Disabled Cause
+
+2              Power Saving Schedule       Disabled       Triggering Time Not Reached
+130            Scheduled Carrier Shutdown  Enabled        N/A
+130            Power Saving Schedule       Disabled       Triggering Time Not Reached
+(Number of results = 3)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_nrducellpowersaving__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>NR DU Cell ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of an NR DU cell. It uniquely identifies an NR DU cell within a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Power Saving Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the power saving type of an NR DU cell.</p>
+<p>When this parameter is set to TIMING_CARRIER_SHUTDOWN, the local cell shuts down the carrier at the preset time.</p>
+<p>When this parameter is set to LNR_SMART_CARRIER_SHUTDOWN, the local cell performs power saving based on the load on the NR and LTE networks.</p>
+<p>When this parameter is set to RF_SHUTDOWN, the local cell shuts down RF channels at the preset time under the specified load condition.</p>
+<p>When this parameter is set to POWER_SAVING_SCHEDULE, the local cell performs power saving scheduling at the preset time under the specified load condition.</p>
+<p>When this parameter is set to DYNAMIC_SSB, the local cell performs dynamic SSB power saving at the preset time under specified load and user number conditions.</p>
+<p>When this parameter is set to LNR_BUNDLED_SCHEDULING, the local cell performs LTE and NR bundled scheduling at the preset time under the specified load condition.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current State</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the status of the power saving feature for the cell. The value can be DISABLED(Disabled) or ENABLED(Enabled).</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current Disabled Cause</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cause why cell power saving does not take effect. The cause can be NA(N/A), LICENSE_INSUFFICIENT(Insufficient License), SWITCH_OFF(Switch Turned Off), NEIGHBORING_CELL_NOT_CONFIG(Neighboring Cell Not Configured), CELL_UNAVAILABLE(Cell Unavailable), NOT_IN_SHUTDOWN_TIME(Triggering Time Not Reached), NEIGHBORING_CELL_UNAVAILABLE(Neighboring Cell Unavailable), IMPACTED_FEATURE_TAKEN_EFFECT(Impacted Feature Taken Effect), DEPENDENT_FEATURE_DISABLED(Prerequisite Feature Not Taken Effect), NOT_IN_DL_PRB_THRESHOLD(Downlink PRB Threshold Not Reached), NOT_IN_UE_NUM_THRESHOLD(UE Number Threshold Not Reached), NCELL_PRB_EXCEED_THRESHOLD(Neighboring Cell Load Exceeding Threshold), IN_PENALTY_STATE(In Penalty State), RF_HW_CAPB_NOT_SUPPORTED(RF Hardware Capability Not Supported), BBP_SW_CAPB_NOT_SUPPORTED(BBP Software Capability Not Supported), or OTHERS(Others).</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

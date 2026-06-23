@@ -1,0 +1,204 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify SrbCfg (MOD SRBCFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_srbcfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify SrbCfg (MOD SRBCFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_srbcfg"></a><a name="mod_srbcfg"></a>
+
+
+<h1 class="topictitle1">Modify SrbCfg (MOD SRBCFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_srbcfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the SRB configurations.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_srbcfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_srbcfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SrbCfg-SrbRlcParaAdaptSwitch.html">SrbRlcParaAdaptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRB RLC Parameter Adaptive Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable adaptive configuration of parameters related to Radio Link Control (RLC) on SRBs. If this parameter is set to ON, the eNodeB adaptively adjusts the SRB polling PDU retransmission timer for the eNodeB based on the timer expiration information and the number of scheduled UEs in the uplink. This aims to match the timer length and the interval at which UEs send the status report and reduces the number of invalid retransmissions due to the timer expiration. If the SMALL_BAND_RLC_OPT_SWITCH option of the SmallBandOptSwitch parameter is selected, for a small-bandwidth cell (cell with a bandwidth of 5 MHz, 3 MHz, or 1.4 MHz), the eNodeB proceeds as the SrbRlcParaAdaptSwitch parameter is set to ON regardless of the SrbRlcParaAdaptSwitch parameter setting. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the SRB polling PDU retransmission timer for the eNodeB can be adaptively adjusted, decreasing the number of retransmissions and saving the air interface resources.</p>
+<p>If this parameter is set to OFF, the timer cannot be adaptively adjusted. In this case, when the number of UEs is growing, the UE scheduling interval in the uplink increases, causing excessive invalid downlink RLC retransmissions. When the number of RLC retransmissions reaches its maximum value, the probability of RRC connection reestablishment increases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SrbCfg-SrbPollTimerAdjustStep.html">SrbPollTimerAdjustStep</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRB Polling Timer Adjust Step</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the adjustment step of the SRB polling PDU retransmission timer for the eNodeB when the SrbRlcParaAdaptSwitch parameter is set to ON or the SMALL_BAND_RLC_OPT_SWITCH option of the SmallBandOptSwitch parameter is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~49</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~49</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a smaller adjustment step and less frequent adaptation of uplink scheduling interval.</p>
+<p>A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SrbCfg-SrbPollTimerPreset.html">SrbPollTimerPreset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Preset eNodeB SRB Poll Retransmit Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the initial value of the SRB polling PDU retransmission timer for the eNodeB when the SrbRlcParaAdaptSwitch parameter is set to ON or the SMALL_BAND_RLC_OPT_SWITCH option of the SmallBandOptSwitch parameter is selected. If the SrbPollTimerPreset parameter value is greater than the SrbPollTimerMaxAdjustValue parameter value, the SrbPollTimerMaxAdjustValue parameter value is taken as the initial value. It is recommended that the SrbPollTimerPreset parameter value be greater than or equal to the ENodeBPollRetransmitTimer parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: m5(5ms), m10(10ms), m15(15ms), m20(20ms), m25(25ms), m30(30ms), m35(35ms), m40(40ms), m45(45ms), m50(50ms), m55(55ms), m60(60ms), m65(65ms), m70(70ms), m75(75ms), m80(80ms), m85(85ms), m90(90ms), m95(95ms), m100(100ms), m105(105ms), m110(110ms), m115(115ms), m120(120ms), m125(125ms), m130(130ms), m135(135ms), m140(140ms), m145(145ms), m150(150ms), m155(155ms), m160(160ms), m165(165ms), m170(170ms), m175(175ms), m180(180ms), m185(185ms), m190(190ms), m195(195ms), m200(200ms), m205(205ms), m210(210ms), m215(215ms), m220(220ms), m225(225ms), m230(230ms), m235(235ms), m240(240ms), m245(245ms), m250(250ms), m300(300ms), m350(350ms), m400(400ms), m450(450ms), m500(500ms)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: m5, m10, m15, m20, m25, m30, m35, m40, m45, m50, m55, m60, m65, m70, m75, m80, m85, m90, m95, m100, m105, m110, m115, m120, m125, m130, m135, m140, m145, m150, m155, m160, m165, m170, m175, m180, m185, m190, m195, m200, m205, m210, m215, m220, m225, m230, m235, m240, m245, m250, m300, m350, m400, m450, m500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: m100(100ms)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in more polling PDU retransmissions. In addition, the number of ARQ retransmissions reaches its maximum due to consecutive PDU retransmissions, and therefore the RRC connection is reestablished. In the same scenarios, a larger value of this parameter results in less polling PDU retransmission but RLC status reports are sent less promptly.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SrbCfg-SrbPollTimerAdjUserNumThd.html">SrbPollTimerAdjUserNumThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRB Polling Timer Adjust User Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UE number threshold for triggering the SRB RLC parameter adaptation. If the SrbRlcParaAdaptSwitch parameter is set to ON(On) and the number of UEs in a cell is greater than the SrbPollTimerAdjUserNumThd parameter value, the adaptive adjustment of the SRB polling PDU retransmission timer for the eNodeB is triggered. If the SMALL_BAND_RLC_OPT_SWITCH(SMALL_BAND_RLC_OPT_SWITCH) option of the SmallBandOptSwitch parameter is selected, this parameter does not take effect and the UE number threshold specified by the system is used. The threshold value is 75 for a 5 MHz bandwidth, 45 for a 3 MHz bandwidth, and 20 for a 1.4 MHz bandwidth. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~5000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 150</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability of triggering the adaptive adjustment of the SRB polling PDU retransmission timer for the eNodeB when the number of UEs in the cell is growing. In this case, the timer length applied to UEs may be shorter than the actual UE scheduling interval, and the decrease in the number of SRB RLC retransmissions becomes slower.</p>
+<p>If this parameter is set to a too small value, there is a high probability of triggering the adaptive adjustment of the SRB polling PDU retransmission timer for the eNodeB when the number of UEs in the cell is growing. In this case, when UE packets are lost due to poor channel quality, RLC retransmissions are not promptly performed in the downlink.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SrbCfg-RrcConnRelMaxRetxThd.html">RrcConnRelMaxRetxThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRCConnRel Maximum Retransmit Times</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of RRC Connection Release message retransmissions. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~32</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~32</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 32</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a higher probability that a UE will successfully receive the RRC Connection Release message and a smaller number of RRC connection reestablishment attempts. However, the RBLER and number of retransmission packets increase for RRC Connection Release messages. A smaller value of this parameter results in a higher probability that the UE cannot receive the RRC Connection Release message and a larger number of RRC connection reestablishment attempts.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SrbCfg-SrbPollTimerMaxAdjustValue.html">SrbPollTimerMaxAdjustValue</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRB Polling Timer Maximum Adjust Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum adjustment step of the SRB polling PDU retransmission timer for the eNodeB when the SrbRlcParaAdaptSwitch parameter is set to ON or the SMALL_BAND_RLC_OPT_SWITCH option of the SmallBandOptSwitch parameter is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: m5(5ms), m10(10ms), m15(15ms), m20(20ms), m25(25ms), m30(30ms), m35(35ms), m40(40ms), m45(45ms), m50(50ms), m55(55ms), m60(60ms), m65(65ms), m70(70ms), m75(75ms), m80(80ms), m85(85ms), m90(90ms), m95(95ms), m100(100ms), m105(105ms), m110(110ms), m115(115ms), m120(120ms), m125(125ms), m130(130ms), m135(135ms), m140(140ms), m145(145ms), m150(150ms), m155(155ms), m160(160ms), m165(165ms), m170(170ms), m175(175ms), m180(180ms), m185(185ms), m190(190ms), m195(195ms), m200(200ms), m205(205ms), m210(210ms), m215(215ms), m220(220ms), m225(225ms), m230(230ms), m235(235ms), m240(240ms), m245(245ms), m250(250ms), m300(300ms), m350(350ms), m400(400ms), m450(450ms), m500(500ms)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: m5, m10, m15, m20, m25, m30, m35, m40, m45, m50, m55, m60, m65, m70, m75, m80, m85, m90, m95, m100, m105, m110, m115, m120, m125, m130, m135, m140, m145, m150, m155, m160, m165, m170, m175, m180, m185, m190, m195, m200, m205, m210, m215, m220, m225, m230, m235, m240, m245, m250, m300, m350, m400, m450, m500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: m200(200ms)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: In heavy-traffic scenarios, if this parameter is set to a small value, the timer adjustment range is small and the decrease in the number of retransmissions due to the timer expiration becomes slow. If this parameter is set to a large value, the uplink status report may not be sent in a timely manner.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SrbCfg-HOCmdRRCRlsMsgRetxAdpSw.html">HOCmdRRCRlsMsgRetxAdpSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HO Command RRC Release Msg Retran Adp Sw</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to optimize invalid retransmission of handover signaling and RRC release messages. The eNodeB optimizes invalid retransmission of handover signaling and RRC release messages only if this parameter is set to ON(On).</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON(On), the source eNodeB extends the SRB Polling PDU retransmission timer at the RLC layer after receiving the ACK to unfragmented handover signaling and RRC Connection Release messages at the MAC layer. As a result, invalid retransmission of handover signaling and RRC Connection Release messages decreases, thereby saving CCE resources and scheduled RB resources and increasing downlink user-perceived data rates. If this parameter is set to OFF(Off), the network performance is not affected.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_srbcfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">+++    0        2014-10-24 09:30:01
+O&amp;M    #806354948
+%%MOD SRBCFG: SrbRlcParaAdaptSwitch=ON, SrbPollTimerAdjustStep=20, SrbPollTimerMaxAdjustValue=m75, SrbPollTimerAdjUserNumThd=210;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

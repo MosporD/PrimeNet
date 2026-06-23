@@ -1,0 +1,361 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Voice Quality Monitoring Algorithm Parameter (MOD VQMALGO)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_vqmalgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Voice Quality Monitoring Algorithm Parameter (MOD VQMALGO)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_vqmalgo"></a><a name="mod_vqmalgo"></a>
+
+
+<h1 class="topictitle1">Modify Voice Quality Monitoring Algorithm Parameter (MOD VQMALGO)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_vqmalgo__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify voice quality monitoring (VQM) algorithm parameters.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_vqmalgo__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>Before parameters related to the VQM algorithm are modified by running this command, ensure that the VQM switch has been turned on.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_vqmalgo__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-ULDelayJitter.html">ULDelayJitter</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Delay Jitter</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum UL voice packet delay variation allowed on the Uu interface. If the actual delay variation of a UL voice packet exceeds this limit, this packet is regarded as lost during the evaluation of voice quality indicator (VQI). The delay variation is measured at the eNodeB PDCP layer. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~255</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF. The parameter setting takes effect only when the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the ULDelayJitter parameter increases the proportion of uplink voice services with good voice quality and decreases the proportion of uplink voice services with poor voice quality. The ULDelayJitter parameter does not apply to UEs not running voice services and has no impact on such UEs.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-VqiGoodThd.html">VqiGoodThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VQI Good Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the voice quality indicator (VQI) threshold for determining the voice quality is good. If the VQI evaluation value is greater than the VqiGoodThd parameter value and less than or equal to the VqiExcellentThd parameter value, the voice quality is considered as good. If the VQI evaluation value is less than or equal to the VqiGoodThd parameter value and greater than the VqiPoorThd parameter value, the voice quality is considered as accepted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~500</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5, step: 0.01</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 300</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the VQMAlgo MO, VqiExcellentThd must be larger than VqiGoodThd.</li><li>In the VQMAlgo MO, VqiGoodThd must be larger than VqiPoorThd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-VqiPoorThd.html">VqiPoorThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VQI Poor Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the voice quality indicator (VQI) threshold for determining the voice quality is poor. If the VQI evaluation value is greater than the VqiBadThd parameter value and less than or equal to the VqiPoorThd parameter value, the voice quality is considered as poor. If the VQI evaluation value is less than or equal to the VqiGoodThd parameter value and greater than the VqiPoorThd parameter value, the voice quality is considered as accepted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~500</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5, step: 0.01</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 200</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the VQMAlgo MO, VqiGoodThd must be larger than VqiPoorThd.</li><li>In the VQMAlgo MO, VqiPoorThd must be larger than VqiBadThd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-VqiBadThd.html">VqiBadThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VQI Bad Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the voice quality indicator (VQI) threshold equal to or below which the voice quality is considered as bad. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~500</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5, step: 0.01</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the VQMAlgo MO, VqiPoorThd must be larger than VqiBadThd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-AmrWbRadioLowQualRelThd.html">AmrWbRadioLowQualRelThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Release Threshold of Radio Low Quality for Amr Wideband</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the packet loss rate over the air interface for normally releasing AMR-WB and EVS voice services. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_AMR_ON and the uplink or downlink packet loss rate of AMR-WB UEs over the air interface exceeds this threshold, the eNodeB considers that AMR-WB UEs release calls due to poor voice quality. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_ADAPTIVE_ON and the uplink or downlink packet loss rate of AMR-WB and EVS UEs over the air interface exceeds this threshold, the eNodeB considers that AMR-WB and EVS UEs release calls due to poor voice quality. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF.</p>
+<p>If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_AMR_ON, a larger value of the AmrWbRadioLowQualRelThd parameter decreases the number of times that AMR-WB voice services are released by UEs due to poor voice quality over the air interface. A smaller value of the AmrWbRadioLowQualRelThd parameter results in the opposite effects.</p>
+<p>If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the AmrWbRadioLowQualRelThd parameter decreases the number of times that AMR-WB and EVS voice services are released by UEs due to poor voice quality over the air interface. A smaller value of the AmrWbRadioLowQualRelThd parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-AmrNbRadioLowQualRelThd.html">AmrNbRadioLowQualRelThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Release Threshold of Radio Low Quality for Amr Narrowband</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the packet loss rate over the air interface for normally releasing AMR-NB voice services. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON and the uplink or downlink packet loss rate of AMR-NB UEs over the air interface exceeds this threshold, the eNodeB considers that UEs release calls due to poor voice quality. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF. If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the AmrNbRadioLowQualRelThd parameter decreases the number of times that AMR-NB voice services are released by UEs due to poor voice quality. A smaller value of the AmrNbRadioLowQualRelThd parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-AmrSilentPeriodNum.html">AmrSilentPeriodNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Period Number of Silent for Amr</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of periods that is used to evaluate whether a voice service is muted due to poor voice quality. If an AMR or EVS voice service performed by a UE is muted in consecutive periods specified by this parameter, voice mute is regarded to occur during communication. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF. If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the AmrSilentPeriodNum parameter increases the number of periods for voice quality evaluation and may decrease the number of times of communication in one direction only. A smaller value of the AmrSilentPeriodNum parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-AmrLowQualRelPeriodNum.html">AmrLowQualRelPeriodNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Period Number of Low Quality Release for Amr</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of periods that is used to evaluate whether a voice service is released due to poor voice quality. If the voice quality of an AMR or EVS voice service is poor in consecutive periods specified by this parameter, the UE is regarded to normally release the voice service due to poor voice quality. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF. If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the AmrLowQualRelPeriodNum parameter increases the number of periods for voice quality evaluation and may decrease the number of times that voice services are normally released due to poor voice quality. A smaller value of the AmrLowQualRelPeriodNum parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-VqiExcellentThd.html">VqiExcellentThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VQI Excellent Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the voice quality indicator (VQI) threshold above which the voice quality is considered as excellent. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~500</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5, step: 0.01</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 400</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the VQMAlgo MO, VqiExcellentThd must be larger than VqiGoodThd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-AmrNbSilentThd.html">AmrNbSilentThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Threshold of Silent for Amr Narrowband</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the packet loss rate for determining whether AMR-NB services are muted. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON and the uplink or downlink packet loss rate of AMR-NB UEs exceeds this threshold, the eNodeB considers that AMR-NB services are muted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF. If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the AmrNbSilentThd parameter decreases the number of times that AMR-NB voice services are muted due to packet loss. A smaller value of the AmrNbSilentThd parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-AmrWbRcvLowQualRelThd.html">AmrWbRcvLowQualRelThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Release Threshold of Receive Low Quality for Amr Wideband</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the received packets loss rate for normally releasing AMR-WB and EVS voice services due to poor voice quality. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_AMR_ON and the received packets loss rate of AMR-WB UEs in the uplink or downlink exceeds this threshold, the eNodeB considers that AMR-WB UEs release calls due to poor voice quality. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_ADAPTIVE_ON and the received packets loss rate of AMR-WB and EVS UEs in the uplink or downlink exceeds this threshold, the eNodeB considers that AMR-WB and EVS UEs release calls due to poor voice quality. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 15</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF.</p>
+<p>If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_AMR_ON, a larger value of the AmrWbRcvLowQualRelThd parameter decreases the number of times that AMR-WB voice services are released by UEs due to poor voice quality caused by receive packet loss. A smaller value of the AmrWbRcvLowQualRelThd parameter results in the opposite effects.</p>
+<p>If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the AmrWbRcvLowQualRelThd parameter decreases the number of times that AMR-WB and EVS voice services are released by UEs due to poor voice quality caused by receive packet loss. A smaller value of the AmrWbRcvLowQualRelThd parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-AmrNbRcvLowQualRelThd.html">AmrNbRcvLowQualRelThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Release Threshold of Receive Low Quality for Amr Narrowband</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the received packets loss rate for normally releasing AMR-NB voice services due to poor voice quality. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON and the received packets loss rate of AMR-NB UEs in the uplink or downlink exceeds this threshold, the eNodeB considers that AMR-NB UEs release calls due to poor voice quality. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF. If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_AMR_ON or VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the AmrNbRcvLowQualRelThd parameter decreases the number of times that AMR-NB voice services are released by UEs due to poor voice quality caused by receive packet loss. A smaller value of the AmrNbRcvLowQualRelThd parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-AmrWbSilentThd.html">AmrWbSilentThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Threshold of Silent for Amr Wideband</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the packet loss rate for determining whether AMR-WB and EVS services are muted. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_AMR_ON and the uplink or downlink packet loss rate of AMR-WB UEs exceeds this threshold, the eNodeB considers that AMR-WB services are muted. If the VQMAlgoSwitch parameter in the ENodeBAlgoSwitch MO is set to VQM_ALGO_SWITCH_ADAPTIVE_ON and the uplink or downlink packet loss rate of AMR-WB and EVS UEs exceeds this threshold, the eNodeB considers that AMR-WB and EVS services are muted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 30</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The validity of this parameter depends on the setting of the VQMAlgoSwitch parameter, the default value of which is VQM_ALGO_SWITCH_OFF.</p>
+<p>If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_AMR_ON, a larger value of the AmrWbSilentThd parameter decreases the number of times that AMR-WB voice services are muted due to packet loss. A smaller value of the AmrWbSilentThd parameter results in the opposite effects.</p>
+<p>If the VQMAlgoSwitch parameter is set to VQM_ALGO_SWITCH_ADAPTIVE_ON, a larger value of the AmrWbSilentThd parameter decreases the number of times that AMR-WB and EVS voice services are muted due to packet loss. A smaller value of the AmrWbSilentThd parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-VQMAlgoPeriod.html">VQMAlgoPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VQM Algorithm Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VQM evaluation period. During VQM-based voice quality evaluation, voice quality is evaluated and a score is exported periodically. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 2DOT5(2.5), 5(5), 10(10)</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 2DOT5, 5, 10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VQMAlgo-VoiceCallSetupDelayThld.html">VoiceCallSetupDelayThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Voice Call Setup Delay Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for determining abnormal voice call setup delay. If the voice call setup delay (the duration between the INVITE message and the 180RINGING message) is greater than this threshold, an SIP exception event will be recorded in the internal CHR. If the voice call setup delay is less than or equal to this threshold, no SIP exception event will be recorded in the internal CHR. If this parameter is set to 0, the eNodeB does not check whether there are delay exceptions or record SIP exception events in the internal CHR. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~30000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~30000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: When the resource reservation procedure is enabled on the IMS side, the recommended value is 5000. When the resource reservation procedure is disabled on the IMS side, the recommended value is 3000.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_vqmalgo__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To change the value of UL Delay Jitter to 50, run the following command:
+MOD VQMALGO: ULDelayJitter=50;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

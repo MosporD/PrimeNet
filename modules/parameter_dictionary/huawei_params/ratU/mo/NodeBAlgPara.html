@@ -1,0 +1,529 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NODEBALGPARA">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="Mode" content="UMTS">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NodeBAlgPara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NODEBALGPARA</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NodeBAlgPara"></a><a name="NodeBAlgPara"></a>
+
+
+<h1 class="topictitle1">NODEBALGPARA</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="NodeBFunction.html">NODEBFUNCTION</a>
+    +-<a href="NodeBAlgPara.html"><strong>NODEBALGPARA</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The NODEBALGPARA MO configures NodeB-level algorithm parameters.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NodeBFunction.html">NODEBFUNCTION</a></li><li>Relation with the <strong>ULOCELL</strong> MO:<ul><li>When <strong>ULRESWORKMODE</strong> under <strong>NODEBALGPARA</strong> is set to MANUAL_CHAIN or AUTO_CHAIN, the <strong>LOCELLTYPE</strong> under <strong>ULOCELL</strong> cannot be MULTIRRU_CELL, MIXED_MULTIRRU_CELL and the <strong>RMTCM</strong> cannot be TRUE and the <strong>RADIUS</strong> cannot be greater than 30 km.</li><li>For a NodeB, if <strong>ULSUPERNARROWBANDFILTER</strong> under any <strong>ULOCELL</strong> MO is not set to NOTSUPPORT, <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO must be set to NORMAL.</li><li>When the <strong>ULRESWORKMODE</strong> parameter in the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION, the <strong>RMTCM</strong> parameter in the <strong>ULOCELL</strong> MO cannot be TRUE, and the <strong>RADIUS</strong> parameter cannot be greater than 30 km.</li><li>If <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is not NORMAL, the value of <strong>GU5MHZPERFOPT</strong> under the <strong>ULOCELL</strong> MO cannot contain ULADAPTIVEBPFILTER.</li><li>For a NodeB, if <strong>VAM</strong> or <strong>INTEL2TVAM</strong> under any <strong>ULOCELL</strong> MO is set to TRUE and <strong>ULPOWERSHARE</strong> under the <strong>ULOCELL</strong> MO is set to TRUE, <strong>VAMPWRSAVSW</strong> under the <strong>NODEBALGPARA</strong> MO cannot be ON.</li><li>If <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to MANUAL_CHAIN or AUTO_CHAIN or NORMAL_EXTENSION, the <strong>BFMODE</strong> under <strong>ULOCELL</strong> MO cannot be set to MASSIVEBEAM, NORMALBEAM, or COORDINATEDBEAM.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULRESWORKMODE</strong> under <strong>NODEBALGPARA</strong> MO must be NORMAL.</li><li>If <strong>UL0BUFFERZONE</strong> is set to TRUE in the <strong>ULOCELL</strong> MO, <strong>ULRESWORKMODE</strong> in the <strong>NODEBALGPARA</strong> MO must be set to NORMAL.</li><li>If <strong>ULSPECTRUMSHARINGPHASE2</strong> in the <strong>ULOCELL</strong> MO is set to TRUE, <strong>ULRESWORKMODE</strong> in the <strong>NODEBALGPARA</strong> MO must be NORMAL.</li><li>For a NodeB, if both <strong>VAM</strong> and <strong>TTW</strong> under any <strong>ULOCELL</strong> MO are set to TRUE, <strong>VAMPWRSAVSW</strong> under the <strong>NODEBALGPARA</strong> MO cannot be ON.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong> and <strong>BASEBANDEQM</strong> MOs:<ul><li>When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is DEM_2_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is MANUAL_CHAIN or AUTO_CHAIN, a maximum of 48 <strong>ULOCELL</strong> MOs are configured under the <strong>BASEBANDEQM</strong> MO.</li><li>At most six <strong>ULOCELL</strong> MOs are configured under the <strong>BASEBANDEQM</strong> MO when <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_4_CHAN or DEM_ECON_4_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL or NORMAL_EXTENSION.</li><li>At most twelve <strong>ULOCELL</strong> MOs can be configured under the <strong>BASEBANDEQM</strong> MO when <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL or NORMAL_EXTENSION.</li><li>The <strong>ULOCELL</strong> MO can not be configured under the <strong>BASEBANDEQM</strong> MO when <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_4_CHAN or DEM_ECON_4_CHAN or DEM_ADPT_CHAN and the <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to MANUAL_CHAIN or AUTO_CHAIN.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>BASEBANDEQM</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>Ensure that the sum of x and y is not greater than 12 if all the following conditions apply: (1) <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION. (2) <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN or DEM_ADPT_CHAN. (3) Assume that x is the number of SECTOREQMs used by MULTIRRU_CELLs plus the number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs plus the number of NORMAL_CELLs, HALFFREQ_CELLs, and DIST_CELLs, and y is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used.</li><li>Ensure that the sum of x and y is not greater than 12 if all the following conditions apply: (1) <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION. (2) <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN or DEM_ADPT_CHAN. (3) Assume that x is the number of SECTOREQMs used by MULTIRRU_CELLs plus the number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs plus the number of NORMAL_CELLs, HALFFREQ_CELLs, and DIST_CELLs, and y is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE and different <strong>DLFREQ</strong> settings are used.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>BASEBANDEQM</strong>, <strong>SECTOREQM</strong>, <strong>BEAMCELLGROUP</strong>, <strong>BEAMCELLGROUPITEM</strong>, and <strong>BBP</strong> MOs:<ul><li>TYPE of all <strong>BBP</strong> MOs configured in <strong>BASEBANDEQM</strong> MO cannot be WBBP if all the following conditions apply: (1) <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL. (2) <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN. (3) The sum of x, y, 2 multiplied by z, 4 multiplied by m, n, 4 multiplied by k, h, 2 multiplied by s, and t is greater than 6, assuming that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, and number of HALFFREQ_CELLs and DIST_CELLs, y is the number of NORMAL_CELLs that are not configured in <strong>BEAMCELLGROUP</strong> MO, z and m are respectively the number of NORMAL_CELLs configured with four RX antennas and that of NORMAL_CELLs configured with eight RX antennas in <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM, n is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, k is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, h is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R, s is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R, and t is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used.</li><li>TYPE of all <strong>BBP</strong> MOs configured in <strong>BASEBANDEQM</strong> MO cannot be WBBP if all the following conditions apply: (1) <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL. (2) <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN. (3) The sum of x, y, 2 multiplied by z, 4 multiplied by m, n, 4 multiplied by k, h, 2 multiplied by s, and t is greater than 6, assuming that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, and number of HALFFREQ_CELLs and DIST_CELLs, y is the number of NORMAL_CELLs that are not configured in <strong>BEAMCELLGROUP</strong> MO, z and m are respectively the number of NORMAL_CELLs configured with four RX antennas and that of NORMAL_CELLs configured with eight RX antennas in <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM, n is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, k is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, h is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R, s is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R, and t is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE and different <strong>DLFREQ</strong> settings are used.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>BASEBANDEQM</strong>, and <strong>BBP</strong> MOs:<ul><li>When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL, <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_4_CHAN or DEM_ECON_4_CHAN and the sum of ULOCELLs that are not set to IMB_CELL is greater than 3, <strong>TYPE</strong> of all <strong>BBP</strong> MOs configured in the <strong>BASEBANDEQM</strong> MO cannot be WBBP.</li><li>When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION, <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_4_CHAN or DEM_ECON_4_CHAN and the sum of ULOCELLs that are not set to IMB_CELL is greater than 3, the <strong>BASEBANDEQM</strong> MO must be configured with <strong>BBP</strong> MOs on which <strong>TYPE</strong> must be set to UBBP and UMTS must be selected for <strong>BBWS</strong>.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>BASEBANDEQM</strong>, and <strong>MDU</strong> MOs:<ul><li>When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL, <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_4_CHAN or DEM_ECON_4_CHAN and the sum of ULOCELLs that are not set to IMB_CELL is greater than 3, all the <strong>TYPE</strong> under the <strong>BASEBANDEQM</strong> MO must be UMDU or MDUC.</li></ul>
+</li><li>Relation with the <strong>NODEBBASEBANDEQMPARA</strong> MO:<ul><li>If the <strong>ULRESWORKMODE</strong> in the <strong>NODEBALGPARA</strong> MO is set to MANUAL_CHAIN or AUTO_CHAIN, the <strong>ULBASEBANDEQMWORKMODE</strong> in the <strong>NODEBBASEBANDEQMPARA</strong> MO cannot be set to AIR.</li></ul>
+</li><li>Relation with the <strong>ULOCELLSECTOREQM</strong> MO:<ul><li>If <strong>ULRESWORKMODE</strong> in the <strong>NODEBALGPARA</strong> MO is set to MANUAL_CHAIN or AUTO_CHAIN, <strong>SECTOREQMPROPERTY</strong> in each configured <strong>ULOCELLSECTOREQM</strong> MO cannot be set to ASSISTANCE.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>BASEBANDEQM</strong>, <strong>SECTOREQM</strong>, and <strong>ULOCELLSECEQMGRP</strong> MOs:<ul><li>Assume that the sum of number of SECTOREQMs used by MULTIRRU_CELL, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELL cells, and the number of DIST_CELL cells is x, and in the NORMAL_CELL and HALFFREQ_CELL cells, the number of ULOCELLs configured with less than four and greater than zero RX antennas is y, the number of ULOCELLs configured with four RX antennas is z, and the number of <strong>ULOCELL</strong> MOs, for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE and different <strong>DLFREQ</strong> settings are used, is m. When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION and <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_ADPT_CHAN, the sum of x, y, 2*z and m must be less than or equal to 12.</li><li>Assume that the sum of number of SECTOREQMs used by MULTIRRU_CELL, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELL cells, and the number of DIST_CELL cells is x, and in the NORMAL_CELL and HALFFREQ_CELL cells, the number of ULOCELLs configured with less than four and greater than zero RX antennas is y, the number of ULOCELLs configured with four RX antennas is z, and the number of <strong>ULOCELL</strong> MOs, for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used, is m. When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION and <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_ADPT_CHAN, the sum of x, y, 2*z and m must be less than or equal to 12.</li></ul>
+</li><li>Relation with the <strong>BASEBANDEQM</strong>, <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>SECTOREQM</strong>, <strong>BBP</strong>, and <strong>ULOCELLSECEQMGRP</strong> MOs:<ul><li>When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION and <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN, assume that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, the number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, the number of NORMAL_CELLs, HALFFREQ_CELLs and DIST_CELLs, and y is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used. If the sum of x and y is greater than 6, the <strong>BASEBANDEQM</strong> MO must be configured with UBBP board on which UMTS must be selected for <strong>BBWS</strong>.</li><li>When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION, assume that the sum of number of SECTOREQMs used by MULTIRRU_CELL cells, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELL cells, and number of NORMAL_CELL, HALFFREQ_CELL and DIST_CELL cells is x, and the number of local cells, for which <strong>SECTOREQMPROPERTY</strong> of the used sector equipment is set to ASSISTANCE and frequency settings are different, is y. If the sum of x and y is greater than 6, the <strong>BASEBANDEQM</strong> MO must be configured with <strong>BBP</strong> MOs on which <strong>TYPE</strong> must be set to UBBP and UMTS must be selected for <strong>BBWS</strong>.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>BASEBANDEQM</strong>, <strong>SECTOREQM</strong>, <strong>BEAMCELLGROUP</strong>, and <strong>BEAMCELLGROUPITEM</strong> MOs:<ul><li>Assume that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, and the number of HALFFREQ_CELLs and DIST_CELLs, y is the number of NORMAL_CELLs that are not configured in <strong>BEAMCELLGROUP</strong> MO, z and m are respectively the number of NORMAL_CELLs configured with four RX antennas and that of NORMAL_CELLs configured with eight RX antennas in <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM or FOURTXSPLITSECTOR, p is the number of NORMAL_CELLs that are added to the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM and use the <strong>SECTOREQM</strong> MO whose <strong>ANTCFGMODE</strong> is set to BEAM, n is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, k is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, h is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, s is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, and t is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used. When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN or DEM_ADPT_CHAN, and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL, the sum of x, y, 2 multiplied by z, 4 multiplied by m, 2 multiplied by p, n, 4 multiplied by k, h, 2 multiplied by s, and t must be less than or equal to 12.</li><li>Assume that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, and the number of HALFFREQ_CELLs and DIST_CELLs, y is the number of NORMAL_CELLs that are not configured in <strong>BEAMCELLGROUP</strong> MO, z and m are respectively the number of NORMAL_CELLs configured with four RX antennas and that of NORMAL_CELLs configured with eight RX antennas in <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM or FOURTXSPLITSECTOR, p is the number of NORMAL_CELLs that are added to the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM and use the <strong>SECTOREQM</strong> MO whose <strong>ANTCFGMODE</strong> is set to BEAM, n is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, k is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, h is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, s is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, and t is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE and different <strong>DLFREQ</strong> settings are used. When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN or DEM_ADPT_CHAN, and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL, the sum of x, y, 2 multiplied by z, 4 multiplied by m, 2 multiplied by p, n, 4 multiplied by k, h, 2 multiplied by s, and t must be less than or equal to 12.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>BASEBANDEQM</strong>, <strong>SECTOREQM</strong>, <strong>ULOCELLSECEQMGRP</strong>, <strong>BEAMCELLGROUP</strong>, and <strong>BEAMCELLGROUPITEM</strong> MOs:<ul><li>Assume that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, and the number of DIST_CELLs, y is the number of HALFFREQ_CELLs configured with a total of two or three RX antennas, z is the number of HALFFREQ_CELLs configured with four RX antennas, m is the number of NORMAL_CELLs with <strong>BFMODE</strong> set to MASSIVEBEAM, NORMALBEAM or COORDINATEDBEAM that are not configured in <strong>BEAMCELLGROUP</strong> MO, n and k are respectively the number of NORMAL_CELLs configured with a total of two or three RX antennas and that of NORMAL_CELLs configured with four RX antennas if <strong>BFMODE</strong> is set to NOTSUPPORT or FOURTXBEAMOPT and the NORMAL_CELLs are not configured in <strong>BEAMCELLGROUP</strong> MO, h and s are respectively the number of NORMAL_CELLs configured with four RX antennas and that of NORMAL_CELLs configured with eight RX antennas in <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM or FOURTXSPLITSECTOR, p is the number of NORMAL_CELLs that are added to the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM and use the <strong>SECTOREQM</strong> MO whose <strong>ANTCFGMODE</strong> is set to BEAM, t is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, w is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, r is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, q is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, and g is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE and different <strong>DLFREQ</strong> settings are used. When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_ADPT_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL, the sum of x, y, 2 multiplied by z, m, n, 2 multiplied by k, 2 multiplied by h, 4 multiplied by s, 2 multiplied by p, t, 4 multiplied by w, r, 2 multiplied by q, and g must be less than or equal to 12.</li><li>Assume that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, and the number of DIST_CELLs, y is the number of HALFFREQ_CELLs configured with a total of two or three RX antennas, z is the number of HALFFREQ_CELLs configured with four RX antennas, m is the number of NORMAL_CELLs with <strong>BFMODE</strong> set to MASSIVEBEAM, NORMALBEAM or COORDINATEDBEAM that are not configured in <strong>BEAMCELLGROUP</strong> MO, n and k are respectively the number of NORMAL_CELLs configured with a total of two or three RX antennas and that of NORMAL_CELLs configured with four RX antennas if <strong>BFMODE</strong> is set to NOTSUPPORT or FOURTXBEAMOPT and the NORMAL_CELLs are not configured in <strong>BEAMCELLGROUP</strong> MO, h and s are respectively the number of NORMAL_CELLs configured with four RX antennas and that of NORMAL_CELLs configured with eight RX antennas in <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM or FOURTXSPLITSECTOR, p is the number of NORMAL_CELLs that are added to the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM and use the <strong>SECTOREQM</strong> MO whose <strong>ANTCFGMODE</strong> is set to BEAM, t is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, w is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, r is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, q is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, and g is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used. When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_ADPT_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL, the sum of x, y, 2 multiplied by z, m, n, 2 multiplied by k, 2 multiplied by h, 4 multiplied by s, 2 multiplied by p, t, 4 multiplied by w, r, 2 multiplied by q, and g must be less than or equal to 12.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong> and <strong>ULOCELLALGPARA</strong> MOs:<ul><li>For a NodeB, if <strong>VAM</strong> or <strong>INTEL2TVAM</strong> under any <strong>ULOCELL</strong> MO is set to TRUE and <strong>R99TOHPWSHSW</strong> or <strong>HTOHPWSHSW</strong> under the <strong>ULOCELLALGPARA</strong> MO is set to ON, <strong>VAMPWRSAVSW</strong> under the <strong>NODEBALGPARA</strong> MO cannot be ON.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NodeBAlgPara__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NodeBAlgPara__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NodeBAlgPara__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_nodebvampwrsav.html">DSP NODEBVAMPWRSAV</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query whether the VAM Power Saving feature takes effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nodebadpretranssw.html">LST NODEBADPRETRANSSW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>The command is used to list the HSUPA adaptive retransmission control switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nodebalgpara.html">LST NODEBALGPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>The command is used to list NodeB algorithm parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nodebcongctrlpara.html">LST NODEBCONGCTRLPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to list congest protection parameters.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nodebicmode.html">LST NODEBICMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>The command is used to list the current NodeB IC mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nodebkpifaultdetectpara.html">LST NODEBKPIFAULTDETECTPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query invisible fault alarm-related parameters.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nodebvampwrsavpara.html">LST NODEBVAMPWRSAVPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query parameter configurations related to the VAM Power Saving feature.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_nodebadpretranssw.html">SET NODEBADPRETRANSSW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>The command is used to set the HSUPA adaptive retransmission control switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_nodebalgpara.html">SET NODEBALGPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>The command is used to modify NodeB algorithm parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_nodebcongctrlpara.html">SET NODEBCONGCTRLPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set congestion protection parameters.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_nodebicmode.html">SET NODEBICMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to set the IC mode of NodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_nodebkpifaultdetectpara.html">SET NODEBKPIFAULTDETECTPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set invisible fault alarm-related parameters.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_nodebvampwrsavpara.html">SET NODEBVAMPWRSAVPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set parameters related to the VAM Power Saving feature.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NodeBAlgPara__tab2">Table 2</a> and <a href="#NodeBAlgPara__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NodeBAlgPara__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NodeBAlgPara__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ceRsvFor2msUser.html">2ms User Minimum Admission CE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum number of CEs for admitting 2 ms users when CE Overbooking is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ccpicPhaseSwCtrl.html">CCPIC Phase Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for selecting the CCPIC phase. The value DEFAULT indicates that CCPIC Phase 3 and CCPIC Phase 4 are disabled. The value CCPICPHASE3 indicates that CCPIC Phase 3 is enabled and CCPIC Phase 4 is disabled. The value CCPICPHASE4 indicates that CCPIC Phase 3 and CCPIC Phase 4 is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-hspaL2PoolSw.html">Hsdpa Scheduler Pool Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable HSDPA scheduler pool.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-pwrChkSw.html">Power Configuration Check Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the power configuration check.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ccpicPh2SirTarModSw.html">CCPIC Phase SIR Target Correction SW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to correct the SIR outer loop power control target value when CCPIC is enabled. If CCPIC Phase 2 is enabled, this parameter controls only the value corresponding to CCPIC phase 2. If CCPIC Phase 3 is enabled, this parameter controls both the value corresponding to CCPIC phase 2 and the value corresponding to CCPIC phase 3.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-adpRetransSw.html">HSUPA AdaRetransSwitch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the HSUPA Adaptive Retransmission Control Switch. The function will be enabled if this parameter is set to OPEN. The function will be disabled if this parameter is set to CLOSE. If this parameter is set to OPEN and there are adequate channel elements (CEs), this improves uplink HSUPA capacity and uplink HSUPA coverage.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-frtRjt.html">First Reject Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the control plane congestion first reject threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-icMode.html">Inter-board cancellation gain switch between the WBBPa and WBBPb boards</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the inter-board cancellation gain switch between the WBBPa/WBBPb board and a board supporting IC. This parameter is valid when features related to inter-board cancellation take effect. The features related to inter-board cancellation include HSUPA IC, Turbo IC, CCPIC Phase2 and CCPIC Phase3.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-utrpcExtCnbapCap.html">CNBAP Capacity Extension Using UTRPc</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to extend the CNBAP capacity using the UTRPc. When the value of this parameter changes, the base station needs to be manually reset.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-rtwpScalePrecisionOpt.html">RTWP Quantitative Accuracy Optimization</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RTWP quantitative accuracy optimization switch. It improves RTWP accuracy for multicarrier RRU3804 modules or WRFUs. This parameter is recommended to set to OFF when RTWP values are similar among carriers.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ceDetectPeriodLevel.html">2ms TTI HSUPA Users CE Callback Detect Period Level</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the callback detection period of CEs for 2 ms TTI HSUPA users.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ulResWorkMode.html">UL Resource Work Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink resource allocation mode of a NodeB. If NORMAL is selected, the same uplink resources are allocated to one set of uplink baseband equipment. If AUTO_CHAIN is selected, the uplink resources allocated to one set of uplink baseband equipment are connected in chain mode to share the resources. If MANUAL_CHAIN is selected, the uplink resources can be manually specified for the uplink baseband equipment. If Normal Extension is selected, cell specifications can be expanded in the uplink baseband equipment configured with both the UBBP board in UMTS mode and the WBBP board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ceImprovement2msSw.html">HSUPA 2ms CE Efficiency Improvement Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for CE efficiency improvement for 2 ms TTI HSUPA users.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-initSingleHarqSw.html">Initial Single HARQ Switch for 2ms HSUPA Users</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for initial activation of single HARQ for 2 ms TTI HSUPA users. If this switch is turned on, single HARQ takes effect on newly admitted users.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ulHiThpMaceSw.html">HSUPA High throughput Scheduling SW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for scheduling HSUPA services.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-kpiFaultAutoRcvRmThd.html">KPI Fault auto Recover Para</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the self-healing level of potential KPI faults. Self-healing operations vary with the value of this parameter.If this parameter is set to NONE(NONE), the NodeB does not perform any operations. If this parameter is set to BBRESOURCERESET(BBRESOURCERESET), the NodeB supports self-healing at the BBRESOURCERESET(BBRESOURCERESET) level. Currently, self-healing operations at the CELLRESTART(BBRESOURCERESET) and CELLRFMODULERESET(BBRESOURCERESET) levels are unavailable. Therefore, do not use these functions.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-fixedCeRsvFor2ms.html">Fixed CE Reserved for HSUPA 2ms TTI</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the fixed number of CEs reserved for each 2 ms TTI user if CE Overbooking is enabled. Value 0 indicates that CE Overbooking takes effect separately and CE reservation for 2 ms TTI users does not take effect. A value ranging from 1 to 8 indicates that CE reservation for 2 ms TTI users takes effect and the corresponding parameter values specifies the fixed number of CEs reserved for each 2 ms TTI user.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-dlTxPwrMeasPeriod.html">DL Carrier Transmit Pwr Measurement Prd</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period of measuring the average downlink transmit carrier power and average downlink non-HSPA transmit carrier power in the power congestion-based E2E flow control algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-pwrPredictSwForCac.html">Pwr Predict Switch for CAC</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch used to predict the power of power congestion-based E2E flow control users. This parameter is valid when the power congestion-based E2E flow control algorithm takes effect. If this switch is turned on, admission decision is based on a comparison between the sum of access user initial power and measured cell power in the measurement period and the threshold. If this switch is turned off, admission decision is based on a comparison between the measured cell power and the threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-dlFpWinAdjSw.html">Downlink FP Window Adjustment Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch used to adjust the FP window. The soft handover success rate between a Huawei NodeB and few neighboring vendor's NodeBs is low because the vendors' NodeBs have poor performance. Turning on this switch increases the soft handover success rate.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-hspaMcInterBrdSchSw.html">MC Inter-Board Joint Scheduling Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the HSDPA multicarrier cell supports inter-board joint scheduling. If this parameter is set to ON, the HSDPA multicarrier cell supports inter-board joint scheduling, thereby improving the balance of baseband resources between boards and reducing the number of capability decline alarms for the following features: DC-HSDPA, DC-HSDPA+MIMO, Flexible Dual Carrier HSDPA, MC-HSDPA+MIMO, DB-HSDPA+MIMO, DB-HSDPA, 3C-HSDPA, 4C-HSDPA, and Macro-Micro DC-HSDPA.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-r99FaultThd.html">R99 User Fault Detect Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for determining whether an R99 user has a high BLER.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-upaFaultThd.html">UPA User Fault Detect Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for determining whether an HSUPA user has a high BLER.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-procUnitFaultThd.html">Process Unit Fault Detect Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for determining whether a processing unit has a high proportion of abnormal users.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-protectionThd.html">Traffic Fault Detect Threshold protection</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of fault detection protection. The configured R99 User Fault Detect Threshold, UPA User Fault Detect Threshold, or Process Unit Fault Detect Threshold cannot be less than the difference between the corresponding default threshold and the fault detection protection threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-procUnitFaultClearThd.html">Process Unit Fault Clear Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of determining whether a processing unit is restored after its faults are rectified.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-almOccurPrd.html">Board Invisible Fault Alarm Occur Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time segment during which invisible fault alarms are detected on the board through the service function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-almClearPrd.html">Board Invisible Fault Alarm Clear Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of times invisible fault alarms are cleared on the board through the service function within a measurement period.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-pdMeasMSw.html">Propagation Delay Measure Matrix Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to collect the propagation delay measurement matrix for the CCO feature.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ulcchOLPCMinSirTarget.html">Uplink Control Channel OLPC Minimum SIR Target</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum SIR target for uplink control channel-based OLPC. Relationship between the GUI value and actual value: Actual value = (GUI value - 40) x 0.1.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-hsupaSchPoolSw.html">Hsupa Scheduler Pool Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable HSUPA Scheduler Pool.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ulCovExpCfgMod.html">Coverage Expansion Neighbour Cell Configure Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode to establish neighboring cells (coordinating cells) when the Coverage Expansion Under Interference feature is enabled. If this parameter is set to AUTOMATIC, the coordination relationship is automatically identified by the NodeB and does not need to be configured. If this parameter is set to MANUAL, the coordination relationship must be manually configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-pwrCfgProtect.html">Power Configuration Protection Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable power configuration protection. If this switch is turned on, the RRU checks the sum of power on the carrier served by the RRU. If the check fails, the power configuration will be limited to be below the power specifications, and the carrier fails to be set up.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-upCeImproveForAmrWbSw.html">Uplink CE Improvement for AMR-WB Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable uplink CE efficiency improvement for AMR-WB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-nbisAdaptiveSw.html">NBIS Adaptive Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the adaptive NBIS switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-uX2SonSetupSw.html">uX2 SON Setup Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the uX2 automatic setup function. If this parameter is set to ON, the NodeB supports automatic uX2 setup by the OSS. If this parameter is set to OFF, uX2 links must be manually set up.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-sleepingCellAlarmSw.html">Sleeping Cell Alarm Report Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the sleeping cell alarm report function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-sleepingCellDetectOption.html">Sleeping Cell Detection Option</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the scope of detecting sleeping cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-cpcFdpchDtxSw.html">CPC F-DPCH DTX Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the CPC F-DPCH DTX function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-iubCongestKpiImproveSw.html">Iub Congestion KPI Improvement Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for improving the RRC connection setup success rate in transmission congestion scenarios. When this parameter is set to ON, the RRC connection setup success rate increases in transmission congestion scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-vamPaShdSw.html">VAM Power Saving Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the VAM Power Saving feature. If this parameter is set to ON, the VAM Power Saving feature is enabled to save energy.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-vamPaShdStartTime.html">VAM Power Saving Start Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time at which the VAM Power Saving feature takes effect. When the system time reaches the time specified by this parameter, the VAM Power Saving feature takes effect.</p>
+<p>The parameter value is in the format of HH:MM:SS. For example, 10:20:05, indicating that the VAM Power Saving feature takes effect at 10:20:05.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-vamPaShdStopTime.html">VAM Power Saving Stop Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time at which the VAM Power Saving feature becomes ineffective. When the system time reaches the time specified by this parameter, the VAM Power Saving feature becomes ineffective.</p>
+<p>The parameter value is in the format of HH:MM:SS. For example, 10:20:05, indicating that the VAM Power Saving feature becomes ineffective at 10:20:05.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-vamPaShdTxPwrLowThd.html">VAM Power Saving TX Power Low Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the output power percentage for cells to use the VAM Power Saving feature. If the average output power percentage of each VAM cell served by an RF module is lower than this threshold, one power amplifier is disabled and all VAM cells emit power over only one power amplifier.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-vamPaShdTxPwrHighThd.html">VAM Power Saving TX Power High Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the output power percentage for cells to stop the VAM Power Saving feature. If the average output power percentage of any VAM cell served by an RF module is greater than this threshold, the disabled power amplifier is enabled to equally share the power emitted by VAM cells between two working power amplifiers.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-hsdpaSerCellChOptSw.html">HSDPA Serving Cell Change Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for HSDPA serving cell change optimization. When this switch is turned on, the data transmission policy during the HSDPA serving cell change is improved, increasing the user throughput and user experience. When this switch is turned off, the original algorithm applies.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-dlAutoReshuffleSw.html">DL Cell Auto Reshuffle Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for automatic downlink hitless cell reshuffling.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-adpEtAdjFlag.html">Adjusting E-Tilt Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the electrical tilt of the antenna can be adjusted automatically.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-amrTxBandWidthCompSw.html">AMR Transmission Bandwidth Compression</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates AMR transmission bandwidth compression switch. When this switch is turned on, the AMR transmission bandwidth compression function is enabled for all cells served by a NodeB. When this switch is turned off, the AMR transmission bandwidth compression function is disabled for all cells served by a NodeB. It is good practice to turn on this switch in satellite transmission over Iub scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-sfsSwitch.html">Soft Fault Self-healing Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable soft failure self-healing. If BBPRESETSWITCH is set to ON, the NodeB determines whether a soft failure occurs based on the baseband processing unit check result and the number of random access messages. If the soft failure affects services, the baseband processing unit is restarted to recover services. When BBPRESETSWITCH is set to ON, if BBPRESETDELAYSWITCH is set to ON, the baseband processing unit is postponed to restart at 03:00 in the early morning to recover services upon detecting soft failures and service exceptions; if BBPRESETDELAYSWITCH is set to OFF, the baseband processing unit restarts immediately upon detecting soft failures and service exceptions. If RFRESETSWITCH is set to ON, the NodeB determines whether a soft failure occurs based on the RF unit check result and the number of random access messages. If the soft failure affects services, the RF unit is restarted to recover services. When RFRESETSWITCH is set to ON, if RFRESETDELAYSWITCH is set to ON, the RF unit is postponed to restart at 03:00 in the early morning to recover services upon detecting soft failures and service exceptions; if RFRESETDELAYSWITCH is set to OFF, the RF unit restarts immediately upon detecting soft failures and service exceptions. If BBSFRESHUFFLESWITCH is set to ON, the NodeB attempts to relocate cells served by the faulty baseband module to other baseband modules and restart the faulty module for self-healing after detecting a soft failure on the baseband module. If BBSFCORRECTSWITCH is set to ON, the NodeB attempts to correct the soft failure. This reduces the frequency of restarting the baseband module.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-kpiFaultDetect.html">KPI Fault Detection</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for potential KPI fault detection and reporting of related alarms. The items to be detected include the baseband resource R99 user BLER, baseband resource HSUPA user BLER, cell R99 user BLER, cell HSUPA user BLER, cell HSDPA user BLER, and Iub interface failure rate. If an option under this parameter is set to ON, the NodeB performs fault detection on the related detection item and reports related alarms. If an option under this parameter is set to OFF, the NodeB does not perform fault detection on the related detection item or report related alarms.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-rruIntelDorFreqBand.html">RRU Intelligent Dormancy Frequency Band</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Frequency band that supports RRU Intelligent Dormancy. If this option is selected for all the frequency bands supported by the RRU or RFU, the RRU or RFU supports RRU Intelligent Dormancy.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-operatorShareCeMode.html">Mode of the CE Sharing for the Operator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CE sharing mode of the common group when MOCN is enabled. When this parameter is set to FULLSHARE, private operators can use the CE resources in the common group. When this parameter is set to OPTIONALSHARE, whether private operators can use the CE resources in the common group depends on the settings of the OPERATORINDEXSELECTION parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-operatorIndexSelection.html">Selection of the Operator Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of operators not allowed to use the license CE resources in the common group. When MOCN is enabled and OPERATORSHARECEMODE is set to OPTIONALSHARE, the operator specified by this parameter cannot use the license CE resources in the common group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-nbisReselPeriod.html">NBIS Reselection Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the reselection period of Narrowband Interference Suppression (NBIS). When this parameter is set to a proper value, the NodeB disables the NBIS function on the current carrier and checks whether the narrowband interference is cleared on the current carrier or choose another carrier to perform the NBIS function. When this parameter is set to 0, the NodeB does not perform the reselection of NBIS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-rtwpImbalanceAlmThd.html">RTWP Imbalance Alarm Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RTWP imbalance alarm threshold. When the difference between the RTWP of the uplink channel of RRU and the RTWP of the uplink channel of the RFU exceeds the threshold, ALM-26522 RF Unit RX Channel RTWP/RSSI Unbalanced is reported.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-cellRtwpExcessAlmSw.html">Cell RTWP Excessive Alarm Report Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the Cell RTWP Excessive alarm report function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-cellRtwpExcessAlmThd.html">Cell RTWP Excessive Alarm Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Cell RTWP Excessive alarm threshold. When Cell RTWP Excessive Alarm Report Switch is set to ON, the NodeB measures the RTWP of each uplink channel in a cell every second. In the alarm reporting period (2 hours), if more than 80% of the measured value on the uplink channel is higher than or equal to the threshold, the Cell RTWP Excessive alarm is reported. After the alarm is reported, in the alarm clearing period (3 minutes), if more than 80% of measured value on the cell uplink channel is lower than the threshold, the alarm is cleared. If the desensitization parameter is configured, the measured value on the uplink channel is modified based on the cell-level desensitization intensity. If the cell is enabled with GU@5 MHz, the threshold is modified based on the GU@5 MHz configurations.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-nbisIniActThd.html">NBIS Initial Startup Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the NBIS initial startup threshold when NBIS Adaptive Switch is set to ON. If the average no-service RTWP of all cells working on a frequency within half an hour is greater than the threshold, NBIS is started. Otherwise, NBIS is not started.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ackFldDecThldOptSw.html">ACK Field Detect Threshold Opt Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable ACK field detection threshold optimization. When this switch is turned on, the NodeB optimizes the detection threshold of the ACK field. When this switch is turned off, the NodeB does not optimize the detection threshold of the ACK field.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-smartScheLearnMode.html">Smart Scheduling Learning Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the machine leaning mode for smart scheduling. If this parameter is set to LEARNING, the NodeB performs real-time machine learning and activates the Machine Learning based Scheduling feature. If this parameter is set to HOLD, the NodeB suspends the learning and uses the current optimal learning result to activate the Machine Learning based Scheduling feature.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-ulPwrShareTm.html">UMTS and LTE Dynamic Power Sharing Time Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time period in which the UMTS and LTE Dynamic Power Sharing feature is effective on a multimode base station.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-priOperatorLicAlm.html">Private Operator License Alarm Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to optimize reporting of ALM-26812 System Dynamic Traffic Exceeding Licensed Limit for a private operator. With the optimization, ALM-26812 System Dynamic Traffic Exceeding Licensed Limit is reported when the number of licenses used by the private operator exceeds the total licensed threshold for the private operator and the common operator. This threshold is specified using the SET NODEBLICENSEALMTH command. Without the optimization, this alarm is reported when the number of licenses used by the private operator exceeds the licensed threshold for the private operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-shutdownFaultDetectSw.html">Shutdown Fault Detection Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the NodeB shutdown fault identification function is enabled. When this parameter is set to ON, the cause of the NodeB shutdown fault can be promptly identified.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-interBrdFaultDetectSw.html">Inter Board Fault Detect Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to perform inter-board service link failure detection and report ALM-26215 Inter-Board Service Link Failure. When this switch is turned on, inter-board link failure detection is required. If an exception occurs, ALM-26215 Inter-Board Service Link Failure is reported. When this switch is turned off, inter-board link failure detection is not required. This parameter is valid only when the main control board is UMPT and the baseband board is WBBPa, WBBPb, or WBBPd.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-rlDetectDemodulateOptSw.html">RL Detection and Demodulation Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable RL detection and demodulation algorithm optimization. When this switch is turned on, the RL detection and demodulation functions are optimized to ensure that the SIR estimation is more accurate when the CS Voice Precise Power Control feature takes effect. When this switch is turned off, the RL detection and demodulation algorithm optimization does not take effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-powerCtlPerfOptSw.html">Power Control Performance Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable power control performance optimization in a cell. When this parameter is set to ON(ON), the power control performance in the cell on the board where this function takes effect improves. Currently, this parameter takes effect only on the UBBPg board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBAlgPara-tfciDemOptiSw.html">Switch of Invalid TFCI Demodulation and Decoding Optimization Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the TFCI demodulation and decoding optimization algorithm does not take effect. If this parameter is set to ON(ON), the demodulation and decoding optimization algorithm does not take effect. If this parameter is set to OFF(OFF), the demodulation and decoding optimization algorithm takes effect.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="NodeBAlgPara__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="NodeBAlgPara__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/NodeBAlgPara-vamPaShdState.html">VAM Power Saving State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether the VAM Power Saving feature is enabled. Enable indicates that the feature is enabled. Disable indicates that the feature is disabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/NodeBAlgPara-vamPaShdTime.html">VAM Power Saving Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the effective duration of the VAM Power Saving feature from the time specified by the latest setting of the VAM Power Saving Start Time parameter to the current time.</p>
+<p>The parameter value is in the format of HH:MM:SS. For example, 10:20:05, indicating that the effective duration of the VAM Power Saving feature is 10 hours 20 minutes and 5 seconds.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,302 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellRicAlgo">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellRicAlgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellRicAlgo</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellRicAlgo"></a><a name="CellRicAlgo"></a>
+
+
+<h1 class="topictitle1">CellRicAlgo</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellRicAlgo.html"><strong>CellRicAlgo</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellRicAlgo MO consists of the parameters related to remote interference cancellation. This function detects downlink interference between TDD eNodeBs that are distant from each other and also prevents or eliminates the interference. Remote interference cancellation applies to an LTE TDD network consisting of more than 200 eNodeBs or consisting of multiple subnetworks with inter-subnetwork spacing greater than 21.4 km. The time that related commands begin to take effect must be specified according to the Greenwich Mean Time (GMT).</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE, <strong>FddTddInd</strong> is CELL_TDD Model and <strong>DlBandWidth</strong> is CELL_BW_N25, <strong>RicAlgoSwitch</strong> in the <strong>CellRicAlgo</strong> must be set OFF.</li><li>The <strong>DuctDLSubfrmShutoffSwitch</strong> parameter in the <strong>CellRicAlgo</strong> MO can be set to ON(On) only when the <strong>FddTddInd</strong> and <strong>SubframeAssignment</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD(TDD) and SA2(SA2) respectively for a cell and the <strong>SpecialSubframePatterns</strong> parameter in the <strong>Cell</strong> MO is set to SSP5(SSP5), SSP6(SSP6), SSP7(SSP7), or SSP9(SSP9) for this cell.</li><li>When the DUCT_DL_SUBFRM_SHUTOFF_OPT_SW option of the <strong>DuctDLSubfrmShutoffOptSw</strong> parameter in a <strong>CellRicAlgo</strong> MO is selected, the following parameters in the associated <strong>Cell</strong> MO must be set to the specific values: Set <strong>FddTddInd</strong> to CELL_TDD, set <strong>SubframeAssignment</strong> to SA2, and set <strong>SpecialSubframePatterns</strong> to SSP5, SSP6, SSP7, or SSP9.</li><li>If the DUCT_DL_SF_SCHED_SHUTOFF_SW option of the <strong>DuctDLSubfrmShutoffOptSw</strong> parameter in the <strong>CellRicAlgo</strong> MO is selected, then in the <strong>Cell</strong> MO, the <strong>FddTddInd</strong> parameter must be set to CELL_TDD, the <strong>SubframeAssignment</strong> parameter must be set to SA2, and the <strong>SpecialSubframePatterns</strong> parameter must be set to SSP5, SSP6, SSP7, or SSP9.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the InterDlCompCbfSwitch option of the <strong>DlCompSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, the <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>The TddAvoidUpPTSInterfSwitch option of the <strong>AvoidInterfSwitch</strong> parameter can be selected when the <strong>MuteUpPTSSymNum</strong> parameter is set to 0.</li><li>The InterCellDmimoJTSwitch option of the <strong>DMIMOAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only if the <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO is set to 0.</li><li>The InBandRelayReNbSwitch option of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only if the <strong>RemoteInfAdpAvoidSwitch</strong> parameter in the associated <strong>CellRicAlgo</strong> MO is set to OFF.</li></ul>
+</li><li>Relation with the <strong>CellUSParaCfg</strong>, <strong>SRSCfg</strong>, and <strong>CellSrsAdaptiveCfg</strong> MOs:<ul><li>When the <strong>UsSrsGuaranteeSwitch</strong> parameter in the <strong>CellUSParaCfg</strong> MO is set to 8_USERS_GUARANTEE(8_USERS_GUARANTEE), 16_USERS_GUARANTEE(16_USERS_GUARANTEE), or 24_USERS_GUARANTEE(24_USERS_GUARANTEE), the <strong>SrsPeriodAdaptive</strong> parameter in the <strong>CellSrsAdaptiveCfg</strong> MO must be set to ON(On), the SrvBasedSRSAdjAlgo option of the <strong>SrsCfgPolicySwitch</strong> parameter in the <strong>SRSCfg</strong> MO must be deselected, and the <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>If the <strong>MultiCellShareMode</strong> parameter in the <strong>Cell</strong> MO is set to SPLIT and the SsrdSchOptSwitch option of the <strong>SSRDAlgoSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected, the <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SRSCfg</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The TDOA_SWITCH option of the <strong>LbsSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD(TDD), the <strong>TddSrsCfgMode</strong> parameter in the <strong>SRSCfg</strong> MO is set to EXPERIENCE_ENHANCED or ACCESS_ENHANCED, and the <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO is set to 0.</li><li>The InBandRelayReNbSwitch option of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only when the following conditions are true: The <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD; the <strong>TddSrsCfgMode</strong> parameter in the <strong>SRSCfg</strong> MO is set to ACCESS_ENHANCED; and the <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO is set to 0.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The InBandRelayReNbSwitch option of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only when all of the following conditions are met: 1. The UlInterfSuppressionSwitch option of the <strong>AvoidInterfSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. 2. The <strong>DuctDLSubfrmShutoffSwitch</strong> parameter in the <strong>CellRicAlgo</strong> MO is set to OFF. 3. The DUCT_DL_SUBFRM_SHUTOFF_OPT_SW option of the <strong>DuctDLSubfrmShutoffOptSw</strong> parameter in the <strong>CellRicAlgo</strong> MO is deselected. 4. The DUCT_DL_SF_SCHED_SHUTOFF_SW option of the <strong>DuctDLSubfrmShutoffOptSw</strong> parameter in the <strong>CellRicAlgo</strong> MO is deselected.</li><li>The InBandRelayReNbSwitch option of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only when all of the following conditions are met: 1. The UlInterfSuppressionSwitch option of the <strong>AvoidInterfSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. 2. The <strong>DuctDLSubfrmShutoffSwitch</strong> parameter in the <strong>CellRicAlgo</strong> MO is set to OFF. 3. The DUCT_DL_SUBFRM_SHUTOFF_OPT_SW option of the <strong>DuctDLSubfrmShutoffOptSw</strong> parameter in the <strong>CellRicAlgo</strong> MO is deselected. 4. The DUCT_DL_SF_SCHED_SHUTOFF_SW option of the <strong>DuctDLSubfrmShutoffOptSw</strong> parameter in the <strong>CellRicAlgo</strong> MO is deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SectorSplitCell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, then the <strong>RicAlgoSwitch</strong> parameter in the <strong>CellRicAlgo</strong> MO must be set to OFF.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, then the <strong>DuctDLSubfrmShutoffSwitch</strong> parameter in the <strong>CellRicAlgo</strong> MO must be set to OFF.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, then the <strong>RemoteInfAdpAvoidSwitch</strong> parameter in the <strong>CellRicAlgo</strong> MO must be set to OFF.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, then the DUCT_DL_SUBFRM_SHUTOFF_OPT_SW option of the <strong>DuctDLSubfrmShutoffOptSw</strong> parameter in the <strong>CellRicAlgo</strong> MO must be deselected.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, then the DUCT_DL_SF_SCHED_SHUTOFF_SW option of the <strong>DuctDLSubfrmShutoffOptSw</strong> parameter in the <strong>CellRicAlgo</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SRSCfg</strong>, <strong>CellAlgoSwitch</strong>, <strong>CellBf</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>The <strong>SrsResExpansionSwitch</strong> parameter in the <strong>SRSCfg</strong> MO can be set to SRS_RES_EXPANSION_MODE only when all of the following conditions are met: 1. The <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD. 2. The <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R. 3. The <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured. 4. The WTTxSRSIntrfAvoidanceSw option of the <strong>SrsCfgPolicySwitch</strong> parameter in the <strong>SRSCfg</strong> MO is set to OFF. 5. The SplitSdmaSwitch option of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. 6. The <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO is set to 0. 7. The PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. 8. The LARGE_DELAY_SPREAD_UE_IDENT_SW option of the <strong>UeIdentificationSwitch</strong> parameter in the <strong>CellBf</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, <strong>SectorSplitGroup</strong>, and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 8T8R, the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, and the <strong>BeamDeploymentMode</strong> parameter in the <strong>SectorSplitGroup</strong> MO is set to MODE_3, and the SsrdSchOptSwitch option of <strong>SSRDAlgoSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected, then the <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO must be 0, and the <strong>PreambleFmt</strong> parameter in the <strong>Cell</strong> MO must not be set to 4.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellRicAlgo__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellRicAlgo__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellRicAlgo__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellmeasinfo.html">DSP CELLMEASINFO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command applies only to LTE TDD cells. This command can be used to query the signal strength from different directions in a massive MIMO cell and quickly locate strong signal sources, such as interference sources. If there are few UEs in a cell (for example, fewer than 50 UEs), the measurement result is meaningless because there are few or even no samples. For details about data analysis, contact Huawei technical support.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_inrec.html">DSP INREC</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query historical interference data. This command applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/get_cellricdata.html">GET CELLRICDATA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to collect the interference data about a cell for identifying interference sources.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellricalgo.html">LST CELLRICALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the remote interference cancellation algorithm in one or all cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellricalgo.html">MOD CELLRICALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of the remote interference cancellation algorithm in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/snd_cellricpciseq.html">SND CELLRICPCISEQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to send data about TDD cell remote interference. Dedicated signals (DSs) are generated based on the equivalent PCI of a cell. The equivalent PCI equals the sum of the cell PCI and the PCI offset set in this command. DSs are used to distinguish cells with the same PCI and help identify the cells that cause remote interference.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellRicAlgo__tab2">Table 2</a> and <a href="#CellRicAlgo__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellRicAlgo__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellRicAlgo__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local identity of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-RicAlgoSwitch.html">RIC algorithm switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for the remote interference cancellation algorithm. If this switch is turned on, the eNodeB performs remote interference detection and records in call history record (CHR) logs if any interference is detected. If this switch is turned off, the eNodeB does not perform remote interference detection. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-MuteUpPTSSymNum.html">Mute UpPTS Symbol Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of symbols during which no SRSs are transmitted in an uplink pilot timeslot (UpPTS). If this parameter is set to a non-zero value N, no SRSs are transmitted within N symbols starting from the first symbol during which SRS transmission is allowed in the UpPTS. For any given special subframe configuration, the value of this parameter must not be greater than the total number of symbols during which SRS transmission is allowed in the UpPTS. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-MuteULSym.html">Whether to mute UL symbol</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to mute the last symbol in an uplink subframe. If this parameter is set to ON, the last symbol in an uplink subframe is muted. If this parameter is set to OFF, the last symbol in an uplink subframe is not muted. This parameter applies only to LTE TDD cells using uplink-downlink subframe configuration 1. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-UlInterferenceThd.html">UL Interference Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the relative threshold used to determine whether uplink interference occurs in a cell. If the average uplink interference and noise received on each PRB in a cell is at least 15 dBm greater than this threshold or the average UpPTS interference is at least 15 dBm greater than this threshold minus 10, it is considered that severe interference has occurred in the cell. At this point, the eNodeB records an entry of interference-related characteristic (which can be queried by running the DSP INREC command) and collects inverse spectrum data. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctingRemoteInfThd.html">Ducting Remote Interfer Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for identifying remote interference caused by an atmospheric duct by detecting characteristic sequences. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-InfAvoidDetPeriodNum.html">Interfer Avoid Detect Period Num</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of characteristic sequence detection periods in which the detection results are used to determine whether to perform remote interference avoidance. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-InfAvoidRecDetPeriodNum.html">Interf Avoid Recovery Detect Period Num</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of characteristic sequence detection periods in which the detection results are used to determine whether to stop remote interference avoidance. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-RemoteInfAdpAvoidSwitch.html">Remote Interfer Adaptive Avoid Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable adaptive avoidance of remote interference. If this parameter is set to ON(On), characteristic sequences are sent and detected to adaptively avoid remote interference. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-UlInterferenceSymbMaxDiff.html">Max Difference of UL Inter-Symbol RX Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the difference between the maximum and minimum receive power of uplink symbols measured in the full time domain. If the difference between the maximum and minimum receive power of uplink symbols exceeds this threshold, the eNodeB determines that abnormal interference occurs. This parameter can be used only to trigger automatic recording of one interference record and reverse spectrum data collection. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctDLSubfrmShutoffSwitch.html">Atmospheric Duct DL Subframe Shutdown Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable atmospheric duct DL subframe shutdown. If this parameter is set to ON(On), the eNodeB shuts down downlink subframes. If this parameter is set to OFF(Off), the eNodeB does not shut down downlink subframes. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-UlInterferenceDuration.html">UL Interference Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of consecutive monitoring periods (5s for each period) during which abnormal interference meets the related threshold criteria, for interference recording. For example, if this parameter is set to 12 and the eNodeB detects interference that meets the criteria for 1 minute, the eNodeB records interference for maintenance. This parameter can be used only to trigger automatic recording of one interference record and reverse spectrum data collection. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctDLSubfrmShutoffInfThld.html">Duct DL Subframe Shutoff Opt Inf Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the absolute interference threshold for determining whether atmospheric duct interference occurs in an uplink subframe. The eNodeB may optimize downlink subframe shutdown due to atmospheric duct interference only when interference occurring in an uplink subframe on the 72 subcarriers in the middle of the frequency domain exceeds this threshold. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctDLSubfrmShutoffOptSw.html">Duct DL Subframe Shutoff Opt Sw</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>DUCT_DL_SUBFRM_SHUTOFF_OPT_SW: If this option is selected, the eNodeB automatically detects atmospheric duct interference and shuts down downlink subframes when the interference meets the preset condition. If this option is deselected, the eNodeB does not detect atmospheric duct interference or shut down downlink subframes. This option applies only to LTE TDD.</p>
+<p>DUCT_DL_SF_SCHED_SHUTOFF_SW: If this option is selected, the eNodeB automatically detects atmospheric duct interference in the cell within the specified detection period, and shuts down downlink subframes when the interference condition is met. If this option is deselected, the eNodeB neither detects atmospheric duct interference nor shuts down downlink subframes. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctInfDetPeriodCount.html">Duct Inf Det Period Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of interference detection periods for determining whether to optimize downlink subframe shutdown when atmospheric duct interference occurs. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctInfPwrDiffInThld.html">Duct DL Subfrm Shutoff Opt Inf Pwr Diff In Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For 2T2R, 4T4R and 8T8R cells: Indicates the threshold of receive power difference between the first half slot and the second half slot of a TDD uplink subframe on the 72 subcarriers in the middle of the frequency domain. This threshold is used to determine whether there is atmospheric duct interference. Optimized atmospheric duct downlink subframe shutdown takes effect only when the receive power difference exceeds this threshold. This parameter applies only to LTE TDD.</p>
+<p>For 32T32R and 64T64R cells: Indicates the threshold of the power difference between the symbol with the maximum receive power and that with the minimum receive power in a TDD uplink subframe on the 72 subcarriers in the middle of the frequency domain. This threshold is used to determine whether there is atmospheric duct interference. Optimized atmospheric duct downlink subframe shutdown takes effect only when the power difference exceeds this threshold. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctInfPwrDiffOutThld.html">Duct DL Subfrm Shutoff Opt Inf Pwr Diff Out Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For 2T2R, 4T4R and 8T8R cells: Indicates the threshold of receive power difference between the first half slot and the second half slot of a TDD uplink subframe on the 72 subcarriers in the middle of the frequency domain. This threshold is used to determine whether atmospheric duct interference meets the conditions for terminating optimized atmospheric duct downlink subframe shutdown. If the receive power difference is less than this threshold, optimized atmospheric duct downlink subframe shutdown may terminate. Otherwise, this function remains unchanged. This parameter applies only to LTE TDD.</p>
+<p>For 32T32R and 64T64R cells: Indicates the threshold of the power difference between the symbol with the maximum receive power and that with the minimum receive power in a TDD uplink subframe on the 72 subcarriers in the middle of the frequency domain. This threshold is used to determine whether atmospheric duct interference meets the conditions for terminating optimized atmospheric duct downlink subframe shutdown. If the power difference is less than this threshold, optimized atmospheric duct downlink subframe shutdown may terminate. Otherwise, this function remains unchanged. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctSubfrmShutoffDepth.html">Atmospheric Duct Subframe Shutoff Depth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates which downlink subframes to shut down and how to shut them down when atmospheric duct interference occurs. If this parameter is set to DWPTS_SHUTOFF(DWPTS_SHUTOFF), the eNodeB shuts down only special subframes 1 and 6 and stops scheduling services in DwPTSs. If this parameter is set to SLOT01_SHUTOFF(SLOT01_SHUTOFF), the eNodeB shuts down special subframes and subframes 0 and 5, performs scheduling only for paging in subframe 0, and transmits only SIB1 in subframe 5. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-AtmosDuctUlAvgIntrfPwrThld.html">Atmospheric Duct UL Average Intrf Pwr Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of average uplink interference for identifying atmospheric duct interference. The eNodeB can send characteristic sequences only if the average uplink interference is greater than this threshold. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-AtmosDuctUlPwrDiffThld.html">Atmospheric Duct UL Pwr Difference Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For 4T4R and 8T8R cells: Indicates the threshold of the power difference between symbols 0 and 11 in a TDD uplink subframe. This threshold is used to determine whether there is atmospheric duct interference. The characteristic sequence can be sent only when the power difference exceeds this threshold. This parameter applies only to LTE TDD.</p>
+<p>For 32T32R and 64T64R cells: Indicates the threshold of the power difference between the symbol with the maximum receive power and that with the minimum receive power in a TDD uplink subframe. This threshold is used to determine whether there is atmospheric duct interference. The characteristic sequence can be sent only when the power difference exceeds this threshold. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctDlSfShutdnDetnStrtTime.html">Duct DL Subframe Shutdown Detection Start Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the start time of a detection period for the function of scheduled atmospheric-duct-based downlink subframe shutdown. If this function is enabled, the eNodeB automatically detects atmospheric duct interference in the cell within the specified detection period, and shuts down downlink subframes when the interference condition is met. If this function is disabled, the eNodeB neither detects atmospheric duct interference nor shuts down downlink subframes. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellRicAlgo-DuctDlSfShutdnDetnEndTime.html">Duct DL Subframe Shutdown Detection End Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the end time of a detection period for the function of scheduled atmospheric-duct-based downlink subframe shutdown. If this function is enabled, the eNodeB automatically detects atmospheric duct interference in the cell within the specified detection period, and shuts down downlink subframes when the interference condition is met. If this function is disabled, the eNodeB neither detects atmospheric duct interference nor shuts down downlink subframes. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CellRicAlgo__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CellRicAlgo__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-Time.html">Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the time when interference is generated. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-UlAvgInterfPwr.html">UL Average Interference Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the average uplink interference power when interference is generated. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-UpPTSAvgInterfPwr.html">UpPTS Average Interference Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the average uplink interference power on the UpPTS when interference is generated. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-ULFirstSubFrmSymbol0Pwr.html">First UL Frame First Symbol Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the power of the first symbol in the first UL subframe when interference is generated. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-ULFirstSubFrmLastSymPwr.html">First UL Seventh (or Fifth) Symbol Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the receive power of the seventh (or fifth when extended CP is used) symbol in the first UL subframe when interference is generated. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-ULLastSubFrmSymbol0Pwr.html">Last UL Frame First Symbol Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the power of the first symbol in the last UL subframe when interference is generated. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-ULLastSubFrmLastSymPwr.html">Last UL Twelfth (or Tenth) Symbol Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the receive power of the twelfth (or tenth when extended CP is used) symbol in the last UL subframe when interference is generated. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-IdleGPInterfPower.html">Idle GP Interference Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the interference power in an idle GP. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-InterRruChnCalibInterfPwr.html">Inter-RRU Channel Calibration Interf Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the interference power in a GP during inter-RRU channel calibration. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellRicAlgo-IntraRruChnCalibInterfPwr.html">Intra-RRU Channel Calibration Interf Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the interference power in a GP during intra-RRU channel calibration. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

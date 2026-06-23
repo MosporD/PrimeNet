@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Analytics - PrimeNet (Huawei PM API)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.2">
+    <link rel="stylesheet" href="{{ url_for('performance_analytics.static', filename='performance_analytics.css') }}?v=2.0">
+    <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
+</head>
+<body class="perf-page" data-pa-api="1" data-pa-configured="{{ '1' if configured else '0' }}">
+<div class="container perf-container">
+
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>📈 Performance Analytics</h1>
+                <span class="pa-api-badge">Huawei PM API</span>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button type="button" class="btn-query" id="pa-test-btn" title="Test MAE OAuth">Test API</button>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    {% if not configured %}
+    <div class="pa-config-banner">
+        Huawei PM Open API is not configured. Set <code>HUAWEI_CM_HOST</code>, <code>HUAWEI_CM_PORT=31127</code>,
+        <code>HUAWEI_CM_USER</code>, and <code>HUAWEI_CM_PASSWORD</code> in <code>.env</code>.
+    </div>
+    {% endif %}
+
+    <div class="perf-body">
+
+        <aside id="perf-left-panel" class="filter-panel perf-filter-hw">
+            <input type="hidden" id="filter-site" value="">
+            <input type="hidden" id="filter-cell" value="">
+            <input type="hidden" id="filter-data-scope" value="hourly">
+
+            <div id="pa-time-window" class="perf-time-window-row pa-time-window-row">
+                <div class="pa-time-field">
+                    <label class="perf-time-window-label" for="pa-start">Start</label>
+                    <input type="text" id="pa-start" class="perf-time-window-select pa-time-input"
+                           value="{{ start_default }}" placeholder="2026-06-14 10:00:00">
+                </div>
+                <div class="pa-time-field">
+                    <label class="perf-time-window-label" for="pa-end">End</label>
+                    <input type="text" id="pa-end" class="perf-time-window-select pa-time-input"
+                           value="{{ end_default }}" placeholder="2026-06-14 11:00:00">
+                </div>
+                <div class="pa-time-field">
+                    <label class="perf-time-window-label" for="pa-period">Period (min)</label>
+                    <select id="pa-period" class="perf-time-window-select">
+                        {% for p in periods %}
+                        <option value="{{ p }}" {% if p == 60 %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div id="cell-list-wrap" class="hw-tree-panel">
+                <div class="perf-sidebar-section perf-sidebar-cells">
+                    <button type="button" class="perf-sidebar-toggle" id="perf-toggle-cells"
+                            aria-expanded="true" aria-controls="perf-cells-body"
+                            onclick="perfSidebarToggle(this)">
+                        <span class="perf-chevron" aria-hidden="true">▼</span>
+                        <span>Objects</span>
+                    </button>
+                    <div id="perf-cells-body" class="perf-sidebar-body perf-cells-body">
+                        <div class="hw-tree-toolbar">
+                            <div class="hw-tree-toolbar-row">
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Technology</span>
+                                    <select id="filter-tech" class="hw-real-select" onchange="onFilterTechChange()">
+                                        <option value="">All Technologies</option>
+                                        <option value="2G">2G</option>
+                                        <option value="3G">3G</option>
+                                        <option value="4G" selected>4G</option>
+                                        <option value="5G">5G</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Vendor</span>
+                                    <select id="filter-vendor" class="hw-real-select" onchange="onVendorChange()">
+                                        <option value="Huawei" selected>Huawei</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Object group</span>
+                                    <select id="filter-area" class="hw-real-select" onchange="onAreaChange()">
+                                        <option value="">Whole Network</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field hw-toolbar-field--grow">
+                                    <span class="hw-field-label">Object cluster</span>
+                                    <select id="filter-cluster" class="hw-real-select" onchange="onClusterChange()">
+                                        <option value="">All Clusters</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="hw-tree-toolbar-row">
+                                <div class="hw-toolbar-field hw-toolbar-field--grow">
+                                    <span class="hw-field-label">Selection</span>
+                                    <select id="filter-selection-type" class="hw-real-select" onchange="onSelectionTypeChange()">
+                                        <option value="cell" selected>Cell</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="hw-tree-toolbar-row hw-tree-toolbar-row--tools">
+                                <input type="search" id="cell-search" class="hw-tree-search"
+                                       placeholder="Filter by keyword…" autocomplete="off"
+                                       oninput="filterCellChips(this.value)">
+                                <div class="hw-select-mode" role="radiogroup" aria-label="Selection mode">
+                                    <label class="hw-radio"><input type="radio" name="perf-sel-mode" value="single" checked onchange="onPerfSelectionModeChange()"> Single</label>
+                                    <label class="hw-radio"><input type="radio" name="perf-sel-mode" value="multiple" onchange="onPerfSelectionModeChange()"> Multiple</label>
+                                </div>
+                                <button type="button" class="hw-icon-btn" title="Collapse all" onclick="perfTreeCollapseAll()">−</button>
+                                <button type="button" class="hw-icon-btn" title="Expand all" onclick="perfTreeExpandAll()">+</button>
+                                <button type="button" class="hw-icon-btn hw-icon-btn-refresh" title="Refresh" onclick="refreshData()">↻</button>
+                                <a id="map-link" href="/network-map" class="hw-toolbar-map" title="Open network map">Map</a>
+                            </div>
+                            <div class="hw-tree-meta"><span id="cell-count-badge"></span></div>
+                        </div>
+                        <div id="cell-list" class="hw-object-tree" role="tree"></div>
+                    </div>
+                </div>
+                <div id="kpi-scope-panel" class="kpi-scope-panel" aria-label="Counters for PM query">
+                    <div class="kpi-scope-head">
+                        <button type="button" class="perf-sidebar-toggle perf-sidebar-toggle--nest" id="perf-toggle-kpis"
+                                aria-expanded="true" aria-controls="perf-kpis-body"
+                                onclick="perfSidebarToggle(this)">
+                            <span class="perf-chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <span class="kpi-scope-title" id="kpi-scope-title">Counters</span>
+                        <span class="kpi-scope-count" id="kpi-scope-count"></span>
+                    </div>
+                    <div id="perf-kpis-body" class="perf-sidebar-body perf-kpis-body">
+                        <div class="kpi-scope-controls">
+                            <label class="kpi-scope-select-all">
+                                <input type="checkbox" id="kpi-select-all">
+                                <span>Select all shown</span>
+                            </label>
+                        </div>
+                        <div class="pa-counter-toolbar">
+                            <select id="pa-subset-select" class="hw-real-select pa-subset-select" title="Function subset">
+                                <option value="">All function subsets…</option>
+                            </select>
+                            <button type="button" class="btn-query pa-subset-all-btn" id="pa-subset-all-btn" title="Select up to 150 counters in subset">Select subset</button>
+                        </div>
+                        <div class="pa-counter-add-row">
+                            <input type="search" id="pa-counter-search" class="pa-counter-input"
+                                   placeholder="Search counter name or ID…">
+                        </div>
+                        <div id="pa-counter-meta" class="pa-counter-meta"></div>
+                        <div id="kpi-scope-list" class="kpi-scope-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="perf-query-bar" role="region" aria-label="Run query">
+                <div id="perf-kpis-controls">
+                    <button type="button" class="btn-query" id="btn-perf-query" onclick="runPerformanceQuery()">Query</button>
+                    <p class="perf-query-hint">Live MAE PM query (§5.4). Window ≤ 24 h, max 150 counters.</p>
+                </div>
+            </div>
+
+        </aside>
+        <button type="button" id="perf-left-panel-toggle" class="perf-left-panel-toggle"
+                aria-label="Collapse left panel" aria-expanded="true"
+                title="Collapse filters" onclick="togglePerfLeftPanel()">
+            ◀
+        </button>
+
+        <main class="charts-area">
+
+            <div class="charts-header">
+                <div class="charts-header-top">
+                    <div class="charts-header-titles">
+                        <div id="charts-title" class="charts-title">Select Huawei cell(s), choose counters, then Query</div>
+                    </div>
+                    <div class="header-actions">
+                        <button id="btn-add-charts" class="btn-query" onclick="addChartsFromLastQuery()" style="display:none;">
+                            + Add Charts
+                        </button>
+                        <button id="btn-export" class="btn-export" onclick="paExportCsv()" style="display:none;">
+                            Export CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="charts-header-bottom">
+                    <div id="view-toggle" class="view-toggle" style="display:none;">
+                        <button id="btn-charts-view" class="view-btn active" onclick="switchViewMode('charts')">Charts</button>
+                        <button id="btn-table-view" class="view-btn" onclick="switchViewMode('table')">PM Results</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="no-selection" class="no-selection">
+                <div class="no-selection-icon">📊</div>
+                <p>Choose <strong>technology</strong> (Huawei cells load automatically). Select cell(s), check counters, set the time window, then click <strong>Query</strong>.</p>
+            </div>
+
+            <div id="charts-wrap" class="charts-wrap" style="display:none;"></div>
+
+            <div id="loading-charts" class="loading-charts" style="display:none;">
+                <div class="loading-spinner"></div>
+                <p>Querying Huawei PM server…</p>
+            </div>
+
+            <div id="pm-table-view" class="pm-table-view" style="display:none;">
+                <div class="hw-toolbar">
+                    <input type="text" id="hw-search" class="hw-search-input"
+                           placeholder="Search by object or NE…"
+                           oninput="onHwSearch(this.value)">
+                    <span id="hw-row-count" class="hw-row-count"></span>
+                </div>
+                <div id="hw-table-container" class="hw-table-container">
+                    <p class="hw-empty-msg">Run <strong>Query</strong> to fetch live PM data from MAE.</p>
+                </div>
+                <div id="hw-pagination" class="hw-pagination"></div>
+            </div>
+
+        </main>
+
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+<script>
+    window.PA_HUAWEI_API = true;
+    window.PA_API_CONFIGURED = {{ 'true' if configured else 'false' }};
+    window.PA_SERVER = {{ {'host': host, 'port': port}|tojson }};
+    window.PERF_KPI_CATEGORY_MAP_URL = "{{ url_for('performance.get_kpi_mapping') }}";
+</script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=8.8"></script>
+<script src="{{ url_for('performance_analytics.static', filename='performance_analytics.js') }}?v=2.0"></script>
+</body>
+</html>

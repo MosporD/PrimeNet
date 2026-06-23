@@ -48,14 +48,14 @@ echo ============================================
 echo.
 echo Open your browser and go to: http://localhost:5000
 echo.
-echo Default Admin Login:
-echo   Username: admin
-echo   Password: admin123
+echo Bootstrap Admin Login:
+echo   Username: from NCM_BOOTSTRAP_ADMIN_USERNAME (default: admin)
+echo   Password: from NCM_BOOTSTRAP_ADMIN_PASSWORD
 echo.
 echo Press Ctrl+C to stop the server
 echo ============================================
 echo.
 
-python app_enhanced.py
+python app.py
 
 pause

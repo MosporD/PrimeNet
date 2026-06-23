@@ -1,0 +1,247 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Certificate File (SET CERTFILE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_certfile">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Certificate File (SET CERTFILE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_certfile"></a><a name="set_certfile"></a>
+
+
+<h1 class="topictitle1">Set Certificate File (SET CERTFILE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="set_certfile__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to configure NE certificate files to be loaded. The files are the root certificate, certificate revocation list (CRL), certificate chain, public key, and private key. These certificate files are used for digital connection authentication during the Secure Sockets Layer (SSL) handshake. This command can be used to remove the certificates for the certificate revocation list(CRL),certificate chains, and private key password.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_certfile__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before running this command, ensure that the connection type is ALL. If the connection type is SSL, a certificate not matching the NE can be configured successfully but the NE cannot be managed by the MAE.</p>
+</li><li><p>The certificate configuration modified by running this command will take effect during the next connection setup.</p>
+</li><li><p>If the private key corresponding to the certificate is saved in a password-based encrypted file, the password must be set so that the file information can be read correctly.</p>
+</li><li><p>The CRL, certificate chain file, and private key password must be specified when and only when they are required.</p>
+</li><li><p>Before running this command, run the <a href="dld_genfile.html">DLD GENFILE</a> command to download the certificate file.</p>
+</li><li><p>If an NE fails to load a certificate, the NE may start the bypass. The bypass policy is as follows: 1. If the NE fails to load the CA certificate or CA certificate chain, the value of Authentication Mode is changed to Verify None. 2. If the NE fails to load the public key certificate or private key certificate, the value of Connection Type is changed to Compatible Mode and the value of Authentication Mode is changed to Verify None.</p>
+</li><li><p>[Co-MPT,NodeB]Before loading certificates not including any certificate chains to a BS loaded with a certificate chain, set Certificate Chain File Enabled State to DISABLE.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_certfile__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-ROOTCERT.html">ROOTCERT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Root Certificate File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name of the SSL root certificate. The file name cannot contain any of the following characters: \, /, :, *, ?, ", &lt;, &gt;, and |. Valid extensions of the root certificate are .cer (ASN1 type), .pem (PEM type), and .p12/.pfx (PFX type).</p>
+<p>GUI Value Range: 1~63 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~63 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-PUBCERT.html">PUBCERT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name of the shared key certificate used in the authentication at the peer end.</p>
+<p>GUI Value Range: 1~63 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~63 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-PRIVKEY.html">PRIVKEY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Private Key File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name of the private key certificate used in the authentication at the peer end.</p>
+<p>GUI Value Range: 1~63 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~63 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-PKPENABLESTA.html">PKPENABLESTA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Private Key Password Enabled State</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the password of the secret key file is enabled.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-KEYPWD.html">PWD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Private Key Password</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the password of the secret certificate.</p>
+<p>GUI Value Range: 1~67 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~67 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid when Private Key Password Enabled State is set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-CRLENABLESTA.html">CRLENABLESTA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Revocation List File Enabled State</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the CRL is enabled.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-CRL.html">CRL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Revocation List File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name of the certificate revocation list used in the authentication at the peer end.</p>
+<p>GUI Value Range: 1~63 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~63 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid when Certificate Revocation List File Enabled State is set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-CCAENABLESTA.html">CCAENABLESTA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Chain File Enabled State</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the certificate chain is enabled.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-CERTCHAIN.html">CERTCHAIN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Chain File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name of the certificate chain used in the authentication at the peer end.</p>
+<p>GUI Value Range: 1~63 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~63 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid when Certificate Chain File Enabled State is set to ENABLE(Enable).</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_certfile__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set certificate files with the parameters as follows: Root Certificate File Name: rootcert.pem, Certificate File Name: servercert.pem, Private Key File Name: serverkey.pem, Private Key Password Enabled State: DISABLE, Certificate Revocation List File Enabled State: ENABLE, Certificate Revocation List File Name: crl.pem, Certificate Chain File Enabled State: ENABLE, Certificate Chain File Name: certchain.pem, run the following command:
+SET CERTFILE: ROOTCERT="rootcert.pem", PUBCERT="servercert.pem", PRIVKEY="serverkey.pem", PKPENABLESTA=DISABLE, CRLENABLESTA=ENABLE, CRL="crl.pem", CCAENABLESTA=ENABLE, CERTCHAIN="certchain.pem";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

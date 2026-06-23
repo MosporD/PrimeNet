@@ -1,0 +1,391 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell Mimo Configuration (MOD CELLMIMOPARACFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellmimoparacfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell Mimo Configuration (MOD CELLMIMOPARACFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellmimoparacfg"></a><a name="mod_cellmimoparacfg"></a>
+
+
+<h1 class="topictitle1">Modify Cell Mimo Configuration (MOD CELLMIMOPARACFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellmimoparacfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the parameters related to cell MIMO configuration.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellmimoparacfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellmimoparacfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local cell ID. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-MimoAdaptiveSwitch.html">MimoAdaptiveSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MIMO Adaptive Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of adaptive MIMO for a multi-antenna eNodeB. The values are described as follows:</p>
+<p>NO_ADAPTIVE: A fixed MIMO transmission mode is used. That is, transition between MIMO transmission modes is not supported.</p>
+<p>OL_ADAPTIVE: Open-loop transmission modes are adaptively selected. UEs report rank and CQI values but do not report PMI values.</p>
+<p>CL_ADAPTIVE: Closed-loop transmission modes are adaptively selected. UEs report rank, CQI, and PMI values.</p>
+<p>OC_ADAPTIVE: Open- or closed-loop transmission modes are adaptively selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NO_ADAPTIVE(NO_ADAPTIVE), OL_ADAPTIVE(OL_ADAPTIVE), CL_ADAPTIVE(CL_ADAPTIVE), OC_ADAPTIVE(OC_ADAPTIVE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO_ADAPTIVE, OL_ADAPTIVE, CL_ADAPTIVE, OC_ADAPTIVE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NO_ADAPTIVE(NO_ADAPTIVE)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid only when the BfSwitch option of the BfAlgoSwitch parameter in the CellAlgoSwitch MO is deselected.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to NO_ADAPTIVE, the eNodeB uses the fixed MIMO transmission mode specified by the FixedMimoMode parameter for UEs in the downlink.</p>
+<p>If this parameter is set to OL_ADAPTIVE, the eNodeB adaptively uses open-looped MIMO schemes for individual UEs. UEs report RI and CQI values but do not report PMI values to the eNodeB. Open-loop MIMO adaptation brings the highest robustness under high UE mobility among all MIMO schemes. When 2-way transmission is enabled on the network, the adaptation has no requirements on UEs. When 4-way transmission is enabled on the network, UEs must support 4-way transmission on the network to prevent significant deterioration of throughput, the service drop rate, or the access success rate.</p>
+<p>If this parameter is set to CL_ADAPTIVE, the eNodeB adaptively uses closed-loop MIMO schemes for individual UEs. UEs report RI, PMI, and CQI values to the eNodeB. When 2-way transmission is enabled on the network, closed-loop MIMO adaptation is suitable for UEs that are static or moving in walk speed. Compared with open-loop MIMO adaptation, closed-loop MIMO adaptation increases the downlink throughput, but it decreases the uplink throughput if the uplink coding rate increases because of PMI reporting. With 2-way transmission enabled, closed-loop MIMO adaptation is dependent on UEs. If the PMI values reported by UEs are unreliable, the demodulation capability of UEs is low under closed-loop MIMO schemes, or UEs move fast such as in high-speed railway scenarios, closed-loop MIMO adaptation decreases the downlink throughput compared with open-loop MIMO adaptation. When 4-way transmission is enabled on the network, closed-loop MIMO adaptation significantly increases the downlink throughput in non-high-speed scenarios compared with the open-loop MIMO adaptation, but it decreases the uplink throughput if the uplink coding rate increases because of PMI reporting. With 4-way transmission enabled, UEs must support 4-way transmission from the network to prevent significant deterioration of throughput, service drop rate, or access success rate.</p>
+<p>If this parameter is set to OC_ADAPTIVE, the eNodeB adaptively uses open- or closed-loop MIMO schemes for individual UEs. The eNodeB automatically switches between open- and closed-loop MIMO schemes for each UE. Open- and closed-loop MIMO adaptation is dependent on UEs. When 2-way transmission is enabled on the network, open- and closed-loop MIMO adaptation decreases the throughput compared with the open-loop MIMO adaptation if the PMI values reported by UEs are unreliable or the demodulation capability of UEs is low under closed-loop MIMO schemes. When 4-way transmission is enabled on the network, UEs must support 4-way transmission from the network to prevent significant deterioration of throughput, the service drop rate, or the access success rate.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-FixedMimoMode.html">FixedMimoMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Fixed MIMO Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the fixed MIMO mode for a multi-antenna eNodeB. This parameter is valid only when MimoAdaptiveSwitch is set to NO_ADAPTIVE. There are four values.</p>
+<p>TM2: Transmission mode 2 is always used for UEs.</p>
+<p>TM3: Transmission mode 3 is always used for UEs.</p>
+<p>TM4: Transmission mode 4 is always used for UEs.</p>
+<p>TM6: Transmission mode 6 is always used for UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: TM2(TM2), TM3(TM3), TM4(TM4), TM6(TM6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TM2, TM3, TM4, TM6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: TM3(TM3)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid only when the MimoAdaptiveSwitch parameter is set to NO_ADAPTIVE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TM2, transmission mode 2 is permanently applied to all UEs. UEs report CQI values but do not report RI or PMI values, and only a single data stream can be transmitted. Compared with TM3 or TM4, TM2 results in lower downlink throughput and supports only half the downlink peak data rate (with 2-way transmission enabled on the network) or even lower (with 4-way transmission enabled on the network). If a high PDCCH aggregation level is used on the network, TM2 increases the access success rate.</p>
+<p>If this parameter is set to TM3, transmission mode 3 is permanently applied to UEs. UEs report RI and CQI values but do not report PMI values, and one or more data streams can be transmitted. Compared with TM2, TM3 results in higher downlink throughput and supports twice the downlink peak data rate (with 2-way transmission enabled on the network) or even higher (with 4-way transmission enabled on the network). If a low PDCCH aggregation level is used on the network, TM3 decreases the access success rate.</p>
+<p>If this parameter is set to TM4, transmission mode 4 is permanently applied to UEs. UEs report RI, CQI, and PMI values, and one or more data streams can be transmitted. Compared with TM2, TM4 results in higher downlink throughput and supports twice the downlink peak data rate (with 2-way transmission enabled on the network) or even higher (with 4-way transmission enabled on the network). If a low PDCCH aggregation level is used on the network, TM4 decreases the access success rate. When 2-way transmission is enabled on the network for UEs in static scenarios or moving in walk speed, TM4 increases the downlink throughput compared with TM3, but it decreases the uplink throughput if uplink coding rate increases because of PMI reporting. With 2-way transmission enabled, TM4 is dependent on UEs. If the PMI values reported by UEs are unreliable, the demodulation capability of UEs is low under closed-loop MIMO schemes, or UEs move fast such as in high-speed railway scenarios, TM4 decreases the downlink throughput compared with TM3. When 4-way transmission is enabled on the network, TM4 significantly increases the downlink throughput in non-high-speed scenarios compared with TM3, but it decreases the uplink throughput if uplink coding rate increases because of PMI reporting. With 4-way transmission enabled, UEs must support 4-way transmission from the network to prevent significant deterioration in the throughput, service drop rate, or access success rate.</p>
+<p>If this parameter is set to TM6, transmission mode 6 is permanently applied to UEs. UEs report PMI and CQI values but do not report RI values, and only a single data stream can be transmitted. Compared with TM3 or TM4, TM6 (similar to TM2) results in lower downlink throughput and supports only half the downlink peak data rate (with 2-way transmission enabled on the network) or even lower (with 4-way transmission enabled on the network). When 2-way transmission is enabled on the network for UEs in static scenarios or moving in walk speed, TM6 increases the downlink throughput compared with TM2, but it decreases the uplink throughput if uplink coding rate increases because of PMI reporting. With 2-way transmission enabled, TM6 is dependent on UEs. If the PMI values reported by UEs are unreliable, the demodulation capability of UEs is low under closed-loop MIMO schemes, or UEs move fast such as in high-speed railway scenarios, TM6 decreases the downlink throughput compared with TM2. When 4-way transmission is enabled on the network, TM6 significantly increases the downlink throughput in non-high-speed scenarios compared with TM2, but it decreases the uplink throughput if uplink coding rate increases because of PMI reporting. With 4-way transmission enabled, UEs must support 4-way transmission from the network to prevent significant deterioration in the throughput, service drop rate, or access success rate. In addition, when downlink frequency selective scheduling or ICIC is enabled, the downlink throughput will decrease because of resource allocation in TM6.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-InitialMimoType.html">InitialMimoType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Initial Mimo Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MIMO transmission mode used during initial network access.</p>
+<p>If this parameter is set to TM2, the MIMO transmission mode used during initial network access is TM2.</p>
+<p>If this parameter is set to ADAPTIVE, the MIMO transmission mode used during initial network access is determined by the settings of the MimoAdaptiveSwitch and FixedMimoMode parameters. If the MimoAdaptiveSwitch parameter is set to NO_ADAPTIVE, the initial MIMO transmission mode is determined by the setting of the FixedMimoMode parameter. If the MimoAdaptiveSwitch parameter is set to OL_ADAPTIVE or OC_ADAPTIVE, the initial MIMO transmission mode is TM3. If the MimoAdaptiveSwitch parameter is set to CL_ADAPTIVE, the initial MIMO transmission mode is TM4. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: TM2(TM2), ADAPTIVE(ADAPTIVE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TM2, ADAPTIVE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ADAPTIVE(ADAPTIVE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TM2, the eNodeB performs an additional MIMO reconfiguration procedure for a UE that initially accesses the network compared with that when this parameter is set to ADAPTIVE. Therefore, the service drop rate increases. If a high PDCCH aggregation level is selected on the network, the access success rate increases but downlink throughput decreases because only a single data stream can be transmitted.</p>
+<p>If this parameter is set to ADAPTIVE, the eNodeB does not perform a MIMO reconfiguration procedure for a UE that initially accesses the network, compared with that when this parameter is set to TM2. Therefore, the service drop rate decreases. In addition, downlink throughput increases because one or more data streams can be transmitted. If a low PDCCH aggregation level is selected on the network, the access success rate decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-MimoSwitch.html">MimoSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MIMO Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates MIMO algorithm switches.</p>
+<p>8T_TM9_MU-MIMO_SW: Indicates whether to enable 8T TM9 MU-MIMO. The function is enabled only if this option is selected. This option applies only to LTE FDD.</p>
+<p>MM_SCC_TM9_MU_MIMO_SW: Indicates whether to enable TM9 MU-MIMO in a massive MIMO SCell. If this option is selected, then TM9 MU-MIMO is enabled and the massive MIMO SCell adaptively selects an MIMO mode and determines whether to perform multiple UE pairing based on the TM9 UE penetration rate and load. If this option is deselected, then TM9 MU-MIMO is disabled and the massive MIMO SCell only uses SU-MIMO. This option applies only to LTE FDD.</p>
+<p>TM9_RANK8_SCH_OPT_SW: Indicates whether to enable TM9 rank 8 UE scheduling optimization. If this option is selected, TM9 rank 8 UE scheduling optimization is enabled. If this option is deselected, the optimization does not take effect. This option applies only to LTE TDD.</p>
+<p>FREQ_DIFF_AMEND_SW: Indicates whether to enable frequency difference amendment in the cell. If this option is selected, frequency difference amendment is enabled. This function reduces the impact of excessive spacing between uplink and downlink center frequencies for FDD cells. This option applies only to massive MIMO cells. This option applies only to LTE FDD.</p>
+<p>PRECISE_DL_CSI_SW: Indicates whether to enable high-precision downlink CSI in the cell. If this option is selected, this function is enabled. This option applies only to LTE FDD.</p>
+<p>MASSIVE_MIMO_SUBBAND_BF_SW: Indicates whether to enable subband beamforming in the cell. If this option is selected, aperiodic subband feedback mode can be configured for UEs to trigger feedback and subband beamforming is enabled. This option applies only to LTE FDD.</p>
+<p>MASSIVE_MIMO_MU_RANK_OPT_SW: Indicates whether to enable MU-MIMO rank optimization in the cell. If this option is selected, the maximum rank values that UEs can report are adaptively tuned in the cell. This option applies only to LTE FDD.</p>
+<p>4T_TM9_ADAPTATION_SW: Indicates whether to enable TM9 adaptation in 4T cells. If this option is selected, some TM9-capable UEs are allowed to enter TM9 in 4T cells. If this option is deselected, the function does not take effect. This option applies only to LTE FDD.</p>
+<p>GUI Value Range: 8T_TM9_MU_MIMO_SW(8T_TM9_MU-MIMO_SW), MM_SCC_TM9_MU_MIMO_SW(MM_SCC_TM9_MU_MIMO_SW), TM9_RANK8_SCH_OPT_SW(TM9_RANK8_SCH_OPT_SW), FREQ_DIFF_AMEND_SW(FREQ_DIFF_AMEND_SW), PRECISE_DL_CSI_SW(PRECISE_DL_CSI_SW), MASSIVE_MIMO_SUBBAND_BF_SW(MASSIVE_MIMO_SUBBAND_BF_SW), MASSIVE_MIMO_MU_RANK_OPT_SW(MASSIVE_MIMO_MU_RANK_OPT_SW), 4T_TM9_ADAPTATION_SW(4T_TM9_ADAPTATION_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 8T_TM9_MU_MIMO_SW, MM_SCC_TM9_MU_MIMO_SW, TM9_RANK8_SCH_OPT_SW, FREQ_DIFF_AMEND_SW, PRECISE_DL_CSI_SW, MASSIVE_MIMO_SUBBAND_BF_SW, MASSIVE_MIMO_MU_RANK_OPT_SW, 4T_TM9_ADAPTATION_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 8T_TM9_MU_MIMO_SW:Off, MM_SCC_TM9_MU_MIMO_SW:Off, TM9_RANK8_SCH_OPT_SW:Off, FREQ_DIFF_AMEND_SW:Off, PRECISE_DL_CSI_SW:Off, MASSIVE_MIMO_SUBBAND_BF_SW:Off, MASSIVE_MIMO_MU_RANK_OPT_SW:Off, 4T_TM9_ADAPTATION_SW:On</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: 8T_TM9_MU_MIMO_SW: When this option is selected, the cell adaptively determines whether to enter or exit 8T TM9 MU-MIMO mode based on factors such as UE capability, channel condition, and cell load. Then, the cell schedules and pairs UEs meeting the pairing conditions for MU-MIMO, thereby increasing the cell spectral efficiency and user-perceived rate. When this option is deselected, network performance is not affected.</p>
+<p>MM_SCC_TM9_MU_MIMO_SW: If this option is selected, user-perceived data rates improve. If this option is deselected, network performance is not affected.</p>
+<p>TM9_RANK8_SCH_OPT_SW: If this option is selected, the eNodeB optimizes the scheduling policy for rank 8 UEs continuously performing large-packet services, which may increase the downlink UE throughput. If this option is deselected, network performance is not affected.</p>
+<p>FREQ_DIFF_AMEND_SW: If this option is selected, user-perceived data rates increase when the spacing between uplink and downlink center frequencies is large. If this option is deselected, network performance is not affected.</p>
+<p>PRECISE_DL_CSI_SW: If this option is selected, downlink channel information precision and user-perceived rates are improved. If this option is deselected, network performance is not affected.</p>
+<p>MASSIVE_MIMO_SUBBAND_BF_SW: If this option is selected, the eNodeB configures and triggers UEs to report subband channel information, increasing user-perceived data rates. The uplink data rates are affected because the uplink feedback overhead is increased. If this option is deselected, network performance is not affected.</p>
+<p>MASSIVE_MIMO_MU_RANK_OPT_SW: If this option is selected, the downlink cell data rate increases. If this option is deselected, network performance is not affected.</p>
+<p>4T_TM9_ADAPTATION_SW: If this option is selected, some TM9-capable UEs that meet certain conditions can enter TM9 in 4T cells, which has no impact on network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-MuPairingGainThldForTm9.html">MuPairingGainThldForTm9</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MU Pairing Gain Threshold For TM9</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the gain threshold related to UE pairing in MU-MIMO in TM9. If the gain from UE pairing exceeds the threshold, UE pairing is allowed. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in higher throughput gains after UE pairing for MU-MIMO and a lower probability that UE pairing takes effect. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-MuPairingMcsThldForTm9.html">MuPairingMcsThldForTm9</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MU Pairing TBS Index Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TBS index threshold for downlink multi-user pairing. For LTE FDD, this parameter specifies the TBS index threshold for TM9 MU-MIMO pairing. If the TBS index of a UE exceeds the threshold, the UE can participate in multi-user pairing. For LTE TDD, this parameter specifies the TBS index threshold for MU beamforming pairing. If the TBS index of a UE exceeds the threshold, the UE can participate in multi-user pairing. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~33</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~33</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>FDD: 5</p>
+<p>TDD: 6</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability of UE pairing for MU-MIMO and higher throughput gains after UE pairing. A smaller value of this parameter results in a higher probability of UE pairing for MU-MIMO and results that the throughput gain is not obvious after UE pairing.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-PrbRatioThldForTm9SuMimo.html">PrbRatioThldForTm9SuMimo</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PRB Ratio Threshold For TM9 SU-MIMO</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB ratio threshold related to SU-MIMO in TM9. If the ratio of the number of PRBs scheduled for TM9-capable UEs in the cell to the total number of PRBs scheduled in the cell exceeds the threshold, SU-MIMO in TM9 takes effect. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability that SU-MIMO in TM9 takes effect and higher throughput gains after SU-MIMO in TM9 takes effect. A smaller value of this parameter results in a higher probability that SU-MIMO in TM9 takes effect. In this way, the throughput gain is not obvious.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-MuMimoMaxPairLayer.html">MuMimoMaxPairLayer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MU-MIMO Max Pair Layer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of layers that can be paired for MU-MIMO in an FDD massive MIMO cell. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: FOUR_LAYERS(FOUR_LAYERS), EIGHT_LAYERS(EIGHT_LAYERS), TWELVE_LAYERS(TWELVE_LAYERS), SIXTEEN_LAYERS(SIXTEEN_LAYERS), TWO_LAYERS(TWO_LAYERS), SIX_LAYERS(SIX_LAYERS), TEN_LAYERS(TEN_LAYERS), FOURTEEN_LAYERS(FOURTEEN_LAYERS)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FOUR_LAYERS, EIGHT_LAYERS, TWELVE_LAYERS, SIXTEEN_LAYERS, TWO_LAYERS, SIX_LAYERS, TEN_LAYERS, FOURTEEN_LAYERS</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SIXTEEN_LAYERS</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a smaller number of layers for UEs that are paired in massive MIMO in TM9 and a lower downlink traffic volume. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-MuMimoWeightAdjStrategy.html">MuMimoWeightAdjStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MU-MIMO Weight Adjustment Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the strategy for adjusting data transmission weight values for MU-MIMO. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: FULL_ZERO_FORCING(FULL_ZERO_FORCING), NON_ZERO_FORCING(NON_ZERO_FORCING)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FULL_ZERO_FORCING, NON_ZERO_FORCING</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FULL_ZERO_FORCING</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Setting this parameter to FULL_ZERO_FORCING helps increase downlink throughput in suburban or sparse urban areas. Setting this parameter to NON_ZERO_FORCING helps increase downlink throughput in dense urban areas.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-McsIndexThldForAdaptTm9.html">McsIndexThldForAdaptTm9</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MCS Index Thld for Adaptive TM9</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MCS index threshold for TM9 adaptation. If this parameter is set to 255, the adaptation does not take effect. A UE can exit TM9 only if the MCS index of the UE exceeds this threshold. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~28,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~28,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 23</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability of exiting TM9 and this may cause a decrease in peak throughput; however, beamforming gains of TM9 can be obtained. A smaller value of this parameter results in a higher probability of exiting TM9, ensuring that the peak throughput does not decrease; however, beamforming gains of TM9 may fail to be obtained.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-PairingProbThldForAdaptTm9.html">PairingProbThldForAdaptTm9</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Pairing Probability Thld for Adaptive TM9</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UE pairing (for MU-MIMO) probability threshold for TM9 adaptation. A UE can exit TM9 only if the pairing probability for the UE is lower than this threshold. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a higher probability of exiting TM9, which ensures that the peak throughput does not decrease but may reduce the pairing gains of TM9. A smaller value of this parameter results in a lower probability of exiting TM9, which helps maximize the pairing gains of TM9 but may decrease the peak throughput.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-HighOrderMimoPairingStrat.html">HighOrderMimoPairingStrat</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">High Order MIMO Pairing Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UE pairing policy for high-order MIMO. If this parameter is set to DEFAULT, UEs using rank 3 or rank 4 can be directly paired. If this parameter is set to FALLBACK_SU, UEs using rank 3 or rank 4 cannot be paired and therefore can perform only SU-MIMO. If this parameter is set to FALLBACK_RANK, UEs using rank 3 or rank 4 can be paired on condition that their current rank is reduced to rank 2. If this parameter is set to ADAPTIVE, the eNodeB determines whether to restrict codebook subsets for UEs using rank 3 or rank 4 or reduce the current rank of these UEs to rank 2 for pairing based on UE-level characteristics. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: DEFAULT(DEFAULT), FALLBACK_SU(FALLBACK_SU), FALLBACK_RANK(FALLBACK_RANK), ADAPTIVE(ADAPTIVE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULT, FALLBACK_SU, FALLBACK_RANK, ADAPTIVE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DEFAULT</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to DEFAULT, network performance is not affected. If this parameter is set to FALLBACK_SU, downlink user-perceived rates of 4R UEs increase. If this parameter is set to FALLBACK_RANK, downlink user-perceived rates of 2R UEs increase. If this parameter is set to ADAPTIVE, downlink cell throughput increases.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-RanSharingSchOptSwitch.html">RanSharingSchOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RAN Sharing Sch Opt Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the algorithm for allocating RB resources for different operators proportionally in multi-user pairing scenarios. If this parameter is set to OFF, the eNodeB does not allocate RB resources for different operators proportionally in multi-user pairing scenarios. If this parameter is set to MU_PAIRING_RB_ALLOC, the operator-specific scheduling priority takes effect for all UEs. If this parameter is set to MU_PAIRING_RB_ALLOC_ENH, the operator-specific scheduling priority takes effect for paired UEs only. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(OFF), MU_PAIRING_RB_ALLOC(MU_PAIRING_RB_ALLOC), MU_PAIRING_RB_ALLOC_ENH(MU_PAIRING_RB_ALLOC_ENH)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, MU_PAIRING_RB_ALLOC, MU_PAIRING_RB_ALLOC_ENH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: In multi-user pairing scenarios: If this parameter is set to OFF, the actual proportion of occupied RBs for each operator is not restricted by the allocated RB resources. If this parameter is set to MU_PAIRING_RB_ALLOC, the actual proportion of occupied RBs for each operator is close to the proportion of allocated RB resources. If this parameter is set to MU_PAIRING_RB_ALLOC_ENH, the larger the number of non-paired UEs in a cell, the greater the difference between the actual proportion of occupied RBs for each operator and the proportion of allocated RB resources.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellMimoParaCfg-MuMimoPairingStrategy.html">MuMimoPairingStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MU-MIMO Pairing Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UE pairing policy for MU-MIMO.</p>
+<p>If this parameter is set to DEFAULT, the eNodeB uses the correlation policy for UE pairing.</p>
+<p>If this parameter is set to EPF_FIRST, the eNodeB selects UEs to be paired based on the pairing efficiency maximization policy and preferentially considers scheduling fairness.</p>
+<p>If this parameter is set to PAIRING_EFF_FIRST, the eNodeB selects UEs to be paired based on the pairing efficiency maximization policy and preferentially considers spectral efficiency.</p>
+<p>If this parameter is set to EPF_PAIRING_EFF_BALANCING, the eNodeB selects UEs to be paired based on the pairing efficiency maximization policy and balances the spectral efficiency and scheduling fairness.</p>
+<p>This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: DEFAULT(DEFAULT), EPF_FIRST(EPF_FIRST), PAIRING_EFF_FIRST(PAIRING_EFF_FIRST), EPF_PAIRING_EFF_BALANCING(EPF_PAIRING_EFF_BALANCING)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULT, EPF_FIRST, PAIRING_EFF_FIRST, EPF_PAIRING_EFF_BALANCING</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DEFAULT(DEFAULT)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to DEFAULT, network performance is not affected.</p>
+<p>If this parameter is set to EPF_FIRST, downlink cell throughput increases slightly and UE throughput at the cell edge decreases slightly. If this parameter is set to EPF_PAIRING_EFF_BALANCING, downlink cell throughput increases more and UE throughput at the cell edge decreases more, compared with the scenario where this parameter is set to EPF_FIRST. If this parameter is set to PAIRING_EFF_FIRST, downlink cell throughput increases further more and UE throughput at the cell edge decreases further more, compared with the scenario where this parameter is set to EPF_PAIRING_EFF_BALANCING.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellmimoparacfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify parameters related to adaptive MIMO as follows: Local cell ID: 0, MIMO adaptive switch: OL_ADAPTIVE, run the following command:
+MOD CELLMIMOPARACFG: LocalCellId=0, MimoAdaptiveSwitch=OL_ADAPTIVE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

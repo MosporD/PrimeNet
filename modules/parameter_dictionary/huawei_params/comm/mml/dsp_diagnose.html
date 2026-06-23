@@ -1,0 +1,349 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display Diagnose Information (DSP DIAGNOSE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_diagnose">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display Diagnose Information (DSP DIAGNOSE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_diagnose"></a><a name="dsp_diagnose"></a>
+
+
+<h1 class="topictitle1">Display Diagnose Information (DSP DIAGNOSE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_diagnose__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>If the Diagnose Type is set to IKENEGO, use this command to query IKE/IPSec negotiation errors in security networking scenarios. If the Diagnose Type is set to SCTP, use this command to query information about disconnected SCTP links.If the Diagnose Type is set to ENDPOINT, use this command to query error information about an automatic setup procedure of end point MOs.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_diagnose__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>If an IKE peer or IPSec policy is modified by running the <a href="mod_ikepeer.html">MOD IKEPEER</a> or <a href="mod_ipsecpolicy.html">MOD IPSECPOLICY</a> command, respectively, the IKE or IPSec negotiation error messages pertaining to the IKE peer or IPSec policy will be deleted.</p>
+</li><li><p>When Diagnose Type is set to IKENEGO, a maximum of 128 records of diagnosis information can be displayed and it is recommended that filtering conditions be specified before this command is executed. When Diagnose Type is set to SCTP, a maximum of five records of diagnosis information can be displayed. When Diagnose Type is set to ENDPOINT, only the last record of diagnosis information is displayed for the same records of diagnosis information and a maximum of 20 records of diagnosis information can be displayed.</p>
+</li><li><p>If the diagnosis type is IKENEGO, this operation is time-consuming. After this command is executed, if the execution of another MML command times out or the board does not respond, wait 15 seconds until the execution of this command is complete and then run the next MML command again.</p>
+</li><li><p>When the base station serves as the responder and Diagnose Type is set to IKENEGO, some IPSec negotiation errors cannot be queried by filtering IPSec policy groups.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_diagnose__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-DiagnoseType.html">DIAGNOSETYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Diagnose Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the diagnosis type.</p>
+<p>GUI Value Range: IKENEGO(IKENEGO), SCTP(SCTP), ENDPOINT(ENDPOINT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IKENEGO, SCTP, ENDPOINT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses a board.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when the <strong>DIAGNOSETYPE</strong> parameter is set to IKENEGO in the diagnose information query result.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses a board.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when the <strong>DIAGNOSETYPE</strong> parameter is set to IKENEGO in the diagnose information query result.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where a board is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when the <strong>DIAGNOSETYPE</strong> parameter is set to IKENEGO in the diagnose information query result.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subboard type of a board.</p>
+<p>GUI Value Range: ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH_COVERBOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SN</strong> is set to a value in the range of 0 to 5, this parameter must be set to ETH_COVERBOARD.</li><li>If <strong>SN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port type. In the old model, the query using the <a href="dsp_diagnose.html">DSP DIAGNOSE</a> command with Port Type set to INTERFACE is not supported. In the new model, only the query using the <a href="dsp_diagnose.html">DSP DIAGNOSE</a> command with Port Type set to INTERFACE is supported. When the <a href="dsp_diagnose.html">DSP DIAGNOSE</a> command is executed with Port Type set to INTERFACE to query the IKE/IPsec negotiation error information, the correct cabinet, subrack, and slot information is required. When IPSec Bind Mode in the IKECFG MO is set to ALL and the <a href="dsp_diagnose.html">DSP DIAGNOSE</a> command is executed with Port Type set to the normal interface bound to the IPSECBINDITF MO, the corresponding IKE/IPsec negotiation error information can be queried.</p>
+<p>GUI Value Range: ETH(Ethernet Port), ETHTRK(Ethernet Trunk), INTERFACE(Interface), ETHCI(Ethernet CI Port)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH, ETHTRK, INTERFACE, ETHCI</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to ETH, ETHTRK, ETHCI or INTERFACE.</li><li>If <strong>SBT</strong> is set to ETH_COVERBOARD, this parameter can be set to ETH, ETHTRK or INTERFACE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number. When Port Type is set to Interface, this parameter indicates the number of the corresponding interface.</p>
+<p>GUI Value Range: 0~1499,10000~19999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1499,10000~19999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter can be set to 0 if <strong>PT</strong> is set to ETHCI. </li><li>This parameter can be set to 0 to 3 if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH. </li><li>This parameter can be set to 0 or 1 if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETHTRK. </li><li>If <strong>SBT</strong> and <strong>PT</strong> are set to ETH_COVERBOARD and ETH, respectively, this parameter can be set to any value in the range of 0 to 5.</li><li>If <strong>SBT</strong> and <strong>PT</strong> are set to ETH_COVERBOARD and ETHTRK, respectively, this parameter can be set to any value in the range of 0 to 2.</li><li>This parameter can be set to any value in the range of 0 to 1499 or from 10000 to 19999 if <strong>PT</strong> is set to INTERFACE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-SCTPNo.html">SCTPNO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SCTP Link No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of an SCTP link.</p>
+<p>GUI Value Range: 0~65535,70000~79999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535,70000~79999</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when the <strong>DIAGNOSETYPE</strong> parameter is set to SCTP in the diagnose information query result.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-Phase.html">PHASE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Display Phase</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the phase of an IKE negotiation.</p>
+<p>GUI Value Range: PHASE1(Phase1), PHASE2(Phase2)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PHASE1, PHASE2</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when the <strong>DIAGNOSETYPE</strong> parameter is set to IKENEGO in the diagnose information query result.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-IKEPeerName.html">IKEPNM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IKE Peer Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the IKE peer.</p>
+<p>GUI Value Range: 0~15 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when the <strong>PHASE</strong> parameter is set to PHASE1 in the diagnose information query result.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-PolicyGroupName.html">SPGN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Policy Group Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the IPSec policy group used by the IPSec SA.</p>
+<p>GUI Value Range: 0~15 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when the <strong>PHASE</strong> parameter is set to PHASE2 in the diagnose information query result.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DiagnoseParaInfo-SequenceNo.html">SPSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Sequence No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the sequence number of the IPSec policy.</p>
+<p>GUI Value Range: 1~20000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~20000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when the <strong>PHASE</strong> parameter is set to PHASE2 in the diagnose information query result.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_diagnose__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query the diagnosis information with the parameters as follows: Diagnose Type: SCTP, run the following command:
+DSP DIAGNOSE: DIAGNOSETYPE=SCTP;
+The result is shown as follows:
++++    0        2019-09-20 15:32:47
+O&amp;M    #475
+%%DSP DIAGNOSE: DIAGNOSETYPE=SCTP;%%
+RETCODE = 0  Operation succeeded.
+
+Display Diagnose Information
+----------------------------
+Diagnose Information  =  2019-09-20 15:31:38  Err: The local failed to receive an INITACK message when it retransmited the INIT message more than maximum times!
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_diagnose__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Diagnose Information</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the diagnosis information.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,111 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify FDD Resource Mode (MOD FDDRESMODE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_fddresmode">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify FDD Resource Mode (MOD FDDRESMODE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_fddresmode"></a><a name="mod_fddresmode"></a>
+
+
+<h1 class="topictitle1">Modify FDD Resource Mode (MOD FDDRESMODE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_fddresmode__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify operating modes of LTE FDD resources in the eNodeB.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_fddresmode__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<p>With the BbResExclusiveSwitch parameter set to ON(On), when operators attempt to bind cell sector equipment or cell sector equipment groups to the baseband equipment that is not bound to any other cell sector equipment or cell sector equipment group and activate the corresponding cell, the cell activation may fail because of insufficient baseband resources. Then, the cell is re-activated through cell health check. If there are other cells that have already been established on the baseband equipment but the corresponding cell sector equipment or cell sector equipment groups are not bound to the baseband equipment, these cells will also be re-activated through cell health check.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_fddresmode__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FddResMode-BbCapabilityMode.html">BbCapabilityMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BbResCapacityMode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the operating mode of LBBPd for LTE FDD in the eNodeB.</p>
+<p>If this parameter is set to NORMAL, the number of cells that can be established on the LBBP and features supported by the LBBP remain unchanged.</p>
+<p>The parameter value LBBP_LARGE_CAPACITY is applicable only to LBBPd3 boards. With the LBBP_LARGE_CAPACITY setting, an LBBPd3 supports a larger number of cells but features are adversely affected. Before setting this parameter to LBBP_LARGE_CAPACITY, disable ultra-high speed mobility, extended CP, intra-subframe frequency hopping, and PUCCH-based uplink timing. All cells established on the LBBPd3 are automatically reactivated after this parameter is set to LBBP_LARGE_CAPACITY. If PUCCH-based uplink timing is enabled and this parameter is set to LBBP_LARGE_CAPACITY, the feature does not take effect after the cells are reactivated. If ultra-high speed mobility, extended CP, and intra-subframe frequency hopping are enabled and then this parameter is set to LBBP_LARGE_CAPACITY, the cells cannot be reactivated.</p>
+<p>This parameter applies only to LTE FDD and NB-IoT.</p>
+<p>GUI Value Range: NORMAL(Normal Mode), LBBP_LARGE_CAPACITY(Large Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL, LBBP_LARGE_CAPACITY</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NORMAL(Normal Mode)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Setting this parameter to NORMAL has no impact on network performance. If this parameter is set to LBBP_LARGE_CAPACITY(Large Mode), an LBBPd3 supports six 2T4R cells with a bandwidth of 20 MHz per cell, but the cells established on the LBBPd3 no longer support ultra-high speed mobility, extended CP, inter-subframe frequency hopping, and PUCCH-based uplink timing. The uplink and downlink peak rates and the number of UEs supported by the LBBPd3 remain unchanged. Because all cells established on the LBBPd3 are reactivated after this parameter is set to LBBP_LARGE_CAPACITY(Large Mode), the E-RAB setup success rate, RRC connection setup success rate, and handover success rate decrease, and the service drop rate increases during the cell reactivation. After the cells are reactivated, these KPIs are no longer affected. In addition, setting this parameter to LBBP_LARGE_CAPACITY(Large Mode) has a slight impact on the uplink coverage and uplink throughput of the cells.</p>
+<p>Applicable Mode: L-FDD, L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FddResMode-BbResExclusiveSwitch.html">BbResExclusiveSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Baseband Equipment Exclusive Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell sector equipment, PRB sector equipment or cell sector equipment group that is not bound to a piece of baseband equipment can be set up on this baseband equipment to which other cell sector equipment, PRB sector equipment, or cell sector equipment group has been bound. If this parameter is set to OFF and cell sector equipment, PRB sector equipment or a cell sector equipment group is bound to a piece of baseband equipment, the cell sector equipment, PRB sector equipment or cell sector equipment group bound to or not bound to this piece of baseband equipment can be set up on this baseband equipment. If this parameter is set to ON and cell sector equipment, PRB sector equipment or a cell sector equipment group is bound to a piece of baseband equipment, the cell sector equipment, PRB sector equipment or cell sector equipment group not bound to this piece of baseband equipment cannot be set up on this baseband equipment. If this parameter is set to ON_WITH_BIND and cell sector equipment, PRB sector equipment, or a cell sector equipment group is bound to a piece of baseband equipment, then: (a) cells that are bound to this baseband equipment can be set up on other baseband equipment to which other cells are bound, on condition that this baseband equipment is faulty and all cells not bound to this baseband equipment have been activated; (b) cells that are not bound to this baseband equipment cannot be set up on this baseband equipment. This parameter applies to LTE FDD and NB-IoT.</p>
+<p>GUI Value Range: OFF(Off), ON(On), ON_WITH_BIND</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON, ON_WITH_BIND</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Set this parameter to ON(On) in the following scenario:</p>
+<p>Only some cells served by the eNodeB are bound to baseband equipment.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-NB-IOT</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_fddresmode__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the FDD Resource Mode, Baseband Resource Capability Mode: LBBP_LARGE_CAPACITY, run the following command:
++++    HUAWEI        2014-07-23 16:10:35
+O&amp;M    #806354979
+%%MOD FDDRESMODE: BbCapabilityMode=LBBP_LARGE_CAPACITY;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

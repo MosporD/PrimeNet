@@ -1,0 +1,271 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add TMA (ADD TMA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_tma">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add TMA (ADD TMA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_tma"></a><a name="add_tma"></a>
+
+
+<h1 class="topictitle1">Add TMA (ADD TMA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_tma__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a  tower mounted amplifier (TMA). The subunits and device data are also added at the same time.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_tma__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>A single TMA is connected to only one physical port. An AISG1.1-based twin TMA, however, consists of two internal TMAs and functions as two subunits of an AISG2.0-based TMA.</p>
+</li><li><p>If a combiner is used or RRUs are interconnected, all the ALD devices must be controlled by the same RF.</p>
+</li><li><p>After a TMA is added, the TMA is available only when the ALD current alarm threshold is set and the ALD power supply switch is set to ON. For details about how to query the port status, see the <a href="dsp_antennaport.html">DSP ANTENNAPORT</a> command. For details about how to modify the port status, see the <a href="mod_antennaport.html">MOD ANTENNAPORT</a> command.</p>
+</li><li><p>For the TMA with dual-port power supply, the power supply switches at both ports should be turned on to ensure the normal operation of the TMA.</p>
+</li><li><p>An AISG1.1-based twin TMA can be used as two devices with one subunit for each device or as a device with two subunits. If the TMA is configured as two devices, software loading fails for the second device in the following conditions:</p>
+<p>1. The TMA is reset after the software loading is complete for the first device.</p>
+<p>2. The TMA does not respond to the command for loading software for the second device.</p>
+<p>3. The TMA returns an error message for the software loading on the second device.</p>
+<p>Actually, the software upgrade is successful for the whole twin TMA and the twin TMA function is not affected because actually only one TMA exists. After the software loading, you can run the <a href="dsp_aldver.html">DSP ALDVER</a> command to query the TMA version and check whether the software upgrade is successful.</p>
+</li><li><p>The RRU or RFU specified by the Control Port Cabinet No., Control Port Subrack No. and Control Port Slot No. of the TMA must be configured.</p>
+</li><li><p>Adding the first device in a manual scanning process will terminate the current scan.</p>
+</li><li><p>When an AISG1.1-based twin TMA is added, the TMA has two serial numbers and can be configured as either a device or two devices. When the TMA is configured as a device, the Serial No. parameter does not need to be specified. When this TMA is configured as two devices, both the serial numbers must be specified; otherwise, this TMA cannot get started.</p>
+</li><li><p>When an RRU or RFU is connected to multiple TMAs, each TMA must be configured with a serial number. If an AISG1.1-based twin TMA is used, this AISG1.1-based twin TMA must be configured as two TMA devices. In this case, each TMA device must be configured with a subunit and each subunit must be configured with a serial number.</p>
+</li><li><p>The virtual TMA is a device which amplifies signals between an RF port and an antenna port. The system does not interact with virtual TMAs. Therefore, unlike normal TMAs, virtual TMAs do not support operation and maintenance. To identify virtual TMAs, set TMA Type to VIRTUAL_TMA.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_tma__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-DeviceNo.html">DEVICENO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Device No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the device number of the ALD. The device number of the ALD must be unique.</p>
+<p>GUI Value Range: 0~1023</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1023</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+
+<p>[Co-MPT, NodeB, eGBTS]The following parameters cannot be set to the same value: <strong>DEVICENO</strong> in the <strong>RET</strong> MO, <strong>DEVICENO</strong> in the <strong>TMA</strong> MO, <strong>DEVICENO</strong> in the <strong>SASU</strong> MO, <strong>DEVICENO</strong> in the <strong>RAE</strong> MO, <strong>DEVICENO</strong> in the <strong>RVD</strong> MO, and <strong>DEVICENO</strong> in the <strong>RAS</strong> MO.</p>
+<p>[eNodeB, gNodeB]The following parameters cannot be set to the same value: <strong>DEVICENO</strong> in the <strong>RET</strong> MO, <strong>DEVICENO</strong> in the <strong>TMA</strong> MO, <strong>DEVICENO</strong> in the <strong>RAE</strong> MO, <strong>DEVICENO</strong> in the <strong>RVD</strong> MO, and <strong>DEVICENO</strong> in the <strong>RAS</strong> MO.</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-DeviceName.html">DEVICENAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Device Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the device name of the ALD, which identifies the ALD. It is recommended that you set the device name in the following format: sector_device type_network type. The meanings of the parts are as follows: Sector indicates the number of the sector. Device type indicates the type of currently connected device. The device type can be SINGLE_RET (Single-antenna Remote Electrical Tilt Unit), MULTI_RET (Multi-antenna Remote Electrical Tilt Unit), TMA (Tower-mounted Amplifier), SASU (Same-band Antenna Sharing Unit), RAE (Remote eAntenna Extension), RVD (Remote Vendor Defined Antenna Line Device), or RAS (Remote Azimuth Steering Unit). Network type indicates whether the current ALD is used for a 2G network or 3G/LTE network. The device name is optional, but the device name configured for each ALD must be unique.</p>
+<p>GUI Value Range: 0~83 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~83 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+
+<p>[Co-MPT, NodeB, eGBTS]The following parameters cannot be set to the same value: <strong>DEVICENAME</strong> in the <strong>RET</strong> MO, <strong>DEVICENAME</strong> in the <strong>TMA</strong> MO, <strong>DEVICENAME</strong> in the <strong>SASU</strong> MO, <strong>DEVICENAME</strong> in the <strong>VRET</strong> MO, <strong>DEVICENAME</strong> in the <strong>RAE</strong> MO, <strong>DEVICENAME</strong> in the <strong>RVD</strong> MO, and <strong>DEVICENAME</strong> in the <strong>RAS</strong> MO.</p>
+<p>[eNodeB]The following parameters cannot be set to the same value: <strong>DEVICENAME</strong> in the <strong>RET</strong> MO, <strong>DEVICENAME</strong> in the <strong>TMA</strong> MO, <strong>DEVICENAME</strong> in the <strong>VRET</strong> MO, <strong>DEVICENAME</strong> in the <strong>RAE</strong> MO, <strong>DEVICENAME</strong> in the <strong>RVD</strong> MO, and <strong>DEVICENAME</strong> in the <strong>RAS</strong> MO.</p>
+<p>[gNodeB]The following parameters cannot be set to the same value: <strong>DEVICENAME</strong> in the <strong>RET</strong> MO, <strong>DEVICENAME</strong> in the <strong>TMA</strong> MO, <strong>DEVICENAME</strong> in the <strong>RAE</strong> MO, <strong>DEVICENAME</strong> in the <strong>RVD</strong> MO, and <strong>DEVICENAME</strong> in the <strong>RAS</strong> MO.</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-TMAType.html">TMATYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TMA Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TMA type. The value NORMAL_TMA indicates a normal TMA. The value VIRTUAL_TMA indicates a device other than a TMA which amplifies signals between an RF port and an antenna port.</p>
+<p>GUI Value Range: NORMAL_TMA(Normal TMA), VIRTUAL_TMA(Virtual TMA)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL_TMA, VIRTUAL_TMA</p>
+<p>MML Default Value: NORMAL_TMA(Normal TMA)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-CtrlCabinetNo.html">CTRLCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Control Port Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the RRU or RFU that controls the ALD.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-CtrlSubrackNo.html">CTRLSRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Control Port Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the RRU or RFU that controls the ALD.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CTRLCN</strong> in the <strong>ALD</strong> MO ranges from 0 to 15, the value of <strong>CTRLSRN</strong> can be 4, 5, or a number ranging from 60 to 254. When the value of <strong>CTRLCN</strong> in the <strong>ALD</strong> MO ranges from 16 to 62, <strong>CTRLSRN</strong> must be set to 4 or 5.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-CtrlSlotNo.html">CTRLSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Control Port Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the RRU or RFU that controls the ALD.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CTRLSRN</strong> in the <strong>ALD</strong> MO is set to 4 or 5, the value of <strong>CTRLSN</strong> ranges from 0 to 8 if <strong>TYPE</strong> in the <strong>CABINET</strong> MO where the <strong>ALD</strong> MO is located is set to BTS3900AL. The value of <strong>CTRLSN</strong> ranges from 0 to 5 if <strong>TYPE</strong> is not set to BTS3900AL. When the value of <strong>CTRLSRN</strong> in the <strong>ALD</strong> MO is set to 60, <strong>CTRLSN</strong> ranges from 0 to 5. When the value of <strong>CTRLSRN</strong> in the <strong>ALD</strong> MO ranges from 61 to 254, <strong>CTRLSN</strong> is set to 0.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-SubunitNum.html">SUBUNITNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Number of TMA Subunits</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of configured TMA subunits.</p>
+<p>GUI Value Range: 1~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-VendorCode.html">VENDORCODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Vendor Code</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the vendor code.</p>
+<p>GUI Value Range: 0~2 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~2 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+
+<p>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>VENDORCODE</strong> in a <strong>TMA</strong> MO must be a string of 0 or 2 characters.</p>
+<p>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SERIALNO</strong> in a <strong>TMA</strong> MO has been set, <strong>VENDORCODE</strong> in the <strong>TMA</strong> MO must be set.</p>
+<p>[Co-MPT, NodeB, eGBTS]The following parameters must have a unique combination of values: 1. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RET</strong> MO; 2. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>TMA</strong> MO; 3. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>SASU</strong> MO; 4. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RAE</strong> MO; 5. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RVD</strong> MO; 6. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RAS</strong> MO.</p>
+<p>[eNodeB, gNodeB]The following parameters must have a unique combination of values: 1. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RET</strong> MO; 2. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>TMA</strong> MO; 3. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RAE</strong> MO; 4. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RVD</strong> MO; 5. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RAS</strong> MO.</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TMA-SerialNo.html">SERIALNO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Serial No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the serial number of the ALD. The vendor code and the serial number uniquely identify an ALD.</p>
+<p>GUI Value Range: 0~36 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~36 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+
+<p>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>VENDORCODE</strong> in a <strong>TMA</strong> MO has been set, <strong>SERIALNO</strong> in the <strong>TMA</strong> MO must be set.</p>
+<p>[Co-MPT, NodeB, eGBTS]The following parameters must have a unique combination of values: 1. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RET</strong> MO; 2. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>TMA</strong> MO; 3. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>SASU</strong> MO; 4. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RAE</strong> MO; 5. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RVD</strong> MO; 6. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RAS</strong> MO.</p>
+<p>[eNodeB, gNodeB]The following parameters must have a unique combination of values: 1. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RET</strong> MO; 2. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>TMA</strong> MO; 3. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RAE</strong> MO; 4. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RVD</strong> MO; 5. <strong>VENDORCODE</strong> and <strong>SERIALNO</strong> in the <strong>RAS</strong> MO.</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_tma__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a TMA with the parameters as follows: Device No.: 0, Device Name: PEOPLESQUARE_SEC1_TMA_01, TMA Type:Normal TMA, Control Port Cabinet No.: 0, Control Port Subrack No.: 60, Control Port Slot No.: 0, Number of TMA Subunits: 1, run the following command:
+ADD TMA: DEVICENO=0, DEVICENAME="PEOPLESQUARE_SEC1_TMA_01", TMATYPE=NORMAL_TMA, CTRLCN=0, CTRLSRN=60, CTRLSN=0, SUBUNITNUM=1;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

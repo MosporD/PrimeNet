@@ -1,0 +1,351 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellDrxPara">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellDrxPara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellDrxPara</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellDrxPara"></a><a name="CellDrxPara"></a>
+
+
+<h1 class="topictitle1">CellDrxPara</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellDrxPara.html"><strong>CellDrxPara</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A CellDrxPara MO consists of cell-level discontinuous reception (DRX) parameters. This MO is used to configure traffic volume thresholds for UEs to enter and exit the DRX mode and the length of the UE traffic measurement period. Whether to enable DRX depends on the measurement result within a UE traffic measurement period.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If a <strong>Cell</strong> MO is configured, the <strong>CellDrxPara</strong> MO that references <strong>LocalCellId</strong> in the <strong>Cell</strong> MO must exist.</li><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_FDD, the value of <strong>OndurationTimerUnsync</strong> must be smaller than the value of <strong>LongDrxCycleUnsync</strong>.</li><li>If the value of the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is CELL_TDD and SA0 is used, the relationship between the values of <strong>OndurationTimerUnsync</strong> and <strong>LongDrxCycleUnsync</strong> must meet the following requirements; In the following formula, x indicates the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10 and rounded down, and y indicates the remainder of the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10. The value of <strong>LongDrxCycleUnsync</strong> equals to x*4 + temp (y) where: if y = 0, temp = 0; y = 2, temp = 2; y = 4, temp = 2; y = 5, temp = 2; y = 6, temp = 3; y = 8, temp = 4. The value of <strong>OndurationTimerUnsync</strong> must be smaller than the value of <strong>LongDrxCycleUnsync</strong> calculated based on the preceding formula.</li><li>If the value of the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is CELL_TDD and SA1 is used, the relationship between the values of <strong>OndurationTimerUnsync</strong> and <strong>LongDrxCycleUnsync</strong> must meet the following requirements; In the following formula, x indicates the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10 and rounded down, and y indicates the remainder of the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10. The value of <strong>LongDrxCycleUnsync</strong> equals to x*6 + temp (y) where: if y = 0, temp = 0; y = 2, temp = 2; y = 4, temp = 2; y = 5, temp = 3; y = 6, temp = 4; y = 8, temp = 5. The value of <strong>OndurationTimerUnsync</strong> must be smaller than the value of <strong>LongDrxCycleUnsync</strong> calculated based on the preceding formula.</li><li>If the value of the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is CELL_TDD and SA2 is used, the relationship between the values of <strong>OndurationTimerUnsync</strong> and <strong>LongDrxCycleUnsync</strong> must meet the following requirements; In the following formula, x indicates the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10 and rounded down, and y indicates the remainder of the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10. The value of <strong>LongDrxCycleUnsync</strong> equals to x*8 + temp (y) where: if y = 0, temp = 0; y = 2, temp = 2; y = 4, temp = 3; y = 5, temp = 4; y = 6, temp = 5; y = 8, temp = 6. The value of <strong>OndurationTimerUnsync</strong> must be smaller than the value of <strong>LongDrxCycleUnsync</strong> calculated based on the preceding formula.</li><li>If the value of the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is CELL_TDD and SA3 is used, the relationship between the values of <strong>OndurationTimerUnsync</strong> and <strong>LongDrxCycleUnsync</strong> must meet the following requirements; In the following formula, x indicates the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10 and rounded down, and y indicates the remainder of the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10. The value of <strong>LongDrxCycleUnsync</strong> equals to x*7 + temp (y) where: if y = 0, temp = 0; y = 2, temp = 2; y = 4, temp = 2; y = 5, temp = 2; y = 6, temp = 3; y = 8, temp = 5. The value of <strong>OndurationTimerUnsync</strong> must be smaller than the value of <strong>LongDrxCycleUnsync</strong> calculated based on the preceding formula.</li><li>If the value of the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is CELL_TDD and SA4 is used, the relationship between the values of <strong>OndurationTimerUnsync</strong> and <strong>LongDrxCycleUnsync</strong> must meet the following requirements; In the following formula, x indicates the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10 and rounded down, and y indicates the remainder of the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10. The value of <strong>LongDrxCycleUnsync</strong> equals to x*8 + temp (y) where: if y = 0, temp = 0; y = 2, temp = 2; y = 4, temp = 2; y = 5, temp = 3; y = 6, temp = 4; y = 8, temp = 6. The value of <strong>OndurationTimerUnsync</strong> must be smaller than the value of <strong>LongDrxCycleUnsync</strong> calculated based on the preceding formula.</li><li>If the value of the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is CELL_TDD and SA5 is used, the relationship between the values of <strong>OndurationTimerUnsync</strong> and <strong>LongDrxCycleUnsync</strong> must meet the following requirements; In the following formula, x indicates the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10 and rounded down, and y indicates the remainder of the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10. The value of <strong>LongDrxCycleUnsync</strong> equals to x*9 + temp (y) where: if y = 0, temp = 0; y = 2, temp = 2; y = 4, temp = 3; y = 5, temp = 4; y = 6, temp = 5; y = 8, temp = 7. The value of <strong>OndurationTimerUnsync</strong> must be smaller than the value of <strong>LongDrxCycleUnsync</strong> calculated based on the preceding formula.</li><li>If the value of the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is CELL_TDD and SA6 is used, the relationship between the values of <strong>OndurationTimerUnsync</strong> and <strong>LongDrxCycleUnsync</strong> must meet the following requirements; In the following formula, x indicates the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10 and rounded down, and y indicates the remainder of the value of the <strong>LongDrxCycleUnsync</strong> parameter divided by 10. The value of <strong>LongDrxCycleUnsync</strong> equals to x*5 + temp (y) where: if y = 0, temp = 0; y = 2, temp = 2; y = 4, temp = 2; y = 5, temp = 2; y = 6, temp = 3; y = 8, temp = 4. The value of <strong>OndurationTimerUnsync</strong> must be smaller than the value of <strong>LongDrxCycleUnsync</strong> calculated based on the preceding formula.</li></ul>
+</li><li>Relation with the <strong>NsaDcMgmtConfig</strong> MO:<ul><li>If the LNR_DRX_SYNCHRONIZE_SW option of the <strong>NsaDcAlgoSwitch</strong> parameter in the <strong>NsaDcMgmtConfig</strong> MO is selected, the <strong>DrxAlgSwitch</strong> parameter in the <strong>CellDrxPara</strong> MO must be selected.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellDrxPara__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellDrxPara__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellDrxPara__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_celldrxpara.html">LST CELLDRXPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list DRX parameters of a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_celldrxpara.html">MOD CELLDRXPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify DRX parameters of a cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellDrxPara__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellDrxPara__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellDrxPara__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-FddEnterDrxThd.html">FDD enter DRX threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for UEs to enter the discontinuous reception (DRX) mode in a cell that operates in FDD mode. This threshold is used in the DRX algorithm. It is expressed as a proportion of the transmission time intervals (TTIs) with data transmission to the total TTIs. If the measurement result of UE traffic is equal to or lower than this threshold, the eNodeB determines that the UE should remain in DRX mode or the UE should be triggered to enter DRX mode. If both the values of the FddExitDrxThd and FddEnterDrxThd parameters are small and close to each other, the UE frequently enters and exits the DRX mode. When both the FddEnterDrxThd parameter and the FddExitDrxThd parameter are set to 1000 and DRX is enabled, the eNodeB directly determines that the UE should enter or exit the DRX mode, but not according to the measurement result of UE traffic. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-FddExitDrxThd.html">FDD exit DRX threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for UEs to exit the discontinuous reception (DRX) mode in a cell that operates in FDD mode. This threshold is used in the DRX algorithm. It is expressed as a proportion of the transmission time intervals (TTIs) with data transmission to the total TTIs. If the measurement result of UE traffic is higher than this threshold, the eNodeB determines that the UE should remain in the non-DRX mode or the UE should be triggered to exit the DRX mode. If the value of the FddExitDrxThd parameter is set to 1000 and the value of the FddEnterDrxThd parameter is set to a value smaller than 1000, the UE will not exit the DRX mode once entering the DRX mode. If both the values of the FddExitDrxThd and FddEnterDrxThd parameters are small and close to each other, the UE frequently enters and exits the DRX mode. When both the FddEnterDrxThd parameter and the FddExitDrxThd parameter are set to 1000 and DRX is enabled, the eNodeB directly determines that the UE should enter or exit the DRX mode, but not according to the measurement result of UE traffic. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-TddEnterDrxThdUl.html">TDD enter DRX threshold Uplink</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink traffic volume threshold for UEs to enter DRX mode in a cell that operates in LTE TDD mode. This threshold is used in the DRX algorithm. It is expressed as a proportion of the TTIs with uplink data transmission to the total TTIs. If the traffic volume of a UE is less than or equal to this threshold, the eNodeB determines that the UE should retain its DRX state or enter DRX mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-TddExitDrxThdUl.html">TDD exit DRX threshold Uplink</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink traffic volume threshold for UEs to exit DRX mode in a cell that operates in LTE TDD mode. This threshold is used in the DRX algorithm. It is expressed as a proportion of the TTIs with uplink data transmission to the total TTIs. If the traffic volume of a UE is greater than or equal to this threshold, the eNodeB decides that the UE should retain its non-DRX state or exit DRX mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-TddEnterDrxThdDl.html">TDD enter DRX threshold Downlink</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink traffic volume threshold for UEs to enter DRX mode in a cell that operates in LTE TDD mode. This threshold is used in the DRX algorithm. It is expressed as a proportion of the TTIs with downlink data transmission to the total TTIs. If the traffic volume of a UE is less than or equal to this threshold, the eNodeB determines that the UE should retain its DRX state or enter DRX mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-TddExitDrxThdDl.html">TDD exit DRX threshold Downlink</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink traffic volume threshold for UEs to exit DRX mode in a cell that operates in LTE TDD mode. This threshold is used in the DRX algorithm. It is expressed as a proportion of the TTIs with downlink data transmission to the total TTIs. If the traffic volume of a UE is greater than or equal to this threshold, the eNodeB decides that the UE should retain its non-DRX state or exit DRX mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DataAmountStatTimer.html">Data amount Statistic timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the UE traffic measurement period. The traffic volume of a UE during this period is measured. Based on the measurement result, the DRX algorithm decides whether the UE should enter or exit DRX. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-TddPowerSaveMeasSwitch.html">DRX Power Saving Measurement Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether DRX active-time measurement is supported in an LTE TDD cell. If this parameter is set to ON, DRX active-time measurement is supported in the cell. If this parameter is set to OFF, DRX active-time measurement is not supported in the cell. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-TddPowerSaveStatTimer.html">DRX Power Saving Measurement Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration of the UE active-time measurement period for an LTE TDD cell. The eNodeB uses the measurement result in the DRX algorithm to determine whether the UE should enter or exit DRX mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-TddPowerSavingEnterDrxThd.html">DRX Power Saving Measurement Enter DRX Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the active-time measurement threshold for UEs to enter DRX mode in an LTE TDD cell. This threshold is used in the DRX algorithm. If the measurement result of a UE is less than this threshold, the eNodeB determines that the UE should retain its DRX state or enter DRX mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-TddPowerSavingExitDrxThd.html">DRX Power Saving Measurement Exit DRX Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the active-time measurement threshold for UEs to exit DRX mode in an LTE TDD cell. This threshold is used in the DRX algorithm. If the measurement result of a UE is greater than this threshold, the eNodeB determines that the UE should retain its non-DRX state or exit DRX mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-LongDrxCycleUnsync.html">UnSync Long DRX Cycle</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the long DRX cycle for a UE in the uplink out-of-synchronization state. Set this parameter to a value greater than the value of LongDrxCycle; otherwise, the power saving gain of the DRX for UEs in the uplink out-of-synchronization state may decrease. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-CqiMask.html">Cqi-Mask Config Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the cqi-Mask IE can be set. The cqi-Mask IE is an optional IE introduced in 3GPP Release 9. If the cqi-Mask IE is set to Setup, the UE can send CQI/PMI/RI/PTI reports on PUCCH only in the onDuration period of discontinuous reception (DRX). If the cqi-Mask IE is not set, the UE can send CQI/PMI/RI/PTI reports on PUCCH in the active period of DRX. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-OndurationTimerUnsync.html">Onduration Timer Unsync</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DRX onduration timer for UEs when the eNodeB does not maintain synchronization for UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxInactivityTimerUnsync.html">DRX Inactivity Timer Unsync</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DRX inactivity timer for UEs when the eNodeB does not maintain synchronization for UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxPolicyMode.html">DRX Policy Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy for selecting a DRX parameter group and the policy for enabling DRX for a UE whose bearers have different QCIs.</p>
+<p>If this parameter is set to DEFAULT, the eNodeB preferentially selects the DRX parameter group with the shortest long DRX cycle specified by the LongDrxCycle parameter for the UE when the EnterDrxSwitch parameter in the DrxParaGroup MOs is set to ON for all bearers of the UE. Specially, if the LongDrxCycle parameter values for multiple QCIs are the same, the eNodeB selects the DRX parameter groups based on the QCI-specific ARP priorities delivered from the EPC. The eNodeB selects the DRX parameter group mapped to the highest-ARP-priority QCI for the UE. However, if the EnterDrxSwitch parameter in the DrxParaGroup MO is set to OFF for any bearer of the UE, the eNodeB does not configure DRX parameters for the UE.</p>
+<p>If this parameter is set to QCIPRIORITY, the eNodeB selects the DRX parameter group mapped to the highest-priority QCI for the UE. Specially, if the EnterDrxSwitch parameter in the DrxParaGroup MO mapped to the highest-priority QCI is set to OFF, the eNodeB does not configure DRX parameters for the UE.</p>
+<p>If this parameter is set to 3GPPDEFINEDQCIPRIORITY, the eNodeB preferentially selects the DRX parameter group with the shortest long DRX cycle specified by the LongDrxCycle parameter for the UE when the EnterDrxSwitch parameter in the DrxParaGroup MOs is set to ON for all bearers of the UE. Specially, if the LongDrxCycle parameter values for multiple QCIs are the same, the eNodeB selects the DRX parameter groups based on the 3GPP-defined QCI priorities. The eNodeB selects the DRX parameter group mapped to the highest-priority QCI for the UE. However, if the EnterDrxSwitch parameter in the DrxParaGroup MO is set to OFF for any bearer of the UE, the eNodeB does not configure DRX parameters for the UE.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxStartOffsetOptSwitch.html">DRX Start Offset Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable optimized random distribution of DrxStartOffset values for UEs that are configured with only sounding reference signal (SRS) resources, or periodic channel quality indicator (CQI), or neither. If this parameter is set to OFF, then DrxStartOffset takes the value of SrsOffset, CqiOffset, or 0 when a UE is configured with only SRS resources, or periodic CQI, or neither, respectively. This prevents DrxStartOffset values from being randomly distributed within the range of 0 to (LongDrxCycle - 1). If this parameter is set to ON, DrxStartOffset values can be randomly distributed within the range of 0 to (LongDrxCycle - 1) for UEs that are configured with only SRS resources, or periodic CQI, or neither. This parameter applies only to LTE FDD eNodeBs and is recommended to be set to ON when SRS resources are not allocated for UEs or there is a large number of UEs in the cell. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxRcvDtxProSwitch.html">DRX Receive DTX Process Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>If this parameter is set to ON and two consecutive discontinuous transmissions (DTXs) are detected in the downlink, the eNodeB continues the scheduling within the valid inactivity timer period. Otherwise, the eNodeB instructs the UE to enter the DRX sleep time. The valid inactivity timer period refers to the running period of the DrxInactivityTimer (excluding the timer running triggered by situations such as false SR detections and missing PDCCH detections). In carrier aggregation (CA) scenarios, the eNodeB regards DTXs on the PCC and SCCs as one DTX only when the PCC and SCCs are scheduled. If this parameter is set to OFF, the eNodeB instructs the UE to enter the DRX sleep time when detecting two consecutive DTXs, irrespective of whether the inactivity timer period is valid. In addition, when the PCC and SCC have data scheduling, the eNodeB regards DTXs on either the PCC or the SCC as one DTX.</p>
+<p>In CA scenarios, the setting of this parameter in the PCell and SCells must be the same. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxForMeasSwitch.html">DRX for Measurement Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to deliver measurement-dedicated DRX parameters to a UE when GERAN measurements are triggered for CSFB of the UE. If this parameter is set to ON, the eNodeB delivers both DRX parameters and gap-assisted GERAN measurement configurations to the UE. If this parameter is set to OFF, the eNodeB delivers only gap-assisted GERAN measurement configurations to the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-LongDrxCycleForMeas.html">Long DRX Cycle for Measurement</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the long DRX cycle dedicated to GERAN measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-OnDurTimerForMeas.html">On Duration Timer for Measurement</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the On Duration Timer dedicated to GERAN measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxInactTimerForMeas.html">DRX Inactivity Timer for Measurement</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the DRX Inactivity Timer dedicated to GERAN measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxReTxTimerForMeas.html">DRX Retransmission Timer for Measurement</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the DRX Retransmission Timer dedicated to GERAN measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-ShortDrxSwForMeas.html">Short DRX Switch for Measurement</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the short DRX cycle dedicated to GERAN measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-ShortDrxCycleForMeas.html">Short DRX Cycle for Measurement</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the short DRX cycle dedicated to GERAN measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-ShortCycleTimerForMeas.html">Short Cycle Timer for Measurement</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the DRX Short Cycle Timer dedicated to GERAN measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxSrDetectOptSwitch.html">SR Detect Optimize Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For TDD, this parameter indicates whether to optimize the identification of false SR detection for UEs in the DRX state and the subsequent handling. For FDD, this parameter indicates whether to enable preferential downlink scheduling of voice UEs during the On Duration time in DRX scenarios.</p>
+<p>For TDD: If this parameter is set to OFF, the eNodeB uses less strict conditions for identifying false SR detection for UEs in the DRX state. If this parameter is set to ON, the eNodeB uses stricter conditions to identify false SR detection for UEs in the DRX state, and does not allow UEs to enter the active state before false SR detection is confirmed, which reduces the impact of false SR detection. It is recommended that the PuschDtxSwitch option of the UlSchSwitch parameter be selected when this parameter is set to ON.</p>
+<p>For FDD: If this parameter is set to ON, the eNodeB does not schedule the downlink data of voice UEs during the DRX SR pending time, but preferentially schedules the data during the DRX On Duration time to reduce the impact of false SR detection on voice service quality. If this parameter is set to OFF, downlink data of voice UEs is scheduled during the DRX active time.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-MeasDrxSpecSchSwitch.html">Measurement DRX Special Schedule Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable special scheduling for UEs to which the eNodeB has delivered measurement-dedicated DRX parameters. If this parameter is set to ON, special scheduling is enabled so that the sleep time, during which GERAN measurements can be performed, is maximized for UEs that are running services. As a result, the measurement reporting delay is shortened for such UEs. If this parameter is set to OFF, special scheduling is disabled. For UEs with ongoing services, the sleep time is so short that measurement reporting is delayed. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-CovGsmMeasDrxCfgSwitch.html">Coverage based GSM Measurement DRX Configure Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to deliver measurement-dedicated DRX parameters to a UE when GERAN measurements are triggered for a coverage-based handover of the UE. If this parameter is set to ON, the eNodeB delivers both DRX parameters and gap-assisted GERAN measurement configurations to the UE. If this parameter is set to OFF, the eNodeB delivers only gap-assisted GERAN measurement configurations to the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-OnDurationUnextendSwitch.html">DRX On Duration Timer Unextend Opt Sw</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to report at least one periodic CQI during the period specified by the On Duration timer.</p>
+<p>If this parameter is set to ON and the CqiMask parameter is set to OFF, the periodic CQI may not be reported during the period specified by the On Duration timer.</p>
+<p>If both this parameter and the CqiMask parameter are set to ON, at least one periodic CQI is reported during the period specified by the On Duration timer.</p>
+<p>If this parameter is set to OFF, at least one periodic CQI is reported during the period specified by the On Duration timer. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxStateDuringUlHarqRetx.html">DRX State During UL HARQ Retrans</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow only retransmission during an uplink HARQ retransmission period. If this parameter is set to DRX_ACTIVE_FOR_RETX, for UEs in DRX mode, the eNodeB performs only retransmission during an uplink HARQ retransmission period.</p>
+<p>If this parameter is set to DRX_ACTIVE_FOR_VOICE, for voice UEs in DRX mode, the eNodeB can also perform initial transmission during an uplink HARQ retransmission period. If drx-InactivityTimer for a voice UE is less than 8 ms, the probability of scheduling this voice UE increases, shortening the DRX-induced scheduling delay and improving speech quality. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxAlgSwitch.html">DRX Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable DRX. This parameter does not control dynamic DRX. In FDD and TDD cells, DRX takes effect on a CA UE only when this parameter is set to ON for both eNodeBs serving the PCell and SCells of the CA UE. In NB-IoT cells, DRX takes effect when this parameter is set to ON.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-ShortDrxCycleSwitch.html">Short DRX Cycle Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable or disable short DRX cycles. Short DRX cycles reduce the traffic delay. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-VolteGapDrxExclusiveSwitch.html">VoLTE Gap and DRX Exclusive Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB delivers the intra-RAT gap-assisted measurement configuration and DRX configuration to a UE performing a voice service at the same time. If this parameter is set to ON(On), the eNodeB instructs the UE to perform gap-assisted measurements and at the same time removes the DRX configuration that has been delivered to the UE. If this parameter is set to OFF(Off), the eNodeB can deliver both configurations to the UE. If the DrxForMeasSwitch parameter is set to ON(On), the VolteGapDrxExclusiveSwitch parameter does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxStopSrPendingSw.html">DRX Stop SR Pending Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to stop the SR pending triggered by a false SR detection. If this parameter is set to ON, the eNodeB stops the SR pending triggered by a false SR detection to prevent the impact on performance. If this parameter is set to OFF, the function of stopping the SR pending triggered by a false SR detection does not take effect. This option applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-GapDrxExclusiveSwitch.html">GAP and DRX Exclusive Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB delivers the gap-assisted measurement configuration and DRX configuration to a UE at the same time. If this parameter is set to ON(On), the eNodeB instructs the UE to perform gap-assisted measurements and at the same time removes the DRX configuration that has been delivered to the UE. If this parameter is set to OFF(Off), the eNodeB can deliver both configurations to the UE. If the DrxForMeasSwitch parameter is set to ON(On), the GapDrxExclusiveSwitch parameter does not take effect. If the GapDrxExclusiveSwitch parameter is set to ON(On), the VolteGapDrxExclusiveSwitch parameter does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-NbDrxInactivityTimer.html">NB-IoT DRX Inactivity Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the DRX Inactivity Timer in an NB-IoT cell. The unit is the PDCCH period of the coverage level corresponding to a UE. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-NbDrxReTxTimer.html">NB-IoT DRX Retransmission Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the DRX Retransmission Timer in an NB-IoT cell. The unit is the PDCCH period of the coverage level corresponding to a UE. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-NbDrxUlReTxTimer.html">NB-IoT DRX Uplink Retransmission Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the DRX uplink retransmission timer in an NB-IoT cell. The unit is the PDCCH period of the coverage level corresponding to a UE. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-NbLongDrxCycle.html">NB-IoT Long DRX Cycle</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the long DRX cycle in an NB-IoT cell. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-NbOnDurationTimer.html">NB-IoT On Duration Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the On Duration Timer in an NB-IoT cell. The unit is the PDCCH period of the coverage level corresponding to a UE. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxOdPreSchSwitch.html">DRX OnDuration Pre-Scheduling Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to guarantee preallocation when the On Duration Timer is running. If this parameter is set to ON, the eNodeB performs at least one preallocation when the On Duration Timer is running in a long DRX cycle. This aims to obtain a longer DRX active time. If this parameter is set to OFF, whether the eNodeB performs preallocation in the preceding scenario depends on the preallocation mechanism. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-DrxUeSrsOptSwitch.html">DRX UE SRS Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to perform SRS optimization for DRX UEs. DrxUeSrsDtxDetectionSwitch: Indicates whether to perform DTX detection on SRSs of DRX UEs. If this option is selected, the eNodeB performs DTX detection on SRSs of DRX UEs. If this option is deselected, the eNodeB does not perform DTX detection on SRSs of DRX UEs. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-SinrThldForVolteDrxCtrl.html">SINR Threshold for VoLTE DRX Control</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SINR threshold for disabling DRX for VoLTE services. If the uplink SINR of VoLTE UEs is less than this threshold, the eNodeB disables DRX to lower the probability of deterioration in VoLTE experience due to packet loss and delay. If this parameter is set to -100, SINR-based DRX control for VoLTE services does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-CaDrxOptSwitch.html">CA DRX Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DRX optimization algorithms in CA scenarios.</p>
+<p>PCC_SCC_DRX_STATE_SYNC_SW: If this option is selected, a PCC or SCC informs other CCs of its DRX status change. If this option is deselected, each CC maintains its own DRX status. This option applies only to LTE FDD and LTE TDD.</p>
+<p>FDD_TDD_ON_DUR_TIMER_EXT_SW: Indicates whether to extend the length of the On Duration Timer in FDD+TDD CA scenarios. If this option is selected and a UE is in the FDD+TDD CA state with an FDD cell serving as the PCell, the length of the On Duration Timer is extended when the number of downlink subframes within the length of the On Duration Timer in a TDD cell is less than four. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-VoltePlrThldForExitingDrx.html">VoLTE Packet Loss Rate Thld for Exiting DRX</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the VoLTE packet loss rate threshold for exiting DRX, which is used by the DRX algorithm to determine whether UEs exit DRX. If this parameter is set to 0, this function does not take effect. If the uplink or downlink packet loss rate in a 2.5s time window is greater than or equal to this threshold, the eNodeB stops voice quality monitoring and determines that the voice quality is poor and then instructs UEs to exit DRX. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDrxPara-VocDrxEntryForbidLoadThld.html">Cell Load Thld for Forbidding Voice UE DRX Entry</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell load threshold for forbidding newly accessed voice UEs to enter the DRX mode. The algorithm does not take effect when this parameter is set to 0. When this parameter is set to a value in the range of 1 to 100, the eNodeB forbids newly accessed voice UEs to enter the DRX mode only if the cell load is higher than the threshold value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

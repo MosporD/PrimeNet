@@ -1,0 +1,158 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellDynPowerSharing">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellDynPowerSharing">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellDynPowerSharing</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellDynPowerSharing"></a><a name="CellDynPowerSharing"></a>
+
+
+<h1 class="topictitle1">CellDynPowerSharing</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellDynPowerSharing.html"><strong>CellDynPowerSharing</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A CellDynPowerSharing MO consists of parameters used to configure dynamic power sharing, including the local cell ID, dynamic power sharing switch, and maximum power sharing rate.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CspcAlgoPara</strong>, <strong>CellCspcPara</strong>, <strong>CellAlgoSwitch</strong>, <strong>Cell</strong>, and <strong>PHICHCfg</strong> MOs:<ul><li>The LTE_DYN_POWER_SHARING_SW and LTE_EXTREME_POWER_SHARING_SW options of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected only when the following conditions are met: The <strong>GLPwrShare</strong> parameter in the <strong>CellAlgoSwitch</strong> MO, the <strong>CspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO, and the <strong>CellCspcSwitch</strong> and <strong>CelleCspcSwitch</strong> parameters in the <strong>CellCspcPara</strong> MO are set to OFF, the PhichInnerLoopPcSwitch option of the <strong>DlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected, the <strong>HighSpeedFlag</strong> parameter in the <strong>Cell</strong> MO is set to LOW_SPEED, and the <strong>PhichDuration</strong> parameter in the <strong>PHICHCfg</strong> MO is not set to EXTENDED.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>The LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected when the <strong>MultiRruCellMode</strong> parameter in the <strong>Cell</strong> MO is not set to MPRU_AGGREGATION, TWO_RRU_COMBINATION, or DIGITAL_COMBINATION.</li><li>The UMTS_LTE_DYN_POWER_SHARING_SW and LTE_EXTREME_POWER_SHARING_SW options of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO can be selected only if the <strong>FddTddInd</strong> parameter in this <strong>Cell</strong> MO is set to CELL_FDD.</li><li>If the LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO is selected, the <strong>MultiRruCellFlag</strong> parameter in this <strong>Cell</strong> MO cannot be set to BOOLEAN_TRUE.</li><li>The LTE_NR_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the LTE_NR_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, then the LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO must be selected.</li><li>The LTE_NR_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R.</li></ul>
+</li><li>Relation with the <strong>PDSCHCfg</strong> MO:<ul><li>The LTE_DYN_POWER_SHARING_SW and LTE_EXTREME_POWER_SHARING_SW options of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO can be selected only if the <strong>TxPowerOffsetAnt0</strong>, <strong>TxPowerOffsetAnt1</strong>, <strong>TxPowerOffsetAnt2</strong>, and <strong>TxPowerOffsetAnt3</strong> parameters in the <strong>PDSCHCfg</strong> MO under this <strong>Cell</strong> MO are all set to 255.</li><li>If the LTE_DYN_POWER_SHARING_SW, UMTS_LTE_DYN_POWER_SHARING_SW, or LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, the <strong>CrsPowerBoostingAmplitude</strong> parameter in the <strong>PDSCHCfg</strong> MO can only be set to DB_0.</li><li>If the LTE_DYN_POWER_SHARING_SW, UMTS_LTE_DYN_POWER_SHARING_SW, or LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, the <strong>PdschPowerBoostingSwitch</strong> parameter in the <strong>PDSCHCfg</strong> MO can only be set to OFF.</li><li>If the LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO is selected, the SINGLE_CA_PWR_SHARE_SW_FOR_4T option of the <strong>TxChnPowerCfgSw</strong> parameter in the <strong>PDSCHCfg</strong> MO under this <strong>Cell</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellUSParaCfg</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>When the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, the <strong>MultiCellShareMode</strong> and <strong>SubframeAssignment</strong> parameters in the <strong>Cell</strong> MO must be set to NORMAL and SA2 respectively, and both the USPwrSharePaSwitch option of the <strong>UsAlgoExSwitch</strong> parameter in the <strong>CellUSParaCfg</strong> MO and InterCellDmimoJTSwitch option of the <strong>DMIMOAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellEmtcAlgo</strong> MOs:<ul><li>The LTE_DYN_POWER_SHARING_SW and LTE_EXTREME_POWER_SHARING_SW options of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected only when the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO is not set to TRUE, the EMTC_ONLY_CELL_SWITCH option of the <strong>EmtcAlgoSwitch</strong> parameter in the <strong>CellEmtcAlgo</strong> MO is deselected, and the <strong>DlBandWidth</strong> parameter in the <strong>Cell</strong> MO is not set to CELL_BW_N6(1.4M) or CELL_BW_N15(3M).</li></ul>
+</li><li>Relation with the <strong>ENodeBAlgoSwitch</strong>, <strong>CspcAlgoPara</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected only if the <strong>DlIcicSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is set to DlIcicSwitch_OFF_ENUM, the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO is deselected, and both the BFModeUserAdptPwrSwitch and BFModeUserPwrSwitch options of the <strong>DlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are deselected.</li></ul>
+</li><li>Relation with the <strong>CellAuxEnbBind</strong> and <strong>CellAuxDuBind</strong> MOs:<ul><li>When the LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, no CellAuxEnbBind and CellAuxDuBind MO can be added.</li></ul>
+</li><li>Relation with the <strong>CellCounterParaGroup</strong> MO:<ul><li>The <strong>InterferenceControlSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be set to ON only if the BasedA3EdgeUserSwitch option of the <strong>CellCounterAlgoSwitch</strong> parameter in the <strong>CellCounterParaGroup</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SpectrumCloud</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> in the <strong>Cell</strong> is set to CELL_FDD, and the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is set to LTE_NR_SPECTRUM_SHR, the LTE_DYN_POWER_SHARING_SW and UMTS_LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO cannot be selected.</li></ul>
+</li><li>Relation with the <strong>ContigIntraBandCarr</strong> MO:<ul><li>The LTE_DYN_POWER_SHARING_SW or UMTS_LTE_DYN_POWER_SHARING_SW or LTE_NR_DYN_POWER_SHARING_SW or LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO and the CONTIG_INTRA_BAND_CARR_SW option of the <strong>ContigIntraBandCarrSw</strong> parameter in the <strong>ContigIntraBandCarr</strong> MO cannot be both selected.</li></ul>
+</li><li>Relation with the <strong>SymbolPwrSaving</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>TrigBndlSchDlAvgPrbThld</strong> parameter in the <strong>SymbolPwrSaving</strong> MO is not set to 0 for a cell and the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD for the same cell, the UMTS_LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO must be deselected for the cell.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, and the SsrdDynDlPwrSharingSwitch option of the <strong>SSRDAlgoSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected, then the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO cannot be set to ON.</li></ul>
+</li><li>Relation with the <strong>ENodeBAlgoSwitch</strong>, <strong>SectorSplitGroup</strong>, <strong>SectorSplitCell</strong>, and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in this <strong>Cell</strong> MO is set to 8T8R, the cell specified by this <strong>Cell</strong> MO is added in a <strong>SectorSplitCell</strong> MO under a <strong>SectorSplitGroup</strong> MO, the <strong>BeamDeploymentMode</strong> parameter in this <strong>SectorSplitGroup</strong> MO is set to MODE_3, and the SsrdDynDlPwrSharingSwitch option of the <strong>SSRDAlgoSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected, then the LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO cannot be selected.</li></ul>
+</li><li>Relation with the <strong>SectorSplitCell</strong>, <strong>Cell</strong>, and <strong>SectorSplitGroup</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD, the cell specified by this <strong>Cell</strong> MO is added in a <strong>SectorSplitCell</strong> MO under a <strong>SectorSplitGroup</strong> MO, and the <strong>BeamDeploymentMode</strong> parameter in this <strong>SectorSplitGroup</strong> MO is set to MODE_3, then the LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellPdcchAlgo</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the LTE_NR_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, then the <strong>PdcchSparePowerAllocStrage</strong> parameter in the <strong>CellPdcchAlgo</strong> MO must be set to NONE and the <strong>PdcchSdmaWeightType</strong> parameter in the <strong>CellPdcchAlgo</strong> MO cannot be set to POWER_SHARING_AMONG_3_BEAMS, POWER_SHARING_AMONG_4_BEAMS, or POWER_SHARING_AMONG_5_BEAMS.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the LTE_NR_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, then the <strong>PdcchPowerCheckSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, and <strong>SectorSplitGroup</strong> MOs:<ul><li>For all <strong>Cell</strong> MOs associated with the <strong>SectorSplitCell</strong> MOs in a <strong>SectorSplitGroup</strong> MO, if the <strong>FddTddInd</strong>, <strong>TxRxMode</strong>, and <strong>CellActiveState</strong> parameters in one of the <strong>Cell</strong> MOs are set to CELL_TDD, 8T8R, and CELL_ACTIVE, respectively, and the cell specified by this <strong>Cell</strong> MO is added in a <strong>SectorSplitCell</strong> MO under a <strong>SectorSplitGroup</strong> MO, and the <strong>BeamDeploymentMode</strong> parameter in this <strong>SectorSplitGroup</strong> MO is set to NOT_CFG, then the setting of the LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO for all these <strong>Cell</strong> MOs must be the same.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If the LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO is selected, the Virtual4T4RSwitch option of the <strong>EmimoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO under this <strong>Cell</strong> MO must be deselected.</li><li>If the LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO is selected, the OutOfBandRelaySwitch and InBandRelayDeNbSwitch options of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO under this <strong>Cell</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> MO:<ul><li>If the LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO is selected, the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO under this <strong>Cell</strong> MO cannot be set to LTE_NR_SPECTRUM_SHR.</li></ul>
+</li><li>Relation with the <strong>CellDlschAlgo</strong>, <strong>CellMBMSCfg</strong>, <strong>SectorSplitCell</strong>, and <strong>SectorSplitGroup</strong> MOs:<ul><li>If the LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO is selected, and any option of the <strong>MbsfnSfCfg</strong> parameter in the <strong>CellDlschAlgo</strong> MO under this <strong>Cell</strong> MO is selected or the MBMSSwitch option of the <strong>MBMSSwitch</strong> parameter in the <strong>CellMBMSCfg</strong> MO under this <strong>Cell</strong> MO is selected, then the <strong>PwrSharingHighLoadThld</strong> parameter can only be set to 100 in the <strong>SectorSplitGroup</strong> MO that includes the <strong>SectorSplitCell</strong> MO corresponding to this <strong>Cell</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellDynPowerSharing__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellDynPowerSharing__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellDynPowerSharing__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_celldynpwrshastatus.html">DSP CELLDYNPWRSHASTATUS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of dynamic power sharing in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_enodebpagrp.html">DSP ENODEBPAGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the dynamic power sharing group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_celldynpowersharing.html">LST CELLDYNPOWERSHARING</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration of dynamic power sharing in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_celldynpowersharing.html">MOD CELLDYNPOWERSHARING</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify parameters related to cell dynamic power sharing.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellDynPowerSharing__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellDynPowerSharing__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellDynPowerSharing__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDynPowerSharing-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of a cell, which uniquely identifies the cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDynPowerSharing-DynamicPowerSharingSwitch.html">Dynamic Power Sharing Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable dynamic power sharing. This parameter consists of the following options:</p>
+<p>LTE_DYN_POWER_SHARING_SW: Indicates whether to enable power sharing between LTE carriers. These LTE carriers can be FDD carriers or TDD carriers, but cannot be any combination of FDD and TDD carriers. When this option is selected, power can be shared between LTE carriers. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UMTS_LTE_DYN_POWER_SHARING_SW: Indicates whether to enable power sharing between LTE and UMTS carriers. When this option is selected, power can be shared between LTE and UMTS carriers. This option applies only to LTE FDD.</p>
+<p>LTE_NR_DYN_POWER_SHARING_SW: Indicates whether to enable power sharing between LTE and NR carriers. When this option is selected, power can be shared between LTE and NR carriers. This option applies only to LTE TDD.</p>
+<p>LTE_EXTREME_POWER_SHARING_SW: Indicates whether to enable power sharing between LTE carriers that share the same channel and between split cells. When this option is selected, power can be shared between LTE carriers that share the same channel and between split cells. This option applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDynPowerSharing-MaxPowerSharingRate.html">Max Power Sharing Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum percentage of power that the LTE carrier can share from other carriers. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDynPowerSharing-InterferenceControlSwitch.html">Interference Control Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable interference control. If this parameter is set to ON, interference control is enabled. The eNodeB periodically predicts the impact of the local cell's reception of shared power on neighboring cells in terms of interference. If the prediction results indicate that the overall performance of the local and neighboring cells will be better after power sharing, the eNodeB allows the local cell to receive shared power in the next period. If this parameter is set to OFF, interference control is disabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDynPowerSharing-PowerAdjustmentMode.html">Power Adjustment Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the power adjustment mode of the cell that receives shared power. If this parameter is set to PDSCH_ONLY, the eNodeB increases only PDSCH power in the cell. If this parameter is set to CRS_AND_PDSCH, the eNodeB increases both CRS power and PDSCH power in the cell. This option applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDynPowerSharing-PwrInsuffTimeRateThld.html">Power Insufficiency Time Rate Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold, which is a percentage of the scheduling time with power insufficiency, for LTE extreme power sharing to take effect. The larger the value of this parameter, the longer the allowed duration of power insufficiency and the higher the probability that power sharing takes effect. The smaller the value of this parameter, the shorter the allowed duration of power insufficiency and the lower the probability that power sharing takes effect. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

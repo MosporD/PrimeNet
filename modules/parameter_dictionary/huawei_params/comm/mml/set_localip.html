@@ -1,0 +1,117 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Local OM IP Address (SET LOCALIP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_localip">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Local OM IP Address (SET LOCALIP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_localip"></a><a name="set_localip"></a>
+
+
+<h1 class="topictitle1">Set Local OM IP Address (SET LOCALIP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_localip__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the IP address of the local maintenance channel. The IP address of the local maintenance channel refers to the IP address of the local maintenance Ethernet port on the board.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_localip__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>After this command is executed at the local end, if the new IP address for the local maintenance channel is different from the currently used IP address for the local maintenance channel, the local maintenance channel becomes unavailable. When this occurs, the message indicating operation succeeded cannot be reported.</p>
+</li><li><p>In the same routing domain, the IP address of a local maintenance channel and that configured at another port must be on the network segments that are exclusive of each other. In the same routing domain, the two IP addresses are on the same network segment if the following conditions are met: (IPValueA &amp; IPMaskA == IPValueB &amp; IPMaskB) and (IPMaskA == IPMaskB). The two network segments are inclusive if the following conditions are met: (IPValueA &amp; IPMask == IPValueB &amp; IPMask) and (IPMask = IPMaskA &amp; IPMaskB). &amp; indicates the bitwise logical AND operation.</p>
+</li><li><p>When a terminal equipped with the WDT software is directly connected to an NE through a USB port and the port mode is USB (which can be queried by running the <a href="dsp_localethport.html">DSP LOCALETHPORT</a> command), the outputs of the <a href="dsp_localip.html">DSP LOCALIP</a> and <a href="lst_localip.html">LST LOCALIP</a> commands may be different. In this case, ALM-26245 Configuration Data Inconsistency is not reported.</p>
+</li><li><p>When a terminal equipped with the WDT software is directly connected to an NE through a USB port, the local maintenance IP address and mask are obtained from the terminal through the DHCP protocol.</p>
+</li><li><p>During site deployment, the BS restores the current local maintenance IP address to the default value 192.168.0.49 if the IP address conflicts with the local IP address of a remote maintenance channel that is obtained by the DHCP server.</p>
+</li><li><p>[NodeB,eNodeB]If an error message indicating an IP address conflict is displayed, search the existing IP addresses in the system that may conflict with the IP address for local maintenance by running the following commands: <a href="lst_devip.html">LST DEVIP</a>, <a href="dsp_devip.html">DSP DEVIP</a>, <a href="lst_omch.html">LST OMCH</a>, <a href="dsp_omch.html">DSP OMCH</a>, <a href="lst_ppplnk.html">LST PPPLNK</a>, <a href="dsp_ppplnk.html">DSP PPPLNK</a>, <a href="lst_mpgrp.html">LST MPGRP</a>, <a href="dsp_mpgrp.html">DSP MPGRP</a>, <a href="lst_iprt.html">LST IPRT</a>, and <a href="dsp_iprt.html">DSP IPRT</a>. The conflicting IP address may be a device IP address, local IP address of a remote maintenance channel, local IP address of a PPP link, local IP address of an MP group, or next hop IP address of an IP route.</p>
+</li><li><p>[gNodeB]If an error message indicating an IP address conflict is displayed, search the existing IP addresses in the system that may conflict with the IP address for local maintenance by running the following commands: <a href="lst_devip.html">LST DEVIP</a>, <a href="dsp_devip.html">DSP DEVIP</a>, <a href="lst_omch.html">LST OMCH</a>, <a href="dsp_omch.html">DSP OMCH</a>, <a href="lst_iprt.html">LST IPRT</a>, and <a href="dsp_iprt.html">DSP IPRT</a>. The conflicting IP address may be a device IP address, local IP address of a remote maintenance channel, or next hop IP address of an IP route.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_localip__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LOCALIP-IP.html">IP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP address for local maintenance. The value of this parameter must meet the following conditions:</p>
+<p>(1) It must be a valid IP address of Class A, B, or C, and cannot be set to 0.x.x.x or 127.x.x.x.</p>
+<p>(2) It must be different from the local IP address of any remote maintenance channel and from any device IP address.</p>
+<p>(3) It must be on different network segments from the IP address of any remote maintenance channel and from any device IP address.</p>
+<p>(4) It must be different from any IP address configured on other ports.</p>
+<p>(5) It must be on different network segments from the destination IP address of any IP route.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Planned IP address for local maintenance on a board</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>IP</strong> in the <strong>LOCALIP</strong> MO must be set to a valid IP address of Class A, B, or C. In addition, it cannot be 127.x.x.x or 0.x.x.x.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>LOCALIP</strong> MO, neither the network ID nor the host ID can be all 0 or 1 in the logical operation result of <strong>IP</strong> and <strong>MASK</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LOCALIP-Mask.html">MASK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mask</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subnet mask for the IP address of a local maintenance channel. This subnet mask must be a valid mask address and cannot be 0.0.0.0 or 255.255.255.255.</p>
+<p>GUI Value Range: Valid subnet mask</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid subnet mask</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Planned subnet mask of the local maintenance channel on a board</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the binary value converted from <strong>MASK</strong> in the <strong>LOCALIP</strong> MO, 0 is not allowed to precede 1. <strong>MASK</strong> cannot be 0.0.0.0 or 255.255.255.255.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>LOCALIP</strong> MO, neither the network ID nor the host ID can be all 0 or 1 in the logical operation result of <strong>IP</strong> and <strong>MASK</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_localip__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the IP address of the local maintenance with the following parameters: IP Address: "192.168.211.158", Mask: "255.255.255.0", run the following command:
+SET LOCALIP: IP="192.168.211.158", MASK="255.255.255.0";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

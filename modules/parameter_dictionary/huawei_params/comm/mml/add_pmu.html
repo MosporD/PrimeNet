@@ -1,0 +1,654 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add PMU (ADD PMU)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_pmu">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add PMU (ADD PMU)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_pmu"></a><a name="add_pmu"></a>
+
+
+<h1 class="topictitle1">Add PMU (ADD PMU)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_pmu__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a power monitoring unit (PMU). When the PMU is added, a PMU subrack and a PMU board are added at the same time.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_pmu__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>When the SC48200 PMU is added, batteries are added at the same time.</p>
+</li><li><p>Before adding a PMU, add a cabinet for the PMU and add a subrack for the manager of the PMU.</p>
+</li><li><p>The SC48200 PMU does not support the setting or querying of customized alarm ports and AC voltage thresholds.</p>
+</li><li><p>The communication address 27 is used by a new monitoring device XMU. Therefore, do not set the communication address to 27 when running this command.</p>
+</li><li><p>The manager unit of the PMU must be configured and be a BBU subrack, an RRU in slot 0, an RHUB, or a CCU.</p>
+</li><li><p>A temperature sensor and a humidity sensor monitor the temperature and humidity inside a cabinet, respectively. The PMU cannot report related alarms if it is not connected to a certain sensor. For details about whether a certain type of PMU is connected to a temperature or humidity sensor, see section "HPMI" in the related hardware description. In addition, the ATLTHD, ATUTHD, AHLTHD, and AHUTHD parameters need to be set to their default values.</p>
+</li><li><p>When both the flag for power-off against time and the flag for power-off against low voltage are enabled, the load is powered off when the duration of AC power shutdown exceeds Load Shutdown Time or the battery voltage is less than Load Shutdown Voltage. After load low voltage disconnection (LLVD), the load is reconnected after AC power supply of the base station resumes or Load Shutdown Flag is set to DISABLE.</p>
+</li><li><p>For the RRUs, only the RRU in slot 0 can be connected to a monitoring device.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_pmu__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the PMU is located.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the PMU is located.</p>
+<p>GUI Value Range: 7,17~18</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 7,17~18</p>
+<p>MML Default Value: 7</p>
+<p>Recommended Value: 7</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where the PMU is located.</p>
+<p>GUI Value Range: 0</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-PowerType.html">PTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power System Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the power system for the PMU.</p>
+<p>GUI Value Range: APM100(APM 100), APM200(APM 200), APM30(APM 30), EPS4890(EPS4890), EPS4815(EPS4815), SC48200(SC48200), EPS48200(EPS48200), TP48300A(TP48300A), ETP(ETP), EPU(EPU)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: APM100, APM200, APM30, EPS4890, EPS4815, SC48200, EPS48200, TP48300A, ETP, EPU</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: APM30(APM 30)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to SC48200, <strong>BCV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than or equal to <strong>DCVUTHD</strong> in the <strong>PMU</strong> MO minus 15.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to a value other than SC48200, <strong>BCV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than <strong>DCVUTHD</strong> in the <strong>PMU</strong> MO minus 10.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>LSDV</strong> in the <strong>PMU</strong> MO must be greater than or equal to <strong>SDV</strong> in the <strong>BATTERY</strong> MO plus 5 under the following conditions: 1. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to SC48200; 2. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is also set to ENABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to a value other than SC48200, <strong>FCV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be greater than <strong>DCVLTHD</strong> in the <strong>PMU</strong> MO plus 20.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than <strong>DCVLTHD</strong> in the <strong>PMU</strong> under the following conditions: 1. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to DISABLE; 2. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to a value other than SC48200.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than <strong>LSDV</strong> in the <strong>PMU</strong> under the following conditions: 1. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to ENABLE; 2. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to a value other than SC48200.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, <strong>INSTALLTYPE</strong> in the <strong>BATTERY</strong> MO must be set to INNER or OUTER.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200, <strong>INSTALLTYPE</strong> in the <strong>BATTERY</strong> MO must be set to OUTER.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, and <strong>BN</strong> in the <strong>BATTERY</strong> MO is 1, <strong>BC1</strong> in the <strong>BATTERY</strong> MO must be in the range from 5 to 5000; If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, and <strong>BN</strong> in the <strong>BATTERY</strong> MO is 2, <strong>BC1</strong> and <strong>BC2</strong> in the <strong>BATTERY</strong> MO must be in the range from 5 to 5000.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, <strong>BCV</strong> in the <strong>BATTERY</strong> MO must be in the range from 433 to 576.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200, <strong>BCV</strong> in the <strong>BATTERY</strong> MO must be in the range from 542 to 575.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, <strong>FCV</strong> in the <strong>BATTERY</strong> MO must be in the range from 432 to 575.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200, <strong>FCV</strong> in the <strong>BATTERY</strong> MO must be in the range from 520 to 563.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, <strong>BCV</strong> in the <strong>BATTERY</strong> MO must be greater than <strong>FCV</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200, <strong>BCV</strong> in the <strong>BATTERY</strong> MO must be greater than or equal to the value of <strong>FCV</strong> plus 22.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, <strong>TCC</strong> in the <strong>BATTERY</strong> MO must be smaller than or equal to 500 mV/degree Celsius (278 mV/degree Fahrenheit).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200, <strong>TCC</strong> in the <strong>BATTERY</strong> MO must be smaller than or equal to 100 mV/degree Celsius (56 mV/degree Fahrenheit).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, <strong>TUTHD</strong> in the <strong>BATTERY</strong> MO must be in the range from 35 to 80 degree Celsius (39 to 176 degree Fahrenheit).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200, <strong>TUTHD</strong> in the <strong>BATTERY</strong> MO must be in the range from 35 to 60 degree Celsius (95 to 140 degree Fahrenheit).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, <strong>SDT</strong> in the <strong>BATTERY</strong> MO must be greater than or equal to 40 degree Celsius (104 degree Fahrenheit) and smaller than or equal to 70 degree Celsius (158 degree Fahrenheit).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to a value other than SC48200, <strong>SDV</strong> in the <strong>BATTERY</strong> MO must be in the range from 350 to 553.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200, <strong>BC1</strong> in the <strong>BATTERY</strong> MO must be in the range from 50 to 5000.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200 and <strong>HTSDF</strong> in the <strong>BATTERY</strong> MO is set to ENABLE, <strong>SDT</strong> in the <strong>BATTERY</strong> MO must be in the range from 45 to 70 degree Celsius (113 to 158 degree Fahrenheit).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>PTYPE</strong> in the upper-level <strong>PMU</strong> MO of the <strong>BATTERY</strong> MO is set to SC48200 and <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO is set to ENABLE, <strong>SDV</strong> in the <strong>BATTERY</strong> MO must be in the range from 450 to 480.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the values of <strong>LSDF</strong> in the <strong>PMU</strong> MO and <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO are set to ENABLE, <strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO with <strong>PTYPE</strong> set to a value other than SC48200 must be smaller than <strong>LSDV</strong> in the <strong>PMU</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to EPU, the value of <strong>SRN</strong> must be equal to 17 or 18. When the value of <strong>PTYPE</strong> is not set to EPU, the value of <strong>SRN</strong> must be equal to 7.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-ManagerCabinet.html">MCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Manager Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the manager. The manager of the PMU is usually a BBU, RRU or CCU.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-ManagerSubrack.html">MSRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Manager Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the manager. The manager of the PMU is usually a BBU, RRU or CCU.</p>
+<p>GUI Value Range: 0~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~254</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TYPE</strong> in the <strong>CABINET</strong> MO to which the <strong>PMU</strong> MO belongs is APM300, the manager unit for the <strong>PMU</strong> MO must be the <strong>CCU</strong>MO in which <strong>SRN</strong> is 15.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The manager unit of a <strong>PMU</strong> MO must be one of the following: 1. A <strong>SUBRACK</strong> MO with the value of <strong>SRN</strong> smaller than or equal to 1; 2. The <strong>RRU</strong> MO with the value of <strong>SRN</strong> ranging from 60 to 254 and <strong>SN</strong> equal to 0; 3. A <strong>CCU</strong> MO with <strong>SRN</strong> set to 15.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-ManagerPort.html">MPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Manager Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the serial port where the PMU is connected. The serial port is the port through which the PMU is connected to the manager unit.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: When the PMU is connected to the MON1 port on the UPEU/UEIU, set this parameter to 1. When the PMU is connected to the MON0 port on the UPEU/UEIU, set this parameter to 0. When the PMU is connected to the RRU, set this parameter to 0. When the PMU is connected to the CCU, set this parameter to a value within the range of 0 to 7.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>MSRN</strong> is set to 15, the value of <strong>MPN</strong> must be smaller than or equal to 7. When the value of <strong>MSRN</strong> is greater than or equal to 60, the value of <strong>MPN</strong> must be equal to 0. When the value of <strong>MSRN</strong> is smaller than or equal to 1, the value of <strong>MPN</strong> must be smaller than or equal to 1.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-Addr.html">ADDR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the communication address of the PMU, which is determined by the settings of the 4-bit dual in-line package (DIP) switch on the PMU. The communication address is used by the PMU to communicate with the main control and transmission board. The value of this parameter must be consistent with the actual settings of the DIP switch. The 4-bit DIP switch can be treated as a 4-bit binary number. The settings of ON and OFF are represented by 1 and 0 respectively. Convert the 4-bit number from binary to decimal, and then the decimal number is used as the value of this parameter.</p>
+<p>GUI Value Range: 1~30</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-AcLthd.html">ACVLTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC Voltage Alarm Lower Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower threshold of AC input voltage. When the AC input voltage is lower than the value, an ALM-25622 Mains Input Out of Range alarm is reported.</p>
+<p>GUI Value Range: 60~300</p>
+<p>Unit: V</p>
+<p>Actual Value Range: 60~300</p>
+<p>MML Default Value: 180</p>
+<p>Recommended Value: 180</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is not set to SC48200, the value of <strong>ACVLTHD</strong> must be smaller than <strong>ACVUTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-AcUthd.html">ACVUTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC Voltage Alarm Upper Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the higher threshold of AC input voltage. When the AC input voltage is higher than the value, an ALM-25622 Mains Input Out of Range alarm is reported.</p>
+<p>GUI Value Range: 60~300</p>
+<p>Unit: V</p>
+<p>Actual Value Range: 60~300</p>
+<p>MML Default Value: 280</p>
+<p>Recommended Value: 280</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is not set to SC48200, the value of <strong>ACVLTHD</strong> must be smaller than <strong>ACVUTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-DcLthd.html">DCVLTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DC Voltage Alarm Lower Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower threshold of the DC voltage. When the output voltage of the busbar is lower than the value, an ALM-25621 Power Supply DC Output Out of Range alarm is reported.</p>
+<p>GUI Value Range: 350~556</p>
+<p>Unit: 0.1V</p>
+<p>Actual Value Range: 35.0~55.6, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The recommended value of this parameter for the SC48200 PMU is 470. The recommended value of this parameter for other types of PMU is 450. If lithium batteries are used, the minimum value of DC Voltage Alarm Lower Threshold that takes effect on a PMU is 500.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>DCVLTHD</strong> in the <strong>PMU</strong> MO must be greater than 430 under the following conditions: 1. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to a value other than SC48200; 2. The <strong>PMU</strong> MO does not have a lower-level <strong>BATTERY</strong> MO; 3. <strong>LSDF</strong> is set to DISABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>PMU</strong> MO, <strong>DCVLTHD</strong> must be smaller than 515 when <strong>PTYPE</strong> is set to a value other than SC48200 and there is no lower-level <strong>BATTERY</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to a value other than SC48200, <strong>FCV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be greater than <strong>DCVLTHD</strong> in the <strong>PMU</strong> MO plus 20.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than <strong>DCVLTHD</strong> in the <strong>PMU</strong> under the following conditions: 1. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to DISABLE; 2. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to a value other than SC48200.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to SC48200, the value of <strong>DCVLTHD</strong> must be greater than or equal to 460 and smaller than or equal to 500, and the value of <strong>DCVUTHD</strong> must be greater than or equal to 580 and smaller than or equal to 600.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when the values of <strong>PTYPE</strong> and <strong>LSDF</strong> are set to SC48200 and ENABLE, respectively, the value of <strong>DCVLTHD</strong> minus the value of <strong>LSDV</strong> must be greater than or equal to 5.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, the value of <strong>LSDV</strong> must be smaller than <strong>DCVLTHD</strong> when the following conditions are met: 1. <strong>PTYPE</strong> is set to APM30, APM100, APM200, EPS4890, EPS48200, TP48300A, or ETP; 2. <strong>LSDF</strong> is set to ENABLE.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to SC48200, <strong>DCVLTHD</strong> is set to 470 by default. When <strong>PTYPE</strong> is set to a value other than SC48200, <strong>DCVLTHD</strong> is set to 450 by default.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-DcUthd.html">DCVUTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DC Voltage Alarm Upper Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper threshold of the DC voltage. When the output voltage of the busbar is higher than the value, an ALM-25621 Power Supply DC Output Out of Range alarm is reported.</p>
+<p>GUI Value Range: 580~600</p>
+<p>Unit: 0.1V</p>
+<p>Actual Value Range: 58.0~60.0, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The recommended value of this parameter for the SC48200 PMU is 585. The recommended value of this parameter for other types of PMU is 580.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to SC48200, <strong>BCV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than or equal to <strong>DCVUTHD</strong> in the <strong>PMU</strong> MO minus 15.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to a value other than SC48200, <strong>BCV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than <strong>DCVUTHD</strong> in the <strong>PMU</strong> MO minus 10.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to SC48200, the value of <strong>DCVLTHD</strong> must be greater than or equal to 460 and smaller than or equal to 500, and the value of <strong>DCVUTHD</strong> must be greater than or equal to 580 and smaller than or equal to 600.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to SC48200, <strong>DCVUTHD</strong> is set to 585 by default. When <strong>PTYPE</strong> is set to a value other than SC48200, <strong>DCVUTHD</strong> is set to 580 by default.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-LoadShutdownFlg.html">LSDF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Load Shutdown Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the flag for power-off against low voltage, which determines whether the load is powered off in the case of low voltage.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The recommended value of this parameter for the SC48200 PMU is ENABLE(Enable). The recommended value of this parameter for other types of PMU is DISABLE(Disable).</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>LSDV</strong> in the <strong>PMU</strong> MO must be greater than or equal to <strong>SDV</strong> in the <strong>BATTERY</strong> MO plus 5 under the following conditions: 1. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to SC48200; 2. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is also set to ENABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than <strong>DCVLTHD</strong> in the <strong>PMU</strong> under the following conditions: 1. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to DISABLE; 2. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to a value other than SC48200.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than <strong>LSDV</strong> in the <strong>PMU</strong> under the following conditions: 1. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to ENABLE; 2. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to a value other than SC48200.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the values of <strong>LSDF</strong> in the <strong>PMU</strong> MO and <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO are set to ENABLE, <strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO with <strong>PTYPE</strong> set to a value other than SC48200 must be smaller than <strong>LSDV</strong> in the <strong>PMU</strong> MO.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to SC48200, <strong>LSDF</strong> is set to ENABLE by default. When <strong>PTYPE</strong> is set to a value other than SC48200, <strong>LSDF</strong> is set to DISABLE by default.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-LoadShutDownVol.html">LSDV</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Load Shutdown Voltage</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the load voltage below which the load is powered off automatically when load power-off against low voltage is enabled.</p>
+<p>GUI Value Range: 350~556</p>
+<p>Unit: 0.1V</p>
+<p>Actual Value Range: 35.0~55.6, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The recommended value of this parameter for the SC48200 PMU is 465. The recommended value of this parameter for other types of PMU is 440. If lithium batteries are used, the minimum value of Load Shutdown Voltage that takes effect on a PMU is 490.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>LSDV</strong> in the <strong>PMU</strong> MO must be greater than 430 under the following conditions: 1. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to a value other than SC48200; 2. The <strong>PMU</strong> MO does not have a lower-level <strong>BATTERY</strong> MO; 3. <strong>LSDF</strong> is set to ENABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when <strong>PTYPE</strong> and <strong>LSDF</strong> are set to SC48200 and ENABLE, respectively, the value of <strong>LSDV</strong> must be greater than or equal to 455 and smaller than or equal to 485.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>LSDV</strong> in the <strong>PMU</strong> MO must be greater than or equal to <strong>SDV</strong> in the <strong>BATTERY</strong> MO plus 5 under the following conditions: 1. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to SC48200; 2. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is also set to ENABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO must be smaller than <strong>LSDV</strong> in the <strong>PMU</strong> under the following conditions: 1. <strong>LSDF</strong> in the <strong>PMU</strong> MO is set to ENABLE; 2. <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO is set to ENABLE; 3. <strong>PTYPE</strong> in the <strong>PMU</strong> MO is set to a value other than SC48200.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the values of <strong>LSDF</strong> in the <strong>PMU</strong> MO and <strong>LVSDF</strong> in the <strong>BATTERY</strong> MO are set to ENABLE, <strong>SDV</strong> in the <strong>BATTERY</strong> MO corresponding to the <strong>PMU</strong> MO with <strong>PTYPE</strong> set to a value other than SC48200 must be smaller than <strong>LSDV</strong> in the <strong>PMU</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, when the values of <strong>PTYPE</strong> and <strong>LSDF</strong> are set to SC48200 and ENABLE, respectively, the value of <strong>DCVLTHD</strong> minus the value of <strong>LSDV</strong> must be greater than or equal to 5.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, the value of <strong>LSDV</strong> must be smaller than <strong>DCVLTHD</strong> when the following conditions are met: 1. <strong>PTYPE</strong> is set to APM30, APM100, APM200, EPS4890, EPS48200, TP48300A, or ETP; 2. <strong>LSDF</strong> is set to ENABLE.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>PMU</strong> MO, when <strong>PTYPE</strong> is set to SC48200, <strong>LSDV</strong> is set to 465 by default. When <strong>PTYPE</strong> is set to a value other than SC48200, <strong>LSDV</strong> is set to 440 by default.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-LSDTF.html">LSDTF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Load Shutdown Time Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: This parameter determines whether the load is powered off based on time in a base station. When this parameter is set to DISABLE, the load is powered off only when the battery voltage is less than Load Shutdown Voltage. When this parameter is set to ENABLE, the load is powered off when the duration of AC power shutdown exceeds Load Shutdown Time or the battery voltage is less than Load Shutdown Voltage.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-LSDT.html">LSDT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Load Shutdown Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration after which the load is powered off. When both the flag for power-off against time and the flag for power-off against low voltage are enabled, the load is powered off when the duration of AC power shutdown exceeds Load Shutdown Time or the battery voltage is less than Load Shutdown Voltage.</p>
+<p>GUI Value Range: 0~1440</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 0~1440</p>
+<p>MML Default Value: 120</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-PDSNBCF.html">PDSNBCF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power Distribution Slot No-Backup Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the no-backup capability of the power distribution slots for a power system.If this parameter is set to DISABLE, the power system retains the backup power capability of the storage batteries in the power distribution slots when an AC power failure occurs. If this parameter is set to ENABLE, the power system powers off the load that is powered by the power distribution slots when an AC power failure occurs.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-LoadTempLthd.html">ATLTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet Temperature Alarm Lower Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower threshold of the cabinet temperature. If the cabinet temperature is lower than the value, an ALM-25652 Cabinet Temperature Unacceptable alarm is reported. This parameter is valid only for the APM100 and APM200 cabinets.</p>
+<p>GUI Value Range: -20~20(metric system);-4~68(imperial system)</p>
+<p>Unit: degree Celsius(metric system);degree Fahrenheit(imperial system)</p>
+<p>Actual Value Range: -20~20(metric system);-4~68(imperial system)</p>
+<p>MML Default Value: 0(metric system);32(imperial system)</p>
+<p>Recommended Value: 0(metric system);32(imperial system)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-LoadTempUthd.html">ATUTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet Temperature Alarm Upper Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper threshold of the cabinet temperature. If the cabinet temperature is higher than the value, an ALM-25652 Cabinet Temperature Unacceptable alarm is reported. This parameter is valid only for the APM100 and APM200 cabinets.</p>
+<p>GUI Value Range: 35~80(metric system);95~176(imperial system)</p>
+<p>Unit: degree Celsius(metric system);degree Fahrenheit(imperial system)</p>
+<p>Actual Value Range: 35~80(metric system);95~176(imperial system)</p>
+<p>MML Default Value: 50(metric system);122(imperial system)</p>
+<p>Recommended Value: 50(metric system);122(imperial system)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-HumiLthd.html">AHLTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet Humidity Alarm Lower Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower threshold of the cabinet humidity. If the cabinet humidity is lower than the value, an ALM-25653 Cabinet Humidity Unacceptable alarm is reported.</p>
+<p>GUI Value Range: 0~50</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~50</p>
+<p>MML Default Value: 10</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, <strong>AHLTHD</strong> must be smaller than <strong>AHUTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-HumiUthd.html">AHUTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet Humidity Alarm Upper Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper threshold of the cabinet humidity. If the cabinet humidity is higher than the value, an ALM-25653 Cabinet Humidity Unacceptable alarm is reported.</p>
+<p>GUI Value Range: 50~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 50~100</p>
+<p>MML Default Value: 80</p>
+<p>Recommended Value: 80</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PMU</strong> MO, <strong>AHLTHD</strong> must be smaller than <strong>AHUTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-SpecAnalogAlmFlg.html">SAAF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Special Analog Alarm Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to allow the report of a dedicated analog alarm. If the shield flag for an analog alarm is enabled, the analog alarm cannot be reported.</p>
+<p>GUI Value Range: BT1_DISABLE(Battery Temperature Sensor 1 Disabled), AH_DISABLE(Cabinet Humidity Sensor Disabled), AT1_DISABLE(Cabinet Temperature Sensor 1 Disabled), BT2_DISABLE(Battery Temperature Sensor 2 Disabled)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BT1_DISABLE, AH_DISABLE, AT1_DISABLE, BT2_DISABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that Battery Temperature Sensor 1 Disabled be set to OFF for PMUs in the APM30, PS4890, and SC48200 and ON for other PMUs, Cabinet Humidity Sensor Disabled be set to ON, Cabinet Temperature Sensor 1 Disabled be set to OFF for PMUs in the APM100 and APM200 and ON for other PMUs, and Battery Temperature Sensor 2 Disabled be set to ON.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-SpecBoolAlmFlg.html">SBAF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Special Boolean Alarm Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to allow the reporting of a dedicated Boolean alarm. If the shield flag for a Boolean alarm is enabled, the Boolean alarm cannot be reported.</p>
+<p>GUI Value Range: WS_DISABLE(Water-Immersed Sensor Disabled), SS_DISABLE(Smog Sensor Disabled), GS_DISABLE(Gating Sensor Disabled)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: WS_DISABLE, SS_DISABLE, GS_DISABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that Water-Immersed Sensor Disabled be set to ON, Smog Sensor Disabled be set to ON, and Gating Sensor Disabled be set to OFF for PMUs in the APM30, APM100, and APM200 and ON for other PMUs.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-HVDUNumber.html">HVDUNUMBER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HVDU Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of 225-400 V DC power distribution units (HVDUs). Set this parameter based on site conditions. An incorrect configuration will affect the reporting of the alarm related to the safety of 225-400 V DC power distribution..</p>
+<p>GUI Value Range: 0~3</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~3</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-HVDCIRAT.html">HVDCIRAT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HVDC Insulation Resistance Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the insulation resistance alarm threshold. The insulation resistance is that between the positive/negative bus bar and the ground, which retains the default value. If the load resistance value is less than the threshold, contact Huawei technical support to check the threshold.</p>
+<p>GUI Value Range: 10~300</p>
+<p>Unit: kohm</p>
+<p>Actual Value Range: 10~300</p>
+<p>MML Default Value: 28</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-HVDCOutputVoltage.html">HVDCOUTVOLTAGE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HVDC Output Voltage</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the 225-400 V direct current (DC) output voltage. Set this parameter based on site conditions. An incorrect parameter value may lead to overvoltage protection or even damage. If this parameter is set to a value greater than 300 V, disable the DC output of the DC power supply unit (HSU) and then enable the DC output to make the parameter setting take effect.</p>
+<p>GUI Value Range: 225~400</p>
+<p>Unit: V</p>
+<p>Actual Value Range: 225~400</p>
+<p>MML Default Value: 280</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-ACCLF.html">ACCLF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC Current Limiting Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the AC power system limits the AC input current. When this switch is turned on, the AC power system limits the AC input current to prevent the entire base station from being powered off due to the upper-level circuit breaker tripping. When this switch is turned off, the AC power system does not limit the AC input current. The maximum AC input current depends on the hardware capability of the AC power system. If the AC input current exceeds the rated current of the upper-level circuit breaker, the entire base station may be powered off.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-ACASCLT.html">ACASCLT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC Air Switch Current Limiting Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the AC input current threshold of the AC power system. After the AC current limiting function takes effect, the AC power system limits the AC input current so that the AC input current does not exceed the AC current threshold.</p>
+<p>GUI Value Range: 1~999</p>
+<p>Unit: A</p>
+<p>Actual Value Range: 1~999, step: 1</p>
+<p>MML Default Value: 63</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PMU-ACPT.html">ACPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC Phase Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the external AC phase type of the AC power system.</p>
+<p>GUI Value Range: SINGLE_PHASE(SINGLE_PHASE), DUAL_LIVE_WIRE(DUAL_LIVE_WIRE), THREE_PHASE(THREE_PHASE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLE_PHASE, DUAL_LIVE_WIRE, THREE_PHASE</p>
+<p>MML Default Value: THREE_PHASE(THREE_PHASE)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_pmu__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a PMU with the parameters as follows: Cabinet No.: 0, Subrack No.: 7, Power System Type: APM30, Manager Port No.: 0, run the following command:
+ADD PMU: CN=0, SRN=7, PTYPE=APM30, MPN=0;                              </pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

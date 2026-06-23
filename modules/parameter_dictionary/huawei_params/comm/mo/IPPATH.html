@@ -1,0 +1,449 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IPPATH">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IPPATH">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPPATH</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IPPATH"></a><a name="IPPATH"></a>
+
+
+<h1 class="topictitle1">IPPATH</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IPPATH.html"><strong>IPPATH</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The IPPATH MO is used to differentiate service transmission through the service transmission channel between the BS and other NEs by configuring the IP address and service quality on both ends of the channel.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>TRANSCFGMODE</strong> of <strong>IPPATH</strong> must be the same with the <strong>TRANSCFGMODE</strong> of <strong>GTRANSPARA</strong>.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>CASCADEPORT</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO or AUTO, this board cannot be configured with the <strong>IPPATH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]On a UBBP or LCOP board, if the <strong>CASCADEPORT</strong> MO in which the <strong>PN</strong> parameter is set to 6 does not exist, this board cannot be configured with the <strong>IPPATH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*40GE, and <strong>PT</strong> in the <strong>IPPATH</strong> MO for this board is set to ETH, <strong>PN</strong> and <strong>SBT</strong> can only be set to 0 and ETH_COVERBOARD, respectively, in the <strong>IPPATH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 4*10GE, and <strong>PT</strong> in the <strong>IPPATH</strong> MO for this board is set to ETH, <strong>PN</strong> and <strong>SBT</strong> can only be set to 0, 1, 2, or 3 and ETH_COVERBOARD, respectively, in the <strong>IPPATH</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]On a UBBP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*100GE, and <strong>PT</strong> in the <strong>IPPATH</strong> MO for this board is set to ETH, <strong>PN</strong> and <strong>SBT</strong> can only be set to 0 and ETH_COVERBOARD, respectively, in the <strong>IPPATH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPMSESSION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO is set to YES, the <strong>IPPATH</strong> MO specified by <strong>PATHID</strong> in the <strong>IPPMSESSION</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>BINDPATH</strong> and <strong>IPPMTYPE</strong> in an <strong>IPPMSESSION</strong> MO are set to YES and THREE_TUPLE, respectively, <strong>PATHTYPE</strong> in the <strong>IPPATH</strong> MO whose <strong>PATHID</strong> is the same as <strong>PATHID</strong> in the <strong>IPPMSESSION</strong> MO must be set to ANY.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>BINDPATH</strong> and <strong>IPPMTYPE</strong> in an <strong>IPPMSESSION</strong> MO are set to YES and THREE_TUPLE, respectively, <strong>SBT</strong> in the <strong>IPPATH</strong> MO whose <strong>PATHID</strong> is the same as <strong>PATHID</strong> in the <strong>IPPMSESSION</strong> MO must be set to BASE_BOARD or ETH_COVERBOARD.</li></ul>
+</li><li>Relation with the <strong>RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>JNRSCGRP</strong> in an <strong>IPPATH</strong> MO is set to ENABLE, the associated <strong>RSCGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> and <strong>JNRSCGRP</strong> in an <strong>IPPATH</strong> MO are set to PPP and DISABLE, respectively, the associated <strong>PPPLNK</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO is set to 0.0.0.0, the <strong>IPPATH</strong> MO must have been configured on a <strong>PPPLNK</strong> MO whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to PPP respectively, the associated <strong>PPPLNK</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, <strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO is set to 0.0.0.0, the <strong>IPPATH</strong> MO must have been configured on a <strong>PPPLNK</strong> MO whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> and <strong>JNRSCGRP</strong> in an <strong>IPPATH</strong> MO are set to MPGRP and DISABLE, respectively, the associated <strong>MPGRP</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO is set to 0.0.0.0, the <strong>IPPATH</strong> MO must have been configured on an <strong>MPGRP</strong> MO whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to MPGRP respectively, the associated <strong>MPGRP</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, <strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO is set to 0.0.0.0, the <strong>IPPATH</strong> MO must have been configured on an <strong>MPGRP</strong> MO whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>ETHTRK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> and <strong>JNRSCGRP</strong> in an <strong>IPPATH</strong> MO are set to ETHTRK and DISABLE, respectively, the associated <strong>ETHTRK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ETHTRKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in an <strong>IPPATH</strong> MO is set to ETH, ensure that the Ethernet port is not associated with an <strong>ETHTRKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]Any two <strong>IPPATH</strong> MOs must have different <strong>DSCP</strong> values if all of the following conditions are met: (1) The two MOs are in the same routing domain. (2) <strong>PATHTYPE</strong> is set to FIXED in these two MOs. (3) The two MOs have the same combination of <strong>LOCALIP</strong> and <strong>PEERIP</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PATHTYPE</strong> is set to ANY in one or two <strong>IPPATH</strong> MOs in the same routing domain, the two MOs must have different address pairs. That is, the two MOs must have different combinations of <strong>LOCALIP</strong> and <strong>PEERIP</strong>.</li><li>[Co-MPT, eNodeB]On a BS, the sum of <strong>IPPATH</strong> MOs must be less than or equal to 320.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in an <strong>IPPATH</strong> MO is set to LOOPINT, the corresponding <strong>DEVIP</strong> MO must have been configured, and <strong>VRFIDX</strong>, <strong>PT</strong>, and <strong>PN</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>VRFIDX</strong>, <strong>PT</strong>, and <strong>PN</strong> in the <strong>DEVIP</strong> MO, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in an <strong>IPPATH</strong> MO is set to TUNNEL, the <strong>DEVIP</strong> MO whose <strong>PT</strong> and <strong>BORROWIFIP</strong> are set to LOOPINT and NO respectively and that is in the same routing domain as the <strong>IPPATH</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO must be the same as a <strong>DEVIP</strong> MO configured at a physical port or loopback port of the same board. If <strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO is the same as a <strong>DEVIP</strong> MO configured at a physical port, <strong>PT</strong> and <strong>PN</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>PT</strong> and <strong>PN</strong> in the <strong>DEVIP</strong> MO, respectively. Alternatively, <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>LOCALIP</strong> in the associated <strong>PPPLNK</strong> MO or <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PORTSECURITY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>ETHPORT</strong> MO that is associated with an <strong>IPPATH</strong> MO must meet either of the following conditions: (1) No <strong>PORTSECURITY</strong> MO is associated with the <strong>ETHPORT</strong> MO; (2) A <strong>PORTSECURITY</strong> MO is associated with the <strong>ETHPORT</strong> MO, but <strong>SWITCH</strong> in the <strong>PORTSECURITY</strong> MO is set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to ETHTRK respectively, the associated <strong>ETHTRUNK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to ETHTRK respectively, the corresponding <strong>ETHTRUNKLNK</strong> MO of the associated <strong>ETHTRUNK</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eNodeB]If <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to ETH, ensure that the Ethernet port is not associated with an <strong>ETHTRUNKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BACKTUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to TUNNEL respectively, the associated <strong>BACKTUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ETHPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to ETH respectively, the associated <strong>ETHPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>LOOPBACK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to LOOPINT respectively, the associated <strong>LOOPBACK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>MPGRP</strong>, <strong>PPPLNK</strong>, <strong>LOOPBACK</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, the corresponding <strong>IPADDR4</strong> MO of an <strong>IPPATH</strong> MO must have been configured on the <strong>INTERFACE</strong> MO, and <strong>VRFIDX</strong>, and <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>VRFIDX</strong>, and <strong>IP</strong> in the <strong>IPADDR4</strong> MO, respectively. Alternatively, <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>LOCALIP</strong> in the associated <strong>PPPLNK</strong> MO or <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO. Alternatively, <strong>IPADDR4</strong> for the corresponding <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be configured on the port of <strong>LOOPBACK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>MPGRP</strong>, <strong>PPPLNK</strong>, <strong>LOOPBACK</strong>, <strong>INTERFACE</strong>, and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to ENABLE, the corresponding <strong>IPADDR4</strong> MO for <strong>LOCALIP</strong> must have been configured on the port of the <strong>IPRSCGRP</strong> MO which the <strong>IPPATH</strong> MO joins in, and <strong>VRFIDX</strong>, and <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>VRFIDX</strong>, and <strong>IP</strong> in the <strong>IPADDR4</strong> MO, respectively. Alternatively, <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>LOCALIP</strong> in the associated <strong>PPPLNK</strong> MO or <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO. Alternatively, <strong>IPADDR4</strong> for the corresponding <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be configured on the port of <strong>LOOPBACK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to ENABLE and <strong>LOCALIP</strong> is set to 0.0.0.0, the corresponding <strong>PT</strong> of <strong>IPRSCGRP</strong> MO must be set to PPP or MPGRP.</li><li>[Co-MPT, NodeB, eNodeB]If <strong>JNIPRSCGRP</strong> in an <strong>IPPATH</strong> MO is set to ENABLE, the associated <strong>IPRSCGRP</strong> MO must have been configured and is not set to AUTOPORT and DEFAULTPORT.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to ENABLE and <strong>LOCALIP</strong> is set to 0.0.0.0, and the corresponding <strong>PT</strong> of <strong>IPRSCGRP</strong> MO is set to PPP, the corresponding <strong>PPPLNK</strong> MO must have been configured whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to ENABLE and <strong>LOCALIP</strong> is set to 0.0.0.0, and the corresponding <strong>PT</strong> of <strong>IPRSCGRP</strong> MO is set to MPGRP, the corresponding <strong>MPGRP</strong> MO must have been configured whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>LOOPBACK</strong>, <strong>BACKTUNNEL</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to TUNNEL, the <strong>IPADDR4</strong> MO that is in the same routing domain as the <strong>IPPATH</strong> MO must have been configured, and also <strong>INTERFACE</strong> MO must have been configured on the <strong>LOOPBACK</strong> MO, which is on the same board with the corresponding <strong>BACKTUNNEL</strong> MO the <strong>IPPATH</strong> MO bears on.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>LOOPBACK</strong>, <strong>BACKTUNNEL</strong>, <strong>IPRSCGRP</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to ENABLE, and the <strong>PT</strong> in corresponding <strong>IPRSCGRP</strong> MO is set to TUNNEL, the <strong>IPADDR4</strong> MO that is in the same routing domain as the <strong>IPPATH</strong> MO must have been configured, and also <strong>INTERFACE</strong> MO must have been configured on the <strong>LOOPBACK</strong> MO, which is on the same board with the corresponding <strong>BACKTUNNEL</strong> MO the <strong>IPPATH</strong> MO bears on.</li></ul>
+</li><li>Relation with the <strong>TUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> and <strong>JNRSCGRP</strong> in an <strong>IPPATH</strong> MO are set to TUNNEL and DISABLE, respectively, the associated <strong>TUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]The <strong>DEVIP</strong> MO that is depended by an <strong>IPPATH</strong> MO cannot borrow an <strong>IFIP</strong> MO whose <strong>PT</strong> is ETHCI.</li><li>[Co-MPT, NodeB, eNodeB]If the <strong>DEVIP</strong> MO depended by an <strong>IPPATH</strong> MO borrows an <strong>IFIP</strong> MO and <strong>PT</strong> in the borrowed <strong>IFIP</strong> MO is SUBIF, <strong>PT</strong> and <strong>PN</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>PT</strong> and <strong>PN</strong> in the corresponding <strong>SUBIF</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>GPM</strong> MO:<ul><li>[Co-MPT, NodeB]When <strong>PT</strong> and <strong>RSCGRPID</strong> in the <strong>GPM</strong> MO are not set to LOOPINT and DEFAULTPORT, respectively, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>GPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li><li>[Co-MPT, NodeB]When <strong>PT</strong> in the <strong>GPM</strong> MO is not set to LOOPINT and <strong>RSCGRPID</strong> in the <strong>GPM</strong> MO is set to DEFAULTPORT, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>GPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li><li>[Co-MPT, NodeB]When <strong>PT</strong> in the <strong>GPM</strong> MO is set to LOOPINT, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>GPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li></ul>
+</li><li>Relation with the <strong>IPGPM</strong> MO:<ul><li>[Co-MPT, NodeB]When <strong>PT</strong> in the <strong>IPGPM</strong> MO is not set to LOOPINT and <strong>RSCGRPNO</strong> in the associated <strong>IPRSCGRP</strong> MO is not set to DEFAULTPORT, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>IPGPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li><li>[Co-MPT, NodeB]When <strong>PT</strong> in the <strong>IPGPM</strong> MO is set to LOOPINT, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>IPGPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li></ul>
+</li><li>Relation with the <strong>IPGPM</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB]When <strong>PT</strong> in the <strong>IPGPM</strong> MO is not set to LOOPINT and <strong>RSCGRPNO</strong> in the associated <strong>IPRSCGRP</strong> MO is set to DEFAULTPORT, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>IPGPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>IPPATH</strong> MOs must be less than or equal to 32 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>NODE</strong> MO:<ul><li>[Co-MPT]An <strong>IPPATH</strong> MO cannot be configured on a <strong>PRODUCTTYPE</strong> MO with <strong>PRODUCTTYPE</strong> set to DBS3900 DCU or DBS5900 DCU.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IPPATH__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPPATH__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IPPATH__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ippath.html">ADD IPPATH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ippath.html">DSP IPPATH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of an IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ippath.html">LST IPPATH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of an IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_ippath.html">MOD IPPATH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of an IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ippath.html">RMV IPPATH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an IP path.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IPPATH__tab2">Table 2</a> and <a href="#IPPATH__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IPPATH__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IPPATH__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-PathID.html">Path ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board where the IP path is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board where the IP path is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board where the IP path is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-PortType.html">Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the physical port type of the IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-PortNo.html">Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the port where the IP path is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-PathType.html">Path Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the IP path. FIXED indicates that this IP path is used to carry the service with specified Quality of Service (QoS), that is, with a specified DSCP. ANY indicates that this IP path can be used to carry services of any QoS and hence is used to carry the service without a specified DSCP.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-DSCP.html">DSCP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the differentiated services code point (DSCP) of the services carried on an IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-LocalIP.html">Local IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IP address of an IP path. The value 0.0.0.0 indicates that the local IP address needs to be negotiated.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-PeerIP.html">Peer IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer IP address of the IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-TranRscType.html">Transmission Resource Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of transport resource for the IP path. The value HQ indicates high-quality transport resources, and the value LQ indicates low-quality transport resources. This parameter must be set in the hybrid transmission scenario. In other scenarios, the default value of this parameter is used. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-MuxSwitch.html">IP MUX Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the IP MUX function is enabled on IP paths. LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-MuxTimeout.html">MUX Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the IP MUX timer, which defines the maximum buffer time for IP MUX packets. The LTE currently does not support the IP MUX function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-MaxMFLen.html">Maximum Length of IP MUX Multiframe</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum multiframe length of IP MUX. The LTE currently does not support the IP MUX function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-MaxSFLen.html">Maximum Length of IP MUX Subframe</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum subframe length of IP MUX. The LTE currently does not support the IP MUX function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-RscGroupNo.html">Transmission Resource Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the transmission resource group established on an IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-Description.html">Description</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the description about the peer of the IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where the IP path is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-JoinRscGroup.html">Join Transmission Resource Group</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the IP path joins a transmission resource group. If this parameter is set to DISABLE, the IP path is established on the default IP transmission resource group on a specific physical port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-LinkStaticChk.html">Static Check Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the GTP-U static detection function for a link. When this parameter is set to ENABLE, the GTP-U static detection function is enabled for a link. When this parameter is set to DISABLE, the GTP-U static detection function is disabled for a link. When this parameter is set to FOLLOW_GLOBAL, the setting of the switch for the GTP-U static detection function is the same as that of the base station-level GTP-U detection switch. This parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-TransCfgMode.html">Transmission Configuration Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the configuration mode of the transmission model. The transmission model can be configured in old or new mode.</p>
+<p>In old mode, the transmission model contains information such as cabinet, subrack, and slot numbers. Transmission configurations are bound to device boards.</p>
+<p>In new mode, the transmission model has decoupled transmission and device models. That is, transmission configuration removes unnecessary cabinet, subrack, and slot configurations.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-JoinIpRscGroup.html">Join IP Transmission Resource Group</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the IP path is added to an IP transmission resource group. When this parameter is set to DISABLE, the IP path is established on the default IP transmission resource group on a specified physical port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-IpRscGrpId.html">IP Transmission Resource Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the IP transmission resource group to which the IP path belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-BearPortType.html">Bearing Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the physical port type of the IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPPATH-PortId.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the port to which the IP path belongs.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IPPATH__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IPPATH__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-RealtimeTxBandwidth.html">Realtime TX Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual real-time traffic transmitted on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-RealtimeRxBandwidth.html">Realtime RX Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual real-time traffic received on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-NonRealtimeTxBandwidth.html">Non-Realtime TX Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual non-real-time traffic transmitted on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-NonRealtimeRxBandwidth.html">Non-Realtime RX Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual non-real-time traffic received on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-NonRealtimeReservedTxBandwidth.html">Non-Realtime Reserved TX Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual TX bandwidth reserved for the non-real-time service transmitted on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-NonRealtimeReservedRxBandwidth.html">Non-Realtime Reserved RX Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual RX bandwidth reserved for the non-real-time service received on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-IppathCheckResult.html">IP Path Check Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the check result for the GTP-U static detection of an IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-RealtimeTotalRxBandwidth.html">RX Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual total traffic received on the IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-RealtimeTotalTxBandwidth.html">TX Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual total traffic transmitted on the IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-ServiceType.html">Service Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the service type of an IP path.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPPATH-FaultGenerationTime.html">Fault Generation Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the time when an IP path becomes faulty.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#IPPATH__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPPATH__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="IPPATH__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455392.html">VS.IPPath.TxRtPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of real-time service packets successfully transmitted on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455393.html">VS.IPPath.TxRtBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes in the real-time service packets successfully transmitted on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455392.html">VS.IPPath.RxRtPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of real-time service packets successfully received on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455393.html">VS.IPPath.RxRtBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes in the real-time service packets successfully received on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455400.html">VS.IPPath.TxNrtPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of non-real-time service packets successfully transmitted on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455401.html">VS.IPPath.TxNrtBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes in the non-real-time service packets successfully transmitted on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455400.html">VS.IPPath.RxNrtPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of non-real-time service packets successfully received on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455401.html">VS.IPPath.RxNrtBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes in the non-real-time service packets successfully received on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455872.html">VS.IPPath.TxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes successfully transmitted on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455872.html">VS.IPPath.RxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes successfully received on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455874.html">VS.IPPath.TxPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of packets successfully transmitted on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455874.html">VS.IPPath.TxDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of discarded packets transmitted on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455874.html">VS.IPPath.RxDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of discarded packets received on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455874.html">VS.IPPath.RxPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of packets successfully received on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455878.html">VS.IPPath.TxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average TX rate on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455878.html">VS.IPPath.TxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum TX rate on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455878.html">VS.IPPath.RxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average RX rate on the IP path</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455878.html">VS.IPPath.RxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum RX rate on the IP path</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

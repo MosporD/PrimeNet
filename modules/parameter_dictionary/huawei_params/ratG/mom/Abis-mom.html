@@ -1,0 +1,94 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="Abis MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of the Abis MOM and provides the managed object model (MOM) view and MOs related to the Abis interface.">
+<meta name="description" content="This section describes the functions and concepts of the Abis MOM and provides the managed object model (MOM) view and MOs related to the Abis interface.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../ratG/mom/GBTSFunction-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Abis-mom">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Abis MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Abis-mom"></a><a name="Abis-mom"></a>
+
+
+<h1 class="topictitle1">Abis MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of the Abis MOM and provides the managed object model (MOM) view and MOs related to the Abis interface.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p>The GSM Abis interface works between a BTS and a BSC and complies with the protocol stacks shown in <a href="#Abis-mom__fig-1">Figure 1</a>. By data to be transmitted, the Abis interface can be divided into the
+control plane and user plane. </p>
+<div class="p"><div class="fignone" id="Abis-mom__fig-1"><a name="Abis-mom__fig-1"></a><a name="fig-1"></a><span class="figcap"><b>Figure 1 </b>Abis protocol stack</span>
+
+<br><span><img src="../image/mom/Abis1.png"></span></div>
+</div>
+<ul><li>The protocol stacks at the physical layer, data link layer, and network transport layer are the same for the control plane and user plane over the Abis interface of GBTSFunction. The physical layer uses FE/GE and E1/T1 protocols. The data link
+layer uses Ethernet, virtual local area network (VLAN), Point-to-Point Protocol (PPP), and Multi-Link Point-to-Point Protocol (MLPPP) protocols. The network transport layer uses Internet Protocol (IP).</li><li>On the control plane over the Abis interface of GBTSFunction, the transport layer is borne by the SCTP protocol and the radio network layer has RSLs and CSLs. On the user plane over the Abis interface of GBTSFunction, the transport layer is borne
+by the UDP protocol and the radio network layer has TCHpTrau and PDCH pTrau. </li></ul>
+<p><a href="#Abis-mom__fig-2">Figure 2</a> shows the relationship between MOs over the GSM Abis interface.</p>
+<div class="p"><div class="fignone" id="Abis-mom__fig-2"><a name="Abis-mom__fig-2"></a><a name="fig-2"></a><span class="figcap"><b>Figure 2 </b>Relationship between MOs over the Abis interface</span>
+
+<br><span><img src="../image/mom/Abis2.png"></span></div>
+</div>
+<p>The Abis data can be configured in Link or End-Point mode. In Link mode, both local and peer parameters, such as source and destination IP addresses, are manually configured. In End-Point mode,
+local parameters can only be manually configured and peer parameters can be automatically obtained by the GBTSFunction from signaling or manually configured.</p>
+<ul><li>The control-plane data over the Abis interface can be configured only in Link mode. The related MOs are SCTPLNK, CPBEARER, and GBTSABISCP.</li><li>The user-plane data over the Abis interface can be configured in either Link or End-Point mode. In Link mode, the related MOs are IPPATH and GBTSPATH (optional). In End-Point mode, the related MOs are USERPLANEHOST, USERPLANEPEER, EPGROUP, and
+ABIS.<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody"><div class="p"><ol><li>The user-plane data over the Abis interface can be configured in only one mode (Link mode or End-Point mode) at a time. The Link mode is recommended.</li><li>When the user-plane data over the Abis interface is configured in Link mode, the GBTSPATH MO is optional. For a co-MPT GSM/UMTS base station, if the GSM and UMTS modes use the same peer IP address and differentiated services code point (DSCP) but
+different local IP addresses under the IPPATH MO, the GBTSPATH MO must be configured. </li><li>When the user-plane data over the Abis interface is configured in End-Point mode, it is recommended that local parameters be manually configured and peer parameters be automatically obtained by the GBTSFunction from signaling.</li></ol>
+</div>
+</div></div>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">MOM</h4><p><strong>Abis Control-Plane MOM</strong></p>
+<p><a href="#Abis-mom__fig-3">Figure 3</a> is a subset of the eGBTS MOM and provides MOs related to the Abis control plane.</p>
+<div class="p"><div class="fignone" id="Abis-mom__fig-3"><a name="Abis-mom__fig-3"></a><a name="fig-3"></a><span class="figcap"><b>Figure 3 </b>MOM view for Abis control plane</span>
+
+<br><span><img src="../image/mom/Abis3.png"></span></div>
+</div>
+<ul><li><a href="../../comm/mo/SCTPLNK.html">SCTPLNK</a> defines an SCTP link over the Abis interface of the GBTSFunction and is used to configure SCTP-related parameters.</li><li><a href="../../comm/mo/CPBEARER.html">CPBEARER</a> is the encapsulation and abstraction of the control port bearer and is used to shield lower-layer protocol information from the upper-layers and to provide transmission bearer for the control
+plane at the application layer. One CPBEARER MO corresponds to one SCTPLNK MO.</li><li><a href="../mo/GbtsAbisCP.html">GBTSABISCP</a> defines the control port that carries the Abis control-plane data for a GBTSFunction. One GBTSABISCP MO corresponds to one CPBEARER MO.</li></ul>
+<p><strong>Abis User-Plane MOM</strong></p>
+<p><a href="#Abis-mom__fig-4">Figure 4</a> and <a href="#Abis-mom__fig-5">Figure 5</a> are subsets of the eGBTS MOM and provide MOs related to the Abis user plane.</p>
+<div class="p"><div class="fignone" id="Abis-mom__fig-4"><a name="Abis-mom__fig-4"></a><a name="fig-4"></a><span class="figcap"><b>Figure 4 </b>MOM diagram for Abis user plane (in Link mode)</span>
+
+<br><span><img src="../image/mom/Abis4.png"></span></div>
+</div>
+<ul><li><a href="../../comm/mo/IPPATH.html">IPPATH</a> defines a path for transmitting user-plane data over the Abis interface of a GBTSFunction.</li><li><a href="../mo/GbtsPath.html">GBTSPATH</a>, which is optional, defines the IPPATH MO that can be bound to the GBTSFunction. One GBTSPATH MO corresponds to one IPPATH MO.</li></ul>
+<div class="p"><div class="fignone" id="Abis-mom__fig-5"><a name="Abis-mom__fig-5"></a><a name="fig-5"></a><span class="figcap"><b>Figure 5 </b>MOM view for Abis user plane (in End-Point mode)</span>
+
+<br><span><img src="../image/mom/Abis5.png"></span></div>
+</div>
+<ul><li><a href="../../comm/mo/USERPLANEHOST.html">USERPLANEHOST</a> defines local transmission parameters for the user-plane data. <a href="../../comm/mo/USERPLANEPEER.html">USERPLANEPEER</a> defines peer transmission parameters for the user-plane
+data.</li><li><a href="../../comm/mo/EPGROUP.html">EPGROUP</a> defines a set of transmission end point resources, including a set of control-plane end points, user-plane end points, or a combined set of both. The GBTSFunction can only use the set of user-plane
+end points. One EPGROUP MO can be configured with a maximum of 12 USERPLANEHOST MOs.</li><li><a href="../mo/Abis.html">ABIS</a> defines a set of transmission resources bound to the Abis interface of a GBTSFunction. One ABIS MO corresponds to one EPGROUP MO.</li></ul>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../ratG/mom/GBTSFunction-mom.html" title="This section describes the functions and concepts of GBTSFunction and also provides the managed object model (MOM) view and MOs related to GBTSFunction.">GBTSFunction MOM Description</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

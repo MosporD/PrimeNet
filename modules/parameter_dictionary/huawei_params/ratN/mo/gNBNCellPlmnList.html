@@ -1,0 +1,125 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="gNBNCellPlmnList">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="gNBNCellPlmnList">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>gNBNCellPlmnList</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="gNBNCellPlmnList"></a><a name="gNBNCellPlmnList"></a>
+
+
+<h1 class="topictitle1">gNBNCellPlmnList</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="gNBNCellPlmnList.html"><strong>gNBNCellPlmnList</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO defines the neighboring-cell PLMN list of a gNodeB.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="gNodeBFunction.html">gNodeBFunction</a></li><li>Relation with the <strong>gNBOperator</strong> MO:<ul><li>Among <strong>gNBNCellPlmnList</strong> MO instances with <strong>RatType</strong> set to NR, if the values of <strong>Mnc</strong> and <strong>Mcc</strong> are the same as those of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>gNBOperator</strong> MO, respectively, <strong>PlmnListType</strong> in these MO instances must be set to WHITELIST.</li></ul>
+</li><li>Relation with the <strong>NRExternalNCellPlmn</strong> MO:<ul><li>If the values of <strong>SharedMnc</strong> and <strong>SharedMcc</strong> in the <strong>NRExternalNCellPlmn</strong> MO are the same as the respective values of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>gNBNCellPlmnList</strong> MO, and <strong>RatType</strong> in the <strong>gNBNCellPlmnList</strong> MO is set to NR, <strong>PlmnListType</strong> in the <strong>gNBNCellPlmnList</strong> MO cannot be set to BLACKLIST.</li></ul>
+</li><li>Relation with the <strong>NRExternalNCell</strong> MO:<ul><li>If the values of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>NRExternalNCell</strong> MO are the same as the respective values of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>gNBNCellPlmnList</strong> MO, and <strong>RatType</strong> in the <strong>gNBNCellPlmnList</strong> MO is set to NR, <strong>PlmnListType</strong> in the <strong>gNBNCellPlmnList</strong> MO cannot be set to BLACKLIST.</li></ul>
+</li><li>Relation with the <strong>gNBEutraExtCellPlmn</strong> MO:<ul><li>If the values of <strong>SharedMnc</strong> and <strong>SharedMcc</strong> in the <strong>gNBEutraExtCellPlmn</strong> MO are the same as the respective values of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>gNBNCellPlmnList</strong> MO, and <strong>RatType</strong> in the <strong>gNBNCellPlmnList</strong> MO is set to EUTRAN, <strong>PlmnListType</strong> in the <strong>gNBNCellPlmnList</strong> MO cannot be set to BLACKLIST.</li><li>In all the <strong>gNBNCellPlmnList</strong> MOs with <strong>RatType</strong> set to EUTRAN, if the <strong>PlmnListType</strong> values include WHITELIST and GREYLIST, the following condition must be true: the values of <strong>SharedMnc</strong> and <strong>SharedMcc</strong> in all the <strong>gNBEutraExtCellPlmn</strong> MOs configured for the local gNodeB must be the same as those of <strong>Mnc</strong> and <strong>Mcc</strong> in a <strong>gNBNCellPlmnList</strong> MO with <strong>RatType</strong> set to EUTRAN, respectively.</li></ul>
+</li><li>Relation with the <strong>gNBEutraExternalCell</strong> MO:<ul><li>If the values of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>gNBEutraExternalCell</strong> MO are the same as the respective values of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>gNBNCellPlmnList</strong> MO, and <strong>RatType</strong> in the <strong>gNBNCellPlmnList</strong> MO is set to EUTRAN, <strong>PlmnListType</strong> in the <strong>gNBNCellPlmnList</strong> MO cannot be set to BLACKLIST.</li><li>In all the <strong>gNBNCellPlmnList</strong> MOs with <strong>RatType</strong> set to EUTRAN, if the <strong>PlmnListType</strong> values include WHITELIST and GREYLIST, the following condition must be true: the values of <strong>Mnc</strong> and <strong>Mcc</strong> in all the <strong>gNBEutraExternalCell</strong> MOs configured for the local gNodeB must be the same as those of <strong>Mnc</strong> and <strong>Mcc</strong> in a <strong>gNBNCellPlmnList</strong> MO with <strong>RatType</strong> set to EUTRAN, respectively.</li></ul>
+</li><li>Relation with the <strong>NRExternalNCellPlmn</strong> and <strong>gNBOperator</strong> MOs:<ul><li>In all the <strong>gNBNCellPlmnList</strong> MOs with <strong>RatType</strong> set to NR, if the <strong>PlmnListType</strong> values include WHITELIST and GREYLIST, the following condition must be true: the values of <strong>SharedMnc</strong> and <strong>SharedMcc</strong> in all the <strong>NRExternalNCellPlmn</strong> MOs must be the same as those of <strong>Mnc</strong> and <strong>Mcc</strong> in a <strong>gNBOperator</strong> MO, respectively; or the values of <strong>SharedMnc</strong> and <strong>SharedMcc</strong> in all the <strong>NRExternalNCellPlmn</strong> MOs must be the same as those of <strong>Mnc</strong> and <strong>Mcc</strong> in a <strong>gNBNCellPlmnList</strong> MO with <strong>RatType</strong> set to NR, respectively.</li></ul>
+</li><li>Relation with the <strong>NRExternalNCell</strong> and <strong>gNBOperator</strong> MOs:<ul><li>In all the <strong>gNBNCellPlmnList</strong> MOs with <strong>RatType</strong> set to NR, if the <strong>PlmnListType</strong> values include WHITELIST and GREYLIST, the following condition must be true: the values of <strong>Mnc</strong> and <strong>Mcc</strong> in all the <strong>NRExternalNCell</strong> MOs must be the same as those of <strong>Mnc</strong> and <strong>Mcc</strong> in a <strong>gNBOperator</strong> MO, respectively; or the values of <strong>Mnc</strong> and <strong>Mcc</strong> in all the <strong>NRExternalNCell</strong> MOs must be the same as those of <strong>Mnc</strong> and <strong>Mcc</strong> in a <strong>gNBNCellPlmnList</strong> MO with <strong>RatType</strong> set to NR, respectively.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#gNBNCellPlmnList__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="gNBNCellPlmnList__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="gNBNCellPlmnList__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_gnbncellplmnlist.html">ADD GNBNCELLPLMNLIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a record to the neighboring-cell PLMN list of a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_gnbncellplmnlist.html">LST GNBNCELLPLMNLIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list neighboring-cell PLMN list configurations of a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_gnbncellplmnlist.html">RMV GNBNCELLPLMNLIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a record from the neighboring-cell PLMN list of a gNodeB.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#gNBNCellPlmnList__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="gNBNCellPlmnList__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="gNBNCellPlmnList__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBNCellPlmnList-RatType.html">RAT Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RAT of the neighboring cell corresponding to the PLMN.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBNCellPlmnList-Mcc.html">Mobile Country Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MCC in the PLMN of the neighboring cell. The value of this parameter is a string of three decimal digits.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBNCellPlmnList-Mnc.html">Mobile Network Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MNC in the PLMN of the neighboring cell. The value of this parameter is a string of two or three decimal digits.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBNCellPlmnList-PlmnListType.html">PLMN List Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of a PLMN list. If this parameter is set to BLACKLIST, the cell of the blacklisted PLMN cannot be configured as a neighboring cell or an external cell by ANR. If this parameter is set to GREYLIST, the cell of the graylisted PLMN can be added as a neighboring cell and an external cell by ANR, but handovers to the cell of the graylisted PLMN are not allowed. If this parameter is set to WHITELIST, the cell of the whitelisted PLMN can be added as a neighboring cell and an external cell by ANR. This parameter can be set to only two of the three values for all PLMNs in NR and E-UTRAN. The type of PLMNs for which this parameter is not configured is considered the third type by default.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,541 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell Beamforming Configuration (MOD CELLBF)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellbf">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell Beamforming Configuration (MOD CELLBF)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellbf"></a><a name="mod_cellbf"></a>
+
+
+<h1 class="topictitle1">Modify Cell Beamforming Configuration (MOD CELLBF)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellbf__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the information used to control the single-stream or dual-stream beamforming.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellbf__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>Modifying the PdschSplitBeamConfigIndex parameter will result in automatic reset of the cell.</p>
+</li><li><p>If a TDD cell is activated, the TM9HybridPrecodingSwitch option of the CellAlgoSwitch.EnhMIMOSwitch parameter must be deselected before setting the CellCsiRsParaCfg.CsiRsPortNum parameter and the CellBf.PdschSplitBeamConfigIndex parameter to CSI_RS_PORT_8 and CONFIG_INDEX4, respectively.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellbf__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cell ID of the local cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-MaxBfRankPara.html">MaxBfRankPara</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Beamforming maximum number of layers</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of beamforming layers, that is, the rank of beamforming. The value SINGLE_LAYER_BF indicates single-layer beamforming (that is, beamforming with the rank of 1). The value DUAL_LAYER_BF indicates dual-layer beamforming (that is, beamforming with the rank of 2). The value FOUR_LAYER_BF indicates three- or four-layer beamforming (that is, beamforming with the rank of 3 or 4). This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: SINGLE_LAYER_BF(Single-Layer BF), DUAL_LAYER_BF(Dual-Layer BF), FOUR_LAYER_BF(Four-Layer BF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLE_LAYER_BF, DUAL_LAYER_BF, FOUR_LAYER_BF</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SINGLE_LAYER_BF(Single-Layer BF)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-AntSelUEMubfPairMode.html">AntSelUEMubfPairMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Antenna Selection UE MUBF Pair Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MU beamforming pairing policy for UEs that support transmit antenna selection during SRS transmission. This parameter takes effect only in massive MIMO scenarios. If this parameter is set to SINGLE_STREAM_PAIR, such UEs in single-stream beamforming mode are paired for MU beamforming. If this parameter is set to DUAL_STREAM_PAIR, such UEs in dual-stream beamforming mode are paired for MU beamforming. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: SINGLE_STREAM_PAIR(SINGLE_STREAM_PAIR), DUAL_STREAM_PAIR(DUAL_STREAM_PAIR)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLE_STREAM_PAIR, DUAL_STREAM_PAIR</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DUAL_STREAM_PAIR(DUAL_STREAM_PAIR)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to SINGLE_STREAM_PAIR, the downlink cell throughput increases. If this parameter is set to DUAL_STREAM_PAIR, the downlink cell throughput further increases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-NonAntSelUEMubfPairMode.html">NonAntSelUEMubfPairMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Non Antenna Selection UE MUBF Pair Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the policy of pairing UEs that do not support transmit antenna selection during SRS transmission for MU beamforming. This parameter applies only to massive MIMO cells. If this parameter is set to SINGLE_STREAM_PAIR(SINGLE_STREAM_PAIR), such UEs in single-stream beamforming mode are paired for MU beamforming. If this parameter is set to DUAL_STREAM_PAIR(DUAL_STREAM_PAIR), such UEs in dual-stream beamforming mode are paired for MU beamforming. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: SINGLE_STREAM_PAIR(SINGLE_STREAM_PAIR), DUAL_STREAM_PAIR(DUAL_STREAM_PAIR)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLE_STREAM_PAIR, DUAL_STREAM_PAIR</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SINGLE_STREAM_PAIR(SINGLE_STREAM_PAIR)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to SINGLE_STREAM_PAIR(SINGLE_STREAM_PAIR), the downlink cell throughput increases. If this parameter is set to DUAL_STREAM_PAIR(DUAL_STREAM_PAIR), the downlink cell throughput further increases, but the downlink BLER may increase too.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-PdschSplitBeamConfigIndex.html">PdschSplitBeamConfigIndex</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDSCH Split Beam Config Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PDSCH split beam weight index in massive MIMO scenarios. This parameter is used to select a transmit weight coefficient for the transmission modes (TM7, TM8, and TM9) used to demodulate downlink UE-specific reference signals. This parameter applies only to massive MIMO LTE TDD cells.</p>
+<p>1. If this parameter is set to CONFIG_DEFAULT, the default beam configuration template is used, and 15 beams are configured.</p>
+<p>2. If this parameter is set to CONFIG_INDEX1, the first set of beam configuration templates is used, and 11 beams are configured.</p>
+<p>3. If this parameter is set to CONFIG_INDEX2, the second set of beam configuration templates is used, and 9 beams are configured.</p>
+<p>4. If this parameter is set to CONFIG_INDEX3, the third set of beam configuration templates is used, and 7 beams are configured.</p>
+<p>5. If this parameter is set to CONFIG_INDEX4, the fourth set of beam configuration templates is used. For 64T64R cells, 15 beams using 4-port TM9 hybrid precoding and 14 beams using 8-port TM9 hybrid precoding are configured. For 32T32R cells, 15 beams using 4-port TM9 hybrid precoding and 6 beams using 8-port TM9 hybrid precoding are configured. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: CONFIG_DEFAULT(CONFIG_DEFAULT), CONFIG_INDEX1(CONFIG_INDEX1), CONFIG_INDEX2(CONFIG_INDEX2), CONFIG_INDEX3(CONFIG_INDEX3), CONFIG_INDEX4(CONFIG_INDEX4)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CONFIG_DEFAULT, CONFIG_INDEX1, CONFIG_INDEX2, CONFIG_INDEX3, CONFIG_INDEX4</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: CONFIG_DEFAULT(CONFIG_DEFAULT)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Set this parameter based on network conditions to achieve better performance. If UEs are widely distributed or a small proportion of UEs are moving, the configuration denoting more beams is suitable. If UEs are centrally distributed or a large proportion of UEs are moving, the configuration denoting fewer beams is suitable.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-SplitSdmaAdaptionPeriod.html">SplitSdmaAdaptionPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Split SDMA Adaption Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the adjustment period for adaptation between entry to and exit from split SDMA in massive MIMO scenarios. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: FORCE_SPLIT_SDMA(FORCE_SPLIT_SDMA), PERIOD_15MIN(PERIOD_15MIN), PERIOD_30MIN(PERIOD_30MIN), PERIOD_60MIN(PERIOD_60MIN), PERIOD_120MIN(PERIOD_120MIN)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FORCE_SPLIT_SDMA, PERIOD_15MIN, PERIOD_30MIN, PERIOD_60MIN, PERIOD_120MIN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: PERIOD_60MIN(PERIOD_60MIN)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: When split SDMA is enabled:</p>
+<p>If this parameter is set to FORCE_SPLIT_SDMA, split SDMA takes effect directly.</p>
+<p>If this parameter is set to another value, the eNodeB distinguishes the network conditions within the period specified by this parameter to determine whether to trigger split SDMA. A short period leads to a high probability of triggering split SDMA and high pairing efficiency, but frequent entries to or exits from split SDMA and more signaling overheads for transmission mode reconfigurations. A long period leads to a low probability of triggering split SDMA and low pairing efficiency, but infrequent entries to or exits from split SDMA and less signaling overheads for transmission mode reconfigurations.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-HighOrderMubfMaxLayer.html">HighOrderMubfMaxLayer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max Number of MUBF Layers</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of layers that can be paired for MU beamforming. This parameter takes effect only when the MuBfSwitch option of the MuBfAlgoSwitch parameter is selected. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: TWO_LAYERS(TWO_LAYERS), FOUR_LAYERS(FOUR_LAYERS), EIGHT_LAYERS(EIGHT_LAYERS), TWELVE_LAYERS(TWELVE_LAYERS), SIXTEEN_LAYERS(SIXTEEN_LAYERS), TWENTYFOUR_LAYERS(TWENTYFOUR_LAYERS), SIX_LAYERS(SIX_LAYERS), TEN_LAYERS(TEN_LAYERS), FOURTEEN_LAYERS(FOURTEEN_LAYERS), EIGHTEEN_LAYERS(EIGHTEEN_LAYERS), TWENTY_LAYERS(TWENTY_LAYERS), TWENTYTWO_LAYERS(TWENTYTWO_LAYERS)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TWO_LAYERS, FOUR_LAYERS, EIGHT_LAYERS, TWELVE_LAYERS, SIXTEEN_LAYERS, TWENTYFOUR_LAYERS, SIX_LAYERS, TEN_LAYERS, FOURTEEN_LAYERS, EIGHTEEN_LAYERS, TWENTY_LAYERS, TWENTYTWO_LAYERS</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: TWO_LAYERS</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The HighOrderMubfMaxLayer parameter in the CellBf MO cannot be set to EIGHTEEN_LAYERS, TWENTY_LAYERS, TWENTYTWO_LAYERS, or TWENTYFOUR_LAYERS when the MassiveMIMOMubfPairRule parameter in the CellBf MO is set to MU_CORR_PAIR_RULE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the number of layers of UEs that can be paired for MU beamforming and the downlink cell throughput decrease. If this parameter is set to a large value, the number of layers of UEs that can be paired for MU beamforming and the downlink cell throughput increase.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-HighOrderMubfPairRule.html">HighOrderMubfPairRule</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MUBF Pairing Rule</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rule of high-order MU beamforming pairing. This parameter takes effect only when the MuBfSwitch option of the MuBfAlgoSwitch parameter is selected in non-massive MIMO scenarios. There are two pairing rules. PRE_MU_PRI_PAIR_RULE: Indicates that UEs are paired based on the UE scheduling priority used before they are paired. The impact on the network performance of this rule is similar to the impact of the scheduling algorithm used before UE pairing for MU beamforming. POST_MU_PF_PRI_PAIR_RULE: Indicates that UEs are paired based on the evaluated UE scheduling priorities and channel quality difference after UEs are paired for MU beamforming. This rule increases the system capacity after pairing for MU beamforming. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: PRE_MU_PRI_PAIR_RULE(PRE_MU_PRI_PAIR_RULE), POST_MU_PF_PRI_PAIR_RULE(POST_MU_PF_PRI_PAIR_RULE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PRE_MU_PRI_PAIR_RULE, POST_MU_PF_PRI_PAIR_RULE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: POST_MU_PF_PRI_PAIR_RULE</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: PRE_MU_PRI_PAIR_RULE: If this parameter is set to PRE_MU_PRI_PAIR_RULE, UEs are paired based on the scheduling priority of UEs used before they are paired. The impact on the network depends on the scheduling algorithm used by the UE before pairing.</p>
+<p>POST_MU_PF_PRI_PAIR_RULE: If this parameter is set to POST_MU_PF_PRI_PAIR_RULE, UEs are paired by considering the channel quality and whether the PF priority of UEs is optimal after they are paired. This pairing rule increases the system capacity and ensures the scheduling fairness among UEs. However, the differentiation among UEs is not considered.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-MovingUeMuBfScheme.html">MovingUeMuBfScheme</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Moving Ue MUBF Scheme</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MU beamforming scheme selected for moving UEs when massive MIMO is enabled. An appropriate MU beamforming scheme increases the throughput of MU beamforming UEs. This parameter applies only to LTE TDD.</p>
+<p>If this parameter is set to MOVING_MUBF_SCHEME_OFF, the eNodeB disables the MU beamforming scheme for moving UEs.</p>
+<p>If this parameter is set to HEAVY_LOAD_SCHEME, the eNodeB selects an MU beamforming scheme that applies to moving UEs in heavy-load scenarios.</p>
+<p>If this parameter is set to LIGHT_LOAD_SCHEME, the eNodeB selects an MU beamforming scheme that applies to moving UEs in light-load scenarios.</p>
+<p>If this parameter is set to SPLIT_SDMA_SCHEME, the eNodeB enables split SDMA for moving UEs. This value takes effect after split SDMA is enabled.</p>
+<p>If this parameter is set to BIG_EVENT_PROTECT_SCHEME, the eNodeB optimizes MU beamforming pairing for coverage areas with a large number of UEs in mobility state during major events.</p>
+<p>If this parameter is set to HIGH_SPEED_OPT_SCHEME, the eNodeB enables MU beamforming pairing optimization in high-speed scenarios.</p>
+<p>GUI Value Range: MOVING_MUBF_SCHEME_OFF(MOVING_MUBF_SCHEME_OFF), HEAVY_LOAD_SCHEME(HEAVY_LOAD_SCHEME), LIGHT_LOAD_SCHEME(LIGHT_LOAD_SCHEME), SPLIT_SDMA_SCHEME(SPLIT_SDMA_SCHEME), BIG_EVENT_PROTECT_SCHEME(BIG_EVENT_PROTECT_SCHEME), HIGH_SPEED_OPT_SCHEME(HIGH_SPEED_OPT_SCHEME)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MOVING_MUBF_SCHEME_OFF, HEAVY_LOAD_SCHEME, LIGHT_LOAD_SCHEME, SPLIT_SDMA_SCHEME, BIG_EVENT_PROTECT_SCHEME, HIGH_SPEED_OPT_SCHEME</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: HEAVY_LOAD_SCHEME(HEAVY_LOAD_SCHEME)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to MOVING_MUBF_SCHEME_OFF, the UE throughput decreases when MU beamforming pairing is performed for moving UEs.</p>
+<p>If this parameter is set to HEAVY_LOAD_SCHEME, the eNodeB selects an MU beamforming scheme that applies to moving UEs in heavy-load scenarios, increasing the throughput of MU beamforming UEs.</p>
+<p>If this parameter is set to LIGHT_LOAD_SCHEME, the eNodeB selects an MU beamforming scheme that applies to moving UEs in light-load scenarios, increasing the throughput of MU beamforming UEs.</p>
+<p>If this parameter is set to SPLIT_SDMA_SCHEME, the eNodeB enables split SDMA for moving UEs, improving the throughput of such UEs.</p>
+<p>If this parameter is set to BIG_EVENT_PROTECT_SCHEME, the eNodeB selects an MU beamforming scheme for coverage areas with a large number of walking UEs or UEs moving faster than the walking speed during major events. This increases the average cell throughput but reduces the number of layers paired for MU beamforming.</p>
+<p>The eNodeB uses the counter measuring the number of layers successfully paired for MU beamforming to determine whether the network is heavily or lightly loaded, and then selects an appropriate MU beamforming scheme.</p>
+<p>If this parameter is set to HIGH_SPEED_OPT_SCHEME, the eNodeB enables MU beamforming pairing optimization to improve the throughput of moving UEs in high-speed scenarios.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-QualUEPortAvoidMode.html">QualUEPortAvoidMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Allocation Avoid for Continuous NACK UEs</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to identify UEs with consecutive bit errors and whether to implement the port allocation policy. If this parameter is set to OFF, the eNodeB does not identify and protect UEs with consecutive bit errors. If this parameter is set to USERIDENTIFY, the eNodeB protects only UEs with consecutive bit errors. If this parameter is set to ALLUSERPROTECT, the eNodeB protects all UEs. If this parameter is set to USERIDENTIFYRANK2PAIRING, the eNodeB protects only UEs with consecutive bit errors, and dual-stream beamforming UEs with consecutive bit errors can be paired for MU beamforming and D-MIMO. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(OFF), USERIDENTIFY(USERIDENTIFY), ALLUSERPROTECT(ALLUSERPROTECT), USERIDENTIFYRANK2PAIRING(USERIDENTIFYRANK2PAIRING)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, USERIDENTIFY, ALLUSERPROTECT, USERIDENTIFYRANK2PAIRING</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, UEs with consecutive bit errors may be disconnected from the network, affecting cell KPIs. If this parameter is set to USERIDENTIFY, the eNodeB identifies UEs with consecutive bit errors and performs protection operations for such UEs, preventing such errors from occurring again. If this parameter is set to ALLUSERPROTECT, the eNodeB performs protection operations for all UEs to prevent consecutive bit errors, which will lower the cell throughput. If this parameter is set to USERIDENTIFYRANK2PAIRING, the eNodeB identifies UEs with consecutive bit errors and performs protection operations for such UEs, preventing such errors from occurring again. At the same time, dual-stream beamforming UEs with consecutive bit errors can be paired for MU beamforming and D-MIMO. This can increase the cell throughput in multi-UE heavy-load test scenarios with a high pairing ratio, but cannot ensure positive gains to the cell throughput for commercial networks.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-WaitPairingLayerThd.html">WaitPairingLayerThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Wait Pairing Layer Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the number of pairing layers. This parameter is used to identify heavy-load and multi-layer pairing scenarios and adapt the transmission mode for each cell, facilitating multi-user pairing and improving system capacity. If this parameter is set to 0, heavy-load scenarios are not identified and the transmission mode is not adapted for each cell. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~640</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that this parameter be set to 0 when multi-layer pairing is not performed or when multi-layer pairing can be performed but the cell load is light or the pairing rate is low.</p>
+<p>It is recommended that this parameter be set to 30 when the cell load is heavy and the multi-layer pairing rate is high.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a smaller value, the eNodeB is more likely to adapt the transmission mode for each cell, allowing beamforming UEs to stay in beamforming mode for multi-user pairing. If this parameter is set to a larger value, the eNodeB is less likely to adapt the transmission mode for each cell.</p>
+<p>If this parameter is set to a small value when multi-layer pairing can be performed, multi-user pairing is more likely to be performed, increasing the cell throughput.</p>
+<p>If this parameter is set to a small value when multi-layer pairing cannot be performed, beamforming UEs cannot be paired even in beamforming mode, decreasing the cell throughput. Therefore, you are advised to set this parameter to a large value when multi-layer pairing cannot be performed.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-MassiveMIMOMubfPairRule.html">MassiveMIMOMubfPairRule</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Massive MIMO MUBF Pairing Rule</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rule of UE pairing for MU beamforming in massive MIMO scenarios. For LTE TDD cells, this parameter takes effect only when the MuBfSwitch option of the MuBfAlgoSwitch parameter is selected in massive MIMO scenarios. For LTE FDD cells, this parameter takes effect only when the dynamic dedicated beam (DDB) function is enabled in 32T32R massive MIMO scenarios. If this parameter is set to MU_CORR_PAIR_RULE, the eNodeB selects only UEs of low correlation for pairing. If this parameter is set to MU_WITHOUT_CORR_PAIR_RULE, the eNodeB does not consider UE correlation when selecting UEs for pairing. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: MU_CORR_PAIR_RULE(MU_CORR_PAIR_RULE), MU_WITHOUT_CORR_PAIR_RULE(MU_WITHOUT_CORR_PAIR_RULE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MU_CORR_PAIR_RULE, MU_WITHOUT_CORR_PAIR_RULE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MU_CORR_PAIR_RULE</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The HighOrderMubfMaxLayer parameter in the CellBf MO cannot be set to EIGHTEEN_LAYERS, TWENTY_LAYERS, TWENTYTWO_LAYERS, or TWENTYFOUR_LAYERS when the MassiveMIMOMubfPairRule parameter in the CellBf MO is set to MU_CORR_PAIR_RULE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: MU_CORR_PAIR_RULE: If this parameter is set to MU_CORR_PAIR_RULE, the eNodeB selects only UEs of low correlation for pairing. In this case, the number of layers of UE pairing decreases, but system capacity improves after pairing.</p>
+<p>MU_WITHOUT_CORR_PAIR_RULE: If this parameter is set to MU_WITHOUT_CORR_PAIR_RULE, the eNodeB does not consider UE correlation when selecting UEs for pairing. In this case, the number of layers of UE pairing increases, but system capacity may decrease after pairing.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-MultiLayerThdSwitchToTM7.html">MultiLayerThdSwitchToTM7</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Highload Thd for Switch to BF</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the number of pairing layers for switching the UE transmission mode to TM7. If the number of layers of UEs to be paired in the cell reaches this threshold, the eNodeB switches the transmission mode of TM8, open-loop TM9, and MIMO UEs to TM7 to achieve more pairing gains. Set this parameter based on network conditions such as the downlink cell load. The value 0 indicates that this function does not take effect. This parameter indicates the threshold of the number of UEs to be scheduled in the downlink when the DmimoJTSwitch option of the DMIMOAlgoSwitch parameter in the CellAlgoSwitch MO is selected and downlink D-MIMO takes effect. If the number of UEs to be scheduled in the downlink reaches this threshold, the transmission mode of UEs that newly access the network and UEs newly handed over to the cell quickly switches to TM7, TM8, or open-loop TM9. The value 0 indicates the function does not take effect. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~640</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter leads to a high probability of switching the UE transmission mode to TM7 when transmission mode adaptation is enabled. A large value of this parameter leads to a low probability of switching the transmission mode to TM7 when transmission mode adaptation is enabled. If this parameter is set to a small value when multi-layer pairing can be performed, the eNodeB is more likely to switch the UE transmission mode to TM7 for multi-user pairing, increasing the cell throughput.</p>
+<p>If this parameter is set to a small value when multi-layer pairing cannot be performed, UEs cannot be paired even when their transmission mode is switched to TM7, decreasing the cell throughput. Therefore, you are advised to set this parameter to a large value when multi-layer pairing cannot be performed.</p>
+<p>If downlink D-MIMO takes effect and the network is heavily loaded, a small value of this parameter leads to a high probability of switching the transmission mode of UEs that newly access the network and UEs newly handed over to the cell to TM7, TM8, or open-loop TM9, increasing the pairing probability.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-BfWeightOptDegreeFactor.html">BfWeightOptDegreeFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BF Weight Optimization Degree Factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the beamforming weight optimization degree factor. If this parameter is set to 0, beamforming weight optimization is disabled. If this parameter is set to 1 or a larger value, beamforming weight optimization takes effect. Set this parameter based on time-variant characteristics of channels. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 200</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to a higher weight optimization degree and poorer adaptability to time-variant characteristics of channels. A smaller value of this parameter leads to a lower weight optimization degree and better adaptability to time-variant characteristics of channels. The value of this parameter affects throughput performance of weight optimization. The optimal value varies with fluctuations of time-variant characteristics in the radio environment.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-BfWeightOptChnQltyThldOfs.html">BfWeightOptChnQltyThldOfs</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BF Weight Opt Chn Quality Thld Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the channel quality threshold for weight optimization. Weight optimization is performed only if the radio channel quality of a UE is lower than the sum of the channel quality threshold and this offset. The channel quality threshold is 0 dB. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: -200~50</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: -20~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to a higher probability of optimizing weights for UEs, including those that are with good signal quality and do not require weight optimization. For UEs that are with good channel quality and do not require weight optimization, the optimized weight lags behind UE channel changes, causing throughput decreases. A smaller value of this parameter leads to a lower probability of optimizing weights for UEs. This avoids throughput decreases due to an optimized weight lagging behind UE channel changes. The value of this parameter affects throughput performance of weight optimization. The optimal value varies with radio channel conditions.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-Tm8PairingOptSwitch.html">Tm8PairingOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TM8 Pairing Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable TM8 pairing optimization. If this parameter is set to ON, TM8 pairing optimization is enabled. If this parameter is set to OFF, TM8 pairing optimization is disabled. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, TM8 pairing optimization is enabled to improve the performance of TM8 UE pairing. If this parameter is set to OFF, TM8 pairing optimization is disabled, and network performance is not affected.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-TurboBfWbbAvgUeCountThld.html">TurboBfWbbAvgUeCountThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Turbo BF WBB Average UE Count Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the average number of WBB UEs for turbo beamforming. If the average number of WBB UEs in a cell is greater than this threshold within a measurement period, turbo beamforming takes effect. If the average number of WBB UEs in a cell is less than or equal to this threshold, turbo beamforming does not take effect. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 8~1200</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 8~1200</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Set this parameter based on the cell load to maximize gains. If this parameter is set to a too large value, the function cannot be triggered in the cell and produces no performance gains. If this parameter is set to a too small value, the function produces few gains or even negative gains when the cell load fluctuates greatly. This is because this function produces obvious gains only when there are sufficient UEs.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-MubfPowerNormAdptFactor.html">MubfPowerNormAdptFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MUBF Power Normalization Adaptive Factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the control factor of the switching threshold for adaptive MU beamforming power normalization. This parameter is used to calculate the SNR threshold for switching between NEBF and PEBF for pairing UEs. If this parameter is set to 0, PEBF power normalization is always implemented for MU beamforming. If this parameter is set to 10, NEBF is always implemented for MU beamforming. If this parameter is set to a value ranging from 0 to 10, the eNodeB adjusts the SNR threshold for switching between NEBF and PEBF in MU beamforming scenarios. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 8</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a lower SNR threshold for switching between NEBF and PEBF and a higher probability of implementing PEBF for MU beamforming. This preferentially guarantees the orthogonality of paired layers. A larger value of this parameter leads to a higher SNR threshold for switching between NEBF and PEBF and a higher probability of implementing NEBF for MU beamforming. This preferentially makes full use of antenna transmit power.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-AdaptMubfStartThld.html">AdaptMubfStartThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Adaptive MUBF Start Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the downlink PRB usage in a cell for adaptive entry to or exit from space-domain-preferred MU beamforming. If this parameter is set to 255, adaptive MU beamforming does not take effect. If this parameter is set to a value other than 255, space-domain-preferred MU beamforming takes effect when the downlink PRB usage of a cell is higher than this threshold and does not take effect when the downlink PRB usage of a cell is lower than this threshold (within a certain range). This parameter applies only to 8T8R cells. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~100,255</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a higher probability of triggering space-domain-preferred MU beamforming and higher downlink spectral efficiency of a cell but risks of negative gains on the downlink user-perceived rate. A larger value of this parameter leads to a lower probability of triggering space-domain-preferred MU beamforming and slower increases in the downlink spectral efficiency and user-perceived rate. If this parameter is set to 255, adaptive MU beamforming does not take effect.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-DualStreamBfAlgoSw.html">DualStreamBfAlgoSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dual-Stream BF Algorithm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable dual-stream beamforming.</p>
+<p>ACK_FEEDBACK_IN_MUX_MODE_SW: Indicates whether to support the multiplexing mode for ACK feedback during dual-stream beamforming. If this option is selected, the multiplexing mode is supported by ACK feedback during dual-stream beamforming. If this option is deselected, the multiplexing mode is not supported by ACK feedback during dual-stream beamforming. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: ACK_FEEDBACK_IN_MUX_MODE_SW(ACK_FEEDBACK_IN_MUX_MODE_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ACK_FEEDBACK_IN_MUX_MODE_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACK_FEEDBACK_IN_MUX_MODE_SW:On</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: ACK_FEEDBACK_IN_MUX_MODE_SW: If this option is selected, the multiplexing mode is supported by ACK feedback during dual-stream beamforming. This improves the user-perceived rate in massive MIMO cells but may affect PDCCH reliability. If this option is deselected, network performance is not affected.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-HeavyLoadSwitchToBfOpt.html">HeavyLoadSwitchToBfOpt</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Heavy-Load Switch to BF Optimization</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the optimization of switching to beamforming in heavy-load scenarios.</p>
+<p>If this parameter is set to 255, the optimization does not take effect.</p>
+<p>For massive MIMO cells, if this parameter is set to a value other than 255 and the MultiLayerThdSwitchToTM7 or WaitPairingLayerThd parameter in the CellBf MO is set to a value other than 0, online WBB UEs are allowed to be switched to beamforming in heavy-load scenarios. If the HEAVYLOADTRANSMODEADAPTBOOSTSW and HISTORICALSPECTRALEFFOPTSW options of the BfMimoAlgoOptSwitch parameter in the CellBfMimoParaCfg MO are both selected, adaptive switching between cell-level transmission mode adaptation and cell-level target transmission mode is enabled only when the average number of downlink pairing layers is less than or equal to the value of this parameter.</p>
+<p>For non-massive MIMO cells, if this parameter is set to a value other than 255, the HEAVYLOADTRANSMODEADAPTBOOSTSW option of the BfMimoAlgoOptSwitch parameter in the CellBfMimoParaCfg MO is selected, and a UE supporting three or more layers in TM9 uses TM9 with PMI in 5 seconds after accessing a cell using the target transmission mode, then it will not be forcibly switched to beamforming.</p>
+<p>This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~24,25.5, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 13</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: For massive MIMO cells, if this parameter is set to a value other than 255 and the MultiLayerThdSwitchToTM7 or WaitPairingLayerThd parameter in the CellBf MO is set to a value other than 0, the more WBB UEs, the higher the proportion of beamforming UEs in heavy-load scenarios. This increases the number of downlink pairing layers and may increase the downlink spectral efficiency and downlink user-perceived rate. However, when UE pairing is inapplicable, the downlink spectral efficiency and downlink user-perceived rate decrease. If the HEAVYLOADTRANSMODEADAPTBOOSTSW and HISTORICALSPECTRALEFFOPTSW options of the BfMimoAlgoOptSwitch parameter in the CellBfMimoParaCfg MO are both selected, a smaller value of this parameter results in a lower probability of adaptive switching to cell-level transmission mode adaptation and a higher proportion of beamforming UEs in heavy-load scenarios. The downlink spectral efficiency increases when UE pairing is applicable, but decreases when UE pairing is inapplicable.</p>
+<p>For non-massive MIMO cells, the more UEs supporting three or more layers in TM9, the lower the proportion of beamforming UEs in heavy-load scenarios. If all UEs supporting three or more layers in TM9 are located at the cell center, single-UE multi-layer gains can be obtained and downlink spectral efficiency increases. If all UEs supporting three or more layers in TM9 are located away from the cell center, single-UE multi-layer gains cannot be obtained. In addition, the number of pairing layers in a cell and the downlink spectral efficiency decrease.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-UeIdentificationSwitch.html">UeIdentificationSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UE Identification Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable status identification for different types of UEs.</p>
+<p>SRS_LMT_AND_ABN_UE_IDENT_SW: Indicates whether to enable identification of SRS-restricted UEs and UEs suffering from abnormal downlink scheduling. If this option is selected, the eNodeB identifies UEs with poor downlink performance or suffering from abnormal downlink scheduling due to delayed SRS updates. If this option is deselected, the algorithm does not take effect. This option applies only to LTE TDD.</p>
+<p>LARGE_DELAY_SPREAD_UE_IDENT_SW: Indicates whether to enable identification of UEs with a long delay spread. If this option is selected, the identification takes effect. If this option is deselected, the identification does not take effect. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: SRS_LMT_AND_ABN_UE_IDENT_SW(SRS_LMT_AND_ABN_UE_IDENT_SW), LARGE_DELAY_SPREAD_UE_IDENT_SW(LARGE_DELAY_SPREAD_UE_IDENT_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SRS_LMT_AND_ABN_UE_IDENT_SW, LARGE_DELAY_SPREAD_UE_IDENT_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SRS_LMT_AND_ABN_UE_IDENT_SW:On, LARGE_DELAY_SPREAD_UE_IDENT_SW:On</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBf-MubfAlgoOptSwitch.html">MubfAlgoOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MUBF Algorithm Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable MU beamforming optimization algorithms.</p>
+<p>ABN_UE_PRI_SUPPRESSION_SW: Indicates whether to restrict the priorities of abnormal UEs. If this option is selected, the function takes effect. If this option is deselected, the function does not take effect. This option applies only to 8T8R cells. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: ABN_UE_PRI_SUPPRESSION_SW(ABN_UE_PRI_SUPPRESSION_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ABN_UE_PRI_SUPPRESSION_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ABN_UE_PRI_SUPPRESSION_SW:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: ABN_UE_PRI_SUPPRESSION_SW: If this option is selected, the downlink spectral efficiency of the cell increases, but the downlink user-perceived rates of abnormal UEs decrease and the proportion of low downlink rates in the cell increases. If this option is deselected, network performance is not affected.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellbf__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1:To modify the beamforming stream mode to dual-stream beamforming for the cell with an ID of 0, run the following commad:
+MOD CELLBF: LocalCellId=0, MaxBfRankPara=DUAL_LAYER_BF;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

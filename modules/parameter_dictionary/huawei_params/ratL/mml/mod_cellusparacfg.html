@@ -1,0 +1,1515 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell US Para Configuration (MOD CELLUSPARACFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellusparacfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell US Para Configuration (MOD CELLUSPARACFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellusparacfg"></a><a name="mod_cellusparacfg"></a>
+
+
+<h1 class="topictitle1">Modify Cell US Para Configuration (MOD CELLUSPARACFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellusparacfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the cell-level parameters for US UEs.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellusparacfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>The RatFreqPriorityGroup MO referenced by UsDataRatFreqPriGroupId in the CellUsParaCfg MO must be configured.</p>
+</li><li><p>The RatFreqPriorityGroup MO referenced by NsRatFreqPriGroupId in the CellUsParaCfg MO must be configured.</p>
+</li><li><p>The RatFreqPriorityGroup MO referenced by UsVoIPRatFreqPriGroupId in the CellUsParaCfg MO must be configured.</p>
+</li><li><p>The RatFreqPriorityGroup MO referenced by NsIdleRatFreqPriGroupId in the CellUsParaCfg MO must be configured.</p>
+</li><li><p>When changing the UsPaPcOff parameter value to a larger value, ensure that the increased cell TX power will not exceed the maximum RRU TX power after the change. The change does not take effect if the increased cell TX power exceeds the maximum RRU TX power.</p>
+</li><li><p>When the UsUeGuaranteeSwitch option and the SfCtrlAsScell or SfCtrlAsInterNcell option are selected, the following energy conservation functions become ineffective: Intelligent Power-Off of Carriers in the Same Coverage, and RF Channel Intelligent Shutdown.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellusparacfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local cell ID. It uniquely identifies a cell within an eNodeB.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsAlgoSwitch.html">UsAlgoSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Us Guarantee Algorithm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to guarantee services for UEs running unlimited services in a cell.</p>
+<p>UsUeGuaranteeSwitch: Indicates whether all options related to service guarantee for UEs running unlimited services take effect. If this option is selected, functions and parameters of service guarantee for UEs running unlimited services take effect. If this option is deselected, functions and parameters of service guarantee for UEs running unlimited services do not take effect.</p>
+<p>UsHoSwitch: Indicates whether to enable handovers based on UEs running unlimited services. If this option is selected, this type of handover is enabled. If this option is deselected, this type of handover is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsCellReselSwitch: Indicates whether to enable cell reselection based on UEs running unlimited services. If this option is selected, the eNodeB triggers cell reselection to the frequencies in the configured target frequency group for UEs running unlimited services. If this option is deselected, the eNodeB does not trigger cell reselection to the frequencies in the configured target frequency group for UEs running unlimited services. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsUePuschPcPrioritySwitch: Indicates whether to enable optimization on closed-loop PUSCH power control for UEs running unlimited services near the cell center, to prevent these UEs from unnecessarily lowering the PUSCH transmit power due to inter-RAT or abrupt interference. When the NearPointUeOptPUSCHSwitch option of the UlPcAlgoSwitch parameter is deselected, if the UsUePuschPcPrioritySwitch is selected, optimization on closed-loop PUSCH power control for UEs running unlimited services near the cell center is enabled; if the UsUePuschPcPrioritySwitch is deselected, optimization on closed-loop PUSCH power control for UEs running unlimited services near the cell center is disabled. When the NearPointUeOptPUSCHSwitch option of the UlPcAlgoSwitch parameter is selected, optimization on closed-loop PUSCH power control for UEs running unlimited services near the cell center is enabled regardless of whether the UsUePuschPcPrioritySwitch option is selected or not. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DlUsVoIPCqiAdjOptSwitch: Indicates whether to enable optimization on downlink channel quality indicator (CQI) adjustment for UEs running unlimited voice services, to accelerate the convergence of the IBLER of voice packets. If this option is selected, optimization on downlink CQI adjustment for UEs running unlimited voice services is enabled. If this option is deselected, optimization on downlink CQI adjustment for UEs running unlimited voice services is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsCellNotDriveNsSwitch: Indicates whether to enable user steering in cells where UEs' unlimited services must be guaranteed to distinguish these UEs from NS UEs. If this option is deselected, user steering is enabled in such scenarios. If this option is selected, user steering is disabled in such scenarios. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsCtrlDRXSwitch: If this option is deselected, the eNodeB does not perform special processing on the DRX function of UEs running unlimited services. If this option is selected, the DRX function is disabled for UEs running unlimited services. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SfCtrlAsScell: Indicates whether to enable intelligent subframe control when a cell functions as a serving cell. If this option is deselected, intelligent subframe control is disabled when a cell functions as a serving cell. If this option is selected, intelligent subframe control is enabled when a cell functions as a serving cell. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SfCtrlAsInterNcell: Indicates whether to enable intelligent subframe control when the cell serves as an inter-eNodeB neighboring cell and whether to enable scheduling prohibition in MBSFN subframes when the cell serves UEs running unlimited services. For FDD cells: If this option is deselected, intelligent subframe control is disabled when the cell serves as an inter-eNodeB neighboring cell. If this option is selected, intelligent subframe control is enabled when the cell serves as an inter-eNodeB neighboring cell. For TDD cells: If this option is deselected, downlink scheduling of UEs running normal services is allowed in MBSFN subframes in the cell when the cell serves UEs running unlimited services. In addition, intelligent subframe control is disabled when the cell serves as an inter-eNodeB neighboring cell. If this option is selected, downlink scheduling of UEs running normal services is prohibited in MBSFN subframes in the cell when the cell serves UEs running unlimited services. In addition, intelligent subframe control is enabled when the cell serves as an inter-eNodeB neighboring cell. This option can be selected only when all eNodeBs on the network are time-synchronized. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsSccHoSwitch: Indicates whether to enable handovers triggered for UEs running unlimited services based on their SCCs. If this option is selected, handovers triggered for UEs running unlimited services based on their SCCs are enabled. If this option is deselected, this type of handover is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UlUsVoipRbRsvSwitch: Indicates whether to enable the RB reservation and related parameter configuration for UEs running unlimited voice services in the uplink. If this option is selected, the RB reservation and related parameter configuration are enabled for UEs running unlimited voice services in the uplink. If this option is deselected, the RB reservation and related parameter configuration are disabled for UEs running unlimited voice services in the uplink. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ULCoMPResourceCtrl: Indicates whether to perform UL CoMP resource control for a cell. If this option is selected, UL CoMP resource control can be performed for a cell. If this option is deselected, UL CoMP resource control cannot be performed for a cell. This option applies only to LTE FDD.</p>
+<p>UsUlCaSchSwitch: Indicates whether to enable uplink scheduling based on CA UEs running unlimited services. If this option is selected, uplink scheduling based on CA UEs running unlimited services is enabled. If this option is deselected, uplink scheduling based on CA UEs running unlimited services is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UlUsDiffRatFreqPri: Indicates whether to enable frequency priority differentiation for UEs running unlimited data services in the uplink. If this option is selected, the eNodeB selects frequencies from dedicated target frequency groups to perform handovers or cell reselection for UEs running unlimited data services in the uplink. If this option is deselected, the eNodeB uses identical target frequency groups to perform handovers or cell reselection for UEs running unlimited data services in the uplink and UEs running the same type of services in the downlink. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsNbInterfHoSwitch: Indicates whether to enable optimization on handover parameters based on the interference suppression threshold in an intra-frequency neighboring cell of the local cell serving UEs running unlimited services. If this option is selected, handover parameters of a cell are optimized based on the interference suppression threshold in an intra-frequency neighboring cell of the local cell serving UEs running unlimited services, to ensure that the handovers are performed smoothly. If this option is deselected, handover parameters of a cell are not optimized based on the interference suppression threshold in an intra-frequency neighboring cell of the local cell serving UEs running unlimited services. This option applies only to LTE FDD and LTE TDD.</p>
+<p>MBSFNSubJTOptSwitch: Indicates whether to enable JT optimization in MBSFN subframes. If this option is selected, JT optimization is enabled in MBSFN subframes. If this option is deselected, JT optimization is disabled in MBSFN subframes. This option applies only to LTE TDD.</p>
+<p>UsPdcchOptSwitch: Indicates whether to enable PDCCH optimization for UEs using unlimited services. If this option is selected, PDCCH optimization for UEs using unlimited services is enabled. If this option is deselected, PDCCH optimization for UEs using unlimited services is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsCellDlStartRBOptSwitch: Indicates whether to optimize RB start position in the downlink for UEs running unlimited services in cells where the services of such UEs must be guaranteed. If this option is selected, optimization of RB start position in the downlink is enabled for UEs running unlimited services in cells where the services of such UEs must be guaranteed. If this option is deselected, optimization of RB start position in the downlink is disabled for UEs running unlimited services in such cells. This parameter applies only to LTE TDD.</p>
+<p>CellBFAnt: Indicates whether to enable selection of antenna weights for a cell. If this option is selected, the serving cell selects a specified new antenna weight. This option applies only to 8T8R LTE TDD eNodeBs working on band 39. This option applies only to LTE TDD.</p>
+<p>UsAutoGapSwitch: Indicates whether to enable automatic measurement gap configuration for UEs running unlimited services. If this option is selected and UEs running unlimited services support automatic measurement gap configurations on the target frequency, the eNodeB does not deliver gap configurations to such UEs. If this option is deselected, the eNodeB delivers gap configurations to UEs for inter-frequency and inter-RAT measurements. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsCellDlAdSchOptSwitch: Indicates whether to optimize downlink advance scheduling and downlink start RB positions for UEs running unlimited services in cells where the services of such UEs must be guaranteed. If this option is selected, downlink advance scheduling is optimized for UEs using unlimited services in cells where the services of such UEs must be guaranteed. If this option is deselected, downlink advance scheduling is not optimized for UEs using unlimited services in such cells. This option applies only to LTE TDD.</p>
+<p>UsCqiSrsPeriodOptSwitch: Indicates whether to enable smooth handover optimization for VoLTE UEs running unlimited services. Smooth handover optimization is enabled for VoLTE UEs running unlimited services only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsCfiOptSwitch: Indicates whether to optimize the CFI for the cell in which UEs running unlimited services reside. If this option is selected, the CFI is optimized for the cell in which UEs running unlimited services reside. If this option is deselected, the CFI is not optimized for the cell in which UEs running unlimited services reside. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsUlcompPuschSchSwtich: Indicates whether to optimize UL CoMP and PUSCH scheduling for UEs running unlimited services. If this option is selected, UL CoMP and PUSCH scheduling are optimized for UEs running unlimited services in LTE TDD cells, and only UL CoMP is optimized for UEs running unlimited services in LTE FDD cells or NB-IoT cells. If this option is deselected, UL CoMP and PUSCH scheduling are not optimized for UEs running unlimited services.</p>
+<p>UsHoCoverEnhanceSwitch: Indicates whether to delay beamforming for UEs that are handed over to the cell and run unlimited services, to reduce the interference of such UEs to CEUs in the source cell. If this option is selected, the eNodeB delays beamforming for UEs that are handed over to the cell and run unlimited services, reducing the interference of such UEs to CEUs in the source cell. If this option is deselected, the eNodeB does not delay beamforming for UEs that are handed over to the cell and run unlimited services. This option applies only to LTE TDD.</p>
+<p>NsUlDlSchRestrictSwitch: Indicates whether to restrict uplink and downlink scheduling of NS UEs. If this option is deselected, uplink and downlink scheduling of NS UEs is not restricted. If this option is selected, uplink and downlink scheduling of NS UEs is restricted. The setting of this option takes effect in both single-carrier and multi-carrier scenarios. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsCceGuaranteeSwitch: Indicates whether to guarantee PDCCH CCE resources for UEs running unlimited services. If this option is selected, PDCCH CCE resources are guaranteed for UEs running unlimited services. If this option is deselected, PDCCH CCE resources are not guaranteed for UEs running unlimited services. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsEmtcCrntiOptSwitch: Indicates whether to optimize C-RNTI usage for UEs running unlimited services in a cell where the eMTC function is enabled. If this option is selected, UEs use specified C-RNTIs. If this option is deselected, UEs are normally allocated C-RNTIs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DisuseStatement: UsCellDlStartRBOptSwitch: The UsCellDlStartRBOptSwitch option will be removed in later versions. Although the configuration interface in this version supports synchronization and delivery of the setting of this option, the system does not use this option. Therefore, avoid using this option. The function of this option is now controlled by the UsCellDlAdSchOptSwitch option of the UsAlgoSwitch parameter.</p>
+<p>GUI Value Range: UsUeGuaranteeSwitch(UsUeGuaranteeSwitch), UsHoSwitch(UsHoSwitch), UsCellReselSwitch(UsCellReselSwitch), UsUePuschPcPrioritySwitch(UsUePuschPcPrioritySwitch), DlUsVoIPCqiAdjOptSwitch(DlUsVoIPCqiAdjOptSwitch), UsCellNotDriveNsSwitch(UsCellNotDriveNsSwitch), UsCtrlDRXSwitch(UsCtrlDRXSwitch), SfCtrlAsScell(SfCtrlAsScell), SfCtrlAsInterNcell(SfCtrlAsInterNcell), UsSccHoSwitch(UsSccHoSwitch), UlUsVoipRbRsvSwitch(UlUsVoipRbRsvSwitch), ULCoMPResourceCtrl(ULCoMPResourceCtrl), UsUlCaSchSwitch(UsUlCaSchSwitch), UlUsDiffRatFreqPri(UlUsDiffRatFreqPri), UsNbInterfHoSwitch(UsNbInterfHoSwitch), MBSFNSubJTOptSwitch(MBSFNSubJTOptSwitch), UsPdcchOptSwitch(UsPdcchOptSwitch), UsCellDlStartRBOptSwitch(UsCellDlStartRBOptSwitch), CellBFAnt(CellBFAnt), UsAutoGapSwitch(UsAutoGapSwitch), UsCellDlAdSchOptSwitch(UsCellDlAdSchOptSwitch), UsCqiSrsPeriodOptSwitch(UsCqiSrsPeriodOptSwitch), UsCfiOptSwitch(UsCfiOptSwitch), UsUlcompPuschSchSwtich(UsUlcompPuschSchSwtich), UsHoCoverEnhanceSwitch(UsHoCoverEnhanceSwitch), NsUlDlSchRestrictSwitch(NsUlDlSchRestrictSwitch), UsCceGuaranteeSwitch(UsCceGuaranteeSwitch), UsEmtcCrntiOptSwitch(UsEmtcCrntiOptSwitch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UsUeGuaranteeSwitch, UsHoSwitch, UsCellReselSwitch, UsUePuschPcPrioritySwitch, DlUsVoIPCqiAdjOptSwitch, UsCellNotDriveNsSwitch, UsCtrlDRXSwitch, SfCtrlAsScell, SfCtrlAsInterNcell, UsSccHoSwitch, UlUsVoipRbRsvSwitch, ULCoMPResourceCtrl, UsUlCaSchSwitch, UlUsDiffRatFreqPri, UsNbInterfHoSwitch, MBSFNSubJTOptSwitch, UsPdcchOptSwitch, UsCellDlStartRBOptSwitch, CellBFAnt, UsAutoGapSwitch, UsCellDlAdSchOptSwitch, UsCqiSrsPeriodOptSwitch, UsCfiOptSwitch, UsUlcompPuschSchSwtich, UsHoCoverEnhanceSwitch, NsUlDlSchRestrictSwitch, UsCceGuaranteeSwitch, UsEmtcCrntiOptSwitch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: UsUeGuaranteeSwitch:Off, UsHoSwitch:Off, UsCellReselSwitch:Off, UsUePuschPcPrioritySwitch:Off, DlUsVoIPCqiAdjOptSwitch:Off, UsCellNotDriveNsSwitch:Off, UsCtrlDRXSwitch:Off, SfCtrlAsScell:Off, SfCtrlAsInterNcell:Off, UsSccHoSwitch:Off, UlUsVoipRbRsvSwitch:Off, ULCoMPResourceCtrl:Off, UlUsDiffRatFreqPri:Off, UsNbInterfHoSwitch:Off, MBSFNSubJTOptSwitch:Off, UsPdcchOptSwitch:Off, UsCellDlStartRBOptSwitch:Off, CellBFAnt:Off, UsAutoGapSwitch:Off, UsCellDlAdSchOptSwitch:Off, UsCqiSrsPeriodOptSwitch:Off, UsCfiOptSwitch:Off, UsUlcompPuschSchSwtich:Off, UsHoCoverEnhanceSwitch:Off, NsUlDlSchRestrictSwitch:Off, UsCceGuaranteeSwitch:Off, UsEmtcCrntiOptSwitch:Off</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The JTUserCoCellPowerSwitch option of the UsAlgoExSwitch parameter in a CellUSParaCfg MO can be selected only when the MBSFNSubJTOptSwitch option of the UsAlgoSwitch parameter in the CellUSParaCfg MO is selected.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: UsHoSwitch: If this option is selected, UEs are handed over based on frequency priorities defined in the frequency groups configured based on user attributes, and therefore the number of handovers increases.</p>
+<p>UsCellReselSwitch: If this option is selected, UEs reselect cells based on frequency priorities in the frequency groups configured based on user attributes, and therefore the number of cell reselections increases.</p>
+<p>UsUePuschPcPrioritySwitch: If this option is selected, the PUSCH transmit power for UEs running unlimited services increases, and therefore the uplink throughput of these UEs increases.</p>
+<p>DlUsVoIPCqiAdjOptSwitch: If this option is selected, the BLER of UEs running unlimited voice services decreases, and user experience of these UEs improves.</p>
+<p>UsCellNotDriveNsSwitch: If this option is selected, the number of times NS UEs in the serving cell of NS UEs are steered to different frequencies decreases, and the number of handovers decreases. This has no impact on the handover success rate.</p>
+<p>UsCtrlDRXSwitch: If this option is selected, DRX and dynamic DRX do not take effect for UEs running unlimited services. As a result, power consumption of these UEs increases.</p>
+<p>SfCtrlAsScell: If this option is selected, the downlink UE throughput of a cell increases when this cell functions as a serving cell, but the UE throughput decreases and user experienced service delay is extended in its neighboring cells.</p>
+<p>SfCtrlAsInterNcell: If this option is selected, the throughput of UEs decreases and user experienced service delay is extended when this cell functions as an inter-eNodeB neighboring cell, but the downlink UE throughput in the serving cell decreases.</p>
+<p>UsSccHoSwitch: If this option is selected, handovers for UEs are performed based on frequency priorities in frequency groups configured based on user attributes, steering UEs on SCCs to cells operating on different frequencies.</p>
+<p>UlUsVoipRbRsvSwitch: If this option is selected, a dedicated frequency band is set for UEs running unlimited voice services in the uplink, reducing interference to such UEs and improving the UE performance.</p>
+<p>ULCoMPResourceCtrl: If this option is selected, available UL CoMP resources in a cell increase, but the number of uplink scheduled UEs decreases. If this option is deselected, available UL CoMP resources in a cell decrease, but the number of uplink scheduled UEs increases.</p>
+<p>UlUsDiffRatFreqPri: If this option is selected, the cell throughput increases, but the number of handovers also increases. If this option is deselected, no gains in the cell throughput increase can be obtained from this option, but the number of handovers does not increase.</p>
+<p>UsNbInterfHoSwitch: This option can be used with the UsNbInterfCtrl parameter to ensure smooth handovers of UEs running unlimited services and increase the average downlink throughput of the cell.</p>
+<p>MBSFNSubJTOptSwitch: If this option is selected, the downlink throughput of UEs in the cell increases when the cell functions as a serving cell. If this option is deselected, the network performance is not affected.</p>
+<p>UsPdcchOptSwitch: If this option is selected, the number of times a UE running unlimited services is scheduled in the uplink and downlink increases, increasing the uplink and downlink throughput of such UEs. If this option is deselected, the network performance is not affected.</p>
+<p>UsCellDlStartRBOptSwitch: If this option is selected, RB resources for PBCH, PSS, and SSS are preferentially allocated to services of higher priorities, increasing the number of RBs that can be allocated to TM7, TM8, and TM9 UEs running unlimited services. As a result, the downlink throughput of such UEs increases. If this option is deselected, downlink RB resources may not be fully allocated to such UEs.</p>
+<p>CellBFAnt: If this option is selected, the cell uses a new antenna weight instead of the default antenna weight, improving cell coverage and throughput.</p>
+<p>UsAutoGapSwitch: If this option is selected, the number of times UEs running unlimited services are scheduled in both the uplink and downlink increases during the gap-assisted measurement period on the condition that the UEs support autonomous gap configuration. As a result, the downlink throughput and uplink throughput of such UEs increase. If this option is deselected, the network performance is not affected.</p>
+<p>UsCellDlAdSchOptSwitch: If this option is selected, the number of times UEs running unlimited services are scheduled in the downlink increases, and the RB resources where the PBCH, PSS, and SSS are located are preferentially allocated to services of higher priorities to increase the number of RBs that can be allocated to TM7, TM8, and TM9 UEs running unlimited services. As a result, the downlink throughput of UEs running unlimited services increases. If this option is deselected, the number of times UEs running unlimited services are scheduled and the number of RBs that can be allocated to these UEs may be insufficient.</p>
+<p>UsCqiSrsPeriodOptSwitch: If this option is selected, the number of RRC connection reestablishments of VoLTE services caused by data services on the same vehicle decreases during drive tests. Deselecting this option has no impact on network performance.</p>
+<p>UsCfiOptSwitch: If this option is selected, the CFI of the cell in which UEs running unlimited services reside can be reduced, improving downlink spectral efficiency. If this option is deselected, the network performance is not affected.</p>
+<p>UsUlcompPuschSchSwtich: If this option is selected, the uplink throughput of UEs running unlimited services increases. If this option is deselected, the network performance is not affected.</p>
+<p>UsHoCoverEnhanceSwitch: If this option is selected, the eNodeB delays beamforming for UEs that are handed over into the cell and run unlimited services, reducing the interference of such UEs to CEUs in the source cells and improving overall downlink coverage in network performance tests. Also, the number of resources used for downlink retransmission decreases, and the downlink throughput in network performance tests increases. This option applies only to LTE TDD cells.</p>
+<p>NsUlDlSchRestrictSwitch: If this option is selected, both the uplink and downlink throughput of NS UEs decrease, but both the uplink and downlink throughput of UEs running unlimited services increase. If this option is deselected, the network performance is not affected.</p>
+<p>UsCceGuaranteeSwitch: If this option is selected, the number of times UEs running unlimited services are scheduled increases, improving the throughput of such UEs. If this option is deselected, the network performance is not affected.</p>
+<p>UsEmtcCrntiOptSwitch: If this option is selected, the possibility of concurrently allocating uplink and downlink data to eMTC UEs in the cell center increases and the peak rate for the eNodeB to perform packet injection on full-duplex UEs in both the uplink and downlink increases. However, the number of C-RNTIs used by the cell decreases and the cell allows the access of only a small number of UEs. When the use of the eMTC function is completed, this option must be deselected immediately. If this option is deselected, the C-RNTIs are normally allocated in the cell, which has no impact on the number of admitted UEs.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsDataPreAllocMinPeriod.html">UsDataPreAllocMinPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Data Minimal Period of Preallocation</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum interval between two consecutive preallocations for a UE running unlimited data services. When the DRX algorithm is enabled and the UE is in the DRX state, the actual minimum interval does not exceed the DrxInactivityTimer parameter value.</p>
+<p>GUI Value Range: 1~40</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1~40</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that this parameter be set to 1 when the cell bandwidth is 20 MHz or 15 MHz. It is recommended that this parameter be set to the same value of the PreallocationMinPeriod parameter when the cell bandwidth is 10 MHz or less.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in shorter uplink delay but more UE power consumption and greater uplink interference. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsVoIPPreAllocSize.html">UsVoIPPreAllocSize</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US VoIP Packet Size of Preallocation</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the amount of data preallocated to a UE running unlimited voice services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 45~1500</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 45~1500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 80</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in shorter uplink data transmission delay but more UE power consumption and stronger uplink interference. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsDataPreAllocSize.html">UsDataPreAllocSize</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Data Packet Size of Preallocation</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the amount of data that can be preallocated resources for a UE running unlimited services.</p>
+<p>GUI Value Range: 45~1500</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 45~1500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 80</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in shorter uplink data transmission delay but more UE power consumption and stronger uplink interference. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsDataSmartPreallocDura.html">UsDataSmartPreallocDura</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Data Smart Preallocation Duration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration of smart preallocation each time it is performed for a UE running unlimited data services. If this parameter is set to 0, preallocation does not take effect. For an NB-IoT cell, the actual duration is 10 times the value configured on the GUI.</p>
+<p>GUI Value Range: 0~60000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~60000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>1500 for FDD and TDD cells</p>
+<p>0 for NB-IoT cells</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 0, smart preallocation does not take effect for UEs running unlimited data services. A larger value of this parameter results in a larger decrease in the uplink delay for these UEs but more UE power consumption and stronger uplink interference. A smaller value of this parameter results in the opposite effects. If this parameter value is greater than 1000, delay of ping services can be decreased.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UlUsVoIPIblerTarget.html">UlUsVoIPIblerTarget</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Ul VoIP Ibler Target</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink target initial block error rate (IBLER) of UEs running unlimited voice services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a higher probability of hybrid automatic repeat request (HARQ) retransmissions and poorer user experience. A smaller value of this parameter results in a lower index of the selected modulation and coding scheme (MCS) than the optimal MCS and more resource blocks (RBs) to be consumed.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-NsNumThdForUsHo.html">NsNumThdForUsHo</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NS Number Thd Based on US Handover</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum number of UEs running normal services that is used in steering mobility management for such UEs when steering mobility management for UEs running unlimited services is enabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~10000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsPucchSinrTargetOffset.html">UsPucchSinrTargetOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US PUCCH SINR Target Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the target signal to interference plus noise ratio (SINR) on the PUCCH for UEs running unlimited services relative to the target SINR on the PUCCH for UEs running normal services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~20</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in higher PUCCH power of UEs running unlimited services and stronger interference on other UEs in the local cell and neighboring cells. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsPucchRsrpHighThdOffset.html">UsPucchRsrpHighThdOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US PUCCH RSRP High Threshold Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the reference signal received power (RSRP) upper limit on the PUCCH for UEs running unlimited services to the RSRP upper limit on the PUCCH for UEs running normal services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~20</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in higher allowed PUCCH power of UEs running unlimited services and stronger interference on other UEs in the local cell and neighboring cells. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsDataRatFreqPriGroupId.html">UsDataRatFreqPriGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Data Rat Freq Priority Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the intra-RAT frequency priority group for UEs running unlimited data services. If the UlUsDiffRatFreqPri option is selected for UEs running unlimited data services, the uplink and downlink are differentiated for UEs running unlimited data services and this parameter indicates the ID of the intra-RAT frequency priority group for UEs running unlimited data services in the downlink. Otherwise, the uplink and downlink are not differentiated for UEs running unlimited data services, and this parameter indicates the ID of the intra-RAT frequency priority group for UEs running unlimited data services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsGuaranteeDurTimer.html">UsGuaranteeDurTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Guarantee Duration Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration of service guarantee for UEs running unlimited services during UE steering when steering mobility management for UEs running unlimited services is enabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~360</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 1~360</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 15</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsGapMeasurementPeriod.html">UsGapMeasurementPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Gap Measurement Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval at which the eNodeB triggers the A4-related measurement for a UE running unlimited services during inter-frequency handovers. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 3~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 3~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 60</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a longer interval between measurements and less frequent gap-assisted measurements. As a result, the probability of detecting target cells for handovers decreases and the impact on UE throughput reduces. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsVoIPRatFreqPriGroupId.html">UsVoIPRatFreqPriGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US VoIP Rat Freq Priority Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the intra-RAT frequency priority group for UEs running unlimited voice services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-NsRatFreqPriGroupId.html">NsRatFreqPriGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NS Rat Freq Priority Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an intra-RAT frequency priority group for UEs running normal services in the connected mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsPaPcOff.html">UsPaPcOff</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Unlimited Service PA</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PA value allocated to UEs running unlimited services when the PDSCH power assignment is even. If this parameter is set to a value less than the PA value that is allocated to UEs when the PDSCH power assignment is even, this parameter does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: DB_6_P_A(-6 dB), DB_4DOT77_P_A(-4.77 dB), DB_3_P_A(-3 dB), DB_1DOT77_P_A(-1.77 dB), DB0_P_A(0 dB), DB1_P_A(1 dB), DB2_P_A(2 dB), DB3_P_A(3 dB)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DB_6_P_A, DB_4DOT77_P_A, DB_3_P_A, DB_1DOT77_P_A, DB0_P_A, DB1_P_A, DB2_P_A, DB3_P_A</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DB_6_P_A(-6 dB)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in greater PDSCH power assigned to UEs running unlimited services and a higher modulation and coding scheme (MCS) selected for these UEs, thereby increasing downlink throughput of these UEs. A smaller value results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsPuschSinrHighThdOffset.html">UsPuschSinrHighThdOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US PUSCH SINR High Threshold Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the signal to interference plus noise ratio (SINR) upper limit on the PUSCH for UEs running unlimited services to the SINR upper limit on the PUSCH for UEs running normal services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~20</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in greater PUSCH power of UEs running unlimited services near the cell center, higher uplink throughput of these UEs, but also stronger interference on neighboring cells. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-MMPowerRatio.html">MMPowerRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Massive MIMO Power Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ratio of the power of moving UEs to that of static UEs during tests on massive MIMO for multiple UEs running unlimited services. If this parameter is set to 0, the eNodeB does not perform power optimization for UEs running unlimited services in massive MIMO scenarios. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter leads to a small amount of power allocated to moving UEs during tests on massive MIMO for multiple UEs. A large value of this parameter leads to a large amount of power allocated to moving UEs during the tests.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsUePrachReuseThld.html">UsUePrachReuseThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US UE PRACH Reuse Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SINR threshold for triggering the reuse of the PRACH for UEs running unlimited services. The value -300 indicates that this parameter does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -300~300</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: -30~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: -300</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter leads to a high probability of reusing the PRACH for UEs running unlimited services but poor capability of UEs running unlimited services to resist PRACH interference. A large value of this parameter leads to a low probability of reusing the PRACH for UEs running unlimited services but good capability of UEs running unlimited services to resist PRACH interference.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-NsRbRestrictRatio.html">NsRbRestrictRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NS User RB Restrict Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the proportion of resource blocks (RBs) that UEs running normal services can use in a cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in fewer RBs that can be used by UEs running normal services in the neighboring cell and better user experience for UEs running unlimited services. As a result, the neighboring cell throughput decreases and throughput of UEs running normal services decreases in the neighboring cell.</p>
+<p>A larger value of this parameter results in more RBs that can be used by UEs running normal services in the neighboring cell, worse user experience for UEs running unlimited services, and a smaller impact on the neighboring cell throughput and throughput of UEs running normal services in the neighboring cell.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsDetectTimer.html">UsDetectTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US User Detect Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer for detecting UEs running unlimited services.</p>
+<p>GUI Value Range: 1~21600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~21600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 60</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsDlMinGbr.html">UsDlMinGbr</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Unlimited Service Downlink MinGBR</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum downlink guaranteed bit rate of non-GBR services for UEs running unlimited services. A large value of this parameter leads to a high downlink scheduling priority for UEs running unlimited services and a high probability that the service rate of such UEs is preferentially guaranteed. A small value of this parameter leads to a low downlink scheduling priority for UEs running unlimited services and a low probability that the service rate of such UEs is preferentially guaranteed. This parameter does not take effect if it is set to 0. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~12500</p>
+<p>Unit: kB/s</p>
+<p>Actual Value Range: 0~12500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter decreases the downlink guaranteed bit rate of the non-GBR service for US UEs. However, the downlink transport load and licensed traffic load also decrease, which increases the number of admitted non-GBR services in limited downlink transmission bandwidth or limited downlink licensed traffic scenarios. A large value of this parameter increases the downlink guaranteed bit rate of the non-GBR service for US UEs. However, the downlink transport load and licensed traffic load also increase, which decreases the number of admitted non-GBR services in limited downlink transmission bandwidth or limited downlink licensed traffic scenarios. In addition, the downlink throughput of NS UEs may decrease because the radio resources are occupied by US UEs.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsUlMinGbr.html">UsUlMinGbr</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Unlimited Service Uplink MinGBR</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum uplink guaranteed bit rate of non-GBR services for UEs running unlimited services. A large value of this parameter leads to a high uplink scheduling priority for UEs running unlimited services and a high probability that the service rate of such UEs is preferentially guaranteed. A small value of this parameter leads to a low uplink scheduling priority for UEs running unlimited services and a low probability that the service rate of such UEs is preferentially guaranteed. This parameter does not take effect if it is set to 0. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~12500</p>
+<p>Unit: kB/s</p>
+<p>Actual Value Range: 0~12500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter decreases the uplink guaranteed bit rate of the non-GBR service for US UEs. However, the uplink transport load and licensed traffic load also decrease, which increases the number of admitted non-GBR services in limited uplink transmission bandwidth or limited uplink licensed traffic scenarios. A large value of this parameter increases the uplink guaranteed bit rate of the non-GBR service for US UEs. However, the uplink transport load and licensed traffic load also increase, which decreases the number of admitted non-GBR services in limited uplink transmission bandwidth or limited uplink licensed traffic scenarios. In addition, the uplink throughput of NS UEs may decrease because the radio resources are occupied by US UEs.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-RestrictedNsUlRbCount.html">RestrictedNsUlRbCount</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Restricted NS UL RB Count</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of uplink RBs that can be scheduled for UEs running normal services per TTI. If the parameter value is not 100, the number of uplink RBs that can be scheduled for UEs running normal services per TTI cannot exceed the parameter value. If this parameter is set to 100, the eNodeB does not restrict the number of uplink RBs that can be scheduled for UEs running normal services. If this parameter is set to a value exceeding the cell bandwidth capability, the eNodeB does not restrict the number of uplink RBs that can be scheduled for UEs running normal services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 4~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter leads to high uplink throughput of UEs running unlimited services and low throughput of UEs running normal services. In this case, the radio connection rate and handover success rate of UEs running normal services decrease by a large margin, and the service drop rate of UEs running normal services increases by a large margin. A large value of this parameter leads to low uplink throughput of UEs running unlimited services and high throughput of UEs running normal services. In this case, the radio connection rate and handover success rate of UEs running normal services decrease by a small margin, and the service drop rate of UEs running normal services increases by a small margin.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsNbInterfCtrl.html">UsNbInterfCtrl</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Neighbor Interference Control</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interference suppression threshold in a neighboring cell of the local cell serving UEs running unlimited services. The parameter value 0 indicates that interference suppression is disabled.</p>
+<p>GUI Value Range: 0~80</p>
+<p>Unit: 0.5dB</p>
+<p>Actual Value Range: 0~40</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: If the UsUeGuaranteeSwitch option of the UsAlgoSwitch parameter is selected and UEs running unlimited services access the local cell, a larger value of the UsNbInterfCtrl parameter results in weaker interference from the intra-frequency neighboring cell on the local cell, and a smaller value of the UsNbInterfCtrl parameter results in stronger interference.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UlSchOptCount.html">UlSchOptCount</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Schedule Optimize Count</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of uplink scheduling optimization times. When this parameter is set to 0, the function is disabled. When this parameter is set to other values, this parameter indicates the number of optimization times during the transition from a silent period to talk spurt. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~3</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to less improvement in the timeliness of uplink scheduling. A larger value of this parameter leads to the opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UlUsVoipRsvStartRb.html">UlUsVoipRsvStartRb</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL US VoIP Reserved Start RB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start position of the reserved RB for UEs running unlimited voice services in the uplink. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the function of reserving RBs for UEs running unlimited services in the uplink is enabled, the eNodeB reserves a frequency band based on the value of this parameter. A larger reserved frequency band results in a larger improvement in performance of UEs running unlimited voice services.</p>
+<p>If the function of reserving RBs for UEs running unlimited services in the uplink is disabled, this parameter becomes invalid, which has no impact on network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UlUsVoipRsvEndRb.html">UlUsVoipRsvEndRb</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL US VoIP Reserved End RB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the end position of the reserved RB for UEs running unlimited voice services in the uplink. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the function of reserving RBs for UEs running unlimited services in the uplink is enabled, the eNodeB reserves a frequency band based on the value of this parameter. A larger reserved frequency band results in a larger improvement in performance of UEs running unlimited voice services.</p>
+<p>If the function of reserving RBs for UEs running unlimited services in the uplink is disabled, this parameter becomes invalid, which has no impact on network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-SfCtrlPrbThd.html">SfCtrlPrbThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PRB Threshold of Subframe Control</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB threshold for intelligent subframe control. The eNodeB selects different subframes for intelligent control based on the PRB thresholds for intelligent subframe control. If this parameter is set to Percent10 or Percent30, the eNodeB checks the PRB usage before starting intelligent subframe control. If this parameter is set to Percent10ENH or Percent30ENH, the eNodeB does not check the PRB usage before starting intelligent subframe control. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: Percent10, Percent30, Percent10ENH, Percent30ENH</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Percent10, Percent30, Percent10ENH, Percent30ENH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Percent10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a larger increase in the downlink UE throughput and a more severe impact on performance of neighboring cells. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsVoIPKeepOnLen.html">UsVoIPKeepOnLen</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US VoIP Keep On Length</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period of reserving the voice indicator for a UE running unlimited services after a voice service ends. If this parameter is set to 65535, the voice attribute is always reserved for a UE running unlimited services after a voice service ends. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 65535</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-NsIdleRatFreqPriGroupId.html">NsIdleRatFreqPriGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NS Idle Rat Frequency Priority Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an intra-RAT frequency priority group for UEs running normal services in the idle mode. If the UsCellReselSwitch option of the UsAlgoSwitch parameter is selected, the NsIdleRatFreqPriGroupId parameter setting is delivered to steer UEs running normal services to camp on frequencies of different priorities. If the UsCellReselSwitch option is deselected, the NsIdleRatFreqPriGroupId parameter does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsDlPriorityRatio.html">UsDlPriorityRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Downlink Scheduling Priority Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the proportion of the duration that the downlink scheduling weight factor takes effect for UEs running unlimited services. If this parameter is set to 1000, the downlink scheduling weight factor always takes effect for UEs running unlimited services. If this parameter is set to 0, the downlink scheduling weight factor does not take effect for UEs running unlimited services all the time. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~1000</p>
+<p>Unit: per mill</p>
+<p>Actual Value Range: 0~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a smaller proportion of the duration that the downlink scheduling weight factor takes effect for UEs running unlimited services, a higher downlink scheduling weight for UEs running normal services, and a faster data rate of UEs running normal services.</p>
+<p>A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsUlPriorityRatio.html">UsUlPriorityRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Uplink Scheduling Priority Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the proportion of the duration that the uplink scheduling weight factor takes effect for large-packet UEs running unlimited services. If this parameter is set to 1000, the uplink scheduling weight factor always takes effect for large-packet UEs running unlimited services. If this parameter is set to 0, the uplink scheduling weight factor does not take effect for large-packet UEs running unlimited services all the time. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~1000</p>
+<p>Unit: per mill</p>
+<p>Actual Value Range: 0~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a smaller proportion of the duration that the uplink scheduling weight factor takes effect for large-packet UEs running unlimited services, a higher uplink scheduling weight for UEs running normal services, and a faster data rate of UEs running normal services.</p>
+<p>A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsA3HoA2ThdOffset.html">UsA3HoA2ThdOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US A3 Handover A2 Threshold Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the RSRP or RSRQ threshold for triggering event A3 of A2-based inter-frequency handovers for UEs running unlimited services. When the UsUeGuaranteeSwitch option of the UsAlgoSwitch parameter is selected, the threshold can be calculated by adding the value of this parameter to the value of A3InterFreqHoA2ThdRsrp or A3InterFreqHoA2ThdRsrq in the InterFreqHoGroup MO. If the calculated threshold is beyond the value range of A3InterFreqHoA2ThdRsrp or A3InterFreqHoA2ThdRsrq, the actual threshold will be equal to the upper or lower limit of A3InterFreqHoA2ThdRsrp or A3InterFreqHoA2ThdRsrq. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -20~20</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: -20~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value results in a lower probability of starting inter-frequency measurements, delaying inter-frequency measurements for UEs running unlimited services. A larger value results in the opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsA4A5HoA2ThdOffset.html">UsA4A5HoA2ThdOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US A4A5 Handover A2 Threshold Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the RSRP or RSRQ threshold for triggering event A2 of A4/A5-based inter-frequency handovers for UEs running unlimited services. When the UsUeGuaranteeSwitch option of the UsAlgoSwitch parameter is selected, the threshold can be calculated by adding the value of this parameter to the value of InterFreqHoA2ThdRsrp or InterFreqHoA2ThdRsrq in the InterFreqHoGroup MO. If the calculated threshold is beyond the value range of InterFreqHoA2ThdRsrp or InterFreqHoA2ThdRsrq, the actual threshold will be equal to the upper or lower limit of InterFreqHoA2ThdRsrp or InterFreqHoA2ThdRsrq. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -20~20</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: -20~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value results in a lower probability of starting inter-frequency measurements, delaying inter-frequency measurements for UEs running unlimited services. A larger value results in the opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UlUsDataRatFreqPriGroupId.html">UlUsDataRatFreqPriGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL US Data RAT Freq Priority Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the intra-RAT frequency priority group for UEs running unlimited data services in the uplink. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsNbUlSinrHighThdOffset.html">UsNbUlSinrHighThdOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Us Neighbor Cell UL SINR High Thd Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the high threshold offset of uplink SINR for NS UEs (UEs running normal services) in neighboring cells of a cell that serves US UEs (UEs running unlimited services). This parameter takes effect if the UsUeGuaranteeSwitch option of the UsAlgoSwitch parameter is selected and cell US UE guarantee is triggered. When this parameter takes effect, the eNodeB adjusts the high threshold of uplink SINR for NS UEs, thereby reducing interference from neighboring cells. For NB-IoT cells, this parameter indicates the value of P0-ue defined in 3GPP TS 36.331. When this parameter is set to a value in the range of -8 to -12, the eNodeB delivers -8 dB as the value of P0-ue.</p>
+<p>GUI Value Range: -12~0</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: -12~0</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: For FDD and TDD cells: The value of -12 is recommended to achieve optimal neighboring cell suppression effect.</p>
+<p>For NB-IoT cells: The value of -8 is recommended to achieve optimal neighboring cell suppression effect.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in stricter power restrictions for NS UEs in the neighboring cell, and better user experience for US UEs. As a result, the neighboring cell throughput decreases and throughput of NS UEs decreases in the neighboring cell.</p>
+<p>A larger value of this parameter results in looser power restrictions for NS UEs in the neighboring cell, worse user experience for US UEs, and a smaller impact on the neighboring cell throughput and throughput of NS UEs in the neighboring cell.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsNbUlRbRestrictRat.html">UsNbUlRbRestrictRat</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Us Neighbor Cell UL RB Restrict Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the percentage of uplink RBs configured for NS UEs (UEs running normal services) in neighboring cells of a cell that serves US UEs (UEs running unlimited services). This parameter takes effect if the UsUeGuaranteeSwitch option of the UsAlgoSwitch parameter is selected and cell US UE guarantee is triggered. When this parameter takes effect, the eNodeB limits the percentage of uplink RBs configured for NS UEs under the preset percentage, thereby reducing interference from neighboring cells. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The value of 20 is recommended to achieve optimal RB restriction effect for neighboring cell of the local cell serving UEs running unlimited services.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in fewer RBs that can be used by UEs running normal services in the neighboring cell, better user experience for UEs running unlimited services. As a result, the neighboring cell throughput decreases and throughput of UEs running normal services decreases in the neighboring cell.</p>
+<p>A larger value of this parameter results in more RBs that can be used by UEs running normal services in the neighboring cell, worse user experience for UEs running unlimited services, and a smaller impact on the neighboring cell throughput and throughput of UEs running normal services in the neighboring cell.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsA3HoA1ThdOffset.html">UsA3HoA1ThdOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US A3 Handover A1 Threshold Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the RSRP or RSRQ threshold for triggering event A1 of event A3-based handovers for UEs running unlimited services. If the UsUeGuaranteeSwitch option of the UsAlgoSwitch parameter in the CellUSParaCfg MO is selected, the sum of this offset and the value of the A3InterFreqHoA1ThdRsrp or A3InterFreqHoA1ThdRsrq parameter in the InterFreqHoGroup MO is used as the value of the RSRP or RSRQ threshold for triggering event A1 of event A3-based handovers for UEs running unlimited services. If the RSRP or RSRQ threshold for triggering event A1 of event A3-based handovers for UEs running unlimited services exceeds the value range of the A3InterFreqHoA1ThdRsrp or A3InterFreqHoA1ThdRsrq parameter in the InterFreqHoGroup MO, the value of the RSRP or RSRQ threshold for triggering event A1 of event A3-based handovers for UEs running unlimited services is equal to the upper limit or lower limit of the A3InterFreqHoA1ThdRsrp or the A3InterFreqHoA1ThdRsrq parameter in the InterFreqHoGroup MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -20~20</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: -20~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter decreases the probability of triggering event A1 and delays stopping inter-frequency measurement. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsA4A5HoA1ThdOffset.html">UsA4A5HoA1ThdOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US A4A5 Handover A1 Threshold Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the RSRP or RSRQ threshold for triggering event A1 of event A4- or A5-based handovers for UEs running unlimited services. If the UsUeGuaranteeSwitch option of the UsAlgoSwitch parameter in the CellUSParaCfg MO is selected, the sum of this offset and the value of the InterFreqHoA1ThdRsrp or InterFreqHoA1ThdRsrq parameter in the InterFreqHoGroup MO is used as the value of the RSRP or RSRQ threshold for triggering event A1 of event A4- and A5-based handovers for UEs running unlimited services. If the RSRP or RSRQ threshold for triggering event 1 of event A4- or A5-based handovers for UEs running unlimited services exceeds the value range of the InterFreqHoA1ThdRsrp or InterFreqHoA1ThdRsrq parameter in the InterFreqHoGroup MO, the value of the RSRP or RSRQ threshold for triggering event A1 of event A4- or A5-based handovers for UEs running unlimited services is equal to the upper limit or lower limit of the InterFreqHoA1ThdRsrp or InterFreqHoA1ThdRsrq parameter in the InterFreqHoGroup MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -20~20</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: -20~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter decreases the probability of triggering event A1 and delays stopping inter-frequency measurement. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsDataPdcchSinrOffset.html">UsDataPdcchSinrOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Data PDCCH SINR Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PDCCH SINR offset for UEs running unlimited data services. This parameter is used to adjust the PDCCH aggregation level and PDCCH power for such UEs. If this parameter is set to 0, adjustment of the PDCCH aggregation level and PDCCH power does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~30</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter leads to a high PDCCH aggregation level and a large PDCCH power for UEs running unlimited data services. In this case, PDCCH resources are wasted, but the PDCCH demodulation success rate increases. A small value of this parameter leads to a low PDCCH aggregation level and a small PDCCH power for UEs running unlimited data services. In this case, PDCCH resources are saved, but the PDCCH demodulation success rate decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsVoipPdcchSinrOffset.html">UsVoipPdcchSinrOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US VoLTE PDCCH SINR Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PDCCH SINR offset for UEs running unlimited voice services. This parameter is used to adjust the PDCCH aggregation level and PDCCH power for such UEs. If this parameter is set to 0, adjustment of the PDCCH aggregation level and PDCCH power does not take effect. This parameter applies only to LTE FDD and LTE TDD. Note: If both this parameter and the VoltePdcchSinrOffset parameter are set to non-zero values, the value of this parameter prevails for UEs running unlimited services. If this parameter is set to 0 and the VoltePdcchSinrOffset parameter is set to a non-zero value, the value of the VoltePdcchSinrOffset parameter prevails for UEs running unlimited services.</p>
+<p>GUI Value Range: 0~30</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter leads to a high PDCCH aggregation level and a large PDCCH power for UEs running unlimited voice services. In this case, PDCCH resources are wasted, but the PDCCH demodulation success rate is higher. A small value of this parameter indicates a low PDCCH aggregation level and a small PDCCH power for UEs running unlimited voice services. In this case, PDCCH resources are saved, but the PDCCH demodulation success rate is lower.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsVoipInitDlIblerTarget.html">UsVoipInitDlIblerTarget</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US VoLTE Initial DL Target IBLER</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the initial value of the downlink target IBLER for UEs running unlimited voice services. If this parameter is set to 100, the CQI adjustment amount is not updated. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter leads to a high MCS index but a high retransmission rate, affecting the experience of UEs running unlimited voice services. A small value of this parameter leads to a low MCS index but a low retransmission rate, improving the experience of UEs running unlimited services.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsVoipCompenSchPeriod.html">UsVoipCompenSchPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US VoLTE Min UL Compensate Scheduling Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum interval of uplink compensation scheduling for UEs running unlimited voice services If this parameter is set to INTERVAL_OFF(OFF), uplink enhanced scheduling is disabled for UEs running unlimited voice services. If this parameter is not set to INTERVAL_OFF(OFF), uplink enhanced scheduling is enabled for UEs running unlimited voice services, and the value indicates the minimum interval of uplink compensation scheduling for such UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: INTERVAL_5(5ms), INTERVAL_10(10ms), INTERVAL_20(20ms), INTERVAL_30(30ms), INTERVAL_40(40ms), INTERVAL_50(50ms), INTERVAL_60(60ms), INTERVAL_160(160ms), INTERVAL_OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: INTERVAL_5, INTERVAL_10, INTERVAL_20, INTERVAL_30, INTERVAL_40, INTERVAL_50, INTERVAL_60, INTERVAL_160, INTERVAL_OFF</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: INTERVAL_OFF</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a value other than INTERVAL_OFF(OFF), UEs running unlimited voice services are scheduled with a higher priority in the uplink. A small value of this parameter indicates a small minimum interval of uplink compensation scheduling for such UEs during a call, increasing the probability of triggering uplink compensation scheduling. In this case, fewer voice packets are lost in the uplink due to missing SR detection. As a result, the voice quality is better, but more scheduling resources are consumed, lowering the traffic and the throughput. A large value of this parameter indicates a large minimum interval of uplink compensation scheduling for such UEs during a call, reducing the probability of triggering uplink compensation scheduling. In this case, less scheduling resources are consumed, but more voice packets are lost due to missing SR detection, lowering the voice quality.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-CrsShutDownRsrpOffset.html">CrsShutDownRsrpOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CRS Shutdown RSRP Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset for triggering event A3 related to CRS shutdown when CRS shutdown is enabled for UEs running unlimited services (US UEs). The offset is the difference between the signal quality of a neighboring cell and that of the serving cell. A larger value of this parameter results in a lower probability that a neighboring cell can be selected as a CRS shutdown cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -30~30</p>
+<p>Unit: 0.5dB</p>
+<p>Actual Value Range: -15~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: -30</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability that a neighboring cell meets the condition for CRS shutdown and less interference to the serving cell of US UEs. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-CrsShutDownStrategy.html">CrsShutDownStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CRS Shutdown Policy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CRS shutdown policy. When this parameter is set to CRS_SHUTDOWN_DISENABLE, CRS shutdown is disabled. When this parameter is set to CRS_SHUTDOWN_BASED_MEASURE, measurement-based CRS shutdown is enabled. When this parameter is set to CRS_SHUTDOWN_BASED_NCELL_LIST, neighboring cell list-based CRS shutdown is enabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: CRS_SHUTDOWN_DISENABLE(CRS_SHUTDOWN_DISENABLE), CRS_SHUTDOWN_BASED_MEASURE(CRS_SHUTDOWN_BASED_MEASURE), CRS_SHUTDOWN_BASED_NCELL_LIST(CRS_SHUTDOWN_BASED_NCELL_LIST)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CRS_SHUTDOWN_DISENABLE, CRS_SHUTDOWN_BASED_MEASURE, CRS_SHUTDOWN_BASED_NCELL_LIST</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: CRS_SHUTDOWN_DISENABLE</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to CRS_SHUTDOWN_BASED_MEASURE or CRS_SHUTDOWN_BASED_NCELL_LIST, CRS shutdown is enabled, reducing network interference and increasing the downlink throughput of US UEs. However, the performance of UEs in the cells with CRS shutdown is negatively affected. Neighboring cell list-based CRS shutdown increases the downlink throughput of US UEs more significantly than measurement-based CRS shutdown at the cost of shutting down CRS in a greater number of cells and exerting greater impact on network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-NsMaxNumAllowSchPerTTI.html">NsMaxNumAllowSchPerTTI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max. Number of Normal UEs Scheduled Per TTI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of NS UEs that can be scheduled in each TTI. If this parameter is set to 0, no NS UEs can be scheduled in the uplink or downlink. If this parameter is set to 255, SR-based scheduling of NS UEs for data services is restricted in the uplink and no restriction is imposed on scheduling in the downlink. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the throughput of UEs running unlimited services is high, but the throughput of NS UEs is low. If this parameter is set to a large value, the throughput of UEs running unlimited services is low, but the throughput of NS UEs is high.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-NsNotAllowSchSubframe.html">NsNotAllowSchSubframe</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NS Scheduling Not Allowed Subframe</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subframe in which NS UEs cannot be scheduled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: SUBFRAME0(SUBFRAME0), SUBFRAME1(SUBFRAME1), SUBFRAME2(SUBFRAME2), SUBFRAME3(SUBFRAME3), SUBFRAME4(SUBFRAME4), SUBFRAME5(SUBFRAME5), SUBFRAME6(SUBFRAME6), SUBFRAME7(SUBFRAME7), SUBFRAME8(SUBFRAME8), SUBFRAME9(SUBFRAME9)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SUBFRAME0, SUBFRAME1, SUBFRAME2, SUBFRAME3, SUBFRAME4, SUBFRAME5, SUBFRAME6, SUBFRAME7, SUBFRAME8, SUBFRAME9</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SUBFRAME0:Off, SUBFRAME1:Off, SUBFRAME2:Off, SUBFRAME3:Off, SUBFRAME4:Off, SUBFRAME5:Off, SUBFRAME6:Off, SUBFRAME7:Off, SUBFRAME8:Off, SUBFRAME9:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The fewer the options of this parameter are selected, the lower the throughput of UEs running unlimited services, but the higher the throughput of NS UEs. The more the options of this parameter are selected, the higher the throughput of UEs running unlimited services, but the lower of the throughput of NS UEs.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-SchGuaranteeUsNum.html">SchGuaranteeUsNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Scheduling Guarantee Us UE Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of unlimited service (US) UEs (UEs running US services) that require guarantee in uplink and downlink scheduling. When this parameter is set to 255, no guarantee is provided for US UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a smaller number of US UEs that require guarantee in uplink and downlink scheduling. A larger value of this parameter results in the opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsWithGapMode.html">UsWithGapMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Gap Mode for UEs Running Unlimited Services</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to allow US UEs (UEs running unlimited services) to perform unnecessary gap-assisted inter-frequency or inter-RAT measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: DISABLE(DISABLE), ENABLE(ENABLE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ENABLE(ENABLE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ENABLE, US UEs are allowed to perform unnecessary gap-assisted inter-frequency or inter-RAT measurement. During the measurement, US UEs cannot be scheduled and therefore the uplink and downlink throughput of these UEs decreases. If this parameter is set to DISABLE, US UEs are not allowed to perform unnecessary gap-assisted inter-frequency or inter-RAT measurement and there is no impact on uplink and downlink throughput of these UEs.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-VolteSilDelayHoRsrpThld.html">VolteSilDelayHoRsrpThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RSRP Thld for Delayed HO in VoLTE Silent Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable delaying the triggering of handovers during talk spurts to the silent period and also indicates the RSRP threshold used to determine whether handovers need to be immediately triggered when the eNodeB decides to delay the triggering of handovers during talk spurts to the silent period. If the RSRP in the serving cell is lower than this threshold, handovers are triggered immediately. This value of this parameter must be smaller than that of the A3InterFreqHoA2ThdRsrp parameter in the InterFreqHoGroup MO and greater than that of the BlindHoA1A2ThdRsrp parameter in the CellHoParaCfg MO. If this parameter is set to 255, triggering of handovers to be performed during talk spurts are not delayed to the silent period. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -140~-43,255</p>
+<p>Unit: dBm</p>
+<p>Actual Value Range: -140~-43,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a value other than 255, triggering of handovers to be performed during talk spurts of VoLTE UEs running unlimited services is delayed to the silent period. A small value of this parameter leads to a low probability of triggering handovers of such VoLTE UEs after handovers are delayed, and a high voice MOS. However, such UEs may not be timely handed over, causing service drops. A large value of this parameter leads to a high probability of triggering handovers of such VoLTE UEs after handovers are delayed. If this parameter is set to 255, triggering of handovers to be performed during talk spurts of VoLTE UEs running unlimited services is not delayed to the silent period, and the network performance is not affected.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-LargePacketDlDataThld.html">LargePacketDlDataThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Large Packet Service DL Data Amount Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink traffic volume threshold used to determine UEs that are running large-packet services. If the BigPackageIdentify parameter is set to ON, the eNodeB considers a UE as a large-packet unlimited-service UE when the accumulated amount of RLC data buffered for the UE is greater than or equal to this threshold. This parameter applies only to FDD.</p>
+<p>GUI Value Range: 0~300</p>
+<p>Unit: Mbit</p>
+<p>Actual Value Range: 0~300</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsNotSchRbgRsrpOffset.html">UsNotSchRbgRsrpOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Not Schedule RBG RSRP Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the RSRP for the strongest neighboring cell relative to the RSRP for the serving cell. This offset is used in the function of avoiding allocating RBGs exposed to strong interference to unlimited-service UEs.</p>
+<p>GUI Value Range: -15~6</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: -15~6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: -3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability that the preceding RBG allocation avoidance function takes effect and therefore lower gains in downlink throughput brought by this function. A smaller value of this parameter results in the opposite effects but also a higher probability that downlink throughput decreases in weak coverage areas.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsNotSchRbgRsrpThld.html">UsNotSchRbgRsrpThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Not Schedule RBG RSRP Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the serving-cell RSRP threshold used in the function of avoiding allocating RBGs exposed to strong interference to unlimited-service UEs.</p>
+<p>GUI Value Range: -130~-90</p>
+<p>Unit: dBm</p>
+<p>Actual Value Range: -130~-90</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: -110</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability that the preceding RBG allocation avoidance function takes effect and therefore lower gains in downlink throughput brought by this function. A smaller value of this parameter results in the opposite effects but also a higher probability that downlink throughput decreases in weak coverage areas.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsCellSchOptSwitch.html">UsCellSchOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Us Cell Schedule Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable scheduling optimization for cells where UEs running unlimited services reside.</p>
+<p>UsCellPdcchFixSymSwitch: Indicates whether to fix the CFI for cells where UEs running unlimited services reside. If this option is selected, the CFI is fixed for cells where UEs running unlimited services reside. If this option is deselected, the CFI is set based on the setting of the PdcchSymNumSwitch parameter in the CellPdcchAlgo MO for cells where UEs running unlimited services reside. This option applies only to LTE TDD.</p>
+<p>NsSchRestrictOptSwitch: Indicates whether to restrict uplink and downlink scheduling of normal UEs in dual-carrier scenarios. If this option is deselected, the eNodeB does not restrict uplink and downlink scheduling of normal UEs. If this option is selected, the eNodeB restricts uplink and downlink scheduling of normal UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsVolteSchMcsOptSwitch: Indicates whether to optimize scheduling and MCS selection for UEs running unlimited VoLTE services. If this option is deselected, the optimization does not take effect. If this option is selected, the eNodeB adjusts the UL grant volume and optimizes uplink and downlink MCS selection for such UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UlUsVmimoSwitch: Indicates whether to perform resource pairing for UEs running unlimited services in the uplink, UEs running unlimited services in the downlink and sending feedback messages through uplink channels, and UEs running video services. If this option is selected, the resource pairing takes effect. If this option is deselected, the resource pairing is disabled. This option applies only to 8T cells. This option applies only to LTE TDD.</p>
+<p>UsInterfOptSwitch: Indicates whether to enable the interference optimization function for UEs running unlimited services. This option determines how uplink frequency selective scheduling, uplink scheduler-controlled power, and IoT-based power control take effect for these UEs. When the UsInterfOptSwitch option is selected: (a) If the ULFSSAlgoswitch option is selected, uplink frequency-selective scheduling does not take effect for the cell when UEs running unlimited services are camping on the cell. (b) If the SchedulerCtrlPowerSwitch option is deselected, the scheduler-controlled power function does not take effect for the cell when UEs running unlimited services are camping on the cell. (c) If the PuschIoTCtrlSwitch option is selected, IoT-based power control takes effect only for UEs running normal services but not for UEs running unlimited services. When the UsInterfOptSwitch option is deselected, the algorithms specified by the ULFSSAlgoswitch, SchedulerCtrlPowerSwitch, and PuschIoTCtrlSwitch options are implemented same way in cells on which US UEs camp and other cells. The PuschIoTCtrlSwitch option applies only to LTE TDD. This option applies only to LTE FDD and LTE TDD.</p>
+<p>CsfbNsSchRestrictOptSwitch: Indicates whether to prohibit the scheduling of NS UEs in CSFB scenarios. Scheduling of NS UEs is prohibited in CSFB scenarios only when this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DisuseStatement: NsSchRestrictOptSwitch: This parameter will be removed in later versions. In this version, the setting of this parameter is still synchronized between the MAE and the eNodeB and can be delivered to the eNodeB, but it is no longer used internally. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: UsCellPdcchFixSymSwitch(UsCellPdcchFixSymSwitch), NsSchRestrictOptSwitch(NsSchRestrictOptSwitch), UsVolteSchMcsOptSwitch(UsVolteSchMcsOptSwitch), UlUsVmimoSwitch(UlUsVmimoSwitch), UsInterfOptSwitch(UsInterfOptSwitch), CsfbNsSchRestrictOptSwitch(CsfbNsSchRestrictOptSwitch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UsCellPdcchFixSymSwitch, NsSchRestrictOptSwitch, UsVolteSchMcsOptSwitch, UlUsVmimoSwitch, UsInterfOptSwitch, CsfbNsSchRestrictOptSwitch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: UsCellPdcchFixSymSwitch:Off, NsSchRestrictOptSwitch:Off, UsVolteSchMcsOptSwitch:Off, UlUsVmimoSwitch:Off, UsInterfOptSwitch:Off. CsfbNsSchRestrictOptSwitch:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: UsCellPdcchFixSymSwitch: If this option is selected, the CFI value of cells where UEs running unlimited services reside decreases, increasing downlink spectral efficiency and the number of uplink RBs available for such UEs. However, the access success rate, service drop rate, and VoLTE service quality of NS UEs are affected. If this option is deselected, network performance is not affected.</p>
+<p>NsSchRestrictOptSwitch: If this option is selected, the uplink and downlink throughput of UEs running unlimited services increase. However, the uplink and downlink throughput of NS UEs decrease, the handover success rate decreases, and the service drop rate increases. If this option is deselected, network performance is not affected.</p>
+<p>UsVolteSchMcsOptSwitch: If this option is selected, the uplink throughput of NS UEs decreases, but the uplink and downlink throughput of concurrent services of VoLTE UEs running unlimited services increases. If this option is deselected, network performance is not affected.</p>
+<p>UlUsVmimoSwitch: If this option is selected, the number of uplink RBs available for UEs running unlimited services increases, raising the uplink throughput. However, the downlink throughput and throughput of UEs running unlimited video services decrease. If this option is deselected, the downlink throughput and throughput of UEs running unlimited video services are not affected.</p>
+<p>UsInterfOptSwitch: This option takes effect only if the ULFSSAlgoswitch option is selected, or the SchedulerCtrlPowerSwitch option is deselected or the PuschIoTCtrlSwitch option is selected. When the UsInterfOptSwitch option is selected, the uplink throughput of US UEs increases, but uplink interference to neighboring cells of the cell serving US UEs also increases. If this option is deselected, network performance is not affected.</p>
+<p>CsfbNsSchRestrictOptSwitch: If this option is selected, the uplink and downlink throughput of US UEs increases in CSFB drive test scenario. However, the uplink and downlink throughput of NS UEs decreases. In addition, for NS UEs, the call completion rate and handover success rate decrease and the service drop rate increases. If this option is deselected, the network performance is not affected.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsAlgoExSwitch.html">UsAlgoExSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Guarantee Algorithm Extension Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: JTUserCoCellPowerSwitch: Indicates whether to increase the power of the coordinating cell when joint transmission is performed for UEs running unlimited services. If this option is selected, the eNodeB increases the power of the coordinating cell when joint transmission is performed for UEs running unlimited services. If this option is deselected, the eNodeB does not increase the power of the coordinating cell when joint transmission is performed for UEs running unlimited services. This option applies only to LTE TDD. UsSrsOptSwitch: Indicates whether to optimize the SRS reporting period for UEs running unlimited services. If this option is selected, the eNodeB optimizes the SRS reporting period for UEs running unlimited services. If this option is deselected, the eNodeB does not optimize the SRS reporting period for UEs running unlimited services. This option applies only to LTE TDD. UsCellCrsOptSwitch: Indicates whether to perform CRS optimization for a cell where there are UEs running unlimited services. If this option is selected, the eNodeB performs CRS optimization for the cell. If this option is deselected, the eNodeB does not perform CRS optimization for the cell. This option applies only to LTE TDD. UsUeGapSchOptSwitch: Indicates whether to optimize downlink scheduling for UEs running unlimited services when gap-assisted measurement is started. If this option is selected, the eNodeB optimizes downlink scheduling for UEs running unlimited services when gap-assisted measurement is started. If this option is deselected, the eNodeB does not optimize downlink scheduling for UEs running unlimited services when gap-assisted measurement is started. This option applies only to LTE FDD and LTE TDD. UsCellMbsfnSchForbidSw: Indicates whether to prohibit scheduling of NS UEs in MBSFN subframes for a cell where there are UEs running unlimited services. If this option is selected, the eNodeB prohibits scheduling of NS UEs in MBSFN subframes for a cell where UEs running unlimited services reside. If this option is deselected, the eNodeB does not prohibit scheduling of NS UEs in MBSFN subframes for a cell where UEs running unlimited services reside. This option applies only to LTE TDD. MMUeGuaranteeSwitch: Indicates whether to enable all functions related to service guarantee for multiple UEs in massive MIMO scenarios. If this option is selected, the eNodeB enables all functions related to service guarantee for multiple UEs in massive MIMO scenarios. If this option is deselected, the eNodeB disables all functions related to service guarantee for multiple UEs in massive MIMO scenarios. This option applies only to LTE TDD. USPwrSharePaSwitch: If this option is selected, the eNodeB dynamically performs power sharing between carriers of a multi-carrier cell in which UEs running unlimited services reside. This increases the downlink rate of such UEs. If this option is deselected, the eNodeB does not perform power sharing within multi-carrier cells. This option applies only to 8T8R eNodeBs on band D. This option applies only to LTE TDD. EmtcDlThptOptSw: Indicates whether to enable the function of optimizing downlink peak rates of eMTC UEs and downlink throughput of eMTC UEs at the cell edge or at a medium distance from the cell center. The optimization function takes effect only when this option is selected. This option applies only to LTE FDD.</p>
+<p>UsUePrdMeasOptSwitch: Indicates whether to enable periodic measurement optimization for UEs running unlimited services. If this option is selected, the eNodeB optimizes periodic measurement for cells serving US UEs and their intra-frequency neighboring cells. In this case, periodic measurement tasks configured on the MAE for these cells, such as periodic MR tasks, are paused. This improves the uplink drive-test data rate of UEs in comparison tests. If this option is deselected, periodic measurement optimization for US UEs does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsEmtcHarqAckBundleOptSw: Indicates whether to optimize HARQ-ACK bundling for eMTC UEs that support HARQ-ACK bundling. If this option is selected, the uplink and downlink scheduling time sequence is optimized for eMTC UEs that support HARQ-ACK bundling to increase the total uplink and downlink rates for these UEs. This option applies only to LTE FDD.</p>
+<p>UsNbUeThptOptSw: Indicates whether to enable throughput optimization for single NB-IoT UEs. Uplink and downlink throughput optimization for single NB-IoT UEs is enabled only if this option is selected. This option applies only to NB-IoT.</p>
+<p>UsPairingOptSwitch: Indicates whether UEs running unlimited services can be paired with common UEs in massive MIMO scenarios. If this option is selected, UEs running unlimited services can be paired with common UEs in the downlink in the cell. If this option is deselected, UEs running unlimited services cannot be paired with common UEs in the downlink in the cell. This option applies only to LTE TDD.</p>
+<p>UsCellNsNsaUeSteeringSwitch: Indicates whether to enable user steering for NSA DC UEs running normal services when user steering for UEs running unlimited services is enabled. If this option is selected, user steering is enabled for NSA DC UEs running normal services. If this option is deselected, user steering is disabled for NSA DC UEs running normal services. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UsFreqPriStrategySw: Indicates which frequency priority policy is used for NSA DC UEs running unlimited services. If this option is selected, the frequency priority policy for PCC anchoring of NSA DC UEs running normal services is used as the frequency priority policy for NSA DC UEs running unlimited services. If this option is deselected, the frequency priority policy dedicated to LTE UEs running unlimited services is used as the frequency priority policy for NSA DC UEs running unlimited services. This option applies only to LTE FDD and LTE TDD.</p>
+<p>LteAndNrUsCoordinationOptSw: Indicates whether to optimize the performance of UEs running unlimited services in an NR cell on LTE+NR networks. If this option is selected and there are UEs running unlimited services in an NR cell, the following functions are performed in the LTE cell whose spectrum overlaps with that of the NR cell: interference suppression for neighboring cells serving UEs running unlimited services, downlink RB restriction for common UEs, uplink RB restriction for common UEs, and uplink power reduction for common UEs. If LTE and NR spectrum sharing is enabled in the local cell, the NR_PRI value of the LteNrUlSpectrumShrPriority parameter in the LteNrSpctShrCellGrp MO associated with the cell takes effect. In this case, the LteNrSpctHoProtDuration parameter does not take effect for the NR cell receiving shared spectrum. If this option is deselected, the optimization does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DisuseStatement: UsCellMbsfnSchForbidSw: This parameter will be removed in later versions. In this version, the setting of this parameter is still synchronized between the MAE and the eNodeB and can be delivered to the eNodeB, but it is no longer used internally. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: JTUserCoCellPowerSwitch(JTUserCoCellPowerSwitch), UsSrsOptSwitch(UsSrsOptSwitch), UsCellCrsOptSwitch(UsCellCrsOptSwitch), UsUeGapSchOptSwitch(UsUeGapSchOptSwitch), UsCellMbsfnSchForbidSw(UsCellMbsfnSchForbidSw), MMUeGuaranteeSwitch(MMUeGuaranteeSwitch), USPwrSharePaSwitch(USPwrSharePaSwitch), EmtcDlThptOptSw(EmtcDlThptOptSw), UsUePrdMeasOptSwitch(UsUePrdMeasOptSwitch), UsCellNsNsaUeSteeringSwitch(UsCellNsNsaUeSteeringSwitch), UsEmtcHarqAckBundleOptSw(UsEmtcHarqAckBundleOptSw), UsNbUeThptOptSw(UsNbUeThptOptSw), UsPairingOptSwitch(UsPairingOptSwitch), UsFreqPriStrategySw(UsFreqPriStrategySw), LteAndNrUsCoordinationOptSw(LteAndNrUsCoordinationOptSw)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: JTUserCoCellPowerSwitch, UsSrsOptSwitch, UsCellCrsOptSwitch, UsUeGapSchOptSwitch, UsCellMbsfnSchForbidSw, MMUeGuaranteeSwitch, USPwrSharePaSwitch, EmtcDlThptOptSw, UsUePrdMeasOptSwitch, UsCellNsNsaUeSteeringSwitch, UsEmtcHarqAckBundleOptSw, UsNbUeThptOptSw, UsPairingOptSwitch, UsFreqPriStrategySw, LteAndNrUsCoordinationOptSw</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: JTUserCoCellPowerSwitch:Off, UsSrsOptSwitch:Off, UsCellCrsOptSwitch:Off, UsUeGapSchOptSwitch:Off, UsCellMbsfnSchForbidSw:Off, MMUeGuaranteeSwitch:Off, USPwrSharePaSwitch:Off, EmtcDlThptOptSw:Off, UsUePrdMeasOptSwitch:Off, UsEmtcHarqAckBundleOptSw:Off, UsNbUeThptOptSw:Off, UsPairingOptSwitch:Off, UsCellNsNsaUeSteeringSwitch:Off, UsFreqPriStrategySw:On, LteAndNrUsCoordinationOptSw:Off</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The JTUserCoCellPowerSwitch option of the UsAlgoExSwitch parameter in a CellUSParaCfg MO can be selected only when the MBSFNSubJTOptSwitch option of the UsAlgoSwitch parameter in the CellUSParaCfg MO is selected.</li><li>When the UsSrsGuaranteeSwitch parameter in the CellUSParaCfg MO is set to 8_USERS_GUARANTEE(8_USERS_GUARANTEE), 16_USERS_GUARANTEE(16_USERS_GUARANTEE), or 24_USERS_GUARANTEE(24_USERS_GUARANTEE), the UsSrsOptSwitch option of the UsAlgoExSwitch parameter in the CellUSParaCfg MO must be deselected, and the MMUeGuaranteeSwitch option of the UsAlgoExSwitch parameter in the CellUSParaCfg MO must be selected.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: JTUserCoCellPowerSwitch: If this option is selected, the eNodeB increases the power of the coordinating cell when joint transmission is performed for UEs running unlimited services, increasing the downlink throughput. If this option is deselected, the network performance is not affected. UsSrsOptSwitch: If this option is selected, UEs running unlimited data services timely send SRSs, improving downlink beamforming performance and downlink throughput of such UEs. However, the service drop rate may increase. If this option is deselected, the network performance is not affected. UsCellCrsOptSwitch: If this option is selected, the downlink RSRP of UEs running unlimited downlink data services increases, raising the downlink MIMO throughput of such UEs. However, cell coverage may decrease. If this option is deselected, the network performance is not affected. UsUeGapSchOptSwitch: If this option is selected, the eNodeB increases the number of downlink scheduling times for UEs running unlimited services. If this option is deselected, the network performance is not affected. UsCellMbsfnSchForbidSw: If this option is selected and the eNodeB stops scheduling NS UEs in an MBSFN subframe, the impact of retransmission for NS UEs on the number of scheduling times for UEs running unlimited services and the number of RBs allocated to such UEs decreases. The scheduling delay of normal UEs may therefore increase. If this option is deselected, the network performance is not affected. MMUeGuaranteeSwitch: If this option is selected, the eNodeB performs service guarantee during massive MIMO multi-user tests, increasing the cell throughput. If this option is deselected, the network performance is not affected. USPwrSharePaSwitch: If this option is selected, the eNodeB dynamically performs power sharing between carriers of a multi-carrier cell in which UEs running unlimited services reside, increasing the downlink rate of such UEs on carriers with power increase but decreasing coverage of carriers with power decrease. If this option is deselected, the network performance is not affected. EmtcDlThptOptSw: If this option is selected, the downlink data rate of eMTC UEs increases. However, the reporting delay of certain eMTC UEs may be extended, which affects delay-related counters. Deselecting this option does not have this effect.</p>
+<p>UsUePrdMeasOptSwitch: If this option is selected, the uplink throughput of US UEs increases when periodic measurement is enabled, but the number of X2 messages between cells serving US UEs and their intra-frequency neighboring cells increases. If this option is deselected, the network performance is not affected.</p>
+<p>UsEmtcHarqAckBundleOptSw: If this option is selected, the scheduling time sequence for HARQ-ACK bundling is optimized for eMTC UEs, improving the total uplink and downlink rates. If this option is deselected, the network performance is not affected.</p>
+<p>UsFreqPriStrategySw: If this option is selected, independent frequency priority policies are configured for LTE UEs running unlimited services and NSA DC UEs running unlimited services, which allows for the two types of UEs to camp on different frequencies, improving throughput and voice service experience. If this option is deselected, the frequency priority policy for PCC anchoring of NSA DC UEs running unlimited services is the same as the frequency priority policy dedicated to LTE UEs running unlimited services, and this may cause user experience deterioration for one of the two types of UEs.</p>
+<p>UsNbUeThptOptSw: If this option is selected, the uplink and downlink rates of NB-IoT UEs increase. If this option is deselected, network performance is not affected.</p>
+<p>UsPairingOptSwitch: If this option is selected, UEs running unlimited services can be paired with common UEs. This increases the number of MU beamforming pairing layers if there are UEs running unlimited services. If this option is deselected, UEs running unlimited services cannot be paired with common UEs. In this case, if there is only one UE running unlimited services in the cell, the number of MU beamforming pairing layers is 0.</p>
+<p>UsCellNsNsaUeSteeringSwitch: If this option is selected, user steering is enabled for NSA DC UEs running normal services. This assures performance of UEs running unlimited services but may lead to performance loss of NSA DC UEs running normal services. If this option is deselected, performance of NSA DC UEs running normal services is not affected but performance of UEs running unlimited services may be affected.</p>
+<p>LteAndNrUsCoordinationOptSw: If this option is selected, the interference of LTE cells to UEs running unlimited services in the NR cell decreases. If LTE and NR spectrum sharing is enabled in the local cell, the RB resources for UEs running unlimited services in the NR cell increase and the performance of these UEs improves. However, the downlink UE throughput, uplink UE throughput, and number of UEs decrease in LTE cells. If this option is deselected, there is no such impact.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsSrsGuaranteeSwitch.html">UsSrsGuaranteeSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US SRS Guarantee Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of UEs for which SRS guarantee is performed during massive MIMO multi-UE guarantee tests. The default value 0_USERS_GUARANTEE(0 User Guarantee) indicates that the guarantee algorithm does not take effect. The parameter values 8_USERS_GUARANTEE(8 Users Guarantee), 16_USERS_GUARANTEE(16 Users Guarantee), and 24_USERS_GUARANTEE(24 Users Guarantee) indicate that the eNodeB performs SRS guarantee for 8, 16, and 24 UEs respectively during multi-UE guarantee tests. Set this parameter based on test requirements. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0_USERS_GUARANTEE(0 User Guarantee), 8_USERS_GUARANTEE(8 Users Guarantee), 16_USERS_GUARANTEE(16 Users Guarantee), 24_USERS_GUARANTEE(24 Users Guarantee)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0_USERS_GUARANTEE, 8_USERS_GUARANTEE, 16_USERS_GUARANTEE, 24_USERS_GUARANTEE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0_USERS_GUARANTEE(0 User Guarantee)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the UsSrsGuaranteeSwitch parameter in the CellUSParaCfg MO is set to 8_USERS_GUARANTEE(8_USERS_GUARANTEE), 16_USERS_GUARANTEE(16_USERS_GUARANTEE), or 24_USERS_GUARANTEE(24_USERS_GUARANTEE), the UsSrsOptSwitch option of the UsAlgoExSwitch parameter in the CellUSParaCfg MO must be deselected, and the MMUeGuaranteeSwitch option of the UsAlgoExSwitch parameter in the CellUSParaCfg MO must be selected.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 8_USERS_GUARANTEE(8 Users Guarantee), 16_USERS_GUARANTEE(16 Users Guarantee), or 24_USERS_GUARANTEE(24 Users Guarantee), the eNodeB performs SRS guarantee for UEs running unlimited services. In this case, such UEs timely report SRSs, improving beamforming performance and downlink throughput of such UEs. If this parameter is set to 0_USERS_GUARANTEE(0 User Guarantee), the network performance is not affected.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UeMobilIdentifyStrategy.html">UeMobilIdentifyStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UE Mobility Identify Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the basis for identifying moving UEs. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: NONE(NONE), ALGORITHM_BASED(ALGORITHM_ BASED), SPECIFICIPADD_BASED(SPECIFICIPADD_BASED), SPECIFICTRACEID_BASED(SPECIFICTRACEID_BASED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, ALGORITHM_BASED, SPECIFICIPADD_BASED, SPECIFICTRACEID_BASED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NONE(NONE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a value other than NONE(NONE), the eNodeB identifies moving UEs and increases the throughput for identified moving UEs. In this case, the throughput of static UEs may decrease.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsSmoothHoCompThldOfs.html">UsSmoothHoCompThldOfs</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Smooth Handover Compensation Thld Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the compensation threshold for smooth handovers of UEs running unlimited services when the UsNbInterfHoSwitch option of the UsAlgoSwitch parameter is selected. If this parameter is set to 0, the compensation threshold is not adjusted for such handovers. If this parameter is set to a non-0 value, the compensation threshold is added by the value of this parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -30~30</p>
+<p>Unit: 0.5dB</p>
+<p>Actual Value Range: -15~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to an excessively large value, the eNodeB is less likely to successfully hand over UEs running unlimited services and postpones handovers of such UEs. If the signal quality of the cell serving such UEs is poor, performance of such UEs deteriorates. If this parameter is set to an excessively small value, the eNodeB is more likely to successfully hand over UEs running unlimited services and hand over such UEs earlier. If the signal quality of the target cell to which UEs running unlimited services are handed over is poor, performance of such UEs deteriorates.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-VolteSilDelayHoRsrqThld.html">VolteSilDelayHoRsrqThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RSRQ Thld for Delayed HO in VoLTE Silent Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the serving cell RSRQ threshold used for determining whether to trigger handovers immediately for UEs running unlimited VoLTE services during talk spurts after delaying the triggering of handovers during talk spurts to the silent period is enabled. If the RSRQ of the serving cell is smaller than this threshold, the eNodeB immediately triggers handovers for UEs running unlimited VoLTE services during talk spurts. If the RSRQ of the serving cell is greater than or equal to this threshold, the eNodeB postpones the triggering of intra-RAT handovers for UEs running unlimited VoLTE services to the silent period. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -40~-6</p>
+<p>Unit: 0.5dB</p>
+<p>Actual Value Range: -20~-3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: -32</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the VolteSilDelayHoRsrpThld parameter in the CellUSParaCfg MO is not set to 255, the eNodeB can postpone triggering of handovers for UEs running unlimited VoLTE services to the silent period. It is recommended that the VolteSilDelayHoRsrqThld parameter be set to a value ranging from -14 dB to -16 dB. A small value of this parameter leads to a high probability of postponing triggering of intra-RAT handovers to the silent period, but high risks of RRC connection reestablishment due to delayed handovers. A large value of this parameter leads to a low probability of postponing triggering of intra-RAT handovers to the silent period and a small gain produced by handovers triggered during the silent period. If the VolteSilDelayHoRsrpThld parameter in the CellUSParaCfg MO is set to 255, the eNodeB cannot postpone triggering of handovers for UEs running unlimited VoLTE services to the silent period, and the VolteSilDelayHoRsrqThld parameter does not affect network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsVolteAlgoSwitch.html">UsVolteAlgoSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US VoLTE Algorithm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable functions related to US VoLTE UEs.</p>
+<p>US_VOLTE_UE_STEERING_SW: Indicates whether to allow steering of US VoLTE UEs with QCI-1 bearers. Steering of US VoLTE UEs with QCI-1 bearers is allowed only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>US_VOLTE_RTP_REORDER_SW: Indicates whether to enable RTP reordering for US VoLTE UEs. RTP reordering is enabled for US VoLTE UEs only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: US_VOLTE_UE_STEERING_SW(US_VOLTE_UE_STEERING_SW), US_VOLTE_RTP_REORDER_SW(US_VOLTE_RTP_REORDER_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: US_VOLTE_UE_STEERING_SW, US_VOLTE_RTP_REORDER_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: US_VOLTE_UE_STEERING_SW:Off</p>
+<p>US_VOLTE_RTP_REORDER_SW:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: US_VOLTE_UE_STEERING_SW: When this option is selected, the number of handovers increases. When this option is deselected, network performance is not affected.</p>
+<p>US_VOLTE_RTP_REORDER_SW: When this option is selected, voice packet disorder caused by transmission issues can be fixed. When this option is deselected, network performance is not affected.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-RestrictedNsDlRbCount.html">RestrictedNsDlRbCount</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Restricted NS DL RB Count</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of downlink RBs that can be scheduled for UEs running normal services per TTI. If this parameter is set to a value greater than or equal to 4 and less than 100, the number of downlink RBs that can be scheduled for UEs running normal services per TTI cannot exceed the parameter value. If this parameter is set to 100, the eNodeB does not restrict the number of downlink RBs that can be scheduled for UEs running normal services. If this parameter is set to a value exceeding the cell bandwidth capability, the eNodeB does not restrict the number of downlink RBs that can be scheduled for UEs running normal services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 4~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter leads to high downlink throughput of UEs running unlimited services and low throughput of UEs running normal services. In this case, the radio connection rate and handover success rate of UEs running normal services decrease by a large margin, and the service drop rate of UEs running normal services increases by a large margin. A large value of this parameter leads to low downlink throughput of UEs running unlimited services and high throughput of UEs running normal services. In this case, the radio connection rate and handover success rate of UEs running normal services decrease by a small margin, and the service drop rate of UEs running normal services increases by a small margin.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-ConsVolteFrameNum1stSpurt.html">ConsVolteFrameNum1stSpurt</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Consec VoLTE Frame Number in 1st Talk Spurt</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicate the number of consecutive voice frames in the first voice segment. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-ConsVolteFrameNum2ndSpurt.html">ConsVolteFrameNum2ndSpurt</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Consec VoLTE Frame Number in 2nd Talk Spurt</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicate the number of consecutive voice frames in the second voice segment. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsNCellRestrictStrategy.html">UsNCellRestrictStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Neighboring Cell Restrict Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the policy for restricting neighboring cells of the cell serving US UEs. If this parameter is set to BASED_ON_NRT, all intra-frequency neighboring cells of the cell serving US UEs are restricted. If this parameter is set to BASED_ON_MEASUREMENT, only the intra-frequency neighboring cells reported by US UEs are restricted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BASED_ON_NRT(BASED_ON_NRT), BASED_ON_MEASUREMENT(BASED_ON_MEASUREMENT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BASED_ON_NRT, BASED_ON_MEASUREMENT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BASED_ON_NRT(BASED_ON_NRT)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to BASED_ON_NRT, a larger number of neighboring cells are restricted and a larger number of UEs' throughput is restricted than when this parameter is set to BASED_ON_MEASUREMENT. When this parameter is set to BASED_ON_MEASUREMENT, a smaller number of neighboring cells are restricted, a smaller number of UEs' throughput is restricted, and the DT rate of US UEs is lower than when this parameter is set to BASED_ON_NRT.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-NsRbSchRestrictionStrategy.html">NsRbSchRestrictionStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NS RB Scheduling Restriction Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the policy for restricting the scheduling of RBs for UEs running normal services.</p>
+<p>DEFAULT_STRATEGY: Indicates that the scheduling of UEs running normal services is restricted when the number of UEs running unlimited services in the cell is the same as that configured using the MML command.</p>
+<p>NS_VOLTE_UNRESTRICTED: Indicates that the scheduling of UEs running normal services is restricted when the number of UEs running unlimited services in the cell is less than or equal to that configured using the MML command. The scheduling of VoLTE UEs is not restricted.</p>
+<p>NS_VOLTE_RESTRICTED: Indicates that the scheduling of UEs running normal services is restricted when the number of UEs running unlimited services in the cell is less than or equal to that configured using the MML command. In addition, the scheduling of VoLTE UEs is restricted.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: DEFAULT_STRATEGY(DEFAULT_STRATEGY), NS_VOLTE_UNRESTRICTED(NS_VOLTE_UNRESTRICTED), NS_VOLTE_RESTRICTED(NS_VOLTE_RESTRICTED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULT_STRATEGY, NS_VOLTE_UNRESTRICTED, NS_VOLTE_RESTRICTED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DEFAULT_STRATEGY(DEFAULT_STRATEGY)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to DEFAULT_STRATEGY and the number of UEs running unlimited services in a cell is the same as that in the MML command configuration, the data rates of UEs running normal services are affected. If this parameter is set to NS_VOLTE_UNRESTRICTED and the number of UEs running unlimited services in a cell is less than or equal to that in the MML command configuration, the uplink and downlink throughput of non-VoLTE UEs running normal services is affected. The scheduling of UEs meeting the SPID requirements of UEs running unlimited services is not restricted, and the scheduling priority of these UEs is the same as that of UEs running unlimited services.</p>
+<p>If this parameter is set to NS_VOLTE_RESTRICTED and the number of UEs running unlimited services in a cell is less than or equal to that in the MML command configuration, the uplink and downlink throughput of UEs running normal services (including VoLTE UEs) is affected. The scheduling of UEs meeting the SPID requirements of UEs running unlimited services is not restricted, and the scheduling priority of these UEs is the same as that of UEs running unlimited services.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-DlCceSchPriorityPenaltyLvl.html">DlCceSchPriorityPenaltyLvl</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink CCE Sch Priority Penalty Level</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the level of penalty on scheduling priorities. The penalty takes effect on a per PDCCH aggregation level basis.</p>
+<p>The value NONE indicates that the penalty is disabled.</p>
+<p>The value LEVEL_ONE indicates that a low level of penalty is imposed only on UEs for which PDCCH aggregation level 8 is used.</p>
+<p>The value LEVEL_TWO indicates that a medium level of penalty is imposed on UEs for which PDCCH aggregation level 4 or 8 is used.</p>
+<p>The value LEVEL_THREE indicates that a high level of penalty is imposed on UEs for which PDCCH aggregation level 4 or 8 is used.</p>
+<p>This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: NONE, LEVEL_ONE, LEVEL_TWO, LEVEL_THREE</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, LEVEL_ONE, LEVEL_TWO, LEVEL_THREE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger parameter value leads to a higher level of penalty on the scheduling priorities of UEs for which PDCCH aggregation level 4 or 8 is used, a lower probability of scheduling these UEs, and more UEs scheduled in the downlink. A smaller value leads to a lower level of penalty on the scheduling priorities of UEs for which PDCCH aggregation level 4 or 8 is used, a higher probability of scheduling these UEs, and a smaller change in the number of UEs scheduled in the downlink.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UlCceSchPriorityPenaltyLvl.html">UlCceSchPriorityPenaltyLvl</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink CCE Sch Priority Penalty Level</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the level of penalty on uplink scheduling priorities based on the PDCCH aggregation level.</p>
+<p>The value NONE indicates that penalty on uplink scheduling priorities based on the PDCCH aggregation level is disabled.</p>
+<p>If this parameter is set to LEVEL_ONE, the penalty is imposed on only the uplink scheduling priority of UEs with PDCCH aggregation level 8, and the penalty level is low.</p>
+<p>If this parameter is set to LEVEL_TWO, the penalty is imposed on the uplink scheduling priorities of UEs with PDCCH aggregation levels 4 and 8, and the penalty level is medium.</p>
+<p>If this parameter is set to LEVEL_THREE, the penalty is imposed on the uplink scheduling priorities of UEs with PDCCH aggregation levels 4 and 8, and the penalty level is high.</p>
+<p>This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: NONE, LEVEL_ONE, LEVEL_TWO, LEVEL_THREE</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, LEVEL_ONE, LEVEL_TWO, LEVEL_THREE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to a higher penalty level for the uplink scheduling priorities of UEs with PDCCH aggregation levels 4 and 8, a lower probability that these UEs are scheduled, and more UEs scheduled in the uplink. A smaller value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsUeDlAdaptPwrBoostThld.html">UsUeDlAdaptPwrBoostThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US UE DL Adaptive Power Boost Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink power boost threshold for eMTC and NB-IoT UEs running unlimited services. If this parameter is set to 0, downlink power boost is disabled for these UEs.</p>
+<p>GUI Value Range: 0~90</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: 0~9</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to increased power, MCS indexes, and downlink throughput for UEs running unlimited services. A smaller value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellUSParaCfg-UsUeNCellGuaranteeTimer.html">UsUeNCellGuaranteeTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US UE Neighboring Cell Guarantee Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer that governs the period of performance guarantee for the cell serving UEs running unlimited services (US UEs for short) through control over neighboring cells. If the length of time in which no UE is running unlimited services in the cell exceeds the sum of the values of this parameter and the UsDetectTimer parameter (which specifies the length of the timer for detecting US UEs), the eNodeB stops guaranteeing performance of the cell through control over neighboring cells. Specifically, the following parameters stop taking effect: NsRbRestrictRatio, SfCtrlAsScell, SfCtrlAsInterNcell, UsNbInterfCtrl, CrsShutDownStrategy, UsNbUlRbRestrictRat, and UsNbUlSinrHighThdOffset. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1000~60000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1000~60000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to a longer time of performance guarantee for the cell serving US UEs through control over neighboring cells, a lower probability of ping-pong starting and stopping of performance guarantee for the cell serving US UEs through control over neighboring cells, a lower level of interference from neighboring cells to US UEs, higher throughput of US UEs, and lower throughput of common UEs in neighboring cells. A smaller value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellusparacfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the cell US para configuration with the parameters as follows: Local cell ID: 0, US Guarantee Duration Timer: 2 min, run the following command:
+MOD CELLUSPARACFG: LocalCellId=0, UsGuaranteeDurTimer=2;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

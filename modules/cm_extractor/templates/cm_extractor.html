@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CM Extractor - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('cm_extractor.static', filename='cm_extractor.css') }}?v=3.6">
+</head>
+<body data-username="{{ user.username }}" data-user-role="{{ user.role }}" class="{% if user.role == 'admin' %}cm-user-admin{% else %}cm-user-standard{% endif %}">
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">← Dashboard</a>
+                    <h1>CM Extractor</h1>
+                    <p>Pull live configuration from Nokia NetAct{% if huawei_enabled %} and Huawei U2020{% endif %}</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="cm-layout">
+            <div class="cm-main">
+            <div class="vendor-tabs" role="tablist" aria-label="CM vendor">
+                <button type="button" class="vendor-tab active" data-vendor="nokia" role="tab" aria-selected="true">Nokia NetAct</button>
+                {% if huawei_enabled %}
+                <button type="button" class="vendor-tab" data-vendor="huawei" role="tab" aria-selected="false">Huawei U2020</button>
+                {% endif %}
+            </div>
+
+            <div id="nokia-workflow">
+                <section id="nokia-panel" class="panel">
+                    <h2>Nokia CM extraction</h2>
+                    <p class="section-description admin-only">Pick Nokia sites from your network database, then select MO classes and parameters to export from NetAct.</p>
+
+                    <div class="form-row compact-row form-inline-row">
+                        <div class="inline-field">
+                            <label for="nokia-conf-id">Configuration</label>
+                            <select id="nokia-conf-id">
+                                <option value="1">Live network (actual)</option>
+                                <option value="5">Reference / target</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="picker-section">
+                        <div class="picker-head">
+                            <h3>Extraction scope</h3>
+                        </div>
+                        <p class="field-hint scope-api-hint admin-only" id="nokia-scope-hint" hidden>
+                            RNC and BSC use NetAct CM Operations <code>Import_Export</code> (same as
+                            CM Operations Manager), not CM Open API persistency. Requires SFTP to the
+                            OMC (<code>NOKIA_CM_SSH_*</code> or <code>NOKIA_PM_*</code> / <code>ftpuser</code> —
+                            not the CM REST login).
+                        </p>
+                        <p class="field-hint scope-api-hint admin-only" id="nokia-scope-sftp-warning" hidden></p>
+                        <div class="scope-level-row" role="radiogroup" aria-label="CM scope level">
+                            <label class="scope-level-option">
+                                <input type="radio" name="nokia-scope-level" value="MRBTS" checked>
+                                <span>MRBTS <span class="field-hint admin-only">(LTE / NR)</span></span>
+                            </label>
+                            <label class="scope-level-option">
+                                <input type="radio" name="nokia-scope-level" value="RNC">
+                                <span>RNC <span class="field-hint admin-only">(3G)</span></span>
+                            </label>
+                            <label class="scope-level-option">
+                                <input type="radio" name="nokia-scope-level" value="BSC">
+                                <span>BSC <span class="field-hint admin-only">(2G)</span></span>
+                            </label>
+                        </div>
+                        <div class="picker-head">
+                            <h3 id="nokia-site-picker-title">Sites (MRBTS)</h3>
+                            <input type="search" id="nokia-site-search" class="search-input" placeholder="Search site name or id…" autocomplete="off">
+                            <button type="button" class="link-btn" id="nokia-site-select-all">Select all</button>
+                            <button type="button" class="link-btn" id="nokia-site-select-visible">Select visible</button>
+                            <button type="button" class="link-btn" id="nokia-site-clear">Clear</button>
+                        </div>
+                        <div class="area-select-row" id="nokia-area-row" hidden>
+                            <label for="nokia-area-select">Area / cluster</label>
+                            <select id="nokia-area-select" class="search-input">
+                                <option value="">All areas</option>
+                            </select>
+                            <button type="button" class="btn-secondary" id="nokia-area-add-btn">Add all sites in area</button>
+                            <label class="area-filter-toggle">
+                                <input type="checkbox" id="nokia-area-filter-list">
+                                <span>Filter list to area</span>
+                            </label>
+                        </div>
+                        <div class="site-paste-row">
+                            <label for="nokia-site-paste">Paste site IDs</label>
+                            <textarea id="nokia-site-paste" class="site-paste-input" rows="3" placeholder="Paste IDs separated by comma, space, or new line&#10;e.g. 101, 102, 1211"></textarea>
+                            <button type="button" class="btn-secondary" id="nokia-site-apply-paste">Apply pasted IDs</button>
+                            <p id="nokia-site-paste-status" class="field-hint" hidden></p>
+                        </div>
+                        <div id="nokia-site-loading" class="loading-hint">Loading Nokia sites from database…</div>
+                        <div id="nokia-site-error" class="status-message error" hidden></div>
+                        <div id="nokia-site-list" class="mo-class-list site-list" hidden></div>
+                        <p id="nokia-site-selection-hint" class="field-hint admin-only" hidden></p>
+                    </div>
+
+                    <div class="picker-section">
+                        <div class="picker-head">
+                            <h3>Managed object classes</h3>
+                            <input type="search" id="nokia-mo-search" class="search-input" placeholder="Search MO class…" autocomplete="off">
+                            <button type="button" class="link-btn" id="nokia-mo-select-all">Select all</button>
+                            <button type="button" class="link-btn" id="nokia-mo-select-visible">Select visible</button>
+                            <button type="button" class="link-btn" id="nokia-mo-clear">Clear</button>
+                        </div>
+                        <div id="nokia-mo-loading" class="loading-hint">Loading MO classes from NetAct…</div>
+                        <div id="nokia-mo-error" class="status-message error" hidden></div>
+                        <button type="button" id="nokia-mo-retry" class="btn-secondary" hidden>Retry</button>
+                        <div id="nokia-mo-list" class="mo-class-list" hidden></div>
+                    </div>
+
+                    <div id="nokia-param-section" class="picker-section" hidden>
+                        <div class="picker-head">
+                            <h3>Parameters to export</h3>
+                            <input type="search" id="nokia-param-search" class="search-input" placeholder="Search parameter…" autocomplete="off">
+                            <span class="field-hint admin-only">Pick specific parameters, or use <strong>Full MO export</strong> for all parameters (recommended for large exports). One sheet per MO class.</span>
+                        </div>
+                        <div id="nokia-param-loading" class="loading-hint" hidden>Loading parameters…</div>
+                        <div id="nokia-param-groups"></div>
+                    </div>
+
+                    <div id="nokia-output-info" class="info-callout admin-only" hidden>
+                        <strong>Ready to extract:</strong>
+                        <span id="nokia-output-desc"></span>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" id="nokia-preview-btn" disabled>Preview sample</button>
+                        <button type="button" class="btn-primary btn-large" id="nokia-extract-btn" disabled>Extract to Excel</button>
+                    </div>
+
+                    <div id="nokia-preview" class="preview-panel" hidden>
+                        <div class="preview-head"><span id="nokia-preview-count"></span></div>
+                        <div id="nokia-preview-tables"></div>
+                    </div>
+                </section>
+            </div>
+
+            {% if huawei_enabled %}
+            <div id="huawei-workflow" hidden>
+                <section id="huawei-panel" class="panel">
+                    <h2>Huawei CM extraction</h2>
+                    <p class="section-description admin-only">Pick network elements from your database, then select MML object types and parameters to export from U2020.</p>
+
+                    <div class="picker-section">
+                        <div class="picker-head">
+                            <h3 id="huawei-ne-picker-title">Sites (4G eNodeB)</h3>
+                            <input type="search" id="huawei-ne-search" class="search-input" placeholder="Search NE name or id…" autocomplete="off">
+                            <button type="button" class="link-btn" id="huawei-ne-select-all">Select all</button>
+                            <button type="button" class="link-btn" id="huawei-ne-select-visible">Select visible</button>
+                            <button type="button" class="link-btn" id="huawei-ne-clear">Clear</button>
+                            <button type="button" class="btn-secondary admin-only" id="huawei-sync-u2020-btn">Sync NEs from U2020</button>
+                        </div>
+                        <div class="area-select-row">
+                            <label for="huawei-area-select">Area / cluster</label>
+                            <select id="huawei-area-select" class="search-input">
+                                <option value="">All areas</option>
+                            </select>
+                            <button type="button" class="btn-secondary" id="huawei-area-add-btn">Add all sites in area</button>
+                            <label class="area-filter-toggle">
+                                <input type="checkbox" id="huawei-area-filter-list">
+                                <span>Filter list to area</span>
+                            </label>
+                        </div>
+                        <p class="field-hint admin-only" id="huawei-u2020-sync-status">U2020 MML needs the OSS <code>meName</code> exactly as stored in PrimeNet metadata (e.g. <code>2222-Mecca_Mall_Old_Ext_PF_Fiber_IBS_Manage</code>) or from <strong>Sync NEs from U2020</strong> (FM alarm catalog). Only Huawei 4G eNodeB sites with LTE cell inventory are listed; sites without LTE are skipped to <code>Skipped_NEs</code>. MO object selection is separate and does not affect NE mapping.</p>
+                        <div class="site-paste-row">
+                            <label for="huawei-ne-paste">Paste site IDs</label>
+                            <textarea id="huawei-ne-paste" class="site-paste-input" rows="3" placeholder="Paste 4G eNodeB site IDs separated by comma, space, or new line&#10;e.g. 1001, 1002, 1211"></textarea>
+                            <button type="button" class="btn-secondary" id="huawei-ne-apply-paste">Apply pasted IDs</button>
+                            <p id="huawei-ne-paste-status" class="field-hint" hidden></p>
+                        </div>
+                        <div id="huawei-ne-loading" class="loading-hint">Loading Huawei NEs from database…</div>
+                        <div id="huawei-ne-error" class="status-message error" hidden></div>
+                        <div id="huawei-ne-list" class="mo-class-list site-list" hidden></div>
+                        <p id="huawei-ne-selection-hint" class="field-hint admin-only" hidden></p>
+                    </div>
+
+                    <div class="picker-section">
+                        <div class="picker-head">
+                            <h3>MML object types</h3>
+                            <input type="search" id="huawei-mo-search" class="search-input" placeholder="Search object type…" autocomplete="off">
+                            <button type="button" class="link-btn" id="huawei-mo-select-all">Select all</button>
+                            <button type="button" class="link-btn" id="huawei-mo-select-visible">Select visible</button>
+                            <button type="button" class="link-btn" id="huawei-mo-clear">Clear</button>
+                        </div>
+                        <div id="huawei-mo-loading" class="loading-hint">Loading MML object catalog…</div>
+                        <div id="huawei-mo-error" class="status-message error" hidden></div>
+                        <div id="huawei-mo-list" class="mo-class-list" hidden></div>
+                    </div>
+
+                    <div id="huawei-param-section" class="picker-section" hidden>
+                        <div class="picker-head">
+                            <h3>Parameters to export</h3>
+                            <input type="search" id="huawei-param-search" class="search-input" placeholder="Search parameter…" autocomplete="off">
+                            <span class="field-hint admin-only">Object types are discovered by probing U2020 on sample NEs per product (BTS3900, …). Run <strong>Sync NEs from U2020</strong> to refresh. Items marked <em>needs MML rights</em> are valid commands but your NBI user cannot run them yet.</span>
+                        </div>
+                        <div id="huawei-param-loading" class="loading-hint" hidden>Loading parameters…</div>
+                        <div id="huawei-param-groups"></div>
+                    </div>
+
+                    <div id="huawei-output-info" class="info-callout admin-only" hidden>
+                        <strong>Ready to extract:</strong>
+                        <span id="huawei-output-desc"></span>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" id="huawei-preview-btn" disabled>Preview sample</button>
+                        <button type="button" class="btn-primary btn-large" id="huawei-extract-btn" disabled>Extract to Excel</button>
+                    </div>
+
+                    <div id="huawei-preview" class="preview-panel" hidden>
+                        <div class="preview-head"><span id="huawei-preview-count"></span></div>
+                        <div id="huawei-preview-tables"></div>
+                    </div>
+                </section>
+            </div>
+            {% endif %}
+
+            <section id="extract-progress" class="panel progress-panel" hidden>
+                <div class="progress-head">
+                    <span id="extract-progress-label">Extracting CM data…</span>
+                    <span id="extract-progress-elapsed" class="progress-elapsed">0s</span>
+                </div>
+                <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div id="extract-progress-fill" class="progress-fill" style="width: 0%;"></div>
+                </div>
+                <p id="extract-progress-hint" class="field-hint admin-only"></p>
+            </section>
+
+            <section id="results-section" class="panel results-section" hidden>
+                <h2>Extraction complete</h2>
+                <p id="results-message"></p>
+                <p id="results-summary" class="results-summary"></p>
+                <button type="button" class="btn-success btn-large" id="download-btn">Download Excel file</button>
+            </section>
+            </div>
+
+            <aside class="cm-sidebar">
+                <section class="panel scheduler-sidebar">
+                    <div class="scheduler-head">
+                        <h2>Scheduled jobs</h2>
+                        <button type="button" class="btn-ghost btn-icon" id="scheduler-refresh-btn" title="Refresh">↻</button>
+                    </div>
+                    <p class="field-hint sidebar-hint admin-only">Your scheduled extractions are saved under <code>cm_extractor/scheduled_job/&lt;username&gt;/</code> with downloadable run history (last 5 kept).</p>
+                    <button type="button" class="btn-primary btn-block" id="scheduler-new-btn">+ Schedule extraction</button>
+                    <div id="scheduler-jobs" class="scheduler-jobs sidebar-jobs"></div>
+                </section>
+            </aside>
+            </div>
+        </main>
+
+        <div id="schedule-modal" class="modal-overlay" hidden>
+            <div class="modal-dialog schedule-modal" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
+                <div class="modal-header">
+                    <h2 id="schedule-modal-title">Schedule CM extraction</h2>
+                    <button type="button" class="modal-close" id="schedule-modal-close" aria-label="Close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="sched-modal-grid">
+                        <div class="form-row">
+                            <label for="sched-job-name">Job name</label>
+                            <input type="text" id="sched-job-name" placeholder="e.g. Daily LTE cell dump">
+                        </div>
+                        <div class="form-row">
+                            <label>Vendor</label>
+                            <span id="sched-vendor-label" class="sched-vendor-pill">Nokia</span>
+                        </div>
+                    </div>
+                    <div class="sched-modal-grid">
+                        <div class="form-row">
+                            <label>Owner</label>
+                            <span id="sched-owner-label" class="sched-owner-pill"></span>
+                        </div>
+                        <div class="form-row">
+                            <label class="checkbox-row compact-checkbox" title="Private jobs are only visible to you and administrators">
+                                <input type="checkbox" id="sched-user-specific" checked>
+                                <span>Private to me</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label for="sched-storage-subpath">Storage folder (optional)</label>
+                        <input type="text" id="sched-storage-subpath" placeholder="e.g. lte/daily-reports">
+                        <p class="field-hint admin-only">Files saved under <code id="sched-storage-preview">cm_extractor/scheduled_job/…</code></p>
+                    </div>
+
+                    <div id="sched-nokia-scope" class="modal-section">
+                        <h3>Scope</h3>
+                        <div class="scope-level-row" role="radiogroup">
+                            <label class="scope-level-option">
+                                <input type="radio" name="sched-nokia-scope" value="MRBTS" checked>
+                                <span>MRBTS</span>
+                            </label>
+                            <label class="scope-level-option">
+                                <input type="radio" name="sched-nokia-scope" value="RNC">
+                                <span>RNC</span>
+                            </label>
+                            <label class="scope-level-option">
+                                <input type="radio" name="sched-nokia-scope" value="BSC">
+                                <span>BSC</span>
+                            </label>
+                        </div>
+                        <div class="form-row compact-row form-inline-row" id="sched-nokia-conf-row">
+                            <div class="inline-field">
+                                <label for="sched-nokia-conf-id">Configuration</label>
+                                <select id="sched-nokia-conf-id">
+                                    <option value="1">Live network</option>
+                                    <option value="5">Reference / target</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="picker-head modal-picker-head">
+                            <h3>Objects</h3>
+                            <button type="button" class="link-btn" id="sched-site-select-all">Select all</button>
+                            <button type="button" class="link-btn" id="sched-site-select-visible">Select visible</button>
+                            <button type="button" class="link-btn" id="sched-site-clear">Clear</button>
+                        </div>
+                        <input type="search" id="sched-site-search" class="search-input" placeholder="Search site / NE id…" autocomplete="off">
+                        <textarea id="sched-site-paste" class="site-paste-input modal-paste" rows="2" placeholder="Or paste IDs (comma, space, or new line)"></textarea>
+                        <button type="button" class="btn-secondary btn-small" id="sched-site-apply-paste">Apply pasted IDs</button>
+                        <p id="sched-site-status" class="field-hint" hidden></p>
+                        <div id="sched-site-loading" class="loading-hint" hidden>Loading sites…</div>
+                        <div id="sched-site-list" class="mo-class-list site-list modal-scroll-list"></div>
+                        <p id="sched-site-hint" class="field-hint">0 selected</p>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="picker-head modal-picker-head">
+                            <h3>Managed objects</h3>
+                            <button type="button" class="link-btn" id="sched-mo-select-all">Select all</button>
+                            <button type="button" class="link-btn" id="sched-mo-select-visible">Select visible</button>
+                            <button type="button" class="link-btn" id="sched-mo-clear">Clear</button>
+                        </div>
+                        <input type="search" id="sched-mo-search" class="search-input" placeholder="Search MO…" autocomplete="off">
+                        <div id="sched-mo-loading" class="loading-hint" hidden>Loading MO catalog…</div>
+                        <div id="sched-mo-list" class="mo-class-list modal-scroll-list"></div>
+                    </div>
+
+                    <div id="sched-param-section" class="modal-section" hidden>
+                        <h3>Parameters</h3>
+                        <input type="search" id="sched-param-search" class="search-input" placeholder="Search parameter…" autocomplete="off">
+                        <div id="sched-param-loading" class="loading-hint" hidden>Loading parameters…</div>
+                        <div id="sched-param-groups" class="modal-scroll-list"></div>
+                    </div>
+
+                    <div class="modal-section schedule-section">
+                        <h3>Schedule</h3>
+                        <div class="sched-grid">
+                            <div class="form-row">
+                                <label for="sched-job-schedule-type">Frequency</label>
+                                <select id="sched-job-schedule-type">
+                                    <option value="daily">Daily</option>
+                                    <option value="weekly">Weekly</option>
+                                    <option value="interval">Every N hours</option>
+                                    <option value="once">Once</option>
+                                </select>
+                            </div>
+                            <div class="form-row sched-field" data-for="daily weekly">
+                                <label for="sched-job-time">Time</label>
+                                <input type="time" id="sched-job-time" value="02:00">
+                            </div>
+                            <div class="form-row sched-field" data-for="interval">
+                                <label for="sched-job-interval">Every (hours)</label>
+                                <input type="number" id="sched-job-interval" min="1" step="1" value="6">
+                            </div>
+                            <div class="form-row sched-field" data-for="once">
+                                <label for="sched-job-runat">Run at</label>
+                                <input type="datetime-local" id="sched-job-runat">
+                            </div>
+                        </div>
+                        <div class="form-row sched-field" data-for="weekly">
+                            <label>Days</label>
+                            <div id="sched-job-days" class="weekday-row">
+                                <label><input type="checkbox" value="mon"> Mon</label>
+                                <label><input type="checkbox" value="tue"> Tue</label>
+                                <label><input type="checkbox" value="wed"> Wed</label>
+                                <label><input type="checkbox" value="thu"> Thu</label>
+                                <label><input type="checkbox" value="fri"> Fri</label>
+                                <label><input type="checkbox" value="sat"> Sat</label>
+                                <label><input type="checkbox" value="sun"> Sun</label>
+                            </div>
+                        </div>
+                        <p class="field-hint admin-only">Run history keeps the last 5 Excel outputs per job.</p>
+                    </div>
+                    <p id="sched-form-hint" class="field-hint sched-form-error" hidden></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="schedule-modal-cancel">Cancel</button>
+                    <button type="button" class="btn-primary" id="sched-job-create-btn">Save scheduled job</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script src="{{ url_for('cm_extractor.static', filename='cm_extractor.js') }}?v=3.34"></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Disable Cell Transmitter Timer (SET NODEBCLSPATIMER)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_nodebclspatimer">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Disable Cell Transmitter Timer (SET NODEBCLSPATIMER)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_nodebclspatimer"></a><a name="set_nodebclspatimer"></a>
+
+
+<h1 class="topictitle1">Set Disable Cell Transmitter Timer (SET NODEBCLSPATIMER)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="set_nodebclspatimer__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>In the case of a transmission fault or RNC upgrade, the transmitter will be disabled after the transmission on the NodeB is interrupted, and UEs are relocated to other systems such as a GSM network. This mechanism avoids that the NodeB fails to serve the UEs camping on the UMTS cell. If the transmitter of a NodeB with heavy traffic load is disabled immediately when the transmission is interrupted, a large number of handovers happen simultaneously, leading to congestion.</p>
+<p>This command is used to set a time range during which transmitters in cells are shut down in the event of a transmission interruption. Specifically, once detecting a transmission interruption, the NodeB selects a random value from the specified time range and shuts down the transmitters after the random-value period elapses. In this case, transmitters in different cells are shut down at different time and handovers are initiated randomly. From the statistical perspective, UEs are evenly handed over to other systems, which avoids congestion.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_nodebclspatimer__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>None</p>
+</div></div>
+
+<div class="mmlparam"><a name="set_nodebclspatimer__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBClsPaTimer-lowerLimit.html">LOWERLIMIT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Minimum Timer Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum value of the timer for shutting down a transmitter in a cell.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>NODEBCLSPATIMER</strong> MO, the value of <strong>LOWERLIMIT</strong> must be smaller than or equal to <strong>UPPERLIMIT</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NodeBClsPaTimer-upperLimit.html">UPPERLIMIT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximum Timer Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum value of the timer for shutting down a transmitter in a cell.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>NODEBCLSPATIMER</strong> MO, the value of <strong>LOWERLIMIT</strong> must be smaller than or equal to <strong>UPPERLIMIT</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_nodebclspatimer__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Run the following command to set a time range during which transmitters in cells are shut down in the event of a transmission interruption:
+SET NODEBCLSPATIMER: LOWERLIMIT=5, UPPERLIMIT=10;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

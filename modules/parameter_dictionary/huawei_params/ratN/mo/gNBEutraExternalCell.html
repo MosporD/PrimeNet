@@ -1,0 +1,157 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="gNBEutraExternalCell">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="gNBEutraExternalCell">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>gNBEutraExternalCell</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="gNBEutraExternalCell"></a><a name="gNBEutraExternalCell"></a>
+
+
+<h1 class="topictitle1">gNBEutraExternalCell</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="gNBEutraExternalCell.html"><strong>gNBEutraExternalCell</strong></a>
+    +-<a href="gNBEutraExtCellPlmn.html">gNBEutraExtCellPlmn</a>[0~5]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A gNBEutraExternalCell MO consists of the parameters related to an external E-UTRAN cell, which can be configured as a neighboring cell for one or more cells served by the local gNodeB. The E-UTRAN neighbor cell list (NCL) of a gNodeB contains the common information about external E-UTRAN cells. If an E-UTRAN external cell works in RAN sharing mode, their PLMN IDs must be added.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="gNodeBFunction.html">gNodeBFunction</a></li><li><p>Possible children:</p>
+<a href="gNBEutraExtCellPlmn.html">gNBEutraExtCellPlmn</a>[0~5]</li><li>Relation with the <strong>NRCellEutranNFreq</strong> MO:<ul><li><strong>DlEarfcn</strong> in a <strong>gNBEutraExternalCell</strong> MO must be set to a value configured in the associated <strong>NRCellEutranNFreq</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRCellEutraNRelation</strong> MO:<ul><li>The <strong>gNBEutraExternalCell</strong> MO corresponding to an <strong>NRCellEutraNRelation</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>gNBEutraExtCellPlmn</strong> MO:<ul><li>A maximum of five <strong>gNBEutraExtCellPlmn</strong> MO instances can be configured for each <strong>gNBEutraExternalCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>gNBNCellPlmnList</strong> MO:<ul><li>If the values of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>gNBEutraExternalCell</strong> MO are the same as the respective values of <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>gNBNCellPlmnList</strong> MO, and <strong>RatType</strong> in the <strong>gNBNCellPlmnList</strong> MO is set to EUTRAN, <strong>PlmnListType</strong> in the <strong>gNBNCellPlmnList</strong> MO cannot be set to BLACKLIST.</li><li>In all the <strong>gNBNCellPlmnList</strong> MOs with <strong>RatType</strong> set to EUTRAN, if the <strong>PlmnListType</strong> values include WHITELIST and GREYLIST, the following condition must be true: the values of <strong>Mnc</strong> and <strong>Mcc</strong> in all the <strong>gNBEutraExternalCell</strong> MOs configured for the local gNodeB must be the same as those of <strong>Mnc</strong> and <strong>Mcc</strong> in a <strong>gNBNCellPlmnList</strong> MO with <strong>RatType</strong> set to EUTRAN, respectively.</li></ul>
+</li><li>Relation with the <strong>NRCellEutraNRelation</strong> and <strong>NRCellEutranNFreq</strong> MOs:<ul><li>The value of <strong>DlEarfcn</strong> in a <strong>gNBEutraExternalCell</strong> MO corresponding to an <strong>NRCellEutraNRelation</strong> MO must be the same as the value of <strong>DlEarfcn</strong> in an <strong>NRCellEutranNFreq</strong> MO corresponding to the <strong>NRCellEutraNRelation</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> and <strong>NODE</strong> MOs:<ul><li>If the value of <strong>TYPE</strong> in the <strong>MPT</strong> is not UMPT, the <strong>gNBEutraExternalCell</strong> cannot be added.</li><li>If <strong>BRDSPEC</strong> in the <strong>MPT</strong> MO is set to UMPTe, the board type is UMPTe. If <strong>BRDSPEC</strong> in the <strong>MPT</strong> MO is set to UMPTga, the board type is UMPTga. Otherwise, the board type is UMPTg.</li><li>When the board type is UMPTg and <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, the number of <strong>gNBEutraExternalCell</strong> MO instances must be less than or equal to 72 x 32.</li><li>When the board type is UMPTg and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>gNBEutraExternalCell</strong> MO instances must be less than or equal to 144 x 32.</li><li>When the board type is UMPTga and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>gNBEutraExternalCell</strong> MO instances must be less than or equal to 72 x 32.</li><li>When the board type is UMPTga, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM2, the number of <strong>gNBEutraExternalCell</strong> MO instances must be less than or equal to 36 x 32.</li><li>When the board type is UMPTga, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM, the <strong>gNBEutraExternalCell</strong> MO instance cannot be added.</li><li>When the board type is UMPTe and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>gNBEutraExternalCell</strong> MO instances must be less than or equal to 72 x 32.</li><li>When the board type is UMPTe and <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM2, the number of <strong>gNBEutraExternalCell</strong> MO instances must be less than or equal to 36 x 32.</li><li>When the board type is UMPTe, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM, <strong>gNBEutraExternalCell</strong> MO instances cannot be added.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#gNBEutraExternalCell__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="gNBEutraExternalCell__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="gNBEutraExternalCell__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_gnbeutraexternalcell.html">ADD GNBEUTRAEXTERNALCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an external E-UTRAN cell for the gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_gnbeutraexternalcell.html">LST GNBEUTRAEXTERNALCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list external E-UTRAN cell configurations of the gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_gnbeutraexternalcell.html">MOD GNBEUTRAEXTERNALCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify an external E-UTRAN cell for the gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_gnbeutraexternalcell.html">RMV GNBEUTRAEXTERNALCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an external E-UTRAN cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#gNBEutraExternalCell__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="gNBEutraExternalCell__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="gNBEutraExternalCell__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-Mcc.html">Mobile Country Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mobile country code of the E-UTRAN neighboring cell. A PLMN ID is comprised of an MCC and an MNC. The MCC consists of three digits. The MNC consists of two or three digits. For example, MCC = 123, MNC = 45, PLMN = 12345.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-Mnc.html">Mobile Network Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mobile network code of a neighboring E-UTRAN cell. A PLMN ID is comprised of an MCC and an MNC. The MCC consists of three digits. The MNC consists of two or three digits. For example, MCC = 123, MNC = 45, PLMN = 12345.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-EnodebId.html">eNodeB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eNodeB ID of an inter-RAT neighboring E-UTRAN cell. It uniquely identifies an eNodeB within a PLMN. A 28-bit E-UTRAN cell identifier (ECI) is comprised of a cell ID and an eNodeB ID (represented by the most significant 20 bits). An E-UTRAN cell global identifier (ECGI) is comprised of an ECI and a PLMN ID. For details, see 3GPP TS 36.413.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-CellId.html">Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the inter-RAT neighboring E-UTRAN cell. It uniquely identifies a cell within an eNodeB. The 28-bit E-UTRAN cell ID is comprised of the cell ID (represented by the least significant eight bits) and the eNodeB ID. The cell global identity (CGI) of an E-UTRAN cell is comprised of the E-UTRAN cell ID and the PLMN ID. For details, see 3GPP TS 36.413.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-DlEarfcn.html">Downlink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DL EARFCN of the inter-RAT external E-UTRAN cell. For details, see 3GPP TS 36.104.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-PhysicalCellId.html">Physical Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the physical cell ID of the external E-UTRAN cell. For details about this parameter, see 3GPP TS 36.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-Tac.html">Tracking Area Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the TAC of the external E-UTRAN cell. According to 3GPP specifications, the TAC values 0x0000(0) and 0xFFFE(65534) are reserved, and therefore these two TAC values cannot be used in later versions. You are advised not to set 0 or 65534 as the TAC value in network planning and configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-CellName.html">Cell Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the neighboring E-UTRAN cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/gNBEutraExternalCell-AggregationAttribute.html">Aggregation Attribute</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the aggregation attributes of an external E-UTRAN cell.</p>
+<p>MASTER_PLMN_RESERVED_FLAG: Indicates whether to reserve the primary PLMN ID of an external E-UTRAN cell. If this option is selected, the primary PLMN ID of the external E-UTRAN cell is reserved and the cell cannot be selected as a target cell for handovers of UEs served by the primary PLMN. If this option is deselected, the cell can be selected as a target cell for handovers of UEs served by the primary PLMN.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

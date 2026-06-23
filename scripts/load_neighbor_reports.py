@@ -3,7 +3,7 @@ Load normalized neighbor handover rows into ``neighbor_hourly`` (legacy).
 
 For Nokia NetAct exports under SFTP, prefer:
 
-- ``python scripts/pull_nokia_neighbor_raw.py``
+- ``python scripts/pipeline/pull_nokia_neighbor_raw.py``
 - ``python scripts/load_nokia_neighbor_raw_to_db.py``
 
 which populate ``nokia_neighbor_2g`` / ``nokia_neighbor_3g`` / ``nokia_neighbor_4g_intra`` /

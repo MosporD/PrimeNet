@@ -1,0 +1,187 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="PrbRachCeConfig">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="PrbRachCeConfig">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>PrbRachCeConfig</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="PrbRachCeConfig"></a><a name="PrbRachCeConfig"></a>
+
+
+<h1 class="topictitle1">PrbRachCeConfig</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="Prb.html">Prb</a>
+        +-<a href="PrbRachCeConfig.html"><strong>PrbRachCeConfig</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A PrbRachCeConfig MO consists of cell-level coverage-level-specific parameters related to the PRACH configuration for PRB carriers of NB-IoT cells.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Prb.html">Prb</a></li><li>Relation with the <strong>UlGuardBandCfg</strong> MO:<ul><li>The subcarrier index value indicated in the value of the <strong>PrachSubcarrierOffset</strong> parameter in a <strong>PrbRachCeConfig</strong> MO must not be lower than the value of the <strong>LowFreqGuardBand</strong> parameter in the associated <strong>UlGuardBandCfg</strong> MO. In addition, the sum of the subcarrier index value, the value of <strong>HighFreqGuardBand</strong> in the associated <strong>UlGuardBandCfg</strong> MO, and the value of the <strong>PrachSubcarrierNumber</strong> parameter in the <strong>PrbRachCeConfig</strong> MO must not exceed 48.</li><li>The subcarrier index indicated in the value of the <strong>EdtPrachSubcarrierOffset</strong> parameter in the <strong>PrbRachCeConfig</strong> MO must not be less than the value of the <strong>LowFreqGuardBand</strong> parameter in the <strong>UlGuardBandCfg</strong> MO for the corresponding cell; in addition, the sum of the subcarrier index value, the value of the <strong>HighFreqGuardBand</strong> parameter in the <strong>UlGuardBandCfg</strong> MO, and 12 (the number of EDT PRACH subcarriers) must not be not greater than 48.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If the COVERAGE_LEVEL_2 option of the <strong>CoverageLevelType</strong> parameter in the <strong>Cell</strong> MO is selected, the <strong>PrachSubcarrierNumber</strong> parameter in the <strong>PrbRachCeConfig</strong> MO with any coverage level corresponding to all carriers cannot be set to SC_NUM_48.</li><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO associated by the <strong>LocalCellId</strong> parameter in the <strong>PrbRachCeConfig</strong> MO is set to TRUE(TRUE) and the <strong>CellActiveState</strong> parameter in this <strong>Cell</strong> MO is set to CELL_ACTIVE, the <strong>PrachRepetitionCount</strong> parameter in the <strong>PrbRachCeConfig</strong> MO under this <strong>Cell</strong> MO must meet the following condition: When COVERAGE_LEVEL_1 in the <strong>CoverageLevelType</strong> parameter in the <strong>Cell</strong> MO is set to 1, the <strong>PrachRepetitionCount</strong> parameter value for <strong>CoverageLevel</strong> of 0 must be less than that for <strong>CoverageLevel</strong> of 1.</li><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO associated by the <strong>LocalCellId</strong> parameter in the <strong>PrbRachCeConfig</strong> MO is set to TRUE(TRUE) and the <strong>CellActiveState</strong> parameter in this <strong>Cell</strong> MO is set to CELL_ACTIVE, the <strong>PrachRepetitionCount</strong> parameter in the <strong>PrbRachCeConfig</strong> MO under this <strong>Cell</strong> MO must meet the following condition: When COVERAGE_LEVEL_2 in the <strong>CoverageLevelType</strong> parameter in the <strong>Cell</strong> MO is set to 1, the <strong>PrachRepetitionCount</strong> parameter value for <strong>CoverageLevel</strong> of 1 must be less than that for <strong>CoverageLevel</strong> of 2.</li><li>If the value of the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO for a cell is CELL_ACTIVE and the <strong>NbCellFlag</strong> parameter in this <strong>Cell</strong> MO is set to TRUE, the EDT_RANDOM_ACCESS_SW option of the <strong>PrachAlgoSw</strong> parameter in the <strong>PrbRachCeConfig</strong> MO with a specific coverage level under any <strong>Prb</strong> MO of the cell can be selected only when the option indicating that coverage level is selected in the <strong>CoverageLevelType</strong> parameter in this <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>RACHCfg</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE and the <strong>PrachStartTimeCfgInd</strong> parameter in the <strong>RACHCfg</strong> MO is set to CFG, the value of the <strong>PrachTransmissionPeriod</strong> parameter with a specific coverage level must not be lower than the value of the <strong>PrachStartTime</strong> parameter with the same coverage level in the <strong>PrbRachCeConfig</strong> MO associated with the same LocalCellId.</li></ul>
+</li><li>Relation with the <strong>RACHCfg</strong>, <strong>Prb</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The actual duration corresponding to the value of the <strong>PrachTransmissionPeriod</strong> parameter in the <strong>PrbRachCeConfig</strong> MO for a PRB at a certain coverage level must not be less than the PRACH transmission duration for this coverage level of the PRB. The details are as follows: If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 66DOT7(66.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 5.6. If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 266DOT7(266.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 6.4.</li><li>The actual duration corresponding to the value of the <strong>PrachTransmissionPeriod</strong> parameter in the <strong>PrbRachCeConfig</strong> MO for a PRB at a certain coverage level must not be less than the PRACH transmission duration for this coverage level of the PRB. The details are as follows: If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 66DOT7(66.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 5.6. If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 266DOT7(266.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 6.4.</li><li>The actual duration corresponding to the value of the <strong>PrachTransmissionPeriod</strong> parameter in the <strong>PrbRachCeConfig</strong> MO for a PRB at a certain coverage level must not be less than the PRACH transmission duration for this coverage level of the PRB. The details are as follows: If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 66DOT7(66.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 5.6. If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 266DOT7(266.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 6.4.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellEdtConfig</strong> MOs:<ul><li>The EDT_RANDOM_ACCESS_SW option of the <strong>PrachAlgoSw</strong> parameter in the <strong>PrbRachCeConfig</strong> MO can be selected for a cell only when the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to TRUE and the EDT_SWITCH option of the <strong>EdtAlgoSwitch</strong> parameter in the <strong>CellEdtConfig</strong> MO is selected for the cell.</li></ul>
+</li><li>Relation with the <strong>Prb</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>AnchorCarrierFlag</strong> parameter in a <strong>PRB</strong> MO is set to TRUE, the <strong>MtNprachRangeMsg3InitTone</strong> parameter in the <strong>PrbRachCeConfig</strong> MO with the highest coverage level under this Prb MO cannot be set to ZERO_12TONE, ZERO_6TONE, ZERO_3TONE, or ZERO_1TONE.</li><li>If the <strong>MtNprachRangeMsg3InitTone</strong> parameter is set to ZERO_1TONE, ZERO_3TONE, ZERO_6TONE, or ZERO_12TONE in a <strong>PrbRachCeConfig</strong> MO under a <strong>PRB</strong> MO in which the <strong>AnchorCarrierFlag</strong> parameter is set to FALSE, the <strong>PrachProbabilityForAnchor</strong> parameter in the <strong>PrbRachCeConfig</strong> MO with the highest coverage level under the associated <strong>PRB</strong> MO in which the <strong>AnchorCarrierFlag</strong> parameter is set to TRUE cannot be set to ZERO.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If the 100KM_CELL_RADIUS_SWITCH option of the <strong>NbCellAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, the <strong>PrachSubcarrierNumber</strong> parameter in the <strong>PrbRachCeConfig</strong> MOs for all coverage levels and all carriers in the NB-IoT cell can only be set to SC_NUM_12.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>Prb</strong> MOs:<ul><li>If the <strong>AnchorCarrierFlag</strong> parameter in a <strong>Prb</strong> MO is TRUE and the EDT_RANDOM_ACCESS_SW option of the <strong>PrachAlgoSw</strong> parameter in a <strong>PrbRachCeConfig</strong> MO with that coverage level under this <strong>Prb</strong> MO is also selected, or if an option (indicating a coverage level) of the <strong>PrachCoverageLevelType</strong> parameter in a <strong>Prb</strong> MO is selected and the <strong>AnchorCarrierFlag</strong> parameter in the <strong>Prb</strong> MO is FALSE and the EDT_RANDOM_ACCESS_SW option of the <strong>PrachAlgoSw</strong> parameter in a <strong>PrbRachCeConfig</strong> MO with that coverage level under this <strong>Prb</strong> MO is also selected, the following parameter setting requirements must be met for this <strong>Prb</strong> at the corresponding coverage level: (1) The <strong>PrachSubcarrierNumber</strong> parameter cannot be set to SC_NUM_36 or SC_NUM_48. (2) The sum of the subcarrier index indicated in the value of the <strong>PrachSubcarrierOffset</strong> parameter and the subcarrier quantity indicated in the value of the <strong>PrachSubcarrierNumber</strong> parameter must be equal to the subcarrier index indicated in the value of the <strong>EdtPrachSubcarrierOffset</strong> parameter, or the sum of the subcarrier index indicated in the value of the <strong>EdtPrachSubcarrierOffset</strong> parameter and 12 must be equal to the subcarrier index indicated in the value of the <strong>PrachSubcarrierOffset</strong> parameter.</li><li>If the value of <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is CELL_ACTIVE, the EDT_RANDOM_ACCESS_SW option of <strong>PrachAlgoSw</strong> cannot be selected in the <strong>PrbRachCeConfig</strong> MOs set for a specific coverage level under the <strong>Prb</strong> MOs in which <strong>AnchorCarrierFlag</strong> is set to FALSE when the following conditions are met: (1) The option of <strong>PrachCoverageLevelType</strong> indicating that specific coverage level is deselected in the <strong>Prb</strong> MOs in which <strong>AnchorCarrierFlag</strong> is set to FALSE. Alternatively, the option of <strong>PrachCoverageLevelType</strong> indicating that specific coverage level is selected in a <strong>Prb</strong> MO in which <strong>AnchorCarrierFlag</strong> is set to FALSE but <strong>PrachProbabilityForAnchor</strong> is set to ONE in the <strong>PrbRachCeConfig</strong> MO set for that specific coverage level under the <strong>Prb</strong> MO in which <strong>AnchorCarrierFlag</strong> is set to TRUE. (2) The EDT_RANDOM_ACCESS_SW option of the <strong>PrachAlgoSw</strong> parameter is selected in the <strong>PrbRachCeConfig</strong> MO under the <strong>Prb</strong> MO in which <strong>AnchorCarrierFlag</strong> is set to TRUE.</li><li>If the value of <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is CELL_ACTIVE, the EDT_RANDOM_ACCESS_SW option of <strong>PrachAlgoSw</strong> cannot be selected in the <strong>PrbRachCeConfig</strong> MOs set for a specific coverage level under the <strong>Prb</strong> MO in which <strong>AnchorCarrierFlag</strong> is set to TRUE when the following conditions are met: (1) The option of <strong>PrachCoverageLevelType</strong> indicating that specific coverage level is selected in a <strong>Prb</strong> MO in which <strong>AnchorCarrierFlag</strong> is set to FALSE and <strong>PrachProbabilityForAnchor</strong> is set to a value other than ONE in the <strong>PrbRachCeConfig</strong> MO set for that specific coverage level under the <strong>Prb</strong> MO in which <strong>AnchorCarrierFlag</strong> is set to TRUE. (2) The EDT_RANDOM_ACCESS_SW option of the <strong>PrachAlgoSw</strong> parameter is deselected in the <strong>PrbRachCeConfig</strong> MOs under the <strong>Prb</strong> MOs in which <strong>AnchorCarrierFlag</strong> is set to FALSE.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, and <strong>Prb</strong> MOs:<ul><li>If the 100KM_CELL_RADIUS_SWITCH option of the <strong>NbCellAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected for a cell, any option (indicating a coverage level) of the <strong>PrachCoverageLevelType</strong> parameter in any <strong>Prb</strong> MO of this cell and the <strong>AnchorCarrierFlag</strong> parameter in the <strong>Prb</strong> MO is FALSE and the EDT_RANDOM_ACCESS_SW option of the <strong>PrachAlgoSw</strong> parameter in the <strong>PrbRachCeConfig</strong> MO with that coverage level under that <strong>Prb</strong> MO cannot be both selected, and the <strong>AnchorCarrierFlag</strong> parameter in the <strong>Prb</strong> MO is TRUE and the option in the <strong>PrachAlgoSw</strong> parameter in the <strong>PrbRachCeConfig</strong> MO under that <strong>Prb</strong> cannot be selected.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> and <strong>PrbUlSchCeAlgo</strong> MOs:<ul><li>The <strong>MtNprachRangeMsg3InitTone</strong> parameter in the <strong>PrbRachCeConfig</strong> MO can only be set to ONE_1TONE if the MULTITONE_SWITCH option of the <strong>NbCellAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected, the <strong>UlInitialTransRptCount</strong> parameter in the <strong>PrbUlSchCeAlgo</strong> MO is set to a value indicating a repetition count greater than or equal to 2, or the <strong>PrachRepetitionCount</strong> parameter in the <strong>PrbRachCeConfig</strong> MO is set to REP_32, REP_64, or REP_128.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#PrbRachCeConfig__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="PrbRachCeConfig__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="PrbRachCeConfig__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_prbrachceconfig.html">LST PRBRACHCECONFIG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the coverage-level-specific RACH configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_prbrachceconfig.html">MOD PRBRACHCECONFIG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the coverage-level-specific RACH configuration.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#PrbRachCeConfig__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="PrbRachCeConfig__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="PrbRachCeConfig__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local cell ID. It uniquely identifies a cell within an eNodeB. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrbId.html">PRB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID that uniquely specifies a PRB in an NB-IoT cell. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-CoverageLevel.html">Coverage Level</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the coverage level associated with RACH parameters. The value COVERAGE_LEVEL_0 indicates coverage level 0, value COVERAGE_LEVEL_1 indicates coverage level 1, and value COVERAGE_LEVEL_2 indicates coverage level 2. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachTransmissionPeriod.html">PRACH Transmission Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PRACH transmission period. If the PrachStartTimeCfgInd parameter in the RACHCfg MO is set to CFG, this parameter can be set to different values for different coverage levels of a cell. Ensure that PRACH resources for different coverage levels do not overlap. Otherwise, the random access success rate is affected. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachSubcarrierOffset.html">PRACH Subcarrier Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency-domain PRACH subcarrier offset. If the number of the PRACH subcarriers at each coverage level of a PRB is not 48, it is required that this parameter be set to the same value for all coverage levels of the PRB or the sum of the value of this parameter and the number of PRACH subcarriers be the same for all coverage levels of the PRB. Otherwise, the NB-IoT cell cannot work. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachRepetitionCount.html">PRACH Repetition Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of repeated preamble transmissions at the corresponding coverage level. Set this parameter to a proper value. Otherwise, PRACH resources for different coverage levels overlap or RA-RNTIs of different coverage levels conflict, leading to cell activation failures. This parameter is valid only for anchor carriers. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachStartTime.html">PRACH Start Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PRACH start time. If the PrachStartTimeCfgInd parameter in the RACHCfg MO is set to CFG, the eNodeB can set different PRACH start time for different coverage levels of a cell, but the interval between these time points must be 40 ms or longer. Otherwise, the cell cannot be activated. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachDetectionThld.html">PRACH Detection Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the level of the PRACH detection threshold. The value LEVEL_0 indicates a low level, and the value LEVEL_3 indicates a high level. If the PrachRepetitionCount parameter in the CellRachCECfg MO is set to 1, 2, 4, or 128, LEVEL_3 always takes effect regardless of the parameter setting. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachProbabilityForAnchor.html">PRACH Probability for Anchor</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the probability of random access on the anchor carrier for UEs supporting multi-carrier access. If this parameter is set to ONE, UEs perform random access only on an anchor carrier. This parameter is valid only for anchor carriers. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachSubcarrierNumber.html">PRACH Subcarrier Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of subcarriers used for the PRACH. The number of PRACH subcarriers for EDT is not configurable. Currently, the number is fixed at 12. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachCbraSubcarrierNumber.html">PRACH CBRA Subcarrier Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of PRACH subcarriers for contention-based random access. This parameter does not take effect if the CFRA_WITH_SR_SWITCH option of the NbCellAlgoExtSwitch parameter in the CellAlgoExtSwitch MO is deselected. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-BackoffHighLoadThld.html">Backoff High Load Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the high load threshold for backoff in a cell at a coverage level. When the load of the cell is greater than or equal to the value of this parameter, backoff takes effect or the backoff indicator (used to indicate backoff time) increases by one level. For details about backoff time, see 3GPP TS 36.321. The value 0 indicates that this parameter does not take effect. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-BackoffLowLoadThld.html">Backoff Low Load Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the low load threshold for backoff in a cell at a coverage level. If the load of the cell is less than the value of this parameter, the backoff indicator (used to indicate backoff time) decreases by one level or backoff becomes invalid. For details about backoff time, see 3GPP TS 36.321. The value 0 indicates that this parameter does not take effect. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-EdtPrachSubcarrierOffset.html">EDT PRACH Subcarrier Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency offset of the PRACH subcarrier for early data transmission (EDT). This parameter must be set to the same value for different coverage levels and the location of the PRACH subcarrier for EDT cannot overlap that of the common PRACH subcarrier. Otherwise, the NB-IoT cell cannot work. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-PrachAlgoSw.html">PRACH Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable PRACH-related algorithms.</p>
+<p>EDT_RANDOM_ACCESS_SW: Indicates whether random access for EDT is supported at the corresponding coverage level of the PRB. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbRachCeConfig-MtNprachRangeMsg3InitTone.html">Multi-Tone UE NPRACH Range and MSG3 Init Tone</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the factor for the range of dedicated NPRACH resources used by UEs with the multi-tone transmission capability and also indicates the initial number of tones used for the scheduling of Msg3. For details about this parameter, see 3GPP TS 36.331. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

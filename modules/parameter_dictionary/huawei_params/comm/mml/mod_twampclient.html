@@ -1,0 +1,266 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify TWAMP Client Configuration (MOD TWAMPCLIENT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_twampclient">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify TWAMP Client Configuration (MOD TWAMPCLIENT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_twampclient"></a><a name="mod_twampclient"></a>
+
+
+<h1 class="topictitle1">Modify TWAMP Client Configuration (MOD TWAMPCLIENT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_twampclient__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of a TWAMP client.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_twampclient__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Modifying the configuration of a TWAMP client in the full architecture may cause re-negotiation of the TWAMP client and all the TWAMP senders under this client.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The IPv4 address used by a TWAMP client must be an IPv4 address configured using the <a href="add_devip.html">ADD DEVIP</a>, <a href="add_ipaddr4.html">ADD IPADDR4</a>, <a href="add_ppplnk.html">ADD PPPLNK</a>, or <a href="add_mpgrp.html">ADD MPGRP</a> command and cannot be an auto-negotiated IPv4 address or an IPv4 address of an OMCH (except that OMIPv4 and DEVIP/IPADDR4 share an IP address).</p>
+</li><li><p>[eNodeB,gNodeB]The IPv6 address used by a TWAMP client must be an IPv6 address configured using the <a href="add_ipaddr6.html">ADD IPADDR6</a> command and cannot be an auto-negotiated IPv6 address or an IPv6 address of an OMCH (except that OMIPv6 and IPADDR6 share an IPv6 address).</p>
+</li><li><p>[gNodeB]The IPv4 address used by a TWAMP client must be an IPv4 address configured using the <a href="add_devip.html">ADD DEVIP</a> or <a href="add_ipaddr4.html">ADD IPADDR4</a> command and cannot be an auto-negotiated IPv4 address or an IPv4 address of an OMCH (except that OMIPv4 and DEVIP share an IP address).</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_twampclient__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-ClientId.html">CLIENTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Client Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a TWAMP client.</p>
+<p>GUI Value Range: 0~23</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~23</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-IPVersion.html">IPVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP protocol version of a TWAMP client.</p>
+<p>GUI Value Range: IPv4(IPv4), IPv6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPv4, IPv6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in a <strong>TWAMPCLIENT</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>TWAMPARCH</strong> in the <strong>TWAMPCLIENT</strong> MO must be deployed in the full architecture.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>TWAMPARCH</strong> in the <strong>TWAMPCLIENT</strong> MO must be deployed in the light architecture.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>PEERIPV6</strong> in the <strong>TWAMPCLIENT</strong> MO must be set to a global unicast address.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-LocalIP.html">LOCALIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local IPv4 address of a TWAMP client.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>LOCALIP</strong> must be different from <strong>PEERIP</strong> in a <strong>TWAMPCLIENT</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-PeerIp.html">PEERIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peer IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peer IPv4 address of a TWAMP client.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in a <strong>TWAMPCLIENT</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>LOCALIP</strong> must be different from <strong>PEERIP</strong> in a <strong>TWAMPCLIENT</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-LocalIPv6.html">LOCALIPV6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local IPv6 address of a TWAMP client.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-PeerIpv6.html">PEERIPV6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peer IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peer IPv6 address of a TWAMP client.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>PEERIPV6</strong> in the <strong>TWAMPCLIENT</strong> MO must be set to a global unicast address.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-VrfIndex.html">VRFINDEX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-TwampArch.html">TWAMPARCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TWAMP Architecture</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the architecture of a TWAMP client.</p>
+<p>GUI Value Range: FULL(Full Architecture), LIGHT(Light Architecture)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FULL, LIGHT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>TWAMPARCH</strong> in the <strong>TWAMPCLIENT</strong> MO must be deployed in the full architecture.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>TWAMPARCH</strong> in the <strong>TWAMPCLIENT</strong> MO must be deployed in the light architecture.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-Dscp.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DSCP of TCP negotiation packets sent by a TWAMP client. This parameter is valid only when the TWAMP client is deployed in the full architecture.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 46</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TWAMPCLIENT-PeerPort.html">PEERPORT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peer TCP Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peer TCP port number of a TWAMP client. This parameter is valid only when the TWAMP client is deployed in the full architecture.</p>
+<p>GUI Value Range: 1~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 862</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_twampclient__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of a TWAMP Client with the parameters as follows: Client Index: 0, IP Version: IPv4, Peer IP Address: 172.16.90.63, run the following command: 
+MOD TWAMPCLIENT: CLIENTID=0, IPVERSION=IPv4, PEERIP="172.16.90.63";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

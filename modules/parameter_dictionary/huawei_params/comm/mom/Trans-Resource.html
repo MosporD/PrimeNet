@@ -1,0 +1,384 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="Transmission Resource Management MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts related to transport resource management. It also provides the managed object model (MOM) view and describes the managed objects (MOs) related to transport resource management.">
+<meta name="description" content="This section describes the functions and concepts related to transport resource management. It also provides the managed object model (MOM) view and describes the managed objects (MOs) related to transport resource management.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../comm/mom/trans-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Trans-Resource">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Transmission Resource Management MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Trans-Resource"></a><a name="Trans-Resource"></a>
+
+
+<h1 class="topictitle1">Transmission Resource Management MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts related
+to transport resource management. It also provides the managed object
+model (MOM) view and describes the managed objects (MOs) related to
+transport resource management.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p>Quality of service
+(QoS) in network communications is a mechanism that guarantees an
+expected level of performance in the packet loss rate, delay, jitter,
+and bandwidth. QoS provides different service qualities based on different
+requirements. </p>
+<p>Transport resources are one type of resources
+on the access network. The transport resource management function
+manages transport resources based on QoS requirements. </p>
+<div class="p">Transport
+resource management involves transport resource configuration and
+mapping, transport load control, and transport congestion control.
+The radio resource management (RRM) algorithms that are closely related
+to transport resource management include air interface resource scheduling
+algorithm and air interface load control algorithm. The transport
+resource management algorithm policies must be consistent with the
+RRM algorithm policies to the greatest extent. <a href="#Trans-Resource__fig01">Figure 1</a> shows the overall structure of transport resource management.
+For details on transport resource management principles, see the corresponding
+feature parameter description document.<div class="fignone" id="Trans-Resource__fig01"><a name="Trans-Resource__fig01"></a><a name="fig01"></a><span class="figcap"><b>Figure 1 </b>Overall structure of transport resource management</span>
+
+<br><span><img src="../image/mom/Transport-Resource-Management-figure2-1.png"></span><br>
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<td valign="top"><p>IP PM: IP performance monitoring</p>
+</td>
+
+<td valign="top"><p>SAE: System Architecture Evolution</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top"><p>TRM: transport resource management</p>
+</td>
+
+<td valign="top"><p>UE: user equipment</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top"><p>RRM: radio resource management</p>
+</td>
+
+<td valign="top">—</td>
+
+</tr>
+
+</table>
+
+</div>
+</div>
+<div class="p">Transport resource management is described as follows:<ul><li>Transport resource configuration and mapping<div class="p">The principles
+of transport resource configuration and mapping are as follows:<ul><li>Transport resources include physical ports, transport resource
+groups, and IP paths. By properly configuring these transport resources,
+more refined and accurate bandwidth management is achieved.</li><li>Transport resource mapping implements differentiated transmission
+by mapping traffic types to differentiated service code points (DSCPs)
+based on transmission requirements (for example, requirements for
+the delay, jitter, and packet loss rate).</li></ul>
+</div>
+</li><li>Transport load control<div class="p">Transport load control applies when transport
+resources are limited. It aims to provide differentiated services
+(DiffServ), ensure fairness among UEs, and increase transport bandwidth
+usage and network capacity without affecting service quality. Transport
+load control involves the following functions:<ul><li>Transport admission control: Services are admitted based on the
+transport load. By allocating transport resources to UEs, a base station
+manages transport bandwidth and controls the load on transport bandwidth.</li><li>Transport resource preemption: After an initial admission attempt
+fails, high-priority services can access the network by preempting
+the transport resources of low-priority services.</li><li>Transport overload control: This function can be used to rapidly
+enhance transport stability when transport resources are overloaded.</li><li>Transport load reporting: When the transport load is excessively
+high, the transport layer reports the load status to the module for
+load balancing on the air interface or the base station starts transport
+overload control.</li></ul>
+</div>
+</li><li>Transport congestion control<p>The transport network quality may
+fluctuate frequently. In this situation, transport dynamic flow control
+estimates available bandwidth on the transport network and dynamically
+adjusts the bandwidth of base station interface boards based on the
+transport network quality information provided by IP PM. When the
+transport network quality is good, the base station gradually increases
+the bandwidth. When the quality is poor, the base station decreases
+the bandwidth to prevent congestion.</p>
+<div class="p">A base station implements
+dynamic transport flow control on each transport resource group by
+using the following functions:<ul><li>Transport differentiated flow control involves traffic shaping
+of transport resource groups, queue scheduling of transport resource
+groups, and back pressure algorithms. This function provides UEs with
+DiffServ while ensuring fairness. When a base station interface board
+is congested, this function can be used to ensure the quality of non-flow-controllable
+services by transmitting these services preferentially. In addition,
+the rates of non-real-time services are limited to achieve differentiated
+allocation of bandwidth among services.</li><li>Dynamic bandwidth adjustment estimates transport bandwidth and
+provides bandwidth information for transport differentiated flow control
+and transport admission control. If the dynamic TX bandwidth adjustment
+function is enabled, the TX bandwidth is adjusted according to the
+automatic bandwidth adjustment parameters (Packet Loss Ratio Down
+Threshold and Delay Variation Down Threshold). If the traffic exceeds
+the configured bandwidth, the bandwidth can be appropriately adjusted
+to avoid data loss.</li><li>IP PM is a Huawei proprietary function. It performs end-to-end
+performance monitoring to obtain network quality information such
+as the traffic volume, packet loss rate, delay, and jitter. IP PM
+improves system performance by enhancing system maintainability and
+testability.</li></ul>
+</div>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody">Transport congestion control applies to
+user-plane services.</div></div>
+</li></ul>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Trans-Resource__fig2">Figure 2</a> and <a href="#Trans-Resource__fig3">Figure 3</a> shows the transport resource
+management MOMs, which are subsets of the base station MOM.<div class="fignone" id="Trans-Resource__fig2"><a name="Trans-Resource__fig2"></a><a name="fig2"></a><span class="figcap"><b>Figure 2 </b>Transport resource management MOM in the old model</span>
+
+<br><span><img src="../image/mom/Transport-Resource-Management-MOM.png"></span><br>
+</div>
+<div class="fignone" id="Trans-Resource__fig3"><a name="Trans-Resource__fig3"></a><a name="fig3"></a><span class="figcap"><b>Figure 3 </b>Transport resource management MOM in the new model</span>
+
+<br><span><img src="../image/mom/Transport-Resource-Management-MOM-Newmodel.png"></span><br>
+</div>
+</div>
+<div class="p">The following describes the MOs related to transport
+resource management. For details on the MOs related to the data link
+layer and network layer, see <i><cite>IPv4 MOM Description</cite></i>. <a href="#Trans-Resource__tab01">Table 1</a> describes the mapping between transport resource
+management algorithms and MOs.
+<div class="tablenoborder"><a name="Trans-Resource__tab01"></a><a name="tab01"></a><table cellpadding="4" cellspacing="0" summary="" id="Trans-Resource__tab01" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Mapping between transport resource management algorithms and
+MOs</caption>
+
+<thead align="left">
+<tr>
+<th class="cellrowborder" valign="top" width="25%" id="mcps1.4.2.3.3.2.5.1.1"><p>Algorithm Class</p>
+</th>
+
+<th class="cellrowborder" valign="top" width="25%" id="mcps1.4.2.3.3.2.5.1.2"><p>Algorithm (Level 1)</p>
+</th>
+
+<th class="cellrowborder" valign="top" width="25%" id="mcps1.4.2.3.3.2.5.1.3"><p>Algorithm (Level 2)</p>
+</th>
+
+<th class="cellrowborder" valign="top" width="25%" id="mcps1.4.2.3.3.2.5.1.4"><p>MO</p>
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+<tr>
+<td class="cellrowborder" rowspan="3" valign="top" width="25%" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Traffic data processing algorithm</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="25%" headers="mcps1.4.2.3.3.2.5.1.2 "><p>Transport differentiated flow control</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="25%" headers="mcps1.4.2.3.3.2.5.1.3 "><p>N/A</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="25%" headers="mcps1.4.2.3.3.2.5.1.4 "><div class="p"><ul><li><a href="../mo/PRI2QUE.html">PRI2QUE</a> (in the old model)/<a href="../mo/DSCP2QUEMAP.html">DSCP2QUEMAP</a> (in the new model)</li><li><a href="../mo/RSCGRPALG.html">RSCGRPALG</a> (in the old
+model)/<a href="../mo/IPRSCGRPALG.html">IPRSCGRPALG</a> (in the
+new model)</li><li><a href="../mo/RSCGRP.html">RSCGRP</a> (in the old model)/<a href="../mo/IPRSCGRP.html">IPRSCGRP</a> (in the new model)</li><li><a href="../mo/IP2RSCGRP.html">IP2RSCGRP</a> (in the old
+model)/<a href="../mo/IP2IPRSCGRP.html">IP2IPRSCGRP</a> (in the
+new model)</li><li><a href="../mo/LR.html">LR</a> (in the old model)/<a href="../mo/PORTLR.html">PORTLR</a> (in the new model)</li></ul>
+</div>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="2" valign="top" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Transport Dynamic Flow Control</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.2 "><p>Dynamic Bandwidth Adjustment</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.3 "><p><a href="../mo/RSCGRPALG.html">RSCGRPALG</a> (in the
+old model)/<a href="../mo/IPRSCGRPALG.html">IPRSCGRPALG</a> (in
+the new model)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.1 "><p>IP PM</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.2 "><p><a href="../mo/IPPMSESSION.html">IPPMSESSION</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="7" valign="top" width="25%" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Transport load control</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="25%" headers="mcps1.4.2.3.3.2.5.1.2 "><p>DiffServ QoS</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="25%" headers="mcps1.4.2.3.3.2.5.1.3 "><p>N/A</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="25%" headers="mcps1.4.2.3.3.2.5.1.4 "><p><a href="../mo/DIFPRI.html">DIFPRI</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="5" valign="top" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Transport admission control</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.2 "><p>Transport admission control algorithm</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.3 "><p><a href="../mo/TACALG.html">TACALG</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Transport resource preemption algorithm</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.2 "><p><a href="../mo/TACALG.html">TACALG</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Different transport paths based on QoS grade</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.2 "><div class="p"><ul><li><a href="../mo/TACALG.html">TACALG</a></li><li><a href="../mo/DIFPRI.html">DIFPRI</a></li></ul>
+</div>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Transport overbooking</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.2 "><p><a href="../mo/TACALG.html">TACALG</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Transport load reporting</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.2 "><p><a href="../mo/TLDRALG.html">TLDRALG</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.1 "><p>Transport resource overload control</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.2 "><p>N/A</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.3.3.2.5.1.3 "><p><a href="../mo/TOLCALG.html">TOLCALG</a></p>
+<p><a href="../mo/DLFLOWCTRLPARA.html">DLFLOWCTRLPARA</a> (in the old
+model)/<a href="../mo/IPDLFLOWCTRLPARA.html">IPDLFLOWCTRLPARA</a> (in the new model)</p>
+<p><a href="../mo/ULFLOWCTRLPARA.html">ULFLOWCTRLPARA</a> (in the old model)/<a href="../mo/IPULFLOWCTRLPARA.html">IPULFLOWCTRLPARA</a> (in the new model)</p>
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+</div>
+</div>
+<div class="p">MOs related to transport resource management are described
+as follows in terms of transport load control and transport congestion
+control:<ul><li>Transport load control<div class="p">MOs related to transport load control
+include <a href="../mo/DIFPRI.html">DIFPRI</a>, <a href="../mo/TACALG.html">TACALG</a>, <a href="../mo/TLDRALG.html">TLDRALG</a>, and <a href="../mo/TOLCALG.html">TOLCALG</a>. <ul><li><a href="../mo/DIFPRI.html">DIFPRI</a> defines a mapping
+between traffic types and DSCPs. This MO supports different transport
+paths based on DSCPs. Traffic can be classified into signaling, OM,
+and IP clock. </li><li><a href="../mo/TACALG.html">TACALG</a> defines a transport
+admission control algorithm.</li><li><a href="../mo/TLDRALG.html">TLDRALG</a> defines the transport
+load status of a base station. The reported transport load status
+is used as the input for the load balancing algorithm.</li><li><a href="../mo/TOLCALG.html">TOLCALG</a> defines a transport
+overload control (OLC) algorithm.</li><li><a href="../mo/DLFLOWCTRLPARA.html">DLFLOWCTRLPARA</a> (in
+the old model)/<a href="../mo/IPDLFLOWCTRLPARA.html">IPDLFLOWCTRLPARA</a> (in the new model) defines the configuration for the downlink flow
+control algorithm on a NodeB. </li><li><a href="../mo/ULFLOWCTRLPARA.html">ULFLOWCTRLPARA</a> (in
+the old model)/<a href="../mo/IPULFLOWCTRLPARA.html">IPULFLOWCTRLPARA</a> (in the new model) defines the configuration for the uplink flow
+control algorithm on a NodeB.</li></ul>
+</div>
+</li><li>Transport congestion control<div class="p">MOs related to transport congestion
+control include <a href="../mo/PRI2QUE.html">PRI2QUE</a> (in
+the old model)/<a href="../mo/DSCP2QUEMAP.html">DSCP2QUEMAP</a> (in the new model), <a href="../mo/RSCGRP.html">RSCGRP</a> (in
+the old model)/<a href="../mo/IPRSCGRP.html">IPRSCGRP</a> (in
+the new model), <a href="../mo/RSCGRPALG.html">RSCGRPALG</a> (in
+the old model)/<a href="../mo/IPRSCGRPALG.html">IPRSCGRPALG</a> (in the new model), <a href="../mo/LR.html">LR</a> (in the
+old model)/<a href="../mo/PORTLR.html">PORTLR</a> (in the new
+model), and <a href="../mo/IPPMSESSION.html">IPPMSESSION</a>.<ul><li><a href="../mo/PRI2QUE.html">PRI2QUE</a> (in the old model)/<a href="../mo/DSCP2QUEMAP.html">DSCP2QUEMAP</a> (in the new model)
+defines a mapping between system internal queues and transport bearer
+priorities represented by DSCPs. Queue 0 has the highest priority. </li><li><a href="../mo/RSCGRP.html">RSCGRP</a> (in the old model)/<a href="../mo/IPRSCGRP.html">IPRSCGRP</a> (in the new model) defines
+the configuration information of a transport resource group. This
+MO consists of the resource group ID, traffic-related parameters,
+and other parameters. </li><li><a href="../mo/IP2RSCGRP.html">IP2RSCGRP</a> (in the old
+model)/<a href="../mo/IP2IPRSCGRP.html">IP2IPRSCGRP</a> (in the
+new model) defines a mapping between a destination IP address of passing-by
+data and a transport resource group. The MO is used to guarantee the
+QoS of bound service flows in the target network segment by binding
+these service flows to a transport resource group. The mapping between
+IP addresses and transport resource groups is configured only when
+base stations are cascaded.</li><li><a href="../mo/RSCGRPALG.html">RSCGRPALG</a> (in the old
+model)/<a href="../mo/IPRSCGRPALG.html">IPRSCGRPALG</a> (in the
+new model) defines algorithms related to a transport resource group.
+The MO consists of the transport resource group ID and algorithm parameters. </li><li><a href="../mo/LR.html">LR</a> (in the old model)/<a href="../mo/PORTLR.html">PORTLR</a> (in the new model) defines the
+transmission data rate configuration on a physical port. This MO consists
+of the port number, rate limitation algorithm switch, and traffic-related
+parameters. </li><li><a href="../mo/IPPMSESSION.html">IPPMSESSION</a> defines
+an IP PM session. IP PM monitors the quality of transport links, such
+as the delay, jitter, and packet loss rate. The monitoring results
+are used as the input for dynamic flow control.</li><li><a href="../mo/UDT.html">UDT</a> defines a user data type
+and is used to support differentiated user data types including gold,
+silver, and bronze.</li><li><a href="../mo/UDTPARAGRP.html">UDTPARAGRP</a> defines a
+group of user data type parameters and is used to support the parameter
+groups for differentiated user data types including gold, silver,
+and bronze. Each parameter group is uniquely identified by a group
+ID and includes parameters such as the data priority, activity factor,
+primary transport resource type, primary port load threshold, and
+primary-to-secondary port load ratio threshold.</li></ul>
+</div>
+</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../comm/mom/trans-mom.html" title="This chapter describes the MOMs related to transmission.">Transport MOMs</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

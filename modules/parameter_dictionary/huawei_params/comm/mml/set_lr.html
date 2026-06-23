@@ -1,0 +1,313 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Line Rate (SET LR)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_lr">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Line Rate (SET LR)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_lr"></a><a name="set_lr"></a>
+
+
+<h1 class="topictitle1">Set Line Rate (SET LR)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_lr__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the data rate of a physical port. Rate limitation is implemented between the data link layer and the physical layer. The length of a packet measures only the header of the data link layer, not the header of the physical layer. If the port type is set to MPGRP, rate limitation is performed only at the IP layer, but not at the MP header.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_lr__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The sum of the committed burst size (CBS) and the excess burst size (EBS) must be greater than the uplink committed information rate (CIR). It is recommended that this sum be twice the uplink CIR.</p>
+</li><li><p>The UMPTa, UMPTb, UMDU or UTRPc can be configured with a maximum of 1 Gbit/s the uplink committed information rate and 1 Gbit/s the downlink committed information rate. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>The UTRP can be configured with a maximum of 300 Mbit/s the uplink committed information rate and 300 Mbit/s the downlink committed information rate. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>The UMPTe/UMPTga can be configured with a maximum of 10 Gbit/s the uplink committed information rate and 10 Gbit/s the downlink committed information rate. The UMPTg can be configured with a maximum of 25 Gbit/s the uplink committed information rate and 25 Gbit/s the downlink committed information rate. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>When an Ethernet port is deleted, the system automatically deletes the LR objects depending on the Ethernet port. If no Ethernet port object exists in the database, you can run the <a href="add_ethport.html">ADD ETHPORT</a>/<a href="set_ethport.html">SET ETHPORT</a> command to add an Ethernet port, and then run the <a href="rmv_ethport.html">RMV ETHPORT</a> command to remove the Ethernet port. In this case, the system automatically deletes the LR objects depending on the Ethernet port.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]System specifications: If the WMPT/UMPT/LMPT/GTMUb/GTMUc is the main control board, a maximum of 80 Line Rates can be configured. If the UMDU is the main control board, a maximum of 7 Line Rates can be configured.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]Board specifications: A maximum of 7 Line Rates can be configured on a WMPT/UMPTa/UMPTb/UMDU. A maximum of 5 Line Rates can be configured on a UMPTe/UMPTg/UMPTga/GTMUb/GTMUc. A maximum of 3 Line Rates can be configured on an LMPT. A maximum of 6 Line Rates can be configured on a UTRPc. A maximum of 4 Line Rates can be configured on a UTRP (subboard type: UIEC/UQEC/UAEC). A maximum of 2 Line Rates can be configured on a UTRP (subboard type: UEOC). A maximum of 4 Line Rates can be configured on a UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]Currently, the base station supports a maximum of four modes, and therefore tunnel-based transmission resource groups are used only for rate limitation on uplink data streams. It is recommended that each base station with an uplink tunnel be configured with a tunnel-based transmission resource group whose rate configurations are the same as line rates.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]The LMPT board can be configured with a maximum of 360 Mbit/s the uplink committed information rate, 400 Mbit/s committed burst size, 450 Mbit/s excessive burst size and 540 Mbit/s the downlink committed information rate. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>[Co-MPT,eGBTS]The GTMUb/GTMUc can be configured with a maximum of 100 Mbit/s the uplink committed information rate and 100 Mbit/s the downlink committed information rate. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li><li><p>[NodeB]The WMPT board can be configured with a maximum of 100 Mbit/s the uplink committed information rate, 600 Mbit/s committed burst size, 600 Mbit/s excessive burst size and 100 Mbit/s the downlink committed information rate. The value is set to the maximum value supported by the board when it bigger than the maximum one.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_lr__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the board where the port is located.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board where the port is located.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board where the port is located.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where a port is located.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: E1_COVERBOARD(E1 Cover Board), ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board), BACK_BOARD(Back Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E1_COVERBOARD, ETH_COVERBOARD, BASE_BOARD, BACK_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>LR</strong> MO, this parameter can be set to E1_COVERBOARD or ETH_COVERBOARD if <strong>SN</strong> is set to a value within the range of 0 to 5.</li><li>In an <strong>LR</strong> MO, this parameter can be set to BASE_BOARD, BACK_BOARD, or ETH_COVERBOARD if <strong>SN</strong> is set to 6 or 7.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port type.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: MPGRP(Multi-link PPP Group), ETH(Ethernet Port), ETHTRK(Ethernet Trunk), TUNNEL(Tunnel)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MPGRP, ETH, ETHTRK, TUNNEL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[gNodeB]The value of <strong>PT</strong> in an <strong>LR</strong> MO cannot be set to MPGRP.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>LR</strong> MO, if <strong>SBT</strong> is set to E1_COVERBOARD, this parameter must be set to MPGRP.</li><li>In the <strong>LR</strong> MO, if <strong>SBT</strong> is set to ETH_COVERBOARD, this parameter can be set to ETH or ETHTRK.</li><li>In the <strong>LR</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to MPGRP, ETH or ETHTRK.</li><li>In the <strong>LR</strong> MO, if <strong>SBT</strong> is set to BACK_BOARD, this parameter must be set to TUNNEL.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~14</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~14</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 3 if <strong>PT</strong> is set to MPGRP.</li><li>In an <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 14 if <strong>PT</strong> is set to TUNNEL.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 5 if <strong>PT</strong> is set to ETH and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 2 if <strong>PT</strong> is set to ETHTRK and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to 0 to 3 if <strong>PT</strong> is set to ETH and <strong>SBT</strong> is set to BASE_BOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to 0 or 1 if <strong>PT</strong> is set to ETHTRK and <strong>SBT</strong> is set to BASE_BOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-LRSwitch.html">LRSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LR Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for limiting the line rate at the port.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. To mitigate the risk, it is recommended that this parameter not be used.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ENABLE, the rate of a physical port is restricted. If this parameter is set to DISABLE, the rate of a physical port is not restricted. Rate restriction of physical ports is necessary if the bandwidth of a transport network is limited. The transport network may incur congestion or packet loss when its bandwidth is limited and rate restriction is disabled.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-CommittedInformationRate.html">CIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Committed Information Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UL committed information rate after rate limitation is configured at a port. The precision of the UL committed information rate supported by the UMPTa, UMPTb, UMPTe, UMPTg, UMPTga, UMDU or GTMUc is 64 kbit/s, the precision supported by the other board is 32 kbit/s. If the configured UL committed information rate is not a multiple of the precision, the UL committed information rate is rounded up. For the GTMUb, the value of CIR ranges from 64 to 100000. If this parameter is set to a value greater than the maximum allowed value or less than the minimum allowed value, the maximum or the minimum allowed value takes effect.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the UL Committed Information Rate parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 32~100000000</p>
+<p>Unit: kbit/s</p>
+<p>Actual Value Range: 32~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 31744 if <strong>LRSW</strong> is set to enable and <strong>PT</strong> is set to MPGRP. </li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 100000000 if <strong>LRSW</strong> is set to enable and <strong>PT</strong> is set to TUNNEL. </li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 100000000 if <strong>SN</strong> is set to 0~5, <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 10000000 if <strong>SN</strong> is set to 6~7, <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 25000000 if <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to BASE_BOARD.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter value is greater than the available transport bandwidth, the transport network may be congested, affecting the QoS.</p>
+<p>If this parameter value is smaller than the available transport bandwidth, the transport network may incur a waste of bandwidth, affecting the number of admitted services and throughput.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-CommittedBurstSize.html">CBS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Committed Burst Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Committed Burst Size (CBS) after rate limitation is configured at a port. The minimum rate supported by the UMPTa, UMPTb, UMPTe, UMPTg, UMPTga, UMDU or GTMUc is 64 kbit/s. For the GTMUb, the value of CBS ranges from 63 kbit to 256 kbit. If this parameter is set to a value greater than the maximum allowed value or less than the minimum allowed value, the maximum or the minimum allowed value takes effect.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Committed Burst Size parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 32~100000000</p>
+<p>Unit: kbit</p>
+<p>Actual Value Range: 32~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 155000 if <strong>LRSW</strong> is set to enable and <strong>PT</strong> is set to MPGRP. </li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 100000000 if <strong>LRSW</strong> is set to enable and <strong>PT</strong> is set to TUNNEL. </li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 100000000 if <strong>SN</strong> is set to 0~5, <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 10000000 if <strong>SN</strong> is set to 6~7, <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 25000000 if <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to BASE_BOARD.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates a lower tolerance for data burst, which results in packet loss.</p>
+<p>A larger parameter value indicates higher consumption of system resources, which results in a waste of resources.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-ExcessBurstSize.html">EBS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Excess Burst Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Excess Burst Size (EBS) after rate limitation is configured at a port.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Excessive Burst Size parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~100000000</p>
+<p>Unit: kbit</p>
+<p>Actual Value Range: 0~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 155000 if <strong>LRSW</strong> is set to enable and <strong>PT</strong> is set to MPGRP. </li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 100000000 if <strong>LRSW</strong> is set to enable and <strong>PT</strong> is set to TUNNEL. </li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 100000000 if <strong>SN</strong> is set to 0~5, <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 10000000 if <strong>SN</strong> is set to 6~7, <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 0 to 25000000 if <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to BASE_BOARD.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LR-RxCIR.html">DLCIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Committed Information Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DL committed information rate after rate limitation is configured at a port. The parameter does not take effect in GSM and NR. For UMTS, if the downlink flow control switch is set to DYNAMIC_BW_SHAPING or STATIC_BW_SHAPING, this parameter is valid. If the downlink flow control switch is set to BW_SHAPING_ONOFF_TOGGLE, this parameter is valid when traffic congestion is detected. In other cases, this parameter is invalid. For LTE, this parameter computes the value of Physical Port Down Link Admission. The minimum rate supported by the UMPTa, UMPTb, UMPTe, UMPTg, UMPTga or UMDU is 64 kbit/s.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the DL Committed Information Rate parameter in the PORTLR MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 32~100000000</p>
+<p>Unit: kbit/s</p>
+<p>Actual Value Range: 32~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The recommended value for this parameter is 31744 if PT is set to MPGRP.</p>
+<p>The recommended value is 1000000 if PT is set to ETH or ETHTRK.</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 31744 if <strong>LRSW</strong> is set to enable and <strong>PT</strong> is set to MPGRP. </li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 100000000 if <strong>LRSW</strong> is set to enable and <strong>PT</strong> is set to TUNNEL. </li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 100000000 if <strong>SN</strong> is set to 0~5, <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 10000000 if <strong>SN</strong> is set to 6~7, <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to ETH_COVERBOARD.</li><li>In the <strong>LR</strong> MO, this parameter can be set to a value within the range of 32 to 25000000 if <strong>PT</strong> is set to ETH or ETHTRK, <strong>LRSW</strong> is set to enable and <strong>SBT</strong> is set to BASE_BOARD.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_lr__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the line rate with the parameters as follows: Cabinet No.: 0, Subrack No.: 0, Slot No.: 6, Subboard Type: Base Board, Port Type: Ethernet Port, Port No.: 0, LR Switch: Enable, UL Committed Information Rate: 32, Committed Burst Size: 64, Excess Burst Size: 3, DL Committed Information Rate: 100000, run the following command:
+SET LR: CN=0, SRN=0, SN=6, SBT=BASE_BOARD, PT=ETH, PN=0, LRSW=ENABLE, CIR=32, CBS=64, EBS=3, DLCIR=100000; </pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

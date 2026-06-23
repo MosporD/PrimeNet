@@ -1,0 +1,281 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add IP PM Session (ADD IPPMSESSION)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ippmsession">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add IP PM Session (ADD IPPMSESSION)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ippmsession"></a><a name="add_ippmsession"></a>
+
+
+<h1 class="topictitle1">Add IP PM Session (ADD IPPMSESSION)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_ippmsession__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an IP Performance Monitoring (PM) session.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ippmsession__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Before adding an IP PM session, ensure that the peer NE supports the IP PM function.</p>
+</li><li><p>If the peer NE does not support bidirectional activation, only the UL IP PM session can be added to the local end. Otherwise, the IP PM session will be disconnected intermittently.</p>
+</li><li><p>If TXBWASW or RXBWASW is set to ON in the RSCGRPALG object, and an IP PM session is bound to an IP path associated with a transmission resource group in the link model, the base station dynamically adjusts the TX or RX bandwidth of the transmission resource group based on the IP PM detection result. In the link model, if the IP PM session is not bound to any IP path, the IP PM detection result does not affect the TX or RX bandwidth of the transmission resource group. In the endpoint model, even if there is no IP path and the IP PM session is not bound to any IP path, the base station can also dynamically adjust the TX or RX bandwidth of the transmission resource group based on the IP PM detection result.</p>
+</li><li><p>In VLAN group mode, if a triplet-based IP PM session is added, a VLANCLASS object with SRVPRIO of 0 must be added. Otherwise, the IP PM session will fail to be activated.</p>
+</li><li><p>When a quadruplet-based IP PM session is used, the base station experiences probe errors if the intermediate device changes DSCP values.</p>
+</li><li><p>If an IPPMSESSION MO with IP PM Type set to FOUR_TUPLE is bound to an IPPATH MO with Path Type set to FIXED(Fixed QoS), the DSCP value configured in the IPPMSESSION MO does not take effect, but the DSCP value configured in the IPPATH MO takes effect.</p>
+</li><li><p>If a quadruplet-based IP PM session is bound to an any-type IP path, the DSCP value of the IP PM session takes effect, rather than that of the IP path.</p>
+</li><li><p>An IPPMSESSION MO with IP PM Type set to Three_TUPLE cannot be bound to the IPPATH MO with Path Type set to FIXED(Fixed QoS).</p>
+</li><li><p>IP PM sessions are not supported in scenarios where IP path routes are configured.</p>
+</li><li><p>Before configuring IP PM triplets and bidirectionally activated IP PM sessions, ensure that the peer device supports IP PM triplets and bidirectionally activated IP PM sessions.</p>
+</li><li><p>Board specifications: A maximum of 16 IP PM sessions can be configured on a WMPT/UTRP (subboard type: UEOC/UQEC/UIEC/UAEC). A maximum of 128 IP PM sessions can be configured on a UMPT/UMDU/LMPT/UTRPc/UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. A maximum of 8 IP PM sessions can be configured on a GTMUb/GTMUc.</p>
+</li><li><p>System specifications: If the WMPT/GTMUb/GTMUc is the main control board, a maximum of 128 IP PM sessions can be configured. If the LMPT/UMPT is the main control board, a maximum of 500 IP PM sessions can be configured. If the UMDU is the main control board, a maximum of 128 IP PM sessions can be configured.</p>
+</li><li><p>If the UL IP PM session in the base station is activated on the peer device, the UL or round-trip IP PM session does not need to be activated on the base station. If the IP PM session is activated repeatedly, the IP PM session will fail to be activated.</p>
+</li><li><p>When an IP PM session fails to be activated, ALM-25900 IP PM Activation Failure will not be reported under the following conditions: (1) The IP PM session is not bound to any IP path. (2) No IP path or user-plane link has the same local IP address, peer IP address, and DSCP as this IP PM session.</p>
+</li><li><p>In the same routing domain, if a triplet-based IP PM session is not bound to an IP path, the local IP address of the IP PM session is the same as a device IP address. The type of sub-board on the board where the device IP address is established must be BASE_BOARD or ETH_COVERBOARD.</p>
+</li><li><p>If a triplet-based IP PM session is bound to an IP path, the type of sub-board on the board where the IP path is established must be BASE_BOARD or ETH_COVERBOARD.</p>
+</li><li><p>In security networking scenarios, the UCCU, UBBPe, UBBPei, UBBPep, UBBPem, LCOP, UBBPex2, UBBPf1, UBBPf0, UBBPg1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 and UBBPg9 boards do not support high-precision delay monitoring.</p>
+</li><li><p>In the same routing domain, if IP PM sessions with both triplets and quadruples exist, and their local and peer IP addresses are the same, the system uses the last configured triplet or quadruplet to negotiate.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS]A WMPT/UTRP (subboard type: UEOC/UQEC)/GTMUb board does not support a triplet or a bidirectionally activated IP PM session. If this command is executed to add a triplet or a bidirectionally activated IP PM session to a WMPT/UTRP (subboard type: UEOC/UQEC)/GTMUb board, the command will be executed successfully but the configuration will not take effect.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ippmsession__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-SessionID.html">IPPMSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Session ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IP PM session of an NE. An IP PM session with an ID ranging from 0 to 65535 is configured by users. An IP PM session with an ID ranging from 70000 to 79999 is configured by the system.</p>
+<p>GUI Value Range: 0~65535,70000~79999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535,70000~79999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of Session ID in a manually configured IPPMSESSION MO must range from 0 to 65535.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-IppmType.html">IPPMTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP PM Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of IP PM session. A triplet consists of the local IP address, peer IP address, and protocol type; a quad bit consists of the local IP address, peer IP address, protocol type, and DSCP. The WMPT and UTRP do not support the triplets configuration mode.</p>
+<p>GUI Value Range: FOUR_TUPLE(FOUR_TUPLE), THREE_TUPLE(THREE_TUPLE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FOUR_TUPLE, THREE_TUPLE</p>
+<p>MML Default Value: FOUR_TUPLE(FOUR_TUPLE)</p>
+<p>Recommended Value: FOUR_TUPLE(FOUR_TUPLE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-BindPath.html">BINDPATH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bind IP Path</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to bind the IP PM session to an IP path. If the IP PM session is bound to an IP path, the IP PM session uses the local and peer IP addresses of the IP path in data transmission. In addition, if TXBWASW or RXBWASW is set to ON and TCSW is set to ENABLE in the algorithm for the transmission resource group associated with the IP path, the system dynamically adjusts the TX or RX bandwidth of the transmission resource group based on the IP PM detection result. The IP PM dynamic bandwidth adjustment function is available for LTE but unavailable for UMTS. The function of binding the IP PM session to an IP path is unavailable for NR.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[gNodeB]The value of <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO cannot be set to YES.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-BindingPathID.html">PATHID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Path ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the IP path to which an IP PM session is bound.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-LocalIP.html">LOCALIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local IP address of an IP PM session. This IP address must be configured on an Ethernet port, an Ethernet trunk, a PPP link, an MP link or a loopback port, and cannot be set to 0.0.0.0.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPPMSESSION</strong> MO, if <strong>BINDPATH</strong> is set to NO, <strong>LOCALIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPPMSESSION</strong> MO, if <strong>BINDPATH</strong> is set to NO, <strong>LOCALIP</strong> must be different from <strong>PEERIP</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-PeerIP.html">PEERIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peer IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peer IP address of an IP PM session. This IP address must be a valid IP address of Class A, B, or C and different from any existing IP address of the local end. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPPMSESSION</strong> MO, if <strong>BINDPATH</strong> is set to NO, <strong>PEERIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPPMSESSION</strong> MO, if <strong>BINDPATH</strong> is set to NO, <strong>LOCALIP</strong> must be different from <strong>PEERIP</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-DSCP.html">IPPMDSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the differentiated services code point (DSCP) of an IP PM session.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPPMSESSION</strong> MO, this parameter is valid only when <strong>IPPMTYPE</strong> is set to FOUR_TUPLE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-Direction.html">DIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Activate Direction</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates that the activation direction of an IP PM session. For this parameter to be valid, the peer must also support the IP PM session. If this parameter is set to UP, the IP PM session initiated by the BS is activated. If this parameter is set to BIDIR, the IP PM sessions initiated by BS and the peer are activated. The activation direction is specified by the DIR parameter. The WMPT and UTRP do not support bidirectional activation. The DIR parameter determines the activation direction.</p>
+<p>GUI Value Range: UP(Uplink), BIDIR(Bidirection)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UP, BIDIR</p>
+<p>MML Default Value: UP(Uplink)</p>
+<p>Recommended Value: UP(Uplink)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPMSESSION-AssociateUpPathPlr.html">ASSOCIATEUPPATHPLR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Associate with UP Path Packet Loss Rate Alarm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether an IP PM session is associated with ALM-25959 User Plane Path Excessive Packet Loss Rate. If this parameter is set to YES and the local and peer IP addresses of an IP PM session are the local and peer IP addresses of a user-plane link in the endpoint model, the packet loss rate measured during the IP PM session is used to determine whether the packet loss rate for the user-plane link exceeds the threshold and an alarm needs to be reported.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ippmsession__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an IP PM session with the parameters as follows: Session ID: 0, IP PM Type: FOUR_TUPLE, Bind IP Path: NO, Local IP: 192.168.11.110, Peer IP: 192.168.22.220, DSCP: 20, run the following command: 
+ADD IPPMSESSION: IPPMSN=0, IPPMTYPE=FOUR_TUPLE, BINDPATH=NO, LOCALIP="192.168.11.110", PEERIP="192.168.22.220", IPPMDSCP=20;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

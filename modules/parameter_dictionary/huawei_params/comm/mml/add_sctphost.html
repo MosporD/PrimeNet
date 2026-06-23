@@ -1,0 +1,579 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add SCTP Host (ADD SCTPHOST)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_sctphost">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add SCTP Host (ADD SCTPHOST)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_sctphost"></a><a name="add_sctphost"></a>
+
+
+<h1 class="topictitle1">Add SCTP Host (ADD SCTPHOST)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_sctphost__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an SCTP host.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_sctphost__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If the IP addresses of the SCTP host and SCTP peer are set to valid IP addresses and the two local IP addresses are configured on the same board, the base station does not make cross-link attempts. That is, the base station does not support the SCTP link between the first local IP address and the second peer IP address or the link between the second local IP address and the first peer IP address. The base station makes cross-link attempts only when the two local IP addresses are valid and are configured on different boards. This requires that the peer device should support this multi-homing mode.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When security automatic establishment is enabled on an SCTP host, the IPSec Auto Configure Switch is enabled for the SCTP host and a security host is referenced. Therefore, before enabling this feature, ensure that the security host to be referenced has been added by using the <a href="add_securityhost.html">ADD SECURITYHOST</a> command.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If the SIGIP2V4 of an SCTP host is not 0.0.0.0, ensure that the SIGIP1V4 and SIGIP2V4 of the SCTP host have been configured by using the <a href="add_devip.html">ADD DEVIP</a> or <a href="add_ipaddr4.html">ADD IPADDR4</a> command.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The local IP addresses configured in this MO must be mutually reachable with the IP addresses of base station controllers or CN equipment. If some IP addresses are unreachable, services setup will fail on the corresponding equipment.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If the following conditions are met during setup of an IPv4 SCTP link, the system will automatically configure the ACL, ACLRULE, IPSECBIND or IPSECBINDITF, and IPSECPOLICY objects and set up an IPsec tunnel for the SCTP link:</p>
+<p>- IPSec Auto Configure Switch for First Local IP, IPSec Auto Configure Switch for Second Local IP, IPSec Auto Configure Switch for First Peer IP, and IPSec Auto Configure Switch for Second Peer IP are set to ENABLE for the SCTPHOST and SCTPPEER objects in the same endpoint group.</p>
+<p>- SeGW Switch is set to ENABLE for the SECURITYHOST, SECURITYPEER, and SECURITYTEMPLATE objects.</p>
+<p>- The IKEPEER, IKEPROPOSAL, and IPSECPROPOSAL objects have been configured.</p>
+<p>If the following conditions are met during setup of an SCTP link, the system will automatically configure the ACL, ACLRULE, IPSECPOLICY, IPSECBIND or IPSECBINDITF, and IKEPEER objects and set up an IPsec tunnel for the SCTP link:</p>
+<p>- IPSec Auto Configure Switch for First Local IP, IPSec Auto Configure Switch for Second Local IP, IPSec Auto Configure Switch for First Peer IP, and IPSec Auto Configure Switch for Second Peer IP are set to ENABLE for the SCTPHOST and SCTPPEER objects in the same endpoint group.</p>
+<p>- SeGW Switch is set to DISABLE for the SECURITYHOST, SECURITYPEER, and SECURITYTEMPLATE objects.</p>
+<p>- The IKEPROPOSAL and IPSECPROPOSAL objects have been configured.</p>
+<p>If IPSec Auto Configure Switch for First Local IP, IPSec Auto Configure Switch for Second Local IP, IPSec Auto Configure Switch for First Peer IP, and IPSec Auto Configure Switch for Second Peer IP are set to DISABLE for the SCTPHOST and SCTPPEER objects in the same endpoint group, an IPsec tunnel can be set up by manually configuring all the preceding IPsec-related objects.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When the signaling links are set up automatically, the base station automatically establishes an SCTP link if an SCTP link which is same as that of the following information in an endpoint group is not configured: </p>
+<p>    The first local IP address of the SCTP host</p>
+<p>    The second local IP address of the SCTP host</p>
+<p>    The local SCTP port number of the SCTP host</p>
+<p>    The first peer IP address of the SCTP peer</p>
+<p>    The second peer IP address of the SCTP peer</p>
+<p>    The peer SCTP port number of the SCTP peer.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When signaling links are automatically set up, the base station does not automatically establish another SCTP peer and SCTP link if the base station has been configured with an SCTPLNK MO and the following parameters are set to the same values as those of the configured SCTP link: </p>
+<p>First Local IP Address, Second Local IP Address, and Local SCTP Port No. in the SCTP host in the same endpoint group as the SCTP peer to be created</p>
+<p>First Peer IP Address, Second Peer IP Address, and Peer SCTP Port No. in the SCTP peer to be created.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]Ensure that the SCTPTEMPLATEID of the SCTP host has been configured by using the <a href="add_sctptemplate.html">ADD SCTPTEMPLATE</a> command.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]System specifications: If the LMPT/UMPT/UMDU is the main control board, a maximum of 24 SCTP hosts can be configured.</p>
+</li><li><p>[NodeB,eGBTS,eNodeB,gNodeB]During self-setup of the control plane (for example, for the X2/eX2/uX2 interface), the port numbers of the SCTP hosts for adjacent base stations must be the same. In addition, the port number of the SCTP peer must be the same as the port number of the SCTP host for these base stations. Otherwise, the SCTP link negotiation fails.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB]When the port type is MPGRP or PPP, it is not supported to run the <a href="add_ppplnk.html">ADD PPPLNK</a> or <a href="add_mpgrp.html">ADD MPGRP</a> command to configure the first local IP address or the second local IP address of an SCTP host.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If the SIGIP2V6 of an SCTP host is not 0:0:0:0:0:0:0:0, ensure that the SIGIP1V6 and SIGIP2V6 of the SCTP host have been configured by using the <a href="add_ipaddr6.html">ADD IPADDR6</a> command.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If the local and peer IPv6 addresses of the SCTP host and SCTP peer are set to valid IPv6 addresses, the BS does not make cross-link attempts. That is, the BS does not support the SCTP link between the first local IPv6 address and the second peer IPv6 address or the link between the second local IPv6 address and the first peer IPv6 address.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]When the signaling links are set up automatically, the base station automatically establishes an SCTP link if an SCTP link which is same as that of the following information in an endpoint group is not configured: </p>
+<p>    The first local IPv6 address of the SCTP host</p>
+<p>    The second local IPv6 address of the SCTP host</p>
+<p>    The local SCTP port number of the SCTP host</p>
+<p>    The first peer IPv6 address of the SCTP peer</p>
+<p>    The second peer IPv6 address of the SCTP peer</p>
+<p>    The peer SCTP port number of the SCTP peer.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If the following conditions are met during setup of an IPv6 SCTP link, the system will automatically configure the SCTPLNK, TUNNELITF, ACL6, ACLRULE6, IPSECBINDITF, IPSECPOLICY, IKEPEER, INTERFACE, and IPROUTE6 objects and set up an IPsec tunnel for the SCTP link:</p>
+<p>- IPSec Auto Configure Switch for First Local IP, IPSec Auto Configure Switch for Second Local IP, IPSec Auto Configure Switch for First Peer IP, and IPSec Auto Configure Switch for Second Peer IP are set to ENABLE for the SCTPHOST and SCTPPEER objects in the same endpoint group.</p>
+<p>- SeGW Switch is set to DISABLE for the SECURITYHOST, SECURITYPEER, and SECURITYTEMPLATE objects.</p>
+<p>- The IKEPROPOSAL and IPSECPROPOSAL objects have been configured.</p>
+</li><li><p>[Co-MPT,eNodeB]When the local ip for inside sctplnk is configured on the loopback interface, the corresponding port failure will cause the SCTP link fault.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_sctphost__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SctpHostID.html">SCTPHOSTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SCTP Host ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the SCTP host.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, the <strong>VRFIDX</strong> parameter in the <strong>SCTPHOST</strong> MO must be set to 0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>IPVERSION</strong> is set to IPv4 and <strong>SIGIP1SECSWITCH</strong> or <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>VRFIDX</strong> must be set to 0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-IPVersion.html">IPVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP protocol version of an SCTP host.</p>
+<p>GUI Value Range: IPv4(IPv4), IPv6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPv4, IPv6</p>
+<p>MML Default Value: IPv4(IPv4)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, the <strong>IPVERSION</strong> parameter in the <strong>SCTPHOST</strong> MO cannot be set to IPv6.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>IPVERSION</strong> is set to IPv4 and <strong>SIGIP1SECSWITCH</strong> or <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>VRFIDX</strong> must be set to 0.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SigIP1v4.html">SIGIP1V4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First Local IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the first local SCTP IPv4 address, which is used by the base station to establish a signaling channel. That is, this address is the first local IPv4 address for automatically establishing an SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>SCTPHOST</strong> MO, <strong>SIGIP1V4</strong> must be a valid IP address of Class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>SCTPHOST</strong> MO, <strong>SIGIP2V4</strong> must be different from <strong>SIGIP1V4</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SigIP1v6.html">SIGIP1V6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First Local IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the first local SCTP IPv6 address, which is used by the base station to establish a signaling channel. That is, this address is the first local IPv6 address for automatically establishing an SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In the <strong>SCTPHOST</strong> MO, <strong>SIGIP1V6</strong> must be set to a globally scoped unicast address.</li><li>[Co-MPT, eNodeB, gNodeB]In the <strong>SCTPHOST</strong> MO, <strong>SIGIP2V6</strong> must be different from <strong>SIGIP1V6</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SigIP1SecSwitch.html">SIGIP1SECSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Auto Configure Switch for First Local IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to use the first local IP address to automatically set up an IPsec tunnel between the local and peer ends based on the parameter values in the SECURITYHOST and SECURITYPEER MOs. The IPsec tunnel is used to encrypt data to be transmitted on the SCTP link that is set up using the first local IP address of the SCTP host. When the value of this parameter is changed from ENABLE to DISABLE using the <a href="mod_sctphost.html">MOD SCTPHOST</a> command, the system automatically deletes the IPsec tunnel that has been automatically set up.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: If the networking mode does not support IPSec or IPSec tunnels are to be set up by manually configuring IPSec objects, this parameter must be set to DISABLE.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, both the <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> parameters in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>IPVERSION</strong> is set to IPv4 and <strong>SIGIP1SECSWITCH</strong> or <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>VRFIDX</strong> must be set to 0.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>IPVERSION</strong> is set to IPv6 and <strong>SIGIP2V6</strong> is valid, <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Control-plane SCTP links or IPv6 SCTP links are unavailable, cells are abnormal, and UEs cannot access the network if this parameter is set to DISABLE and no IPSec tunnel has been set up between the SCTP host and the SCTP peer for the SCTP links or IPv6 SCTP links in an IPSec-protected network.</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SigIP1SecHostID.html">SIGIP1SECHOSTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Security Host ID for First Local IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the security host referenced by the first IP address of the SCTP host.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SigIP2v4.html">SIGIP2V4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second Local IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the second local SCTP IPv4 address, which is used by the base station to establish a signaling channel. That is, this address is the second local IPv4 address for automatically establishing an SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0.0.0.0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>SCTPHOST</strong> MO, <strong>SIGIP2V4</strong> must be a valid IP address of Class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x but can be set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>SCTPHOST</strong> MO, <strong>SIGIP2V4</strong> must be different from <strong>SIGIP1V4</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SigIP2v6.html">SIGIP2V6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second Local IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the second local SCTP IPv6 address, which is used by the base station to establish a signaling channel. That is, this address is the second local IPv6 address for automatically establishing an SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0:0:0:0:0:0:0:0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In the <strong>SCTPHOST</strong> MO, <strong>SIGIP2V6</strong> must be set to a globally scoped unicast address or ::.</li><li>[Co-MPT, eNodeB, gNodeB]In the <strong>SCTPHOST</strong> MO, <strong>SIGIP2V6</strong> must be different from <strong>SIGIP1V6</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>IPVERSION</strong> is set to IPv6 and <strong>SIGIP2V6</strong> is valid, <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SigIP2SecSwitch.html">SIGIP2SECSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Auto Configure Switch for Second Local IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to use the second local IP address to automatically set up an IPsec tunnel between the local and peer ends based on the parameter values in the SECURITYHOST and SECURITYPEER MOs. The IPsec tunnel is used to encrypt data to be transmitted on the SCTP link that is set up using the second local IP address of the SCTP host. When the value of this parameter is changed from ENABLE to DISABLE using the <a href="mod_sctphost.html">MOD SCTPHOST</a> command, the system automatically deletes the IPsec tunnel that has been automatically set up.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: If the networking mode does not support IPSec or IPSec tunnels are to be set up by manually configuring IPSec objects, this parameter must be set to DISABLE.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, both the <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> parameters in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>IPVERSION</strong> is set to IPv4 and <strong>SIGIP1SECSWITCH</strong> or <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>VRFIDX</strong> must be set to 0.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>IPVERSION</strong> is set to IPv6 and <strong>SIGIP2V6</strong> is valid, <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Control-plane SCTP links or IPv6 SCTP links are unavailable, cells are abnormal, and UEs cannot access the network if this parameter is set to DISABLE and no IPSec tunnel has been set up between the SCTP host and the SCTP peer for the SCTP links or IPv6 SCTP links in an IPSec-protected network.</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SigIP2SecHostID.html">SIGIP2SECHOSTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Security Host ID for Second Local IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the security host referenced by the second IP address of the SCTP host.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-Port.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local SCTP Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the local SCTP port used in automatic setup of an SCTP link.</p>
+<p>GUI Value Range: 1024~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1024~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SimpleModeSwitch.html">SIMPLEMODESWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Simple Mode Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the simplified mode switch of an SCTP host. When this parameter is set to SIMPLE_MODE_OFF, the SCTP host is not used for simplified configuration. When this parameter is set to S1SIMPLE_MODE_ON, the SCTP host is used for S1 interface simplified configuration. When this parameter is set to X2SIMPLE_MODE_ON, the SCTP host is used for X2 interface simplified configuration. When this parameter is set to EX2SIMPLE_MODE_ON, the SCTP host is used for eX2 interface simplified configuration. The parameter takes effect only in LTE.</p>
+<p>GUI Value Range: SIMPLE_MODE_OFF(Simple Mode Off), S1SIMPLE_MODE_ON(S1 Simple Mode On), X2SIMPLE_MODE_ON(X2 Simple Mode On), EX2SIMPLE_MODE_ON(eX2 Simple Mode On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SIMPLE_MODE_OFF, S1SIMPLE_MODE_ON, X2SIMPLE_MODE_ON, EX2SIMPLE_MODE_ON</p>
+<p>MML Default Value: SIMPLE_MODE_OFF(Simple Mode Off)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-cpEpGroupId1.html">CPEPGROUPID1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First End Point Group ID for Control Plane</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the control-plane end point group ID of the first operator corresponding to an SCTP host. This parameter takes effect only on LTE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>CPEPGROUPID1</strong> and <strong>CPEPGROUPID2</strong> must be different in the <strong>SCTPHOST</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-upEpGroupId1.html">UPEPGROUPID1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First End Point Group ID for User Plane</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-plane end point group ID of the first operator corresponding to an SCTP host. This parameter takes effect only on LTE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-opSharingSwitch.html">OPSHARINGSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator Sharing Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether multiple operators can share an SCTP host. This parameter takes effect only on LTE.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-cpEpGroupId2.html">CPEPGROUPID2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second End Point Group ID for Control Plane</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the control-plane end point group ID of the second operator corresponding to an SCTP host. This parameter takes effect only on LTE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>CPEPGROUPID1</strong> and <strong>CPEPGROUPID2</strong> must be different in the <strong>SCTPHOST</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-upEpGroupId2.html">UPEPGROUPID2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second End Point Group ID for User Plane</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-plane end point group ID of the second operator corresponding to an SCTP host. This parameter takes effect only on LTE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-upEpGroup1Type.html">UPEPGROUP1TYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First End Point Group Type for User Plane</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-plane end point group type of the first operator corresponding to an SCTP host. When this parameter is set to COMMON, the user-plane end point group of the first operator is a common group. When this parameter is set to CENTRALIZED_EX2, the user-plane end point group of the first operator is a dedicated group for the centralized eX2. This parameter takes effect only in LTE.</p>
+<p>GUI Value Range: COMMON(COMMON), CENTRALIZED_EX2(CENTRALIZED_EX2)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: COMMON, CENTRALIZED_EX2</p>
+<p>MML Default Value: COMMON(COMMON)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-SctpTemplateID.html">SCTPTEMPLATEID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SCTP Parameters Template ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the SCTP parameter template referenced by the SCTP link that is automatically set up.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-DtlspolicyID.html">DTLSPOLICYID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DTLS Policy ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the sequence number of a DTLS configuration policy, if this parameter is set to a valid value, the DTLS function is enabled on the SCTP link. Currently, only NR supports the DTLS function. If this function is enabled on other modes, the SCTP link will be faulty.</p>
+<p>GUI Value Range: 0(0), NULL(NULL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0, NULL</p>
+<p>MML Default Value: NULL(NULL)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-DtlsConnPolicy.html">DTLSCONNPOLICY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DTLS Connection Policy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DTLS connection policy. DTLS_ONLY indicates that the local end uses only DTLS connections. If the peer end does not support or is not configured with DTLS, the negotiation fails. DTLS_PRIORITY indicates that the local end attempts to establish a DTLS connection for the first time. If the peer end does not support or is not configured with DTLS, the local end uses the SCTP connection. If this parameter is set to DTLS_PRIORITY, the security is reduced. Therefore, you are advised not to set this parameter to DTLS_PRIORITY. This parameter applies only to NR.</p>
+<p>GUI Value Range: DTLS_ONLY(DTLS Forcible Connection), DTLS_PRIORITY(DTLS Preferential Connection)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DTLS_ONLY, DTLS_PRIORITY</p>
+<p>MML Default Value: DTLS_ONLY(DTLS Forcible Connection)</p>
+<p>Recommended Value: DTLS_ONLY(DTLS Forcible Connection)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-AuthChunkLst.html">SCTPAUTHCHUNKLST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SCTP Authentication Chunk List</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the list of SCTP chunk types for which the local end requires the peer end to support authentication. The IDs of SCTP chunks that can be authenticated by the base station are 0, and 3 to 9. For details, see RFC4895 and RFC4960. Currently, SCTP block authentication is supported only in DTLS over SCTP scenarios. This parameter applies only to NR.</p>
+<p>GUI Value Range: SACK(Selective Acknowledgement), HEARTBEAT(Heartbeat Request), HEARTBEATACK(Heartbeat Acknowledgement), ABORT(Abort), SHUTDOWN(Shutdown), SHUTDOWNACK(Shutdown Acknowledgement), ERROR(Operation Error)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SACK, HEARTBEAT, HEARTBEATACK, ABORT, SHUTDOWN, SHUTDOWNACK, ERROR</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPHOST-UserLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the description of the SCTP host.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_sctphost__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an SCTP host with the parameters as follows: SCTP Host ID: 0, IP Version: IPv4, First Local IP Address: 192.168.1.1, IPSec Auto Configure Switch for First Local IP: DISABLE, Second Local IP Address: 0.0.0.0, IPSec Auto Configure Switch for Second Local IP: DISABLE, Local SCTP Port No.: 1024, Simple Mode Switch: SIMPLE_MODE_OFF, SCTP Parameters Template ID: 0, DTLS Policy ID: NULL, run the following command:
+ADD SCTPHOST: SCTPHOSTID=0, IPVERSION=IPv4, SIGIP1V4="192.168.1.1", SIGIP1SECSWITCH=DISABLE, SIGIP2V4="0.0.0.0", SIGIP2SECSWITCH=DISABLE, PN=1024, SIMPLEMODESWITCH=SIMPLE_MODE_OFF, SCTPTEMPLATEID=0, DTLSPOLICYID=NULL;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

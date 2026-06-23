@@ -1,0 +1,165 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="UeCooperationPara">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="UeCooperationPara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>UeCooperationPara</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="UeCooperationPara"></a><a name="UeCooperationPara"></a>
+
+
+<h1 class="topictitle1">UeCooperationPara</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="UeCooperationPara.html"><strong>UeCooperationPara</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The UeCooperationPara MO consists of cell-level parameters related to UE cooperation. This MO is used to set the switch and parameters related to UE cooperation.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>TimeAlignmentTimer</strong> MO:<ul><li><strong>UEAwarePowerSavingSwitch</strong> in the <strong>UeCooperationPara</strong> can be set to ON(On) when Uplink timing advance command optimization switch in the Time Alignment Timer is set to ON(On).</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>When the UlHCodeSwitch option of the <strong>UdcAlgoSwitch</strong> parameter in a <strong>CellAlgoSwitch</strong> is selected, the SpecUeIdentifySwitch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UeCooperationPara</strong> MO must also be selected.</li><li>When the VoLTEMoPrefSwitch option of the <strong>VoLTESwitch</strong> parameter in a <strong>CellAlgoSwitch</strong> MO is selected, the <strong>VoltePagingPriority</strong> parameter in the <strong>UeCooperationPara</strong> MO can be set to a value other than OFF.</li></ul>
+</li><li>Relation with the <strong>CellWttxParaCfg</strong>, <strong>SpidCfg</strong>, <strong>CellQciPara</strong>, and <strong>CellBf</strong> MOs:<ul><li>The <strong>BfWeightOptDegreeFactor</strong> parameter in the <strong>CellBf</strong> MO must be set to 0 when none of the following conditions are met: The SpecUeIdentifySwitch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UeCooperationPara</strong> MO is selected; when the <strong>WbbOrMbbUserDefMode</strong> parameter in the <strong>CellWttxParaCfg</strong> MO is set to SPID_BASED, the <strong>SpecifiedUserFlag</strong> parameter in a <strong>SpidCfg</strong> MO is set to SPECSERUSER; when the <strong>WbbOrMbbUserDefMode</strong> parameter in the <strong>CellWttxParaCfg</strong> MO is set to QCI_BASED, the <strong>ServiceFlag</strong> parameter in a <strong>CellQciPara</strong> is set to WBB_Service. Otherwise, the value range of the <strong>BfWeightOptDegreeFactor</strong> parameter in the <strong>CellBf</strong> MO is 0 to 255.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>In TDD, the Tm9Port5Switch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UeCooperationPara</strong> MO can be selected only when the SpecUeIdentifySwitch option of the same parameter is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The Tm9Port5Switch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UeCooperationPara</strong> MO can be selected only when all of the following conditions are met: 1. The <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD. 2. The <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R. 3. The TM9Switch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected. 4. The SpecUeIdentifySwitch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UeCooperationPara</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellMMAlgo</strong>, <strong>CellAlgoSwitch</strong>, and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>The MM_ANT_SEL_ENH_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only if the <strong>FddTddInd</strong> and <strong>TxRxMode</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD and 64T64R or 32T32R respectively, the BfSwitch option of the <strong>BfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, and the UeSRSAntSelectCtrlSwitch option of the <strong>CompatibilityCtrlSwitch</strong> parameter in the <strong>ENODEBALGOSWITCH</strong> MO is deselected, the SpecUeIdentifySwitch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UECOOPERATIONPARA</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>The UlClosedloopIntelAntSelSwitch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UeCooperationPara</strong> MO can be selected only if all of the following conditions are met: 1. The <strong>FddTddInd</strong> parameter in the associated <strong>Cell</strong> MO is set to CELL_TDD. 2. The UeSRSAntSelectCtrlSwitch option of the <strong>CompatibilityCtrlSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is deselected. 3. The <strong>TxRxMode</strong> parameter in the associated <strong>Cell</strong> MO is set to 64T64R, 32T32R, 8T8R, or 4T4R. 4. The SpecUeIdentifySwitch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UeCooperationPara</strong> MO is selected.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#UeCooperationPara__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="UeCooperationPara__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="UeCooperationPara__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_uecooperationpara.html">LST UECOOPERATIONPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query cell-level parameters related to UE cooperation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_uecooperationpara.html">MOD UECOOPERATIONPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify cell-level parameters related to UE cooperation.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#UeCooperationPara__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="UeCooperationPara__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="UeCooperationPara__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of a cell, which uniquely identifies a cell within a base station. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-MacCeMsgLCID.html">LCID of MAC CE Message</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the reserved LCID used by a Media Access Control control element (MAC CE) message. An eNodeB converts the specified value of this parameter to an enumerated value and then sends the enumerated value to the UE. The UE converts the received enumerated value back to the specified value of this parameter (that is, the actual reserved LCID). If this parameter is set to 17, 18, or 19, an eNodeB coverts the value to 1, 2, or 3, respectively. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-A2Offset.html">A2 Handover Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the A2 threshold for UEs to request for restoring default DRX parameter settings. This offset is configured for UEs. UEs add this offset to another A2 threshold delivered from the eNodeB and use the sum as the threshold for triggering restoration of default DRX parameter settings. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-A3Offset.html">A3 Handover Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the A3 threshold for UEs to request for restoring default DRX parameter settings. This offset is configured for UEs. UEs add this offset to another A3 threshold delivered from the eNodeB and use the sum as the threshold for triggering restoration of default DRX parameter settings. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-UEAwarePowerSavingSwitch.html">UE Awareness Power Saving Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow UE-triggered power saving. If this parameter is set to ON, functions such as UE-triggered DRX parameter configuration and fast entering into the idle state are supported to save UE power. If this parameter is set to OFF, UE-triggered power saving functions are not supported. This parameter takes effect only on UEs that support UE-triggered power saving functions. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-UEForbiddenMsgThd.html">UE Forbidden Messages Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for disabling power saving coordination for a UE. If the number of MAC CE messages sent by a UE within 10s exceeds this threshold, power saving coordination will be disabled for the current connection of the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-SpecUserCooperationSwitch.html">Specified User Cooperation Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable device-pipe synergy functions for specific UEs and support for high-power UEs.</p>
+<p>SpecUeIdentifySwitch: Indicates whether to identify specific UEs. If this option is selected, specific UEs can be identified in the cell. If this option is deselected, specific UEs cannot be identified in the cell.</p>
+<p>HighPowerUeSupportSwitch: Indicates whether the cell can serve high-power UEs. If this option is selected, the cell can serve high-power UEs. If this option is deselected, the cell cannot serve high-power UEs.</p>
+<p>UlAntennaSmartSelectSwitch: Indicates whether to enable intelligent selection of antennas for the uplink. If this option is selected, intelligent selection of antennas for the uplink is enabled in the cell. If this option is deselected, intelligent selection of antennas for the uplink is disabled in the cell. This option applies only to LTE TDD.</p>
+<p>UlQosEnhancementSwitch: Indicates whether to enable uplink QoS enhancement. If this option is selected, uplink QoS enhancement is enabled in the cell. If this option is deselected, uplink QoS enhancement is disabled in the cell. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UlClosedloopIntelAntSelSwitch: Indicates whether to enable intelligent uplink closed-loop antenna selection. If this option is selected, intelligent uplink closed-loop antenna selection is supported in the cell. If this option is deselected, intelligent uplink closed-loop antenna selection is not supported in the cell. This option applies only to LTE TDD.</p>
+<p>Tm9Port5Switch: Indicates whether to allow the use of port 5 for data transmission in TM9. If this option is selected, antenna port 5 can be allocated for data transmission in TM9. If this option is deselected, antenna port 5 cannot be allocated for data transmission in TM9. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-DsdsCooperationRptSwitch.html">DSDS Cooperation Reporting Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable algorithms of the coordinated control feature for dual-SIM dual-standby (DSDS) single-pass UEs. DSDS_STATUS_RPT_SWITCH: Indicates whether to allow DSDS UEs to timely report information about leaving and returning to the LTE network. If this option is selected, such UEs can report MCEs containing information about leaving and returning to the LTE network. If this option is deselected, such UEs cannot report MCEs containing information about leaving and returning to the LTE network. This option applies to LTE FDD and LTE TDD.</p>
+<p>SCELL_ABNORMAL_RPT_SWITCH: Indicates whether to allow UEs to report abnormal SCCs. If this option is selected, the eNodeB allows UEs to report abnormal SCC status and sends an MCE for SCell deactivation to UEs to synchronize the SCC status between the eNodeB and UEs. If this option is deselected, the eNodeB does not allow UEs to report abnormal SCC status. This option applies to LTE FDD and LTE TDD.</p>
+<p>TA_ABNORMAL_RPT_SWITCH: Indicates whether to allow UEs to report abnormal TAs. If this option is selected, the eNodeB allows UEs to report abnormal TAs and triggers the resynchronization process. If this option is deselected, the eNodeB does not allow UEs to report abnormal TAs. This option applies to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-DsdsLcid.html">DSDS LCID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the LCID in the MAC control element (MCE) for coordinated control of dual-SIM dual-standby (DSDS) single-pass UEs. This parameter cannot be set to the same value as the MacCeMsgLCID parameter in the UeCooperationPara MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-SpecUserSmartDrxSwitch.html">Special User Smart DRX Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the power-saving function for specific UEs capable of device-pipe synergy. When this parameter is set to ON, smart DRX for such UEs is supported, reducing power consumption of these UEs. When this parameter is set to OFF, smart DRX is not supported for these UEs. This function requires support from specific UEs capable of device-pipe synergy. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/UeCooperationPara-VoltePagingPriority.html">VoLTE Paging Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable VoLTE marking in PS paging and the paging priority for VoLTE UEs. If this parameter is set to OFF, PS paging call flag addition is disabled. If this parameter is set to a value other than OFF, PS paging call flag addition is enabled. For the value range, see the definition of the paging priority IE in 3GPP TS 36.413. If PS paging call flag addition is enabled, the eNodeB identifies the paging priority of VoLTE services in S1 paging messages, and uses an extended bit in paging messages sent over the air interface to inform UEs of VoLTE paging. Then, UEs send the mo-VoiceCall-v1280 IE during network access. The eNodeB interprets this IE and handles these services by following the procedure for preferential access of mobile-originated VoLTE services. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

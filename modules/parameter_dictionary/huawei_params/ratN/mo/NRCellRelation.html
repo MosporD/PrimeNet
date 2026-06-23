@@ -1,0 +1,171 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NRCellRelation">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NRCellRelation">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NRCellRelation</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NRCellRelation"></a><a name="NRCellRelation"></a>
+
+
+<h1 class="topictitle1">NRCellRelation</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="NRCell.html">NRCell</a>
+    +-<a href="NRCellRelation.html"><strong>NRCellRelation</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An NRCellRelation MO consists of parameters included in the measurement configuration, which are used in handovers and cell reselections.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NRCell.html">NRCell</a></li><li>Relation with the <strong>MPT</strong> and <strong>NODE</strong> MOs:<ul><li>If the value of <strong>TYPE</strong> in the <strong>MPT</strong> is not UMPT, the <strong>NRCellRelation</strong> cannot be added.</li><li>If <strong>BRDSPEC</strong> in the <strong>MPT</strong> MO is set to UMPTe, the board type is UMPTe. If <strong>BRDSPEC</strong> in the <strong>MPT</strong> MO is set to UMPTga, the board type is UMPTga. Otherwise, the board type is UMPTg.</li><li>When the board type is UMPTg and <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, the number of <strong>NRCellRelation</strong> MO instances must be less than or equal to 72 x 256.</li><li>When the board type is UMPTg and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRCellRelation</strong> MO instances must be less than or equal to 144 x 256.</li><li>When the board type is UMPTga and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRCellRelation</strong> MO instances must be less than or equal to 72 x 256.</li><li>When the board type is UMPTga, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM2, the number of <strong>NRCellRelation</strong> MO instances must be less than or equal to 36 x 256.</li><li>When the board type is UMPTga, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM, the <strong>NRCellRelation</strong> MO instance cannot be added.</li><li>When the board type is UMPTe and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRCellRelation</strong> MO instances must be less than or equal to 72 x 256.</li><li>When the board type is UMPTe and <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM2, the number of <strong>NRCellRelation</strong> MO instances must be less than or equal to 36 x 256.</li><li>When the board type is UMPTe, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM, <strong>NRCellRelation</strong> MO instances cannot be added.</li></ul>
+</li><li>Relation with the <strong>NRCell</strong> MO:<ul><li>The serving cell specified by <strong>NrCellId</strong> in an <strong>NRCellRelation</strong> MO can be configured with a maximum of 384 neighboring cells.</li></ul>
+</li><li>Relation with the <strong>gNBSharingMode</strong>, <strong>gNodeBFunction</strong>, <strong>gNBOperator</strong>, and <strong>NRCell</strong> MOs:<ul><li>If <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to OFF, the CGI of the serving cell specified by <strong>NrCellId</strong> in an <strong>NRCellRelation</strong> MO must not be identical with the CGIs of neighboring cells specified by <strong>CellId</strong> in the <strong>NRCellRelation</strong> MO. The CGI of a neighboring cell consists of the MCC, MNC, gNodeB ID, and cell ID, which are specified by <strong>Mcc</strong>, <strong>Mnc</strong>, <strong>gNBId</strong>, and <strong>CellId</strong>, respectively.</li></ul>
+</li><li>Relation with the <strong>gNodeBFunction</strong>, <strong>gNBOperator</strong>, <strong>NRExternalNCell</strong>, and <strong>gNBSharingMode</strong> MOs:<ul><li>If <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to OFF and the value of <strong>gNBId</strong> in an <strong>NRCellRelation</strong> MO is inconsistent with that of <strong>gNBId</strong> in the <strong>gNodeBFunction</strong> MO, an <strong>NRExternalNCell</strong> MO must be configured first.</li></ul>
+</li><li>Relation with the <strong>gNodeBFunction</strong>, <strong>gNBOperator</strong>, <strong>NRCell</strong>, and <strong>gNBSharingMode</strong> MOs:<ul><li>If <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to OFF and intra-site cells are configured as neighboring cells of each other in the <strong>NRCellRelation</strong> MOs, a neighboring cell specified by <strong>CellId</strong> in the <strong>NRCellRelation</strong> MOs and the serving cell must already be configured. In addition, an <strong>NRCell</strong> MO referenced by <strong>CellId</strong>, <strong>Mcc</strong>, and <strong>Mnc</strong> of the neighboring cell must already be configured.</li></ul>
+</li><li>Relation with the <strong>gNodeBFunction</strong>, <strong>NRDUCell</strong>, <strong>NRCell</strong>, <strong>gNBOperator</strong>, and <strong>gNBSharingMode</strong> MOs:<ul><li>Assume that <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to OFF and two <strong>NRDUCell</strong> MO instances meet the following conditions: (1) The first <strong>NRDUCell</strong> MO instance is associated with <strong>CellId</strong> in an <strong>NRCell</strong> MO, which is referenced by <strong>NrCellId</strong> in an <strong>NRCellRelation</strong> MO. The values of <strong>Mcc</strong> and <strong>Mnc</strong> in this <strong>NRCellRelation</strong> MO are the same as <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>gNBOperator</strong> MO, respectively. <strong>gNBId</strong> in this <strong>NRCellRelation</strong> MO is the same as <strong>gNBId</strong> in the <strong>gNodeBFunction</strong> MO. In addition, <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is set to CELL_FDD or CELL_TDD. (2) The second <strong>NRDUCell</strong> MO instance is associated with <strong>CellId</strong> in the <strong>NRCellRelation</strong> MO, and <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is set to CELL_FDD or CELL_TDD. Based on this assumption, if the values of <strong>PhysicalCellId</strong> and <strong>SsbDescMethod</strong> are equal to their counterparts in the two <strong>NRDUCell</strong> MO instances, the values of <strong>SsbFreqPos</strong> in the two <strong>NRDUCell</strong> MO instances must be different. If the values of <strong>PhysicalCellId</strong> are the same but the values of <strong>SsbDescMethod</strong> are different in the two <strong>NRDUCell</strong> MO instances, the NR-ARFCNs corresponding to <strong>SsbFreqPos</strong> in the two <strong>NRDUCell</strong> MO instances must be different.</li></ul>
+</li><li>Relation with the <strong>NRExternalNCell</strong>, <strong>NRDUCell</strong>, and <strong>NRCell</strong> MOs:<ul><li>The <strong>NRDUCell</strong> and <strong>NRExternalNCell</strong> MO instances meet the following conditions: 1. The <strong>NRDUCell</strong> MO instance is associated with <strong>CellId</strong> in an <strong>NRCell</strong> MO, which is correlated with the <strong>NRCellRelation</strong> MO through <strong>NrCellId</strong>. In addition, <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is set to CELL_FDD or CELL_TDD. 2. The values of <strong>Mcc</strong>, <strong>Mnc</strong>, <strong>gNBId</strong>, and <strong>CellId</strong> in the <strong>NRCellRelation</strong> MO are equal to their counterparts in the <strong>NRExternalNCell</strong> MO. If the value of <strong>PhysicalCellId</strong> in the <strong>NRDUCell</strong> MO is the same as the value of <strong>PhysicalCellId</strong> in the <strong>NRExternalNCell</strong> MO and the value of <strong>SsbDescMethod</strong> in the <strong>NRDUCell</strong> MO is the same as the value of <strong>SsbDescMethod</strong> in the <strong>NRExternalNCell</strong> MO, the value of <strong>SsbFreqPos</strong> in the <strong>NRDUCell</strong> MO must be different from the value of <strong>SsbFreqPos</strong> in the <strong>NRExternalNCell</strong> MO. If the value of <strong>PhysicalCellId</strong> in the <strong>NRDUCell</strong> MO is the same as the value of <strong>PhysicalCellId</strong> in the <strong>NRExternalNCell</strong> MO and the value of <strong>SsbDescMethod</strong> in the <strong>NRDUCell</strong> MO is different from the value of <strong>SsbDescMethod</strong> in the <strong>NRExternalNCell</strong> MO, the NR-ARFCN corresponding to <strong>SsbFreqPos</strong> in the <strong>NRDUCell</strong> MO must be different from the NR-ARFCN corresponding to <strong>SsbFreqPos</strong> in the <strong>NRExternalNCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>gNBSharingMode</strong>, <strong>gNBOperator</strong>, <strong>NRDUCell</strong>, <strong>NRDUCellOp</strong>, and <strong>NRCell</strong> MOs:<ul><li>If <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to ON, the NR CGI of the serving cell (consisting of <strong>Mcc</strong>, <strong>Mnc</strong>, <strong>gNBId</strong>, and <strong>CellId</strong> corresponding to <strong>OperatorId</strong> in the <strong>NRDUCellOp</strong> MO with <strong>CellPrimaryOpFlag</strong> set to TRUE associated with the <strong>NRDUCell</strong> MO corresponding to <strong>NrCellId</strong> in the <strong>NRCellRelation</strong> MO) must not be identical with the CGIs of neighboring cells. The CGI of a neighboring cell consists of the MCC, MNC, gNodeB ID, and cell ID, which are specified by <strong>Mcc</strong>, <strong>Mnc</strong>, <strong>gNBId</strong>, and <strong>CellId</strong>, respectively.</li></ul>
+</li><li>Relation with the <strong>gNBOperator</strong>, <strong>NRExternalNCell</strong>, and <strong>gNBSharingMode</strong> MOs:<ul><li>If <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to ON and the combination of <strong>Mnc</strong>, <strong>Mcc</strong>, and <strong>gNBId</strong> in an <strong>NRCellRelation</strong> MO is inconsistent with the combination of <strong>Mcc</strong>, <strong>Mnc</strong>, and <strong>gNBId</strong> in the <strong>gNBOperator</strong> MO, the combination of <strong>Mnc</strong>, <strong>Mcc</strong>, <strong>gNBId</strong>, and <strong>CellId</strong> in the <strong>NRCellRelation</strong> MO must already be configured in an <strong>NRExternalNCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>gNBOperator</strong>, <strong>NRDUCellOp</strong>, and <strong>gNBSharingMode</strong> MOs:<ul><li>If <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to ON and the combination of <strong>Mcc</strong>, <strong>Mnc</strong>, and <strong>gNBId</strong> in an <strong>NRCellRelation</strong> MO has been configured in a <strong>gNBOperator</strong> MO, the combination of <strong>CellId</strong> and <strong>OperatorId</strong> corresponding to <strong>Mnc</strong> and <strong>Mcc</strong> must already be configured in an <strong>NRDUCellOp</strong> MO with <strong>CellPrimaryOpFlag</strong> set to TRUE.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong>, <strong>NRCell</strong>, <strong>gNBOperator</strong>, <strong>NRDUCellOp</strong>, and <strong>gNBSharingMode</strong> MOs:<ul><li>Assume that <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to ON and two <strong>NRDUCell</strong> MO instances meet the following conditions: (1) The first <strong>NRDUCell</strong> MO instance is associated with <strong>CellId</strong> in an <strong>NRCell</strong> MO, which referenced by <strong>NrCellId</strong> in an <strong>NRCellRelation</strong> MO. The combination of <strong>gNBId</strong>, <strong>Mcc</strong>, and <strong>Mnc</strong> in this <strong>NRCellRelation</strong> MO has been configured in the <strong>gNBOperator</strong>. In addition, <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is set to CELL_FDD or CELL_TDD. (2) The second <strong>NRDUCell</strong> MO instance is associated with <strong>NrDuCellId</strong> in the <strong>NRDUCellOp</strong> MO in which the combination of <strong>OperatorId</strong> and <strong>CellId</strong> corresponding to <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>NRCellRelation</strong> MO has been configured. In addition, <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is set to CELL_FDD or CELL_TDD. Based on this assumption, if the values of <strong>PhysicalCellId</strong> and <strong>SsbDescMethod</strong> are equal to their counterparts in the two <strong>NRDUCell</strong> MO instances, the values of <strong>SsbFreqPos</strong> in the two <strong>NRDUCell</strong> MO instances must be different. If the values of <strong>PhysicalCellId</strong> are the same but the values of <strong>SsbDescMethod</strong> are different in the two <strong>NRDUCell</strong> MO instances, the NR-ARFCNs corresponding to <strong>SsbFreqPos</strong> in the two <strong>NRDUCell</strong> MO instances must be different.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NRCellRelation__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NRCellRelation__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NRCellRelation__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_nrcellrelation.html">ADD NRCELLRELATION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a relationship with an NR cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nrcellrelation.html">LST NRCELLRELATION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list relationships with an NR cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nrcellrelation.html">MOD NRCELLRELATION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify a relationship with an NR cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_nrcellrelation.html">RMV NRCELLRELATION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove relationships with an NR cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NRCellRelation__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NRCellRelation__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NRCellRelation__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-NrCellId.html">NR Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an NR cell, which uniquely identifies the NR cell within a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-Mcc.html">Mobile Country Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MCC of the operator who owns a neighboring NR cell. The MCC, together with the MNC, forms the PLMN. The MCC is a string of three decimal digits, and the MNC is a string of two to three decimal digits.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-Mnc.html">Mobile Network Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MNC of the operator who owns a neighboring NR cell. The MNC, together with the MCC, forms the PLMN. The MCC is a string of three decimal digits, and the MNC is a string of two to three decimal digits.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-gNBId.html">gNodeB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the gNodeB ID of a neighboring NR cell. It uniquely identifies a gNodeB within a PLMN.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-CellId.html">Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell ID of a neighboring NR cell. It uniquely identifies an NR cell within a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-CellIndividualOffset.html">Cell Individual Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell individual offset between an NR DU cell and a neighboring cell. It affects the probability of triggering measurement reports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-BlindScellConfigFlag.html">Blind SCell Configuration Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether a neighboring NR cell can be blindly configured as an SCell. The neighboring NR cell can be configured as an SCell or PSCell in a blind manner only if this parameter is set to TRUE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-NoHoFlag.html">No Handover Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow UE handover based on a neighbor relationship.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-NoRmvFlag.html">No Removal Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether removal of a neighbor relationship by ANR is permitted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-NCellReselOffset.html">Neighboring Cell Reselection Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell reselection offset of an NR cell relative to a neighboring cell. This parameter is used to control the probability of cell reselection. If this parameter is set to a value other than 0 dB, this parameter is delivered in the q-OffsetCell IE of SIB3 and SIB4.</p>
+<p>For details about this parameter, see 3GPP TS 38.304.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellRelation-NCellClassLabel.html">Neighboring Cell Class Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the neighbor relationship is formal or extended.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

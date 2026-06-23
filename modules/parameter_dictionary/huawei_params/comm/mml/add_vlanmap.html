@@ -1,0 +1,266 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Mapping from Next Hop IP to VLAN (ADD VLANMAP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_vlanmap">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Mapping from Next Hop IP to VLAN (ADD VLANMAP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_vlanmap"></a><a name="add_vlanmap"></a>
+
+
+<h1 class="topictitle1">Add Mapping from Next Hop IP to VLAN (ADD VLANMAP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_vlanmap__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an entry of mapping from a next-hop IP address to a single VLAN or VLAN group.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_vlanmap__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Either VLANMAP or SUBNETVLAN can be configured at one time. You need to remove the SUBNETVLAN before adding a VLANMAP.</p>
+</li><li><p>System specifications: If the WMPT/UMPT/UMDU/LMPT/GTMUb/GTMUc is the main control board, a maximum of 48 VLANMAPs can be configured.</p>
+</li><li><p>Board specifications: A maximum of 48 VLANMAPs can be configured on a WMPT/UMPT/UMDU/LMPT/UTRPc/UTRP (subboard type: UEOC/UQEC)/UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. A maximum of 36 VLANMAPs can be configured on a GTMUb/GTMUc.</p>
+</li><li><p>This operation may interrupt the services or OM channels. It is recommended that you determine whether to enable the automatic configuration data rollback function depending on scenarios. For details, see the help of the <a href="cfm_cb.html">CFM CB</a> command.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The execution result of this command takes effect on all Ethernet ports of the BS.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]In a VLANMAP, if the next-hop IP address is set to 224.0.0.0, all IGMP packets of the base station will be mapped to the VLAN. For a base station, only one single VLAN with the next hop IP address set to 224.0.0.0 can be configured. The VRF Index, Mask, and VLAN Mode parameters must be set to 0, 255.255.255.255, and SINGLEVLAN(Single VLAN), respectively.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_vlanmap__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In a <strong>VLANMAP</strong> MO, if <strong>NEXTHOPIP</strong> is set to 224.0.0.0, <strong>VRFIDX</strong> must be set to 0.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-NextHopIP.html">NEXTHOPIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Next Hop IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the next hop IP address used for mapping the VLAN.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In a <strong>VLANMAP</strong> MO, <strong>NEXTHOPIP</strong> must be a valid IP address of class A, B, C, or 224.0.0.0. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[NodeB, eGBTS]In a <strong>VLANMAP</strong> MO, <strong>NEXTHOPIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-Mask.html">MASK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mask</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subnet mask of the next hop IP address used for mapping the VLAN.</p>
+<p>GUI Value Range: Valid subnet mask</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid subnet mask</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255.255.255.255</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]After <strong>MASK</strong> in a <strong>VLANMAP</strong> MO is converted to the binary value, 0 cannot exist before 1. In addition, <strong>MASK</strong> can be 255.255.255.255 and cannot be 0.0.0.0.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>VLANMAP</strong> MO, the logical AND result of <strong>NEXTHOPIP</strong> and <strong>MASK</strong> cannot be 0.</li><li>[Co-MPT, eNodeB, gNodeB]In a <strong>VLANMAP</strong> MO, <strong>NEXTHOPIP</strong> is set to 224.0.0.0, <strong>MASK</strong> must be set to 255.255.255.255.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-VLANMode.html">VLANMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VLAN mode. When this parameter is set to SINGLEVLAN, the configured VLAN ID and VLAN priority can be directly used to label the VLAN tag.</p>
+<p>If this parameter is set to VLANGROUP, the next hop IP addresses are mapped to the VLAN groups, and then mapped to the VLAN tags in the VLAN groups according to the DSCPs of the IP packets. In VLAN group mode, ensure that the VLAN groups have been configured by running the <a href="add_vlanclass.html">ADD VLANCLASS</a> command. Otherwise, the configuration does not take effect.</p>
+<p>GUI Value Range: SINGLEVLAN(Single VLAN), VLANGROUP(VLAN Group)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLEVLAN, VLANGROUP</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In a <strong>VLANMAP</strong> MO, <strong>NEXTHOPIP</strong> is set to 224.0.0.0, <strong>VLANMODE</strong> must be set to SINGLEVLAN.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter must be set to a valid value when the <strong>VLANMAP</strong> MO is being modified.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-VLANID.html">VLANID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VLAN ID in the VLAN tag.</p>
+<p>GUI Value Range: 1~4094</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4094</p>
+<p>MML Default Value: 1</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-SetPrio.html">SETPRIO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Set VLAN Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to set a priority for a single VLAN. When this parameter is set to ENABLE, the VLAN priority is configured by running the ADD VLANMAP or MOD VLANMAP command. When this parameter is set to DISABLE, the VLAN priority is determined according to the mappings between DSCPs and VLAN priorities. When Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, the mappings can be configured using the <a href="set_dscpmap.html">SET DSCPMAP</a> command. When Transmission Configuration Mode in the GTRANSPARA MO is set to NEW, the mappings are configured using the DSCP2PCPMAP MO with DSCP-to-PCP Mapping ID being 0.</p>
+<p>The default mappings between DSCPs and VLAN priorities are as follows:</p>
+<p>If the DSCP ranges from 0 to 7, the default priority is 0.</p>
+<p>If the DSCP ranges from 8 to 15, the default priority is 1.</p>
+<p>If the DSCP ranges from 16 to 23, the default priority is 2.</p>
+<p>If the DSCP ranges from 24 to 31, the default priority is 3.</p>
+<p>If the DSCP ranges from 32 to 39, the default priority is 4.</p>
+<p>If the DSCP ranges from 40 to 47, the default priority is 5.</p>
+<p>If the DSCP ranges from 48 to 55, the default priority is 6.</p>
+<p>If the DSCP ranges from 56 to 63, the default priority is 7.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ENABLE(Enable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-VLANPri.html">VLANPRIO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VLAN priority.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter must be set to a valid value when the <strong>VLANMAP</strong> MO is being modified and <strong>SETPRIO</strong> is changed from DISABLE to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates a lower priority of data transmission and affects the QoS.</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-VLANGroupNo.html">VLANGROUPNO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN Group No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VLAN group number.</p>
+<p>GUI Value Range: 0~3</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~3</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter must be set to a valid value if the value of <strong>VLANMODE</strong> is changed from SINGLEVLAN to VLANGROUP during the modification of the <strong>VLANMAP</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANMAP-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether forcible changes of VLANMAP configurations are made. When this parameter is set to NO(No), forcible changes of VLANMAP configurations affecting upper-layer objects are not allowed. When this parameter is set to YES(Yes), forcible changes of VLANMAP configurations are made.This parameter is invalid when a WMPT, LMPT, GTMUb, or GTMUc serves as the main control board.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_vlanmap__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To add a next hop VLAN mapping with the parameters as follows: Next Hop IP: 192.168.1.24, Mask: 255.255.255.0, VLAN Mode: SINGLEVLAN, VLAN ID: 1024, Set VLAN Priority: ENABLE, VLAN Priority: 0, run the following command:
+ADD VLANMAP: NEXTHOPIP="192.168.1.24", MASK="255.255.255.0", VLANMODE=SINGLEVLAN, VLANID=1024, SETPRIO=ENABLE, VLANPRIO=0;
+Example 2: To add a next hop VLAN mapping with the parameters as follows: Next Hop IP: 10.52.21.89, Mask: 255.255.255.0, VLAN Mode: VLANGROUP, VLAN Group No.: 0, run the following command:
+ADD VLANMAP: NEXTHOPIP="10.52.21.89", MASK="255.255.255.0", VLANMODE=VLANGROUP, VLANGROUPNO=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

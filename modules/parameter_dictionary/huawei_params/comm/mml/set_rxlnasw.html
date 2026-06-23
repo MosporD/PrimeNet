@@ -1,0 +1,188 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set LNA Switch of RX Channel (SET RXLNASW)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_rxlnasw">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set LNA Switch of RX Channel (SET RXLNASW)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_rxlnasw"></a><a name="set_rxlnasw"></a>
+
+
+<h1 class="topictitle1">Set LNA Switch of RX Channel (SET RXLNASW)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_rxlnasw__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of the switch and shutdown duration of the low noise amplifier (LNA) for the RRU receive channel.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_rxlnasw__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>When the LNA switch for a specified receive channel is turned off, the performance of corresponding cells is affected in terms of the throughput, access success rate, and call drop rate.</p>
+</li><li><p>Do not remove any carrier of LTE TDD mode from an RRU receive channel for which the LNA switch is turned off.</p>
+</li><li><p>If the LNA switch for an RRU receive channel is turned off, it will be turned on after a cell served by the RRU is reestablished.</p>
+</li><li><p>Before turning off the LNA switch for an RRU receive channel in a base station working in TD-SCDMA and LTE TDD mode, block all the carriers on the channel.</p>
+</li><li><p>For an RRU on which one LNA switch controls two receive channels, the settings of one LNA switch take effect on both receive channels. RRUs on which one LNA switch controls two receive channels include: RRU3158-fa, RRU3158e-fa, RRU3168-fa DTC, RRU3168e-fa, RRU3253, RRU3257, RRU3657, RRU3757, RRU3259, AAU3240, and AAU5242.</p>
+</li><li><p>The LNA switches for receive channels of one RRU can only be turned off one by one.</p>
+</li><li><p>When a receive channel is not carrying any services, the LNA switch for this receive channel is turned off by default and cannot be turned on. After an RRU is reset, the LNA switches for receive channels are automatically reset based on service conditions.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_rxlnasw__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RxBranch-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the RRU or RFU where the RX channel is located.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RxBranch-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the RRU or RFU where the RX channel is located.</p>
+<p>GUI Value Range: 60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>CN</strong> and <strong>SRN</strong> in the <strong>RXBRANCH</strong> must meet the following conditions: 1. When <strong>CN</strong> is set to 0~15, <strong>SRN</strong> must be set to 4~5 or 60~254; 2. When <strong>CN</strong> is set to 16~62, <strong>SRN</strong> must be set to 4~5.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RxBranch-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the RRU or RFU where the RX channel is located.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>SRN</strong> and <strong>SN</strong> in the <strong>RXBRANCH</strong> must meet the following conditions: 1. When <strong>SRN</strong> is set to 4~5 and <strong>TYPE</strong> in the <strong>CABINET</strong> is equal to BTS3900AL, <strong>SN</strong> must be set to 0~8; 2. When <strong>SRN</strong> is set to 4~5 and <strong>TYPE</strong> in the <strong>CABINET</strong> is not equal to BTS3900AL, <strong>SN</strong> must be set to 0~5; 3. When <strong>SRN</strong> is set to 60~254, <strong>SN</strong> must be set to 0; 4. When the value of <strong>SRN</strong> in an <strong>RXBRANCH</strong> MO ranges from 60 to 254 and <strong>RT</strong> in the <strong>RRU</strong> MO is set to MPRF, the value of <strong>SN</strong> in the <strong>RXBRANCH</strong> MO ranges from 1 to 3; 4. When the value of <strong>SRN</strong> in an <strong>RXBRANCH</strong> MO is set to 60 and <strong>RT</strong> in the <strong>RRU</strong> MO is not set to MPRF, <strong>SN</strong> in the <strong>RXBRANCH</strong> MO ranges from 0 to 5; 5. When the value of <strong>SRN</strong> in an <strong>RXBRANCH</strong> MO ranges from 61 to 254 and <strong>RT</strong> in the <strong>RRU</strong> MO is not set to MPRF, <strong>SN</strong> in the <strong>RXBRANCH</strong> MO must be set to 0.</li><li>[eGBTS]<strong>SRN</strong> and <strong>SN</strong> in the <strong>RXBRANCH</strong> must meet the following conditions: 1. When <strong>SRN</strong> is set to 4~5 and <strong>TYPE</strong> in the <strong>CABINET</strong> is equal to BTS3900AL, <strong>SN</strong> must be set to 0~8; 2. When <strong>SRN</strong> is set to 4~5 and <strong>TYPE</strong> in the <strong>CABINET</strong> is not equal to BTS3900AL, <strong>SN</strong> must be set to 0~5; 4. When <strong>SRN</strong> is set to 60, <strong>SN</strong> must be set to 0~5; 4. When <strong>SRN</strong> is set to 61~254, <strong>SN</strong> must be set to 0.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RxBranch-RxNo.html">RXNO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RX Channel No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the RX channel of the RRU or RFU.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RxBranch-RxLNASw.html">RXLNASW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LNA Switch of RX Channel</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the low noise amplifier (LNA) switch for the RRU receive channel. If this parameter is set to ON, the switch is turned on. If this parameter is set to OFF, the switch is turned off. NULL indicates that the query fails or the board does not support the query.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L-TDD, R, N-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RxBranch-Duration.html">DURATION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Receive Channel LNA Shutdown Duration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration in which the low noise amplifier (LNA) of the RRU receive channel is shut down. This parameter applies only when RXLNASW is set to OFF.</p>
+<p>GUI Value Range: 10~30</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 10~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L-TDD, R, N-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_rxlnasw__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of the switch and shutdown duration of the low noise amplifier (LNA) for the RRU receive channel, the parameters as follows: Cabinet No.: 0, Subrack No.: 60, Slot No.: 0, RX Channel No.: 0, LNA Switch of RX Channel:OFF, and Receive Channel LNA Shutdown Duration:10, run the following command: 
+SET RXLNASW: CN=0, SRN=60, SN=0, RXNO=0, RXLNASW=OFF, DURATION=10;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,734 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add IP Clock Link (ADD IPCLKLINK)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ipclklink">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add IP Clock Link (ADD IPCLKLINK)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ipclklink"></a><a name="add_ipclklink"></a>
+
+
+<h1 class="topictitle1">Add IP Clock Link (ADD IPCLKLINK)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_ipclklink__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an IP clock link. For a HW_DEFINED IP clock link or OC_SLAVE IP clock link compliant with IEEE 1588 V2, if the NE can properly obtain synchronization signals from the IP clock server, this link becomes available. For the OC_MASTER link, if the NE is configured with an external reference clock source for supplying reference clock signals, the external reference clock source is locked, and the clock link is set up, the NE can provide clock signals for lower-level NEs.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ipclklink__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>The system supports a maximum of three IP clock links, and all the links must be compliant with the same type of protocol.</p>
+</li><li><p>After an IP clock link is added, the IP clock is only an optional reference clock source for the system.</p>
+</li><li><p>The client IP address must be configured on the same board as the physical link transmitting IP clock signals.</p>
+</li><li><p>In non-hybrid clock synchronization mode, if two OC_SLAVE clock links comply with the IEEE 1588v2 protocol, Cabinet No., Subrack No., Slot No., Clock Net Mode, Profile Type, Compensation, Delay Type, Automatic Compensation Switch, and Priority must be set to the same values for these two links.</p>
+</li><li><p>Any transmission network faults may lead to failures in executing this command.</p>
+</li><li><p>When an OC_SLAVE clock link compliant with IEEE 1588 V2 uses the G.8265.1, 1588V2_16.1 or G.8275.2 protocol, the server needs to support the packet sending frequency requested by the NE so that the server can send synchronization packets at the requested frequency.</p>
+</li><li><p>For a 1588 OC_SLAVE link, if layer 3 multicast networking is used for 1588, Port Type in the DEVIP MO or in the INTERFACE MO associated with the IPCLKLNK MO of the client cannot be set to LOOPINT.</p>
+</li><li><p>The parameters for an IPv6 clock link can be configured only when IPv6 transmission is configured.</p>
+</li><li><p>The OC_SLAVE IP clock link compliant with IEEE 1588 V2 is valid only configured in the default routing domain.</p>
+</li><li><p>For an OC_SLAVE IP clock link compliant with IEEE 1588 V2, when the Profile Type parameter is set to IEEE1588V2_16.1, the value of the Announce Freq parameter is 1/16(1/16), 1/8(1/8), 1/4(1/4), 1/2(1/2), 1.0(1.0), 2.0(2.0), 4.0(4.0), or 8.0(8.0). The value 1/16(1/16) is not recommended in the protocol and can take effect only when the clock server supports this configuration.</p>
+</li><li><p>For an OC_SLAVE IP clock link compliant with IEEE 1588 V2, when the Profile Type parameter is set to IEEE1588V2_16.1, the value range of the Negotiate Duration parameter is 60 to 1000, which is smaller than the range recommended in the protocol (10 to 1000).</p>
+</li><li><p>If time synchronization is used, adding an IEEE 1588 V2 clock link to a UTRPc port interrupts all the services carried on the port for about 3s.</p>
+</li><li><p>The priority is invalid for the OC_MASTER IP clock link compliant with IEEE 1588 V2.</p>
+</li><li><p>The OC_MASTER clock link compliant with 1588 protocols is valid only if a UCCU, UBBPe, LCOP, UBBPf, UBBPg, UBBPfw1 or UBBPfw2 is configured.</p>
+</li><li><p>The method of adding routes varies according to the setting of Transmission Configuration Mode in the GTRANSPARA MO if the following conditions are met: A link is compliant with the Huawei proprietary protocol, or a 1588 OC_SLAVE link complies with IPv4 and is configured in unicast networking; the client IPv4 address and the server IPv4 address are located in different network segments. The method of adding routes varies as follows: When Transmission Configuration Mode is set to OLD, routes are added through the <a href="add_iprt.html">ADD IPRT</a> command. When Transmission Configuration Mode is set to NEW, routes are added through the <a href="add_iproute4.html">ADD IPROUTE4</a> command.</p>
+</li><li><p>If a 1588 OC_SLAVE link complies with IPv6 and is configured in unicast networking and the client IPv6 address and the server IPv6 address are located in different network segments, you need to run the <a href="add_iproute6.html">ADD IPROUTE6</a> command to add a route.</p>
+</li><li><p>If a board is configured with two IP clock links which comply with the Huawei proprietary protocol, the client IPv4 addresses must be the same.</p>
+</li><li><p>An IP clock reference source needs to be configured for only one RAT on a board.</p>
+</li><li><p>If Profile Type is set to G.8275.2(G.8275.2), Delay Freq must be set to the same value for the two links.</p>
+</li><li><p>If CLKSYNCMODE is set to HYBRID, IPSYNCMODE cannot be simultaneously set to TIME for both IP clock links.</p>
+</li><li><p>In hybrid clock synchronization mode, the following conditions must be met for two IP clock links: 1. Delay Type must be set to the same value for these IP clock links. 2. Device Type must be set to OC_SLAVE. 3. Protocol Type must be set to PTP. 4. Clock Net Mode must be set to UNICAST.</p>
+</li><li><p>Domain of two IPCLKLINK MOs can be different only when Clock Synchronization Mode in the TASM MO is set to HYBRID, or when Clock Synchronization Mode in the TASM MO is set to FREQ, and Clock Net Mode is set to UNICAST and Profile Type is set to 1588V2_16.1 for the two IPCLKLINK MOs.</p>
+</li><li><p>[NodeB,eNodeB,gNodeB]The setting of the domain to which the OC_SLAVE IP clock link in compliance with IEEE 1588 V2 belongs must be the same as the setting of the clock server.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]When Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, the port IP address must be added through the <a href="add_devip.html">ADD DEVIP</a> command before an IPv4 clock link is added. If the IPv4 clock link is compliant with the Huawei proprietary protocol, the value of Port Type in the DEVIP MO must be ETH, ETHTRK, or SUBIF. If the IP clock link is compliant with 1588, the value of Port Type in the DEVIP MO must be ETH, LOOPINT, ETHTRK, or SUBIF. When Transmission Configuration Mode in the GTRANSPARA MO is set to NEW, the port IP address must be added through the <a href="add_ipaddr4.html">ADD IPADDR4</a> command before an IPv4 clock link is added. If the IPv4 clock link is compliant with the Huawei proprietary protocol, the value of Port Type in the INTERFACE MO associated with the IPADDR4 MO must be ETH or ETHTRK. If the IP clock link is compliant with 1588, the value of Port Type in the INTERFACE MO must be ETH, LOOPINT, or ETHTRK.</p>
+<p>When Transmission Configuration Mode in the GTRANSPARA MO is set to NEW, the port IP address must be configured through the <a href="add_interface.html">ADD INTERFACE</a> and <a href="add_ipaddr6.html">ADD IPADDR6</a> commands before an IPv6 clock link is added.</p>
+</li><li><p>[NodeB,eGBTS]When Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, the port IP address must be added through the <a href="add_devip.html">ADD DEVIP</a> command before an IPv4 clock link is added. If the IPv4 clock link is compliant with the Huawei proprietary protocol, the value of Port Type in the DEVIP MO must be ETH, ETHTRK, or SUBIF. If the IP clock link is compliant with 1588, the value of Port Type in the DEVIP MO must be ETH, LOOPINT, ETHTRK, or SUBIF. When Transmission Configuration Mode in the GTRANSPARA MO is set to NEW, the port IP address must be added through the <a href="add_ipaddr4.html">ADD IPADDR4</a> command before an IPv4 clock link is added. If the IPv4 clock link is compliant with the Huawei proprietary protocol, the value of Port Type in the INTERFACE MO associated with the IPADDR4 MO must be ETH or ETHTRK. If the IP clock link is compliant with 1588, the value of Port Type in the INTERFACE MO must be ETH, LOOPINT, or ETHTRK.</p>
+</li><li><p>[eNodeB,gNodeB]If the configured IP clock protocol type is inconsistent with the actual one, the configuration takes effect only after the NE is reset.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ipclklink__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-IpClkNo.html">LN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Link No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the IP clock link.</p>
+<p>GUI Value Range: 0~2</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~2</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, when the value of <strong>DEVTYPE</strong> is set to OC_SLAVE, the value of <strong>LN</strong> must be 0 or 1. When the value of <strong>DEVTYPE</strong> is set to OC_MASTER, the value of <strong>LN</strong> must be 2.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Type.html">ICPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Protocol Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the IP clock protocol, which can be PTP or Huawei proprietary protocol. PTP includes IEEE1588 V2, G.8265.1, 1588V2_16.1, G.8275.1 and G.8275.2. IEEE1588 V2, defined by the IEEE, supports both time synchronization and frequency synchronization. G.8265.1 supports frequency synchronization only. 1588 V2_16.1 supports both time synchronization and frequency synchronization. G.8275.1 supports time synchronization only. G.8275.2 supports time synchronization only. Huawei proprietary protocol, which is the Huawei-defined IP clock protocol, applies to the interconnection between Huawei equipment and supports frequency synchronization only.</p>
+<p>GUI Value Range: HW_DEFINED(HW Defined), PTP(PTP)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: HW_DEFINED, PTP</p>
+<p>MML Default Value: PTP(PTP)</p>
+<p>Recommended Value: PTP(PTP)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD and <strong>PT</strong> in the <strong>DEVIP</strong> MO corresponding to an <strong>IPCLKLNK</strong> MO is set to LOOPINT, <strong>ICPT</strong> in the <strong>IPCLKLNK</strong> MO cannot be set to HW_DEFINED.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If more than two <strong>IPCLKLNK</strong> MOs have been configured, the two MOs must have the same <strong>ICPT</strong> value.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-DevType.html">DEVTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Device Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the device type of the IP clock. The value of this parameter can be OC_SLAVE or OC_MASTER. In OC_SLAVE mode, the NE serves as the clock equipment that is synchronized with the upstream clock. In OC_MASTER mode, the NE works as a master clock device to provide IP clock signals, and you need to configure an external reference clock source for supplying reference clock signals.</p>
+<p>GUI Value Range: OC_SLAVE(OC_SLAVE), OC_MASTER(OC_MASTER)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OC_SLAVE, OC_MASTER</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the IP clock link is configured.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the IP clock link is configured.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where the IP clock link is configured.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-NetworkType.html">CNM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Clock Net Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the networking type for the IP clock. The LTE and NR currently do not support L3 Multicast function.</p>
+<p>GUI Value Range: UNICAST(Unicast), L3_MULTICAST(L3 Multicast), L2_MULTICAST(L2 Multicast)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNICAST, L3_MULTICAST, L2_MULTICAST</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-IPMode.html">IPMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode of the IP address.</p>
+<p>GUI Value Range: IPV4(IPv4), IPV6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPV4, IPV6</p>
+<p>MML Default Value: IPV4(IPv4)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If two <strong>IPCLKLNK</strong> MOs which <strong>DEVTYPE</strong> are both set to OC_SLAVE are configured, the two MOs must have the same <strong>IPMODE</strong> value.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IPMODE</strong> in the <strong>IPCLKLNK</strong> MO is set to IPV6, <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO must be set to FREQ.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-ClientIP.html">CIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Client IPv4</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the client IPv4 address of the IP clock link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs which <strong>DEVTYPE</strong> are both set to OC_SLAVE are configured, the values of <strong>CIP</strong> in the two MOs must be the same when the following conditions are met: 1. <strong>ICPT</strong> is set to PTP and <strong>CNM</strong> is not set to L2_MULTICAST in the two MOs; 2. <strong>IPMODE</strong> is set to IPV4 in the two MOs.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, if <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV4, <strong>CIP</strong> cannot be set to 0.0.0.0, 255.255.255.255, 127.x.x.x, or 0.x.x.x, and should be one of CLASS A, CLASS B, CLASS C.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>SIP</strong> and <strong>CIP</strong> must be set to different values when <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV4.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>CIP</strong> is valid only when <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV4.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-ServerIP.html">SIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Server IPv4</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the server IPv4 address of the IP clock link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPCLKLNK</strong> MO, <strong>SIP</strong> cannot be set to 0.0.0.0, 255.255.255.255, 127.x.x.x, or 0.x.x.x, and should be one of CLASS A, CLASS B, CLASS C, when the following conditions are met: 1. <strong>CNM</strong> is not set to L2_MULTICAST; 2. <strong>IPMODE</strong> is set to IPV4.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED are configured on the same board, the values of <strong>SIP</strong> in the two MOs must be different when the following conditions are met: 1. <strong>ICPT</strong> is set to PTP and <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV4 in the two MOs; 2. <strong>ICPT</strong> is set to HW_DEFINED in the two MOs.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>SIP</strong> and <strong>CIP</strong> must be set to different values when <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV4.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>SIP</strong> is valid only when <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV4.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-ClientIPV6.html">CIPV6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Client IPv6</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the client IPv6 address of the IP clock link. The UMTS currently does not support this function.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>SIPV6</strong> and <strong>CIPV6</strong> must be set to different values when <strong>ICPT</strong> is set to PTP and <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV6.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs which <strong>DEVTYPE</strong> are both set to OC_SLAVE are configured, the values of <strong>CIPV6</strong> in the two MOs must be the same when the following conditions are met: 1. <strong>ICPT</strong> is set to PTP and <strong>CNM</strong> is not set to L2_MULTICAST in the two MOs; 2. <strong>IPMODE</strong> is set to IPV6 in the two MOs.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>CIPV6</strong> is valid only when <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-ServerIPV6.html">SIPV6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Server IPv6</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the server IPv6 address of the IP clock link. The UMTS currently does not support this function.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>SIPV6</strong> and <strong>CIPV6</strong> must be set to different values when <strong>ICPT</strong> is set to PTP and <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV6.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs which <strong>DEVTYPE</strong> are both set to OC_SLAVE are configured on the same board, the values of <strong>SIPV6</strong> in the two MOs must be different when the following conditions are met: 1. <strong>ICPT</strong> is set to PTP and <strong>CNM</strong> is not set to L2_MULTICAST; 2. <strong>IPMODE</strong> is set to IPV6 in the two MOs.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>SIPV6</strong> is valid only when <strong>CNM</strong> is not set to L2_MULTICAST and <strong>IPMODE</strong> is set to IPV6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Domain.html">DM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Domain</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the domain to which the IP clock link belongs. The setting of this parameter must be the same as the setting of the clock server.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, when <strong>PROFILETYPE</strong> is set to G.8275.1, the value of <strong>DM</strong> must range from 24 to 43.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-AutoCmpStSw.html">AUTOCMPSTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Phase Deviation Report Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the base station reports information required for automatic compensation for IP clock link asymmetry to the transmission equipment. The bearer network automatically performs the compensation. If this parameter is set to ON, the base station reports the following information to the transmission equipment: phase offset of the 1588 clock relative to the GPS, whether the base station has the GPS, whether the GPS is available, and protocol-defined information such as the 1588 Clock ID. If this parameter is set to OFF, the base station does not report such information.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Compensation.html">CMPST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Compensation</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the compensation for asymmetry of IP clock links.</p>
+<p>GUI Value Range: -1000000~1000000</p>
+<p>Unit: ns</p>
+<p>Actual Value Range: -1000000~1000000</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>ICPT</strong> in the <strong>IPCLKLNK</strong> MO is set to HW_DEFINED, <strong>CMPST</strong> and <strong>DELAYTYPE</strong> in the <strong>IPCLKLNK</strong> MO cannot be configured.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-IpClkDelayType.html">DELAYTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Delay Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the compensation mechanism for the transmission delay between the clock server and the NE. The E2E mode uses the Delay-Request-Response mechanism to measure the average delay between the primary and secondary devices. The P2P mode uses the Peer-Delay mechanism to measure the average delay between two devices.</p>
+<p>GUI Value Range: E2E(E2E), P2P(P2P)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E2E, P2P</p>
+<p>MML Default Value: E2E(E2E)</p>
+<p>Recommended Value: E2E(E2E)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, when <strong>PROFILETYPE</strong> is set to G.8275.1, <strong>DELAYTYPE</strong> must be set to E2E.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>ICPT</strong> in the <strong>IPCLKLNK</strong> MO is set to HW_DEFINED, <strong>CMPST</strong> and <strong>DELAYTYPE</strong> in the <strong>IPCLKLNK</strong> MO cannot be configured.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Priority.html">PRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of the clock source. The value 1 indicates that the current clock source has the highest priority, and the value 4 indicates that the current clock source has the lowest priority.</p>
+<p>GUI Value Range: 1~4</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4</p>
+<p>MML Default Value: 4</p>
+<p>Recommended Value: 4</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs are configured, the values of <strong>PRI</strong> must be the same if the values of <strong>ICPT</strong> are both set to PTP and <strong>DEVTYPE</strong> are both set to OC_SLAVE in the two MOs.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-MacMode.html">MACMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Clock Source Specified or Not</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the clock source is specified.</p>
+<p>GUI Value Range: NO(NO), YES(YES)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(NO)</p>
+<p>Recommended Value: NO(NO)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs which <strong>DEVTYPE</strong> are both set to OC_SLAVE are configured, the values of <strong>MACMODE</strong> are both set to YES and the values of <strong>CLKMAC</strong> must be different in the two MOs when the following conditions are met: 1. The values of <strong>ICPT</strong> are both set to PTP; 2. The values of <strong>CNM</strong> are both set to L2_MULTICAST.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, the <strong>MACMODE</strong> is valid only when <strong>ICPT</strong> is set to PTP and <strong>CNM</strong> is set to L2_MULTICAST.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-ClkMac.html">CLKMAC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Clock Source MAC Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MAC address of the clock source for the IP clock server. The MAC address must be in the format of XXXX-XXXX-XXXX.</p>
+<p>GUI Value Range: 14 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 14 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs which <strong>DEVTYPE</strong> are both set to OC_SLAVE are configured, the values of <strong>MACMODE</strong> are both set to YES and the values of <strong>CLKMAC</strong> must be different in the two MOs when the following conditions are met: 1. The values of <strong>ICPT</strong> are both set to PTP; 2. The values of <strong>CNM</strong> are both set to L2_MULTICAST.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, the <strong>CLKMAC</strong> is valid only when <strong>ICPT</strong> is set to PTP, <strong>CNM</strong> is set to L2_MULTICAST, and <strong>MACMODE</strong> is set to YES.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-ProfileType.html">PROFILETYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Profile Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of protocol supported by the IEEE 1588 V2-compliant IP clock link, which can be ITU-T G.8265.1, IEEE 1588 V2, IEEE1588V2_16.1, ITU-T G.8275.1 or ITU-T G.8275.2. ITU-T G.8265.1 is defined by the International Telecommunication Union (ITU) for frequency synchronization of an IEEE 1588 V2-compliant IP clock link with the networking type of UNICAST. An IP clock link in compliant with ITU-T G.8265.1 supports interconnection with servers from other vendors. An IP clock link in compliant with IEEE 1588 V2 supports interconnection with clock service devices from other vendors only in L2 or L3 multicast networking. IEEE1588V2_16.1 can also be used for interconnection with clock service devices from other vendors when the other vendors do not support ITU-T G.8265.1.The content of IEEE1588V2_16.1 refer to the optional section 16.1 of IEEE1588V2 protocol. ITU-T G.8275.1 is defined by the International Telecommunication Union (ITU) for time synchronization of an IEEE 1588 V2-compliant IP clock link with the networking type of L2 multicast. An IP clock link in compliant with ITU-T G.8275.1 supports interconnection with clock service devices from other vendors. ITU-T G.8275.2 is defined by the International Telecommunication Union (ITU) for time synchronization of an IEEE 1588 V2-compliant IP clock link with the networking type of L3 unicast. An IP clock link in compliant with ITU-T G.8275.2 supports interconnection with clock service devices from other vendors.</p>
+<p>GUI Value Range: 1588V2(1588V2), G.8265.1(G.8265.1), 1588V2_16.1(1588V2_16.1), G.8275.2(G.8275.2), G.8275.1(G.8275.1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1588V2, G.8265.1, 1588V2_16.1, G.8275.2, G.8275.1</p>
+<p>MML Default Value: 1588V2(1588V2)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PROFILETYPE</strong> in the <strong>IPCLKLNK</strong> MO is set to G.8265.1, <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO must be set to FREQ or HYBRID.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PROFILETYPE</strong> in the <strong>IPCLKLNK</strong> MO is set to G.8275.1, <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO must be set to TIME.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, when <strong>CNM</strong> is set to L2_MULTICAST, <strong>PROFILETYPE</strong> must be set to 1588V2 or G.8275.1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PROFILETYPE</strong> is set to G.8275.2, <strong>DELAYTYPE</strong> in the MO must be set to E2E, <strong>CNM</strong> must be set to UNICAST, and the value of <strong>DM</strong> must be between 43 and 64.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>PROFILETYPE</strong> is valid only when <strong>CNM</strong> is set to UNICAST or L2_MULTICAST.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-AnnounceFreq.html">ANNFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Announce Freq</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency at which the clock source sends announcement packets based on its negotiation with the NE.</p>
+<p>GUI Value Range: 1/16(1/16), 1/8(1/8), 1/4(1/4), 1/2(1/2), 1.0(1.0), 2.0(2.0), 4.0(4.0), 8.0(8.0)</p>
+<p>Unit: Hz</p>
+<p>Actual Value Range: 1/16, 1/8, 1/4, 1/2, 1.0, 2.0, 4.0, 8.0</p>
+<p>MML Default Value: 1/2(1/2)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>ANNFREQ</strong> is valid only when <strong>CNM</strong> is set to UNICAST and <strong>PROFILETYPE</strong> is set to G.8265.1, 1588V2_16.1 or G.8275.2.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-MasterPriority.html">MASTERPRIO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Master Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of the IP clock server. The value 0 indicates the highest priority, and the value 255 indicates the lowest priority. If two IP clock servers are required, the value of this parameter is used to identify the active and standby IP clock servers. The IP clock server with a higher priority serves as the active server and the IP clock server with a lower priority serves as the standby server.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: 255</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>MASTERPRIO</strong> is valid only when <strong>CNM</strong> is set to UNICAST and <strong>PROFILETYPE</strong> is set to G.8265.1.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-SyncFreq.html">SYNCFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sync Freq</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency at which the clock source sends synchronization packets based on its negotiation with the NE.</p>
+<p>GUI Value Range: 1/2(1/2), 1.0(1.0), 2.0(2.0), 4.0(4.0), 8.0(8.0), 16.0(16.0), 32.0(32.0), 64.0(64.0), 128.0(128.0)</p>
+<p>Unit: Hz</p>
+<p>Actual Value Range: 1/2, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>SYNCFREQ</strong> is valid only when <strong>CNM</strong> is set to UNICAST and <strong>PROFILETYPE</strong> is set to G.8265.1, 1588V2_16.1 or G.8275.2.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Duration.html">NEGDURATION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Negotiate Duration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval at which negotiations are performed between the NE and IP clock server. After the interval elapses, the NE initiates another negotiation with the IP clock server.</p>
+<p>GUI Value Range: 60~1000</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 60~1000</p>
+<p>MML Default Value: 300</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, <strong>NEGDURATION</strong> is valid only when <strong>CNM</strong> is set to UNICAST and <strong>PROFILETYPE</strong> is set to G.8265.1, 1588V2_16.1 or G.8275.2.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-PreHopIPv4.html">PREHOPIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Pre-Hop IPv4</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the pre-hop IPv4 address of an IP clock.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0.0.0.0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PREHOPIP</strong> is valid only when <strong>IPMODE</strong> in the <strong>IPCLKLNK</strong> MO is set to IPV4, <strong>DELAYTYPE</strong> is set to P2P, and <strong>CNM</strong> is set to a value other than L2_MULTICAST.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-PDelayReuestFreq.html">PDELAYREQFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDelay Request Freq</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency at which PDelay Request packets are sent on an IP clock link.</p>
+<p>GUI Value Range: 1/2(1/2), 1.0(1.0), 2.0(2.0), 4.0(4.0), 8.0(8.0), 16.0(16.0)</p>
+<p>Unit: Hz</p>
+<p>Actual Value Range: 1/2, 1.0, 2.0, 4.0, 8.0, 16.0</p>
+<p>MML Default Value: 1.0(1.0)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-DstMltMacType.html">DSTMLTMACTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Multicast MAC Address Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the destination multicast MAC address to which an NE sends G.8275.1 clock synchronization packets. Forwardable Multicast MAC Address (FMAC) means that the destination MAC address to which the NE sends clock synchronization packets is 01-1B-19-00-00-00. Non-Forwardable Multicast MAC Address (NFMAC) means that the destination MAC address to which the NE sends clock synchronization packets is 01-80-C2-00-00-0E. The NE can handle clock synchronization packets from both FMAC and NFMAC.</p>
+<p>GUI Value Range: FMAC(Forwardable Multicast MAC Address), NFMAC(Non-Forwardable Multicast MAC Address)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FMAC, NFMAC</p>
+<p>MML Default Value: FMAC(Forwardable Multicast MAC Address)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs are configured, the combination of <strong>DSTMLTMACTYPE</strong> in the two MOs must be the same when the following conditions are met: 1. The values of <strong>ICPT</strong> are both set to PTP; 2. The values of <strong>CNM</strong> are both set to L2_MULTICAST; 3. The values of <strong>PROFILETYPE</strong> are both set to G.8275.1.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-DelayFreq.html">DELAYFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Delay Freq</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency at which the clock source sends delay packets based on its negotiation with the NE.</p>
+<p>GUI Value Range: 1.0(1.0), 2.0(2.0), 4.0(4.0), 8.0(8.0), 16.0(16.0), 32.0(32.0), 64.0(64.0), 128.0(128.0)</p>
+<p>Unit: Hz</p>
+<p>Actual Value Range: 1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0</p>
+<p>MML Default Value: 128.0(128.0)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-ClkSrvDescription.html">CLKSRVDESCRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Clock Server Description</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the description of the clock server at the peer end of the clock link.</p>
+<p>GUI Value Range: 0~63 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-IpClkSyncMode.html">IPSYNCMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Clock Sync Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP clock synchronization mode. This parameter is applicable only when Clock Synchronization Mode is set to HYBRID.</p>
+<p>GUI Value Range: FREQ(FREQ), TIME(TIME)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FREQ, TIME</p>
+<p>MML Default Value: FREQ(FREQ)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a virtual routing domain.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ipclklink__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an IP clock link with the parameters as follows: Link No.: 0, Protocol Type: PTP, Slot No.: 7, Network Type: UNICAST, IP Mode: IPv4, Client IP: 192.168.1.107, Server IP: 192.168.1.128, Delay Type: E2E, Profile Type: "1588V2", VrfIndex: 1, run the following command:
+ADD IPCLKLINK: LN=0, ICPT=PTP, SN=7, CNM=UNICAST, IPMODE=IPV4, CIP="192.168.1.107", SIP="192.168.1.128", DELAYTYPE=E2E, PROFILETYPE=1588V2, VRFIDX=1;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

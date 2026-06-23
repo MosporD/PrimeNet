@@ -1,0 +1,252 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IMALNK">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="Mode" content="UMTS">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IMALNK">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IMALNK</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IMALNK"></a><a name="IMALNK"></a>
+
+
+<h1 class="topictitle1">IMALNK</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IMALNK.html"><strong>IMALNK</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An IMALNK MO consists of the parameters related to an IMA link. The multiple E1/T1 links contained in an IMA group logically are called IMA links.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>TSCROSS</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>SBT</strong> in an <strong>IMALNK</strong> MO is set to BACK_BOARD, the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>IMALNKN</strong> in the <strong>IMALNK</strong> MO must be different from the following combinations in the <strong>TSCROSS</strong> MO: (1) the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SRCSN</strong>, <strong>SRCSBT</strong>, and <strong>SRCPN</strong>; (2) the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>DSTSN</strong>, <strong>DSTSBT</strong>, and <strong>DSTPN</strong>.</li><li>[Co-MPT, NodeB]A <strong>TSCROSS</strong> MO whose <strong>SRCTSN</strong> and <strong>DSTTSN</strong> have been used by an <strong>IMALNK</strong> MO on the same port cannot be configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, the <strong>IMALNK</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong> and <strong>E1T1</strong> MOs:<ul><li>[Co-MPT, NodeB]When an <strong>IMALNK</strong> MO is configured for the <strong>E1T1</strong> MO whose <strong>LNCODE</strong> is set to AMI, <strong>SCRAM</strong> in the associated <strong>IMAGRP</strong> MO must be set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>E1T1</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>SBT</strong> in an <strong>IMALNK</strong> MO is set to BACK_BOARD, an <strong>E1T1</strong> MO that meets the following condition must exist: <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>PN</strong> in the <strong>E1T1</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>IMALNKN</strong> in the <strong>IMALNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>SAALLNK</strong>, and <strong>E1T1</strong> MOs:<ul><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>OMCH</strong>, and <strong>E1T1</strong> MOs:<ul><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>AAL2PATH</strong>, <strong>IMAGRP</strong>, and <strong>E1T1</strong> MOs:<ul><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in an <strong>AAL2PATH</strong> MO is set to DISABLE, the transmit bandwidth for the <strong>AAL2PATH</strong> MO cannot exceed the transmit bandwidth for an <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>TREELNKPVC</strong>, and <strong>E1T1</strong> MOs:<ul><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in a <strong>TREELNKPVC</strong> MO is set to DISABLE, the transmit bandwidth for the <strong>TREELNKPVC</strong> MO cannot exceed the transmit bandwidth for an <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>UNILNK</strong> MO:<ul><li>[Co-MPT, NodeB]<strong>IMALNKN</strong> in an <strong>IMALNK</strong> MO must be different from <strong>UNILNKN</strong> in a <strong>UNILNK</strong> MO on the same board.</li></ul>
+</li><li>Relation with the <strong>IMALNK</strong> MO:<ul><li>[Co-MPT, NodeB]<strong>IMALNKN</strong> in the <strong>IMALNK</strong> MOs that are configured on the same slot but have different types of subboard must be different.</li><li>[Co-MPT, NodeB]The number of <strong>IMALNK</strong> MOs in an <strong>IMAGRP</strong> MO must be greater than or equal to <strong>MINLNK</strong> in the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong> MO:<ul><li>[Co-MPT, NodeB]The <strong>IMAGRP</strong> MO associated with an <strong>IMALNK</strong> MO must have been configured.</li><li>[Co-MPT, NodeB]When removing an <strong>IMAGRP</strong> MO, the system automatically removes the <strong>IMALNK</strong> MO that depends on the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>FRAATM</strong> MO:<ul><li>[Co-MPT, NodeB]On the same board, <strong>IMALNKN</strong> in an <strong>IMALNK</strong> MO must be different from <strong>PN</strong> in an <strong>FRAATM</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PORTSECURITY</strong> MO:<ul><li>[Co-MPT, NodeB]The <strong>E1T1</strong> MO that is associated with an <strong>IMALNK</strong> MO must meet either of the following conditions: (1) No <strong>PORTSECURITY</strong> MO is associated with the <strong>E1T1</strong> MO; (2) A <strong>PORTSECURITY</strong> MO is associated with the <strong>E1T1</strong> MO, but <strong>SWITCH</strong> in the <strong>PORTSECURITY</strong> MO is set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>RSCGRP</strong>, and <strong>E1T1</strong> MOs:<ul><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the sum of the values of <strong>TXBW</strong> in each <strong>RSCGRP</strong> MO cannot exceed the bandwidth of the <strong>IMAGRP</strong> MO.</li><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the sum of the values of <strong>RXBW</strong> in each <strong>RSCGRP</strong> MO cannot exceed the bandwidth of the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>IMALNK</strong> MOs is 0 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IMALNK__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IMALNK__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IMALNK__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_imalnk.html">ADD IMALNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an Inverse Multiplexing on ATM (IMA) link to an IMA group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_imalnk.html">DSP IMALNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of an IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_imalnk.html">LST IMALNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the IMA link configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_imalnk.html">RMV IMALNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an IMA link from an IMA group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IMALNK__tab2">Table 2</a> and <a href="#IMALNK__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IMALNK__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IMALNK__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IMALNK-CABINETNO.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board of the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IMALNK-SUBRACKNO.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board of the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IMALNK-SLOTNO.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board of the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IMALNK-IMALNKNO.html">Link No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the IMA link, or indicates the E1/T1 port number of the board of the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IMALNK-IMAGRPNO.html">IMA Group No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IMA group number of the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IMALNK-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where the IMA link is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IMALNK-ImaGrpSubboardType.html">IMA Group Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where the IMA group containing an IMA link is established.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IMALNK__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IMALNK__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-NETXSTATE.html">NE TX Link State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the TX status of the IMA link at the near end. The near end inversely multiplexes one ATM cell stream (unit: cell) to enable the cells to be transmitted on multiple physical links.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-NERXSTATE.html">NE RX Link State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the RX status of the IMA link at the near end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-FETXSTATE.html">FE TX Link State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the TX status of the IMA link at the far end. The far end multiplexes the cell streams transmitted on multiple physical connections into a single cell stream.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-FERXSTATE.html">FE RX Link State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the RX status of the IMA link at the far end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-NERXFAILSTATUS.html">NE IMA RX Link Invalid State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the invalid RX status of the local IMA link at the near end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-FERXFAILSTATUS.html">FE IMA RX Link Invalid State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the invalid RX status of the IMA link at the far end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-TxUserCells.html">Number of Tx User Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of user cells transmitted by the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxUserCells.html">Number of Rx User Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of user cells received by the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxFilteredCells.html">Number of Rx Filtered Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of incorrect user cells discarded by the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxDroppedCells.html">Number of Rx Dropped Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of discarded idle cells received by the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxOifAnomalies.html">Number of Rx Abnormal Synchronized frame Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of cells with abnormal frame synchronization on the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxIcpViolations.html">Number of Violation ICP Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of invalid IMA Control Protocol (ICP) cells received by the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxIcpCells.html">Number of Correct ICP Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of valid IMA Control Protocol (ICP) cells received by an IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxHcsErrs.html">Number of HEC Failure Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of Header Error Control (HEC) error cells received by the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-TxStuffCells.html">Number of Tx Stuff Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of stuff cells transmitted by the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxStuffCells.html">Number of Rx Stuff Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of stuff cells received by the IMA link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IMALNK-RxFillerCells.html">Number of Rx Filler Cells</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of filler cells received by the IMA link.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

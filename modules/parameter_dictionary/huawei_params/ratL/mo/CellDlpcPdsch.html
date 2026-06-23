@@ -1,0 +1,151 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellDlpcPdsch">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellDlpcPdsch">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellDlpcPdsch</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellDlpcPdsch"></a><a name="CellDlpcPdsch"></a>
+
+
+<h1 class="topictitle1">CellDlpcPdsch</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellDlpcPdsch.html"><strong>CellDlpcPdsch</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellDlpcPdsch MO consists of the parameters related to PDSCH power control. It is used for the PDSCH power control.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>ContigIntraBandCarr</strong>, <strong>Cell</strong>, <strong>PDSCHCfg</strong>, <strong>CellDlpcPdschPa</strong>, <strong>eUCellSectorEqm</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>If two cells served by the same sector equipment have the same setting of <strong>FreqBand</strong> and different settings of <strong>DlEarfcn</strong>, the CONTIG_INTRA_BAND_CARR_SW option of <strong>ContigIntraBandCarrSw</strong> is selected in the <strong>ContigIntraBandCarr</strong> MOs corresponding to the two cells, and the difference between the values of <strong>DlEarfcn</strong> of the two cells is less than or equal to half of the sum of the RB quantities indicated in the values of <strong>DlBandWidth</strong> of the two cells, then the setting of each of <strong>ReferenceSignalPwr</strong>, <strong>Pb</strong>, <strong>PaPcOff</strong>, and SINGLE_CA_PWR_SHARE_SW_FOR_4T option of <strong>TxChnPowerCfgSw</strong> must be the same for the two cells, and <strong>RemainingPwrUseStrategy</strong> in <strong>CellDlpcPdsch</strong> must be configured the same.</li><li>If two cells served by the same sector equipment have the same setting of <strong>FreqBand</strong> and different settings of <strong>DlEarfcn</strong>, the CONTIG_INTRA_BAND_CARR_SW option of <strong>ContigIntraBandCarrSw</strong> is selected in the <strong>ContigIntraBandCarr</strong> MOs corresponding to the two cells, and the difference between the values of <strong>DlEarfcn</strong> of the two cells is less than or equal to half of the sum of the RB quantities indicated in the values of <strong>DlBandWidth</strong> of the two cells, then the setting of each of <strong>ReferenceSignalPwr</strong>, <strong>Pb</strong>, <strong>PaPcOff</strong>, and SINGLE_CA_PWR_SHARE_SW_FOR_4T option of <strong>TxChnPowerCfgSw</strong> must be the same for the two cells, and <strong>RemainingPwrUseStrategy</strong> in <strong>CellDlpcPdsch</strong> must be configured the same.</li></ul>
+</li><li>Relation with the <strong>PDSCHCfg</strong> MO:<ul><li>When <strong>LogicalPortSwapSwitch</strong> in <strong>PDSCHCfg</strong> is configured as SWAP_MODE_1, <strong>RemainingPwrUseStrategy</strong> must be configured as OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, and <strong>SimuloadPmiTemplate</strong> MOs:<ul><li>When <strong>FddTddInd</strong> in <strong>Cell</strong> is configured as CELL_TDD, or <strong>NbCellFlag</strong> in <strong>Cell</strong> is configured as TRUE, or <strong>CrsPortNum</strong> in <strong>Cell</strong> is not configured as CRS_PORT_4, or <strong>TxRxMode</strong> in <strong>Cell</strong> is not configured as 4T4R, or <strong>CellBeamMode</strong> in <strong>eUCellSectorEqm</strong> is not NORMAL, or <strong>SimuloadPmiTemplate</strong> in <strong>CellSimuloadPmi</strong> is configured as 4, 5, 6, or 7, <strong>RemainingPwrUseStrategy</strong> in <strong>CellDlpcPdsch</strong> must be configured as OFF.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>CellAlgoExtSwitch</strong>, and <strong>CellShortTtiAlgo</strong> MOs:<ul><li>When the sub-switch Virtual4T4RSwitch of <strong>EmimoSwitch</strong> in <strong>CellAlgoSwitch</strong> is configured to be on, or the sub-switch EmimoMuMimoSwitch of <strong>EmimoSwitch</strong> in <strong>CellAlgoSwitch</strong> is configured to be on, or the sub-switch New4TCodebookSwitch of <strong>EmimoSwitch</strong> in <strong>CellAlgoSwitch</strong> is configured to be on, or the sub-switch 4TxTM9MuMimoSwitch of <strong>EmimoSwitch</strong> in <strong>CellAlgoSwitch</strong> is configured as open, or <strong>GLPwrShare</strong> in <strong>CellAlgoSwitch</strong> is configured as ON, or the sub-switch Tm9FourLayerPairSwitch of <strong>WttxMuMimoSwitch</strong> in <strong>CellAlgoExtSwitch</strong> is configured as on, or when the sub-switch SHORT_TTI_SW of <strong>SttiAlgoSwitch</strong> in <strong>CellShortTtiAlgo</strong> is configured to be on, <strong>RemainingPwrUseStrategy</strong> in <strong>CellDlpcPdsch</strong> must be configured as OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>EuSectorEqmGroup</strong> MOs:<ul><li>When <strong>RemainingPwrUseStrategy</strong> in <strong>CellDlpcPdsch</strong> is configured as PORT_PWR_BALANCING, and <strong>MultiRruCellFlag</strong> is BOOLEAN_TRUE and <strong>MultiRruCellMode</strong> is SFN and <strong>CellActiveState</strong> is CELL_ACTIVE, <strong>EuSectorEqmGroup</strong> cannot be configured.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>When <strong>RemainingPwrUseStrategy</strong> in <strong>CellDlpcPdsch</strong> is configured as PORT_PWR_BALANCING, and <strong>MultiRruCellFlag</strong> is BOOLEAN_TRUE and <strong>MultiRruCellMode</strong> is SFN and <strong>CellActiveState</strong> is CELL_ACTIVE, and the <strong>ANTCFGMODE</strong> in <strong>SECTOREQM</strong> corresponding to the <strong>eUCellSectorEqm</strong> of the cell configuration is ANTENNAPORT, the total number of transmitting antennas (the transmitting antenna means "transmitting antenna active/standby mode" is configured as MASTER) and the number of receive antennas of the corresponding cell must be both 4.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellDlpcPdsch__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellDlpcPdsch__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellDlpcPdsch__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_celldlpcpdsch.html">LST CELLDLPCPDSCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of cell PDSCH downlink power control.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_celldlpcpdsch.html">MOD CELLDLPCPDSCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of cell PDSCH downlink power control.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellDlpcPdsch__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellDlpcPdsch__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellDlpcPdsch__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within a BS. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-CcuPa.html">Center UE PA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PA value of cell center UEs when DL ICIC is enabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-CeuPa.html">Edge UE PA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PA value of cell edge UEs when DL ICIC is enabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-CellEdgLoadEvalPrd.html">Cell Edge Load Evaluation Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval for evaluating the cell edge load when the BFModeUserAdptPwrSwitch check box is selected under the DlPcAlgoSwitch parameter. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-NeighCellEdgLoadThd.html">Neighboring Cell Edge Load Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the neighboring cell edge load for determining whether to increase the power of beamforming UEs at the edge of the local cell when the BFModeUserAdptPwrSwitch check box is selected under the DlPcAlgoSwitch parameter. If the neighboring cell edge load is greater than the threshold specified by this parameter, the power of corresponding beamforming UEs in the local cell edge is not increased. If the neighboring cell edge load is less than or equal to the specified threshold and the number of neighboring cells meeting this condition is less than or equal to a specified percentage, the power of corresponding beamforming UEs in the local cell edge is increased. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-ExceedNCellEdgLoadThdRatio.html">Ratio of Cells Exceeding Neighboring Cell Edge Load Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the percentage of the number of neighboring cells whose cell edge load meets the specified threshold. This percentage is used to determine whether to increase the power of beamforming UEs when the BFModeUserAdptPwrSwitch check box is selected under the DlPcAlgoSwitch parameter. If the percentage of the number of neighboring cells meeting the cell edge load threshold is greater than the value of this parameter, the power of all beamforming UEs in the local cell is not increased. If the percentage of the number of neighboring cells meeting the cell edge load threshold is less than or equal to the value of this parameter, the power of beamforming UEs in the local cell is increased. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-BFUserPwrBoostPrd.html">BF User Power Boost Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period during which the increased value of the beamforming UE power remains unchanged when the BFModeUserAdptPwrSwitch check box is selected under the DlPcAlgoSwitch parameter. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-BFUserAdptPwrA3Offset.html">BF Mode User Adaptive Power A3 offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for event A3 reporting when the BFModeUserAdptPwrSwitch check box is selected under the DlPcAlgoSwitch parameter. This offset is the difference between the quality of a neighboring cell and that of the serving cell. If this parameter is set to a large value, event A3 is reported only if the signal quality of the neighboring cell is significantly better than that of the serving cell. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-BFUserAdptPwrA6Offset.html">BF Mode User Adaptive Power A6 offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for event A6 reporting in CA scenarios when the BFModeUserAdptPwrSwitch check box is selected under the DlPcAlgoSwitch parameter. This offset is the difference between the quality of a neighboring cell and that of the serving cell. If this parameter is set to a large value, event A6 is reported only if the signal quality of the neighboring cell is significantly better than that of the serving cell. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDlpcPdsch-RemainingPwrUseStrategy.html">Remaining Power Use Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to use the remaining power. If this parameter is set to OFF, the remaining power is not used. If this parameter is set to PORT_PWR_BALANCING and the CrsPortNum parameter is set to CRS_PORT_4, power is balanced among the ports. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

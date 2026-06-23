@@ -1,0 +1,360 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="DU Cell and Channel MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of DU cells, sectors, and channels. It also provides the managed object model (MOM) view and describes the managed objects (MOs) related to DU cells, sectors, and channels.">
+<meta name="description" content="This section describes the functions and concepts of DU cells, sectors, and channels. It also provides the managed object model (MOM) view and describes the managed objects (MOs) related to DU cells, sectors, and channels.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../ratN/mom/gNodeBFunction-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="gnodeb-locell-manage">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>DU Cell and Channel MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="gnodeb-locell-manage"></a><a name="gnodeb-locell-manage"></a>
+
+
+<h1 class="topictitle1">DU Cell and Channel MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of DU
+cells, sectors, and channels. It also provides the managed object
+model (MOM) view and describes the managed objects (MOs) related to
+DU cells, sectors, and channels.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p><strong>DU Cell</strong></p>
+<p>A DU cell is the basic unit of an area providing the radio network
+NR cell service for the gNodeB DU function domain. DU cell attributes
+include function and algorithm parameters for physical cell identifier
+(PCI), tracking area code (TAC), the DU cell-level RLC layer, MAC
+layer, and physical layer.</p>
+<p><strong>Sectors</strong></p>
+<p>A sector is
+the smallest radio coverage area. Each sector uses one or more radio
+carriers to achieve coverage. Each radio carrier works at a frequency.
+A sector and a carrier together compose a cell that UEs can access.
+A DU cell references sector and carrier resources and provides services
+for the cell. </p>
+<p>Sectors are classified into omnidirectional sectors
+and directional sectors. An omnidirectional sector covers a circle
+area of 360 degrees with an omnidirectional antenna at the center.
+Omnidirectional sectors are used for low-traffic coverage. Directional
+sectors are used for high-traffic coverage. Each directional sector
+uses a directional antenna for coverage. In three-sector scenarios,
+each directional antenna covers a sector area of 120 degrees. In six-sector
+scenarios, each directional antenna covers a sector area of 60 degrees.
+The coverage areas of adjacent sectors overlap each other because
+the actual azimuth of each sector is slightly larger than 60 or 120
+degrees.</p>
+<div class="p">The number of cells supported by a base station is
+calculated as follows: Number of cells supported by a base station
+= Number of sectors x Number of carriers in each sector. <a href="#gnodeb-locell-manage__fig2">Figure 1</a> shows the mapping between sectors, carriers,
+and cells. This figure uses a typical 3x2 configuration as an example.
+Three sectors (sectors 0-2) cover a circle area. Each sector uses
+two carriers, and each cell uses one carrier. There are a total of
+six cells.  <div class="fignone" id="gnodeb-locell-manage__fig2"><a name="gnodeb-locell-manage__fig2"></a><a name="fig2"></a><span class="figcap"><b>Figure 1 </b>Mapping between sectors, carriers, and cells</span>
+
+<br><span><img src="../image/mom/gnb-mom5.png"></span></div>
+</div>
+<p>Mapping
+between sectors and RF resources</p>
+<div class="p"><a href="#gnodeb-locell-manage__fig3">Figure 2</a> and <a href="#gnodeb-locell-manage__fig4">Figure 3</a> show the mapping between sectors and radio frequency
+(RF) resources of a gNodeB. Sectors use antennas for coverage. When
+an RRU is used, the RRU is connected to the antenna through feeders.
+The antenna installation azimuth determines the sector coverage. When
+an AAU is used, the antenna is integrated with the RF module. The
+AAU installation azimuth and beamforming determine the sector coverage. <div class="fignone" id="gnodeb-locell-manage__fig3"><a name="gnodeb-locell-manage__fig3"></a><a name="fig3"></a><span class="figcap"><b>Figure 2 </b>Mapping between sectors and RF resource 1 of a gNodeB</span>
+
+<br><span><img src="../image/mom/gnb-mom6.png"></span></div>
+<div class="fignone" id="gnodeb-locell-manage__fig4"><a name="gnodeb-locell-manage__fig4"></a><a name="fig4"></a><span class="figcap"><b>Figure 3 </b>Mapping between sectors and RF resource 2 of a gNodeB</span>
+
+<br><span><img src="../image/mom/gnb-mom16.png"></span></div>
+</div>
+<p></p>
+<p><strong>Channels</strong></p>
+<div class="p">In the NR system, channels are classified
+into logical channels, transport channels, and physical channels:<ul><li>Logical channels are defined based on the types of data to be
+transmitted.</li><li>Transport channels are defined based on the formats of transmitted
+data packets. </li><li>Physical channels are defined based on the purposes of time and
+frequency resources on the Uu interface.</li></ul>
+<a href="#gnodeb-locell-manage__table1">Table 1</a> describes the classifications of
+channels.
+<div class="tablenoborder"><a name="gnodeb-locell-manage__table1"></a><a name="table1"></a><table cellpadding="4" cellspacing="0" summary="" id="gnodeb-locell-manage__table1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Classifications of channels</caption>
+<tbody>
+<tr>
+<td class="cellrowborder" colspan="2" valign="top"><p>Classification</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>Channel</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="5" valign="top" width="17.666666666666668%"><p>Logical channels</p>
+</td>
+
+<td class="cellrowborder" rowspan="4" valign="top" width="17.333333333333336%"><p>Control channels</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="65%"><p>BCCH (broadcast control channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PCCH (paging control channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>CCCH (common control channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>DCCH (dedicated control channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>Traffic channels</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>DTCH (dedicated traffic channel)</p>
+</td>
+
+</tr>
+
+<tr>
+
+<td class="cellrowborder" rowspan="5" valign="top" width="17.666666666666668%"><p>Transport channels</p>
+</td>
+
+<td class="cellrowborder" rowspan="3" valign="top" width="17.333333333333336%"><p>Downlink transport channels</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="65%"><p>BCH (broadcast channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>DL-SCH (downlink shared channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PCH (paging channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="2" valign="top"><p>Uplink transport channels</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>UL-SCH (uplink shared channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>RACH (random access channel)</p>
+</td>
+
+</tr>
+
+<tr>
+
+<td class="cellrowborder" rowspan="6" valign="top" width="17.666666666666668%"><p>Physical channels</p>
+</td>
+
+<td class="cellrowborder" rowspan="3" valign="top" width="17.333333333333336%"><p>Downlink physical channels</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="65%"><p>PDSCH (physical downlink shared channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PBCH (physical broadcast channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PDCCH (physical downlink control channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="3" valign="top"><p>Uplink physical channels</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>PUSCH (physical uplink shared channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PUCCH (physical uplink control channel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PRACH (physical random access channel)</p>
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+</div>
+<a href="#gnodeb-locell-manage__fig7">Figure 4</a> and <a href="#gnodeb-locell-manage__fig8">Figure 5</a> show
+the mapping between the three types of channels in the downlink and
+uplink, respectively.<div class="fignone" id="gnodeb-locell-manage__fig7"><a name="gnodeb-locell-manage__fig7"></a><a name="fig7"></a><span class="figcap"><b>Figure 4 </b>Mapping between the three types of channels in the downlink</span>
+
+<br><span><img src="../image/mom/gnb-mom7.png"></span></div>
+<div class="fignone" id="gnodeb-locell-manage__fig8"><a name="gnodeb-locell-manage__fig8"></a><a name="fig8"></a><span class="figcap"><b>Figure 5 </b>Mapping between the three types of channels in the uplink</span>
+
+<br><span><img src="../image/mom/gnb-mom8.png"></span></div>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">MOM Introduction</h4><div class="p"><a href="#gnodeb-locell-manage__fig9">Figure 6</a> shows the DU cell TX/RX function and sector MOM, which is a subset
+of the gNodeBFunction MOM. <div class="fignone" id="gnodeb-locell-manage__fig9"><a name="gnodeb-locell-manage__fig9"></a><a name="fig9"></a><span class="figcap"><b>Figure 6 </b>DU cell TX/RX function and sector MOM</span>
+
+<br><span><img src="../image/mom/gnb-mom9.png"></span></div>
+</div>
+<p><a href="#gnodeb-locell-manage__fig10">Figure 7</a> shows the DU cell and channel MOM, which is
+a subset of the gNodeBFunction MOM.</p>
+<div class="p"><div class="fignone" id="gnodeb-locell-manage__fig10"><a name="gnodeb-locell-manage__fig10"></a><a name="fig10"></a><span class="figcap"><b>Figure 7 </b>DU cell and channel MOM</span>
+
+<br><span><img src="../image/mom/gnb-mom10.png"></span></div>
+</div>
+<p><strong>Sector-related
+MOs</strong></p>
+<div class="p">Sector-related MOs are defined as follows: <ul><li><a href="../../comm/mo/RRU.html">RRU</a>: An RRU MO defines
+a remote radio unit. It consists of multiple antenna ports and is
+connected to one or more antenna devices. The coverage of an RRU depends
+on the installation position and tilt of the connected antenna.</li><li><a href="../../comm/mo/AAS.html">AAS</a>: An AAS MO defines
+an active antenna system unit and provides the built-in antenna function.
+It generally supports beamforming, which determines the coverage of
+the AAS.</li><li><a href="../../comm/mo/Sector.html">Sector</a>: A Sector
+MO defines the smallest radio coverage area in a certain geographical
+area. It can contain a group of RRU antenna ports or AAS modules in
+the same coverage area.</li><li><a href="../../comm/mo/SectorEqm.html">SectorEqm</a>: A SectorEqm
+MO defines a group of RRU antenna ports or the beam RF resources of
+a group of AAS modules that provide services for the same DU cell
+in a sector. If multiple DU cells share the same RRU antenna ports
+or AAS beam and associated RF resources, these DU cells can share
+the same SectorEqm MO.</li><li><a href="../../comm/mo/BaseBandEqm.html">BasebandEqm</a>:
+A BasebandEqm MO defines a group of baseband resources provided by
+one or more UBBP boards. The DU cell TX/RX function is automatically
+deployed on these boards. When the TX/RX functions of multiple DU
+cells share the same baseband boards, the TX/RX functions of these
+DU cells can share the same BasebandEqm MO.</li></ul>
+</div>
+<p><strong>DU cell-related MOs</strong></p>
+<div class="p">DU cell-related MOs are
+defined as follows: <ul><li><a href="../mo/gNBSibConfig.html">gNBSibConfig</a>: A gNBSibConfig MO defines the system information type, system information transmission period, and system information transmission mode.</li><li><a href="../mo/gNBFreqBandConfig.html">gNBFreqBandConfig</a>: A gNBFreqBandConfig MO specifies the gNodeB frequency band configuration. It is used to set the common configurations of the next frequency band configured for the gNodeB. The configurations automatically apply to all cells in this frequency band.</li><li><a href="../mo/NRDUCell.html">NRDUCell</a>: An NRDUCell MO
+defines basic information of a DU cell, including the uplink bandwidth,
+downlink bandwidth, TDD uplink-downlink subframe assignment, subcarrier
+spacing, cyclic prefix length, physical cell identifier (PCI), tracking
+area code (TAC), and number of symbols in each timeslot. The air interface
+information of the DU cell must be configured by the network planning
+personnel based on the actual situation.</li><li><a href="../mo/NRDUCellTrp.html">NRDUCellTrp</a>: An NRDUCellTrp
+MO defines the basic information about the transmission reception
+point (TRP) of an NR DU cell, including the baseband and RF equipment
+information of the cell. The information of the DU cell must be configured
+by the network planning personnel based on the actual situation.</li><li><a href="../mo/NRDUCellCoverage.html">NRDUCellCoverage</a>: An NRDUCellCoverage MO defines the basic information about the
+coverage area of an NR DU cell, including the RF equipment information
+of the cell. The information of the DU cell must be configured by
+the network planning personnel based on the actual situation.</li><li><a href="../mo/NRDUCellTrpBeam.html">NRDUCellTrpBeam</a>:
+An NRDUCellTrpBeam MO defines parameters related to beam configurations.
+NEs can be configured with parameters such as the tilt angle and coverage
+scenario.</li><li><a href="../mo/NRDUCellTrpMmwavBeam.html">NRDUCellTrpMmwavBeam</a>: An NRDUCellTrpMmwavBeam MO is used to configure mmWave-beam-related parameters such as tilt angles and coverage scenarios.</li><li><a href="../mo/NRDUCellTrpCustBeam.html">NRDUCellTrpCustBeam</a>: An NRDUCellTrpCustBeam MO consists of parameters related to customized
+and scenario-based beam configurations. Users can configure parameters
+such as the tilt angle, azimuth, and power under the specified TRP
+ID and beam ID.</li><li><a href="../mo/NRDUCellSul.html">NRDUCellSul</a>: An NRDUCellSul
+MO defines the supplementary uplink (SUL) resource configuration for
+a cell in which the uplink and downlink decoupling feature is enabled.
+The SUL resource configuration includes another DU cell that provides
+SUL services for the DU cell. One NRDUCell MO can be configured with
+only one NRDUCellSul MO. In addition, an NRDUCell MO in SUL duplex
+mode can provide SUL services for only one NRDUCell MO in TDD duplex
+mode.</li><li><a href="../mo/NRDUCellAlgoSwitch.html">NRDUCellAlgoSwitch</a>: An NRDUCellAlgoSwitch MO defines the algorithm switches of a DU
+cell, including the beam algorithm switch, spectrum cloudification
+switch, and link adaptation switch. </li><li><a href="../mo/NRDUCellChnPwr.html">NRDUCellChnPwr</a>: An
+NRDUCellChnPwr MO defines the channel power configuration of a DU
+cell, including the physical broadcast channel power and synchronization
+channel power.</li><li><a href="../mo/NRDUCellUlTaConfig.html">NRDUCellUlTaConfig</a>: An NRDUCellUlTaConfig MO defines the uplink time alignment configuration
+of a DU cell, including the uplink time alignment timer.</li><li><a href="../mo/NRDUCellUeTimerConst.html">NRDUCellUeTimerConst</a>: An NRDUCellUeTimerConst MO defines the UE timer constants of an
+NR DU cell. For details, see 3GPP TS 38.331.</li><li><a href="../mo/NRDUCellPagingConfig.html">NRDUCellPagingConfig</a>: An NRDUCellPagingConfig MO defines paging-related parameters. It
+is used to configure parameters related to paging cycle, number of
+paging groups, and paging.</li><li><a href="../mo/NRDUCellSelConfig.html">NRDUCellSelConfig</a>: An NRDUCellSelConfig MO defines the parameters related to NR DU
+cell selection.</li><li><a href="../mo/NRDUCellUePwrSaving.html">NRDUCellUePwrSaving</a>: An NRDUCellUePwrSaving MO defines the energy conservation parameters
+of UEs in an NR DU cell, such as the DRX feature.</li><li><a href="../mo/NRDUCellSrsMeas.html">NRDUCellSrsMeas</a>:
+An NRDUCellSrsMeas MO defines the SRS measurement of an NR DU cell
+and provides different types of RSRP measurement , SINR hysteresis,
+and SINR thresholds. </li><li><a href="../mo/NRDUCellUlPcConfig.html">NRDUCellUlPcConfig</a>: An NRDUCellSrsMeas MO defines uplink power control parameters for
+common radio resources in an NR DU cell. For details about uplink
+power control, see 3GPP TS 38.213.</li><li><a href="../mo/NRDUCellCarrMgmt.html">NRDUCellCarrMgmt</a>: An NRDUCellSrsMeas MO defines NR DU cell-level carrier management,
+which is used to configure the conditions for adding and deleting
+secondary cells or auxiliary base stations. </li></ul>
+</div>
+<p><strong>Channel-related MOs</strong></p>
+<div class="p">Channel-related MOs are
+defined as follows: <ul><li><a href="../mo/NRDUCellPrach.html">NRDUCellPrach</a>: An
+NRDUCellPrach MO defines the PRACH configuration of a DU cell, including
+the logical root sequence index. For the random access procedure,
+see 3GPP TS 38.321.</li><li><a href="../mo/NRDUCellPdcch.html">NRDUCellPdcch</a>: An
+NRDUCellPdcch MO defines the PDCCH configuration of a DU cell, including
+the number of occupied symbols and resource mapping mode.</li><li><a href="../mo/NRDUCellPdsch.html">NRDUCellPdsch</a>: An
+NRDUCellPdsch MO defines the PDSCH configuration of a DU cell, including
+the PRB bundling size and the maximum number of MIMO layers.</li><li><a href="../mo/NRDUCellPucch.html">NRDUCellPucch</a>: An
+NRDUCellPucch MO defines the PUCCH configuration of a DU cell, including
+the PUCCH structure type.</li><li><a href="../mo/NRDUCellPusch.html">NRDUCellPusch</a>: An
+NRDUCellPusch MO defines the PUSCH configuration of a DU cell, including
+the uplink DMRS type.</li><li><a href="../mo/NRDUCellCoreset.html">NRDUCellCoreset</a>:
+An NRDUCellCoreset MO defines the common control-resource set (CORESET) in an NR DU cell.
+</li><li><a href="../mo/NRDUCellCsirs.html">NRDUCellCsirs</a>: An
+NRDUCellCsirs MO defines the CSI-RS algorithm and protocol parameter
+configuration, which is used for the CSI measurement configuration
+algorithm and resource allocation algorithm.</li><li><a href="../mo/NRDUCellUacBar.html">NRDUCellUacBar</a>: An NRDUCellUacBar MO defines access control parameters configured for different access categories.</li><li><a href="../mo/NRDUCellIntrfParam.html">NRDUCellIntrfParam</a>: An NRDUCellIntrfParam MO consists of the parameters related to the interference solution of an NR DU cell.</li><li><a href="../mo/NRDUCellNsaDcConfig.html">NRDUCellNsaDcConfig</a>: An NRDUCellNsaDcConfig MO is used to configure parameters related to the LTE-NR NSA DC feature.</li><li><a href="../mo/NRDUCellPowerSaving.html">NRDUCellPowerSaving</a>: An NRDUCellPowerSaving MO consists of parameters related to NR DU cell power saving.</li><li><a href="../mo/NRDUCellRimConfig.html">NRDUCellRimConfig</a>: This MO defines NR DU cell remote interference management (RIM) parameter configurations. It is used to configure parameters related to RIM reference signals.</li><li><a href="../mo/NRDUCellUeCoop.html">NRDUCellUeCoop</a>: An NRDUCellUeCoop MO defines parameters related to UE cooperation in an NR DU cell.</li><li><a href="../mo/NRDUFddCellTrpBeam.html">NRDUFddCellTrpBeam</a>: An NRDUFddCellTrpBeam MO defines parameters related to FDD beams such as the coverage scenario and maximum power aggregation capability.</li><li><a href="../mo/NRDUCell3DEirpThld.html">NRDUCell3DEirpThld</a>: An NRDUCell3DEirpThld MO defines the 3D EIRP threshold configuration of an NR DU cell. Different thresholds are provided for different grids.</li><li><a href="../mo/NRDUCellTrpDynPwrShr.html">NRDUCellTrpDynPwrShr</a>: An NRDUCellTrpDynPwrShr MO consists of parameters related to dynamic power sharing for an NR DU cell TRP, including the NR DU cell TRP ID, maximum power sharing rate, and power sharing margin.</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../ratN/mom/gNodeBFunction-mom.html" title="This section describes the functions and concepts of the gNodeBFunction. It also provides the classification of the gNodeBFunction.">gNodeBFunction MOM Description</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

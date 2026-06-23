@@ -1,0 +1,571 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify IKE Peer (MOD IKEPEER)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_ikepeer">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify IKE Peer (MOD IKEPEER)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_ikepeer"></a><a name="mod_ikepeer"></a>
+
+
+<h1 class="topictitle1">Modify IKE Peer (MOD IKEPEER)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_ikepeer__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of the IKE peer.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_ikepeer__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If an IKEPEER can be queried by running the <a href="lst_ikepeer.html">LST IKEPEER</a> command and the value of Auto Config Flag is Auto Created, the IKE peer is automatically created by the system and cannot be modified by users.</p>
+</li><li><p>Before modifying the master IKE peer to which the slave IKE peer corresponds, ensure that the master IKE peer specified by the Master Peer Name parameter exists.</p>
+</li><li><p>The priorities of slave IKE peers corresponding to one master IKE peer must differ.</p>
+</li><li><p>If a master IKE peer has been configured with slave IKE peers, this master IKE peer can be changed to neither slave IKE peer nor non-IPSec redundancy IKE peer.</p>
+</li><li><p>If the slave IKE peer in use is modified, the system uses the slave IKE peer of a lower priority for negotiation.</p>
+</li><li><p>If the only one slave IKE peer is being used, the following occurs when modifying this IKE peer: If the negotiation on the master IKE peer succeeds (no alarm related to IKE negotiation failure is reported), a back switchover is performed from the slave IKE tunnel to the master IKE tunnel. If the negotiation on the master IKE peer fails (the alarm related to IKE negotiation failure is reported), the slave IKE tunnel in use will still be used.</p>
+</li><li><p>If the master IKE peer is modified, a switchover to the master IKE tunnel is performed regardless of whether the master or slave IKE peer is in use or whether back switchover is enabled.</p>
+</li><li><p>If an IPsec policy group has been bound to a port, only one IPsec policy in the IPsec policy group takes effect (queried by using the <a href="dsp_ipsecpolicy.html">DSP IPSECPOLICY</a> command), and the IKE peer referenced by the IPsec policy is modified (excluding the situation where only the IPSECPREFRGSW parameter is modified when IPVERSION is set to IPV6), the system will unbind the IPsec policy group from the port (that is, the <a href="rmv_ipsecbind.html">RMV IPSECBIND</a> or <a href="rmv_ipsecbinditf.html">RMV IPSECBINDITF</a> command is executed) and then rebind it.</p>
+</li><li><p>A master or slave IKE peer can be referenced by only one IPSec policy.</p>
+</li><li><p>The Redundancy Flag parameter in the IKE peer referenced by the security host or security peer must be set to NONE(Non-redundancy).</p>
+</li><li><p>After IKEv2 Redirect Switch is set to ON in an IKE peer, this IKE peer can be referenced by only one IPSECPOLICY MO.</p>
+</li><li><p>The Remote IP Address parameter configured in an IKE peer cannot be the currently used redirection IP address sent by the peer to the base station.</p>
+</li><li><p>After an IKE peer that supports IKEv2 redirection is configured, the IPSECDTNL MO cannot be configured, and vice versa.</p>
+</li><li><p>If parameters in the IKE peer are modified when IPSec dual tunnels are configured, the primary tunnel is preferentially used, regardless of whether the services are carried on the primary or secondary tunnel before the modification.</p>
+</li><li><p>If parameters in the IKE peer are modified , information about switchovers between the primary and secondary IPSec tunnels is cleared in the output of the <a href="dsp_ipsecdtnl.html">DSP IPSECDTNL</a> command.</p>
+</li><li><p>IPSec tunnel pair cannot coexist with master/slave IKE peers.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If multiple IPv4 addresses on the same network segment are configured on an interface, the local IPv4 address in the IKEPEER object must be configured. Otherwise, IKE negotiation may fail.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]The IPv6 IPSec redundancy switchover is performed based on the configured IKE peer priorities, regardless of the route priorities.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_ikepeer__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-PeerName.html">PEERNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IKE Peer Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the IKE peer.</p>
+<p>GUI Value Range: 1~15 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When an <strong>IKEPEER</strong> MO is being added, the <strong>PEERNAME</strong> is case-insensitive; but when an <strong>IKEPEER</strong> MO is referenced, the <strong>PEERNAME</strong> is case-sensitive.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of <strong>PEERNAME</strong> in an <strong>IKEPEER</strong> MO must be comprised of ASCII characters.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>PEERNAME</strong> in a manually configured <strong>IKEPEER</strong> MO cannot be set to a value with the "SON_" prefix.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-ProposalID.html">PROPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IKE Proposal ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the IKE proposal in use.</p>
+<p>GUI Value Range: 1~99</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~99</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-Version.html">IKEVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IKE protocol version.</p>
+<p>Disuse statement: In later versions, the value IKE_V1(IKE V1) will be removed from the value range of this parameter. In the current version, this value can still be configured and take effect. Therefore, avoid setting this parameter to IKE_V1(IKE V1).</p>
+<p>GUI Value Range: IKE_V1(IKE V1), IKE_V2(IKE V2)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IKE_V1, IKE_V2</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: IKE_V2(IKE V2)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AUTHALG</strong> in an <strong>IKEPROPOSAL</strong> MO is set to AES_XCBC_96, SHA256 or SHA384, <strong>IKEVERSION</strong> in the associated <strong>IKEPEER</strong> MO cannot be set to IKE_V1.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-ExchangeMode.html">EXCHMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Exchange Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IKE exchange mode. In main mode, keys are exchanged independently from identity authentications. This protects identity information and hence enhances security. The aggressive mode does not have identity authentication protection.</p>
+<p>Disuse statement: In later versions, this parameter will be removed. In the current version, this parameter can still be configured and take effect. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: MAIN(Main Mode), AGGRESSIVE(Aggressive Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MAIN, AGGRESSIVE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MAIN(Main Mode)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-IPVersion.html">IPVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP protocol version.</p>
+<p>GUI Value Range: IPV4(IPv4), IPV6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPV4, IPV6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-LocalIDType.html">IDTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local ID Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the identification payload that the local end transmits. The authentication can be performed based on IPv4 address, IPv6 address, fully qualified domain name (FQDN) or distinguished name (DN).</p>
+<p>GUI Value Range: IPV4(IPv4 Identify), FQDN(Name Identify), DN(Distinguished Name), IPV6(IPv6 Identify)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPV4, FQDN, DN, IPV6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO, if <strong>IPVERSION</strong> is set to IPV4, <strong>IDTYPE</strong> cannot be set to IPV6.</li><li>In an <strong>IKEPEER</strong> MO, if <strong>IPVERSION</strong> is set to IPV6, <strong>IDTYPE</strong> cannot be set to IPV4.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-RemoteIP.html">REMOTEIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Remote IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP address of the peer end.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>REMOTEIP</strong> in an <strong>IKEPEER</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-RemoteName.html">REMOTENAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Remote Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the peer end.</p>
+<p>GUI Value Range: 0~31 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~31 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-PreShareKey.html">PKEY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Pre-shared Key</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the pre-shared key. The two negotiation ends must be configured with the same authenticator. This parameter takes effect only when Authentication Method in the corresponding IKEPROPOSAL is set to PRE_SHARED_KEY.</p>
+<p>GUI Value Range: 0~127 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~127 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-DPDSwitch.html">DPD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DPD Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the dead peer detection (DPD) function. When the IPSec redundancy function is enabled, it is recommended that the DPD detection function also be enabled. Otherwise, an active or standby IKE peer has to wait for a long time before the switchover.</p>
+<p>GUI Value Range: DISABLE(Disable), PERIODIC(Periodic)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, PERIODIC</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: PERIODIC(Periodic)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>BFDDTCTSW</strong> parameter in the <strong>IPSECDTNL</strong> MO is set to OFF when an IPSec pair is configured, the <strong>DPD</strong> parameter in the <strong>IKEPEER</strong> MOs referenced by the <strong>IPSECPOLICY</strong> MO for the primary IPSec tunnel and the <strong>IPSECPOLICY</strong> MO for the secondary IPSec tunnel in the <strong>IPSECDTNL</strong> MO must be set to PERIODIC.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-DPDIdleTime.html">DPDIDLETIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DPD Idle Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the dead peer detection (DPD) idle time. If the total time during which the local end does not receive encrypted packets reaches the value specified by the DPD Idle Time parameter, the local end sends the DPD packet to perform DPD. However, the exact time at which the eNodeB sends DPD messages varies depending on network environment.</p>
+<p>GUI Value Range: 3~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 3~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-DPDRetryInterval.html">DPDRETRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DPD Retransmission Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval at which DPD detection frames are sent. The interval at which DPD detection frames are sent may slightly vary in various network environments such as network congestion, delay, and jitter.</p>
+<p>GUI Value Range: 3~30</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 3~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-DPDRetryCount.html">DPDRETRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DPD Retransmission Count</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of retransmission attempts after a DPD detection fails.</p>
+<p>GUI Value Range: 3~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-NATTravSwitch.html">NATTRAV</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NAT Traversal</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the Network Address Translation (NAT) traversal function. The NAT traversal function is not supported by IKE SA in IPv6 scenarios.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO, if <strong>IKEVERSION</strong> is set to IKE_V1 and <strong>EXCHMODE</strong> is set to MAIN, <strong>NATTRAV</strong> cannot be set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-LocalIP.html">LOCALIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP address of the local end, which is used in IKE negotiation. This IP address can be set to 0.0.0.0 or a configured interface IP address at the local end. If this parameter is set to 0.0.0.0, the BS automatically uses the interface IP address to negotiate with the peer. If multiple IP addresses are configured at the port, it is recommended that you specify one IP address for the negotiation. If the local BS uses the digital certificate and IP address for authentication in the negotiation, ensure that the IP address in the certificate is the same as the local IP address of the BS.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-RedundancyFlag.html">REDUNDANCYFLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Redundancy Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the redundancy attribute of an IKE peer. If this parameter is set to NONE(Non-redundancy), the IKE peer does not use the IPSec redundancy function. If this parameter is set to MASTER(Master) or SLAVE(Slave), the IPSec policy group that references the IKE peer has been bound to an interface, the security configurations of the IPSec redundancy group to which the IKE peer belongs are modified, and the modified objects (IKEPROPOSAL, IKEPEER, IPSECPOLICY, IPSECPROPOSAL, IPSECBINDITF, and IPSECBIND) are reloaded, then the system unbinds the the IPSec policy group from the interface and then binds the IPSec policy group to the interface again. In the IPSec redundancy function, if the IKE SA of the slave IKE peer is available (you can run the <a href="dsp_ikesa.html">DSP IKESA</a> command to query the IKE SAs) or the slave IKE peer is being negotiated (you can check the negotiation status through IKE tracing), the slave IKE peer is being used. Otherwise, the master IKE peer is being used.</p>
+<p>GUI Value Range: NONE(None), MASTER(Master), SLAVE(Slave)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, MASTER, SLAVE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO, this parameter is valid only when <strong>IKEVERSION</strong> is set to IKE_V1 and <strong>IPVERSION</strong> is set to IPV4.</li><li>In an <strong>IKEPEER</strong> MO, this parameter is valid only when <strong>IKEVERSION</strong> is set to IKE_V2 and <strong>IPVERSION</strong> is set to IPV4 or IPV6.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-MasterPeerName.html">MASTERPEERNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Master Peer Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the master IKE peer to which the current slave IKE peer corresponds.</p>
+<p>GUI Value Range: 1~15 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-Priority.html">PRIORITY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of the current slave IKE peer. A small value indicates a high priority of the slave IKE peer.</p>
+<p>GUI Value Range: 1~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-CertSource.html">CERTSOURCE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate Source</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source of the certificate used for IKE negotiation in the multi-PKI scenario. When this parameter is set to APPCERT, the certificate configured by the APPCERT MO is used. When this parameter is set to CERTMK, the certificate configured by the CERTMK MO is used.</p>
+<p>GUI Value Range: APPCERT(Appcert), CERTMK(Certmk)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: APPCERT, CERTMK</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-CertName.html">CERTNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the certificate file used in the IKE negotiation in the multi-PKI scenario.</p>
+<p>GUI Value Range: 1~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-RedirectSW.html">REDIRECTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IKEv2 Redirect Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the IKEv2 redirection function. When this parameter is set to OFF, the base station does not support the IKEv2 redirection function, and will discard the redirection packets sent from the peer end. When this parameter is set to ON, the base station supports the IKEv2 redirection function. When the IKEv2 redirection function is enabled, the negotiation must be initiated by the base station. The IKEv2 redirection function is not supported by IKE SA in IPv6 scenarios.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid when IKE Version is set to IKE_V2 for the IKE peer and Local ID Type is set to IP.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-IPSecPreFragmentSwitch.html">IPSECPREFRGSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec PreFragment Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether packets can be fragmented before being encrypted. If this parameter is set to OFF and the IPVERSION parameter is set to IPv4 for an IKE peer, the IPv4 traffic is not fragmented, and the IPv6 traffic is fragmented based on the maximum MTU capability of the internal ports. If IPVERSION is set to IPv6 for an IKE peer, the internal system sets the MTU used by IPv4 and IPv6 traffic to the board maximum capability and fragments packets based on the board maximum capability.</p>
+<p>If this parameter is set to ON, packets are fragmented before being encrypted. If the IPVERSION parameter is set to IPv4 for an IKE peer, IPv4 and IPv6 packets are fragmented based on the MTU value of the IKE peer. If the IPVERSION of the IKE peer is set to IPv6, IPv4 and IPv6 traffic is fragmented based on the MTU4 and MTU6 values of the tunnel interface, respectively.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-MTU.html">MTU</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximum Transmission Unit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MTU of IPv4 or IPv6 before packets are encrypted when the IP protocol version of an IKE peer is IPv4. This parameter takes effect for both IPv4 and IPv6 traffic when the ACL type of the IPsec policy that references the IKE peer is IPv4+IPv6.</p>
+<p>If the length of a packet before encryption exceeds the value of this parameter, the system fragments the packet based on the value of this parameter and then encrypts the fragmented packet. If the length of the encrypted packet exceeds the value of MTU in the <strong>ETHPORT</strong> MO, <strong>ETHCIPORT</strong> MO, <strong>ETHTRK</strong> MO, <strong>IPRT</strong> MO, <strong>IPROUTE4</strong> MO, and <strong>INTERFACE</strong> MO, the encrypted packet will be fragmented again based on the MTU of the <strong>ETHPORT</strong> MO, <strong>ETHCIPORT</strong> MO, <strong>ETHTRK</strong> MO, <strong>IPRT</strong> MO, <strong>IPROUTE4</strong> MO, or <strong>INTERFACE</strong> MO.</p>
+<p>GUI Value Range: 46~9000</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 46~9000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1380</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to an excessively large value, a packet is segmented for a second time within the system, which reduces the transmission performance. If this parameter is set to an excessively small value, the number of fragmented packets increases, increasing the encryption times. Moreover, this also reduces the effective payload of transmission. As a result, the bandwidth cannot be efficiently used, and transmission performance decreases.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKEPEER-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether forcible changes to IKEPEER objects are made. When this parameter is set to YES, forcible changes to the IKEPEER objects are made. When this parameter is set to NO, forcible changes to the IKEPEER objects that affect associated objects are not allowed.</p>
+<p>The associated objects include CA and CERTREQ. This parameter is invalid when a WMPT, LMPT, GTMUb, or GTMUc serves as the main control board.</p>
+<p>Pay attention to the following when setting this parameter:</p>
+<p>1. The system checks whether forcible changes to IKEPEER objects affect associated objects based on the object configuration data instead of the actual object running status.</p>
+<p>2. If the NE is configured with an SRCIPRT, SRCIPROUTE4, PPPLNK, or MPGRP MO, the system does not check whether the modification of the local IP address affects the associated MOs of the IKEPEER MO.</p>
+<p>3. If the NE is configured with an SRCIPROUTE6 object, the system does not check whether the modification of the local IPv6 address affects the associated objects of the IKEPEER object.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_ikepeer__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To modify an IKE peer with the parameters as follows: IKE Peer Name: ike, Version: IKE_V1, Exchange Mode: AGGRESSIVE, Certificate Source: CERTMK, Certificate File Name: eNodeBCert.pem, run the following command:
+MOD IKEPEER: PEERNAME="ike", IKEVERSION=IKE_V1, EXCHMODE=AGGRESSIVE, CERTSOURCE=CERTMK, CERTNAME="eNodeBCert.pem";
+
+Example 2: To modify an IKE peer with the parameters as follows: IKE Peer Name: ikepeer, Version: IKE_V2, IP Version: IPV4, Local ID Type: IPV4, IKEv2 Redirect Switch: OFF, run the following command:
+MOD IKEPEER: PEERNAME="ikepeer", IKEVERSION=IKE_V2, IPVERSION=IPV4, IDTYPE=IPV4, REDIRECTSW=OFF;
+
+Example 3: To modify an IKE peer with the parameters as follows: IKE Peer Name: ikepeer2, Version: IKE_V2, IP Version: IPV4, Local ID Type: FQDN, NAT Traversal: DISABLE, run the following command:
+MOD IKEPEER: PEERNAME="ikepeer2", IKEVERSION=IKE_V2, IPVERSION=IPV4, IDTYPE=FQDN, NATTRAV=DISABLE;
+
+Example 4: To modify an IKE peer with the parameters as follows: IKE Peer Name: ikepeer6, Version: IKE_V2, IP Version: IPV6, Local ID Type: IPV6, Remote Name: segw, run the following command:
+MOD IKEPEER: PEERNAME="ikepeer6", IKEVERSION=IKE_V2, IPVERSION=IPV6, IDTYPE=IPV6, REMOTENAME="segw";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

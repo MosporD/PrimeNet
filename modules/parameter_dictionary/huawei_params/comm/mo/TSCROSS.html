@@ -1,0 +1,171 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="TSCROSS">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="TSCROSS">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>TSCROSS</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="TSCROSS"></a><a name="TSCROSS"></a>
+
+
+<h1 class="topictitle1">TSCROSS</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="TSCROSS.html"><strong>TSCROSS</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO indicates the timeslot cross-connection established between two E1/T1 ports. This enables one E1/T1 port to use the transport resources of the other E1/T1 port.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>E1T1</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]The source and destination E1/T1 ports of a timeslot cross-connection must have the same working mode. The source E1/T1 port of a timeslot cross-connection corresponds to the <strong>E1T1</strong> MO whose <strong>PS</strong> is set to ALLPORT and whose <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SRCSN</strong>, and <strong>SRCSBT</strong> in the <strong>TSCROSS</strong> MO, respectively. The destination E1/T1 port of a timeslot cross-connection corresponds to the <strong>E1T1</strong> MO whose <strong>PS</strong> is set to ALLPORT and whose <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>DSTSN</strong>, and <strong>DSTSBT</strong> in the <strong>TSCROSS</strong> MO, respectively. The two <strong>E1T1</strong> MOs must have the same <strong>WORKMODE</strong>. If no <strong>E1T1</strong> MO with <strong>PS</strong> set to ALLPORT has been configured, <strong>WORKMODE</strong> in the <strong>E1T1</strong> MOs must be set to the default value, namely, E1_UNBA.</li><li>[Co-MPT, NodeB, eGBTS]Before adding a <strong>TSCROSS</strong> MO, ensure that the associated backplane <strong>E1T1</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>TSCROSS</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]The total number of cross-board <strong>TSCROSS</strong> MOs, backplane <strong>E1T1</strong> MOs, and cross-board <strong>MPLNK</strong> MOs configured on the same board cannot exceed eight.</li><li>[Co-MPT, NodeB, eGBTS]If either <strong>SRCPN</strong> or <strong>DSTPN</strong> in a <strong>TSCROSS</strong> MO is configured on a backplane <strong>E1T1</strong> MO, the E1/T1 port corresponding to the backplane <strong>E1T1</strong> MO has been occupied. In this case, the backplane <strong>E1T1</strong> MO cannot be used by the ports corresponding to <strong>SRCPN</strong> and <strong>DSTPN</strong> in other <strong>TSCROSS</strong> MOs.</li><li>[Co-MPT, NodeB, eGBTS]A <strong>TSCROSS</strong> MO whose <strong>SRCTSN</strong> and <strong>DSTTSN</strong> have an intersection with those in an existing <strong>TSCROSS</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]In one logical protection group, <strong>SN</strong> in an <strong>HAGRP</strong> MO must be the same as <strong>SRCSN</strong> or <strong>DSTSN</strong> in a <strong>TSCROSS</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]<strong>PPPLNK</strong> and <strong>TSCROSS</strong> MOs cannot use the same backplane E1/T1 port.</li><li>[Co-MPT, NodeB, eGBTS]The E1/T1 timeslots occupied by a <strong>PPPLNK</strong> MO and those occupied by a <strong>TSCROSS</strong> MO cannot have an intersection.</li></ul>
+</li><li>Relation with the <strong>MPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]<strong>MPLNK</strong> and <strong>TSCROSS</strong> MOs cannot use the same backplane E1/T1 port.</li><li>[Co-MPT, NodeB, eGBTS]The E1/T1 timeslots occupied by an <strong>MPLNK</strong> MO and those occupied by a <strong>TSCROSS</strong> MO cannot have an intersection.</li></ul>
+</li><li>Relation with the <strong>IMALNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>SBT</strong> in an <strong>IMALNK</strong> MO is set to BACK_BOARD, the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>IMALNKN</strong> in the <strong>IMALNK</strong> MO must be different from the following combinations in the <strong>TSCROSS</strong> MO: (1) the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SRCSN</strong>, <strong>SRCSBT</strong>, and <strong>SRCPN</strong>; (2) the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>DSTSN</strong>, <strong>DSTSBT</strong>, and <strong>DSTPN</strong>.</li><li>[Co-MPT, NodeB]A <strong>TSCROSS</strong> MO whose <strong>SRCTSN</strong> and <strong>DSTTSN</strong> have been used by an <strong>IMALNK</strong> MO on the same port cannot be configured.</li></ul>
+</li><li>Relation with the <strong>UNILNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>SBT</strong> in a <strong>UNILNK</strong> MO is set to BACK_BOARD, the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>UNILNKN</strong> in the <strong>UNILNK</strong> MO must be different from the following combinations in the <strong>TSCROSS</strong> MO: (1) the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SRCSN</strong>, <strong>SRCSBT</strong>, and <strong>SRCPN</strong>; (2) the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>DSTSN</strong>, <strong>DSTSBT</strong>, and <strong>DSTPN</strong>.</li><li>[Co-MPT, NodeB]A <strong>TSCROSS</strong> MO whose <strong>SRCTSN</strong> and <strong>DSTTSN</strong> have been used by a <strong>UNILNK</strong> MO on the same port cannot be configured.</li></ul>
+</li><li>Relation with the <strong>FRAATM</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>SBT</strong> in an <strong>FRAATM</strong> MO is set to BACK_BOARD, the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>PN</strong> in the <strong>FRAATM</strong> MO must be different from the following combinations in the <strong>TSCROSS</strong> MO: (1) the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SRCSN</strong>, <strong>SRCSBT</strong>, and <strong>SRCPN</strong>; (2) the combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>DSTSN</strong>, <strong>DSTSBT</strong>, and <strong>DSTPN</strong>.</li><li>[Co-MPT, NodeB]A <strong>TSCROSS</strong> MO whose <strong>SRCTSN</strong> and <strong>DSTTSN</strong> have been used by an <strong>FRAATM</strong> MO on the same port cannot be configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, the <strong>TSCROSS</strong> MO cannot be configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#TSCROSS__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="TSCROSS__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="TSCROSS__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_tscross.html">ADD TSCROSS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a timeslot cross connection between two E1/T1 ports.</p>
+<p>In a dual-mode BS, after an E1/T1 port on the backplane is configured on a board, a timeslot cross connection from the panel of the board to the backplane must be created so that the source board can use the E1/T1 port shared by the destination board.</p>
+<p>In a dual-mode co-site base station, a timeslot cross connection from the panel of the source board to that of the destination board must be created so that transparent transmission of E1/T1 signals is available or E1/T1 ports are shared.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_tscross.html">LST TSCROSS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configurations of all timeslot cross-connections.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_tscross.html">RMV TSCROSS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a configured timeslot cross-connection.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#TSCROSS__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="TSCROSS__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="TSCROSS__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-TSCrossNo.html">TS Cross No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of a timeslot cross-connection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet that houses the board where timeslot cross-connections are established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack that houses the board where timeslot cross-connections are established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-SourceSlotNo.html">Source Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot that houses the board where the source ports of timeslot cross-connections are located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-SrcSubboardType.html">Source Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where the source ports of timeslot cross-connections are located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-SourcePortNo.html">Source Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the source port of a timeslot cross connection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-SourceTimeslot.html">Source Time Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the source timeslot of a timeslot cross connection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-DestinationSlotNo.html">Destination Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot that houses the board where the destination ports of timeslot cross-connections are located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-DstSubboardType.html">Destination Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where the destination ports of timeslot cross-connections are located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-DestinationPortNo.html">Destination Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the destination ports of timeslot cross-connections.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-DestinationTimeslot.html">Destination Time Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination timeslot of a timeslot cross-connection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TSCROSS-Description.html">Description</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the brief description about the timeslot cross connection.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

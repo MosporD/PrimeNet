@@ -1,0 +1,193 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="DOT1X">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="DOT1X">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>DOT1X</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="DOT1X"></a><a name="DOT1X"></a>
+
+
+<h1 class="topictitle1">DOT1X</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="DOT1X.html"><strong>DOT1X</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO describes the parameters required during the 802.1x authentication of the BS. When the BS accesses the network, the 802.1x authentication is initiated according to the configuration of 802.1x if the network supports the 802.1X protocol.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In one logical protection group, <strong>SN</strong> in an <strong>HAGRP</strong> MO must be the same as that in a <strong>DOT1X</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>CASCADEPORT</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO, this board cannot be configured with the <strong>DOT1X</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if the <strong>CASCADEPORT</strong> MO in which the <strong>PN</strong> parameter is set to 6 does not exist, this board cannot be configured with the <strong>DOT1X</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*40GE, the <strong>PN</strong> parameter in the <strong>DOT1X</strong> MO configured for this board can only be set to 0.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to AUTO, the <strong>PN</strong> parameter in the <strong>DOT1X</strong> MO configured for this board can only be set to 0.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 4*10GE, the <strong>PN</strong> parameter in the <strong>DOT1X</strong> MO configured for this board can only set to 0, 1, 2, or 3.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*100GE, the <strong>PN</strong> parameter in the <strong>DOT1X</strong> MO configured for this board can only be set to 0.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>DOT1X</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TYPE</strong> in an <strong>MDU</strong> MO is set to MDUC, the <strong>DOT1X</strong> MO must meet the following conditions: Cabinet No., Subrack No., and Slot No. are set to the same values as those in the <strong>MDU</strong> MO; <strong>SBT</strong> is set to BASE_BOARD; <strong>PN</strong> is set to a value within the range 0 to 2.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>DOT1X</strong> MOs is 0 when the following conditions are met:</li><li>The <strong>Application</strong> MO is configured with <strong>AT</strong> set to GBTS.</li><li>The <strong>GTMU</strong> MO is configured with <strong>TYPE</strong> set to GTMU and <strong>BRDSPEC</strong> not set to "GTMUc" (case insensitive) or null.</li><li>The <strong>DOT1X</strong> MO is not configured with <strong>TYPE</strong> set to UMPT.</li><li>[Co-MPT, eGBTS]The number of <strong>DOT1X</strong> MOs does not exceed 48 when the following conditions are met:</li><li>The <strong>Application</strong> MO is configured with <strong>AT</strong> set to GBTS.</li><li>The <strong>GTMU</strong> MO is configured with <strong>TYPE</strong> set to GTMU and <strong>BRDSPEC</strong> set to "GTMUc" (case insensitive) or null.</li><li>The <strong>DOT1X</strong> MO is not configured with <strong>TYPE</strong> set to UMPT.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#DOT1X__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="DOT1X__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="DOT1X__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/act_dot1x.html">ACT DOT1X</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to activate the 802.1X authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dea_dot1x.html">DEA DOT1X</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to deactivate the 802.1X authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_dot1x.html">DSP DOT1X</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of 802.1X.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_dot1x.html">LST DOT1X</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of 802.1X.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#DOT1X__tab2">Table 2</a> and <a href="#DOT1X__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="DOT1X__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="DOT1X__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DOT1X-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet that provides the port on which IEEE 802.1X authentication is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DOT1X-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack that provides the port on which IEEE 802.1X authentication is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DOT1X-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot that provides the port on which IEEE 802.1X authentication is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DOT1X-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board that provides the port on which IEEE 802.1X authentication is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DOT1X-PortNo.html">Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the port on which IEEE 802.1X authentication is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DOT1X-AuthMethod.html">Authentic Method</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IEEE 802.1X authentication method. Currently, only Extensible Authentication Protocol Transport Layer Security (EAP-TLS), a unidirectional authentication method, is supported.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="DOT1X__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="DOT1X__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/DOT1X-AbnormalPackNum.html">Abnormal Packet Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of abnormal packets received during the most recent IEEE 802.1X authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/DOT1X-FailNum.html">Fail Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of IEEE 802.1X authentication failures. The value of this parameter includes the IEEE 802.1X authentication failures during the DHCP process.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/DOT1X-FailReason.html">Fail Reason</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cause of the latest IEEE 802.1X authentication failure or the latest unauthentication where the BS does not initiate the authentication. The value of this parameter is deleted after a successful IEEE 802.1X authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/DOT1X-RecvEapNum.html">Receive EAP Packet Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received Extensible Authentication Protocol (EAP) packets during the most recent IEEE 802.1X authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/DOT1X-AuthState.html">Authentic State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of IEEE 802.1X authentication. Possible states are as follows: UNAUTHENTICATED(Unauthenticated), AUTHENTICATING(Authenticating), AUTHENTIC_SUCCEED(Authenticate Succeed), AUTHENTIC_FAIL(Authenticate Fail), and DHCP_AUTHENTICATING(DHCP Activation Authenticating).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/DOT1X-SendEapNum.html">Send EAP Packet Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted Extensible Authentication Protocol (EAP) packets during the most recent IEEE 802.1X authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/DOT1X-SucceedNum.html">Authentic Succeed Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of successful IEEE 802.1X authentications. The value of this parameter includes the successful IEEE 802.1X authentications during the DHCP process.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

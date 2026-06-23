@@ -1,0 +1,426 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="Cell and Channel MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of managed object models (MOMs) and managed objects (MOs) of cells and channels.">
+<meta name="description" content="This section describes the functions and concepts of managed object models (MOMs) and managed objects (MOs) of cells and channels.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../ratL/mom/eNodeBFunction-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="LTE FDD">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Radio-Cell">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Cell and Channel MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Radio-Cell"></a><a name="Radio-Cell"></a>
+
+
+<h1 class="topictitle1">Cell and Channel MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of managed
+object models (MOMs) and managed objects (MOs) of cells and channels.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p><strong>Cells</strong></p>
+<p>A cell is a radio coverage area that provides services for users.
+All the cells joined together provide coverage for the entire radio
+network. Coverage is classified into overlapping coverage and separate
+coverage. <a href="#Radio-Cell__fig1">Figure 1</a> shows the mapping between cells
+and coverage areas.  </p>
+<div class="p"><div class="fignone" id="Radio-Cell__fig1"><a name="Radio-Cell__fig1"></a><a name="fig1"></a><span class="figcap"><b>Figure 1 </b>Mapping between cells and coverage areas</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure2-1.png"></span></div>
+</div>
+<p>Cell attributes include parameters related to radio services and
+are used to identify cells in different types. The transmit (TX) and
+receive(RX) modes of cells include 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 8T8R,
+and others.</p>
+<p><strong>Sector</strong></p>
+<p>A sector is the
+smallest radio coverage area. Each sector uses one or more radio carriers
+to achieve coverage. Each radio carrier works at a frequency. A sector
+and a carrier together compose a cell that user equipment (UEs) can
+access.</p>
+<p>Sectors are classified into omnidirectional sectors
+and directional sectors. An omnidirectional sector covers a circle
+area of 360 degrees with an omnidirectional antenna at the center.
+Omnidirectional sectors are used for low-traffic coverage. Directional
+sectors are used for high-traffic coverage. Each directional sector
+uses directional antennas for coverage. In three-sector scenarios,
+each directional antenna covers a sector area of 120 degrees. In six-sector
+scenarios, each directional antenna covers a sector area of 60 degrees.
+The coverage areas of adjacent sectors overlap each other because
+the actual azimuth of each sector is slightly larger than 60 or 120
+degrees.</p>
+<p>The number of cells supported by an eNodeB is calculated
+as follows: Number of cells supported by an eNodeB = Number of sectors
+x Number of carriers </p>
+<div class="p"><a href="#Radio-Cell__fig2">Figure 2</a> shows the mapping
+between sectors, carriers, and cells. This figure uses a typical 3x2
+configuration as an example. Three sectors (sectors 0-2) cover a circle
+area. Each sector uses two carriers, and each cell uses one carrier.
+There are a total of six cells. <div class="fignone" id="Radio-Cell__fig2"><a name="Radio-Cell__fig2"></a><a name="fig2"></a><span class="figcap"><b>Figure 2 </b>Mapping between sectors, carriers, and cells</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure2-2.png"></span></div>
+</div>
+<div class="p"><ul><li><p>Mapping Between Sectors and RF Resources</p>
+<a href="#Radio-Cell__fig3">Figure 3</a> shows the mapping between sectors and radio frequency (RF)
+resources of an eNodeB. A sector uses antennas for coverage. To improve
+the receive quality, each antenna provides two receive channels that
+work in receive diversity mode. <div class="fignone" id="Radio-Cell__fig3"><a name="Radio-Cell__fig3"></a><a name="fig3"></a><span class="figcap"><b>Figure 3 </b>Mapping between sectors and RF resources of an eNodeB</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure2-3.png"></span></div>
+</li><li>Cell Type<ul><li><p>Common Cell</p>
+The TX and RX modes of common cells include
+1T1R, 1T2R, 2T2R, 2T4R, 4T4R, and 8T8R. A common cell can be configured
+on an LRRU or LRFU. Larger capacity is provided by a common cell configured
+on two combined LRRUs or LRFUs. The two combined LRRUs or LRFUs must
+be configured to the same LBBP. In LTE TDD, only 2T2R supports the
+networking of combined LRRUs or LRFUs. In LTE frequency division duplex
+(FDD), 2T2R, 2T4R, and 4T4R support the networking of combined LRRUs
+or LRFUs. </li><li><p>Sectors with Multiple RRUs Combined </p>
+<p>Multiple RRUs can
+be combined to serve a cell. The transmitter combines uplink signals
+on each RRU or selectively transmits them. The receiver combines the
+uplink signals from multiple RRUs or selectively demodulates them.
+Multi-RRU combination is also called multi-carrier combination. </p>
+<div class="p">Multi-RRU combination has the following advantages:  <ul><li>Increased cell coverage radius and less UE handovers.</li><li>Improved UE performance by reducing the number of cells, the area
+of cell boundaries, and interference.</li><li>Reduced capacity expansion costs by splitting a cell into multiple
+cells.</li></ul>
+</div>
+<div class="p">Multi-RRU combination is applicable in the following scenarios:
+ <ul><li> Ultra-high-speed railway scenarios (as shown in <a href="#Radio-Cell__fig4">Figure 4</a>): Multi-RRU combination prevents performance deterioration
+caused by frequent UE handovers.</li><li>Non-ultra-high-speed railway scenarios: The scenarios include
+wide coverage scenarios and macro coverage scenarios, as shown in <a href="#Radio-Cell__fig5">Figure 5</a> and <a href="#Radio-Cell__fig6">Figure 6</a> respectively.</li></ul>
+</div>
+</li></ul>
+</li></ul>
+<div class="fignone" id="Radio-Cell__fig4"><a name="Radio-Cell__fig4"></a><a name="fig4"></a><span class="figcap"><b>Figure 4 </b>Two RRUs combined back to back in ultra-high-speed railway
+scenarios</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure2-4.png"></span></div>
+<div class="fignone" id="Radio-Cell__fig5"><a name="Radio-Cell__fig5"></a><a name="fig5"></a><span class="figcap"><b>Figure 5 </b>Multi-RRU combination in wide coverage scenarios</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure2-5.png"></span></div>
+<div class="fignone" id="Radio-Cell__fig6"><a name="Radio-Cell__fig6"></a><a name="fig6"></a><span class="figcap"><b>Figure 6 </b>Multi-RRU combination in macro coverage scenarios</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure2-6.png"></span></div>
+</div>
+<p><strong>Channels</strong></p>
+<div class="p">In the LTE system, channels are classified
+into logical channels, transport channels, and physical channels at
+the layer level:<ul><li>Logical channels are defined based on the types of data to be
+transmitted.</li><li>Transport channels are defined based on the formats of transmitted
+data packets.</li><li>Physical channels are defined based on the purposes of time and
+frequency resources on the Uu interface.</li></ul>
+<a href="#Radio-Cell__table1">Table 1</a> describes the classifications of
+physical channels, transport channels, and logical channels.
+<div class="tablenoborder"><a name="Radio-Cell__table1"></a><a name="table1"></a><table cellpadding="4" cellspacing="0" summary="" id="Radio-Cell__table1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Classifications of physical channels, transport channels, and
+logical channels</caption>
+<tbody>
+<tr>
+<td class="cellrowborder" colspan="2" valign="top"><p>Classification</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>Channel</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="7" valign="top" width="17.666666666666668%"><p>Logical channels</p>
+</td>
+
+<td class="cellrowborder" rowspan="5" valign="top" width="17.333333333333336%"><p>Control channels</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="65%"><p>BCCH(Broadcast Control CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PCCH(Paging Control CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>CCCH(Common Control CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>MCCH(Multicast Control CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>DCCH(Dedicated Control CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="2" valign="top"><p>Traffic channels</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>DTCH(Dedicated Traffic CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>MTCH(Multicast Traffic CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="6" valign="top" width="17.666666666666668%"><p>Transport channels</p>
+</td>
+
+<td class="cellrowborder" rowspan="4" valign="top" width="17.333333333333336%"><p>Downlink transport channels</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="65%"><p>BCH(Broadcast CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>DL-SCH(Downlink Shared CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PCH(Paging CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>MCH(Multicast CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="2" valign="top"><p>Uplink transport channels</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>UL-SCH(Uplink Shared CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>RACH(Random Access CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="9" valign="top" width="17.666666666666668%"><p>physical channels</p>
+</td>
+
+<td class="cellrowborder" rowspan="6" valign="top" width="17.333333333333336%"><p>Downlink physical channels</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="65%"><p>PDSCH(Physical Downlink Shared CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PBCH(Physical Broadcast CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PMCH(Physical Multicast CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PCFICH(Physical Control Format Indicator CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PDCCH(Physical Downlink Control CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PHICH(Physical HARQ Indicator CHannel)</p>
+<div class="note"><span class="notetitle"> NOTE: </span><div class="notebody">HARQ is short for hybrid automatic repeat request.</div></div>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="3" valign="top"><p>Uplink physical channels</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>PUSCH(Physical Uplink Shared CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PUCCH(Physical Uplink Control CHannel)</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>PRACH(Physical Random Access CHannel)</p>
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+</div>
+<a href="#Radio-Cell__fig7">Figure 7</a> and <a href="#Radio-Cell__fig8">Figure 8</a> show
+the mapping between the three types of channels in the downlink and
+uplink, respectively.<div class="fignone" id="Radio-Cell__fig7"><a name="Radio-Cell__fig7"></a><a name="fig7"></a><span class="figcap"><b>Figure 7 </b>Mapping between the three types of channels in the downlink</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure2-7.png"></span></div>
+<div class="fignone" id="Radio-Cell__fig8"><a name="Radio-Cell__fig8"></a><a name="fig8"></a><span class="figcap"><b>Figure 8 </b>Mapping between the three types of channels in the uplink</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure2-8.png"></span></div>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Radio-Cell__fig9">Figure 9</a> shows the cell and channel MOM, which is a subset of the
+eNodeB MOM.<div class="fignone" id="Radio-Cell__fig9"><a name="Radio-Cell__fig9"></a><a name="fig9"></a><span class="figcap"><b>Figure 9 </b>Cell and channel MOM</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure3-1.png"></span></div>
+<a href="#Radio-Cell__fig10">Figure 10</a> shows the sector MOM, which is a subset of the
+eNodeB MOM.<div class="fignone" id="Radio-Cell__fig10"><a name="Radio-Cell__fig10"></a><a name="fig10"></a><span class="figcap"><b>Figure 10 </b>Cell and channel MOM</span>
+
+<br><span><img src="../image/mom/Cell_CH-figure3-2.png"></span></div>
+</div>
+<p><strong>Cell MOs</strong></p>
+<div class="p">Cell MOs are defined as follows:<ul><li><a href="../mo/Cell.html">Cell</a> defines the basic information
+about a cell. Operators need to plan and design parameters such as
+the E-UTRAN cell global identifier (ECGI), E-UTRA absolute radio frequency
+channel number (EARFCN), physical cell identifier (PCI), and tracking
+area code (TAC). The number of cells supported by an eNodeB relates
+to the hardware configuration of the eNodeB. In eRAN3.0, an eNodeB
+supports a maximum of 18 cells.</li><li><a href="../mo/CellOp.html">CellOp</a> defines the information
+about the operator of a cell. The number of <a href="../mo/CellOp.html">CellOp</a> MOs set for each cell varies depending on the working
+mode. <ul><li>If the <em>ENodeBSharingMode</em> parameter is set to INDEPENDENT,
+only one <a href="../mo/CellOp.html">CellOp</a> MO can be set
+for each cell and the corresponding cell operator must be the primary
+operator.</li><li>If the <em>ENodeBSharingMode</em> parameter is set to SEPARATED_FREQ,
+only one <a href="../mo/CellOp.html">CellOp</a> MO can be set
+for each cell.</li><li>If the <em>ENodeBSharingMode</em> parameter is set to SHARED_FREQ,
+a maximum of four <a href="../mo/CellOp.html">CellOp</a> MOs
+can be set for each cell.</li></ul>
+</li><li><a href="../mo/CellAccess.html">CellAccess</a> defines UE
+access parameters such as the cell barring status and reservation
+status. Operators need to set these parameters, which are then broadcast
+using system information.</li><li><a href="../mo/CellAcBar.html">CellAcBar</a> defines barring
+parameters for access classes (ACs). Operators need to set these parameters,
+which are then broadcast using system information.</li><li><a href="../mo/CellSiMap.html">CellSiMap</a> defines the
+transport periods of system information blocks (SIBs) in a cell. Operators
+can set the transport period of an SIB. The eNodeB uses the default
+parameter values if operators do not set the transport periods of
+SIBs.</li><li><a href="../mo/CellSel.html">CellSel</a> defines parameters
+used during cell selection. Operators need to set these parameters,
+which are then broadcast using system information.</li><li><a href="../mo/CellResel.html">CellResel</a> defines intra-
+and inter-frequency cell reselection parameters in the Evolved Universal
+Terrestrial Radio Access Network (E-UTRAN) system. Operators need
+to set these parameters, which are then broadcast using system information.</li><li><a href="../mo/CellReselGeran.html">CellReselGeran</a> defines
+parameters used for UEs to perform reselection from an E-UTRAN cell
+to a GSM/EDGE Radio Access Network (GERAN) cell. This MO is set only
+when GERANs are deployed around an E-UTRAN.</li><li><a href="../mo/CellReselUtran.html">CellReselUtran</a> defines
+parameters used for UEs to perform reselection from an E-UTRAN cell
+to a Universal Terrestrial Radio Access Network (UTRAN) cell. This
+MO is set only when UTRANs are deployed around an E-UTRAN. </li><li><a href="../mo/CellReselCdma2000.html">CellReselCdma2000</a> defines parameters used for UEs to perform reselection from an E-UTRAN
+cell to a CDMA2000 cell. This MO is set only when CDMA2000 networks
+are deployed around an E-UTRAN.</li><li><a href="../mo/UeTimerConst.html">UeTimerConst</a> defines
+UE timer parameters. Operators need to set these parameters, which
+are then broadcast using system information. The eNodeB uses the default
+parameter values if operators do not set these parameters.</li><li><a href="../mo/CellChPwrCfg.html">CellChPwrCfg</a> defines
+transmit power used by downlink channels in a cell.</li></ul>
+</div>
+<p><strong>Sector MOs</strong></p>
+<div class="p">Sector MOs are defined as follows: <ul><li><a href="../mo/Cell.html">Cell</a> defines the basic information
+about a cell. Network planning personnel need to configure the basic
+information such as the cell ID and RF information as required. </li><li><a href="../../comm/mo/Sector.html">Sector</a> defines a
+sector, which is the smallest radio coverage unit.</li><li><a href="../../comm/mo/AntennaPort.html">AntennaPort</a> defines
+an antenna port on an RRU or radio frequency unit (RFU). The RRU or
+RFU supplies power to and exchanges signaling with a remote electrical
+tilt (RET) antenna or tower-mounted amplifier (TMA) through the antenna
+port. In addition, the RRU or RFU transmits RF signals to subunits
+in an RET antenna or TMA through the antenna port. </li><li><a href="../../comm/mo/Equipment.html">Equipment</a> defines
+a root object, which manages equipment-class MOs. Before a sector
+is created, <a href="../../comm/mo/Equipment.html">Equipment</a> must already be created because it is the parent object of the sector.</li><li><a href="../../comm/mo/RRU.html">RRU</a> RRU defines parameters
+related to an RRU. The RRU provide ports for sending and receiving
+baseband and RF signals and process uplink and downlink RF signals.</li><li><a href="../../comm/mo/RFU.html">RFU</a> defines parameters
+related to an RFU. The RFU provide ports for sending and receiving
+baseband and RF signals and process uplink and downlink RF signals.</li></ul>
+</div>
+<p><strong>Channel MOs</strong></p>
+<div class="p">Channel MOs are defined as follows:<ul><li><a href="../mo/BcchCfg.html">BcchCfg</a> defines parameters
+related to a BCCH. The BCCH is a downlink logical channel that broadcasts
+system control information.</li><li><a href="../mo/RACHCfg.html">RACHCfg</a> defines parameters
+related to an RACH. The RACH is an uplink transport channel that is
+used for UEs to initiate initial access.</li><li><a href="../mo/PCCHCfg.html">PCCHCfg</a> defines parameters
+related to a PCCH. The PCCH is a downlink logical channel that transmits
+paging messages and system information update indicators.</li><li><a href="../mo/PDSCHCfg.html">PDSCHCfg</a> defines parameters
+related to a PDSCH. The PDSCH carries downlink shared transport channels
+and paging channels. All UEs in a cell share downlink transport channels
+to transmit downlink data. Paging channels are used to transmit paging
+messages.</li><li><a href="../mo/PUSCHCfg.html">PUSCHCfg</a> defines parameters
+related to a PUSCH. The PUSCH carries uplink shared transport channels.
+All UEs in a cell share uplink transport channels to transmit uplink
+data.</li><li><a href="../mo/PHICHCfg.html">PHICHCfg</a> defines parameters
+related to a PHICH. The PHICH is used to transmit downlink hybrid
+automatic repeat request (HARQ) signals.</li><li><a href="../mo/PUCCHCfg.html">PUCCHCfg</a> defines parameters
+related to a PUCCH. The PUCCH is used for UEs to transmit physical
+uplink control signals.</li><li><a href="../mo/SRSCfg.html">SRSCfg</a> defines parameters
+related to time and frequency resources used by a sounding reference
+signal (SRS). The SRS is a physical signal that a UE transmits to
+the eNodeB to evaluate uplink channel conditions.</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../ratL/mom/eNodeBFunction-mom.html" title="This chapter describes the functions, concepts, and child MOMs of the eNodeBFunction MOM. MOM is short for managed object models.">eNodeBFunction MOM Description</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

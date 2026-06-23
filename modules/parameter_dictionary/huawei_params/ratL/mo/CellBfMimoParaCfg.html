@@ -1,0 +1,342 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellBfMimoParaCfg">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellBfMimoParaCfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellBfMimoParaCfg</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellBfMimoParaCfg"></a><a name="CellBfMimoParaCfg"></a>
+
+
+<h1 class="topictitle1">CellBfMimoParaCfg</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellBfMimoParaCfg.html"><strong>CellBfMimoParaCfg</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A CellBfMimoParaCfg MO indicates the configuration of adaptive selection between beamforming and MIMO. After adaptive selection between beamforming and MIMO is enabled, the eNodeB chooses a transmission mode based on the UE channel characteristics. After adaptive selection between beamforming and MIMO is disabled, the eNodeB always uses MIMO or beamforming transmission mode. Currently, only open-loop beamforming and open-loop MIMO transmission modes are supported.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>When the NoSrsSccBfSwitch option of the <strong>NoSrsSccBfAlgoSwitch</strong> parameter in a <strong>CellAlgoSwitch</strong> MO is selected, the <strong>SccBfMimoAdaptiveSwitch</strong> parameter in the associated <strong>CellBfMimoParaCfg</strong> MO must be set to ON.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, and <strong>CellBf</strong> MOs:<ul><li>The TurboBfSwitch option of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only if the <strong>FddTddInd</strong>, <strong>MultiRruCellFlag</strong>, <strong>TxRxMode</strong>, and <strong>MultiCellShareMode</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD, BOOLEAN_FALSE, 8T8R, and NORMAL respectively, the BfSwitch option of the <strong>BfAlgoSwitch</strong> parameter and MuBfSwitch option of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected, the FreqSelSwitch option of the <strong>DlSchSwitch</strong> parameter and InterCellDmimoJTSwitch option of the <strong>DMIMOAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are deselected, the <strong>HighOrderMubfMaxLayer</strong> parameter in the <strong>CellBf</strong> MO is set to FOUR_LAYERS, and the <strong>BfMimoAdaptiveSwitch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO is set to MIMO_BF_ADAPTIVE.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> and <strong>Cell</strong> MOs:<ul><li>The <strong>BfMimoAdaptiveSwitch</strong> parameter in the <strong>CellBfMimoParacfg</strong> MO must be set to MIMO_BF_ADAPTIVE when the SfnJtSwitch option of the <strong>SfnAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, and the <strong>FddTddInd</strong>, <strong>MultiRruCellFlag</strong>, and <strong>MultiRruCellMode</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD, BOOLEAN_TRUE, and MPRU_AGGREGATION respectively.</li><li>The <strong>BfMimoAdapWithTm4Switch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO can be set to ON only if all of the following conditions are met: The <strong>CrsPortNum</strong> parameter in the <strong>Cell</strong> MO is set to CRS_PORT_4. The BfSwitch check box is selected under the <strong>BfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO. The <strong>BfMimoAdaptiveSwitch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO is set to MIMO_BF_ADAPTIVE.</li><li>The <strong>BfMimoAdapWithTm4Switch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO can be set to ON only if the <strong>MultiRruCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to BOOLEAN_FALSE or all of the following conditions are met: The <strong>MultiRruCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to BOOLEAN_TRUE. The <strong>MultiRruCellMode</strong> parameter in the <strong>Cell</strong> MO is set to SFN. The <strong>SfnDlSchSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is set to JOINT, or the <strong>SfnDlSchSwitch</strong> parameter is set to ADAPTIVE and the SfnDl2LoadLevelAdptSwitch check box is selected under the <strong>SfnAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, <strong>CellBf</strong>, and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>The HEAVYLOADTRANSMODEADAPTBOOSTSW option of the <strong>BfMimoAlgoOptSwitch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO can be selected only when the following conditions are met:</li><li>The <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD.</li><li>The <strong>BfMimoAdaptiveSwitch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO is set to MIMO_BF_ADAPTIVE.</li><li>The BfSwitch option of the <strong>BfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected.</li><li>The SsrdSchOptSwitch option of the <strong>SSRDAlgoSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected or the MuBfSwitch option of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected.</li><li>The <strong>WaitPairingLayerThd</strong> parameter in the <strong>CellBf</strong> MO is set to 0.</li><li>The <strong>MultiLayerThdSwitchToTM7</strong> parameter in the <strong>CellBf</strong> MO is set to 0.</li><li>The TurboBfSwitch option of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The TM9_DL_4LAYER_BOOST_SW option of the <strong>Tm9Dl4LayerMimoEnhSw</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO can be selected only when the following conditions are true: In the <strong>Cell</strong> MO, <strong>FddTddInd</strong> is set to CELL_TDD, and <strong>MultiRruCellFlag</strong> is set to BOOLEAN_TRUE but <strong>MultiRruCellMode</strong> is not set to MPRU_AGGREGATION; in the <strong>CellBfMimoParaCfg</strong> MO, <strong>BfMimoAdaptiveSwitch</strong> is set to MIMO_BF_ADAPTIVE; in the <strong>CellAlgoSwitch</strong> MO, the TM9Switch option of the <strong>EnhMIMOSwitch</strong> parameter is selected.</li></ul>
+</li><li>Relation with the <strong>CellWttxParaCfg</strong>, <strong>SpidCfg</strong>, and <strong>CellQciPara</strong> MOs:<ul><li>The TM9_DL_4LAYER_BOOST_SW option of the <strong>Tm9Dl4LayerMimoEnhSw</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO can be selected only if either of the following conditions is met:</li><li>1. The <strong>WbbOrMbbUserDefMode</strong> parameter in the <strong>CellWttxParaCfg</strong> MO is set to SPID_BASED, and the <strong>SpecifiedUserFlag</strong> parameter in the <strong>SpidCfg</strong> MO is set to SPECSERUSER for any SPID.</li><li>2. The <strong>WbbOrMbbUserDefMode</strong> parameter in the <strong>CellWttxParaCfg</strong> MO is set to QCI_BASED, and the <strong>ServiceFlag</strong> parameter is set to WBB_SERVICE for any QCI used in the cell specified in the <strong>CellQciPara</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SectorSplitCell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, then the <strong>BfMimoAdaptiveSwitch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO must be set to NO_ADAPTIVE or MIMO_BF_ADAPTIVE.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, then the <strong>FixedBfMimoMode</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO cannot be set to TM7, TM8, or TM9w/oPMI.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellBf</strong>, <strong>CellMMAlgo</strong>, <strong>SectorSplitCell</strong>, <strong>ENodeBAlgoSwitch</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The TM8_PORT_ALLOC_OPT_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only when all of the following conditions are met: 1. The <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD. 2. The <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R. 3. The <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured. 4. The <strong>Tm8PairingOptSwitch</strong> parameter in the <strong>CellBf</strong> MO is set to ON. 5. The UeSRSAntSelectCtrlSwitch option of the <strong>CompatibilityCtrlSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is deselected. 6. The FakeAntSelIdentificationSwitch option of the <strong>BfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected. 7. The NON_AS_UE_MAX_BF_RANK_CTRL_SW option of the <strong>BfMimoAlgoOptSwitch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>The <strong>BfMimoAdapWithTm4Switch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO can be set to ON only if the <strong>HighSpeedFlag</strong> parameter in the <strong>Cell</strong> MO is set to LOW_SPEED.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellBfMimoParaCfg__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellBfMimoParaCfg__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellBfMimoParaCfg__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellbfmimoparacfg.html">LST CELLBFMIMOPARACFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the parameters related to adaptive switching between beamforming and MIMO. This command applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellbfmimoparacfg.html">MOD CELLBFMIMOPARACFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of adaptive</p>
+<p>selection between beamforming and MIMO. This command applies only</p>
+<p>to LTE TDD networks.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellBfMimoParaCfg__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellBfMimoParaCfg__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellBfMimoParaCfg__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local cell ID. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-BfMimoAdaptiveSwitch.html">BfMIMO adaptive switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of adaptive selection between beamforming and MIMO for a multi-antenna eNodeB. The values are described as follows:</p>
+<p>NO_ADAPTIVE: A fixed beamforming or MIMO transmission mode is used. That is, transmission mode switching is not supported.</p>
+<p>TxD_BF_ADAPTIVE: The transmission mode changes adaptively between TM2 and TM7 or between TM2 and TM8, depending on the 3GPP release with which UEs comply.</p>
+<p>MIMO_BF_ADAPTIVE: The transmission mode changes adaptively among TM2, TM3, and TM7, among TM2, TM3, and TM8, or among TM2, TM3, TM8, and TM9, depending on the 3GPP release with which UEs comply. The TM9Switch option must be selected if the TM9 mode is required. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-FixedBfMimoMode.html">Fixed BfMIMO mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the fixed beamforming or MIMO transmission mode configured for a multi-antenna eNodeB. This parameter is valid only when the BfMimoAdaptiveSwitch parameter is set to NO_ADAPTIVE. This parameter applies only to LTE TDD. The values are described as follows:</p>
+<p>TM2: Transmission mode 2 is always used for UEs.</p>
+<p>TM3: Transmission mode 3 is always used for UEs.</p>
+<p>TM7: Transmission mode 7 is always used for UEs.</p>
+<p>TM8: Transmission mode 8 is always used for UEs.</p>
+<p>TM4: Transmission mode 4 is always used for UEs.</p>
+<p>TM9 w/o PMI: Transmission mode 9, which does not require PMI feedback, is always used for UEs.</p>
+<p>TM9 w PMI: Transmission mode 9, which requires PMI feedback, is always used for UEs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-BfMimoAdapWithoutTm2.html">Bf Mimo Adaptive Without Tm2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether TM2 can be selected during adaptation between beamforming and MIMO when the BfMimoAdaptiveSwitch parameter is set to MIMO_BF_ADAPTIVE. This parameter applies only to LTE TDD.</p>
+<p>If this parameter is set to ON and the BfMimoAdaptiveSwitch parameter is set to MIMO_BF_ADAPTIVE:</p>
+<p>1. When the BfMimoAdapWithTm4Switch parameter in the CellBfMimoParaCfg MO is set to OFF, TM3 is initially used for handovers in the cell, and then the transmission mode is adaptively selected between TM3</p>
+<p>and TM7, between TM3 and TM8, or among TM3, TM8, and TM9 based on the version of 3GPP release that UEs comply with. If TM9 needs to be adaptively selected, the TM9Switch option of the EnhMIMOSwitch parameter must be selected.</p>
+<p>2. When the BfMimoAdapWithTm4Switch parameter in the CellBfMimoParaCfg MO is set to ON, TM4 is initially used for handovers in the cell, and then the transmission mode is adaptively selected among TM2, TM4, and TM7, among TM2, TM4, and TM8, or among TM2, TM4, TM7, and TM8 based on the version of 3GPP release that UEs comply with.</p>
+<p>If this parameter is set to OFF and the BfMimoAdaptiveSwitch parameter is set to MIMO_BF_ADAPTIVE:</p>
+<p>1. When the BfMimoAdapWithTm4Switch parameter in the CellBfMimoParaCfg MO is set to OFF, TM2 is initially used for handovers in the cell, and then the transmission mode is adaptively selected among TM2, TM3, and TM7, among TM2, TM3, and TM8, or among TM2, TM3, TM8, and TM9 based on the version of 3GPP release that UEs comply with. If TM9 needs to be adaptively selected, the TM9Switch option of the EnhMIMOSwitch parameter must be selected.</p>
+<p>2. When the BfMimoAdapWithTm4Switch parameter in the CellBfMimoParaCfg MO is set to ON, TM2 is initially used for handovers in the cell, and then the transmission mode is adaptively selected among TM2, TM4, and TM7, among TM2, TM4, and TM8, or among TM2, TM4, TM7, and TM8 based on the version of 3GPP release that UEs comply with.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-BfSingleToDualThdOffset.html">Single to Dual Streaming Beamforming Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for switching of the UE transmission mode from single-stream beamforming mode to dual-stream beamforming mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-TM3Rank2ToDualBfThdOffset.html">TM3 Rank2 To Dual Streaming Beamforming Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for switching the UE transmission mode from TM3 dual-stream mode to dual-stream beamforming mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-AsUeDualBfToTM3Rank2Offset.html">AS UE Dual BF To TM3 Rank2 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for triggering switching of the transmission mode of UEs supporting antenna selection from dual-stream beamforming to TM3 rank 2. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-AsUeTM3Rank2ToDualBfOffset.html">AS UE TM3 Rank2 To Dual BF Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for switching the transmission mode of an antenna selection-enabled UE from TM3 dual-stream mode to dual-stream beamforming mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-AsUeBfSingleToDualOffset.html">AS UE Single to Dual BF Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for switching the transmission mode of an antenna selection-enabled UE from single-stream beamforming mode to dual-stream beamforming mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-DualBfToTM3Rank2Offset.html">Dual Streaming Beamforming To TM3 Rank2 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for switching the UE transmission mode from dual-stream beamforming mode to TM3 dual-stream mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-OffsetOfInStat.html">Offset Of In Statistics</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the measured weight has a gain. When the difference between the measured weight and the instantaneous weight is greater than the offset, the measured weight is used as the beamforming weight. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-OffsetOfOutStat.html">Offset Of Out Statistics</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the difference between the instantaneous weight and the measured weight. This parameter is used to identify whether the instantaneous weight has a gain. If the difference between the instantaneous weight and the measured weight is less than this offset, the instantaneous weight is used for beamforming. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-AntBasedBfMimoAlgoSelect.html">Antenna Type-based BF and MIMO Algo Selection</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the antenna type on which adaptive selection between beamforming and MIMO can be performed. This parameter applies only to LTE TDD.</p>
+<p>Value 0(0) indicates 8T8R cross polarization antennas.</p>
+<p>Value 1(1) indicates 8T8R omnidirectional circular antennas.</p>
+<p>Value 2(2) indicates other antenna types.</p>
+<p>Set this parameter based on the antenna type in use.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-Tm3DirectToDualBfSwitch.html">The Switch of Tm3 Direct to DualBF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow transmission mode switching directly from TM3 to dual-stream beamforming when adaptation between MIMO and beamforming is enabled. If this parameter is set to ON, the transmission mode can change directly from TM3 to dual-stream beamforming. If this parameter is set to OFF, TM3 must be changed to single-stream beamforming and then to dual-stream beamforming when the dual-stream beamforming mode is required. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-SccBfMimoAdaptiveSwitch.html">Scc Bf Mimo Adaptive Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable transmission mode adaptation for the SCC.</p>
+<p>If this parameter is set to ON the eNodeB selects a transmission mode for the SCC based on the beamforming and MIMO mode of the SCell.</p>
+<p>If this parameter is set to OFF for non-multi-RRU cells, the transmission mode of the SCC is fixed to TM3 in multi-antenna scenarios and TM1 in single-antenna scenarios.</p>
+<p>If this parameter is set to OFF for multi-RRU cells, the transmission mode of the SCell is TM1 or TM2 (depending on the number of CRS ports) when all RRUs serving the SCell work in 1T1R mode, and is TM3 in other scenarios. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-HighLowSpeedUeThdOffset.html">High and Low Speed UE TM Switch Thld Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the difference between the threshold for triggering low-speed UE switching between beamforming mode and MIMO mode and that for triggering high-speed UE switching between beamforming mode and MIMO mode. This parameter takes effect only when adaptation between beamforming and MIMO is enabled. This parameter can be used for optimization if low-speed UEs cannot select an optimal transmission mode by using the adaptive selection function. If this parameter is set to 0, the same threshold for switching between beamforming and MIMO modes is adopted for low-speed and high-speed UEs. This parameter applies only to LTE TDD cells using 8T cross polarization antennas.</p>
+<p>This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-TmAccelerationSwitch.html">Transmission Mode Acceleration Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to accelerate the determination of transmission mode switching for UEs when adaptation between beamforming and MIMO is enabled. If this parameter is set to ON, the eNodeB adaptively accelerates the determination of transmission mode switching for all UEs based on their signal quality. In this way, the spectral efficiency improves in scenarios with traffic burst. If it is set to OFF, the acceleration function is disabled. If it is set to INITIAL_ACCESS_TO_BF, the eNodeB accelerates the determination of the switching from MIMO to beamforming during initial network access and accelerates the first update of the working RRU attribute of UEs after initial network access or incoming handovers in D-MIMO or SFN scenarios.</p>
+<p>This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-BfMimoAdapWithTm4Switch.html">BfMIMO Adaptive with TM4</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether TM4 can be selected during the adaptation between beamforming and MIMO when the BfMimoAdaptiveSwitch parameter is set to MIMO_BF_ADAPTIVE. If this parameter is set to ON, TM4 can be selected during the adaptation between beamforming and MIMO. If this parameter is set to OFF, TM4 cannot be selected during the adaptation between beamforming and MIMO. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-Tm3AndTm9ThdOffset.html">TM3 and TM9 Switching Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicate the offset to the threshold for switching the UE transmission mode between TM9 with PMI and TM3 when adaptation between TM3, TM8, and TM9 is enabled in a cell. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-BfTo2LayerMubfThdOffset.html">BF to Two Layer MUBF Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for triggering UE pairing in dual-stream MU BF mode for beamforming UEs. In omnidirectional antenna-based or directional antenna-based MU BF pairing scenarios, you are advised to set this parameter to the recommended value. A value that is close to the recommended value is also applicable. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-BfTo4LayerMubfThdOffset.html">BF to Four Layer MUBF Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for triggering UE pairing in four-stream MU BF mode for beamforming UEs. In omnidirectional antenna-based or directional antenna-based high-order MU BF pairing scenarios, you are advised to set this parameter to the recommended value. A value that is close to the recommended value is also applicable. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-Tm3Rank2ToTm9Rank4Offset.html">TM3 Rank2 To TM9 Rank4 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for switching from TM3 rank 2 to 4-layer TM9. This parameter controls the probability of switching the UE transmission mode from TM3 rank 2 to 4-layer TM9. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-Tm9Rank4ToTm3Rank2Offset.html">TM9 Rank4 To TM3 Rank2 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for switching from TM9 quadruple-stream mode to TM3 dual-stream mode. This parameter controls the probability of switching the UE transmission mode from TM9 quadruple-stream mode to TM3 dual-stream mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-HoBfThdAdjSwitch.html">Handover BF Threshold Adjust Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>If this parameter is set to ON and the source cell and target cell for an intra-frequency handover have the same calculation result of PCI mod 3, the eNodeB increases the probability of the handover UE entering the beamforming mode in the target cell, therefore increasing the downlink throughput. If this parameter is set to OFF, the original mechanism is used. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-VolteMimoAdaptiveSwitch.html">Volte MIMO Adaptive Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the adaptive MIMO transmission mode of voice UEs. If this parameter is set to ADAPTIVE and the BfMimoAdaptiveSwitch parameter in the CellBfMimoParaCfg MO is set to NO_ADAPTIVE(NO_ADAPTIVE), a fixed beamforming transmission mode specified by the FixedBfMimoMode parameter in the CellBfMimoParaCfg MO is used for both voice and other UEs. If this parameter is set to ADAPTIVE and the MimoAdaptiveSwitch parameter in the CellMimoParaCfg MO is set to NO_ADAPTIVE(NO_ADAPTIVE), a fixed MIMO transmission mode specified by the FixedMimoMode parameter in the CellMimoParaCfg MO is used for both voice and other UEs. If this parameter is set to FIX_RANK1, voice UEs are scheduled in rank 1 mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-CaSccAddThldOffset.html">CA SCC Add Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the channel quality threshold for adding an SCC for a CA UE. When the channel quality is good, a quadruple-stream-capable CA UE can achieve a higher peak transmission rate when fewer carriers are aggregated than when more carriers are aggregated. If the channel quality of this UE is lower than this threshold, the SCCs of the UE fail to enter the quadruple stream mode. To improve the transmission rate in this case, the eNodeB triggers addition of an SCC. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-CaSccDelThldOffset.html">CA SCC Delete Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the channel quality threshold for removing an SCC for a CA UE. When the channel quality is good, a quadruple-stream-capable CA UE can achieve a higher peak transmission rate when fewer carriers are aggregated than when more carriers are aggregated. If the channel quality is higher than this threshold, the eNodeB triggers removal of an SCC. Then, the remaining SCCs can enter the quadruple stream mode to increase the transmission rate. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-BfMimoAlgoOptSwitch.html">BfMimo Algorithm Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>BFTOMIMOALGOOPTSWITCH: Indicates whether to optimize switching from beamforming to MIMO and rank detection for MIMO. If this option is selected, switching from beamforming to MIMO and rank detection for MIMO are optimized to increase the rank 2 success rate. If this option is deselected, switching from beamforming to MIMO or rank detection for MIMO is not optimized. This option applies only to LTE TDD.</p>
+<p>BFMIMOADAPWITHOUTTM8: Indicates whether TM8 is available during adaptation between beamforming and MIMO or during open-loop beamforming adaptation. If this option is selected and the BfMimoAdaptiveSwitch parameter in the CellBfMimoParaCfg MO is set to MIMO_BF_ADAPTIVE or TxD_BF_ADAPTIVE, the transmission mode cannot be switched to TM8. If this option is deselected and the BfMimoAdaptiveSwitch parameter in the CellBfMimoParaCfg MO is set to MIMO_BF_ADAPTIVE or TxD_BF_ADAPTIVE, the transmission mode can be switched to TM8. This option applies only to LTE TDD.</p>
+<p>FIXEDTM9WPMIOPTSWITCH: Indicates whether UEs can enter closed-loop TM9 mode that always requires PMI feedback from UEs, regardless of channel calibration results. If this option is selected, UEs can enter TM9 mode that always requires PMI feedback from UEs even when the channel calibration results do not meet requirements. If this option is deselected, UEs cannot enter this transmission mode when the channel calibration results do not meet requirements. This option applies only to LTE TDD.</p>
+<p>BFMIMOADAPTATIONOPTSW: Indicates whether to enabled optimized adaptation between beamforming and MIMO. If this option is selected, optimized adaptation between beamforming and MIMO is enabled. If this option is deselected, optimized adaption between beamforming and MIMO is disabled. This option applies only to LTE TDD.</p>
+<p>HEAVYLOADTRANSMODEADAPTBOOSTSW: Indicates whether to enable enhanced transmission mode adaptation in heavy-load scenarios. If this option is selected, enhanced transmission mode adaptation is enabled in heavy-load scenarios. The eNodeB automatically implements transmission mode adaptation or uses the target transmission mode in heavy-load scenarios to achieve optimal spectral efficiency in the cell. If this option is deselected, enhanced transmission mode adaptation is disabled in heavy-load scenarios. This option applies only to LTE TDD.</p>
+<p>HISTORICALSPECTRALEFFOPTSW: Indicates whether to enable historical spectral efficiency optimization when enhanced transmission mode adaptation is enabled in heavy-load scenarios. If this option and the HEAVYLOADTRANSMODEADAPTBOOSTSW option are selected, historical spectral efficiency optimization takes effect. The eNodeB automatically learns historical cell spectral efficiency achieved during transmission mode adaptation and when the target transmission mode is used in heavy-load scenarios, and automatically selects a transmission mode to achieve optimal spectral efficiency in the cell. If this option is deselected when the HEAVYLOADTRANSMODEADAPTBOOSTSW option is selected, historical spectral efficiency optimization does not take effect. In this case, the cell always uses the target transmission mode in heavy-load scenarios. This option applies only to LTE TDD.</p>
+<p>BF_WEIGHT_GRAN_OPT_SWITCH: Indicates whether to enable massive MIMO beamforming weight granularity optimization. If this option is selected, the weight granularity is selected based on the SRS SINR. If this option is deselected, the weight granularity is selected based on the original policy. This option applies only to LTE TDD.</p>
+<p>NON_AS_UE_MAX_BF_RANK_CTRL_SW: Indicates the maximum number of beamforming multiplexing layers for non-antenna selection UEs in massive MIMO cells. If both the FakeAntSelIdentificationSwitch option of the BfAlgoSwitch parameter in the CellAlgoSwitch MO and this option are selected, the maximum number of beamforming multiplexing layers is always rank 1 for non-antenna selection UEs (including fake antenna selection UEs). Otherwise, the maximum number of beamforming multiplexing layers for non-antenna selection UEs (including fake antenna UEs) is specified by the MaxBfRankPara parameter in the CELLBF MO. This option applies only to LTE TDD.</p>
+<p>LOAD_BASED_TMA_OPT_SW: Indicates whether to enable load-based adaptive transmission mode optimization. If this option is selected, the transmission mode is selected for UEs based on the cell load during UE access. When the cell load is light, TM3 is preferentially selected. In addition, if the TM9HybridPrecodingSwitch option of the EnhMIMOSwitch parameter in the CellAlgoSwitch MO is selected, 4R UEs and 8R UEs entering PMI feedback-dependent TM9 is accelerated. When the cell load is heavy, beamforming mode is preferentially selected. If this option is deselected, the original transmission mode selection procedure applies. This option applies only to LTE TDD.</p>
+<p>INCREASE_SM_LAYER_TMA_OPT_SW: Indicates whether to enable TMA optimization for increasing the number of spatial multiplexing layers in a cell. This function is enabled only if this option is selected. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-InitialBfMimoType.html">Initial BFMIMO Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the beamforming and MIMO mode used during initial network access. This parameter applies only to LTE TDD. When the CrsPortNum parameter in the Cell MO is set to CRS_PORT_4(4 ports) and the BfMimoAdapWithTm4Switch parameter in the CellBfMimoParaCfg MO is set to ON(On), the value TM3(TM3) of this parameter does not take effect. If this value is set in this case, TM2 is used as the beamforming and MIMO mode during initial network access.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-MultiLayerPairIsoThd.html">Multi-Layer Pairing Isolation Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE isolation threshold for triggering multi-layer pairing. This parameter must be set based on UE conditions in the cell. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-UeAccessTMMode.html">UE Access Transmission Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the transmission mode during an E-RAB setup procedure and an incoming handover procedure for a UE in a massive MIMO cell with the BfMimoAdaptiveSwitch parameter of the CellBfMimoParaCfg MO set to MIMO_BF_ADAPTIVE. If this parameter is set to TM7, TM7 is used. If this parameter is set to AUTOMATIC, MIMO is used. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-Tm3ToTm9SwtgSEffOfs256qam.html">256QAM TM3 to TM9 Switching Spectral Eff Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the spectral efficiency offset for switching the UE transmission mode from TM3 to TM9 if 256QAM is used. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-Tm9ToTm3SwtgSEffOfs256qam.html">256QAM TM9 to TM3 Switching Spectral Eff Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the spectral efficiency offset for switching the UE transmission mode from TM9 to TM3 if 256QAM is used. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-HeavyLoadAvgUeCountThld.html">Heavy Load Average UE Count Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of UEs for identifying heavy-load cells and triggering enhanced transmission mode adaptation in heavy-load scenarios. If the average number of UEs in a cell exceeds this threshold in an evaluation period and the average downlink PRB usage in the cell exceeds the PRB usage threshold, the cell is considered heavily loaded. If the average number of UEs in a cell is smaller than or equal to this threshold, or the average downlink PRB usage in the cell is smaller than or equal to the PRB usage threshold, the cell is considered lightly loaded. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-HeavyLoadDlPrbUsageThld.html">Heavy Load Downlink PRB Usage Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PRB usage threshold for identifying heavy-load cells and triggering enhanced transmission mode adaptation in heavy-load scenarios. If the average downlink PRB usage in the cell exceeds this threshold in an evaluation period and the average number of UEs in the cell exceeds the UE quantity threshold, the cell is considered heavily loaded. If the average downlink PRB usage in the cell is less than or equal to this threshold, or the average number of UEs in the cell is less than or equal to the UE quantity threshold, the cell is considered lightly loaded. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-HeavyLoadTargetTransMode.html">Heavy Load Target Trans Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the target transmission mode for enhanced transmission mode adaptation in heavy-load scenarios. If this parameter is set to TM7, the eNodeB automatically implements transmission mode adaptation or uses TM7 mode to achieve optimal spectral efficiency in a heavy-load cell. If this parameter is set to TM8, the eNodeB automatically implements transmission mode adaptation or uses TM8 mode (open-loop TM9 mode is used for UEs supporting TM9 mode) to achieve optimal spectral efficiency in a heavy-load cell. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-HeavyLoadTransModeEvalPrd.html">Heavy Load Trans Mode Evaluation Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the transmission mode evaluation period for enhanced transmission mode adaptation. This period is a multiple of 30s. The eNodeB evaluates the cell load in this period and updates statistics of cell spectral efficiency. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-WttxUeTm3ToTm9Rank4Ofs.html">WTTx UE TM3 to TM9 Rank4 Ofs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the threshold for switching the transmission mode of WTTx UEs from TM3 to 4-layer TM9. The value 127 indicates that the function does not take effect. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-Tm9Dl4LayerMimoEnhSw.html">TM9 DL 4-Layer MIMO Enhancement Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enabled enhanced downlink 4-layer MIMO based on TM9.</p>
+<p>TM9_DL_4LAYER_BOOST_SWL Indicates whether to enable enhanced downlink 4-layer TM9. If this option is selected, UEs near the cell center can quickly enter TM9 mode. If this option is deselected, UEs near the cell center cannot quickly enter TM9 mode. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellBfMimoParaCfg-Ue4ROr8RBfMimoAdaptOptSw.html">4R or 8R UE BF MIMO Adaptation Opt Sw</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable optimization of adaptive switching between beamforming and MIMO for 4R and 8R UEs. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

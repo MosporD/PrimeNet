@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=4.5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.2">
 </head>
 <body>
     <div class="container">
@@ -13,9 +13,9 @@
                 <div class="header-left">
                     <h1 class="brand-title">
                         <img src="{{ url_for('static', filename='images/favicon.png') }}?v=4" alt="PrimeNet logo" class="brand-title-logo">
-                        <span>PrimeNet</span>
+                        <span class="brand-title-name">PrimeNet</span>
                     </h1>
-                    <p>Network Performance &amp; Configuration Platform</p>
+                    <p class="brand-tagline">Radio Network Performance &amp; Configuration Platform</p>
                 </div>
                 <div class="header-right">
                     <div class="user-info">
@@ -23,7 +23,7 @@
                         <div class="header-actions">
                             <a href="{{ url_for('user_profile.profile_page') }}" class="btn-header">Settings</a>
                             {% if user.role in ['admin', 'noc_sys'] %}
-                            <a href="/admin-panel" class="btn-header btn-header-admin">Admin</a>
+                            <a href="/admin-panel?section=user-admin" class="btn-header btn-header-admin">Admin</a>
                             {% endif %}
                             <button type="button" onclick="logout()" class="btn-header btn-header-outline">Logout</button>
                         </div>
@@ -53,7 +53,74 @@
                         {% endfor %}
                     </div>
                 </div>
+                <div class="op-sites-vendor-panels">
+                    <div class="op-sites-summary-card vendor-panel">
+                        <div class="op-sites-summary-head vendor-head vendor-head-huawei">
+                            <img src="/parameter_dictionary/static/images/huawei_logo.png" alt="Huawei" class="vendor-logo">
+                        </div>
+                        <div class="op-sites-summary-columns" role="presentation">
+                            {% for col in tech_site_columns %}
+                            <div class="op-sites-summary-col" data-rat="{{ col['key'] }}">
+                                <div class="op-sites-summary-col-title">{{ col['title'] }}</div>
+                                <div class="op-sites-summary-col-value" id="op-sites-vendor-huawei-{{ col['key'] }}">{{ col['vendor_counts']['Huawei'] if col.get('vendor_counts') else 0 }}</div>
+                                <div class="op-sites-summary-col-sub">{{ col['subtitle'] }}</div>
+                                <div class="op-sites-summary-col-unit">sites</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="op-sites-summary-card vendor-panel">
+                        <div class="op-sites-summary-head vendor-head vendor-head-nokia">
+                            <img src="/parameter_dictionary/static/images/nokia_logo.png" alt="Nokia" class="vendor-logo">
+                        </div>
+                        <div class="op-sites-summary-columns" role="presentation">
+                            {% for col in tech_site_columns %}
+                            <div class="op-sites-summary-col" data-rat="{{ col['key'] }}">
+                                <div class="op-sites-summary-col-title">{{ col['title'] }}</div>
+                                <div class="op-sites-summary-col-value" id="op-sites-vendor-nokia-{{ col['key'] }}">{{ col['vendor_counts']['Nokia'] if col.get('vendor_counts') else 0 }}</div>
+                                <div class="op-sites-summary-col-sub">{{ col['subtitle'] }}</div>
+                                <div class="op-sites-summary-col-unit">sites</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </section>
+
+            {% if user.role == 'admin' %}
+            <section class="dashboard-pm-health" id="pm-health-widget" aria-label="Performance database health">
+                <div class="op-sites-summary-card pm-health-card">
+                    <div class="op-sites-summary-head pm-health-head">
+                        <span>Performance database health</span>
+                        <button type="button" class="op-sites-refresh-btn" id="pm-health-refresh-btn" onclick="refreshPmHealth(true)">
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="pm-health-summary" id="pm-health-summary">
+                        <span class="pm-health-loading">Loading health check…</span>
+                    </div>
+                    <div class="pm-health-table-wrap" id="pm-health-table-wrap" hidden>
+                        <table class="pm-health-table" id="pm-health-table">
+                            <thead>
+                                <tr>
+                                    <th>Database</th>
+                                    <th>Status</th>
+                                    <th>Latest data</th>
+                                    <th>Rows (RAT tables)</th>
+                                    <th>Distinct cells</th>
+                                    <th>Size</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pm-health-tbody"></tbody>
+                        </table>
+                        <details class="pm-health-details">
+                            <summary>Per-table breakdown</summary>
+                            <div id="pm-health-details-body"></div>
+                        </details>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
 
             <div class="dashboard-primary-tabs" role="tablist" aria-label="Main sections">
                 <button type="button" role="tab" class="dashboard-primary-tab active" id="tab-performance"
@@ -70,6 +137,13 @@
                     <span class="dashboard-primary-tab-text">Configuration</span>
                     <span class="dashboard-primary-tab-desc">Parameters, XML &amp; tooling</span>
                 </button>
+                <button type="button" role="tab" class="dashboard-primary-tab" id="tab-external-tools"
+                        aria-selected="false" aria-controls="section-external-tools"
+                        onclick="openSection('external-tools')">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">🔗</span>
+                    <span class="dashboard-primary-tab-text">External Tools</span>
+                    <span class="dashboard-primary-tab-desc">OSS, NMS &amp; network portals</span>
+                </button>
             </div>
 
             <!-- ── Performance panel ── -->
@@ -79,25 +153,45 @@
                         <div class="function-icon">📈</div>
                         <div class="function-name">Analytics</div>
                     </a>
-                    <a href="/network-map" class="function-card">
+                    <a href="/performance-analytics" class="function-card">
+                        <div class="function-icon">📡</div>
+                        <div class="function-name">Performance Analytics<br> "Huawei PM API"</div>
+                    </a>
+                    <a href="/cell-heatmap" class="function-card">
                         <div class="function-icon">🗺️</div>
+                        <div class="function-name">Cell Heatmap"</div>
+                    </a>
+                    <a href="/network-map" class="function-card">
+                        <div class="function-icon">&#127757;</div>
                         <div class="function-name">Network Map</div>
                     </a>
                     <a href="/neighbor-analysis" class="function-card">
-                        <div class="function-icon">🧭</div>
+                        <div class="function-icon">&#129309;</div>
                         <div class="function-name">Neighbor Analysis</div>
                     </a>
                     <a href="/reports" class="function-card">
                         <div class="function-icon">📊</div>
                         <div class="function-name">Report Generation</div>
                     </a>
+                    <a href="/sector-health" class="function-card">
+                        <div class="function-icon">📡</div>
+                        <div class="function-name">Sector Health</div>
+                    </a>
                     <a href="/conflict-map" class="function-card">
-                        <div class="function-icon">🛰️</div>
+                        <div class="function-icon">	&#127760;</div>
                         <div class="function-name">Conflict Map</div>
                     </a>
                     <a href="/femto-pm" class="function-card">
                         <div class="function-icon">📶</div>
                         <div class="function-name">Femto PM</div>
+                    </a>
+                    <a href="/son-analytics" class="function-card function-card-dev">
+                        <div class="function-icon">🤖</div>
+                        <div class="function-name">SON Analytics<br> "Development Stage"</div>
+                    </a>
+                    <a href="/network-health" class="function-card function-card-dev">
+                        <div class="function-icon">💚</div>
+                        <div class="function-name">Network Health<br> "Development Stage"</div>
                     </a>
                 </div>
             </div>
@@ -108,6 +202,10 @@
                     <a href="/parameter-dictionary" class="function-card">
                         <div class="function-icon">📚</div>
                         <div class="function-name">Parameter Dictionary</div>
+                    </a>
+                    <a href="/cm-extractor" class="function-card">
+                        <div class="function-icon">📡</div>
+                        <div class="function-name">CM Extractor</div>
                     </a>
                     <a href="/xml-parser" class="function-card">
                         <div class="function-icon">📄</div>
@@ -125,13 +223,105 @@
                         <div class="function-icon">🗓️</div>
                         <div class="function-name">Configuration Task Scheduler</div>
                     </a>
+                    <a href="/ran-features" class="function-card">
+                        <div class="function-icon">&#128218;</div>
+                        <div class="function-name">RAN Features</div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ── External tools panel ── -->
+            <div class="section-panel hidden" id="section-external-tools" role="tabpanel" aria-labelledby="tab-external-tools" hidden>
+                <div class="function-grid external-tools-grid">
+                    <a href="https://10.119.10.104:31943/unisso/login.action?service=%2Funisess%2Fv1%2Fauth%3Fservice%3D%252Fossfacewebsite%252Findex.html&amp;decision=1"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/prs.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">PRS</div>
+                    </a>
+                    <a href="https://10.119.10.4:31943/unisso/login.action?service=%2Funisess%2Fv1%2Fauth%3Fservice%3D%252Fossfacewebsite%252Findex.html"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/u2020.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">U2020</div>
+                    </a>
+                    <a href="https://login.rc02.netact.zainjo.net/startpage/#"
+                       class="function-card function-card-external" data-tool="netact" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/netact.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">NetAct</div>
+                    </a>
+                    <a href="https://10.33.30.19:38443/dspcas/login?request-source=portalWeb&amp;service=https%3A%2F%2F10.33.30.19%3A38443%2Fportal%2Fweb%2Frest%2Fsso%2Findex%3Fori_url%3Dhttps%253A%252F%252F10.33.30.19%253A38443%252Fportal-web%252Fportal%252Fhomepage.html"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/smartcare.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">SmartCare</div>
+                    </a>
+                    <a href="https://10.119.219.210/netchart_zain/xlogin.htm?f=login&amp;message=cookie"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/netchart.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">NetChart</div>
+                    </a>
+                    <a href="https://zainsites.jo.zain.com/web/login#menu_id=136&amp;action=153&amp;model=tasc.site&amp;view_type=list"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/odoo.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">Odoo</div>
+                    </a>
+                    <a href="https://services.jo.zain.com/RanSitesTool/login"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon" aria-hidden="true">🛰️</div>
+                        <div class="function-name">Site Audits</div>
+                    </a>
+                    <a href="https://gls.nemo.fi/GLS02/Account/Login?ReturnUrl=%2fGLS02%2fHome"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/nemo.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">Nemo</div>
+                    </a>
+                    <a href="https://gls.tems.com/auth?ReturnUrl=%2F"
+                       class="function-card function-card-external" data-tool="tems" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/tems.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">TEMS</div>
+                    </a>
+                    <a href="http://192.168.7.201:339/#/basic-login"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/netcell.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">NetCell</div>
+                    </a>
+                    <a href="https://doc.networks.nokia.com/default"
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/discovery-center.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">Discovery Center</div>                                                   
+                    </a>
+                    <a href="https://nokia-central.siteforge.com/jsp/index.jsp#!/dashboard/U2FsdGVkX1+7tXZ5yYphOMbbV/TCX2Ndz+c+Jxbb7nQ="
+                       class="function-card function-card-external" target="_blank" rel="noopener noreferrer">
+                        <div class="function-icon function-icon-logo">
+                            <img src="{{ url_for('static', filename='images/external-tools/ndpd.png') }}" alt="" class="external-tool-logo">
+                        </div>
+                        <div class="function-name">NDPD</div>
+                    </a>
                 </div>
             </div>
 
         </main>
 
         <footer>
-            <p>&copy; 2025 PrimeNet | Network Performance &amp; Configuration Platform</p>
+            <p>&copy; 2026 PrimeNet | Network Performance &amp; Configuration Platform</p>
         </footer>
     </div>
 
@@ -170,7 +360,7 @@
                 panel.classList.remove('hidden');
                 panel.hidden = false;
             }
-            const isPrimary = name === 'performance' || name === 'configuration';
+            const isPrimary = name === 'performance' || name === 'configuration' || name === 'external-tools';
             if (isPrimary && tab) {
                 tab.classList.add('active');
                 tab.setAttribute('aria-selected', 'true');
@@ -225,6 +415,23 @@
                     if (valueEl) {
                         valueEl.textContent = column.count != null ? column.count : 0;
                     }
+                    const vendorCounts = column.vendor_counts || {};
+                    const huaweiEl = document.getElementById(`op-sites-val-${key}-huawei`);
+                    const nokiaEl = document.getElementById(`op-sites-val-${key}-nokia`);
+                    const huaweiPanelEl = document.getElementById(`op-sites-vendor-huawei-${key}`);
+                    const nokiaPanelEl = document.getElementById(`op-sites-vendor-nokia-${key}`);
+                    if (huaweiEl) {
+                        huaweiEl.textContent = vendorCounts.Huawei != null ? vendorCounts.Huawei : 0;
+                    }
+                    if (nokiaEl) {
+                        nokiaEl.textContent = vendorCounts.Nokia != null ? vendorCounts.Nokia : 0;
+                    }
+                    if (huaweiPanelEl) {
+                        huaweiPanelEl.textContent = vendorCounts.Huawei != null ? vendorCounts.Huawei : 0;
+                    }
+                    if (nokiaPanelEl) {
+                        nokiaPanelEl.textContent = vendorCounts.Nokia != null ? vendorCounts.Nokia : 0;
+                    }
                 });
             } catch (error) {
                 alert(error.message || 'Could not refresh operational site counts');
@@ -247,7 +454,117 @@
             }
         }
 
+        function pmHealthStatusClass(status) {
+            const s = String(status || '').toUpperCase();
+            if (s === 'HEALTHY') return 'pm-health-badge pm-health-badge-ok';
+            if (s === 'MISSING') return 'pm-health-badge pm-health-badge-bad';
+            return 'pm-health-badge pm-health-badge-warn';
+        }
+
+        function formatPmHealthRows(tables) {
+            if (!Array.isArray(tables) || !tables.length) return '—';
+            return tables
+                .filter(t => (t.table || '').includes('CELL') || (t.table || '').includes('GROUP'))
+                .map(t => {
+                    const n = t.rows != null ? Number(t.rows).toLocaleString() : '0';
+                    return `${t.table}: ${n}`;
+                })
+                .join(' · ');
+        }
+
+        function renderPmHealth(data) {
+            const summaryEl = document.getElementById('pm-health-summary');
+            const wrapEl = document.getElementById('pm-health-table-wrap');
+            const tbody = document.getElementById('pm-health-tbody');
+            const detailsBody = document.getElementById('pm-health-details-body');
+            if (!summaryEl || !tbody) return;
+
+            const union = data.distinct_cells_all_pm_cell_dbs_union;
+            const meta = data.metadata_cells?.distinct_cells;
+            const cached = data.cached ? ' (cached)' : '';
+            summaryEl.innerHTML = `
+                <div class="pm-health-summary-grid">
+                    <div><span class="pm-health-k">Checked (UTC)</span><span class="pm-health-v">${data.checked_at_utc || '—'}${cached}</span></div>
+                    <div><span class="pm-health-k">Distinct cells (PM union)</span><span class="pm-health-v">${union != null ? Number(union).toLocaleString() : '—'}</span></div>
+                    <div><span class="pm-health-k">Metadata cells</span><span class="pm-health-v">${meta != null ? Number(meta).toLocaleString() : '—'}</span></div>
+                </div>`;
+
+            const dbs = [...(data.pm_cell_databases || []), ...(data.pm_group_databases || [])];
+            tbody.innerHTML = dbs.map(db => {
+                const totalRows = (db.tables || [])
+                    .filter(t => /CELL|GROUP/i.test(t.table || ''))
+                    .reduce((sum, t) => sum + (Number(t.rows) || 0), 0);
+                const latest = db.latest_data_overall || '—';
+                const size = db.file?.size_mb != null ? `${db.file.size_mb} MB` : '—';
+                const cells = db.distinct_cells_db != null ? Number(db.distinct_cells_db).toLocaleString() : '—';
+                return `<tr>
+                    <td>${db.label || '—'}</td>
+                    <td><span class="${pmHealthStatusClass(db.overall)}">${db.overall || '—'}</span></td>
+                    <td>${latest}</td>
+                    <td class="pm-health-rows">${totalRows.toLocaleString()}</td>
+                    <td>${cells}</td>
+                    <td>${size}</td>
+                </tr>`;
+            }).join('');
+
+            if (detailsBody) {
+                detailsBody.innerHTML = dbs.map(db => `
+                    <div class="pm-health-db-block">
+                        <h4>${db.label} <span class="${pmHealthStatusClass(db.overall)}">${db.overall}</span></h4>
+                        <p class="pm-health-meta">Latest: <strong>${db.latest_data_overall || '—'}</strong>
+                            ${db.latest_data_table ? ` (${db.latest_data_table})` : ''}
+                            ${db.empty_tables?.length ? ` · Empty: ${db.empty_tables.join(', ')}` : ''}</p>
+                        <table class="pm-health-subtable">
+                            <thead><tr><th>Table</th><th>Status</th><th>Rows</th><th>Distinct cells</th><th>Latest</th></tr></thead>
+                            <tbody>
+                                ${(db.tables || []).map(t => `<tr>
+                                    <td>${t.table}</td>
+                                    <td>${t.status || '—'}</td>
+                                    <td>${t.rows != null ? Number(t.rows).toLocaleString() : '—'}</td>
+                                    <td>${t.distinct_cells != null ? Number(t.distinct_cells).toLocaleString() : '—'}</td>
+                                    <td>${t.latest || '—'}</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `).join('');
+            }
+
+            if (wrapEl) wrapEl.hidden = false;
+        }
+
+        async function refreshPmHealth(force) {
+            const btn = document.getElementById('pm-health-refresh-btn');
+            const summaryEl = document.getElementById('pm-health-summary');
+            if (!summaryEl) return;
+            const defaultLabel = 'Refresh';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Checking…';
+            }
+            summaryEl.innerHTML = '<span class="pm-health-loading">Running health check (may take up to a minute)…</span>';
+            try {
+                const url = force ? '/api/dashboard/pm-health?refresh=1' : '/api/dashboard/pm-health';
+                const res = await fetch(url, { credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || 'Health check failed');
+                }
+                renderPmHealth(data);
+            } catch (err) {
+                summaryEl.innerHTML = `<span class="pm-health-error">${err.message || 'Could not load PM health'}</span>`;
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = defaultLabel;
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('pm-health-widget')) {
+                refreshPmHealth(false);
+            }
             const maybeShowLegal = () => {
                 const alreadyAcknowledged = sessionStorage.getItem('legalStatementAcknowledged') === '1';
                 if (!alreadyAcknowledged) {

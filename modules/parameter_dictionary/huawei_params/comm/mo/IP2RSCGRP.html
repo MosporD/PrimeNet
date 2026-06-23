@@ -1,0 +1,169 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IP2RSCGRP">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IP2RSCGRP">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IP2RSCGRP</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IP2RSCGRP"></a><a name="IP2RSCGRP"></a>
+
+
+<h1 class="topictitle1">IP2RSCGRP</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IP2RSCGRP.html"><strong>IP2RSCGRP</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The IP2RSCGRP MO indicates a mapping between the destination IP address of the passing-by data or local OM data (over IP transmission)/signaling data and the transmission resource group. This MO is used to guarantee the Quality of Service (QoS) of bound service streams in the target network segment by binding these service streams to a transmission resource group.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>IP2RSCGRP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IP2RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, only one destination network segment can be bound to resource groups configured on the same physical port. That is, if two <strong>IP2RSCGRP</strong> MOs have the same combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>BEAR</strong>, <strong>SBT</strong>, <strong>PT</strong>, and <strong>PN</strong>, <strong>DSTIP</strong> in the two MOs must be on different network segments.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of two resource groups can be bound to the same destination network segment on one board and in the same routing domain. That is, a maximum of two <strong>IP2RSCGRP</strong> MOs whose <strong>DSTIP</strong> is on the same network segment can be configured if the two MOs have the same combination of <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>BEAR</strong>, and <strong>SBT</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of 32 <strong>IP2RSCGRP</strong> MOs can be configured on a board.</li><li>[NodeB]A maximum of 16 <strong>IP2RSCGRP</strong> MOs can be configured for an <strong>RSCGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RSCGRP</strong> MO corresponding to an <strong>IP2RSCGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>VRF</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The VRF instance used by an <strong>IP2RSCGRP</strong> MO must have been configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IP2RSCGRP__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IP2RSCGRP__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IP2RSCGRP__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ip2rscgrp.html">ADD IP2RSCGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add mapping between an IP address and a transmission resource group. The mapping between an IP address and a transmission resource group is the mapping between the destination IP address of the passing-by data or local OM data (over IP transmission)/signaling data and a transmission resource group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ip2rscgrp.html">LST IP2RSCGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the mapping between the IP address and the transmission resource group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ip2rscgrp.html">RMV IP2RSCGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a mapping between the IP address and the transmission resource group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IP2RSCGRP__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IP2RSCGRP__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IP2RSCGRP__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-Ip2RscgrpId.html">Mapping Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mapping between IP addresses and Transport Resource Groups.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet housing the board where a transmission resource group is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack that houses the board where a transmission resource group is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot housing the board where a transmission resource group is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-RscGroupBearType.html">Transmission Resource Group Bear Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the bearer type of a transmission resource group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where a transmission resource group is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-PhyPortType.html">Bearing Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of port where a transmission resource group is carried.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-PhyPortNo.html">Bearing Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the port where a transmission resource group is carried.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-RscGroupNo.html">Transmission Resource Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a transmission resource group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-DstIP.html">Destination IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination IP address of the service flow that is bound to a transmission resource group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IP2RSCGRP-Mask.html">Mask</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subnet mask of the destination IP address of the service traffic bound to a transmission resource group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

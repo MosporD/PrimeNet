@@ -1,0 +1,161 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NODEBULCOMPGRP">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="Mode" content="UMTS">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NodeBUlCompGrp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NODEBULCOMPGRP</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NodeBUlCompGrp"></a><a name="NodeBUlCompGrp"></a>
+
+
+<h1 class="topictitle1">NODEBULCOMPGRP</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="NodeBFunction.html">NODEBFUNCTION</a>
+    +-<a href="NodeBUlCompGrp.html"><strong>NODEBULCOMPGRP</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The NODEBULCOMPGRP MO configures ULCoMP group parameters, such as Host Local Cell ID, Neighbour Local Cell ID, and Neighbour NodeB ID.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NodeBFunction.html">NODEBFUNCTION</a></li><li>Relation with the <strong>ULOCELL</strong> MO:<ul><li>The <strong>HOSTLOCELLID</strong> under the <strong>NODEBULCOMPGRP</strong> MO must have been configured.</li><li>The <strong>LOCELLTYPE</strong> for all local cells associated with the <strong>HOSTLOCELLID</strong> can not be MULTIRRU_CELL, DIST_CELL, HALFFREQ_CELL, IMB_CELL or MIXED_MULTIRRU_CELL.</li><li>The <strong>RMTCM</strong> under the <strong>ULOCELL</strong> MO associated with the <strong>HOSTLOCELLID</strong> must be FALSE and <strong>RADIUS</strong> cannot be greater than 35 km.</li><li>If one <strong>NEIGHBOURLOCELLID</strong> under the MO <strong>NODEBULCOMPGRP</strong> corresponds to multiple <strong>HOSTLOCELLID</strong>, <strong>ULBASEBANDEQMID</strong> used by the MO <strong>ULOCELL</strong> corresponding to <strong>HOSTLOCELLID</strong> must be the same.</li></ul>
+</li><li>Relation with the <strong>NODEBULCOMPGRP</strong> MO:<ul><li>When <strong>ULCOVEXP</strong> under the <strong>NODEBULCOMPGRP</strong> MO is TRUE, the number of <strong>NEIGHBOURLOCELLID</strong> associated with one <strong>HOSTLOCELLID</strong> must be with a maximum of 3.</li><li>When <strong>ULCOMP</strong> under the <strong>NODEBULCOMPGRP</strong> MO is TRUE, the number of <strong>NEIGHBOURLOCELLID</strong> associated with one <strong>HOSTLOCELLID</strong> must be with a maximum of 11.</li><li>When <strong>ULCOMP</strong> under the <strong>NODEBULCOMPGRP</strong> MO is TRUE, the number of <strong>HOSTLOCELLID</strong> associated with one <strong>NEIGHBOURLOCELLID</strong> must be with a maximum of 11.</li><li>When <strong>ULCOVEXP</strong> under the <strong>NODEBULCOMPGRP</strong> MO is TRUE, the number of <strong>HOSTLOCELLID</strong> associated with one <strong>NEIGHBOURLOCELLID</strong> must be with a maximum of 3.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong> and <strong>NODEBFUNCTION</strong> MOs:<ul><li>When the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as the <strong>NODEBID</strong> under the <strong>NODEBFUNCTION</strong> MO, the <strong>NEIGHBOURLOCELLID</strong> must have been configured.</li><li>When the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as the <strong>NODEBID</strong> under the <strong>NODEBFUNCTION</strong> MO, the <strong>LOCELLTYPE</strong> for all local cells associated with the <strong>NEIGHBOURLOCELLID</strong> can not be MULTIRRU_CELL, DIST_CELL, HALFFREQ_CELL or IMB_CELL or MIXED_MULTIRRU_CELL.</li><li>When the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as the <strong>NODEBID</strong> under the <strong>NODEBFUNCTION</strong> MO, the <strong>RMTCM</strong> for all local cells associated with the <strong>NEIGHBOURLOCELLID</strong> must be FALSE and <strong>RADIUS</strong> can not be greater than 35 km.</li><li>When the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as the <strong>NODEBID</strong> under the <strong>NODEBFUNCTION</strong> MO, the <strong>ULBASEBANDEQMID</strong> for the <strong>HOSTLOCELLID</strong> and the <strong>NEIGHBOURLOCELLID</strong> must be the same.</li><li>When the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as the <strong>NODEBID</strong> of the <strong>NODEBFUNCTION</strong>, the <strong>DLFREQ</strong> of the <strong>HOSTLOCELLID</strong> and the <strong>NEIGHBOURLOCELLID</strong> must be the same.</li><li>When the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as the <strong>NODEBID</strong> of the <strong>NODEBFUNCTION</strong>, if the <strong>ULFREQIND</strong> under the <strong>ULOCELL</strong> MO referenced by <strong>HOSTLOCELLID</strong> and the <strong>ULFREQIND</strong> under the <strong>ULOCELL</strong> MO referenced by <strong>NEIGHBOURLOCELLID</strong> are set to TRUE, the <strong>ULFREQ</strong> of the <strong>ULOCELL</strong> MOs must be the same.</li></ul>
+</li><li>Relation with the <strong>NODEBFUNCTION</strong> MO:<ul><li>When the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as the <strong>NODEBID</strong> under the <strong>NODEBFUNCTION</strong> MO, the <strong>HOSTLOCELLID</strong> and the <strong>NEIGHBOURLOCELLID</strong> can not be the same.</li><li>When <strong>ULCOVEXP</strong> under the <strong>NODEBULCOMPGRP</strong> MO is TRUE, the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO and <strong>NODEBID</strong> under the <strong>NODEBFUNCTION</strong> MO must be the same.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong> and <strong>BASEBANDEQM</strong> MOs:<ul><li>When <strong>ULCOVEXP</strong> under the <strong>NODEBULCOMPGRP</strong> MO is set to TRUE, <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO used by the <strong>ULOCELL</strong> MO associated with the <strong>HOSTLOCELLID</strong> must be set to DEM_2_CHAN.</li><li>When <strong>ULCOVEXP</strong> under the <strong>NODEBULCOMPGRP</strong> MO is TRUE, the following parameter settings must be applied under all the other <strong>ULOCELL</strong> MOs that belong to the same <strong>BASEBANDEQM</strong> MO as <strong>ULOCELL</strong> MO associated with the <strong>HOSTLOCELLID</strong>: <strong>RMTCM</strong> cannot be set to TRUE and <strong>RADIUS</strong> cannot be greater than 35 km.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>BASEBANDEQM</strong>, and <strong>BBP</strong> MOs:<ul><li>If <strong>RADIUS</strong> under the <strong>ULOCELL</strong> MO referenced by <strong>HOSTLOCELLID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is greater than 30 km, <strong>TYPE</strong> under all <strong>BBP</strong> MOs configured in the <strong>BASEBANDEQM</strong> MO referenced by <strong>ULBASEBANDEQMID</strong> under the <strong>ULOCELL</strong> MO cannot be WBBP.</li><li>If <strong>ULCOVEXP</strong> under the <strong>NODEBULCOMPGRP</strong> MO is TRUE, and the <strong>BASEBANDEQM</strong> MO referenced by <strong>ULBASEBANDEQMID</strong> under the <strong>ULOCELL</strong> MO referenced by <strong>HOSTLOCELLID</strong> is configured with <strong>ULOCELL</strong> MO under which <strong>RADIUS</strong> is greater than 30 km, <strong>TYPE</strong> under all <strong>BBP</strong> MOs configured in the <strong>BASEBANDEQM</strong> MO cannot be WBBP.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>NODEBFUNCTION</strong>, <strong>BASEBANDEQM</strong>, and <strong>BBP</strong> MOs:<ul><li>If <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as <strong>NODEBID</strong> under the <strong>NODEBFUNCTION</strong> MO, and <strong>RADIUS</strong> under the <strong>ULOCELL</strong> MO referenced by <strong>NEIGHBOURLOCELLID</strong> is greater than 30 km, <strong>TYPE</strong> under all <strong>BBP</strong> MOs configured in the <strong>BASEBANDEQM</strong> MO referenced by <strong>ULBASEBANDEQMID</strong> under the <strong>ULOCELL</strong> MO cannot be WBBP.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>NODEBFUNCTION</strong>, <strong>BASEBANDEQM</strong>, <strong>ULOCELLSECTOREQM</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>When the <strong>NODEBID</strong> under the <strong>NODEBULCOMPGRP</strong> MO is the same as the <strong>NODEBID</strong> under the <strong>NODEBFUNCTION</strong> MO, and <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MOs used by the <strong>ULOCELL</strong> MOs corresponding to the <strong>HOSTLOCELLID</strong> and <strong>NEIGHBOURLOCELLID</strong> is DEM_ADPT_CHAN, for the local cells corresponding to <strong>HOSTLOCELLID</strong> and <strong>NEIGHBOURLOCELLID</strong>, the number of RX antennas configured under the <strong>SECTOREQM</strong> MOs associated with <strong>ULOCELLSECTOREQM</strong> MOs under which <strong>SECTOREQMPROPERTY</strong> is NORMAL must be either smaller than 4 or equal to 4.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NodeBUlCompGrp__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NodeBUlCompGrp__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NodeBUlCompGrp__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_nodebulcompgrp.html">ADD NODEBULCOMPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to configure the coordination relationship for the Uplink CoMP (Joint Reception) based on Coordinated BBU feature or the Coverage Expansion Under Interference feature. The host cell (primary cell) and neighboring cell (coordinating cell) in the coordination relationship combine received signals, thereby improving uplink performance.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_nodebulcompgrp.html">DSP NODEBULCOMPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of the coordination relationship for the Uplink CoMP (Joint Reception) based on Coordinated BBU feature and the Coverage Expansion Under Interference feature.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nodebulcompgrp.html">LST NODEBULCOMPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration of the coordination relationship for the Uplink CoMP (Joint Reception) based on Coordinated BBU feature and the Coverage Expansion Under Interference feature.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_nodebulcompgrp.html">RMV NODEBULCOMPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove the specified coordination relationship for the Uplink CoMP (Joint Reception) based on Coordinated BBU feature and the Coverage Expansion Under Interference feature.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NodeBUlCompGrp__tab2">Table 2</a> and <a href="#NodeBUlCompGrp__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NodeBUlCompGrp__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NodeBUlCompGrp__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBUlCompGrp-hostLoCellId.html">Host Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the host cell where Uplink CoMP (Joint Reception) based on Coordinated BBU is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBUlCompGrp-neighbourLoCellId.html">Neighbour Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the neighboring cell where Uplink CoMP (Joint Reception) based on Coordinated BBU is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBUlCompGrp-nodebId.html">Neighbour NodeB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the NodeB serving the neighboring cell where Uplink CoMP (Joint Reception) based on Coordinated BBU is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBUlCompGrp-ulComp.html">ULCoMP Neighbour Cell Configure</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to configure the coordination relationship for the Uplink CoMP (Joint Reception) based on Coordinated BBU feature. If this parameter is set to TRUE, the coordination relationship configured using the <a href="../mml/add_nodebulcompgrp.html">ADD NODEBULCOMPGRP</a> command is used for the Uplink CoMP (Joint Reception) based on Coordinated BBU feature.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NodeBUlCompGrp-ulCovExp.html">Coverage Expansion Neighbour Cell Configure</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to configure the coordination relationship for the Coverage Expansion Under Interference feature. If this parameter is set to TRUE, the coordination relationship configured using the <a href="../mml/add_nodebulcompgrp.html">ADD NODEBULCOMPGRP</a> command is used for the Coverage Expansion Under Interference feature.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="NodeBUlCompGrp__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="NodeBUlCompGrp__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/NodeBUlCompGrp-ulCompState.html">ULCoMP Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of Uplink CoMP (Joint Reception) based on Coordinated BBU.Value range:ULCoMP Available, ULCoMP Unavailable-Local Cell Disabled, ULCoMP Unavailable-UL Baseband Resource Limited, ULCoMP Unavailable-DL Baseband Resource Limited, ULCoMP Unavailable-License Limited, ULCoMP Unavailable-Neighboring Cell Not Supported, ULCoMP Not Configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/NodeBUlCompGrp-ulCovExpState.html">Coverage Expansion Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of Coverage Expansion Under Interference. Value range:ULCOVEXP Available, ULCOVEXP Unavailable, ULCOVEXP Not Configured.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

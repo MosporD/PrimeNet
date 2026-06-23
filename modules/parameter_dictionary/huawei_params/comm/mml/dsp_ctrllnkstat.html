@@ -1,0 +1,396 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display Control and Clock Signal Link Quality Statistics Between BBUs (DSP CTRLLNKSTAT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_ctrllnkstat">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display Control and Clock Signal Link Quality Statistics Between BBUs (DSP CTRLLNKSTAT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_ctrllnkstat"></a><a name="dsp_ctrllnkstat"></a>
+
+
+<h1 class="topictitle1">Display Control and Clock Signal Link Quality Statistics Between BBUs (DSP CTRLLNKSTAT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_ctrllnkstat__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the statistics of control and clock signal links between BBUs. The statistics mainly include the number of received packets, number of error packets, total packet receiving time, and the loss of signal (LOS) duration, reflecting the link transmission quality. If the port supports MACsec, the MACsec negotiation statistics are displayed. For the UCIU, the rates of error packets on ports 0 to 4 and port 8 are displayed. For the UMPT, the rate of error packets on port 8 is displayed. For the UMDU, the rates of error packets on ports 6 and 7 are displayed.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_ctrllnkstat__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>If two BBU subracks of different modes are cascaded, the local node refers to the local BBU and this command can only be used to query the control link of the local BBU. If two BBU subracks of the same mode are cascaded, the local node can be either the local BBU or the secondary BBU. That is, this command can be used to query the control link of either the local BBU or the secondary BBU.</p>
+</li><li><p>The UMDU supports measurement of only the number of received packets, number of error packets, error packet rate, and measurement duration on a link. It does not support measurement of the port rate, LOS duration, and LOS rate of the local node, and they are displayed as NULL in the result.</p>
+</li><li><p>When UMPTe boards are connected to UMPTe or UMPTg/UMPTga boards, or when UMPTg/UMPTga boards are connected to UMPTe or UMPTg/UMPTga boards, pay attention only to the number of received packets, number of error packets, and the rate of error packets. The LOS duration and the ratio of LOS duration may be measured during negotiation and cannot reflect the link transmission quality.</p>
+</li><li><p>This command applies only if it is executed in the supported RAT and interconnection boards are configured.</p>
+</li><li><p>The system updates the statistics every hour.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_ctrllnkstat__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the local node at one end of the control link.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AT</strong> is set to PEERPORT and <strong>TT</strong> is set to CHAIN, and <strong>LCN</strong> and <strong>LSRN</strong> are neither set to 255 and are not simultaneously set to the values of <strong>HCN</strong> and <strong>HSRN</strong> respectively in an <strong>RRUCHAIN</strong> MO, then there must be a <strong>CTRLLNK</strong> MO with <strong>CN</strong> equal to <strong>LCN</strong> and <strong>SRN</strong> equal to <strong>LSRN</strong> or with <strong>UPCN</strong> equal to <strong>LCN</strong> and <strong>UPSRN</strong> equal to <strong>LSRN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the local node at one end of the control link.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AT</strong> is set to PEERPORT and <strong>TT</strong> is set to CHAIN, and <strong>LCN</strong> and <strong>LSRN</strong> are neither set to 255 and are not simultaneously set to the values of <strong>HCN</strong> and <strong>HSRN</strong> respectively in an <strong>RRUCHAIN</strong> MO, then there must be a <strong>CTRLLNK</strong> MO with <strong>CN</strong> equal to <strong>LCN</strong> and <strong>SRN</strong> equal to <strong>LSRN</strong> or with <strong>UPCN</strong> equal to <strong>LCN</strong> and <strong>UPSRN</strong> equal to <strong>LSRN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the local node at one end of the control link.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-PT.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the port whose control link status is queried. When this parameter is set to a value within the range from 0 to 4, this parameter indicates the ports M0 to M4 on the UCIU. When this parameter is set to a value within the range from 6 to 7, this parameter indicates the ports HEI0 to HEI1 on the UMDU. When this parameter is set to 8, this parameter indicates the S port on the UCIU or the CI port on the UMPT.</p>
+<p>GUI Value Range: 0~4,6~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~4,6~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_ctrllnkstat__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To query the bit error rate of a control link with the parameters as follows: Local Cabinet No.: 0, Local Subrack No.: 0, Local Slot No.: 5, Port No.: 0, run the following command:
+DSP CTRLLNKSTAT: CN=0, SRN=0, SN=5, PT=0;
+The result is shown as follows:
++++    0        2020-01-03 11:02:29
+O&amp;M    #26620
+%%DSP CTRLLNKSTAT: CN=0, SRN=0, SN=5, PT=0;%%
+RETCODE = 0  Operation succeeded.
+
+Dsp Control Link
+----------------
+                   Local Cabinet No.  =  0
+                   Local Subrack No.  =  0
+                      Local Slot No.  =  5
+                            Port No.  =  0
+             Local Port Rate(Gbit/s)  =  4.9 
+              Measurement Start Time  =  2020-01-03 11:02:29
+  Total Error Package Number(packet)  =  0
+Total Receive Package Number(packet)  =  0
+                   Total LOS Time(s)  =  436197
+           Total Measurement Time(s)  =  436197
+           1 Hour LOS Rate(per mill)  =  1000
+                  1 Hour LOS Time(s)  =  3575
+ 1 Hour Error Package Rate(per mill)  =  0
+ 1 Hour Error Package Number(packet)  =  0
+            1 Day LOS Rate(per mill)  =  999
+                   1 Day LOS time(s)  =  85809
+  1 Day Error Package Rate(per mill)  =  0
+  1 Day Error Package Number(packet)  =  0
+           1 Week LOS Rate(per mill)  =  NULL
+                  1 Week LOS time(s)  =  NULL
+ 1 Week Error Package Rate(per mill)  =  NULL
+ 1 Week Error Package Number(packet)  =  NULL
+(Number of results = 1)
+
+
+---    END
+
+Example 2: To query the bit error rate of a control link with the parameters as follows: Local Cabinet No.: 0, Local Subrack No.: 0, Local Slot No.: 6, Port No.: 6, run the following command:
+DSP CTRLLNKSTAT: CN=0, SRN=0, SN=6, PT=6;
+The result is shown as follows:
++++    0        2020-01-03 16:34:28
+O&amp;M    #385
+%%DSP CTRLLNKSTAT: CN=0, SRN=0, SN=6, PT=6;%%
+RETCODE = 0  Operation succeeded.
+
+Dsp Control Link
+----------------
+                   Local Cabinet No.  =  0
+                   Local Subrack No.  =  0
+                      Local Slot No.  =  6
+                            Port No.  =  6
+             Local Port Rate(Gbit/s)  =  2.5
+              Measurement Start Time  =  2020-01-03 16:34:28
+  Total Error Package Number(packet)  =  NULL
+Total Receive Package Number(packet)  =  NULL
+                   Total LOS Time(s)  =  NULL
+           Total Measurement Time(s)  =  NULL
+           1 Hour LOS Rate(per mill)  =  NULL
+                  1 Hour LOS Time(s)  =  NULL
+ 1 Hour Error Package Rate(per mill)  =  NULL
+ 1 Hour Error Package Number(packet)  =  NULL
+            1 Day LOS Rate(per mill)  =  NULL
+                   1 Day LOS time(s)  =  NULL
+  1 Day Error Package Rate(per mill)  =  NULL
+  1 Day Error Package Number(packet)  =  NULL
+           1 Week LOS Rate(per mill)  =  NULL
+                  1 Week LOS time(s)  =  NULL
+ 1 Week Error Package Rate(per mill)  =  NULL
+ 1 Week Error Package Number(packet)  =  NULL
+(Number of results = 1)
+
+MACSec Negotiation State Information
+------------------------------------
+            MACSec Negotiation State  =  None
+    MACSec Negotiation Failure Phase  =  NULL
+    MACSec Negotiation Failure Times  =  0
+    MACSec Negotiation Success Times  =  0
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_ctrllnkstat__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the local node at one end of the control link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the local node at one end of the control link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the local node at one end of the control link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the port whose control link status is queried. When this parameter is set to a value within the range from 0 to 4, this parameter indicates the ports M0 to M4 on the UCIU. When this parameter is set to a value within the range from 6 to 7, this parameter indicates the ports HEI0 to HEI1 on the UMDU. When this parameter is set to 8, this parameter indicates the S port on the UCIU or the CI port on the UMPT.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Port Rate(Gbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the port rate of the local node. NULL indicates that the link is disconnected over the port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Measurement Start Time</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the start time of the measurement.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Total Error Package Number(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the total number of error packets within the measurement periods.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Total Receive Package Number(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the total number of received packets within the measurement periods.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Total LOS Time(s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the total Loss Of Signal (LOS) duration within the measurement periods.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Total Measurement Time(s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the total length of measurement periods.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Hour LOS Rate(per mill)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ratio of the Loss Of Signal (LOS) duration to one hour. The LOS duration is measured within the measurement periods in the latest one hour.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Hour LOS Time(s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the Loss Of Signal (LOS) duration measured within the measurement periods in the latest one hour.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Hour Error Package Rate(per mill)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ratio of the number of error packets to that of received packets within the measurement periods in the latest one hour.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Hour Error Package Number(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of error packets within the measurement periods in the latest one hour.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Day LOS Rate(per mill)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ratio of the Loss Of Signal (LOS) duration to one day. The LOS duration is measured within the measurement periods in the latest one day.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Day LOS time(s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the Loss Of Signal (LOS) duration measured within the measurement periods in the latest one day.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Day Error Package Rate(per mill)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ratio of the number of error packets to that of received packets within the measurement periods in the latest one day.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Day Error Package Number(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of error packets within the measurement periods in the latest one day.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Week LOS Rate(per mill)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ratio of the Loss Of Signal (LOS) duration to one week. The LOS duration is measured within the measurement periods in the latest one week. Value NULL is invalid, indicating that the total measurement period is less than one week.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Week LOS time(s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the Loss Of Signal (LOS) duration measured within the measurement periods in the latest one week. Value NULL is invalid, indicating that the total measurement period is less than one week.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Week Error Package Rate(per mill)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ratio of the number of error packets to that of received packets within the measurement periods in the latest one week. Value NULL is invalid, indicating that the total measurement period is less than one week.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>1 Week Error Package Number(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of error packets within the measurement periods in the latest one week. Value NULL is invalid, indicating that the total measurement period is less than one week.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>MACSec Negotiation State</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the states of MACSec (MAC Security) negotiations. The values of this parameter include Succeeded, Failed, and None.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>MACSec Negotiation Failure Phase</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the phase in which the latest failed MACSec negotiation occurs. The values of this parameter include Identity Authentication, MKA Negotiation, and NULL. MKA is short for MACsec key agreement protocol. The value NULL indicates that a negotiation succeeds or no negotiation is performed.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>MACSec Negotiation Failure Times</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of failed MACSec (MAC Security) negotiations. The number is counted from the time a link becomes normal. The number falls to zero after the link becomes abnormal but is counted again after the link becomes normal.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>MACSec Negotiation Success Times</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of successful MACSec (MAC Security) negotiations. The number is counted from the time a link becomes normal. The number falls to zero after the link becomes abnormal but is counted again after the link becomes normal.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,319 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Configurations of Multi-carrier Unified Scheduling (MOD MULTICARRUNIFIEDSCH)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_multicarrunifiedsch">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Configurations of Multi-carrier Unified Scheduling (MOD MULTICARRUNIFIEDSCH)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_multicarrunifiedsch"></a><a name="mod_multicarrunifiedsch"></a>
+
+
+<h1 class="topictitle1">Modify Configurations of Multi-carrier Unified Scheduling (MOD MULTICARRUNIFIEDSCH)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_multicarrunifiedsch__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configurations of multi-carrier unified scheduling.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_multicarrunifiedsch__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>When the SMART_CARRIER_SELECTION_SW option of the MultiCarrierUnifiedSchSw parameter is selected and the SMART_CARRIER_SELECTION_ENH_SW option of the same parameter is deselected, the eNodeB removes the spectral efficiency prediction models that have been successfully built.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_multicarrunifiedsch__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-IntraFreqMeasA3TimeToTrig.html">IntraFreqMeasA3TimeToTrig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Intra-Freq Measurement A3 Time-to-Trigger</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time-to-trigger for intra-frequency event A3 based on the measurement reports of which the eNodeB queries virtual grid models.</p>
+<p>Before the model query for a UE, the eNodeB delivers intra-frequency event A3 measurement configurations to the UE. When the entering condition of intra-frequency event A3 is met, the UE does not report the event to the eNodeB immediately. Instead, the UE reports the event only when the entering condition is continuously met throughout the time-to-trigger specified by this parameter.</p>
+<p>This parameter reduces the probability that occasional events are reported, and also reduces the probability of incorrect inter-frequency information provided by virtual grid models. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0MS(0MS), 40MS(40MS), 64MS(64MS), 80MS(80MS), 100MS(100MS), 128MS(128MS), 160MS(160MS), 256MS(256MS), 320MS(320MS)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0MS, 40MS, 64MS, 80MS, 100MS, 128MS, 160MS, 256MS, 320MS</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 320MS(320MS)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: This parameter efficiently decreases the inter-frequency handover delay for UEs and also decreases the SCell configuration delay for CA UEs. The smaller the value of this parameter, the greater the decreases in delay. However, a smaller value of this parameter results in lower accuracy of inter-frequency information prediction by virtual grid models and therefore a higher risk of service drops and SCell configuration failures.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-MultiCarrierUnifiedSchSw.html">MultiCarrierUnifiedSchSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Multi-Carrier Unified Sch Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the multi-carrier unified scheduling algorithms.</p>
+<p>SMART_CARRIER_SELECTION_SW: Indicates whether to enable smart carrier selection. If this option is selected, the eNodeB can select the optimal carriers or carrier combinations for UEs based on the air interface quality of inter-frequency neighboring E-UTRAN cells predicted using virtual grid models. When the UMPTb is used, the UMPTB_ENHANCEMENT_SWITCH option of the ServiceMode parameter in the eNodeBResModeAlgo MO must also be selected for smart carrier selection to take effect. If this option is deselected, this function is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SMART_CARRIER_SELECTION_ENH_SW: Indicates whether to enable enhanced smart carrier selection, including improvement of virtual-grid-based spectral efficiency prediction accuracy and smart carrier selection for non-CA UEs at initial access. If this option is selected, enhanced smart carrier selection is enabled. When the UMPTe or UMPTga is used, the AI_ENHANCEMENT_SWITCH option of the ServiceMode parameter in the eNodeBResModeAlgo MO must also be selected for improvement of virtual-grid-based spectral efficiency prediction accuracy to take effect. If this option is deselected, the preceding functions are disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>CA_CONCURRENCY_SCH_CAPB_ENH_SW: If this option is selected, the eNodeB increases the maximum number of concurrently processed CA UEs with SCells activated. If this option is deselected, this function is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SPECTRUM_EFF_EVALUATION_OPT_SW: If this option is selected, the eNodeB selects carriers preferentially based on cell-level average spectral efficiency when the following conditions are met: (1) The eNodeB obtains the inter-frequency spectral efficiency using measurements. (2) UEs report the measurement results of only one inter-frequency neighboring cell on certain frequencies to be evaluated or the level of the serving frequency increases or decreases by 5 dB or more during evaluation. If this option is deselected, the eNodeB selects carriers based on UE-level spectral efficiency. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ULTRA_LOW_LATENCY_SCH_SW: If this option is selected, scheduling with ultra-low latency for CA is enabled. If this option is deselected, this function is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SCC_ADAPT_COV_THLD_SW: If this option is selected, the RSRP thresholds used for SCell addition and removal are adaptively extended. If this option is deselected, this function is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>MOBILITY_ADAPT_COV_THLD_SW: If this option is selected, the RSRP threshold of the serving cell used for coverage-based inter-frequency handovers and the level threshold of the target cell used for smart carrier selection are adaptively extended. If this option is deselected, this function is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>FAST_MOVING_UE_LOAD_CALC_SW: If this option is selected, the eNodeB considers the load of each carrier when selecting carriers for fast-moving UEs. If this option is deselected, the eNodeB does not consider the load of each carrier when selecting carriers for fast-moving UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DisuseStatement: CA_CONCURRENCY_SCH_CAPB_ENH_SW: This option has been replaced by the ULTRA_LOW_LATENCY_SCH_SW option of the MultiCarrUnifiedSch.MultiCarrierUnifiedSchSw parameter (the corresponding command is MOD MULTICARRUNIFIEDSCH) and will be removed in a later version. Although the configuration interface in this version still supports synchronization and delivery of the setting of this option, the system no longer uses this option. Therefore, avoid using this option.</p>
+<p>GUI Value Range: SMART_CARRIER_SELECTION_SW(SMART_CARRIER_SELECTION_SW), SMART_CARRIER_SELECTION_ENH_SW(SMART_CARRIER_SELECTION_ENH_SW), CA_CONCURRENCY_SCH_CAPB_ENH_SW(CA_CONCURRENCY_SCH_CAPB_ENH_SW), SPECTRUM_EFF_EVALUATION_OPT_SW(SPECTRUM_EFF_EVALUATION_OPT_SW), ULTRA_LOW_LATENCY_SCH_SW(ULTRA_LOW_LATENCY_SCH_SW), SCC_ADAPT_COV_THLD_SW(SCC_ADAPT_COV_THLD_SW), MOBILITY_ADAPT_COV_THLD_SW(MOBILITY_ADAPT_COV_THLD_SW), FAST_MOVING_UE_LOAD_CALC_SW(FAST_MOVING_UE_LOAD_CALC_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SMART_CARRIER_SELECTION_SW, SMART_CARRIER_SELECTION_ENH_SW, CA_CONCURRENCY_SCH_CAPB_ENH_SW, SPECTRUM_EFF_EVALUATION_OPT_SW, ULTRA_LOW_LATENCY_SCH_SW, SCC_ADAPT_COV_THLD_SW, MOBILITY_ADAPT_COV_THLD_SW, FAST_MOVING_UE_LOAD_CALC_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SMART_CARRIER_SELECTION_SW:Off, SMART_CARRIER_SELECTION_ENH_SW:Off, CA_CONCURRENCY_SCH_CAPB_ENH_SW:Off, SPECTRUM_EFF_EVALUATION_OPT_SW:Off, ULTRA_LOW_LATENCY_SCH_SW:Off, SCC_ADAPT_COV_THLD_SW:Off, MOBILITY_ADAPT_COV_THLD_SW:Off</p>
+<p>FAST_MOVING_UE_LOAD_CALC_SW: Off if the scheduling priority of fast-moving UEs is higher than that of normal UEs; On in other scenarios.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The SMART_CARRIER_SELECTION_ENH_SW option can be selected only if the SMART_CARRIER_SELECTION_SW option of the MultiCarrierUnifiedSchSw parameter in the MultiCarrUnifiedSch MO is selected.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: SMART_CARRIER_SELECTION_SW: If this option is selected, user-perceived data rates increase. If this option is deselected, network performance is not affected.</p>
+<p>SMART_CARRIER_SELECTION_ENH_SW: If this option is selected, user-perceived data rates increase. If this option is deselected, network performance is not affected.</p>
+<p>CA_CONCURRENCY_SCH_CAPB_ENH_SW: If this option is selected, user-perceived data rates increase. If this option is deselected, network performance is not affected.</p>
+<p>SPECTRUM_EFF_EVALUATION_OPT_SW: If this option is selected, the counters related to the handover success rate and service drop rate can be optimized but the downlink throughput decreases. If this option is deselected, network performance is not affected.</p>
+<p>ULTRA_LOW_LATENCY_SCH_SW: If this option is selected, downlink average UE throughput increases. If this option is deselected, network performance is not affected.</p>
+<p>SCC_ADAPT_COV_THLD_SW: If this option is selected, the configuration rate of CA UEs improves, thereby increasing downlink throughput. However, data transmission indicators, such as the IBLER, deteriorate. If this option is deselected, network performance is not affected.</p>
+<p>MOBILITY_ADAPT_COV_THLD_SW: If this option is selected, the traffic absorbing capability of high frequency bands improves, thereby increasing downlink throughput. However, this may lead to deterioration of signaling-plane indicators, such as the handover success rate and the service drop rate. If this option is deselected, network performance is not affected.</p>
+<p>FAST_MOVING_UE_LOAD_CALC_SW: If this option is set to its recommended value, downlink throughput of fast-moving UEs increases. Otherwise, downlink throughput of fast-moving UEs decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-VgModelPredHoMeasRsrpThld.html">VgModelPredHoMeasRsrpThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Virtual Grid Mdl Pred Unnec HO Meas RSRP Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RSRP prediction accuracy level threshold based on which a virtual grid model is selected for predicting the RSRP used for evaluation in inter-frequency unnecessary handovers. Inter-frequency unnecessary handovers include service-based inter-frequency handover, inter-frequency handover for load balancing, inter-frequency handover for smart carrier selection based on virtual grids.</p>
+<p>If this parameter is set to ACCURACY95_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 95% as the RSRP for handover evaluation.</p>
+<p>If this parameter is set to ACCURACY90_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 90% as the RSRP for handover evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET5, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation and can increase the RSRP by a maximum of 5 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET10, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation and can increase the RSRP by a maximum of 10 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET15, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation and can increase the RSRP by a maximum of 15 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET20, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation and can increase the RSRP by a maximum of 20 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY100_OFFSET0, the eNodeB does not use virtual grid models to predict the RSRP used for evaluation in unnecessary handovers.</p>
+<p>If this parameter is set to ACCURACY90_OFFSET_5, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 90% as the RSRP for handover evaluation and can decrease the RSRP by a maximum of 5 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY90_OFFSET_10, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 90% as the RSRP for handover evaluation and can decrease the RSRP by a maximum of 10 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY95_OFFSET_5, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 95% as the RSRP for handover evaluation and can decrease the RSRP by a maximum of 5 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY95_OFFSET_10, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 95% as the RSRP for handover evaluation and can decrease the RSRP by a maximum of 10 dB before the evaluation.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ACCURACY95_OFFSET0(ACCURACY95_OFFSET0), ACCURACY90_OFFSET0(ACCURACY90_OFFSET0), ACCURACY80_OFFSET0(ACCURACY80_OFFSET0), ACCURACY80_OFFSET5(ACCURACY80_OFFSET5), ACCURACY80_OFFSET10(ACCURACY80_OFFSET10), ACCURACY80_OFFSET15(ACCURACY80_OFFSET15), ACCURACY80_OFFSET20(ACCURACY80_OFFSET20), ACCURACY100_OFFSET0(ACCURACY100_OFFSET0), ACCURACY90_OFFSET_5(ACCURACY90_OFFSET_5), ACCURACY90_OFFSET_10(ACCURACY90_OFFSET_10), ACCURACY95_OFFSET_5(ACCURACY95_OFFSET_5), ACCURACY95_OFFSET_10(ACCURACY95_OFFSET_10)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ACCURACY95_OFFSET0, ACCURACY90_OFFSET0, ACCURACY80_OFFSET0, ACCURACY80_OFFSET5, ACCURACY80_OFFSET10, ACCURACY80_OFFSET15, ACCURACY80_OFFSET20, ACCURACY100_OFFSET0, ACCURACY90_OFFSET_5, ACCURACY90_OFFSET_10, ACCURACY95_OFFSET_5, ACCURACY95_OFFSET_10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCURACY90_OFFSET0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A lower accuracy level threshold specified by this parameter results in a higher probability that a virtual grid model is selected in measurement result prediction for unnecessary handovers, but lower accuracy of predicting the optimal neighboring cell.</p>
+<p>A higher accuracy level threshold specified by this parameter results in a lower probability that a virtual grid model is selected in measurement result prediction for unnecessary handovers, but higher accuracy of predicting the optimal neighboring cell.</p>
+<p>A larger RSRP offset specified by this parameter results in a higher probability of unnecessary handovers. A smaller RSRP offset specified by this parameter results in a lower probability of unnecessary handovers.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-VgModelPredSccMeasRsrpThld.html">VgModelPredSccMeasRsrpThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Virtual Grid Model Pred SCC Meas RSRP Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RSRP prediction accuracy level threshold based on which a virtual grid model is selected for predicting the RSRP used for SCell configuration.</p>
+<p>If this parameter is set to ACCURACY95_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 95% as the RSRP for SCell configuration evaluation.</p>
+<p>If this parameter is set to ACCURACY90_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 90% as the RSRP for SCell configuration evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for SCell configuration evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET5, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for SCell configuration evaluation and can increase the RSRP by a maximum of 5 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET10, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for SCell configuration evaluation and can increase the RSRP by a maximum of 10 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET15, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for SCell configuration evaluation and can increase the RSRP by a maximum of 15 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET20, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for SCell configuration evaluation and can increase the RSRP by a maximum of 20 dB before the evaluation.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ACCURACY95_OFFSET0(ACCURACY95_OFFSET0), ACCURACY90_OFFSET0(ACCURACY90_OFFSET0), ACCURACY80_OFFSET0(ACCURACY80_OFFSET0), ACCURACY80_OFFSET5(ACCURACY80_OFFSET5), ACCURACY80_OFFSET10(ACCURACY80_OFFSET10), ACCURACY80_OFFSET15(ACCURACY80_OFFSET15), ACCURACY80_OFFSET20(ACCURACY80_OFFSET20)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ACCURACY95_OFFSET0, ACCURACY90_OFFSET0, ACCURACY80_OFFSET0, ACCURACY80_OFFSET5, ACCURACY80_OFFSET10, ACCURACY80_OFFSET15, ACCURACY80_OFFSET20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCURACY90_OFFSET0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A lower accuracy level threshold specified by this parameter results in a higher probability that a virtual grid model is selected to predict measurement results for SCell configuration, but lower accuracy of predicting the optimal candidate SCell.</p>
+<p>A higher accuracy level threshold specified by this parameter results in a lower probability that a virtual grid model is selected to predict measurement results for SCell configuration, but higher accuracy of predicting the optimal candidate SCell.</p>
+<p>A larger RSRP offset specified by this parameter results in a higher probability of SCell configuration. A smaller RSRP offset specified by this parameter results in a lower probability of SCell configuration.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-CarrierCapabilityHysteresis.html">CarrierCapabilityHysteresis</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Carrier Capability Hysteresis</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the hysteresis for carriers or carrier combinations evaluated during smart carrier selection. If the difference in air interface capability between two carriers or carrier combinations is greater than the hysteresis, the eNodeB considers that the two have different air interface capabilities. If the difference does not exceed the hysteresis, the eNodeB considers that the two have the same air interface capability. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a larger number of handovers, a higher service drop rate, and a greater gain in UE throughput. A larger value results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-GFactorThldForHoTrgCell.html">GFactorThldForHoTrgCell</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">G Factor Thld for Handover Target Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the G factor threshold used in target cell selection for handovers in smart carrier selection based on virtual grids. The G factor is the RSRP linear value of a cell divided by the sum of RSRP linear values of all of its intra-frequency neighboring cells and the noise floor. If this parameter is set to 32767, handover to a target cell does not take the G factor into consideration. If this parameter is set to another value, handover to a cell is allowed only if the G factor of this cell is greater than the parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -150~300,32767</p>
+<p>Unit: None</p>
+<p>Actual Value Range: -15~30,3276.7, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is not set to 32767, a larger value of this parameter results in fewer handovers and a higher handover success rate. In this case, throughput decreases. A smaller value of this parameter results in more handovers and a lower handover success rate. In this case, downlink UE throughput may increase.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-VgMdlPredNecHoMeasRsrpThld.html">VgMdlPredNecHoMeasRsrpThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Virtual Grid Mdl Pred Nec HO Meas RSRP Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RSRP prediction accuracy level threshold based on which a virtual grid model is selected for predicting the RSRP used for evaluation in necessary handovers. Necessary handovers include only coverage-based inter-frequency handovers.</p>
+<p>If this parameter is set to ACCURACY95_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 95% as the RSRP for handover evaluation.</p>
+<p>If this parameter is set to ACCURACY90_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 90% as the RSRP for handover evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET0, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET5, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation and can increase the RSRP by a maximum of 5 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET10, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation and can increase the RSRP by a maximum of 10 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET15, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation and can increase the RSRP by a maximum of 15 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY80_OFFSET20, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 80% as the RSRP for handover evaluation and can increase the RSRP by a maximum of 20 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY100_OFFSET0, the eNodeB does not use virtual grid models to predict the RSRP used for evaluation in necessary handovers.</p>
+<p>If this parameter is set to ACCURACY90_OFFSET_5, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 90% as the RSRP for handover evaluation and can decrease the RSRP by a maximum of 5 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY90_OFFSET_10, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 90% as the RSRP for handover evaluation and can decrease the RSRP by a maximum of 10 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY95_OFFSET_5, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 95% as the RSRP for handover evaluation and can decrease the RSRP by a maximum of 5 dB before the evaluation.</p>
+<p>If this parameter is set to ACCURACY95_OFFSET_10, the eNodeB uses the RSRP value derived from the virtual grid model that can provide an RSRP prediction accuracy level of greater than or equal to 95% as the RSRP for handover evaluation and can decrease the RSRP by a maximum of 10 dB before the evaluation.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ACCURACY95_OFFSET0(ACCURACY95_OFFSET0), ACCURACY90_OFFSET0(ACCURACY90_OFFSET0), ACCURACY80_OFFSET0(ACCURACY80_OFFSET0), ACCURACY80_OFFSET5(ACCURACY80_OFFSET5), ACCURACY80_OFFSET10(ACCURACY80_OFFSET10), ACCURACY80_OFFSET15(ACCURACY80_OFFSET15), ACCURACY80_OFFSET20(ACCURACY80_OFFSET20), ACCURACY100_OFFSET0(ACCURACY100_OFFSET0), ACCURACY90_OFFSET_5(ACCURACY90_OFFSET_5), ACCURACY90_OFFSET_10(ACCURACY90_OFFSET_10), ACCURACY95_OFFSET_5(ACCURACY95_OFFSET_5), ACCURACY95_OFFSET_10(ACCURACY95_OFFSET_10)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ACCURACY95_OFFSET0, ACCURACY90_OFFSET0, ACCURACY80_OFFSET0, ACCURACY80_OFFSET5, ACCURACY80_OFFSET10, ACCURACY80_OFFSET15, ACCURACY80_OFFSET20, ACCURACY100_OFFSET0, ACCURACY90_OFFSET_5, ACCURACY90_OFFSET_10, ACCURACY95_OFFSET_5, ACCURACY95_OFFSET_10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCURACY90_OFFSET0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A lower accuracy level threshold specified by this parameter results in a higher probability that a virtual grid model is selected in measurement result prediction for necessary handovers, but lower accuracy of predicting the optimal neighboring cell.</p>
+<p>A higher accuracy level threshold specified by this parameter results in a lower probability that a virtual grid model is selected in measurement result prediction for necessary handovers, but higher accuracy of predicting the optimal neighboring cell.</p>
+<p>A larger RSRP offset specified by this parameter results in a higher probability of necessary handovers. A smaller RSRP offset specified by this parameter results in a lower probability of necessary handovers.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-FastMovingUeCarrCapbHyst.html">FastMovingUeCarrCapbHyst</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Carrier Capb Hyst for Fast Moving UE</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the hysteresis of carrier or carrier combination capabilities in smart carrier selection for fast-moving UEs. A carrier or carrier combination is considered to have higher capabilities than another carrier or carrier combination only if the former has higher capabilities and the capability difference is greater than this hysteresis. Otherwise, the two carriers or carrier combinations are considered to have the same capabilities. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in more handovers, a higher service drop rate, and higher gains in UE throughput. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-ScsFastMovingUeJudgeMode.html">ScsFastMovingUeJudgeMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SCS Fast Moving UE Judge Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode of identifying fast-moving UEs. If a UE is identified as a fast-moving UE, the smart carrier selection policy for fast-moving UEs takes effect for the UE.</p>
+<p>If this parameter is set to NONE, fast-moving UEs are not identified. If this parameter is set to QCI, UEs with bearers of a specific QCI, for which the SCS_FAST_MOVING_UE_SW option of the CellQciPara.QciAlgoSwitch parameter is selected, are identified as fast-moving UEs. If this parameter is set to AS, acceleration guarantee UEs for which the SCS_FAST_MOVING_UE_SW option of the AsParaGroup.AccelerationServiceOptSw parameter is selected are identified as fast-moving UEs. If this parameter is set to SPID, UEs of an SPID for which the SCS_FAST_MOVING_UE_SW option of the SpidCfg.SpidAlgoSwitch parameter is selected are identified as fast-moving UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NONE(NONE), QCI(QCI), AS(AS), SPID(SPID)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, QCI, AS, SPID</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to NONE, the throughput of fast-moving UEs may decrease. If this parameter is set to another value, the throughput of identified fast-moving UEs increases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/MultiCarrUnifiedSch-BandwidthHysteresis.html">BandwidthHysteresis</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bandwidth Hysteresis</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth hysteresis for carriers or carrier combinations in smart carrier selection. If this parameter is set to 255, the bandwidth factor is not used as the highest-priority weight in carrier or carrier combination selection. If this parameter is set to another value, a carrier or carrier combination is considered to have a larger bandwidth than another carrier or carrier combination only if the former has a larger bandwidth and the bandwidth difference is greater than this hysteresis. Otherwise, the two carriers or carrier combinations are considered to have the same bandwidth. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~200,255</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~200,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in more handovers, a higher service drop rate, and higher gains in UE throughput. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_multicarrunifiedsch__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">+++    5C32_MM        2019-01-09 16:55:22
+O&amp;M    #806354951
+%%MOD MULTICARRUNIFIEDSCH: IntraFreqMeasA3TimeToTrig=80MS;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

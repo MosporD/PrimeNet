@@ -1,0 +1,134 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display Certificate Diagnosis Information (DSP CERTDIAG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_certdiag">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display Certificate Diagnosis Information (DSP CERTDIAG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_certdiag"></a><a name="dsp_certdiag"></a>
+
+
+<h1 class="topictitle1">Display Certificate Diagnosis Information (DSP CERTDIAG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_certdiag__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query errors generated during certificate application, certificate update, and periodic CRL obtaining.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_certdiag__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>A maximum of 120 records of diagnosis information can be displayed.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_certdiag__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CERTDEPLOY-CertType.html">CERTTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cert Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the certificate type.</p>
+<p>GUI Value Range: DEVCERT(Device Certificate), CRL(CRL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEVCERT, CRL</p>
+<p>MML Default Value: DEVCERT(Device Certificate)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_certdiag__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To query the certification diagnosis information with the parameters as follows: Cert Type: Device Certificate, run the following command:
+DSP CERTDIAG:;
+The result is shown as follows:
++++    0        2019-09-23 17:53:33
+O&amp;M    #54
+%%DSP CERTDIAG:;%%
+RETCODE = 0  Operation succeeded.
+
+Display Certificate Diagnosis Information
+-----------------------------------------
+Diagnose Information                                                                                                                             
+
+FileName: tst.pem                                                                                                                                
+2019-09-23 17:47:20  Opr: request manually, Msg: IR, Server IP: 10.160.30.120, Err: 0x00009D23, Dsc: Receiving the response failed.              
+2019-09-23 17:47:20  Opr: request manually, Msg: IR, Server IP: 10.160.30.120, Err: 0x00009DD6, Dsc: The request message fails to be transmitted.
+(Number of results = 3)
+
+
+---    END
+
+Example 2: To query the certification diagnosis information with the parameters as follows: Cert Type: CRL, run the following command:
+DSP CERTDIAG: CERTTYPE=CRL;
+The result is shown as follows:
++++    0        2019-09-24 09:39:30
+O&amp;M    #153
+%%DSP CERTDIAG: CERTTYPE=CRL;%%
+RETCODE = 0  Operation succeeded.
+
+Display Certificate Diagnosis Information
+-----------------------------------------
+Diagnose Information  =  2019-09-24 09:18:34  crltsk:TSKID=5 Server IP=10.160.4.132 Err:0x720076b6 Desc:Load testca.crl failed!
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_certdiag__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Diagnose Information</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the diagnosis information.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

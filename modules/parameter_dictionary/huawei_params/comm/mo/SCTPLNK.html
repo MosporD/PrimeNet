@@ -1,0 +1,529 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="SCTPLNK">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="SCTPLNK">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>SCTPLNK</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="SCTPLNK"></a><a name="SCTPLNK"></a>
+
+
+<h1 class="topictitle1">SCTPLNK</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="SCTPLNK.html"><strong>SCTPLNK</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An SCTPLNK MO consists of parameters related to a Stream Control Transmission Protocol (SCTP) link. The SCTP link is used to carry signaling.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>SCTPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, each <strong>SCTPLNK</strong> MO must have a unique combination of <strong>LOCIP</strong> or <strong>SECLOCIP</strong> (<strong>SECLOCIP</strong> is not set to 0.0.0.0), <strong>PEERIP</strong> or <strong>SECPEERIP</strong> (<strong>SECPEERIP</strong> is not set to 0.0.0.0), <strong>LOCPORT</strong>, and <strong>PEERPORT</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, each <strong>SCTPLNK</strong> MO must have a unique combination of <strong>LOCIP6</strong> or <strong>SECLOCIP6</strong>, <strong>PEERIP6</strong> or <strong>SECPEERIP6</strong>, <strong>LOCPORT</strong>, and <strong>PEERPORT</strong>. Neither <strong>SECLOCIP6</strong> nor <strong>SECPEERIP6</strong> can be set to 0::0.</li><li>[Co-MPT, eNodeB, gNodeB]On a BS, the total number of <strong>SCTPLNK</strong> MOs must be less than or equal to 1024.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP6</strong> must be set to a globally scoped unicast address.</li><li>[NodeB]The <strong>SCTPLNK</strong> MO of IPv6 cannot been configured.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, <strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>LOCIP</strong> and <strong>SECLOCIP</strong> in an <strong>SCTPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CPBEARER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BEARTYPE</strong> in a <strong>CPBEARER</strong> MO is set to SCTP, an <strong>SCTPLNK</strong> MO whose <strong>SCTPNO</strong> is the same as <strong>LINKNO</strong> in the <strong>CPBEARER</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>BEARTYPE</strong> in the <strong>CPBEARER</strong> MO is set to SCTP, <strong>CTRLMODE</strong> must be set to the same value as <strong>CTRLMODE</strong> that is associated with the <strong>SCTPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>PEERIP</strong> in a <strong>PPPLNK</strong> MO must be different from <strong>LOCIP</strong> and <strong>SECLOCIP</strong> in an <strong>SCTPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>PEERIP</strong> in an <strong>MPGRP</strong> MO must be different from <strong>LOCIP</strong> and <strong>SECLOCIP</strong> in an <strong>SCTPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EPGROUP</strong>, <strong>SCTPHOST</strong>, and <strong>SCTPPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The SCTP configurations of EndPoint conflict with the configurations of a manually configured <strong>SCTPLNK</strong> MO. The following two groups of four-tuple parameters must be different: One group of four-tuple parameters consists of the following parameters: <strong>SIGIP1V4</strong> or <strong>SIGIP2V4</strong> (when the value of <strong>SIGIP2V4</strong> is not 0.0.0.0) in the <strong>SCTPHOST</strong> MO with <strong>IPVERSION</strong> set to IPv4 in the <strong>EPGROUP</strong> MO, <strong>PN</strong>, <strong>SIGIP1V4</strong> or <strong>SIGIP2V4</strong> (when the value of <strong>SIGIP2V4</strong> is not 0.0.0.0) in the <strong>SCTPPEER</strong> MO with <strong>IPVERSION</strong> set to IPv4 in the <strong>EPGROUP</strong> MO, <strong>PN</strong>. The other group of four-tuple parameters consists of the following parameters: <strong>LOCIP</strong> or <strong>SECLOCIP</strong> (when the value of <strong>SECLOCIP</strong> is not 0.0.0.0) in the <strong>SCTPLNK</strong> MO whose <strong>CTRLMODE</strong> is set to MANUAL_MODE, <strong>PEERIP</strong> or <strong>SECPEERIP</strong> (when the value of <strong>SECPEERIP</strong> is not 0.0.0.0), <strong>LOCPORT</strong>, <strong>PEERPORT</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, when <strong>SCTPHOST</strong> MO and <strong>SCTPPEER</strong> MO are configured in one <strong>EPGROUP</strong> MO simultaneously and their IP version are IPv6, the <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong>(<strong>SIGIP2V6</strong> is not set to 0::0), <strong>PN</strong> of <strong>SCTPHOST</strong> MO and the <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong>(<strong>SIGIP2V6</strong> is not set to 0::0), <strong>PN</strong> of <strong>SCTPPEER</strong> MO cannot conflict with the <strong>SCTPLNK</strong> MO's four-tuple parameters.</li><li>[Co-MPT, eNodeB, gNodeB]The SCTP configurations of EndPoint conflict with the configurations of a manually configured <strong>SCTPLNK</strong> MO. The following two groups of four-tuple parameters must be different: One group of four-tuple parameters consists of the following parameters: <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong> (when the value of <strong>SIGIP2V6</strong> is not 0::0) in the <strong>SCTPHOST</strong> MO with <strong>IPVERSION</strong> set to IPv6 in the <strong>EPGROUP</strong> MO, <strong>PN</strong>, <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong> (when the value of <strong>SIGIP2V6</strong> is not 0::0) in the <strong>SCTPPEER</strong> MO with <strong>IPVERSION</strong> set to IPv6 in the <strong>EPGROUP</strong> MO, <strong>PN</strong>. The other group of four-tuple parameters consists of the following parameters: <strong>LOCIP6</strong> or <strong>SECLOCIP6</strong> (when the value of <strong>SECLOCIP6</strong> is not 0::0) in the <strong>SCTPLNK</strong> MO whose <strong>CTRLMODE</strong> is set to MANUAL_MODE, <strong>PEERIP6</strong> or <strong>SECPEERIP6</strong> (when the value of <strong>SECPEERIP6</strong> is not 0::0), <strong>LOCPORT</strong>, <strong>PEERPORT</strong>.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, a maximum of 384 <strong>SCTPLNK</strong> MOs can be configured.</li><li>[Co-MPT, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, the <strong>SCTPLNK</strong> MO of IPv6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>DEVIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, before adding an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE, ensure that the <strong>MPGRP</strong> or <strong>PPPLNK</strong> MO that has the same VRF Index as the <strong>SCTPLNK</strong> MO has been configured. Alternatively, ensure that the <strong>DEVIP</strong> MO, <strong>MPGRP</strong> MO, or <strong>PPPLNK</strong> MO that meets both of the following conditions has been configured: (1) The <strong>DEVIP</strong> MO, <strong>MPGRP</strong> MO, or <strong>PPPLNK</strong> MO is in the same routing domain as the <strong>SCTPLNK</strong> MO. (2) <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO is the same as <strong>IP</strong> in the <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO, or <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO. The first and the second local IP addresses of an SCTP link must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>IPADDR4</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE is configured, either of the following is true: 1. There must be the following parameters that have the same values as <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO and these IP addresses are in the same routing domain: <strong>IP</strong> in the <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO. 2. There must be either the <strong>MPGRP</strong> MO with <strong>LOCALIP</strong> set to 0.0.0.0 or the <strong>PPPLNK</strong> MO with <strong>LOCALIP</strong> set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>INTERFACE</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>SECLOCIP</strong> is valid in an <strong>SCTPLNK</strong> MO, the <strong>IPADDR4</strong> MOs for <strong>LOCIP</strong> and <strong>SECLOCIP</strong> of this MO must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>LOCIP6</strong> in an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be the same as <strong>IPV6</strong> in an existing <strong>IPADDR6</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]<strong>SECLOCIP6</strong> in an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be 0:0:0:0:0:0:0:0 or <strong>IPV6</strong> in an <strong>IPADDR6</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TUNNELITF</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>LOCALIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be different from <strong>LOCIP6</strong> and <strong>SECLOCIP6</strong> in an <strong>SCTPLNK</strong> MO with <strong>IPVERSION</strong> set to IPv6 in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>SECLOCIP6</strong> is valid in an <strong>SCTPLNK</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>LOCIP6</strong> and <strong>SECLOCIP6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>SCTPLNK</strong> MOs must be less than or equal to 4 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>NODE</strong> MO:<ul><li>[Co-MPT]An <strong>SCTPLNK</strong> MO cannot be configured on a <strong>PRODUCTTYPE</strong> MO with <strong>PRODUCTTYPE</strong> set to DBS3900 DCU or DBS5900 DCU.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, before adding an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE, ensure that the <strong>DEVIP</strong> MO that meets both of the following conditions has been configured: (1) The <strong>DEVIP</strong> MO is in the same routing domain as the <strong>SCTPLNK</strong> MO. (2) <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO is the same as <strong>IP</strong> in the <strong>DEVIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, before adding an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE, ensure that the <strong>IPADDR4</strong> MO that meets both of the following conditions has been configured: (1) The <strong>IPADDR4</strong> MO is in the same routing domain as the <strong>SCTPLNK</strong> MO. (2) <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO is the same as <strong>IP</strong> in the <strong>IPADDR4</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#SCTPLNK__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="SCTPLNK__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="SCTPLNK__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_sctplnk.html">ADD SCTPLNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/blk_sctplnk.html">BLK SCTPLNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to block an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_sctplnk.html">DSP SCTPLNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_sctplnk.html">LST SCTPLNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configurations of an SCTP links.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_sctplnk.html">MOD SCTPLNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configurations of an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_sctplnk.html">RMV SCTPLNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rst_sctplnk.html">RST SCTPLNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to reset an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/ubl_sctplnk.html">UBL SCTPLNK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to unblock an SCTP link.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#SCTPLNK__tab2">Table 2</a> and <a href="#SCTPLNK__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="SCTPLNK__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="SCTPLNK__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SctpLnkNo.html">Link No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the SCTP link. The value of SCTPNO in the SCTPLNK MOs configured by users ranges from 0 to 65535. The value of SCTPNO in the SCTPLNK MOs configured by the system ranges from 70000 to 79999.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-MaxStream.html">Maximum Stream No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum stream number of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an object can be modified or deleted by the system. The value MANUAL_MODE means that only the user can modify or delete the object. The value AUTO_MODE means only the system can modify or delete the object. The NR does not support MANUAL_MODE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-LocIP.html">First Local IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the first local IP address of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SecLocIP.html">Second Local IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the second local IP address of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-LocPort.html">Local SCTP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local port number of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-PeerIP.html">First Peer IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the first peer IP address of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SecPeerIP.html">Second Peer IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the second peer IP address of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-PeerPort.html">Peer SCTP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer port number of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-RtoMin.html">RTO Min Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum RTO value for an SCTP link. A smaller value of this parameter indicates a shorter period required for checking link connectivity. The new RTO ranges from the minimum RTO value to the maximum RTO value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-RtoMax.html">RTO Max Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum RTO value of an SCTP link. A larger value indicates a longer period required for checking link connectivity.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-RtoInit.html">RTO Initial Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the initial RTO value of an SCTP link. A larger value indicates a longer period required for checking link connectivity.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-RtoAlpha.html">RTO Alpha Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RTO alpha value of an SCTP link. A larger value indicates less sensitivity to the link delay.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-RtoBeta.html">RTO Beta Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RTO beta value of an SCTP link. A larger value indicates more sensitivity to the link delay.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-HBInter.html">Heart-beat Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the heartbeat interval for an SCTP link. The heartbeat check is independently initiated by each end of an association and then confirmed by the peer end through the HB ACK packet. When no services are carried, a link disconnection is determined if the number of heartbeat check attempts reaches the maximum retransmission attempts on an association but the HB ACK packet is not received from the peer end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-MaxAssocRetr.html">Max Association Retransmission</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of retransmissions for the SCTP association. When the number of retransmissions for the association exceeds the value of this parameter, the SCTP link is disconnected and a link failure alarm is reported.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-MaxPathRetr.html">Max Path Retransmission</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of retransmissions over a path. When the number of retransmissions over a path exceeds the value of this parameter, the path is regarded as failed if no heartbeat acknowledgment is received. If multiple paths are used, path switching is automatically performed.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-ChkSumType.html">Checksum Algorithm Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of checksum algorithm. The checksum algorithms at both ends of an SCTP link must be the same.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SwitchBackFlag.html">Switch Back Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the SCTP link switches back to the primary path when it is restored and reachable. If the primary path is not reachable, the SCTP link switches to the secondary path. When this parameter is set to ENABLE, the SCTP link switches to the primary path if the primary path is restored and reachable. When this parameter is set to DISABLE and the primary path is restored and reachable, the SCTP link does not switch back to the primary path if the secondary path is also reachable, and the SCTP link switches back to the primary path if the secondary path is unreachable.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SwitchBackHBNum.html">Heart-beat Times When Switch Back</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of heartbeats to be detected before the transmission switches back to the primary path. After the primary path is restored, the transmission switches back to the primary path when the number of heartbeats detected reaches this value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-BlockFlag.html">Block Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the SCTP link is blocked or not.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-Tsack.html">SACK Timeout</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time interval that one end of an SCTP link has to wait before it can send an SACK message in response to the reception of data. A larger value of this parameter indicates a longer time interval between the reception of data and the sending of the corresponding SACK message.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-Description.html">Description Info</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer description information of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-AutoCfgFlag.html">Auto Config Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object is created by the system. MANUAL_CREATED means that the object is configured by the user manually. AUTO_CREATED means that the object is created by the system. The NR does not support MANUAL_CREATED.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-IPVersion.html">IP Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP protocol version.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-LocIP6.html">First Local IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the first local IPv6 address of an IPv6 SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SecLocIP6.html">Second Local IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the second local IPv6 address of an IPv6 SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-PeerIP6.html">First Peer IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the first peer IPv6 address of an IPv6 SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-SecPeerIP6.html">Second Peer IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the second peer IPv6 address of an IPv6 SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-MaxSctpPduSize.html">Maximum SCTP PDU Size</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum size of an IPv4 SCTP PDU (Protocol Data Unit). It specifies the maximum length of an SCTP PDU (excluding the IP header) transmitted on an SCTP link. If the value of this parameter is greater than the size of the IP layer MTU of the base station or intermediate transmission equipment, SCTP packets are fragmented at the IP layer. This causes a large number of fragments and affects the transmission efficiency of the intermediate transmission equipment.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-DtlspolicyID.html">DTLS Policy ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the sequence number of a DTLS configuration policy. The parameter takes effect only in NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-DtlsConnPolicy.html">DTLS Connection Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DTLS connection policy. DTLS_ONLY indicates that the local end uses only DTLS connections. If the peer end does not support or is not configured with DTLS, the negotiation fails. DTLS_PRIORITY indicates that the local end attempts to establish a DTLS connection for the first time. If the peer end does not support or is not configured with DTLS, the local end uses the SCTP connection. If this parameter is set to DTLS_PRIORITY, the security is reduced. Therefore, you are advised not to set this parameter to DTLS_PRIORITY. This parameter applies only to NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SCTPLNK-AuthChunkLst.html">SCTP Authentication Chunk List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the list of SCTP chunk types for which the local end requires the peer end to support authentication. The IDs of SCTP chunks that can be authenticated by the base station are 0, and 3 to 9. For details, see RFC4895 and RFC4960. Currently, SCTP block authentication is supported only in DTLS over SCTP scenarios. This parameter applies only to NR.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="SCTPLNK__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="SCTPLNK__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-AssocState.html">SCTP Link Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-TransferCause.html">Status Change Cause</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the reason why the operational state of the SCTP or DTLS link changes from available to unavailable or from unavailable to available for the last time.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-TransferTime.html">Status Change Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the last time when the operational state of the SCTP or DTLS link changes from available to unavailable or from unavailable to available.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-OutStream.html">Out Stream Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of outbound streams negotiated for the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-InStream.html">In Stream Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of inbound streams negotiated for the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-WorkAddrFlag.html">Work Address Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the working address flag of the SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-DeployCN.html">Deployment Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the deployment cabinet number of an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-DeploySRN.html">Deployment Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the deployment subrack number of an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-DeploySN.html">Deployment Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the deployment slot number of an SCTP link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-WorkLocIP.html">Working Local IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the working local IP address of an SCTP link.</p>
+<p>When IP Version of the SCTP link is set to IPv4, the working local IP address is an IPv4 address.</p>
+<p>When IP Version of the SCTP link is set to IPv6, the working local IP address is an IPv6 address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-WorkPeerIP.html">Working Peer IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the working peer IP address of an SCTP link.</p>
+<p>When IP Version of the SCTP link is set to IPv4, the working peer IP address is an IPv4 address.</p>
+<p>When IP Version of the SCTP link is set to IPv6, the working peer IP address is an IPv6 address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SCTPLNK-Dtlsstat.html">DTLS Link Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the DTLS link status. The parameter takes effect only in NR.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#SCTPLNK__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="SCTPLNK__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="SCTPLNK__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460356.html">VS.SctpLnk.RxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes in the IP packets received on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460356.html">VS.SctpLnk.TxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes in the IP packets transmitted on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460358.html">VS.SctpLnk.RxPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IP packets received on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460358.html">VS.SctpLnk.TxPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IP packets transmitted on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460358.html">VS.SctpLnk.RxDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of discarded IP packets received on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460361.html">VS.SctpLnk.RxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum IP packet receive rate on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460361.html">VS.SctpLnk.RxMinSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Minimum IP packet receive rate on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460361.html">VS.SctpLnk.RxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average IP packet receive rate on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460361.html">VS.SctpLnk.TxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum IP packet transmit rate on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460361.html">VS.SctpLnk.TxMinSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Minimum IP packet transmit rate on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460361.html">VS.SctpLnk.TxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average IP packet transmit rate on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460367.html">VS.SctpLnk.ToUserPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of packets transmitted from an SCTP link to the application layer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460367.html">VS.SctpLnk.FromUserPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of packets received on the SCTP link from the application layer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460369.html">VS.SctpLnk.RePkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of chunks retransmitted from the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460356.html">VS.SctpLnk.RxDropBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of discarded IP bytes received on the SCTP link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460371.html">VS.SctpLnk.Cong.Dur</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Congestion Duration of an SCTP Link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460372.html">VS.SctpLnk.Cong</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Congestions on an SCTP Link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460373.html">VS.SctpLnk.Unavail.Dur</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Duration of SCTP Link Unavailable</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460374.html">VS.SctpLnk.Unavail</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Times SCTP Link Unavailable</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460375.html">VS.SctpLnk.TxDataChunk</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Data Chunks Transmitted on an SCTP Link</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460375.html">VS.SctpLnk.RxDataChunk</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Data Chunks Received on an SCTP Link</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

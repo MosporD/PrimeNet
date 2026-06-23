@@ -1,0 +1,173 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="LOOPBACK">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="LOOPBACK">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>LOOPBACK</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="LOOPBACK"></a><a name="LOOPBACK"></a>
+
+
+<h1 class="topictitle1">LOOPBACK</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="LOOPBACK.html"><strong>LOOPBACK</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A LOOPBACK MO defines a loopback interface, which is a virtual interface. A loopback interface can be configured with loopback IP addresses. A loopback IP address is used as the destination IP address of the active or standby route or the inner IP address of an IPsec tunnel.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IPCLKLNK</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNK</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, an <strong>IPADDR4</strong> MO corresponding to the <strong>IPCLKLNK</strong> MO with <strong>DEVTYPE</strong> set to OC_SLAVE must have been configured and the following conditions must be met:</li><li>1. The value of <strong>CIP</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>IP</strong> in the <strong>IPADDR4</strong> MO, and The value of <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>VRFIDX</strong> in the <strong>IPADDR4</strong> MO.</li><li>2. The value of <strong>ITFID</strong> in the <strong>IPADDR4</strong> MO that meets condition 1 is the same as that of <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO. In this <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to LOOPINT, ETH, or ETHTRK.</li><li>3. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to LOOPINT, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>LOOPBACK</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>LOOPBACK</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>4. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETH, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>5. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETHTRK, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHTRUNK</strong> MO.</li><li>6. The value of <strong>PORTID</strong> in the <strong>ETHTRUNK</strong> MO that meets condition 5 is the same as that of <strong>ETHTRKPORTID</strong> in an <strong>ETHTRUNKLNK</strong> MO.</li><li>7. The value of <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO that meets condition 6 is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of two <strong>IPADDR4</strong> MOs can be configured on a loopback interface.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, the IP address defined in the <strong>IPADDR4</strong> MO on an <strong>INTERFACE</strong> MO with <strong>PT</strong> set to LOOPINT cannot be on the same network segment as the IP address defined in the <strong>IPADDR4</strong> MO on another <strong>INTERFACE</strong> MO on a different board when <strong>PT</strong> in the latter <strong>INTERFACE</strong> MO is set to LOOPINT.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>ETHPORT</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, the IP address defined in the <strong>IPADDR4</strong> MO on an <strong>INTERFACE</strong> MO with <strong>PT</strong> set to LOOPINT cannot be on the same network segment as the IP address defined in the <strong>IPADDR4</strong> MO on another <strong>INTERFACE</strong> MO on a different board when <strong>PT</strong> in the latter <strong>INTERFACE</strong> MO is set to ETH.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>ETHTRUNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, the IP address defined in the <strong>IPADDR4</strong> MO on an <strong>INTERFACE</strong> MO with <strong>PT</strong> set to LOOPINT cannot be on the same network segment as the IP address defined in the <strong>IPADDR4</strong> MO on another <strong>INTERFACE</strong> MO on a different board when <strong>PT</strong> in the latter <strong>INTERFACE</strong> MO is set to ETHTRK.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>GTRANSPARA</strong>, <strong>IPADDR4</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>SCTPHOST</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> are valid, and <strong>SIGIP1V4</strong> is configured on a different board from the <strong>IPADDR4</strong> MO to which <strong>SIGIP2V4</strong> belongs, then <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>GTRANSPARA</strong>, <strong>IPADDR4</strong>, <strong>EPGROUP</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>SCTPHOST</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> are valid, and <strong>SIGIP1V4</strong> is configured on a different board from the <strong>IPADDR4</strong> MO to which <strong>SIGIP2V4</strong> belongs, then <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MO referencing the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>LOOPBACK</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>LOOPBACK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]A maximum of 32 <strong>LOOPBACK</strong> MOs can be configured on a board.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the logical protection group where the <strong>SN</strong> of the <strong>LOOPBACK</strong> MO is located, the value of <strong>SN</strong> in the <strong>HAGRP</strong> MO must be the same as the value of <strong>SN</strong> in the <strong>LOOPBACK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>LOOPBACK</strong> MO corresponding to <strong>INTERFACE</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]A maximum of 4 <strong>INTERFACE</strong> MOs which are configured on the port of LOOPINT related to <strong>LOOPBACK</strong> in the same VRF can be configured on a board.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>ETHCIPORT</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, the IP address defined in the <strong>IPADDR4</strong> MO on an <strong>INTERFACE</strong> MO with <strong>PT</strong> set to LOOPINT cannot be on the same network segment as the IP address defined in the <strong>IPADDR4</strong> MO on another <strong>INTERFACE</strong> MO on a different board when <strong>PT</strong> in the latter <strong>INTERFACE</strong> MO is set to ETHCI.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to LOOPINT respectively, the associated <strong>LOOPBACK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>IPADDR4</strong>, <strong>MPGRP</strong>, <strong>PPPLNK</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, the corresponding <strong>IPADDR4</strong> MO of an <strong>IPPATH</strong> MO must have been configured on the <strong>INTERFACE</strong> MO, and <strong>VRFIDX</strong>, and <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>VRFIDX</strong>, and <strong>IP</strong> in the <strong>IPADDR4</strong> MO, respectively. Alternatively, <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>LOCALIP</strong> in the associated <strong>PPPLNK</strong> MO or <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO. Alternatively, <strong>IPADDR4</strong> for the corresponding <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be configured on the port of <strong>LOOPBACK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>IPADDR4</strong>, <strong>MPGRP</strong>, <strong>PPPLNK</strong>, <strong>INTERFACE</strong>, and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to ENABLE, the corresponding <strong>IPADDR4</strong> MO for <strong>LOCALIP</strong> must have been configured on the port of the <strong>IPRSCGRP</strong> MO which the <strong>IPPATH</strong> MO joins in, and <strong>VRFIDX</strong>, and <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>VRFIDX</strong>, and <strong>IP</strong> in the <strong>IPADDR4</strong> MO, respectively. Alternatively, <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>LOCALIP</strong> in the associated <strong>PPPLNK</strong> MO or <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO. Alternatively, <strong>IPADDR4</strong> for the corresponding <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be configured on the port of <strong>LOOPBACK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>IPADDR4</strong>, <strong>BACKTUNNEL</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to TUNNEL, the <strong>IPADDR4</strong> MO that is in the same routing domain as the <strong>IPPATH</strong> MO must have been configured, and also <strong>INTERFACE</strong> MO must have been configured on the <strong>LOOPBACK</strong> MO, which is on the same board with the corresponding <strong>BACKTUNNEL</strong> MO the <strong>IPPATH</strong> MO bears on.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>IPADDR4</strong>, <strong>BACKTUNNEL</strong>, <strong>IPRSCGRP</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to ENABLE, and the <strong>PT</strong> in corresponding <strong>IPRSCGRP</strong> MO is set to TUNNEL, the <strong>IPADDR4</strong> MO that is in the same routing domain as the <strong>IPPATH</strong> MO must have been configured, and also <strong>INTERFACE</strong> MO must have been configured on the <strong>LOOPBACK</strong> MO, which is on the same board with the corresponding <strong>BACKTUNNEL</strong> MO the <strong>IPPATH</strong> MO bears on.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>INTERFACE</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>SECLOCIP</strong> is valid in an <strong>SCTPLNK</strong> MO, the <strong>IPADDR4</strong> MOs for <strong>LOCIP</strong> and <strong>SECLOCIP</strong> of this MO must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>DNSSRV</strong>, <strong>IPADDR4</strong>, <strong>IPADDR6</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]The <strong>DNSCIP4</strong> and <strong>DNSCIP6</strong> parameters in all <strong>DNSSRV</strong> MOs must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>IPCLKLNK</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNK</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, an <strong>IPADDR6</strong> MO corresponding to the <strong>IPCLKLNK</strong> MO with <strong>DEVTYPE</strong> set to OC_SLAVE and <strong>IPMODE</strong> set to IPV6 must have been configured and the following conditions must be met:</li><li>1. The value of <strong>CIPV6</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>IPV6</strong> in the <strong>IPADDR6</strong> MO, and The value of <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>VRFIDX</strong> in the <strong>IPADDR6</strong> MO.</li><li>2. The value of <strong>ITFID</strong> in the <strong>IPADDR6</strong> MO that meets condition 1 is the same as that of <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO. In this <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to LOOPINT, ETH, or ETHTRK.</li><li>3. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to LOOPINT, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>LOOPBACK</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>LOOPBACK</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>4. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETH, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>5. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETHTRK, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHTRUNK</strong> MO.</li><li>6. The value of <strong>PORTID</strong> in the <strong>ETHTRUNK</strong> MO that meets condition 5 is the same as that of <strong>ETHTRKPORTID</strong> in an <strong>ETHTRUNKLNK</strong> MO.</li><li>7. The value of <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO that meets condition 6 is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPULFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>IPULFLOWCTRLPARA</strong> MO is set to LOOPINT, the associated <strong>LOOPBACK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPDLFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>IPDLFLOWCTRLPARA</strong> MO is set to LOOPINT, the associated <strong>LOOPBACK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPPATHRT</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eGBTS, eNodeB]On the board to which the IP address specified by <strong>SRCIP</strong> in an <strong>IPPATHRT</strong> MO belongs, there must be an IP address that is on the same network segment and in the same routing domain as the IP address specified by <strong>NEXTHOPIP</strong> and the latter two IP addresses cannot be the same.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPADDR6</strong> MO is configured on a different board, <strong>VRFIDX</strong> must be set to 0.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE6</strong>, <strong>INTERFACE</strong>, and <strong>IPADDR6</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, if <strong>SRCIP</strong> in an <strong>SRCIPROUTE6</strong> MO is set to an existing <strong>IPADDR6</strong> MO on a board, <strong>IPADDR6</strong> in the same network segment as <strong>NEXTHOP</strong> in the <strong>SRCIPROUTE6</strong> MO and <strong>IPADDR6</strong> on which the <strong>SRCIP</strong> depends must be on the same board.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>SRCIP</strong> in an <strong>SRCIPROUTE6</strong> MO is set to an existing <strong>IPADDR6</strong> MO in the same routing domain, the <strong>IPADDR6</strong> MO referenced by <strong>SRCIP</strong> in an <strong>SRCIPROUTE6</strong> MO and the <strong>INTERFACE</strong> MO referenced by <strong>ITFID</strong> in the <strong>SRCIPROUTE6</strong> MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>SECURITYHOST</strong>, <strong>IPADDR6</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1V6</strong> must be configured on the same board as <strong>LOCIKEIPV6</strong> in a referenced <strong>SCTPHOST</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2V6</strong> must be configured on the same board as <strong>LOCIKEIPV6</strong> in a referenced <strong>SCTPHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>SECURITYHOST</strong>, <strong>IPADDR6</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPSECSWITCH</strong> is set to ENABLE for a <strong>USERPLANEHOST</strong> MO, <strong>LOCIPV6</strong> for the <strong>USERPLANEHOST</strong> MO must be configured on the same board as <strong>LOCIKEIPV6</strong> for the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPGPM</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>PT</strong> in a <strong>IPGPM</strong> MO is not set to LOOPINT, the associated <strong>LOOPBACK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>CASCADEPORT</strong>, <strong>IPGPM</strong>, <strong>IPRSCGRP</strong>, and <strong>BACKTUNNEL</strong> MOs:<ul><li>[Co-MPT, NodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO or AUTO, this board cannot be configured with the <strong>IPGPM</strong> MO. That is, this board cannot be configured with the associated <strong>IPRSCGRP</strong> MO.</li><li>[Co-MPT, NodeB]On a UBBP or LCOP board, if the <strong>CASCADEPORT</strong> MO in which the <strong>PN</strong> parameter is set to 6 does not exist, the UBBP board cannot be configured with the <strong>IPGPM</strong> MO. That is, this board cannot be configured with the associated <strong>IPRSCGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>IPADDR6</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>SECLOCIP6</strong> is valid in an <strong>SCTPLNK</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>LOCIP6</strong> and <strong>SECLOCIP6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and the <strong>SIGIP2V4</strong> parameter in an <strong>SCTPHOST</strong> MO is valid, the <strong>IPADDR4</strong> MOs to which <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> belongs must be configured on the same subrack, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>SIGIP2V6</strong> is valid in an <strong>SCTPHOST</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li><li>[Co-MPT, eNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]If <strong>IPSECSWITCH</strong> is set to ENABLE for a <strong>USERPLANEHOST</strong> MO, <strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO must be configured on the same board as <strong>LOCIKEIPV4</strong> for the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTERING</strong>, <strong>ACLRULE6</strong>, <strong>INTERFACE</strong>, and <strong>IPADDR6</strong> MOs:<ul><li>[Co-MPT, eNodeB]A maximum of 64 <strong>ACLRULE6</strong> MOs can be referenced by <strong>PACKETFILTERING</strong> on a board.</li><li>[gNodeB]A maximum of 64 <strong>ACLRULE6</strong> MOs can be referenced by <strong>PACKETFILTERING</strong> on a board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and the <strong>SIGIP2V4</strong> parameter in an <strong>SCTPHOST</strong> MO is valid, the <strong>IPADDR4</strong> MOs to which <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> belongs must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]When <strong>SIGIP2V6</strong> is valid in an <strong>SCTPHOST</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li><li>[gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]If <strong>IPSECSWITCH</strong> is set to ENABLE for a <strong>USERPLANEHOST</strong> MO, <strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO must be configured on the same board as <strong>LOCIKEIPV4</strong> for the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#LOOPBACK__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="LOOPBACK__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="LOOPBACK__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_loopback.html">ADD LOOPBACK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a loopback interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_loopback.html">LST LOOPBACK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of loopback interfaces.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_loopback.html">MOD LOOPBACK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a loopback interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_loopback.html">RMV LOOPBACK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a loopback interface.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#LOOPBACK__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="LOOPBACK__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="LOOPBACK__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/LOOPBACK-PortId.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a loopback interface and is unique in the system.Port IDs 4 to 7 are reserved by the system and cannot be manually configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/LOOPBACK-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board to which the loopback interface belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/LOOPBACK-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board to which the loopback interface belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/LOOPBACK-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board to which the loopback interface belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/LOOPBACK-UserLabel.html">User Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the user-defined information about a loopback interface.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,345 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add End Point Group (ADD EPGROUP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_epgroup">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add End Point Group (ADD EPGROUP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_epgroup"></a><a name="add_epgroup"></a>
+
+
+<h1 class="topictitle1">Add End Point Group (ADD EPGROUP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_epgroup__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an end point group.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_epgroup__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>System specifications: If the LMPT/UMPT/UMDU/WMPT is the main control board, a maximum of 74 endpoint groups can be configured. If the GTMUb/GTMUc is the main control board, a maximum of 8 endpoint groups can be configured.</p>
+</li><li><p>If Packet Filter ACL Rule Auto-Setup-Deletion SW is set to ENABLE, the <a href="add_packetfilter.html">ADD PACKETFILTER</a> or <a href="add_packetfiltering.html">ADD PACKETFILTERING</a> command must have been used to bind an ACL to a port and the Filter Mode cannot be set to L2_ACL.</p>
+</li><li><p>When Packet Filter ACL Rule Auto-Setup-Deletion SW is set to ENABLE, the system automatically creates the ACL rule for packet filtering. If the local IP address of the base station is of loopback type, the ACL rule is automatically added to all physical ports configured with packet filtering; If the local IP address of the base station is of non-loopback type, the ACL rule is automatically added to the physical port configured with packet filtering of the board on which the local IP address is configured.</p>
+</li><li><p>In an endpoint group, a base station does not automatically set up an ACL rule on cross-connected paths even when both of the following conditions are met: (1) Both the SCTP host and SCTP peer are configured with two valid IP addresses. (2) IPSec Auto Configure Switch for First Local IP and IPSec Auto Configure Switch for Second Local IP in the SCTP host and IPSec Auto Configure Switch for First Peer IP and IPSec Auto Configure Switch for Second Peer IP in the corresponding SCTP peer are set to ENABLE(Enable) or Packet Filter ACL Rule Auto-Setup-Deletion SW in the endpoint group is set to ENABLE(Enable). A cross-connected path refers to a connection between the first local IP address and the second peer IP address or between the second local IP address and the first peer IP address.</p>
+</li><li><p>If an endpoint group is configured for multiple modes, the resources of the local ends and peer ends configured in the group must be available for all modes. Otherwise, the endpoint group cannot be configured for multiple modes.</p>
+</li><li><p>If Packet Filter ACL Rule Auto-Setup-Deletion SW is set to ENABLE(Enable), the system automatically generates the advanced ACL rules for the links on the port configured with packet filtering that are related to the end point group when the <a href="add_packetfilter.html">ADD PACKETFILTER</a> or <a href="add_packetfiltering.html">ADD PACKETFILTERING</a> command is executed, and the system removes the advanced ACL rules automatically generated for the links on the port configured with packet filtering that are related to the end point group when the <a href="rmv_packetfilter.html">RMV PACKETFILTER</a> or <a href="rmv_packetfiltering.html">RMV PACKETFILTERING</a> command is executed.</p>
+</li><li><p>In the same routing domain, if IP PM sessions with both triplets and quadruples exist, and their local and peer IP addresses are the same, the system uses the last configured triplet or quadruplet to negotiate.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]In CU-DU Split scenarios, the Application Type parameter in an EPGROUP object cannot be set to NULL and the corresponding eNodeB Interface or gNodeB Interface parameter must be set. Otherwise, the control-plane link and user-plane path in the EPGROUP object cannot automatically set up.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]When the control plane or user plane of the service interface between the local and peer base stations is automatically generated and both IPv4 and IPv6 SCTPHOST/USERPLANEHOST objects are configured in the EPGROUP MOs at both ends, the values of IPVERPREFERENCE in the EPGROUP MOs to which the service interface belongs must be the same.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]When IP PM Automatic Setup and Deletion Switch is set to ENABLE(Enable) and the value of IP PM DSCP or user-plane host or peer IP address in the EPGROUP object is modified, the IP PM session that is automatically established based on the user-plane host or peer is first deleted and then reestablished.</p>
+</li><li><p>[Co-MPT,NodeB]When the UMPT/UMDU is used as the main control board, the base station automatically creates an advanced ACL rule for the base station controller to ping the base station if the Packet Filter ACL Rule Auto-Setup-Deletion SW parameter is set to ENABLE in the configured EPGROUP object that is referenced by the Iub object. The total number of advanced ACL rules created by the base station in this scenario cannot exceed 128.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_epgroup__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-epGroupId.html">EPGROUPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">End Point Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the end point group to which an end point belongs.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of an IPv4 VRF instance.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-IPv6VrfIndex.html">IPV6VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of an IPv6 VRF instance. This parameter takes effect only in LTE and NR.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-packetFilterSwitch.html">PACKETFILTERSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Packet Filter ACL Rule Auto-Setup-Deletion SW</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the ACL rule self-configuration function for packet filtering. When this parameter is set to ENABLE(Enable), the system automatically generates packet filtering rules for all links of the local and peer end points. If this parameter is set to DISABLE(Disable), the system does not generate packet filtering rules. When the <a href="mod_epgroup.html">MOD EPGROUP</a> command is executed to change the value of this parameter from ENABLE(Enable) to DISABLE(Disable), the system automatically deletes the packet filtering rules related to links of the local and peer end points.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EPGROUP</strong> MO, the parameter <strong>PACKETFILTERSWITCH</strong> is valid when the protocol of the end point node in EPGROUP is IPv4.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-userLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the description of an end point group.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-TypeFlag.html">TYPEFLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of an end point group. When this parameter is set to COMMON, the local end point group is a common group. When this parameter is set to CENTRALIZED_EX2, the local end point group is dedicated group for the centralized eX2. The parameter takes effect only in LTE.</p>
+<p>GUI Value Range: COMMON(COMMON), CENTRALIZED_EX2(CENTRALIZED_EX2)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: COMMON, CENTRALIZED_EX2</p>
+<p>MML Default Value: COMMON(COMMON)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-LinkPfmSwitch.html">LNKPFMSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Link Performance Statistics Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch controlling link performance measurement for user plane. When this parameter is set to ENABLE for an endpoint group, the base station performs link performance measurement for this endpoint group. When this parameter is set to DISABLE for an endpoint group, the base station does not perform link performance measurement for this endpoint group. This parameter takes effect only on the UMPT, UTRPc, or UMDU board. The measurement results must be parsed using the maintenance tool.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-StaticChkSwitch.html">STATICCHK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Static Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the GTP-U static detection function takes effect on user-plane links in an endpoint group. When this parameter is set to ENABLE(Enable), the GTP-U static detection function is enabled on all user-plane links in an endpoint group. When this parameter is set to DISABLE(Disable), the GTP-U static detection function is disabled on all user-plane links in an endpoint group. This parameter is valid only when <strong>STATICCHKMODE</strong> is set to EPSTATICCHK(Endpoint Group Static Check) in the <strong>GEPMODELPARA</strong> MO. This parameter takes effect only for LTE and NR.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-IPPMSwitch.html">IPPMSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP PM Automatic Setup and Deletion Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the IP PM session self-configuration function. If this parameter is set to ENABLE(Enable), the system will automatically generate IP PM sessions for links related to the local and peer end points. If this parameter is set to DISABLE(Disable), the system will not automatically generate IP PM sessions. If the value of this parameter is changed from ENABLE(Enable) to DISABLE(Disable) using the <a href="mod_epgroup.html">MOD EPGROUP</a> command, the system will delete the automatically generated IP PM sessions for links related to the local and peer end points. This parameter is valid only for the user-plane links over the LTE S1 interface. IP PM is a Huawei proprietary protocol. Ensure that IP PM is supported by and has been enabled on the CN equipment before turning on this switch.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ENABLE(Enable), the IP PM sessions that are automatically generated by the system will periodically send FM frames and BR frames, increasing the transmission bandwidth overhead. One IP PM session consumes about 6 kbit/s transmission bandwidth.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-IPPMDscp.html">IPPMDSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP PM DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the differentiated services code point (DSCP) of an IP PM session that is automatically generated by a base station. The parameter takes effect only in LTE.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-AppType.html">APPTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Application Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the application referenced by a DFU. The application provides the running environment for the DFU.</p>
+<p>GUI Value Range: eNodeB(eNodeB), gNodeB(gNodeB), NULL(NULL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: eNodeB, gNodeB, NULL</p>
+<p>MML Default Value: NULL(NULL)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-eNodeBInterface.html">ENBINTERFACE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eNodeB Interface</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the eNodeB interface that uses the endpoint group. When this parameter is set to DUX2_U, the endpoint group is used by the eNodeB to automatically generate the DUX2 object. Only the DUX2_U and DUEX2_NON_IDEAL options can be selected together. Other options must be selected separately. This parameter takes effect only for CU-DU Split.</p>
+<p>GUI Value Range: DUW1(DUW1), DUX2_U(DUX2_U), DUEX2_IDEAL(DUEX2_IDEAL), DUEX2_NON_IDEAL(DUEX2_NON_IDEAL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DUW1, DUX2_U, DUEX2_IDEAL, DUEX2_NON_IDEAL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> in the <strong>EPGROUP</strong> MO is set to eNodeB, only the DUX2_U and DUX2_NON_IDEAL options of the <strong>ENBINTERFACE</strong> parameter can be selected together and all other options must be selected separately.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-gNodeBInterface.html">GNBINTERFACE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">gNodeB Interface</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the gNodeB interface that uses the endpoint group. When this parameter is set to GNBDUF1, the endpoint group is used by the gNodeB to automatically generate the GNBDUF1 object. Currently, only one option can be selected. This parameter takes effect only for CU-DU Split.</p>
+<p>GUI Value Range: GNBDUF1(GNBDUF1), GNBDUS1_U(GNBDUS1_U), GNBDUX2_U(GNBDUX2_U)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: GNBDUF1, GNBDUS1_U, GNBDUX2_U</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> in the <strong>EPGROUP</strong> MO is set to gNodeB, each option of the <strong>GNBINTERFACE</strong> parameter must be selected separately and only of them must be selected.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EPGROUP-IPVerPreference.html">IPVERPREFERENCE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Protocol Version Preference</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP protocol version that is preferentially used to automatically establish a control-plane link or user-plane path when the SCTP local IP address or user-plane local IP address in an EPGROUP MO is dual-stack and the IP address of the peer device is also dual-stack. If this parameter is set to IPv4, the IPv4 protocol is used to set up a control-plane link or user-plane path in the EPGROUP MO with the dual-stack peer device. If this parameter is set to IPv6, the IPv6 protocol is used to set up a control-plane link or user-plane path in the EPGROUP MO with the dual-stack peer device. Only one IP protocol can be selected to set up a control-plane link or user-plane path. IPv4 and IPv6 cannot be backed up for each other. This parameter is invalid when the local address or the IP address of the peer device is single-stack. This parameter takes effect only for LTE and NR.</p>
+<p>GUI Value Range: IPv4(IPv4), IPv6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPv4, IPv6</p>
+<p>MML Default Value: IPv6(IPv6)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_epgroup__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an end point group with the parameters as follows: End Point Group ID: 0, IP PM Automatic Setup, Deletion Switch: DISABLE and Application Type: NULL, run the following command:
+ADD EPGROUP: EPGROUPID=0, IPPMSWITCH=DISABLE, APPTYPE=NULL;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

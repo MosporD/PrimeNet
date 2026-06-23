@@ -1,0 +1,269 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell Relay Algorithm Parameter (MOD CELLRELAYALGOPARA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellrelayalgopara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell Relay Algorithm Parameter (MOD CELLRELAYALGOPARA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellrelayalgopara"></a><a name="mod_cellrelayalgopara"></a>
+
+
+<h1 class="topictitle1">Modify Cell Relay Algorithm Parameter (MOD CELLRELAYALGOPARA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellrelayalgopara__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify parameters related to the relay algorithm for a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellrelayalgopara__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>When changing the Uplink Relay Subframe Ratio or Downlink Relay Subframe Ratio parameter value in the CellRelayAlgoPara MO for a TDD cell, if the S1 link status of the cell changes, the cell will reset automatically.</p>
+</li><li><p>The Uplink Relay Subframe Ratio or Downlink Relay Subframe Ratio parameter can be set to 10_10(10/10) only in pure transmission scenarios. In other scenarios, subframes must not be all configured as relay subframes.</p>
+</li><li><p>Modifying DlRelaySubframeRatio on a relay eNodeB (ReNB) in in-band relay scenarios will cause the cell to reset.</p>
+<p>Modifying DlRelaySubframeRatio on a Donor eNodeB (DeNB) in in-band relay scenarios will release all RUEs in the cell.</p>
+</li><li><p>Modifying InBandRelayConCnt on a relay eNodeB (ReNB) in in-band relay scenarios will cause the cell to reset.</p>
+<p>Modifying InBandRelayConCnt on a Donor eNodeB (DeNB) in in-band relay scenarios will release all RUEs in the cell.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellrelayalgopara__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Local ID of the cell. It uniquely identifies a cell within a BS. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-UlRelaySubframeRatio.html">UlRelaySubframeRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Relay Subframe Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ratio of uplink subframes used as relay subframes. The total number of subframes in each radio frame is 10. For example, the value 2/10 indicates that two uplink subframes in each radio frame are used as relay subframes. In the LTE FDD system, the number of uplink subframes used for common UEs is 8, which is the result of subtracting 2 from 10. In the LTE TDD system, the number of uplink subframes used for common UEs is calculated by subtracting the number of uplink subframes used as relay subframes from the number of uplink subframes specified by the subframe configuration. Relay subframes are preferentially scheduled for relay remote nodes (RRNs) while common subframes are preferentially scheduled for common UEs. If the relay subframes are not used up, they can be used for scheduling for common UEs and if the common subframes are not used up, they can be used for scheduling for RRNs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1_10(1/10), 2_10(2/10), 3_10(3/10), 4_10(4/10), 5_10(5/10), 6_10(6/10), 7_10(7/10), 8_10(8/10), 9_10(9/10), 10_10(10/10)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1_10, 2_10, 3_10, 4_10, 5_10, 6_10, 7_10, 8_10, 9_10, 10_10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-DlRelaySubframeRatio.html">DlRelaySubframeRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink Relay Subframe Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ratio of downlink subframes used as relay subframes in out-of-band relay and in-band relay scenarios. In out-of-band relay scenarios, the parameter value takes 10 (the number of subframes in one radio frame) as the denominator. For example, the value 2/10 indicates that two downlink subframes in each radio frame are used as relay subframes. In the LTE FDD system, the number of downlink common subframes is 8, which is the result of subtracting 2 from 10. In the LTE TDD system, the number of downlink common subframes is calculated by subtracting the number of downlink subframes used as relay subframes from the number of downlink subframes specified by the uplink-downlink configuration. Relay subframes are preferentially scheduled for relay remote nodes (RRNs) and common subframes are preferentially scheduled for common UEs. If the relay subframes are not used up, they can be used for scheduling for common UEs. If the common subframes are not used up, they can be used for scheduling for RRNs. In in-band relay scenarios of an LTE FDD network, the parameter value takes 40 (the total number of subframes in four radio frames) as the denominator. The value 12/40 indicates that 12 downlink subframes in four radio frames are used as relay subframes. The value range is 3/40 to 21/40. In in-band relay scenarios of an LTE TDD network, the parameter value takes 10 (the number of subframes in one radio frame) as the denominator. The value can be 1/10, 2/10, and 3/10. In in-band relay scenarios, relay subframes are preferentially scheduled for RRNs and common subframes are scheduled only for common UEs. In in-band relay scenarios of an LTE FDD network, uplink relay subframes in a cell map to downlink relay subframes in the cell and do not need to be configured. In an LTE TDD cell with uplink-downlink configuration 2, the uplink relay subframes in the cell are fixed and the ratio does not need to be configured. In out-of-band relay or in-band relay scenarios, the value 10/10 indicates that the DeNB is used for transmission only and S1 and X2 interfaces do not need to be configured. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1_10(1_10), 2_10(2_10), 3_10(3_10), 4_10(4_10), 5_10(5_10), 6_10(6_10), 7_10(7_10), 8_10(8_10), 9_10(9_10), 10_10(10_10), 3_40(3_40), 6_40(6_40), 9_40(9_40), 12_40(12_40), 15_40(15_40), 18_40(18_40), 21_40(21_40)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1_10, 2_10, 3_10, 4_10, 5_10, 6_10, 7_10, 8_10, 9_10, 10_10, 3_40, 6_40, 9_40, 12_40, 15_40, 18_40, 21_40</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-RrnPreAllocationMinPeriod.html">RrnPreAllocationMinPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rrn Pre-Allocation Minimum Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum interval between uplink preallocations for a relay remote node (RRN). The interval between two preallocations for the same RRN cannot be smaller than the value of this parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~40</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1~40</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a larger number of times that the eNodeB proactively schedules transmissions for the RRN. This will further lead to shorter periods for uplink packets to be buffered in the RRN, improving RRN service experience. A larger value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-RrnPreAllocationSize.html">RrnPreAllocationSize</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rrn Pre-Allocation Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink preallocation data volume of a relay remote node (RRN), that is, the data volume that can be transmitted during an RRN preallocation. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 45~1500</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 45~1500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 80</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to a shorter delay of uplink data transmission for RRNs and higher uplink interference. A smaller value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-UlSinrAdjTargetIbler.html">UlSinrAdjTargetIbler</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink SINR Adjustment Target IBLER</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the target IBLER used in the SINR adjustment algorithm for uplink dynamic scheduling of RRNs. A larger value of this parameter leads to a greater SINR adjustment value, and therefore a higher MCS index is used. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~99</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0.01~0.99, step: 0.01</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>It is recommended that this parameter be set to a value smaller than the default value only in scenarios where short delay and low jitter are required and the throughput is not a concern.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to smaller delay and jitter of RRNs and lower air interface throughput. A larger value leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-DlSinrAdjTargetIbler.html">DlSinrAdjTargetIbler</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink SINR Adjustment Target IBLER</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the target IBLER used in the SINR adjustment algorithm for downlink dynamic scheduling of RRNs. A larger value of this parameter leads to a greater SINR adjustment value, and therefore a higher MCS index is used. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~99</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0.01~0.99, step: 0.01</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>It is recommended that this parameter be set to a value smaller than the default value only in scenarios where short delay and low jitter are required and the throughput is not a concern.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to smaller delay and jitter of RRNs and lower air interface throughput. A larger value leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-UlEnhancedRelaySchSw.html">UlEnhancedRelaySchSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Enhanced Relay Schedule Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the enhanced uplink scheduling function related to RRNs.</p>
+<p>UlSPSDegradeSwitch: If this option is selected, the uplink SPS priority of normal UEs becomes lower than the uplink scheduling priority of RRNs in uplink relay subframes. If this option is deselected, the uplink SPS priority is not lowered. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: UlSPSDegradeSwitch(UlSPSDegradeSwitch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UlSPSDegradeSwitch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: UlSPSDegradeSwitch:Off</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>It is recommended that the UlSPSDegradeSwitch option be selected when uplink SPS is enabled on a network.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: UlSPSDegradeSwitch: If this option is selected, the uplink SPS priority of normal UEs becomes lower than the uplink scheduling priority of RRNs in uplink relay subframes, facilitating RRN scheduling.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-DlEnhancedRelaySchSw.html">DlEnhancedRelaySchSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink Enhanced Relay Schedule Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the enhanced downlink scheduling function related to RRNs.</p>
+<p>DlSPSDegradeSwitch: If this option is selected, downlink SPS does not take effect in downlink relay subframes. If this option is deselected, downlink SPS is not affected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: DlSPSDegradeSwitch(DlSPSDegradeSwitch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DlSPSDegradeSwitch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DlSPSDegradeSwitch:Off</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>It is recommended that the DlSPSDegradeSwitch option be selected when downlink SPS is enabled on a network.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: DlSPSDegradeSwitch: If this option is selected, downlink SPS does not take effect in downlink relay subframes, facilitating RRN scheduling.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRelayAlgoPara-InBandRelayConCnt.html">InBandRelayConCnt</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">In Band Relay Concatenation Count</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the position of the RRN for the cell in a concatenation when RRNs are concatenated in in-band relay scenarios. The value NON_CON indicates that concatenation is not supported. The other values affect the subframe scheduling template. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NON_CON(NON_CON), CON_COUNT_0(CON_COUNT_0), CON_COUNT_1(CON_COUNT_1), CON_COUNT_2(CON_COUNT_2), CON_COUNT_3(CON_COUNT_3)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NON_CON, CON_COUNT_0, CON_COUNT_1, CON_COUNT_2, CON_COUNT_3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellrelayalgopara__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To change relay parameters for a cell with Local Cell ID set to 0, Downlink Relay Subframe Ratio set to (2_10)2/10, run the following command:
+MOD CELLRELAYALGOPARA: LocalCellId=0, DlRelaySubframeRatio=2_10;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

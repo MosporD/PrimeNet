@@ -1,0 +1,160 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display CMP Session (DSP CMPSESSION)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_cmpsession">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display CMP Session (DSP CMPSESSION)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_cmpsession"></a><a name="dsp_cmpsession"></a>
+
+
+<h1 class="topictitle1">Display CMP Session (DSP CMPSESSION)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_cmpsession__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the status of CMP sessions. A CMP session is used by the BS to apply for a new device certificate or to update a device certificate.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_cmpsession__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>The CMPSESSION MO whose session ID is 1, 3, 5, 7, 9, 11 or 17 is used for applying for a device certificate. The CMPSESSION MO whose session ID is 2, 4, 6, 8, 10, 12, 14, 16 or 18 is used for updating a device certificate. The CMPSESSION MO whose session ID is 13 ,15 or any value from 19 to 65535 is reserved.</p>
+</li><li><p>When the <a href="req_devcert.html">REQ DEVCERT</a> command is executed to apply for a device certificate, the CMPSESSION MO whose session ID is 1 is always used. When the system automatically applies for a certificate, the system chooses an available CMPSESSION with the minimum session ID from the CMPSESSION objects whose session IDs are 1, 3, 5, 7, 9 and 11. When the <a href="upd_devcert.html">UPD DEVCERT</a> command is executed to update a device certificate, the CMPSESSION MO whose session ID is 2 is always used. When the system automatically updates a certificate, the system chooses an available CMPSESSION MO with the minimum session ID from the CMPSESSION objects whose session IDs are 2, 4, 6, 8, 10, 12, 14 and 16.</p>
+</li><li><p>In the multi-PKI scenario where device certificates are applied for and updated, the system automatically selects the minimum available session ID.</p>
+</li><li><p>This command is used to query the status of a CMP session that is applying for or updating a device certificate. When the system is busy, the query may fail. Try again later in this case.</p>
+</li><li><p>In the command output, devcert.cer in the 17th and 18th sessions is the name of the temporary certificate file applied for the RRU agent.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_cmpsession__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CMPSession-SessionID.html">SESSIONID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Session ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a CMP session. It uniquely identifies a CMP session within a BS.</p>
+<p>GUI Value Range: 1~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_cmpsession__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To display the information about CMP session, run the following command:
+DSP CMPSESSION:;
+The result is shown as follows:
++++    0        2011-05-20 10:56:10
+O&amp;M    #1594
+%%DSP CMPSESSION:;%%
+RETCODE = 0  Operation succeeded.
+
+Display CMP Session
+-------------------
+Session ID  Method to Get Cert  Certificate File Name  Status of CMPSession  Start Time          
+
+1           CERTREQ             basestationCert.pem    DONE                  2011-05-20 10:47:35
+2           CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+3           CERTREQ             NULL                   INITIAL               0000-00-00 00:00:00
+4           CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+5           CERTREQ             NULL                   INITIAL               0000-00-00 00:00:00
+6           CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+7           CERTREQ             NULL                   INITIAL               0000-00-00 00:00:00
+8           CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+9           CERTREQ             NULL                   INITIAL               0000-00-00 00:00:00
+10          CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+11          CERTREQ             NULL                   INITIAL               0000-00-00 00:00:00
+12          CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+14          CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+16          CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+17          CERTREQ             NULL                   INITIAL               0000-00-00 00:00:00
+18          CERTUPDATE          NULL                   INITIAL               0000-00-00 00:00:00
+(Number of results = 16)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_cmpsession__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Session ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of a CMP session. It uniquely identifies a CMP session within a BS.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Method to Get Cert</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the method using which a CMP session obtains a certificate. There are two methods: applying for a new certificate or updating an existing certificate.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Certificate File Name</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the file name of a device certificate. The file name cannot include any of the following characters: backslash (\), slash (/), colon (:), asterisk (*), question mark (?), double quotation marks ("), left angle bracket (&lt;), right angle bracket (&gt;), and bar (|).</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Status of CMPSession</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the status of a Certificate Management Protocol (CMP) session. There are six types of status: INITIAL, RUNNING, PENDING, DONE, CLOSED, and STOPPED.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Start Time</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the time when a session starts.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

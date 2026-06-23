@@ -1,0 +1,219 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Reference Clock Working Mode (SET CLKMODE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_clkmode">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Reference Clock Working Mode (SET CLKMODE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_clkmode"></a><a name="set_clkmode"></a>
+
+
+<h1 class="topictitle1">Set Reference Clock Working Mode (SET CLKMODE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_clkmode__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the working mode of the reference clock source.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_clkmode__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before specifying a reference clock source manually, ensure that the reference clock source has been configured.</p>
+</li><li><p>The clock quality will be affected if the reference clock source is changed. Do not use this command frequently.</p>
+</li><li><p>If the clock link of the manually selected reference clock source fails, the system loses the reference clock source. In this case, if the system clock works in the locked state, it changes to the holdover state. If the clock link of the reference clock source keeps faulty for a long time, the system clock will work in the free-run state.</p>
+</li><li><p>If the clock link of the reference clock source working in AUTO mode fails, the system reselects a reference clock source by priority and availability of reference clock sources.</p>
+</li><li><p>If Clock Working Mode is set to AUTO, the system will not select the peer clock whose Peer Clock Node Type is BBU as the clock source.</p>
+</li><li><p>The clock source change takes about five seconds. After the change is finished, run the <a href="dsp_clkstat.html">DSP CLKSTAT</a> to check whether the new reference clock takes effect.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]An NE working in FDD mode does not support SYNCETH+IPCLK or GPS+SYNCETH if frequency synchronization is used.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]The clock accuracy deteriorates if Clock Working Mode is set to FREE. In time synchronization mode, services may be unavailable or interference on neighboring cells occurs which affects the handover success rate. In frequency synchronization mode, services may be affected 90 days later.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]When the clock source is set to GPS+SYNCETH, the GPS clock on the RRU is not supported.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_clkmode__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-WorkMode.html">MODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Clock Working Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the working mode of the system clock. Manual indicates that a clock source must be specified by the user. Auto indicates that the system automatically selects a clock source based on the priority and availability of the clock source. Free indicates that the system clock works in free-running mode, that is, the system clock does not trace any reference clock source.</p>
+<p>GUI Value Range: AUTO(Auto), MANUAL(Manual), FREE(Free)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AUTO, MANUAL, FREE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MANUAL(Manual)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and TOD, respectively, <strong>TYPE</strong> of the corresponding <strong>TOD</strong> MO must be set to IN.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> is set to MANUAL, <strong>CLKSRC</strong> is set to SYNCETH+IPCLK or GPS+SYNCETH, and no <strong>HYBRIDCLK</strong> MO is configured, <strong>MODE</strong> cannot be changed to AUTO. Before changing the value, change <strong>MODE</strong> to FREE, change <strong>CLKSRC</strong> to another value, or add a <strong>HYBRIDCLK</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-ManualSpecSrc.html">CLKSRC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Selected Clock Source</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the user-selected clock source.</p>
+<p>GUI Value Range: GPS(GPS Clock), BITS(BITS Clock), IPCLK(IP Clock), SYNCETH(SyncEth Clock), LINECLK(Line Clock), TOD(TOD Clock), PEERCLK(Peer Clock), SYNCETH+IPCLK(SyncEth Clock+IP Clock), GPS+SYNCETH(GPS Clock+SyncEth Clock), INTERCLK(Inter Clock)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: GPS, BITS, IPCLK, SYNCETH, LINECLK, TOD, PEERCLK, SYNCETH+IPCLK, GPS+SYNCETH, INTERCLK</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: GPS(GPS Clock)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and TOD, respectively, <strong>TYPE</strong> of the corresponding <strong>TOD</strong> MO must be set to IN.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-ClkSrcNo.html">SRCNO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Clock Source No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the clock link number of the reference clock source. When the Selected Clock Source parameter is set to GPS+SYNCETH, this parameter indicates the number of the GPS clock link. When the Selected Clock Source parameter is set to SYNCETH+IPCLK, this parameter indicates the number of the IP clock link. When this parameter is set to AUTO, the system selects an available clock link from those of the specified reference clock source. If there is more than one clock link and the selected clock link fails, another available clock link will be used.</p>
+<p>GUI Value Range: 0, 1, AUTO, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0, 1, AUTO, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>SRCNO</strong> is valid only when the clock source specified by the <strong>CLKSRC</strong> in the <strong>TASM</strong> MO supports more than one clock link and the value of <strong>MODE</strong> is set to MANUAL.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-SynMode.html">SYNMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Clock Time Synchronization Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode of scheduled synchronization for the IP clock link. In ABSOLUTE mode, the system clock obtains synchronization signals from the clock server at a fixed time every few days until the system clock is stable. In RELATIVE mode, the system clock obtains synchronization signals from the clock server at regular intervals until the system clock is stable. In OFF mode, the system clock obtains only messages from the clock server in real time. The LTE currently does not support this function.</p>
+<p>GUI Value Range: ABSOLUTE(ABSOLUTE), RELATIVE(RELATIVE), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ABSOLUTE, RELATIVE, OFF</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>ICPT</strong> and <strong>CNM</strong> in an <strong>IPCLKLNK</strong> MO are set to PTP and UNICAST, respectively, and <strong>MODE</strong> and <strong>CLKSRC</strong> in a <strong>TASM</strong> MO are set to MANUAL and IPCLK, respectively, <strong>SYNMODE</strong> in the <strong>TASM</strong> MO can be set to a value ABSOLUTE or RELATIVE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CLKSYNCMODE</strong> and <strong>MODE</strong> and <strong>CLKSRC</strong> in a <strong>TASM</strong> MO are set to TIME and MANUAL and IPCLK, respectively, <strong>SYNMODE</strong> must be set to OFF.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-Period.html">PERIOD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Synchronization Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the synchronization period of the IP clock link. The LTE currently does not support this function.</p>
+<p>GUI Value Range: 3~200</p>
+<p>Unit: h</p>
+<p>Actual Value Range: 3~200</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 24</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>PERIOD</strong> is valid only when <strong>ICPT</strong> in the <strong>IPCLKLNK</strong> MO is set to PTP and <strong>SYNMODE</strong> in the <strong>TASM</strong> MO is set to RELATIVE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-Day.html">DAY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Day</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of timing synchronization days of the IP clock. The LTE currently does not support this function.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-TM.html">TM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Synchronization Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start time of scheduled synchronization for the IP clock link. The LTE currently does not support this function.</p>
+<p>GUI Value Range: 00:00:00~23:59:59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00:00:00~23:59:59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>TM</strong> is valid only when <strong>ICPT</strong> in the <strong>IPCLKLNK</strong> MO is set to PTP and <strong>SYNMODE</strong> in the <strong>TASM</strong> MO is set to ABSOLUTE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_clkmode__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the clock working mode to MANUAL, the selected clock source to GPS and the clock source No. to 0, run the following command:
+SET CLKMODE: MODE=MANUAL, CLKSRC=GPS, SRCNO=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,103 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="List ROHC Configuration (LST PDCPROHCPARA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="lst_pdcprohcpara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>List ROHC Configuration (LST PDCPROHCPARA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="lst_pdcprohcpara"></a><a name="lst_pdcprohcpara"></a>
+
+
+<h1 class="topictitle1">List ROHC Configuration (LST PDCPROHCPARA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="lst_pdcprohcpara__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to list the parameters related to ROHC. The parameters are used by the ROHC entities at the PDCP layer on the radio interface, for header compression and decompression of data packets on the user plane.</p>
+</div></div>
+
+<div class="mmlnote"><a name="lst_pdcprohcpara__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="lst_pdcprohcpara__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<p>None.</p>
+</div></div>
+
+<div class="mmlexample"><a name="lst_pdcprohcpara__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">List ROHC Configuration:
+LST PDCPROHCPARA:;
+The result is shown as follows:
++++    0        2019-12-05 08:54:20
+O&amp;M    #806355179
+%%LST PDCPROHCPARA:;%%
+RETCODE = 0  Operation succeeded.
+
+List ROHC Configuration
+-----------------------
+                  ROHC Highest mode  =  Bi-directional Optimistic Mode
+               Compression profiles  =  Profile0x0001:On
+                                     =  Profile0x0002:On
+                                     =  Profile0x0003:On
+                                     =  Profile0x0004:On
+                                     =  Profile0x0006:Off
+ROHC TCP SINR Trigger Threshold(dB)  =  0
+           ROHC Optimization Switch  =  ROHC_FEEDBACK_ENHANCEMENT_SW:Off
+                                     =  PROFILE6_DL_OPTIMIZATION_SW:Off
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="lst_pdcprohcpara__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody"><table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder"><tr><th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ROHC Highest mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the operating mode of ROHC.</p>
+<p>In Unidirectional Mode (U-Mode), packets are sent only from the compressor to the decompressor, and a feedback channel is not mandatory. Therefore, U-Mode is less reliable than Bidirectional Optimistic Mode (O-Mode) and Bidirectional Reliable Mode (R-Mode), but its feedback-induced overhead is minimum compared with the overhead in O-Mode and R-Mode. In O-Mode, the decompressor can send feedback messages to the compressor to indicate decompression failures or successful context synchronization. O-Mode is more reliable than U-Mode and requires a smaller number of feedback messages than R-Mode. In R-Mode, the reliability of context synchronization between the compressor and the decompressor is higher than that in any other mode. However, because of frequent feedback, R-Mode causes the largest amount of link overhead.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Compression profiles</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the compression profiles supported by the eNodeB.</p>
+<p>Under the ROHC framework, header compression algorithms vary with protocols. Profiles define the header compression protocols (such as RTP/UDP/IP or TCP/IP), which are under the same ROHC framework, for specific types of packet streams. Each profile has a unique identifier.</p>
+<p>As defined by LTE specifications, the eNodeB supports the following profiles: Profile 0x0001 (usage: RTP/UDP/IP; reference: RFC 3095 and RFC 4815), Profile 0x0002 (usage: UDP/IP; reference: RFC 3095 and RFC 4815), Profile 0x0003 (usage: ESP/IP; reference: RFC 3095 and RFC 4815), Profile 0x0004 (usage: IP; reference: RFC 3843 and RFC 4815), and Profile 0x0006 (usage: TCP/IP; reference: RFC 6846).</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ROHC TCP SINR Trigger Threshold(dB)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the SINR threshold for triggering ROHC TCP. This parameter controls the activation scope of ROHC TCP. When ROHC TCP is enabled and a UE supports ROHC TCP, the eNodeB delivers the RRC connection reconfiguration message to the UE to activate ROHC TCP if the uplink SINR of the UE periodically measured by the eNodeB reaches the threshold. In this case, the UE enters the ROHC TCP state and performs ROHC TCP compression on uplink TCP/IP packet headers. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ROHC Optimization Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether to enable ROHC-related optimization functions.</p>
+<p>ROHC_FEEDBACK_ENHANCEMENT_SW: Indicates whether an eNodeB sends NACK feedback immediately after ROHC decompression failures occur in the uplink when the HighestMode parameter is set to O_MODE in the PdcpRohcPara MO. The eNodeB immediately sends NACK feedback in the previous scenario only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>PROFILE6_DL_OPTIMIZATION_SW: Indicates the downlink packet format when the IE "uplinkOnlyHeaderCompression" is configured. If this option is selected, profile 0 is not used in the downlink. If this option is deselected, profile 0 is used in the downlink. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+</table>
+</div></div>
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

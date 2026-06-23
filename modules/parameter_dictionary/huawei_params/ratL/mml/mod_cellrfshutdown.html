@@ -1,0 +1,355 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell RF Channel Intelligent Shutdown Configuration (MOD CELLRFSHUTDOWN)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellrfshutdown">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell RF Channel Intelligent Shutdown Configuration (MOD CELLRFSHUTDOWN)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellrfshutdown"></a><a name="mod_cellrfshutdown"></a>
+
+
+<h1 class="topictitle1">Modify Cell RF Channel Intelligent Shutdown Configuration (MOD CELLRFSHUTDOWN)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellrfshutdown__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of RF channel intelligent shutdown in a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellrfshutdown__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>A cell enters RF channel intelligent shutdown state when all of the following conditions are met: (1) The RF channel intelligent shutdown switch is turned on. (2) The current time is between the start time and end time for RF channel intelligent shutdown. (3) The number of UEs and PRB usage in the cell reach the corresponding thresholds. (4) The number of antennas of the cell meets the criteria. (5) The cell bandwidth meets the criteria. (6) The cell power configuration and aggregation level for common signaling meet the criteria. (7) The current time is not within the last penalty period for exit from RF channel intelligent shutdown state.</p>
+</li><li><p>Cells with only one transmit channel do not support RF channel intelligent shutdown.</p>
+</li><li><p>Cells with a bandwidth of 5 MHz or less do not support RF channel intelligent shutdown.</p>
+</li><li><p>If a cell enters RF channel intelligent shutdown state, carriers are blocked and channels are shut down for the cell.</p>
+</li><li><p>If a cell enters RF channel intelligent shutdown state, UEs can be scheduled in only TM2 mode.</p>
+</li><li><p>If a cell enters RF channel intelligent shutdown state, PDCCH symbol adaptation is not supported.</p>
+</li><li><p>If a cell enters RF channel intelligent shutdown state, the number of available RBs is reduced for the cell.</p>
+</li><li><p>The PRB threshold for exit from RF channel intelligent shutdown state (sum of the corresponding PRB usage threshold and offset) must not be too high. Otherwise, a cell cannot exit from RF channel intelligent shutdown state.</p>
+</li><li><p>LTE TDD cells in cell combination mode do not support RF channel intelligent shutdown.</p>
+</li><li><p>The coverage area of an NB-IoT cell shrinks after it enters the RF channel intelligent shutdown state.</p>
+</li><li><p>If an NB-IoT cell is configured with an LTE in-band carrier, the NB-IoT cell can enter the RF channel intelligent shutdown state only when both the NB-IoT cell and the FDD cell associated with the in-band carrier of the NB-IoT cell meet the conditions for entering the RF channel intelligent shutdown state.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellrfshutdown__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within a base station.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-RfShutdownSwitch.html">RfShutdownSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RF intelligent shutdown switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable intelligent RF channel shutdown. The eNodeB can perform intelligent RF channel shutdown when specific criterion is met only if this parameter is set to ON. If this parameter is set to DETECTION, the eNodeB only detects and measures the duration when intelligent RF channel shutdown can be triggered, but does not perform intelligent RF channel shutdown.</p>
+<p>GUI Value Range: OFF(Off), ON(On), DETECTION(DETECTION)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON, DETECTION</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-StartTime.html">StartTime</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Start time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start time of RF channel intelligent shutdown for the cell.</p>
+<p>GUI Value Range: 00:00:00~23:59:59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00:00:00~23:59:59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 00:00:00</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-StopTime.html">StopTime</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Stop time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the stop time of RF channel intelligent shutdown for the cell. If the stop time is earlier than or the same as the start time, the stop time is assumed to be a time of the next day.</p>
+<p>GUI Value Range: 00:00:00~23:59:59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00:00:00~23:59:59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 06:00:00</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-RsPwrAdjOffset.html">RsPwrAdjOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reference signal power adjust offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the value by which the reference signal power is increased during the RF channel intelligent shutdown period. The reference signal power increases by the value specified by this parameter to ensure coverage of the cell. If this parameter is set to a value greater than 3, the value 3 is used. Otherwise, the configuration value is used. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-DlPrbThd.html">DlPrbThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink PRB threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink PRB usage threshold for RF channel intelligent shutdown. For NB-IoT cells, this parameter indicates the downlink subcarrier usage threshold for RF channel intelligent shutdown. A cell enters the RF channel intelligent shutdown mode when the current cell load is less than or equal to both the uplink PRB usage threshold and downlink PRB usage threshold. A cell exits the RF channel intelligent shutdown mode when the cell load reaches 100%, or when the cell load is greater than the sum of the uplink PRB usage threshold and the offset to the uplink PRB usage or the sum of the downlink PRB usage threshold and the offset to the downlink PRB usage.</p>
+<p>A smaller value of this parameter leads to a lower probability that the cell will enter the RF channel intelligent shutdown mode, which does not facilitate eNodeB power saving. A larger value of this parameter leads to a higher probability that the cell will enter the RF channel intelligent shutdown mode, which affects services.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 8</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellRfShutdown MO, the sum of DlPrbThd and DlPrbOffset must be smaller than or equal to 100.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-UlPrbThd.html">UlPrbThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink PRB threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink PRB usage threshold for RF channel intelligent shutdown. For NB-IoT cells, this parameter indicates the uplink subcarrier usage threshold for RF channel intelligent shutdown. A cell enters the RF channel intelligent shutdown mode when the current cell load is less than or equal to both the uplink PRB usage threshold and downlink PRB usage threshold. A cell exits the RF channel intelligent shutdown mode when the cell load reaches 100%, or when the cell load is greater than the sum of the uplink PRB usage threshold and the offset to the uplink PRB usage or the sum of the downlink PRB usage threshold and the offset to the downlink PRB usage.</p>
+<p>A smaller value of this parameter leads to a lower probability that the cell will enter the RF channel intelligent shutdown mode, which does not facilitate eNodeB power saving. A larger value of this parameter leads to a higher probability that the cell will enter the RF channel intelligent shutdown mode, which affects services.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 8</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellRfShutdown MO, the sum of UlPrbThd and UlPrbOffset must be smaller than or equal to 100.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-DlPrbOffset.html">DlPrbOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink PRB offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the downlink PRB usage for RF channel intelligent shutdown.</p>
+<p>For NB-IoT cells, this parameter indicates the offset to the downlink subcarrier usage for RF channel intelligent shutdown.</p>
+<p>A cell exits the RF channel intelligent shutdown mode when the cell load reaches 100%, or when the cell load is greater than the sum of the uplink PRB usage threshold and the offset to the uplink PRB usage or the sum of the downlink PRB usage threshold and the offset to the downlink PRB usage.</p>
+<p>A smaller value of this parameter leads to a higher probability that the cell will exit the RF channel intelligent shutdown mode and also a higher probability of ping-pong switchover between entry into and exit from the RF channel shutdown mode. A larger value of this parameter leads to a lower probability that the cell will exit the RF channel intelligent shutdown mode, which affects services.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 12</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellRfShutdown MO, the sum of DlPrbThd and DlPrbOffset must be smaller than or equal to 100.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-UlPrbOffset.html">UlPrbOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink PRB offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the uplink PRB usage for RF channel intelligent shutdown.</p>
+<p>For NB-IoT cells, this parameter indicates the offset to the uplink subcarrier usage for RF channel intelligent shutdown.</p>
+<p>A cell exits the RF channel intelligent shutdown mode when the cell load reaches 100%, or when the cell load is greater than the sum of the uplink PRB usage threshold and the offset to the uplink PRB usage or the sum of the downlink PRB usage threshold and the offset to the downlink PRB usage.</p>
+<p>A smaller value of this parameter leads to a higher probability that the cell will exit the RF channel intelligent shutdown mode and also a higher probability of ping-pong switchover between entry into and exit from the RF channel shutdown mode. A larger value of this parameter leads to a lower probability that the cell will exit the RF channel intelligent shutdown mode, which affects services.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 12</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellRfShutdown MO, the sum of UlPrbThd and UlPrbOffset must be smaller than or equal to 100.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-UENumThd.html">UENumThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UE Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UE number threshold for RF channel intelligent shutdown. The cell enters RF channel intelligent shutdown mode if all of the following conditions are met: (1) the number of RRC_CONNECTED UEs is less than or equal to this threshold; (2) the uplink cell load is lower than or equal to the preset uplink PRB usage; (3) the downlink cell load is lower than or equal to the preset downlink PRB usage. The cell exits RF channel intelligent shutdown mode if any of the following conditions is met: (1) the number of RRC_CONNECTED UEs exceeds this threshold; (2) the uplink cell load is higher than the sum of the uplink PRB usage threshold and the uplink PRB usage offset; (3) the downlink cell load is higher than the sum of the downlink PRB usage threshold and the downlink PRB usage offset. A smaller value of this parameter leads to a lower probability that the cell will enter RF channel intelligent shutdown, which does not facilitate base station power saving. A larger value of this parameter leads to a higher probability that the cell will enter RF channel intelligent shutdown, which affects services. For LTE TDD cells, this parameter takes effect only when the RfShutdownJudgingPolicy parameter in the CellRfShutdown MO is set to PRB_AND_UE_NUMBER.</p>
+<p>GUI Value Range: 0~60</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~60</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a longer time that a cell stays in the RF channel intelligent shutdown mode and a larger impact on average cell throughput in the downlink. A smaller value of this parameter results in the opposite effects. If this parameter is set to 0, a cell enters the RF channel intelligent shutdown mode when no UE in RRC_CONNECTED mode exists in the cell.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-RfShutdownJudgingPolicy.html">RfShutdownJudgingPolicy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RF Intelligent Shutdown Judging Policy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the basis for entering or exiting RF channel intelligent shutdown. If this parameter is set to PRB(PRB), the eNodeB determines whether to enter or exit RF channel intelligent shutdown for the cell, based on the uplink and downlink PRB usage of the cell. If this parameter is set to PRB_AND_UE_NUMBER(PRB_AND_UE_NUMBER), the eNodeB determines whether to enter or exit RF channel intelligent shutdown for the cell, based on the uplink and downlink PRB usage and the number of online UEs in the cell. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: PRB(PRB), PRB_AND_UE_NUMBER(PRB_AND_UE_NUMBER)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PRB, PRB_AND_UE_NUMBER</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: PRB(PRB)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to PRB(PRB), the eNodeB determines whether to perform or terminate RF channel intelligent shutdown for the cell based on the uplink and downlink PRB usage of the cell. In this case, RF channel intelligent shutdown can be performed for a cell with a large number of online UEs but a low PRB usage. This affects UE services, but saves power for the eNodeB. If this parameter is set to PRB_AND_UE_NUMBER(PRB_AND_UE_NUMBER), the eNodeB determines whether to enter or exit RF channel intelligent shutdown for the cell, based on the uplink and downlink PRB usage and the number of online UEs in the cell. In this case, RF channel intelligent shutdown cannot be performed for a cell with a large number of online UEs but a low PRB usage. This does not affect UE services, but hinder power saving of the eNodeB.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-RfChnShutdownPwrCheckSw.html">RfChnShutdownPwrCheckSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RF Channel Shutdown Power Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable power check for RF channel shutdown. SYMBOL_0_POWER_CHECK_OPT_SW: Indicates whether to enable symbol 0 power check optimization for RF channel shutdown. If this option is selected, symbol 0 power check optimization is performed after RF channel shutdown takes effect, preventing continuous PDCCH allocation failures. If this option is deselected, symbol 0 power check optimization is not performed after RF channel shutdown takes effect, which may lead to continuous PDCCH allocation failures. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: SYMBOL_0_POWER_CHECK_OPT_SW(SYMBOL_0_POWER_CHECK_OPT_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SYMBOL_0_POWER_CHECK_OPT_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SYMBOL_0_POWER_CHECK_OPT_SW:On</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: SYMBOL_0_POWER_CHECK_OPT_SW: If this option is selected, PDCCH allocation for UEs will not continuously fail after RF channel shutdown takes effect. Some performance indicators are improved, including the RRC connection setup success rate, the service drop rate, and the number of successful PDCCH allocations. In addition, the duration for which RF channel shutdown takes effect decreases. If this option is deselected, there is a low probability that PDCCH allocation for UEs continuously fails after RF channel shutdown takes effect and a low probability that some performance indicators deteriorate, such as the RRC connection setup success rate, the service drop rate, and the number of successful PDCCH allocations.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-MultiRatJointChnShutdownSw.html">MultiRatJointChnShutdownSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Multi-RAT Joint Channel Shutdown Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable multi-RAT joint channel shutdown. If this parameter is set to ON for a cell, multi-RAT joint channel shutdown takes effect in the cell under certain conditions. If this parameter is set to OFF, the function does not take effect. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the RF module power consumption decreases, but the UE throughput also decreases. If this parameter is set to OFF, network performance is not affected.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellRfShutdown-PenaltyDuration.html">PenaltyDuration</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Penalty Duration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration of penalty imposed on a cell that has exited RF channel intelligent shutdown and meets the penalty condition. In the penalty period, the conditions for triggering RF channel intelligent shutdown will not be checked for the cell.</p>
+<p>GUI Value Range: 1~60</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 1~60</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 30</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a larger impact on the duration in which RF channel intelligent shutdown takes effect, a lower probability of frequent entering and exiting RF channel intelligent shutdown, and a smaller impact on system resource consumption caused by entering and exiting RF channel intelligent shutdown. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellrfshutdown__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of RF channel intelligent shutdown in the cell with the parameters as follows: Local cell ID: 0, RF intelligent shutdown switch: ON, Start time: 00:00:00, Stop time: 06:00:00, Reference signal power adjust offset: 3, UE Number Threshold: 1, run the following command:
+MOD CELLRFSHUTDOWN: LocalCellId=0, RfShutdownSwitch=ON, StartTime=00&amp;00&amp;00, StopTime=06&amp;00&amp;00, RsPwrAdjOffset=3, UENumThd=1;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

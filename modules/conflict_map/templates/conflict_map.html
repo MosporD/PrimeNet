@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conflict Map - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('conflict_map.static', filename='conflict_map.css') }}?v=1.2">
+</head>
+<body class="conflict-map-page">
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>🛰️ Conflict Map</h1>
+                <p>Visualize PCI reuse risk by distance, azimuth vs. bearing, strictness, area, band, and technology.</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="section conflict-map-section">
+            <div id="conf-filter-panel" class="conf-filter-panel">
+                <div class="conf-filter-panel-head">
+                    <strong>Conflict Filters</strong>
+                    <button class="btn-secondary small-btn" type="button" id="conf-panel-toggle">Collapse</button>
+                </div>
+                <div id="conf-filter-panel-body" class="filter-row">
+                    <label for="conf-tech">Technology</label>
+                    <select id="conf-tech">
+                        <option value="" selected disabled>Select technology</option>
+                        <option value="3G">3G</option>
+                        <option value="4G">4G</option>
+                        <option value="5G">5G</option>
+                    </select>
+                    <label for="conf-strictness">Strictness</label>
+                    <select id="conf-strictness" title="Controls max distance and how tightly cell azimuth must match geographic bearing toward the neighbor. Tune presets in modules/conflict_map/logic.py → CONFLICT_STRICTNESS_PROFILES.">
+                        <option value="" selected disabled>Select strictness</option>
+                        <option value="strict">Strict</option>
+                        <option value="standard">Standard</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="relaxed">Relaxed</option>
+                    </select>
+                    <label for="conf-risk">Risk</label>
+                    <select id="conf-risk">
+                        <option value="" selected disabled>Select risk</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <label for="conf-area">Area</label>
+                    <select id="conf-area">
+                        <option value="" selected disabled>Select area</option>
+                        <option value="all">All Areas</option>
+                    </select>
+                    <label for="conf-band">Band</label>
+                    <select id="conf-band"><option value="" selected disabled>Select band</option></select>
+                    <label for="conf-elev"><input type="checkbox" id="conf-elev"> Include Elevation</label>
+                    <button class="btn-secondary small-btn" type="button" id="conf-refresh">Query</button>
+                    <button class="btn-secondary small-btn" type="button" id="conf-refresh-cache">Refresh Data</button>
+                    <button class="btn-secondary small-btn" type="button" id="conf-export-kml">Export KML</button>
+                </div>
+                <details class="conf-strictness-help">
+                    <summary>How strictness &amp; risk work</summary>
+                    <p><strong>Strictness</strong> sets three thresholds (see API field <code>filters.strictness_profiles</code> for values): max link length (<code>dist_max_km</code>), distance cap for <strong>High</strong> when both cells are aligned (<code>dist_high_km</code>), and the max azimuth–bearing difference in degrees to count as aligned (<code>az_near_deg</code>).</p>
+                    <p><strong>Risk</strong> filters which tier to draw: High / Medium / Low, derived from those rules. To change what each strictness level shows, edit <code>CONFLICT_STRICTNESS_PROFILES</code> in <code>modules/conflict_map/logic.py</code> and refresh the conflict cache.</p>
+                </details>
+            </div>
+            <div id="conf-map-stats" class="conf-map-stats">Select all filters then click Query.</div>
+            <div id="conflict-map"></div>
+        </section>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.6"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('conflict_map.static', filename='conflict_map.js') }}?v=1.2"></script>
+<script>
+async function logout() {
+    if (confirm('Logout?')) {
+        await fetch('/api/logout', { method: 'POST' });
+        window.location.href = '/login';
+    }
+}
+</script>
+</body>
+</html>

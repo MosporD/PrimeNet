@@ -1,0 +1,332 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellOp">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellOp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellOp</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellOp"></a><a name="CellOp"></a>
+
+
+<h1 class="topictitle1">CellOp</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellOp.html"><strong>CellOp</strong></a>
+        +-<a href="eNBCellOpRsvdPara.html">eNBCellOpRsvdPara</a>[1~1]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A CellOp MO consists of the parameters used to identify an operator of a cell. The maximum number of CellOp MOs that can be configured for a cell varies with the RAN sharing mode. In independent mode, only one CellOp MO can be configured for each cell and this MO must correspond to the primary operator. In RAN sharing with dedicated carrier mode, only one CellOp MO can be configured for each cell. In RAN sharing with common carrier mode or hybrid RAN sharing mode, a maximum of six CellOp MOs can be configured for each cell.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li><p>Possible children:</p>
+<a href="eNBCellOpRsvdPara.html">eNBCellOpRsvdPara</a>[1~1]</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE, one or more <strong>CellOp</strong> MOs must have been configured for the <strong>Cell</strong> MO.</li><li>If the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, the <strong>OpResourceGroupIndex</strong> parameter in a <strong>CellOp</strong> MO under this <strong>Cell</strong> MO must be set to 255.</li><li>If the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, the <strong>CellReservedForOp</strong> parameter in the <strong>CellOp</strong> MOs under this <strong>Cell</strong> MO cannot be set to CELL_DYNAMIC_RESERVED_FOR_OP.</li></ul>
+</li><li>Relation with the <strong>CnOperatorTa</strong> MO:<ul><li><strong>TrackingAreaId</strong> in a <strong>CellOp</strong> MO must have been set in the associated <strong>CnOperatorTa</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>ENodeBSharingMode</strong> MOs:<ul><li>If the <strong>ENodeBSharingMode</strong> parameter in the <strong>ENodeBSharingMode</strong> MO is set to INDEPENDENT, a maximum of one <strong>CellOp</strong> MO with the same <strong>LocalCellId</strong> as that in a <strong>Cell</strong> MO can be configured.</li><li>If the <strong>ENodeBSharingMode</strong> parameter in the <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ, a maximum of one <strong>CellOp</strong> MO with the same <strong>LocalCellId</strong> as that in a <strong>Cell</strong> MO can be configured.</li><li>If <strong>ENodeBSharingMode</strong> in <strong>ENodeBSharingMode</strong> is set to SHARED_FREQ or HYBRID_SHARED, a maximum of six <strong>CellOp</strong> MO with the same <strong>LocalCellId</strong> as that in a <strong>Cell</strong> MO can be configured.</li><li>When the <strong>ENodeBSharingMode</strong> parameter of an <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ_SPEC, for each <strong>LocalCellId</strong> parameter in the associated <strong>Cell</strong> MO, a maximum of two <strong>CellOp</strong> MO instances can exist and a maximum of one <strong>CellOp</strong> MO instance with <strong>CellReservedForOp</strong> set to CELL_NOT_RESERVED_FOR_OP can exist.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>ENodeBSharingMode</strong>, and <strong>CnOperator</strong> MOs:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SHARED_FREQ and <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is CELL_ACTIVE, one of the <strong>CellOp</strong> MOs with the same local cell ID as that specified by <strong>LocalCellId</strong> in the <strong>Cell</strong> MO must meet the following requirement: <strong>CnOperatorType</strong> is set to CNOPERATOR_PRIMARY in the <strong>CnOperator</strong> MO corresponding to the <strong>CnOperatorTa</strong> MO with the same tracking area ID as that specified by <strong>TrackingAreaId</strong> in the <strong>CellOp</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RatFreqPriorityGroup</strong> MO:<ul><li>If the <strong>RatFreqPriorityGroupId</strong> or <strong>NsaDcRatFreqPriorityGrpId</strong> parameter in a <strong>CellOp</strong> MO is set to a value less than 65535, this value must be the same as a configured <strong>RatFreqPriorityGroupId</strong> parameter value in a <strong>RatFreqPriorityGroup</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranIntraFreqNCell</strong>, <strong>CnOperator</strong>, <strong>CnOperatorTa</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>A <strong>CellOp</strong> MO must be configured for each <strong>EutranIntraFreqNCell</strong> MO that corresponds to an intra-eNodeB intra-frequency neighboring cell. If the <strong>ENodeBSharingMode</strong> parameter in the <strong>ENodeBSharingMode</strong> MO is set to SHARED_FREQ, <strong>Mcc</strong> and <strong>Mnc</strong> in such an <strong>EutranIntraFreqNCell</strong> MO must be the same as the <strong>Mcc</strong> and <strong>Mnc</strong> specified in the <strong>CnOperator</strong> MO representing the primary operator. If <strong>ENodeBSharingMode</strong> is set to INDEPENDENT or SEPARATED_FREQ, <strong>Mcc</strong> and <strong>Mnc</strong> in such an <strong>EutranIntraFreqNCell</strong> MO must be set to the same values as <strong>Mcc</strong> and <strong>Mnc</strong> specified in the <strong>CnOperator</strong> MO corresponding to the <strong>CellOp</strong> MO associated with this <strong>EutranIntraFreqNCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong>, <strong>CnOperator</strong>, <strong>CnOperatorTa</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>A <strong>CellOp</strong> MO must be configured for each <strong>EutranInterFreqNCell</strong> MO that corresponds to an intra-eNodeB inter-frequency neighboring cell. If the <strong>ENodeBSharingMode</strong> parameter in the <strong>ENodeBSharingMode</strong> MO is set to SHARED_FREQ, <strong>Mcc</strong> and <strong>Mnc</strong> in such an <strong>EutranInterFreqNCell</strong> MO must be the same as the <strong>Mcc</strong> and <strong>Mnc</strong> specified in the <strong>CnOperator</strong> MO representing the primary operator. If <strong>ENodeBSharingMode</strong> is set to INDEPENDENT or SEPARATED_FREQ, <strong>Mcc</strong> and <strong>Mnc</strong> in such an <strong>EutranInterFreqNCell</strong> MO must be set to the same values as <strong>Mcc</strong> and <strong>Mnc</strong> specified in the <strong>CnOperator</strong> MO corresponding to the <strong>CellOp</strong> MO associated with this <strong>EutranInterFreqNCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CnOperatorTa</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SHARED_FREQ or HYBRID_SHARED and <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE, <strong>CnOperatorId</strong> in the <strong>CnOperatorTa</strong> MO corresponding to <strong>TrackingAreaId</strong> in each <strong>CellOp</strong> MO must be unique.</li><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ_SPEC and <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE, <strong>CnOperatorId</strong> in the <strong>CnOperatorTa</strong> MO corresponding to <strong>TrackingAreaId</strong> in each <strong>CellOp</strong> MO must be unique.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CnOperatorTa</strong>, <strong>ENodeBSharingMode</strong>, and <strong>CnOperator</strong> MOs:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SHARED_FREQ or HYBRID_SHARED and <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE, <strong>Tac</strong> in the <strong>CnOperatorTa</strong> MO corresponding to <strong>TrackingAreaId</strong> in each <strong>CellOp</strong> MO must have the same value.</li><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ_SPEC and <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE, <strong>Tac</strong> in the <strong>CnOperatorTa</strong> MO corresponding to <strong>TrackingAreaId</strong> in each <strong>CellOp</strong> MO must have the same value.</li><li>When the <strong>ENodeBSharingMode</strong> parameter of an <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ_SPEC, for each <strong>LocalCellId</strong> parameter in the associated <strong>Cell</strong> MO, a maximum of one <strong>CellOp</strong> MO instance can exist if: the <strong>CnOperatorType</strong> parameter in a <strong>CnOperator</strong> MO associated by the <strong>TrackingAreaId</strong> parameter in the <strong>CellOp</strong> MO is set to CNOPERATOR_PRIMARY, and the <strong>CellReservedForOp</strong> parameter of the <strong>CellOp</strong> MO is set to CELL_NOT_RESERVED_FOR_OP.</li><li>When the <strong>ENodeBSharingMode</strong> parameter of an <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ_SPEC, for each <strong>LocalCellId</strong> parameter in the associated <strong>Cell</strong> MO, if there are two <strong>CellOp</strong> MO instances, there must be one <strong>CellOp</strong> MO instance with the <strong>CnOperatorType</strong> parameter in a <strong>CnOperator</strong> MO associated by the <strong>TrackingAreaId</strong> parameter in the <strong>CellOp</strong> MO is set to CNOPERATOR_PRIMARY, and the <strong>CellReservedForOp</strong> parameter in the <strong>CellOp</strong> MO is set to CELL_RESERVED_FOR_OP.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong>, <strong>CnOperator</strong>, <strong>CnOperatorTa</strong>, <strong>CnOpSharingGroup</strong>, <strong>Cell</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>A <strong>CellOp</strong> MO must be configured for each <strong>EutranInterFreqNCell</strong> MO that corresponds to an intra-eNodeB inter-frequency neighboring cell. If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED, <strong>Mcc</strong> and <strong>Mnc</strong> in such an <strong>EutranInterFreqNCell</strong> MO must be set to the same values as <strong>Mcc</strong> and <strong>Mnc</strong>, respectively, in the <strong>CnOperator</strong> MO referenced by <strong>PrimaryOperatorId</strong> in the <strong>CnOpSharingGroup</strong> MO for the intra-eNodeB inter-frequency neighboring cell.</li></ul>
+</li><li>Relation with the <strong>EutranIntraFreqNCell</strong>, <strong>CnOperator</strong>, <strong>CnOperatorTa</strong>, <strong>CnOpSharingGroup</strong>, <strong>Cell</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>A <strong>CellOp</strong> MO must be configured for each <strong>EutranIntraFreqNCell</strong> MO that corresponds to an intra-eNodeB intra-frequency neighboring cell. If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED, <strong>Mcc</strong> and <strong>Mnc</strong> in such an <strong>EutranIntraFreqNCell</strong> MO must be set to the same values as <strong>Mcc</strong> and <strong>Mnc</strong>, respectively, in the <strong>CnOperator</strong> MO referenced by <strong>PrimaryOperatorId</strong> in the <strong>CnOpSharingGroup</strong> MO for the intra-eNodeB intra-frequency neighboring cell.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CnOperatorTa</strong>, <strong>CnOpSharingGroup</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED, <strong>CnOperatorId</strong> in the <strong>CnOperatorTa</strong> corresponding to <strong>TrackingAreaId</strong> in the <strong>CellOp</strong> MO under the <strong>Cell</strong> MO must be configured in <strong>PrimaryOperatorId</strong> or <strong>SecondaryOperatorList</strong> in the <strong>CnOpSharingGroup</strong> associated with the <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ENodeBSharingMode</strong>, <strong>Cell</strong>, <strong>CnOperatorTa</strong>, and <strong>CnOpSharingGroup</strong> MOs:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED and <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE, <strong>CnOperatorId</strong> in a <strong>CnOperatorTa</strong> MO associated with the <strong>CellOp</strong> MO under the <strong>Cell</strong> MO must be set to the same value as <strong>PrimaryOperatorId</strong> in the <strong>CnOpSharingGroup</strong> MO associated with the <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CnOperatorTa</strong>, and <strong>CnOperator</strong> MOs:<ul><li>When the <strong>PlmnMode</strong> parameter in a <strong>CnOperator</strong> MO corresponding to the <strong>CnOperatorId</strong> parameter in the <strong>CnOperatorTa</strong> MO associated with the <strong>TrackingAreaId</strong> parameter in the <strong>CellOp</strong> MO is set to IOPS_PLMN, the <strong>CellReservedForOp</strong> parameter must be set to CELL_RESERVED_FOR_OP.</li><li>The sum of the values of <strong>OpDlRbUsedRatio</strong> in the <strong>CellOp</strong> MO instances excluding those meeting the following condition cannot be greater than 100: <strong>TrackingAreaId</strong> in the <strong>CellOp</strong> MO instances is referenced by the <strong>CnOperatorTa</strong> MO instances in which <strong>CnOperatorId</strong> is referenced by the <strong>CnOperator</strong> MO instances whose <strong>PlmnMode</strong> is set to IOPS_PLMN.</li><li>The sum of the values of <strong>OpUlRbUsedRatio</strong> in the <strong>CellOp</strong> MO instances excluding those meeting the following condition cannot be greater than 100: <strong>TrackingAreaId</strong> in the <strong>CellOp</strong> MO instances is referenced by the <strong>CnOperatorTa</strong> MO instances in which <strong>CnOperatorId</strong> is referenced by the <strong>CnOperator</strong> MO instances whose <strong>PlmnMode</strong> is set to IOPS_PLMN.</li><li>The sum of the values of <strong>OpUeNumRatio</strong> in the <strong>CellOp</strong> MO instances excluding those meeting the following condition cannot be greater than 100: <strong>TrackingAreaId</strong> in the <strong>CellOp</strong> MO instances is referenced by the <strong>CnOperatorTa</strong> MO instances in which <strong>CnOperatorId</strong> is referenced by the <strong>CnOperator</strong> MO instances whose <strong>PlmnMode</strong> is set to IOPS_PLMN.</li></ul>
+</li><li>Relation with the <strong>ENodeBSharingMode</strong>, <strong>CnOperatorTa</strong>, and <strong>CnOperator</strong> MOs:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SHARED_FREQ, <strong>CnOperator</strong> MOs configured with <strong>Cell</strong> MO must have one <strong>CnOperator</strong> MO which is primary operator.</li></ul>
+</li><li>Relation with the <strong>EutranBlkNCell</strong>, <strong>CnOperator</strong>, <strong>CnOperatorTa</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>In intra-eNodeB scenarios, the <strong>CellOp</strong> MO must be configured for the intra-eNodeB cell that is represented by an <strong>EutranBlkNCell</strong> MO and is configured as a blacklisted neighboring cell of the serving cell. If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SHARED_FREQ, <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>EutranBlkNCell</strong> MO must be set to the same values as <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>CnOperator</strong> of the primary operator. If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to INDEPENDENT or SEPARATED_FREQ, <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>EutranBlkNCell</strong> MO must be set to the same values of <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>CnOperator</strong> MO corresponding to the <strong>CellOp</strong> MO configured for the intra-eNodeB cell that is added as the blacklisted neighboring cell.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>When the OpPrbGroupshareSwitch option of <strong>OpResourceGroupShareSwitch</strong> is selected, all <strong>OpNonGbrResourceRatio</strong> in same operator group must be set to the same value.</li><li>If the <strong>RanShareModeSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO under a <strong>Cell</strong> MO is set to ON and the <strong>RbSharingRatioWithOtherOp</strong> parameter in a <strong>CellOp</strong> MO under this <strong>Cell</strong> MO is set to a value other than 255, the <strong>RbSharingRatioWithOtherOp</strong> parameter in this <strong>CellOp</strong> MO cannot be set to a value greater than the value of the <strong>OpUlRbUsedRatio</strong> or <strong>OpDlRbUsedRatio</strong> parameter in this <strong>CellOp</strong> MO.</li><li>The WBBMBB_USER_PRB_UP_LMT_SWITCH and WBB_UE_DL_DYN_PRB_LMT_SWITCH options of the <strong>SpecUserAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO under a <strong>Cell</strong> MO can be selected only when the <strong>RbSharingRatioWithOtherOp</strong> parameter is set to 255 in all the <strong>CellOp</strong> MOs under this <strong>Cell</strong> MO.</li><li>In a <strong>CellOp</strong> MO, the value of the <strong>OpMaxAvailableRbRatio</strong> parameter must be greater than or equal to the values of both the <strong>OpUlRbUsedRatio</strong> and <strong>OpDlRbUsedRatio</strong> parameters if the <strong>RanShareModeSwitch</strong> parameter in the corresponding <strong>CellAlgoSwitch</strong> MO is set to ON.</li><li>The <strong>RbSharingRatioWithOtherOp</strong> parameter in the <strong>CellOp</strong> MOs under a <strong>Cell</strong> MO can be set to a value other than 255 only when the <strong>RanShareModeSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO under this <strong>Cell</strong> MO is set to ON.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CnOperatorTa</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, the <strong>NbIotTaFlag</strong> parameter in the <strong>CnOperatorTa</strong> MO for the <strong>TrackingAreaId</strong> parameter in the <strong>CellOp</strong> MO must be BOOLEAN_TRUE(BOOLEAN_TRUE).</li><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to FALSE, the <strong>NbIotTaFlag</strong> parameter in the <strong>CnOperatorTa</strong> MO for the <strong>TrackingAreaId</strong> parameter in the <strong>CellOp</strong> MO must be BOOLEAN_FALSE(BOOLEAN_FALSE).</li></ul>
+</li><li>Relation with the <strong>ENodeBSharingMode</strong>, <strong>Cell</strong>, <strong>CnOperator</strong>, and <strong>CnOperatorTa</strong> MOs:<ul><li>When the <strong>ENodeBSharingMode</strong> parameter in an <strong>ENodeBSharingMode</strong> MO is set to SHARED_FREQ or SEPARATED_FREQ or HYBRID_SHARED, the total number of <strong>CnOperator</strong> MO instances associated with the <strong>CellOp</strong> MO under the <strong>Cell</strong> with <strong>NbCellFlag</strong> set to TRUE must not exceed four.</li><li>When the <strong>ENodeBSharingMode</strong> parameter in an <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ_SPEC and the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO corresponding to the <strong>CellOp</strong> MO is set to TRUE, the <strong>CnOperatorType</strong> parameter in the <strong>CnOperator</strong> MO corresponding to this <strong>CellOp</strong> MO must be set to CNOPERATOR_PRIMARY.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellOp__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellOp__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellOp__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_cellop.html">ADD CELLOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a cell operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellbroadcastcnoperator.html">DSP CELLBROADCASTCNOPERATOR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the broadcast sequence of operators in the cell system information.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellop.html">LST CELLOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the parameters about a cell operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellop.html">MOD CELLOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the parameters about a cell operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_cellop.html">RMV CELLOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a cell operator.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellOp__tab2">Table 2</a> and <a href="#CellOp__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellOp__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellOp__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-TrackingAreaId.html">Local tracking area ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local tracking area identity of the cell, which uniquely identifies an operator's record of tracking area information within a cell. This parameter is used only in the eNodeB and is different from the tracking area identity configured in the tracking area list on the MME.</p>
+<p>This parameter applies to LTE FDD, LTE TDD, and NB-IoT. According to NB-IoT specifications, the TAIs planned for NB-IoT must be different from the TAIs planned for LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-CellReservedForOp.html">Cell reserved for operator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the cell is reserved for an operator.</p>
+<p>If this parameter is set to CELL_RESERVED_FOR_OP, the cell is reserved for the operator. UEs of AC11 or AC15 in their HPLMN or EHPLMN can consider this cell as a candidate cell for cell selection or reselection. UEs of AC11 or AC15 outside their HPLMN/EHPLMN and UEs of AC0 to AC9 and AC12 to AC14 consider this cell as a barred cell during cell selection or reselection.</p>
+<p>If this parameter is set to CELL_NOT_RESERVED_FOR_OP, the cell is not reserved for the operator. All UEs can consider this cell as a candidate cell for cell selection or reselection.</p>
+<p>If this parameter is set to CELL_DYNAMIC_RESERVED_FOR_OP, the cell is dynamically reserved for the operator based on the cell load. When the cell is overloaded, the cell is reserved for the operator. When the cell is lightly loaded, the cell is not reserved for the operator. The CELL_DYNAMIC_RESERVED_FOR_OP value is valid only when the AcBarAlgoSwitch parameter in the CellAlgoSwitch MO is set to ACBAR_SWITCH_DYNAMIC.</p>
+<p>This parameter applies to LTE FDD, LTE TDD, and NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpUlRbUsedRatio.html">Operator uplink RB used ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the percentage of resource blocks (RBs) occupied by the operator on the physical uplink shared channel (PUSCH) when RAN sharing is enabled on the eNodeB and the RanShareModeSwitch parameter of the CellAlgoSwitch MO is set to ON(On). If the data volume is sufficient, the percentage of RBs occupied by each operator will reach the preset value. Modifications on this parameter affect the percentages of RBs occupied by operators on the PUSCH. When the OpPrbGroupshareSwitch option is selected in RAN sharing mode, this parameter is used to calculate the percentage of RBs occupied by the operator resource group on the PUSCH. The percentage of RBs occupied by an operator resource group is the sum of percentages of RBs occupied by operators in the group. This parameter takes effect only in RAN sharing with common carrier mode or in hybrid RAN sharing mode with more than one CellOp MO being configured. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpDlRbUsedRatio.html">Operator downlink RB used ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the percentage of resource blocks (RBs) occupied by the operator on the physical downlink shared channel (PDSCH) when RAN sharing is enabled on the eNodeB and the RanShareModeSwitch parameter of the CellAlgoSwitch MO is set to ON(On). If the data volume is sufficient, the percentage of RBs occupied by each operator will reach the preset value. Modifications on this parameter affect the percentage of RBs occupied by operators on the PDSCH. When the OpPrbGroupshareSwitch option is selected in RAN sharing mode, this parameter is used to calculate the percentage of RBs occupied by the operator resource group on the PDSCH. The percentage of RBs occupied by an operator resource group is the sum of percentages of RBs occupied by operators in the group. This parameter takes effect only in RAN sharing with common carrier mode or in hybrid RAN sharing mode with more than one CellOp MO being configured. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMECfgNum.html">MME configure number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of cell-specific MMEs. This parameter also indicates whether dedicated-MME configuration is allowed for a cell.</p>
+<p>If this parameter is set to 0, dedicated-MME configuration is not allowed for the cell and no dedicated MMEs can be configured for the cell.</p>
+<p>If this parameter is set to a value in the range of 1 to 4, dedicated-MME configuration is allowed for the cell and the number of MME parameter groups that can be configured for the cell equals the value of this parameter. Each MME parameter group consists of an MME group identifier (MMEGI) and an MME code (MMEC)</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMEGI1.html">First MME group identity</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MMEGI of the first MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 1.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMEC1.html">First MME code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MMEC of the first MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 1.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMEGI2.html">Second MME group identity</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MMEGI of the second MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 2.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMEC2.html">Second MME code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MMEC of the second MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 2.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMEGI3.html">Third MME group identity</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MMEGI of the third MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 3.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMEC3.html">Third MME code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MMEC of the third MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 3.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMEGI4.html">Fourth MME group identity</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MMEGI of the fourth MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is equal to 4.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-MMEC4.html">Fourth MME code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MMEC of the fourth MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is equal to 4.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpUeNumRatio.html">Operator Ue Number Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the percentage of activated UEs served by the operator in a cell when inter-frequency load balancing and RAN sharing are enabled. Modifications on this parameter affect the percentage of activated UEs served by operators. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpPttUlRbHighThd.html">Operator PTT UL RB Utilization High Thd</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper usage threshold of the uplink PRBs that an operator allocates to PTT services in a cell. Based on the parameter value, the eNodeB determines whether to admit PTT services in the uplink. If the uplink PRB usage of PTT services is greater than the parameter value, PTT services are not admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpPttUlRbLowThd.html">Operator PTT UL RB Utilization Low Thd</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the lower usage threshold of the uplink PRBs that an operator allocates to PTT services in a cell. Based on the parameter value, the eNodeB determines whether to admit PTT services in the uplink. If the uplink PRB usage of PTT services is less than the parameter value, PTT services are admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpPttDlRbHighThd.html">Operator PTT DL RB Utilization High Thd</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper usage threshold of the downlink PRBs that an operator allocates to PTT services in a cell. Based on the parameter value, the eNodeB determines whether to admit PTT services in the downlink. If the downlink PRB usage of PTT services is greater than the value of this parameter, PTT services are not admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpPttDlRbLowThd.html">Operator PTT DL RB Utilization Low Thd</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the lower usage threshold of the downlink PRBs that an operator allocates to PTT services in a cell. Based on the parameter value, the eNodeB determines whether to admit PTT services in the downlink. If the downlink PRB usage of PTT services is less than the parameter value, PTT services are admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpNonGbrResourceRatio.html">Operator Non-GBR Resource Reservation Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of resources that an operator reserves for downlink non-GBR services to the total resources of the operator when RAN sharing is enabled on the eNodeB and the RanShareModeSwitch parameter of the CellAlgoSwitch MO is set to ON(On). If this parameter is set to 0 for all operators in a cell, this parameter does not take effect. The proportion of resources reserved for downlink non-GBR services is subject to the cell-level non-GBR reservation parameter. If this parameter is set to a non-zero value for at least one operator in the cell, the cell-level non-GBR reservation parameter does not take effect. In this case, this parameter specifies the proportion of resources reserved for downlink non-GBR services of the operator. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OperatorPlmnRoundPeriod.html">Operator PLMN Round Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the operator-specific interval for changing the PLMN at the top of the broadcast PLMN list in round robin mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpResourceGroupIndex.html">Operator Resource Group Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of the resource group to which the operator belongs. The default value is 255, which indicates an invalid value. The OpPrbGroupshareSwitch option takes effect only when the OpResourceGroupIndex parameter is set to a valid value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-RatFreqPriorityGroupId.html">RAT Frequency Priority Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eNodeB-level inter-frequency or inter-RAT frequency priority group ID for LTE UEs of an operator. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-UlAmrcMode.html">Uplink Rate Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink voice rate control mode for the operator. This parameter is valid only if RAN sharing with common carriers mode or hybrid RAN sharing mode is used and there is more than one CellOp MO instance for the cell.</p>
+<p>If this parameter is set to INVALID, this parameter does not take effect.</p>
+<p>If this parameter is set to ULRATECTRL_OFF, voice rate control does not take effect. If RTP packets are encrypted, this parameter must be set to ULRATECTRL_OFF.</p>
+<p>If this parameter is set to ULAMRC_ENB_CONTROL, the eNodeB adjusts the uplink AMR rate.</p>
+<p>If this parameter is set to ULAMRC_SBC_CONTROL, the eNodeB instructs the session border controller (SBC) in the EPC to adjust the uplink AMR rate. The SBC must be a Huawei SBC that supports voice rate control.</p>
+<p>If this parameter is set to ULEVSC_ENB_CONTROL, the eNodeB adjusts the uplink EVS rate.</p>
+<p>If this parameter is set to ADAPTIVE_ENB_CONTROL, the eNodeB adaptively adjusts the uplink AMR/EVS rate.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>For a specific operator, this operator-level parameter and the cell-level parameter UlAmrcMode in the CellAlgoSwitch MO take effect in the following way:</p>
+<p>1. If the cell-level parameter is set to ULRATECTRL_OFF, rate control does not take effect for the operator regardless of the operator-level parameter setting.</p>
+<p>2. If the operator-level parameter is set to ULRATECTRL_OFF, rate control does not take effect for the operator regardless of the cell-level parameter setting.</p>
+<p>3. If the operator-level parameter is set to INVALID, this parameter does not take effect. Rate control defined by the cell-level parameter takes effect for the operator.</p>
+<p>4. If the cell-level parameter and the operator-level parameter are set to other values, rate control takes effect for the operator based on the intersection of the meanings of the two parameter values. There is no intersection between any two of the ULAMRC_ENB_CONTROL, ULEVSC_ENB_CONTROL, and ULAMRC_SBC_CONTROL values. The value ADAPTIVE_ENB_CONTROL includes ULAMRC_ENB_CONTROL and ULEVSC_ENB_CONTROL but does not intersect with ULAMRC_SBC_CONTROL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-RbSharingRatioWithOtherOp.html">RB Sharing Ratio with Other Operator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of RBs that can be shared by the operator with other operators to the total number of RBs in the cell when the operators share cell RB resources. The value 255 indicates that there is no restriction on the proportion of RBs that can be shared by the operator with other operators. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpLevelMlbThldAdjValue.html">Operator-Level MLB Thld Adj Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the adjustment value of the inter-frequency MLB threshold for operator-level PRB-usage-based MLB. If this parameter is set to a value in the range of -50 to -1, the value indicates a decrease in the original threshold. If this parameter is set to a value in the range of 1 to 50, the value indicates an increase in the original threshold. If this parameter is set to 0, the original threshold remains unchanged. Actual PRB usage threshold for the operator = PRB usage threshold for the cell x (1 + The value of this parameter). This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-NsaDcRatFreqPriorityGrpId.html">NSA DC RAT Frequency Priority Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a RAT-specific frequency priority group for NSA DC UEs served by a base-station-level operator. The parameter value 65535 indicates that this parameter has not been set. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellOp-OpMaxAvailableRbRatio.html">Operator Max Available RB Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of the maximum number of RBs available for the operator to the total number of RBs available in the cell when operators share the cell RB resources. This parameter is valid only when the RbSharingRatioWithOtherOp parameter is set to a value other than 255 for an operator of the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CellOp__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CellOp__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellOp-BroadcastCnOperatorId.html">Broadcast CN operator ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the operator index that is broadcast in the cell system information.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

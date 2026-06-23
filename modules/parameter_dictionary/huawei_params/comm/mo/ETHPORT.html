@@ -1,0 +1,470 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="ETHPORT">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+<meta name="Mode" content="RFA">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="ETHPORT">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>ETHPORT</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="ETHPORT"></a><a name="ETHPORT"></a>
+
+
+<h1 class="topictitle1">ETHPORT</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="ETHPORT.html"><strong>ETHPORT</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO indicates an Ethernet port on a panel that is used to connect to other NEs. In this MO, you can configure such parameters as rate, duplex mode, port attribute, ARP proxy, and maximum transmission unit. You can also list information about the statistics of received and transmitted packets and loopback status.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IPCLKLNK</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>LOOPBACK</strong>, <strong>ETHTRUNK</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, an <strong>IPADDR4</strong> MO corresponding to the <strong>IPCLKLNK</strong> MO with <strong>DEVTYPE</strong> set to OC_SLAVE must have been configured and the following conditions must be met:</li><li>1. The value of <strong>CIP</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>IP</strong> in the <strong>IPADDR4</strong> MO, and The value of <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>VRFIDX</strong> in the <strong>IPADDR4</strong> MO.</li><li>2. The value of <strong>ITFID</strong> in the <strong>IPADDR4</strong> MO that meets condition 1 is the same as that of <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO. In this <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to LOOPINT, ETH, or ETHTRK.</li><li>3. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to LOOPINT, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>LOOPBACK</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>LOOPBACK</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>4. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETH, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>5. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETHTRK, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHTRUNK</strong> MO.</li><li>6. The value of <strong>PORTID</strong> in the <strong>ETHTRUNK</strong> MO that meets condition 5 is the same as that of <strong>ETHTRKPORTID</strong> in an <strong>ETHTRUNKLNK</strong> MO.</li><li>7. The value of <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO that meets condition 6 is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPCLKLNK</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>ETHTRUNK</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, an <strong>IPADDR4</strong> MO corresponding to the <strong>IPCLKLNK</strong> MO with <strong>ICPT</strong> set to HW_DEFINED must have been configured and the following conditions must be met:</li><li>1. The value of <strong>CIP</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>IP</strong> in the <strong>IPADDR4</strong> MO, and The value of <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>VRFIDX</strong> in the <strong>IPADDR4</strong> MO.</li><li>2. The value of <strong>ITFID</strong> in the <strong>IPADDR4</strong> MO that meets condition 1 is the same as that of <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO. In this <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to ETH, or ETHTRK.</li><li>3. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETH, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>4. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETHTRK, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHTRUNK</strong> MO.</li><li>5. The value of <strong>PORTID</strong> in the <strong>ETHTRUNK</strong> MO that meets condition 4 is the same as that of <strong>ETHTRKPORTID</strong> in an <strong>ETHTRUNKLNK</strong> MO.</li><li>6. The value of <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO that meets condition 5 is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTERING</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in a <strong>PACKETFILTERING</strong> MO is set to ETH, the corresponding <strong>ETHPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In one logical protection group, <strong>SN</strong> in an <strong>HAGRP</strong> MO must be the same as that in an <strong>ETHPORT</strong> MO.</li><li>[Co-MPT, eGBTS, eNodeB, gNodeB]If <strong>PA</strong> in an <strong>ETHPORT</strong> MO is set to AUTO, no <strong>HAGRP</strong> MO can be configured.</li></ul>
+</li><li>Relation with the <strong>LR</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When removing an <strong>ETHPORT</strong> MO, the system automatically removes the <strong>LR</strong> MO that depends on the <strong>ETHPORT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PORTSECURITY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When removing an <strong>ETHPORT</strong> MO, the system automatically removes the <strong>PORTSECURITY</strong> MO that depends on the <strong>ETHPORT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ETHPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The data rates of all <strong>ETHTRKLNK</strong> MOs in an <strong>ETHTRK</strong> MO must be the same.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The data rates of all <strong>ETHTRUNKLNK</strong> MOs in an <strong>ETHTRUNK</strong> MO must be the same.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring an <strong>ETHTRUNKLNK</strong> MO, ensure that the <strong>ETHPORT</strong> MO that is associated with <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO is configured.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>CASCADEPORT</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO or AUTO, this board cannot be configured with the <strong>ETHPORT</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if the <strong>CASCADEPORT</strong> MO in which the <strong>PN</strong> parameter is set to 6 does not exist, this board cannot be configured with the <strong>ETHPORT</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 4*10GE, the <strong>PN</strong> and <strong>SPEED</strong> parameters in the <strong>ETHPORT</strong> MO configured for this board can only set to 0, 1, 2, or 3, and 10G, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*40GE, the <strong>PN</strong> and <strong>SPEED</strong> parameters in the <strong>ETHPORT</strong> MO configured for this board can only be set to 0 and 40G, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*100GE, the <strong>PN</strong> and <strong>SPEED</strong> parameters in the <strong>ETHPORT</strong> MO configured for this board can only be set to 0 and 100G, respectively.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of eight <strong>IPADDR4</strong> MOs can be configured on an Ethernet port.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, the IP address defined in the <strong>IPADDR4</strong> MO on an <strong>INTERFACE</strong> MO with <strong>PT</strong> set to LOOPINT cannot be on the same network segment as the IP address defined in the <strong>IPADDR4</strong> MO on another <strong>INTERFACE</strong> MO on a different board when <strong>PT</strong> in the latter <strong>INTERFACE</strong> MO is set to ETH.</li></ul>
+</li><li>Relation with the <strong>PORTLR</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>PORTLR</strong> MO is set to ETH, the associated <strong>ETHPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>CFMLOCALMEP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring a <strong>CFMLOCALMEP</strong> MO on an <strong>ETHPORT</strong> MO, ensure that the <strong>ETHPORT</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>DOT1XAUTH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>DOT1XAUTH</strong> MO associated with an <strong>ETHPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>CASCADEPORT</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO, AUTO or 1*40GE, this board cannot be configured with the <strong>ETHTRUNKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TYPE</strong> is set to MDUC in the <strong>MDU</strong> MO, the <strong>ETHPORT</strong> MO must meet the following conditions: when <strong>PN</strong> is set to 0 or 1, <strong>PA</strong> is set to COPPER, and <strong>SPEED</strong> is set to 10M, 100M, or AUTO; when <strong>PN</strong> is set to 2, <strong>PA</strong> is set to FIBER, and <strong>SPEED</strong> is set to 100M, 1000M, or AUTO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TYPE</strong> in an <strong>MDU</strong> MO is set to MDUC, the <strong>ETHPORT</strong> MO must meet the following conditions: Cabinet No., Subrack No., and Slot No. are set to the same values as those in the <strong>MDU</strong> MO; <strong>SBT</strong> is set to BASE_BOARD; <strong>PN</strong> is set to a value within the range 0 to 2.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>ETHPORT</strong> MO corresponding to <strong>INTERFACE</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>IPRSCGRP</strong> MO is set to ETH, the associated <strong>ETHPORT</strong> MO must have been configured.</li><li>[Co-MPT, eNodeB]The sum of non-default <strong>IPRSCGRP</strong> and <strong>RSCGRP</strong> MOs must be less than or equal to 16 on a board.</li><li>[NodeB]A maximum of eight <strong>IPRSCGRP</strong> MOs whose <strong>RSCGRPNO</strong> is not set to DEFAULTPORT or AUTOPORT can be configured on a board.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to ETH respectively, the associated <strong>ETHPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>LLDP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>ETHPORT</strong> MO corresponding to <strong>LLDP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ETH3AH</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>ETHPORT</strong> MO corresponding to <strong>ETH3AH</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PORTID</strong> to any two <strong>ETHPORT</strong> MOs must be different and valid.</li></ul>
+</li><li>Relation with the <strong>DLFLOWCTRLPARA</strong> and <strong>ULFLOWCTRLPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS]When removing an <strong>ETHPORT</strong> MO, the system automatically removes the <strong>DLFLOWCTRLPARA</strong> and <strong>ULFLOWCTRLPARA</strong> MOs that depend on the <strong>ETHPORT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>TYPE</strong> in <strong>MPT</strong> is LMPT, if <strong>PA</strong> is AUTO in <strong>ETHPORT</strong> on the LMPT board, the <strong>SPEED</strong> and <strong>DUPLEX</strong> of the <strong>ETHPORT</strong> MO must be AUTO.</li></ul>
+</li><li>Relation with the <strong>IPULFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>IPULFLOWCTRLPARA</strong> MO is set to ETH, the associated <strong>ETHPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPDLFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>IPDLFLOWCTRLPARA</strong> MO is set to ETH, the associated <strong>ETHPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPCLKLNK</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>LOOPBACK</strong>, <strong>ETHTRUNK</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, an <strong>IPADDR6</strong> MO corresponding to the <strong>IPCLKLNK</strong> MO with <strong>DEVTYPE</strong> set to OC_SLAVE and <strong>IPMODE</strong> set to IPV6 must have been configured and the following conditions must be met:</li><li>1. The value of <strong>CIPV6</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>IPV6</strong> in the <strong>IPADDR6</strong> MO, and The value of <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>VRFIDX</strong> in the <strong>IPADDR6</strong> MO.</li><li>2. The value of <strong>ITFID</strong> in the <strong>IPADDR6</strong> MO that meets condition 1 is the same as that of <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO. In this <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to LOOPINT, ETH, or ETHTRK.</li><li>3. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to LOOPINT, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>LOOPBACK</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>LOOPBACK</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>4. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETH, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>5. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETHTRK, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHTRUNK</strong> MO.</li><li>6. The value of <strong>PORTID</strong> in the <strong>ETHTRUNK</strong> MO that meets condition 5 is the same as that of <strong>ETHTRKPORTID</strong> in an <strong>ETHTRUNKLNK</strong> MO.</li><li>7. The value of <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO that meets condition 6 is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and the <strong>SIGIP2V4</strong> parameter in an <strong>SCTPHOST</strong> MO is valid, the <strong>IPADDR4</strong> MOs to which <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> belongs must be configured on the same subrack, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>SIGIP2V6</strong> is valid in an <strong>SCTPHOST</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li><li>[Co-MPT, eNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]If <strong>IPSECSWITCH</strong> is set to ENABLE for a <strong>USERPLANEHOST</strong> MO, <strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO must be configured on the same board as <strong>LOCIKEIPV4</strong> for the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>LSWPORT</strong> MO:<ul><li>[Co-MPT, eNodeB]The <strong>ETHPORT</strong> MO on which <strong>ETHPORTID</strong> in an <strong>LSWPORT</strong> MO depends must exist.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>ETHPORT</strong> MOs must be less than or equal to 32 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>ETHTRUNKLNK</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and the <strong>SIGIP2V4</strong> parameter in an <strong>SCTPHOST</strong> MO is valid, the <strong>IPADDR4</strong> MOs to which <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> belongs must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>ETHTRUNKLNK</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]When <strong>SIGIP2V6</strong> is valid in an <strong>SCTPHOST</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHTRUNKLNK</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li><li>[gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHTRUNKLNK</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]If <strong>IPSECSWITCH</strong> is set to ENABLE for a <strong>USERPLANEHOST</strong> MO, <strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO must be configured on the same board as <strong>LOCIKEIPV4</strong> for the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#ETHPORT__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="ETHPORT__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="ETHPORT__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ethport.html">ADD ETHPORT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an Ethernet port and set its related parameters, such as the Ethernet port speed, duplex mode, and port attribute.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ethport.html">DSP ETHPORT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of an Ethernet port, including the maximum transfer unit, speed, MAC address, duplex mode, physical layer status, and traffic information.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ethport.html">LST ETHPORT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the Ethernet port configuration, including the speed, duplex mode, and port attribute.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ethport.html">RMV ETHPORT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to restore the default configuration of an Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rst_ethport.html">RST ETHPORT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to reset an Ethernet port. After the Ethernet port is reset, the port negotiation automatically restarts. The data to be negotiated consists of the maximum transmission unit, port rate, and duplex mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_ethport.html">SET ETHPORT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to configure an Ethernet port. The configuration of an Ethernet port includes (but not limited to) the port rate, duplex mode, and port attribute.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_macloop.html">SET MACLOOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set a MAC loopback for an Ethernet port. If an Ethernet port is faulty, you can set a MAC loopback to identify problems in the transmission link or the port.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#ETHPORT__tab2">Table 2</a> and <a href="#ETHPORT__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="ETHPORT__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="ETHPORT__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board where the Ethernet port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board where the Ethernet port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board where the Ethernet port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where the Ethernet port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-PortNo.html">Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-PortId.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an Ethernet port, which uniquely identifies the Ethernet port. When the system automatically creates an Ethernet port, the most significant bit to the least significant bit of this parameter value indicate the cabinet number, subrack number, slot number, and port number of the Ethernet port, respectively. When Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, this parameter is optional. If this parameter is not set, the default value 4294967295 is used. When Transmission Configuration Mode in the GTRANSPARA MO is set to NEW, this parameter is mandatory and must be unique in the system. If the ETHPORT MO is not configured, the default value 4294967295 of PORTID is displayed.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-PortAttr.html">Port Attribute</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an Ethernet port is an electrical port or optical port. When the system starts, the system binds an Ethernet port to an electrical port preferentially if the default value of the port attribute is AUTO. If the BS does not support cascading, the port attribute is set to AUTO. If this parameter is incorrectly set, services of a base station will be interrupted after the base station is reset.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-MTU.html">Maximum Transmission Unit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum IPv4 packet size (including the IP header) at the Ethernet port. For the UMPTa/b, UMDU, LMPT, UCCU, and UTRPc, the value of this parameter ranges from 46 to 1800. For the WMPT, GTMUb, GTMUc, UQEC, and UEOC, the value of this parameter ranges from 46 to 1500. For the UMPTe, the value of this parameter ranges from 46 to 2000. For the UMPTg and UMPTga, the value of this parameter ranges from 46 to 9000. If this parameter is set to a value greater than the maximum allowed value, the maximum allowed value takes effect. A value greater than or equal to 776 is recommended, because broadcast packets, such as DHCP packets, may experience reception or transmission failures if the maximum transmission unit is smaller than 776. If the Ethernet port is added to an Ethernet trunk, this parameter becomes invalid. The actual maximum transmission unit depends on the value set for the Ethernet trunk.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-Speed.html">Speed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the speed mode of the Ethernet port. This parameter must be set to the same value as that of the peer port. GE electrical ports of base board support 1000 Mbit/s only when working in auto-negotiation mode. When Port Attribute is set to FIBER and Speed is set to AUTO for a GE optical port, the port works at a rate of 1000 Mbit/s in auto-negotiation mode. In this case, the base station can only negotiate the duplex mode with the peer device at a fixed rate of 1000 Mbit/s. When Port Attribute is set to FIBER and Speed is set to 1000M for a GE optical port, the port works at a rate of 1000 Mbit/s in forced mode. If the Ethernet port corresponding to the optical port of the main control board is not configured, the system uses the 1000 Mbit/s auto-negotiation mode by default. If the non-default 1000 Mbit/s auto-negotiation mode is used, for example, 10 Gbit/s optical port is used, you need to run the <a href="../mml/add_ethport.html">ADD ETHPORT</a> command to set parameters such as the rate.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-Duplex.html">Duplex</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duplex mode of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-ARPProxy.html">ARP Proxy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the ARP proxy function on the Ethernet port. If the ARP proxy function is enabled, the system serves as an ARP proxy for a loopback interface address of the base station or for an interface IP address of a lower-level base station. If this function is disabled, the system does not serve as an ARP proxy for the loopback interface IP address of the base station or for the interface IP address of a lower-level base station. To access either IP address in this case, an external device on the same subnet must be configured with a route. If the Ethernet port is added to an Ethernet trunk, this parameter becomes invalid. Whether the ARP proxy function is enabled is determined by the setting of this parameter for the Ethernet trunk.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-FlowControl.html">Flow Control</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable flow control on the Ethernet port. Flow control is implemented to prevent congestion. When flow control is enabled, the RX end repeatedly sends PAUSE frames to the TX end, instructing the TX end to lower the TX rate if congestion occurs on the RX end. Upon receiving PAUSE frames, the TX end stops sending data during a period of time to prevent congestion.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-MACOccurThreshold.html">MAC Frame Error Rate Occur Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the generation threshold for the MAC Excessive Frame Error Rate alarm (ID: 25881). When the number of erroneous MAC frames exceeds this threshold, the MAC Excessive Frame Error Rate alarm is reported.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-MACRestoreThreshold.html">MAC Frame Error Rate Clear Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the clearance threshold for the MAC Excessive Frame Error Rate alarm (ID: 25881). When the number of erroneous MAC frames falls below this threshold, the MAC Excessive Frame Error Rate alarm is cleared.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-RxBCastPktAlmOcrThd.html">Rx Broadcast Pkts Alarm Occur Thd</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the generation threshold for the excessive RX broadcast packet alarm. If the average number of broadcast packets that are received on the Ethernet port keeps above the threshold for 30 seconds, an excessive RX broadcast packet alarm is reported.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-RxBCastPktAlmClrThd.html">Rx Broadcast Pkts Alarm Clear Thd</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the clearance threshold for the excessive RX broadcast packet alarm. If the average number of broadcast packets that are received on the Ethernet port keeps below the threshold for 30 seconds, the excessive RX broadcast packet alarm is cleared.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-FiberSpeedMatch.html">Fiber Speed Match</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the method of obtaining the data rate for an optical Ethernet port. When this switch is turned on, an optical Ethernet port uses the configured rate if its rate cannot be obtained. When this switch is turned off, an optical Ethernet port obtains its rate from the Ethernet chip.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-UserLabel.html">User Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the user-defined information about an Ethernet port. PeerPortLocation is contained in the UserLabel field.</p>
+<p>The format of UserLabel is UserLabel="%PeerPortLocation::XXXX%ssssss", where "XXXX" indicates the value of PeerPortLocation, and "ssssss" indicates the value of UserLabel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-FECMODE.html">FEC Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the forward error correction (FEC) mode of the Ethernet port when it is a 25 Gbit/s optical port. When this parameter is set to RS-FEC, the transmit end adds error correction information to the data packet. The receive end uses the error correction information to correct the bit error generated during the transmission of the data packet, so as to improve the signal quality. When this parameter is set to NO-FEC, the FEC function is disabled and no error correction information is added to the transmitted packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ETHPORT-AutoCfgFlag.html">Auto Config Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object is created by the system. MANUAL_CREATED means that the object is configured by the user manually. AUTO_CREATED means that the object is created by the system.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="ETHPORT__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="ETHPORT__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-MAC.html">MAC Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the MAC address (six bytes) configured for the Ethernet port. The format is XXXX-XXXX-XXXX.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-PortStatus.html">Port Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-LoopbackStatus.html">Loopback Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the loopback status of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-InLoopbackTestMode.html">In Loopback Mode or Not</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether the Ethernet port is in the steady state of the OAM 3AH loopback response. For details, see IEEE 802.3ah.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-OAM3AHEnableFlag.html">Ethernet OAM 3AH Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether the Ethernet OAM 3AH is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-RxPackets.html">Number of RX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets received at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-RxBytes.html">Number of RX Bytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes received at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-RxCRCError.html">Number of RX CRC Error Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of CRC error packets received at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-RxFlowRate.html">RX Traffic</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the traffic received at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-TxPackets.html">Number of TX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets transmitted at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-TxBytes.html">Number of TX Bytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes transmitted at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-TxFlowRate.html">TX Traffic</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the traffic transmitted at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-IPNum.html">Number of IPs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of IP addresses configured for the Ethernet port.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-IPList.html">IP Address List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IP address and mask list configured for the Ethernet port.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-LocRealNegoMode.html">Local Negotiation Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation mode of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-LocSpeed.html">Local Speed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the speed mode of the Ethernet port. This parameter must be set to the same value as that of the peer port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-LocDuplex.html">Local Duplex</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the duplex mode of the Ethernet port. If an Ethernet electrical port is used, this parameter is valid when SPEED is not set to AUTO. If an Ethernet optical port is used, this parameter must be set to FULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-PeerNegoMode.html">Peer Actual Negotiation Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation mode of the NE connecting to the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-PeerSpeed.html">Peer Speed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the speed mode of the NE connecting to the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-PeerDuplex.html">Peer Duplex</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the duplex mode of the NE connecting to the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/ETHPORT-PhyLayerStat.html">Physical Layer Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the physical layer status of the Ethernet port.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#ETHPORT__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="ETHPORT__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="ETHPORT__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455297.html">VS.FEGE.TxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes in the packets successfully transmitted on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455298.html">VS.FEGE.TxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of packets successfully transmitted on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455297.html">VS.FEGE.RxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of bytes in the packets successfully received on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455298.html">VS.FEGE.RxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of packets successfully received on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455298.html">VS.FEGE.RxErrPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of error packets received on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455302.html">VS.FEGE.TxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum transmit rate on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455302.html">VS.FEGE.TxMinSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Minimum transmit rate on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455302.html">VS.FEGE.TxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average transmit rate on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455302.html">VS.FEGE.RxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum receive rate on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455302.html">VS.FEGE.RxMinSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Minimum receive rate on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455302.html">VS.FEGE.RxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average receive rate on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460296.html">VS.FEGE.TxTotalBW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total transmit bandwidth on the Ethernet port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460296.html">VS.FEGE.RxTotalBW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total receive bandwidth on the Ethernet port</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

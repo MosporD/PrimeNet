@@ -1,0 +1,111 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Combine RRU Chain/Ring (CMB RRUCHAIN)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="cmb_rruchain">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Combine RRU Chain/Ring (CMB RRUCHAIN)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="cmb_rruchain"></a><a name="cmb_rruchain"></a>
+
+
+<h1 class="topictitle1">Combine RRU Chain/Ring (CMB RRUCHAIN)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="cmb_rruchain__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to combine two RRU chains into a cold backup RRU ring. The cold backup mode is described in the backup mode parameter of the <a href="mod_rruchain.html">MOD RRUCHAIN</a> command.</p>
+<p>To improve the reliability of RRU chains, use a fiber optic cable to connect two RRUs on the tails of two chains. Then, run this command to combine them into a ring.</p>
+<p>When two RRU chains are combined successfully, the number of the first chain is used as the number of the newly created ring by default.</p>
+<p>If the original two RRU chains have no breakpoints, the new ring has no breakpoint.</p>
+<p>If only one RRU chain has breakpoints, breakpoints 1 and 2 of the new ring coincide.</p>
+<p>If both the original RRU chains have breakpoints, the new ring has two breakpoints. The position of breakpoint 1 is that of the breakpoint on the first RRU chain. The position of breakpoint 2 is the level of the new ring minus the position of the breakpoint on the second RRU chain.</p>
+</div></div>
+
+<div class="mmlnote"><a name="cmb_rruchain__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The two RRU chains to be combined cannot have the same chain number, and their topology types should only be CHAIN.</p>
+</li><li><p>The total number of board levels on the two RRU chains should not exceed 21 before combination.</p>
+</li><li><p>Before combining two chains, run the <a href="dsp_cprilbr.html">DSP CPRILBR</a> command to query the CPRI line rate modes and the CPRI line rates of the two chains. If the two chains have different CPRI line rates or modes, the first old chain CPRI rate or mode will be as the result of the new ring. After combining two chains, run the <a href="lst_rruchain.html">LST RRUCHAIN</a> command to query the current fixed CPRI line rate and run the <a href="dsp_cprilbr.html">DSP CPRILBR</a> command to query the current running CPRI line rate. If the result of fixed mode is not up to the expectation, set the appropriate CPRI line rate by the <a href="mod_rruchain.html">MOD RRUCHAIN</a> command again. If the result of auto mode is not up to the expectation, run the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command to implement rate negotiation.</p>
+</li><li><p>In a ring topology, neither multimode RRUs nor single-mode RRUs working in a mode different from the baseband processing board can be configured.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="cmb_rruchain__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ParaInfo-RRUChainId1.html">RCN1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First RRU Chain No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the first RRU chain.</p>
+<p>GUI Value Range: 0~249</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~249</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ParaInfo-RRUChainId2.html">RCN2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second RRU Chain No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the second RRU chain.</p>
+<p>GUI Value Range: 0~249</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~249</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="cmb_rruchain__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To combine two RRU chains numbered 0 and 1, run the following command:
+CMB RRUCHAIN: RCN1=0, RCN2=1;
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

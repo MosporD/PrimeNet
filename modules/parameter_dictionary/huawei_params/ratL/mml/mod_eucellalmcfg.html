@@ -1,0 +1,123 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify eNodeB Cell Alarm Configuration (MOD EUCELLALMCFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_eucellalmcfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify eNodeB Cell Alarm Configuration (MOD EUCELLALMCFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_eucellalmcfg"></a><a name="mod_eucellalmcfg"></a>
+
+
+<h1 class="topictitle1">Modify eNodeB Cell Alarm Configuration (MOD EUCELLALMCFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_eucellalmcfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the data record of eNodeB cell alarm configurations.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_eucellalmcfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>Actual value range of parameter RxNoisePwrThd is 0~32. When actual value is smaller than 12, 12 will be used by eNodeB.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_eucellalmcfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EuCellAlmCfg-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LocalCellId</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of a cell, which uniquely identifies a cell within an eNodeB.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EuCellAlmCfg-RxNoisePwrThd.html">RxNoisePwrThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rx Noise Power Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for reporting an alarm indicating interference noise power imbalance between receive (RX) channels of the cell. The threshold is an average interference noise power difference between two RX channels of the cell. This parameter applies only to LTE FDD cells and NB-IoT cells deployed in a mode other than LTE in-band mode.</p>
+<p>GUI Value Range: 0~320</p>
+<p>Unit: 0.1dBm</p>
+<p>Actual Value Range: 0~32</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 120</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability that an alarm indicating interference noise power imbalance between RX channels will be reported for the cell. Therefore, there is a possibility that no alarms are reported when related KPIs deteriorate due to RF module or antenna issues. A smaller value of this parameter results in a higher probability that such an alarm will be reported for the cell.</p>
+<p>Applicable Mode: L-FDD, L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EuCellAlmCfg-RxChannelNoiseDetectMode.html">RxChannelNoiseDetectMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RX Channel Noise Detection Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the method of checking the alarm of interference noise power imbalance between receive channels in a cell.</p>
+<p>ALL_CHANNELS: Indicates that the eNodeB checks whether the interference power of all channels in a cell is balanced. If the interference power is unbalanced and exceeds the RxNoisePwrThd parameter value, ALM-29250 Cell RX Channel Interference Noise Power Unbalanced is generated. If this parameter is changed from another value to this value, the modification takes effect at the next check period.</p>
+<p>RRU_CHANNELS: Indicates that the eNodeB checks whether the interference noise power is balanced between RRU channels. This value applies only to physical cells served by two combined RRUs. If interference noise power is unbalanced, ALM-29250 Cell RX Channel Interference Noise Power Unbalanced is generated. If this parameter is changed from another value to this value, the modification takes effect at the next check period.</p>
+<p>NONE: Indicates that ALM-29250 Cell RX Channel Interference Noise Power Unbalanced is not generated. If this alarm has been reported, the eNodeB clears the alarm.</p>
+<p>This parameter applies only to LTE FDD cells and NB-IoT cells deployed in a mode other than LTE in-band mode.</p>
+<p>GUI Value Range: ALL_CHANNELS(ALL_CHANNELS), RRU_CHANNELS(RRU_CHANNELS), NONE(NONE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ALL_CHANNELS, RRU_CHANNELS, NONE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that this parameter be set to RRU_CHANNELS when a physical cell is served by two combined RRUs. Otherwise, you are advised to set this parameter to ALL_CHANNELS.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-NB-IOT</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_eucellalmcfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of the eNodeB cell alarm as follows: Local cell ID: 0: Rx Noise Power Threshold: 123, run the following command:
+MOD EUCELLALMCFG: LocalCellId=0, RxNoisePwrThd=123;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

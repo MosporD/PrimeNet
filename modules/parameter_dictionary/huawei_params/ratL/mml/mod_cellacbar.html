@@ -1,0 +1,771 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell Access Barring Configuration (MOD CELLACBAR)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellacbar">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell Access Barring Configuration (MOD CELLACBAR)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellacbar"></a><a name="mod_cellacbar"></a>
+
+
+<h1 class="topictitle1">Modify Cell Access Barring Configuration (MOD CELLACBAR)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellacbar__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of cell access barring.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellacbar__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If ac-BarringFactor is set to a value other than P00, this value takes effect only if signaling from UEs of access class 11 to access class 15 is not barred.</p>
+</li><li><p>By setting related parameters to control the access to the cell, operators can effectively avoid channel overload.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellacbar__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarringInfoCfgInd.html">AcBarringInfoCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC barring information configure indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the AC barring information configuration mode.</p>
+<p>If this parameter is set to NOT_CFG, AC barring information is not configured.</p>
+<p>If this parameter is set to CFG, AC barring information is configured.</p>
+<p>If this parameter is set to OPERATOR_BASED_CFG, AC barring information is configured based on operator information.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure), OPERATOR_BASED_CFG(Operator-based configuration)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG, OPERATOR_BASED_CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. This parameter is used with other parameters related to cell access barring to control the UE accesses.)</p>
+<p>Impact on Radio Network Performance: If AcBarringForMoDataCfgInd or AcBarringForMoSigCfgInd in SIB2 is set to CFG, the UE generates a random number in the range [0, 1). If the random number is smaller than the value of AcBarringFactorForCall or AcBarringFactorForSig, the UE considers access to the cell as allowed. That is, an RRC connection can be set up for the mobile-originated call or signaling. A larger value of AcBarringFactorForCall or AcBarringFactorForSig leads to a higher probability of granting access to a UE, which may increase cell load. A smaller value of AcBarringFactorForCall or AcBarringFactorForSig leads to a lower probability of granting access to a UE. As a result, a UE may fail to access the cell even when the cell load is relatively light. If this parameter is set to P00, no RRC connection for the mobile-originated call or signaling can be set up.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarringForEmergency.html">AcBarringForEmergency</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Emergency call barring state</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the barring status of access class 10. This parameter specifies whether UEs are allowed to initiate emergency calls.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access classes 0 to 9 or UEs without IMSIs are not allowed to initiate emergency calls. If this parameter is set to BOOLEAN_FALSE, UEs of access classes 0 to 9 or UEs without IMSIs are allowed to initiate emergency calls.</p>
+<p>A UE of access class 11 to 15 are not allowed to initiate emergency calls only when its access class and access class 10 are both barred. If its access class or access class 10 is not barred, the UE is allowed to initiate emergency calls. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AcBarringForEmergency is optional, depending on the setting of AcBarringInfoCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (For the UE in idle mode, if it is BOOLEAN_TRUE, the emergency calls initiated by the UEs of access categories 0 to 9 or UEs without IMSI are rejected.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarringForMoDataCfgInd.html">AcBarringForMoDataCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC barring for mobile data configure indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure the AC barring information for mobile-originated calls. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AcBarringForMoDataCfgInd is optional, depending on the setting of AcBarringInfoCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (The access request of the mobile-originated call initiated by a UE in idle mode is accepted or rejected according to the corresponding barring status.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarringFactorForCall.html">AcBarringFactorForCall</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Access probability factor for originating call</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the access probability factor for mobile-originated calls. A mobile-originated call is granted access if the random number generated by the UE is less than this access probability factor; otherwise, the access request is rejected. According to 3GPP TS 36.331, if any of the parameters AC11BarforCall, AC12BarforCall, AC13BarforCall, AC14BarforCall, and AC15BarforCall is set to BOOLEAN_TRUE, the eNodeB sends UEs P00 as the access probability factor for mobile-originated calls in the system information block type 2 (SIB2), regardless of the actual setting of the AcBarringFactorForCall parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: P00(0%), P05(5%), P10(10%), P15(15%), P20(20%), P25(25%), P30(30%), P40(40%), P50(50%), P60(60%), P70(70%), P75(75%), P80(80%), P85(85%), P90(90%), P95(95%)</p>
+<p>Unit: %</p>
+<p>Actual Value Range: P00, P05, P10, P15, P20, P25, P30, P40, P50, P60, P70, P75, P80, P85, P90, P95</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: P95(95%)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AcBarringFactorForCall is optional, depending on the setting of AcBarringForMoDataCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (For the UE in idle mode, the source call accesses are allowed only when the random number generated by the UE is smaller than the access probability factor.)</p>
+<p>Impact on Radio Network Performance: If AcBarringForMoDataCfgInd in SIB2 is set to CFG, the UE generates a random number in the range [0,1). If the random number is smaller than the value of this parameter, the UE considers access to the cell as allowed. That is, an RRC connection can be set up for the mobile-originated call. If this parameter is set to a large value, the probability of allowing access to the cell is high, which may lead to a high cell load. If this parameter is set to a small value, the probability of allowing access to the cell is low. As a result, UEs may fail to access the cell even when the cell load is relatively light. If this parameter is set to P00, an RRC connection is prohibited from being set up for the mobile-originated call.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarTimeForCall.html">AcBarTimeForCall</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mean access barring time for originating call</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the average access barring duration for mobile-originated calls. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ACCESS_BARRING_TIME_S4(4s), ACCESS_BARRING_TIME_S8(8s), ACCESS_BARRING_TIME_S16(16s), ACCESS_BARRING_TIME_S32(32s), ACCESS_BARRING_TIME_S64(64s), ACCESS_BARRING_TIME_S128(128s), ACCESS_BARRING_TIME_S256(256s), ACCESS_BARRING_TIME_S512(512s)</p>
+<p>Unit: s</p>
+<p>Actual Value Range: ACCESS_BARRING_TIME_S4, ACCESS_BARRING_TIME_S8, ACCESS_BARRING_TIME_S16, ACCESS_BARRING_TIME_S32, ACCESS_BARRING_TIME_S64, ACCESS_BARRING_TIME_S128, ACCESS_BARRING_TIME_S256, ACCESS_BARRING_TIME_S512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCESS_BARRING_TIME_S4(4s)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AcBarTimeForCall is optional, depending on the setting of AcBarringForMoDataCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC11BarforCall.html">AC11BarforCall</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC11 barring state for originating call</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 11 are barred from initiating mobile-originated calls.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 11 cannot initiate mobile-originated calls. If this parameter is set to BOOLEAN_FALSE, UEs of access class 11 can initiate mobile-originated calls. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC11BarforCall is optional, depending on the setting of AcBarringForMoDataCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, UEs of access class 11 are not allowed to initiate calls.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC12BarforCall.html">AC12BarforCall</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC12 barring state for originating call</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 12 are barred from initiating mobile-originated calls.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 12 are not allowed to initiate mobile-originated calls. If this parameter is set to BOOLEAN_FALSE, UEs of access class 12 are allowed to initiate mobile-originated calls. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC12BarforCall is optional, depending on the setting of AcBarringForMoDataCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the mobile-originated calls initiated by UEs of access class 12 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC13BarforCall.html">AC13BarforCall</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC13 barring state for originating call</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 13 are barred from initiating mobile-originated calls.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 13 cannot initiate mobile-originated calls. If this parameter is set to BOOLEAN_FALSE, UEs of access class 13 can initiate mobile-originated calls. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC13BarforCall is optional, depending on the setting of AcBarringForMoDataCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the mobile-originated calls initiated by UEs of access class 13 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC14BarforCall.html">AC14BarforCall</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC14 barring state for originating call</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 14 are barred from initiating mobile-originated calls.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 14 are not allowed to initiate mobile-originated calls. If this parameter is set to BOOLEAN_FALSE, UEs of access class 14 are allowed to initiate mobile-originated calls. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC14BarforCall is optional, depending on the setting of AcBarringForMoDataCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the mobile-originated calls initiated by UEs of access class 14 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC15BarforCall.html">AC15BarforCall</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC15 barring state for originating call</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 15 are barred from initiating mobile-originated calls.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 15 cannot initiate mobile-originated calls. If this parameter is set to BOOLEAN_FALSE, UEs of access class 15 can initiate mobile-originated calls. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC15BarforCall is optional, depending on the setting of AcBarringForMoDataCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the mobile-originated calls initiated by UEs of access class 15 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarringForMoSigCfgInd.html">AcBarringForMoSigCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC barring for mobile signal configure indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure the AC barring information for mobile-originated signaling. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AcBarringForMoSigCfgInd is optional, depending on the setting of AcBarringInfoCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (The access request of the signaling initiated by a UE in idle mode is accepted or rejected according to the corresponding barring status.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarringFactorForSig.html">AcBarringFactorForSig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Access probability factor for signaling</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the access probability factor for signaling. Signaling from a UE is granted access if the random number generated by the UE is less than this access probability factor; otherwise, the access request is rejected. According to 3GPP TS 36.331, if any of the parameters AC11BarForSig, AC12BarForSig, AC13BarForSig, AC14BarForSig, and AC15BarForSig is set to BOOLEAN_TRUE, the eNodeB sends UEs P00 as the access probability factor for signaling in the system information block type 2 (SIB2), regardless of the actual setting of the AcBarringFactorForSig parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: P00(0%), P05(5%), P10(10%), P15(15%), P20(20%), P25(25%), P30(30%), P40(40%), P50(50%), P60(60%), P70(70%), P75(75%), P80(80%), P85(85%), P90(90%), P95(95%)</p>
+<p>Unit: %</p>
+<p>Actual Value Range: P00, P05, P10, P15, P20, P25, P30, P40, P50, P60, P70, P75, P80, P85, P90, P95</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: P95(95%)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AcBarTimeForSig is optional, depending on the setting of the AcBarringForMoSigCfgInd parameter.</li></ul>
+<p>Service Interrupted After Modification: No (The signaling initiated by a UE in idle mode is granted access only when the random number generated by the UE is smaller than the access probability factor.)</p>
+<p>Impact on Radio Network Performance: If AcBarringForMoDataCfgInd or AcBarringForMoSigCfgInd in SIB2 is set to CFG, the UE generates a random number in the range [0,1). If the random number is smaller than the value of this parameter, the UE considers access to the cell as allowed. That is, an RRC connection can be set up for the signaling. A larger value of this parameter leads to a higher probability of granting access to a UE, which may increase cell load. A smaller value of this parameter leads to a lower probability of granting access to a UE. As a result, a UE may fail to access the cell even when the cell load is relatively light. If this parameter is set to P00, the RRC connection for signaling cannot be set up.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarTimeForSig.html">AcBarTimeForSig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mean access barring time for signaling</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the average access barring duration for signaling. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ACCESS_BARRING_TIME_S4(4s), ACCESS_BARRING_TIME_S8(8s), ACCESS_BARRING_TIME_S16(16s), ACCESS_BARRING_TIME_S32(32s), ACCESS_BARRING_TIME_S64(64s), ACCESS_BARRING_TIME_S128(128s), ACCESS_BARRING_TIME_S256(256s), ACCESS_BARRING_TIME_S512(512s)</p>
+<p>Unit: s</p>
+<p>Actual Value Range: ACCESS_BARRING_TIME_S4, ACCESS_BARRING_TIME_S8, ACCESS_BARRING_TIME_S16, ACCESS_BARRING_TIME_S32, ACCESS_BARRING_TIME_S64, ACCESS_BARRING_TIME_S128, ACCESS_BARRING_TIME_S256, ACCESS_BARRING_TIME_S512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCESS_BARRING_TIME_S4(4s)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AcBarTimeForSig is optional, depending on the setting of AcBarringForMoSigCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC11BarForSig.html">AC11BarForSig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC11 barring state for signaling</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 11 are barred from initiating signaling access.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 11 are not allowed to initiate signaling access. If this parameter is set to BOOLEAN_FALSE, UEs of access class 11 are allowed to initiate signaling access. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC11BarForSig is optional, depending on the setting of AcBarringForMoSigCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the signaling access initiated by UEs of access class 11 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC12BarForSig.html">AC12BarForSig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC12 barring state for signaling</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 12 are barred from initiating signaling access.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 12 are not allowed to initiate signaling access. If this parameter is set to BOOLEAN_FALSE, UEs of access class 12 are allowed to initiate signaling access. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC12BarForSig is optional, depending on the setting of AcBarringForMoSigCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the signaling access initiated by UEs of access class 12 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC13BarForSig.html">AC13BarForSig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC13 barring state for signaling</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 13 are barred from initiating signaling access.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 13 are not allowed to initiate signaling access. If this parameter is set to BOOLEAN_FALSE, UEs of access class 13 are allowed to initiate signaling access. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC13BarForSig is optional, depending on the setting of AcBarringForMoSigCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the signaling access initiated by UEs of access class 13 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC14BarForSig.html">AC14BarForSig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC14 barring state for signaling</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 14 are barred from initiating signaling access.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 14 cannot initiate signaling access. If this parameter is set to BOOLEAN_FALSE, UEs of access class 14 can initiate signaling access. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC14BarForSig is optional, depending on the setting of AcBarringForMoSigCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the signaling access initiated by UEs of access class 14 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AC15BarForSig.html">AC15BarForSig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC15 barring state for signaling</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UEs of access class 15 are barred from initiating signaling access.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, UEs of access class 15 cannot initiate signaling access. If this parameter is set to BOOLEAN_FALSE, UEs of access class 15 can initiate signaling access. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>AC15BarForSig is optional, depending on the setting of AcBarringForMoSigCfgInd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode. If this parameter is set to BOOLEAN_TRUE, the signaling access initiated by UEs of access class 15 are not allowed.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarForMVoiceCfgInd.html">AcBarForMVoiceCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC barring for MMTEL voice configure indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure the AC barring information for multimedia telephony (MMTEL) voice services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>The AcBarForMVoiceCfgInd parameter is optional, depending on the AcBarringInfoCfgInd parameter setting.</li></ul>
+<p>Service Interrupted After Modification: No (The access request of MMTEL voice services initiated by a UE in idle mode is accepted or barred based on the corresponding barring indicator.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarFactorForMVoice.html">AcBarFactorForMVoice</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Access probability factor for MMTEL voice</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the access probability factor for multimedia telephony (MMTEL) voice services. An MMTEL voice service is granted access if the random number generated by the UE is less than this access probability factor; otherwise, the access request is barred. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: P00(0%), P05(5%), P10(10%), P15(15%), P20(20%), P25(25%), P30(30%), P40(40%), P50(50%), P60(60%), P70(70%), P75(75%), P80(80%), P85(85%), P90(90%), P95(95%)</p>
+<p>Unit: %</p>
+<p>Actual Value Range: P00, P05, P10, P15, P20, P25, P30, P40, P50, P60, P70, P75, P80, P85, P90, P95</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: P95(95%)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellAcBar MO, if any of AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, and AC15BARSTATE under SpecialACBarForMVoice is selected, AcBarFactorForMVoice must be set to P00.</li></ul>
+<p>Service Interrupted After Modification: No (If the random number generated by the UE in idle mode is less than this access probability factor, the MMTEL voice service is granted access.)</p>
+<p>Impact on Radio Network Performance: If AcBarForMVoiceCfgInd is set to CFG, the UE generates a random number in the range [0,1). If the random number is smaller than this parameter value, the UE considers access to the cell as allowed. That is, an RRC connection can be set up for the MMTEL voice service. A larger value of this parameter leads to a higher probability of granting access to a UE, which may increase cell load. A smaller value of this parameter leads to a lower probability of granting access to a UE. As a result, a UE may fail to access the cell even when the cell load is relatively light. If this parameter is set to P00, no RRC connection can be set up for the MMTEL voice service.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarTimeForMVoice.html">AcBarTimeForMVoice</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mean access barring time for MMTEL voice</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the average access barring time of multimedia telephony (MMTEL) voice services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ACCESS_BARRING_TIME_S4(4s), ACCESS_BARRING_TIME_S8(8s), ACCESS_BARRING_TIME_S16(16s), ACCESS_BARRING_TIME_S32(32s), ACCESS_BARRING_TIME_S64(64s), ACCESS_BARRING_TIME_S128(128s), ACCESS_BARRING_TIME_S256(256s), ACCESS_BARRING_TIME_S512(512s)</p>
+<p>Unit: s</p>
+<p>Actual Value Range: ACCESS_BARRING_TIME_S4, ACCESS_BARRING_TIME_S8, ACCESS_BARRING_TIME_S16, ACCESS_BARRING_TIME_S32, ACCESS_BARRING_TIME_S64, ACCESS_BARRING_TIME_S128, ACCESS_BARRING_TIME_S256, ACCESS_BARRING_TIME_S512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCESS_BARRING_TIME_S4(4s)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>The AcBarTimeForMVoice parameter is optional, depending on the AcBarForMVoiceCfgInd parameter setting.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-SpecialACBarForMVoice.html">SpecialACBarForMVoice</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC 11-15 barring state for MMTEL voice</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether multimedia telephony (MMTEL) voice services initiated by UEs of AC 11 to AC 15 are granted access.</p>
+<p>AC11BARSTATE: If this option is selected, the MMTEL voice services initiated by UEs of AC 11 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC12BARSTATE: If this option is selected, the MMTEL voice services initiated by UEs of AC 12 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC13BARSTATE: If this option is selected, the MMTEL voice services initiated by UEs of AC 13 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC14BARSTATE: If this option is selected, the MMTEL voice services initiated by UEs of AC 14 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC15BARSTATE: If this option is selected, the MMTEL voice services initiated by UEs of AC 15 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: AC11BARSTATE(AC11BARSTATE), AC12BARSTATE(AC12BARSTATE), AC13BARSTATE(AC13BARSTATE), AC14BARSTATE(AC14BARSTATE), AC15BARSTATE(AC15BARSTATE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, AC15BARSTATE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: AC11BARSTATE:Permit, AC12BARSTATE:Permit, AC13BARSTATE:Permit, AC14BARSTATE:Permit, AC15BARSTATE:Permit</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellAcBar MO, if any of AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, and AC15BARSTATE under SpecialACBarForMVoice is selected, AcBarFactorForMVoice must be set to P00.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarForMVideoCfgInd.html">AcBarForMVideoCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC barring for MMTEL video configure indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure the AC barring information for multimedia telephony (MMTEL) video services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>The AcBarForMVideoCfgInd parameter is optional, depending on the AcBarringInfoCfgInd parameter setting.</li></ul>
+<p>Service Interrupted After Modification: No (The access request of MMTEL video services initiated by a UE in idle mode is accepted or barred based on the corresponding barring indicator.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarFactorForMVideo.html">AcBarFactorForMVideo</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Access probability factor for MMTEL video</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the access probability factor for multimedia telephony (MMTEL) video services. An MMTEL video service is granted access if the random number generated by the UE is less than this access probability factor; otherwise, the access request is barred. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: P00(0%), P05(5%), P10(10%), P15(15%), P20(20%), P25(25%), P30(30%), P40(40%), P50(50%), P60(60%), P70(70%), P75(75%), P80(80%), P85(85%), P90(90%), P95(95%)</p>
+<p>Unit: %</p>
+<p>Actual Value Range: P00, P05, P10, P15, P20, P25, P30, P40, P50, P60, P70, P75, P80, P85, P90, P95</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: P95(95%)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellAcBar MO, if any of AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, and AC15BARSTATE under SpecialACBarForMVideo is selected, AcBarFactorForMVideo must be set to P00.</li></ul>
+<p>Service Interrupted After Modification: No (If the random number generated by the UE in idle mode is less than this access probability factor, the MMTEL video service is granted access.)</p>
+<p>Impact on Radio Network Performance: If AcBarForMVideoCfgInd is set to CFG, the UE generates a random number in the range [0,1). If the random number is smaller than this parameter value, the UE considers access to the cell as allowed. That is, an RRC connection can be set up for the MMTEL video service. A larger value of this parameter leads to a higher probability of granting access to a UE, which may increase cell load. A smaller value of this parameter leads to a lower probability of granting access to a UE. As a result, a UE may fail to access the cell even when the cell load is relatively light. If this parameter is set to P00, no RRC connection can be set up for the MMTEL video service.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarTimeForMVideo.html">AcBarTimeForMVideo</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mean access barring time for MMTEL video</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the average access barring time of multimedia telephony (MMTEL) video services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ACCESS_BARRING_TIME_S4(4s), ACCESS_BARRING_TIME_S8(8s), ACCESS_BARRING_TIME_S16(16s), ACCESS_BARRING_TIME_S32(32s), ACCESS_BARRING_TIME_S64(64s), ACCESS_BARRING_TIME_S128(128s), ACCESS_BARRING_TIME_S256(256s), ACCESS_BARRING_TIME_S512(512s)</p>
+<p>Unit: s</p>
+<p>Actual Value Range: ACCESS_BARRING_TIME_S4, ACCESS_BARRING_TIME_S8, ACCESS_BARRING_TIME_S16, ACCESS_BARRING_TIME_S32, ACCESS_BARRING_TIME_S64, ACCESS_BARRING_TIME_S128, ACCESS_BARRING_TIME_S256, ACCESS_BARRING_TIME_S512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCESS_BARRING_TIME_S4(4s)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>The AcBarTimeForMVideo parameter is optional, depending on the AcBarForMVideoCfgInd parameter setting.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-SpecialACBarForMVideo.html">SpecialACBarForMVideo</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC 11-15 barring state for MMTEL video</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether multimedia telephony (MMTEL) video services initiated by UEs of AC 11 to AC 15 are granted access.</p>
+<p>AC11BARSTATE: If this option is selected, the MMTEL video services initiated by UEs of AC 11 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC12BARSTATE: If this option is selected, the MMTEL video services initiated by UEs of AC 12 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC13BARSTATE: If this option is selected, the MMTEL video services initiated by UEs of AC 13 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC14BARSTATE: If this option is selected, the MMTEL video services initiated by UEs of AC 14 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC15BARSTATE: If this option is selected, the MMTEL video services initiated by UEs of AC 15 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: AC11BARSTATE(AC11BARSTATE), AC12BARSTATE(AC12BARSTATE), AC13BARSTATE(AC13BARSTATE), AC14BARSTATE(AC14BARSTATE), AC15BARSTATE(AC15BARSTATE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, AC15BARSTATE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: AC11BARSTATE:Permit, AC12BARSTATE:Permit, AC13BARSTATE:Permit, AC14BARSTATE:Permit, AC15BARSTATE:Permit</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellAcBar MO, if any of AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, and AC15BARSTATE under SpecialACBarForMVideo is selected, AcBarFactorForMVideo must be set to P00.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarForCsfbCfgInd.html">AcBarForCsfbCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC barring for CSFB configure indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure the access barring information for CS fallback (CSFB) services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>The AcBarForCsfbCfgInd parameter is optional, depending on the AcBarringInfoCfgInd parameter setting.</li></ul>
+<p>Service Interrupted After Modification: No (The access request of the CSFB service initiated by a UE in idle mode is accepted or barred based on corresponding barring status.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarFactorForCsfb.html">AcBarFactorForCsfb</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Access probability factor for CSFB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the access probability factor for CS fallback (CSFB) services. If the random number generated by a UE is less than the parameter value, the eNodeB accepts the CSFB service access request; otherwise, the eNodeB rejects the access request. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: P00(0%), P05(5%), P10(10%), P15(15%), P20(20%), P25(25%), P30(30%), P40(40%), P50(50%), P60(60%), P70(70%), P75(75%), P80(80%), P85(85%), P90(90%), P95(95%)</p>
+<p>Unit: %</p>
+<p>Actual Value Range: P00, P05, P10, P15, P20, P25, P30, P40, P50, P60, P70, P75, P80, P85, P90, P95</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: P95(95%)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellAcBar MO, if any of AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, and AC15BARSTATE under SpecialACBarForCsfb is selected, AcBarFactorForCsfb must be set to P00.</li></ul>
+<p>Service Interrupted After Modification: No (If the random number generated by the UE in idle mode is less than this access probability factor, the CS service is granted access.)</p>
+<p>Impact on Radio Network Performance: If AcBarForCsfbCfgInd in SIB2 is set to CFG, the UE generates a random number in the range [0,1). If the random number is smaller than this parameter value, the UE considers access to the cell as allowed. That is, an RRC connection can be set up for the CSFB service. A larger value of this parameter leads to a higher probability of granting access to a UE, which may increase cell load. A smaller value of this parameter leads to a lower probability of granting access to a UE. As a result, a UE may fail to access the cell even when the cell load is relatively light. If this parameter is set to P00, no RRC connection can be set up for the CSFB service.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-AcBarTimeForCsfb.html">AcBarTimeForCsfb</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mean access barring time for CSFB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the average access barring time of CS fallback (CSFB) services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ACCESS_BARRING_TIME_S4(4s), ACCESS_BARRING_TIME_S8(8s), ACCESS_BARRING_TIME_S16(16s), ACCESS_BARRING_TIME_S32(32s), ACCESS_BARRING_TIME_S64(64s), ACCESS_BARRING_TIME_S128(128s), ACCESS_BARRING_TIME_S256(256s), ACCESS_BARRING_TIME_S512(512s)</p>
+<p>Unit: s</p>
+<p>Actual Value Range: ACCESS_BARRING_TIME_S4, ACCESS_BARRING_TIME_S8, ACCESS_BARRING_TIME_S16, ACCESS_BARRING_TIME_S32, ACCESS_BARRING_TIME_S64, ACCESS_BARRING_TIME_S128, ACCESS_BARRING_TIME_S256, ACCESS_BARRING_TIME_S512</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCESS_BARRING_TIME_S4(4s)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>The AcBarTimeForCsfb parameter is optional, depending on the AcBarForCsfbCfgInd parameter setting.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-SpecialACBarForCsfb.html">SpecialACBarForCsfb</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">AC 11-15 barring state for CSFB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether CS fallback (CSFB) services initiated by UEs of AC 11 to AC 15 are granted access.</p>
+<p>AC11BARSTATE: If this option is selected, the CSFB services initiated by UEs of AC 11 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC12BARSTATE: If this option is selected, the CSFB services initiated by UEs of AC 12 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC13BARSTATE: If this option is selected, the CSFB services initiated by UEs of AC 13 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC14BARSTATE: If this option is selected, the CSFB services initiated by UEs of AC 14 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AC15BARSTATE: If this option is selected, the CSFB services initiated by UEs of AC 15 in idle mode are barred. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: AC11BARSTATE(AC11BARSTATE), AC12BARSTATE(AC12BARSTATE), AC13BARSTATE(AC13BARSTATE), AC14BARSTATE(AC14BARSTATE), AC15BARSTATE(AC15BARSTATE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, AC15BARSTATE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: AC11BARSTATE:Permit, AC12BARSTATE:Permit, AC13BARSTATE:Permit, AC14BARSTATE:Permit, AC15BARSTATE:Permit</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellAcBar MO, if any of AC11BARSTATE, AC12BARSTATE, AC13BARSTATE, AC14BARSTATE, and AC15BARSTATE under SpecialACBarForCsfb is selected, AcBarFactorForCsfb must be set to P00.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellAcBar-VoLTEPreferCfgInd.html">VoLTEPreferCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VoLTE Preference Configuration Indication</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to allow preferential accesses for MMTEL video services, MMTEL voice services, or short messages during AC control. This parameter takes effect only when the AcBarforVoLTEPreferSwitch option of the VoLTESwitch parameter in the CellAlgoSwitch MO is selected.</p>
+<p>MMTELVoicePreferCfgInd: Indicates whether to allow preferential accesses for MMTEL voice services during AC control. This option applies only to LTE FDD and LTE TDD.</p>
+<p>MMTELVideoPreferCfgInd: Indicates whether to allow preferential accesses for MMTEL video services during AC control. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SMSPreferCfgInd: If this option is selected, the eNodeB allows preferential accesses for short messages during AC control. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: MMTELVoicePreferCfgInd(MMTELVoicePreferCfgInd), MMTELVideoPreferCfgInd(MMTELVideoPreferCfgInd), SMSPreferCfgInd(SMSPreferCfgInd)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MMTELVoicePreferCfgInd, MMTELVideoPreferCfgInd, SMSPreferCfgInd</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MMTELVoicePreferCfgInd:CFG, MMTELVideoPreferCfgInd:CFG, SMSPreferCfgInd:CFG</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: MMTELVoicePreferCfgInd: If this option is selected, access experience of UEs initiating MMTEL voice services improves. If this option is deselected, access experience of such UEs is negatively affected.</p>
+<p>MMTELVideoPreferCfgInd: If this option is selected, access experience of UEs initiating MMTEL video services improves. If this option is deselected, access experience of such UEs is negatively affected.</p>
+<p>SMSPreferCfgInd: If this option is selected, access experience of UEs initiating short messaging services improves. If this option is deselected, access experience of such UEs is negatively affected.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellacbar__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To modify the parameters of the cell access barring information as follows: Local cell ID: 0, 
+AC Barring Information Configure Indication: NOT_CFG, run the following command: 
+MOD CELLACBAR: LocalCellId=0, AcBarringInfoCfgInd=NOT_CFG;
+Example 2: To modify the parameters of the cell access barring information as follows: Local cell ID: 0, 
+AC Barring Information Configure Indication: CFG, Emergency Call Barring state: BOOLEAN_FALSE, run the following command:
+MOD CELLACBAR: LocalCellId=0, AcBarringInfoCfgInd=CFG, AcBarringForEmergency=BOOLEAN_FALSE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

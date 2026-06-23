@@ -1,0 +1,255 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="PKI MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of the public key infrastructure (PKI) system architecture, digital certificate classifications, and device certificate management. It also provides the managed object model (MOM) view and describes managed objects (MOs) related to device certificates, trust certificates, and certificate revocation lists (CRLs).">
+<meta name="description" content="This section describes the functions and concepts of the public key infrastructure (PKI) system architecture, digital certificate classifications, and device certificate management. It also provides the managed object model (MOM) view and describes managed objects (MOs) related to device certificates, trust certificates, and certificate revocation lists (CRLs).">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../comm/mom/trans-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Trans-PKI">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>PKI MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Trans-PKI"></a><a name="Trans-PKI"></a>
+
+
+<h1 class="topictitle1">PKI MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of the
+public key infrastructure (PKI) system architecture, digital certificate
+classifications, and device certificate management. It also provides
+the managed object model (MOM) view and describes managed objects
+(MOs) related to device certificates, trust certificates, and certificate
+revocation lists (CRLs).</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p><strong>PKI System Architecture</strong></p>
+<div class="p">PKI is a system that generates, distributes, activates, and
+revokes digital certificates. A PKI system consists of NEs, a Certificate
+Authority (CA), a Registration Authority (RA), and a certificate &amp;
+CRL database for storing digital certificates and CRLs. The RA is
+optional. <a href="#Trans-PKI__fig01">Figure 1</a> shows the PKI system architecture.<div class="fignone" id="Trans-PKI__fig01"><a name="Trans-PKI__fig01"></a><a name="fig01"></a><span class="figcap"><b>Figure 1 </b>PKI system architecture</span>
+
+<br><span><img src="../image/mom/PKI-figure2-1.png"></span></div>
+The RA
+directly interacts with eNodeBs or the operation and maintenance (OM)
+personnel. It collects and authenticates information about digital
+certificate applicants, and decides whether to issue digital certificates
+to them. If an applicant is proved qualified, the RA sends the applicant's
+digital certificate request to the CA. Then, the CA issues a certificate
+to the certificate &amp; CRL database.</div>
+<p>Revoked certificates
+are recorded in a CRL. The CA issues the CRL to a specified certificate
+&amp; CRL database. A base station obtains the CRL from the database
+to check whether a peer digital certificate has been revoked.</p>
+<p><strong>Digital Certificate Classifications</strong></p>
+<div class="p">A base station supports
+three types of digital certificates: device certificates, trust certificates,
+and cross-certificates, as shown in <a href="#Trans-PKI__fig02">Figure 2</a>.<div class="fignone" id="Trans-PKI__fig02"><a name="Trans-PKI__fig02"></a><a name="fig02"></a><span class="figcap"><b>Figure 2 </b>Digital certificates supported by the eNodeBs</span>
+
+<br><span><img src="../image/mom/PKI-figure2-2.png"></span></div>
+</div>
+<div class="p">For details about Digital certificates are as follows:<ul><li>Device Certificate<p> A device certificate identifies a device.
+Each device certificate is associated with a unique private key.</p>
+<p>Each base station stores a Huawei-issued device certificate named <span class="parmname"><b>appcert.pem</b></span>. This device certificate is issued by Huawei
+CA and activated automatically before delivery.</p>
+</li><li>Trust Certificate<p> A trust certificate contains a root certificate
+and a certificate chain.</p>
+<p>The root certificate, issued by a root
+CA, is a top-most certificate used to verify other certificates in
+the certificate chain.</p>
+<div class="p">The base station uses trust certificates
+to authenticate peer devices in the following ways:<ul><li>Each base station stores a Huawei root certificate named <span class="parmname"><b>appcert.pem</b></span>. This root certificate is issued by Huawei
+CA and activated automatically before delivery. The Huawei base station
+supports mutual authentication of other devices configured with Huawei
+device and root certificates.</li><li>To authenticate an operator's device, <span>for
+example, a Security Gateway (SeGW),</span>the base station must be configured
+with a root certificate issued by the operator's CA (referred to as
+operator's root certificate in this document). Similarly, to authenticate
+a Huawei base station, the operator's device must be preconfigured
+with a trusted Huawei root certificate.</li></ul>
+</div>
+</li><li>Cross-Certificate<p> A cross-certificate is used for cross-certification
+between CAs or devices of different PKI systems.</p>
+<p>The cross-certificate
+is issued by a CA in one PKI system to a trusted CA in another PKI
+system.</p>
+<p>Cross-certificates are an alternative to root certificates
+in cross-certification between a Huawei base station and an operator's
+device.</p>
+</li></ul>
+</div>
+<div class="p"><strong>Certificate Management</strong><ul><li>Certificate Management Mode<div class="p"> base station device certificates
+are managed in the following modes: Network Management-assisted certificate
+management and direct certificate management. After deployment, a
+base station manages device certificates in either Network Management-assisted
+certificate management mode or direct certificate management mode
+by replacing, updating, or checking a device certificate.<ul><li>Network Management-Assisted Certificate Management<div class="p"> The Network
+Management communicates with a CA through a standard Certificate Management
+Protocol version 2 (CMPv2) interface and communicates with eNodeBs
+through private man-machine language (MML) interfaces. The Network
+Management manages certificate requests, updates, and revocation.
+In other words, the Network Management serves as an OM platform and
+also as a proxy between eNodeBs and the CA when managing device certificates. <a href="#Trans-PKI__fig03">Figure 3</a> shows how the base station device certificates
+are managed in Network Management-assisted certificate management
+mode.<div class="fignone" id="Trans-PKI__fig03"><a name="Trans-PKI__fig03"></a><a name="fig03"></a><span class="figcap"><b>Figure 3 </b>Network Management-assisted certificate management mode for
+base station device certificates</span>
+
+<br><span><img src="../image/mom/PKI-figure2-3.PNG"></span></div>
+Network
+Management-assisted certificate management requires each base station
+or operator's device be configured with a Huawei root certificate
+or an operator's root certificate, respectively. After the devices
+access the live network, those preconfigured certificates are updated
+on the Network Management manually.</div>
+</li><li>Direct Certificate Management<div class="p"> In direct certificate management
+mode, both the eNodeBs and the Network Management provide the CMPv2
+interface, and eNodeBs directly communicate with a CA. The eNodeBs
+manage certificate requests, updates, and revocation. When managing
+device certificates, the eNodeBs communicate with the CA by exchanging
+CMPv2 messages. The Network Management serves only as an OM platform. <a href="#Trans-PKI__fig04">Figure 4</a> shows how the base station device certificates
+are managed in direct certificate management mode.<div class="fignone" id="Trans-PKI__fig04"><a name="Trans-PKI__fig04"></a><a name="fig04"></a><span class="figcap"><b>Figure 4 </b>Direct certificate management mode for base station device
+certificates</span>
+
+<br><span><img src="../image/mom/PKI-figure2-4.PNG"></span></div>
+Direct
+certificate management is an automatic process. In this situation,
+no preconfigured certificate is required. The eNodeBs can directly
+apply for certificates to access the live network.</div>
+</li></ul>
+</div>
+</li><li>Certificate Management Method<p></p>
+<p><strong>Replacing a Certificate</strong></p>
+<div class="p">During device certificate replacement, the current device
+certificate is deactivated and a new one is activated. Possible scenarios
+for device certificate replacement are as follows:<ul><li>The operator deploys a PKI system before deploying a base station.
+To access a transport network, the base station requests a device
+certificate issued by the operator's CA (referred to as operator-issued
+device certificate in this document) to replace the preconfigured
+Huawei-issued device certificate.</li><li>The operator deploys a PKI system after deploying a base station.
+The base station requests an operator-issued device certificate to
+replace the preconfigured Huawei-issued device certificate.</li><li>The device certificate of a base station is revoked before it
+expires because the private key is not complex enough or disclosed.</li><li>A base station is moved from the management area of one CA to
+another.</li></ul>
+</div>
+<p><strong>Updating a Certificate</strong></p>
+<p>If a device certificate
+expires or the location of a base station changes, the device certificate
+of the base station must be updated to ensure correctness of the certificate.</p>
+<p><strong>Checking a Certificate</strong></p>
+<p>Before communicating with
+the peer end, a base station must check whether the device certificate
+of the peer end is in the CRL for security concerns. This CRL can
+be loaded onto the base station manually by OM personnel on the Network
+Management or the Local Maintenance Terminal (LMT). Alternatively,
+the administrator can create a scheduled task so that the base station
+downloads the CRL automatically and periodically from a certificate
+&amp; CRL database. If the device certificate of the peer end is found
+in the CRL, the base station reports an alarm or stops the communication
+with the peer end, according to the configuration.</p>
+<p><strong>Deploying
+a Certificate</strong></p>
+<p>A device certificate is configured on an LTE
+main processing and transmission unit (LMPT) or a universal transmission
+processing unit (UTRP) where other boards can obtain the certificate
+as required.</p>
+<p>For details about the PKI system, see the corresponding
+feature parameter description document.</p>
+</li></ul>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Trans-PKI__fig05">Figure 5</a> shows the PKI MOM of MOs related to CRLs.<div class="fignone" id="Trans-PKI__fig05"><a name="Trans-PKI__fig05"></a><a name="fig05"></a><span class="figcap"><b>Figure 5 </b>PKI MOM of MOs related to CRLs</span>
+
+<br><span><img src="../image/mom/PKI-figure3-1.png"></span></div>
+</div>
+<div class="p">MOs related to PKI are classified into three categories: MOs related
+to device certificates, MOs related to trust certificates (including
+root certificates), and MOs related to CRLs.<div class="fignone" id="Trans-PKI__fig06"><a name="Trans-PKI__fig06"></a><a name="fig06"></a><span class="figcap"><b>Figure 6 </b>MOs related to PKI</span>
+
+<br><span><img src="../image/mom/PKI-figure3-2.png"></span></div>
+</div>
+<div class="p">	MOs related to device certificates, trust certificates, and CRLs
+are as follows:<ul><li>	MOs related to device certificates are <a href="../mo/CERTREQ.html">CERTREQ</a>, <a href="../mo/CERTMK.html">CERTMK</a>, <a href="../mo/CERTMK.html">APPCERT</a>, <a href="../mo/CERTCHKTSK.html">CERTCHKTSK</a> and <a href="../mo/CA.html">CA</a>. Device certificates are used to authenticate
+the identities of NEs.</li><li>	MOs related to trust certificates (including root certificates)
+are <a href="../mo/TRUSTCERT.html">TRUSTCERT</a> and <a href="../mo/CROSSCERT.html">CROSSCERT</a>. Root certificates are
+the device certificates of root CAs. They are used to check validity
+of device certificates issued by the CAs.</li><li>	MOs related to CRLs are <a href="../mo/CRL.html">CRL</a>, <a href="../mo/CRLTSK.html">CRLTSK</a> and <a href="../mo/CRLPOLICY.html">CRLPOLICY</a>. A CRL is used to record
+certificates that are revoked because of key disclosure or certificate
+expiry. Using a CRL, an NE checks validity of certificates and decides
+to generate alarms or break connections, depending on users' policies.</li></ul>
+</div>
+<div class="p">This section describes MOs related to PKI shown in <a href="#Trans-PKI__fig01">Figure 1</a>.<ul><li><p><a href="../mo/CERTDEPLOY.html">CERTDEPLOY</a> defines
+the number of the slot where a certificate is to be deployed and configuration
+and maintenance commands are to be delivered. Other certificate-related
+MOs are dependent on this MO.</p>
+</li><li>MOs Related to Device Certificates<div class="p">The MOs related to device
+certificates are defined as follows:<ul><li><a href="../mo/CA.html">CA</a>defines a certification authority
+that provides information required for the base station to connect
+to the CA server, including information about the issuing authority
+of certificates. This MO is required only when the direct certificate
+management mode is adopted. This MO is not required when the Network
+Management-assisted certificate management mode is adopted.</li><li><a href="../mo/CERTREQ.html">CERTREQ</a>defines registration
+information in a device certificate request. The information includes
+the common name of the certificate request file, the organization
+that owns the device, the location of the device, and the request
+type.</li><li><a href="../mo/CERTMK.html">CERTMK</a>defines a device certificate
+that has already been verified by using the local private key. A device
+certificate must be verified before it can be activated and used.</li><li><a href="../mo/APPCERT.html">APPCERT</a> defines an activated
+device certificate. Only a certificate that is proved valid and verified
+by a trust certificate can be used.</li><li><a href="../mo/CERTCHKTSK.html">CERTCHKTSK</a> defines a
+device certificate checking task. If this MO is configured, the base
+station automatically checks the validity of its device certificate
+and updates the device certificate when it is about to expire.</li></ul>
+</div>
+</li><li>MOs Related to Trust Certificates<div class="p"> The MOs related to trust
+certificates are defined as follows:<ul><li><a href="../mo/TRUSTCERT.html">TRUSTCERT</a> defines a trust
+certificate, which is used by the base station to verify the device
+certificate of the peer end.</li><li><a href="../mo/CROSSCERT.html">CROSSCERT</a> defines a cross-certificate,
+which is used by the base station to authenticate a peer device during
+the cross-certification.</li></ul>
+</div>
+</li><li> MOs Related to CRLs<div class="p"> The MOs related to CRLs are defined as
+follows:<ul><li><a href="../mo/CRL.html">CRL</a> defines a CRL, also known
+as a certificate blacklist. It records all revoked certificates.</li><li><a href="../mo/CRLPOLICY.html">CRLPOLICY</a> defines a policy
+to use CRLs. It determines whether the base station checks the local
+and peer certificates based on the CRL and which action to take if
+the check fails.</li><li><a href="../mo/CRLTSK.html">CRLTSK</a> defines a CRL checking
+task, in which the base station periodically checks the validity of
+its device certificate based on the policy to use CRLs.</li></ul>
+</div>
+</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../comm/mom/trans-mom.html" title="This chapter describes the MOMs related to transmission.">Transport MOMs</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

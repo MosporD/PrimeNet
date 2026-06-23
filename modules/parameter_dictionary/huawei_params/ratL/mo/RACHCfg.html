@@ -1,0 +1,258 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="RACHCfg">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="RACHCfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>RACHCfg</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="RACHCfg"></a><a name="RACHCfg"></a>
+
+
+<h1 class="topictitle1">RACHCfg</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="RACHCfg.html"><strong>RACHCfg</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The RACHCfg MO consists of the parameters related to the Random Access Channel (RACH), which is common radio resources in a cell.</p>
+<p>For details about the random access procedure, see 3GPP TS 36.321.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellAlgoSwitch</strong> and <strong>Cell</strong> MOs:<ul><li>When <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>FddTddInd</strong> in this <strong>Cell</strong> MO is set to CELL_FDD, the PucchSwitch option of <strong>PucchAlgoSwitch</strong> in the associated <strong>CellAlgoSwitch</strong> MO is deselected, and <strong>PrachFreqOffsetStrategy</strong> in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC, <strong>PrachFreqOffset</strong> in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>When the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE and the <strong>FddTddInd</strong> parameter is set to CELL_TDD: If the value of the <strong>PreambleFmt</strong> parameter is Type0 and the value of the <strong>SubframeAssignment</strong> parameter is SA0, the value of the <strong>PrachConfigIndex</strong> parameter must range from 0 to 8. If the value of the <strong>PreambleFmt</strong> parameter is Type0 and the value of the <strong>SubframeAssignment</strong> parameter is SA1, the value of the <strong>PrachConfigIndex</strong> parameter must range from 0 to 7. If the value of the <strong>PreambleFmt</strong> parameter is Type0 and the value of the <strong>SubframeAssignment</strong> parameter is SA2, the value of the <strong>PrachConfigIndex</strong> parameter must range from 0 to 4 or be 6. If the value of the <strong>PreambleFmt</strong> parameter is Type0 and the value of the <strong>SubframeAssignment</strong> parameter is SA5, the value of the <strong>PrachConfigIndex</strong> parameter must range from 0 to 1 or must be 3. If the value of the <strong>PreambleFmt</strong> parameter is Type1, the <strong>SubframeAssignment</strong> parameter cannot be set to SA2 or SA5. If the value of the <strong>PreambleFmt</strong> parameter is Type1 and the value of the <strong>SubframeAssignment</strong> parameter is SA0, the value of the <strong>PrachConfigIndex</strong> parameter must range from 20 to 25. If the value of the <strong>PreambleFmt</strong> parameter is Type1 and the value of the <strong>SubframeAssignment</strong> parameter is SA1, the value of the <strong>PrachConfigIndex</strong> parameter must range from 20 to 25. If the value of the <strong>PreambleFmt</strong> parameter is Type2, the <strong>SubframeAssignment</strong> parameter cannot be set to SA2 or SA5. If the value of the <strong>PreambleFmt</strong> parameter is Type2 and the value of the <strong>SubframeAssignment</strong> parameter is SA0, the value of the <strong>PrachConfigIndex</strong> parameter must range from 30 to 34. If the value of the <strong>PreambleFmt</strong> parameter is Type2 and the value of the <strong>SubframeAssignment</strong> parameter is SA1, the value of the <strong>PrachConfigIndex</strong> parameter must range from 30 to 34.</li><li>When the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE and the <strong>FddTddInd</strong> parameter is set to CELL_TDD and the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE: If the value of the <strong>PreambleFmt</strong> parameter is Type3 and the value of the <strong>SubframeAssignment</strong> parameter is SA0, the value of the <strong>PrachConfigIndex</strong> parameter must range from 40 to 44. If the value of the <strong>PreambleFmt</strong> parameter is Type4, the value of the <strong>HighSpeedFlag</strong> parameter must be LOW_SPEED. If the value of the <strong>PreambleFmt</strong> parameter is Type4 and the value of the <strong>SubframeAssignment</strong> parameter is SA0, the value of the <strong>PrachConfigIndex</strong> parameter must range from 48 to 53. If the value of the <strong>PreambleFmt</strong> parameter is Type4 and the value of the <strong>SubframeAssignment</strong> parameter is SA1, the value of the <strong>PrachConfigIndex</strong> parameter must range from 48 to 53. If the value of the <strong>PreambleFmt</strong> parameter is Type4 and the value of the <strong>SubframeAssignment</strong> parameter is SA2, the value of the <strong>PrachConfigIndex</strong> parameter must range from 48 to 53. If the value of the <strong>PreambleFmt</strong> parameter is Type4 and the value of the <strong>SubframeAssignment</strong> parameter is SA5, the value of the <strong>PrachConfigIndex</strong> parameter must be 48, 49, or 51.</li><li>In a <strong>Cell</strong> MO, if the value of the <strong>CellActiveState</strong> parameter is CELL_ACTIVE, the <strong>FddTddInd</strong> parameter is set to CELL_FDD, and the <strong>NbCellFlag</strong> parameter is set a value other than FALSE, then:</li><li>When the <strong>PreambleFmt</strong> parameter is set to Type0, the <strong>PrachConfigIndex</strong> parameter in the <strong>RACHCfg</strong> MO must be set to 15 or a value in the range of 0 to 8.</li><li>When the <strong>PreambleFmt</strong> parameter is set to Type1, the <strong>PrachConfigIndex</strong> parameter in the <strong>RACHCfg</strong> MO must be set to 31 or a value in the range of 16 to 24.</li><li>When the <strong>PreambleFmt</strong> parameter is set to Type2, the <strong>PrachConfigIndex</strong> parameter in the <strong>RACHCfg</strong> MO must be set to 47 or a value in the range of 32 to 37.</li><li>When the <strong>PreambleFmt</strong> parameter is set to Type3, the <strong>PrachConfigIndex</strong> parameter in the <strong>RACHCfg</strong> MO must be set to 63 or a value in the range of 48 to 53.</li><li>Assume that the values of the <strong>CellActiveState</strong> and <strong>NbCellFlag</strong> parameters in the <strong>Cell</strong> MO for a cell are CELL_ACTIVE and FALSE, respectively, and the value of the <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO for this cell is MANUAL. If the <strong>FddTddInd</strong> parameter is set to CELL_FDD, or if the <strong>FddTddInd</strong> parameter is set to CELL_TDD and the <strong>PreambleFmt</strong> parameter is set to a value other than 4, the <strong>PrachFreqOffset</strong> in the <strong>RACHCfg</strong> MO cannot be set to a value that causes the frequency-domain position of the PRACH to exceed the system bandwidth.</li><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, the value of the <strong>NbRsrpFirstThreshold</strong> parameter in the <strong>RACHCfg</strong> MO associated with the <strong>Cell</strong> MO must be greater than or equal to the <strong>NbRsrpSecondThreshold</strong> parameter value.</li><li>The <strong>PreambInitRcvTargetPwr</strong> parameter in the <strong>RACHCfg</strong> MO can be set to one of the following values only if the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to TRUE: DBM_130(-130dBm), DBM_128(-128dBm), DBM_126(-126dBm), DBM_124(-124dBm), DBM_122(-122dBm), DBM_88(-88dBm), DBM_86(-86dBm), DBM_84(-84dBm), DBM_82(-82dBm), and DBM_80(-80dBm).</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If <strong>PrachConfigIndexCfgInd</strong> in the <strong>RACHCfg</strong> MO is set to NOT_CFG, SuperCombCellSwitch of <strong>SfnAlgoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO must be deselected.</li><li>If the 100KM_CELL_RADIUS_SWITCH option of the <strong>NbCellAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO must be set to 266DOT7 and the HIGH_SPEED_MOBILITY_SWITCH option of the <strong>NbCellAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>LteNrSpctShrCellGrp</strong> MOs:<ul><li>If the <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is set to MANUAL or AUTOMATIC and the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is set to LTE_NR_UPLINK_SPECTRUM_SHR, the <strong>LteNrUlSpectrumShrMode</strong> parameter in the <strong>LteNrSpctShrCellGrp</strong> MO cannot be set to STATIC_SHARING.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>GlobalProcSwitch</strong> MOs:<ul><li>If <strong>FddTddInd</strong> and <strong>HighSpeedFlag</strong> in a <strong>Cell</strong> MO are set to CELL_TDD and ULTRA_HIGH_SPEED, respectively, the HighSpeedR14Switch option of <strong>ProtocolCompatibilitySw</strong> in the <strong>GlobalProcSwitch</strong> MO is selected, and <strong>PrachConfigIndexCfgInd</strong> in the <strong>RACHCfg</strong> MO under this <strong>Cell</strong> MO is set to CFG, then <strong>PrachConfigIndex</strong> in the <strong>RACHCfg</strong> MO must be set as follows depending on the setting of <strong>PreambleFmt</strong> in the <strong>Cell</strong> MO: If <strong>PreambleFmt</strong> is set to 0, <strong>PrachConfigIndex</strong> must be set to 3; if <strong>PreambleFmt</strong> is set to 1, <strong>PrachConfigIndex</strong> must be set to 23; if <strong>PreambleFmt</strong> is set to 2, <strong>PrachConfigIndex</strong> must be set to 30; if <strong>PreambleFmt</strong> is set to 3, <strong>PrachConfigIndex</strong> must be set to 40.</li><li>If <strong>FddTddInd</strong> and <strong>HighSpeedFlag</strong> in a <strong>Cell</strong> MO are set to CELL_FDD and ULTRA_HIGH_SPEED, respectively, the HighSpeedR14Switch option of <strong>ProtocolCompatibilitySw</strong> in the <strong>GlobalProcSwitch</strong> MO is selected, and <strong>PrachConfigIndexCfgInd</strong> in the <strong>RACHCfg</strong> MO under this <strong>Cell</strong> MO is set to CFG, then <strong>PrachConfigIndex</strong> in the <strong>RACHCfg</strong> MO must be set as follows depending on the setting of <strong>PreambleFmt</strong> in the <strong>Cell</strong> MO: If <strong>PreambleFmt</strong> is set to 0, <strong>PrachConfigIndex</strong> must be set to 3; if <strong>PreambleFmt</strong> is set to 1, <strong>PrachConfigIndex</strong> must be set to 19; if <strong>PreambleFmt</strong> is set to 2, <strong>PrachConfigIndex</strong> must be set to 32; if <strong>PreambleFmt</strong> is set to 3, <strong>PrachConfigIndex</strong> must be set to 48.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD and the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO under this <strong>Cell</strong> MO is set to LTE_NR_SPECTRUM_SHR, the <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO under this <strong>Cell</strong> MO must be set to FULLY_AUTOMATIC.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>PrbRachCeConfig</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE and the <strong>PrachStartTimeCfgInd</strong> parameter in the <strong>RACHCfg</strong> MO is set to CFG, the value of the <strong>PrachTransmissionPeriod</strong> parameter with a specific coverage level must not be lower than the value of the <strong>PrachStartTime</strong> parameter with the same coverage level in the <strong>PrbRachCeConfig</strong> MO associated with the same LocalCellId.</li></ul>
+</li><li>Relation with the <strong>PrbRachCeConfig</strong>, <strong>Prb</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The actual duration corresponding to the value of the <strong>PrachTransmissionPeriod</strong> parameter in the <strong>PrbRachCeConfig</strong> MO for a PRB at a certain coverage level must not be less than the PRACH transmission duration for this coverage level of the PRB. The details are as follows: If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 66DOT7(66.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 5.6. If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 266DOT7(266.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 6.4.</li><li>The actual duration corresponding to the value of the <strong>PrachTransmissionPeriod</strong> parameter in the <strong>PrbRachCeConfig</strong> MO for a PRB at a certain coverage level must not be less than the PRACH transmission duration for this coverage level of the PRB. The details are as follows: If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 66DOT7(66.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 5.6. If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 266DOT7(266.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 6.4.</li><li>The actual duration corresponding to the value of the <strong>PrachTransmissionPeriod</strong> parameter in the <strong>PrbRachCeConfig</strong> MO for a PRB at a certain coverage level must not be less than the PRACH transmission duration for this coverage level of the PRB. The details are as follows: If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 66DOT7(66.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 5.6. If the <strong>NbCyclicPrefixLength</strong> parameter in the <strong>RACHCfg</strong> MO referenced by the <strong>PRB</strong> MO through the <strong>LocalCellId</strong> parameter is set to 266DOT7(266.7us), the PRACH transmission duration for the corresponding coverage level is the result of the value of the <strong>PrachRepetitionCount</strong> parameter for the anchor carrier multiplied by 6.4.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellEmtcAlgo</strong> MOs:<ul><li>If the <strong>DlBandWidth</strong> or <strong>UlBandWidth</strong> parameter in the <strong>Cell</strong> MO is set to CELL_BW_N6(1.4M) and the EMTC_SWITCH option of the <strong>EmtcAlgoSwitch</strong> parameter in the <strong>CellEmtcAlgo</strong> MO is selected, the <strong>EmtcPrachPeriod</strong> parameter in the <strong>RACHCfg</strong> MO must be set to MS20.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>SRSCfg</strong>, <strong>Cell</strong>, <strong>SpectrumCloud</strong>, <strong>CellLteFlexBw</strong>, and <strong>ContigIntraBandCarr</strong> MOs:<ul><li>The PUCCH_SRS_ADAPT_SWITCH option of the <strong>NonStandardBwAlgoSw</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected when all the following five conditions are true: The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected; the <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is set to AUTOMATIC or FULLY_AUTOMATIC; the <strong>AnSrsSimuTrans</strong> parameter in the <strong>SRSCfg</strong> MO is set to BOOLEAN_TRUE; the UlVmimoSwitch option of the <strong>UlSchSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected; the <strong>CustomizedBandWidthCfgInd</strong> parameter in the <strong>Cell</strong> MO is set to CFG, and the <strong>CompactBwCtrlIntrfMode</strong> parameter in the <strong>Cell</strong> MO is set to a value other than NORMAL, or the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is set to GL_SPECTRUM_CONCURRENCY, UL_SPECTRUM_SHR_PH2_WITH_GSM, DC_HSDPA_BASED_UL_SPECTRUM_SHR or UL_SPECTRUM_SHARING, or the LTE_FB_CFG_SWITCH option of the <strong>LteFlexBwSwitch</strong> parameter in the <strong>CellLteFlexBw</strong> MO is selected, or the CONTIG_INTRA_BAND_CARR_SW option of the <strong>ContigIntraBandCarrSw</strong> parameter in the <strong>ContigIntraBandCarr</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>Cell</strong>, <strong>PUCCHCfg</strong>, <strong>CellPdcchAlgo</strong>, <strong>SpectrumCloud</strong>, and <strong>ULZeroBufferZone</strong> MOs:<ul><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N15, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N25, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N50, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N75, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N100, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li></ul>
+</li><li>Relation with the <strong>UlInterfSuppressCfg</strong> and <strong>Cell</strong> MOs:<ul><li>If the CHN_CALIB_SHIFT_SW option of the <strong>RemoteInfULEnhanceSw</strong> parameter in the <strong>UlInterfSuppressCfg</strong> MO is selected, then the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO must be set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO must be set to 32T32R or 64T64R, the <strong>PrachConfigIndex</strong> parameter in the <strong>RACHCfg</strong> MO must be set to 4, and the <strong>ChnCalOptSwitch</strong> parameter in the <strong>UlInterfSuppressCfg</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>NsaDcMgmtConfig</strong>, <strong>ENodeBAlgoSwitch</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD, the TDM_SWITCH option of the <strong>NsaDcAlgoSwitch</strong> parameter in the <strong>NsaDcMgmtConfig</strong> MO associated with the cell can be selected when either of the following conditions is met: 1. The <strong>PrachConfigIndexCfgInd</strong> parameter in the <strong>RACHCfg</strong> MO is set to CFG and the <strong>PrachConfigIndex</strong> parameter in the same MO is set to 0, 3, 6, 9, 13, 14, 16, 19, 22, 25, 29, 32, 35, 38, 41, 45, 48, 51, 54, or 57. 2. The <strong>PrachConfigIndexCfgInd</strong> parameter in the <strong>RACHCfg</strong> MO is set to NOT_CFG, the <strong>PrachTimeStagSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is set to OFF, and the RachAdjSwitch option of the <strong>RachAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#RACHCfg__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="RACHCfg__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="RACHCfg__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_rachcfg.html">DSP RACHCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query parameters related to the RACH.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_rachcfg.html">LST RACHCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration information of the Random Access Channel (RACH).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_rachcfg.html">MOD RACHCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the RACH configuration.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#RACHCfg__tab2">Table 2</a> and <a href="#RACHCfg__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="RACHCfg__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="RACHCfg__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PrachStartTimeCfgInd.html">PRACH Start Time Config Indication</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow configuration of the PRACH start time. When this parameter is set to NOT_CFG, the PRACH start time is not configurable. The PRACH start time for coverage level 0 is always 8 ms. The PRACH start time for coverage level 1 is determined based on the following factors: the sum of the PRACH start time and PRACH time length for coverage level 0, and the restriction that the PRACH start time interval between two adjacent coverage levels is not less than 40 ms. The PRACH start time for coverage level 2 is determined in a way similar to that for determining the PRACH start time for coverage level 1. If there are PRACH resources used for early data transmission (EDT), the positions of the EDT PRACH subcarriers and those of the common PRACH subcarriers cannot overlap, and the start time and transmission interval of the EDT PRACH must be the same as those of the common PRACH. When this parameter is set to CFG, the PRACH start time for each coverage level is configurable. The PRACH start time interval between two adjacent coverage levels must not be less than 40 ms. Otherwise, cells cannot be activated. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PwrRampingStepCE1.html">Power Ramping Step CE1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ramping step of preamble power at coverage level 1. If multiple access attempts over the NPRACH fail, the UE increases the TX power for random access preambles by a step specified by this parameter to ensure successful access.</p>
+<p>For details about this parameter, see 3GPP TS 36.321. This parameter is optional. The value NOT_CFG indicates that this parameter is not configured. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PreambInitRcvTargetPwrCE1.html">Preamble Initial Received Target Power CE1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eNodeB-expected target receive power level of the NPRACH preambles sent from NB-IoT UEs at coverage level 1.</p>
+<p>For details about this parameter, see 3GPP TS 36.321. This parameter is optional. The value NOT_CFG indicates that this parameter is not configured. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PwrRampingStep.html">Power ramping step</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the step by which the TX power for random access preambles is increased each time after a RACH access failure. If multiple access attempts over the PRACH fail, the UE increases the TX power for random access preambles by a step specified by this parameter each time after an access failure to ensure successful access.</p>
+<p>For details, see 3GPP TS 36.321.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PreambInitRcvTargetPwr.html">Preamble Initial Received Target Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eNodeB-expected target receive power of PRACH preambles when PRACH preamble format 0 is used and the requirements for preamble detection performance are met. For NB-IoT cells, the values DBM_130(-130dBm), DBM_128(-128dBm), DBM_126(-126dBm), DBM_124(-124dBm), and DBM_122(-122dBm) are added to extend the lower power limit, and the values DBM_88(-88dBm), DBM_86(-86dBm), DBM_84(-84dBm), DBM_82(-82dBm), and DBM_80(-80dBm) are added to extend the upper power limit. These added values can be configured only for NB-IoT cells.</p>
+<p>For details about this parameter, see 3GPP TS 36.321.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-MessageSizeGroupA.html">Message size of select group A</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for determining the size of Msg3 when a UE selects a preamble from random access preamble group A during a random access procedure.</p>
+<p>For details, see 3GPP TS 36.321. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PrachFreqOffset.html">PRACH Frequency Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for the starting frequency-domain position of PRACH RBs. The PrachFreqOffset parameter takes effect only when the PrachFreqOffsetStrategy parameter is set to MANUAL or the PucchSwitch option of the PucchAlgoSwitch parameter is deselected for an LTE FDD cell whose PrachFreqOffsetStrategy is not set to FULLY_AUTOMATIC. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PrachConfigIndexCfgInd.html">Indication of PRACH Configuration Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to configure a PRACH configuration index for a cell. If an LTE TDD cell is established on an LBBPc, the PRACH configuration index configured for the cell does not take effect. When the eMTC function takes effect, this parameter does not take effect. In this case, LTE PRACH configurations will be reconfigured, and the PRACH configuration index is determined by eNodeB based on the corresponding the algorithm. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PrachConfigIndex.html">PRACH Configuration Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PRACH configuration index of a cell. If cells are established on an LBBPc in a 4T4R scenario, the PRACH configuration indexes of these cells must be staggered in the time domain.</p>
+<p>If a cell is an ultra-high-speed cell and HighSpeedR14Switch is set to ON, the value of this parameter takes effect only for the 3GPP-defined IE prach-ConfigIndex, but not for the 3GPP-defined IE prach-ConfigIndexHighSpeed-r14. For LTE FDD cells: If PreambleFmt is 0, prach-ConfigIndex is 3 and prach-ConfigIndexHighSpeed-r14 is 5. If PreambleFmt is 1, prach-ConfigIndex is 19 and prach-ConfigIndexHighSpeed-r14 is 21. If PreambleFmt is 2, prach-ConfigIndex is 35 and prach-ConfigIndexHighSpeed-r14 is 37. If PreambleFmt is 3, prach-ConfigIndex is 51 and prach-ConfigIndexHighSpeed-r14 is 53. For LTE TDD cells: If PreambleFmt is 0, prach-ConfigIndex is 3 and prach-ConfigIndexHighSpeed-r14 is 4. If PreambleFmt is 1, prach-ConfigIndex is 23 and prach-ConfigIndexHighSpeed-r14 is 24. If PreambleFmt is 2, prach-ConfigIndex is 33 and prach-ConfigIndexHighSpeed-r14 is 34. If PreambleFmt is 3, prach-ConfigIndex is 43 and prach-ConfigIndexHighSpeed-r14 is 44. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PreambleTransMax.html">Maximum number of preamble transmission</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of preamble transmission times. For details about this parameter, see 3GPP TS 36.321.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-ContentionResolutionTimer.html">Timer for contention resolution</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period that a UE waits for message 4 (Msg4) during a random access (RA) procedure. This timer starts when a UE initially sends or resends message 3 (Msg3). If the UE receives Msg4 or the NACK to Msg3 before the timer expires, the timer stops. If the UE does not receive either message until the timer expires, the RA fails, and the UE must reinitiate an RA procedure. For details about this parameter, see 3GPP TS 36.321. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-MaxHarqMsg3Tx.html">Maximum number of Msg3 HARQ transmissions</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of HARQ retransmissions of the message 3. For details about this parameter, see 3GPP TS 36.321. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-RandomPreambleRatio.html">Random Preamble Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of the number of random preambles in a cell to the number of preambles in the cell. The number of random preambles in a cell is calculated by this parameter value multiplied by the number of preambles in the cell. Preambles in a cell can be classified as random preambles and dedicated preambles, which are used for contention-based random access and non-contention-based random access, respectively. For details, see section 5.1.1 in 3GPP TS 36.321. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-RaPreambleGrpARatio.html">Random Access preamble Group A Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of the number of group A random preambles in a cell to the number of random preambles in the cell. The number of group A random preambles in a cell is calculated by this parameter value multiplied by the number of random preambles in the cell. Preambles in a cell can be classified as random preambles and dedicated preambles, and random preambles are classified into group A random preambles and group B random preambles. For details, see section 5.1.1 in 3GPP TS 36.321. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-PrachFreqOffsetStrategy.html">PRACH Frequency Offset Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy of determining the PRACH frequency-domain offset. If this parameter is set to AUTOMATIC(AUTOMATIC) or FULLY_AUTOMATIC(FULLY_AUTOMATIC), the eNodeB determines the PRACH frequency-domain offset. If this parameter is set to MANUAL(MANUAL), the PRACH frequency-domain offset is specified by the PrachFreqOffset parameter. In an LTE FDD cell, the eNodeB determines the PRACH frequency-domain offset only if this parameter is set to FULLY_AUTOMATIC(FULLY_AUTOMATIC) when the PucchSwitch option of the PucchAlgoSwitch parameter is deselected. In an LTE TDD cell, the parameter value MANUAL(MANUAL) does not take effect when preamble format 4 is used. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-NbCyclicPrefixLength.html">NB-IoT Cyclic Prefix Length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PRACH cyclic prefix length, which supports 66.7 us and 266.7 us. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-NbRsrpFirstThreshold.html">NB-IoT RSRP First Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP level-1 threshold. When the measured RSRP value of a UE is higher than the RSRP level-1 threshold, the UE initiates random access in the cell at coverage level 0. When the measured RSRP value of a UE is between the RSRP level-1 threshold and RSRP level-2 threshold, the UE initiates random access in the cell at coverage level 1. When the measured RSRP value of a UE is lower than the RSRP level-2 threshold, the UE initiates random access in the cell at coverage level 2. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-NbRsrpSecondThreshold.html">NB-IoT RSRP Second Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP level-2 threshold. When the measured RSRP value of a UE is higher than the RSRP level-1 threshold, the UE initiates random access in the cell at coverage level 0. When the measured RSRP value of a UE is between the RSRP level-1 threshold and RSRP level-2 threshold, the UE initiates random access in the cell at coverage level 1. When the measured RSRP value of a UE is lower than the RSRP level-2 threshold, the UE initiates random access in the cell at coverage level 2. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-UeRaInfoReportRatioThd.html">UE RACH Information Report Ratio Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the proportion of the number of random access messages reported by the UE to the number of successful UE access attempts. RACH resource adjustment is not triggered when the proportion is smaller than the threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-VolteHoRamPreamblePwrOfs.html">VoLTE Handover Random Preamble Power Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of the target power of preambles sent by VoLTE UEs to be handed over and initially received by the eNodeB to the target power of preambles sent by non-VoLTE UEs and initially received by the eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-EmtcPrachPeriod.html">eMTC PRACH Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eMTC PRACH period. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-NbPathLossCoeff.html">NB-IoT Path Loss Coefficient</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the path loss coefficient, which is used in the uplink power control for SR transmission during non-contention-based random access. For details, see 3GPP TS 36.213. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RACHCfg-NbSrP0.html">NB-IoT SR P0</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eNodeB-expected target transmit power for SR transmission during non-contention-based random access. The expected transmit power is for normal PRACH demodulation. For details, see 3GPP TS 36.213. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="RACHCfg__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="RACHCfg__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RACHCfg-ZeroCorrelationZoneConf.html">Zero correlation zone config</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the length index for the Zadoff-Chu sequence that generates random access preambles. When this parameter is set to 0, the number of preambles generated by a root sequence is 1. For details about this parameter, see 3GPP TS 36.211. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

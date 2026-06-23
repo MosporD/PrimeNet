@@ -1,0 +1,179 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Clock Class (SET PRICLASS)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_priclass">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Clock Class (SET PRICLASS)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_priclass"></a><a name="set_priclass"></a>
+
+
+<h1 class="topictitle1">Set Clock Class (SET PRICLASS)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_priclass__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set priorities for the four clock classes of the IP clock link. This command is applicable only when the IEEE 1588 OC_SLAVE standard is supported. The OC_MASTER link does not support the function.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_priclass__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If two OC_SLAVE IP clock links in compliance with IEEE 1588 V2 are configured, modification of the Priority Clock Class parameter takes effect for both the links.</p>
+</li><li><p>The setting of priorities for the clock classes is valid only when the Profile Type parameter is set to 1588V2 or 1588V2_16.1 and the Priority Clock Class Identify Flag parameter is set to ON.</p>
+</li><li><p>If Priority Clock Class Identify Flag is set to ON and the clock quality level of the IP server is beyond the priority clock class range, the IP clock will become unavailable.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_priclass__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-IpClkNo.html">LN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Link No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the IP clock link.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, when the value of <strong>DEVTYPE</strong> is set to OC_SLAVE, the value of <strong>LN</strong> must be 0 or 1. When the value of <strong>DEVTYPE</strong> is set to OC_MASTER, the value of <strong>LN</strong> must be 2.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Class0.html">CLASS0</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority Clock Class0</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority configured by the user for the BMC (Best Master Clock) algorithm. The information about the priority can be collected from the upper-level clock equipment. This parameter specifies the clock quality that is anticipated by the user. The upper-level clock equipment with the matching clock quality is selected as the target server. Class0 has the highest priority, and Class0 to Class3 indicate priorities in descending order.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 6</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The values of any two parameters among <strong>CLASS0</strong>, <strong>CLASS1</strong>, <strong>CLASS2</strong>, and <strong>CLASS3</strong> in an <strong>IPCLKLNK</strong> must be different.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CLASSIDENTIFY</strong> in the <strong>IPCLKLNK</strong> MO is set to OFF, the BMC algorithm is disabled, and the setting of <strong>CLASS0</strong> does not take effect. When <strong>CLASSIDENTIFY</strong> in the <strong>IPCLKLNK</strong> MO is set to ON, the BMC algorithm is enabled. If there are multiple clock servers at different clock quality levels, the server that meets the customer's requirements to the most extent is selected in descending order of priority.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Class1.html">CLASS1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority Clock Class1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority configured by the user for the BMC (Best Master Clock) algorithm. The information about the priority can be collected from the upper-level clock equipment. This parameter specifies the clock quality that is anticipated by the user. The upper-level clock equipment with the matching clock quality is selected as the target server. Class0 has the highest priority, and Class0 to Class3 indicate priorities in descending order.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 13</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The values of any two parameters among <strong>CLASS0</strong>, <strong>CLASS1</strong>, <strong>CLASS2</strong>, and <strong>CLASS3</strong> in an <strong>IPCLKLNK</strong> must be different.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CLASSIDENTIFY</strong> in the <strong>IPCLKLNK</strong> MO is set to OFF, the BMC algorithm is disabled, and the setting of <strong>CLASS1</strong> does not take effect. When <strong>CLASSIDENTIFY</strong> in the <strong>IPCLKLNK</strong> MO is set to ON, the BMC algorithm is enabled. If there are multiple clock servers at different clock quality levels, the server that meets the customer's requirements to the most extent is selected in descending order of priority.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Class2.html">CLASS2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority Clock Class2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority configured by the user for the BMC (Best Master Clock) algorithm. The information about the priority can be collected from the upper-level clock equipment. This parameter specifies the clock quality that is anticipated by the user. The upper-level clock equipment with the matching clock quality is selected as the target server. Class0 has the highest priority, and Class0 to Class3 indicate priorities in descending order.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 7</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The values of any two parameters among <strong>CLASS0</strong>, <strong>CLASS1</strong>, <strong>CLASS2</strong>, and <strong>CLASS3</strong> in an <strong>IPCLKLNK</strong> must be different.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CLASSIDENTIFY</strong> in the <strong>IPCLKLNK</strong> MO is set to OFF, the BMC algorithm is disabled, and the setting of <strong>CLASS2</strong> does not take effect. When <strong>CLASSIDENTIFY</strong> in the <strong>IPCLKLNK</strong> MO is set to ON, the BMC algorithm is enabled. If there are multiple clock servers at different clock quality levels, the server that meets the customer's requirements to the most extent is selected in descending order of priority.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-Class3.html">CLASS3</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority Clock Class3</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority configured by the user for the BMC (Best Master Clock) algorithm. The information about the priority can be collected from the upper-level clock equipment. This parameter specifies the clock quality that is anticipated by the user. The upper-level clock equipment with the matching clock quality is selected as the target server. Class0 has the highest priority, and Class0 to Class3 indicate priorities in descending order.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 14</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The values of any two parameters among <strong>CLASS0</strong>, <strong>CLASS1</strong>, <strong>CLASS2</strong>, and <strong>CLASS3</strong> in an <strong>IPCLKLNK</strong> must be different.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CLASSIDENTIFY</strong> in the <strong>IPCLKLNK</strong> MO is set to OFF, the BMC algorithm is disabled, and the setting of <strong>CLASS3</strong> does not take effect. When <strong>CLASSIDENTIFY</strong> in the <strong>IPCLKLNK</strong> MO is set to ON, the BMC algorithm is enabled. If there are multiple clock servers at different clock quality levels, the server that meets the customer's requirements to the most extent is selected in descending order of priority.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_priclass__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set clock classes with parameters as follows: IPClk No.: 0, Priority Clock Class0: 6, Priority Clock Class1: 13, Priority Clock Class2: 7, Priority Clock Class3: 14, run the following command:
+SET PRICLASS: CLASS0=6, CLASS1=13, CLASS2=7, CLASS3=14;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

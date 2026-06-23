@@ -1,0 +1,1141 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Mac-hs Scheduling Parameters (SET ULOCELLMACHSPARA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_ulocellmachspara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Mac-hs Scheduling Parameters (SET ULOCELLMACHSPARA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_ulocellmachspara"></a><a name="set_ulocellmachspara"></a>
+
+
+<h1 class="topictitle1">Set Mac-hs Scheduling Parameters (SET ULOCELLMACHSPARA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="set_ulocellmachspara__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>The command is used to modify the Mac-hs parameters.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_ulocellmachspara__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li>Modifying parameters does not affect ongoing services, but affects only the services that are established later.</li><li>If <strong>LOCELLTYPE</strong> is set to IMB_CELL, this command is invalid.</li><li>Parameters associated with rules are introduced to accommodate the User Experience Improvement for Lightly Loaded Cells feature. The mapping between parameters and rules is as follows: <strong>EXTRAPOWER</strong> associates with rules 5 and 6. According to the mapping between a parameter and a rule, run the <a href="dsp_nodebruleactionpara.html">DSP NODEBRULEACTIONPARA</a> command to query the rule activation status for a cell. If the rule is activated, run the <a href="lst_nodebruleactionpara.html">LST NODEBRULEACTIONPARA</a> command to query the setting of Administrative State. If Administrative State is ENABLE, the parameter settings in the <a href="set_ulocellmachspara.html">SET ULOCELLMACHSPARA</a> command will not take effect. Accordingly, the <strong>NODEBRULEACTIONPARA</strong> parameter settings take effect.</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_ulocellmachspara__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-uLoCellId.html">ULOCELLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Local Cell ID.</p>
+<p>GUI Value Range: 0~268435455</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~268435455</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-rscAllocMethod.html">RSCALLOCM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Resource Allocate Method</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Resource Allocate Method. Radio resources indicate HSDPA available power resources and code resources. Code Priority: The code resource priority allocation scheme mainly applies to scenarios where power resources are limited. In scenarios where power resources are not limited, this scheme lowers the system throughput. Power Priority: The power resource priority allocation scheme mainly applies to scenarios where code resources are limited. In scenarios where code resources are not limited, this scheme lowers the system throughput. Balance between Code and Power: The power-code balanced scheme avoids exhaustion of either type of resources, improves the resource use efficiency and improves the cell capacity.</p>
+<p>GUI Value Range: CODE_PRI(Code Priority), POWER_PRI(Power Priority), POWERCODE_BAL(Balance between Code and Power)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CODE_PRI, POWER_PRI, POWERCODE_BAL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: CODE_PRI: The code resource priority allocation scheme mainly applies to scenarios where power resources are limited. In scenarios where power resources are not limited, this scheme lowers the power resource use efficiency and thereby lowers the system throughput.</p>
+<p>POWER_PRI: The power resource priority allocation scheme mainly applies to scenarios where code resources are limited. In scenarios where code resources are not limited, this scheme lowers the code resource use efficiency and thereby lowers the system throughput.</p>
+<p>POWERCODE_BAL: The power-code balanced scheme strikes a balance between the code resources and power resources consumed by the cell. This avoids exhaustion of either type of resources, improves the resource use efficiency and improves the cell capacity. Compared with the code resource priority allocation scheme, the power-code balanced scheme increases the downlink load of the cell and reduces the code resource use efficiency.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-codeOptSw.html">CODEOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Code Utilization Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for code utilization optimization. If this switch is turned on, the HSDPA code utilization rate increases but the power usage decreases. If this switch is turned off, code utilization optimization does not take effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: During trade-off between power and code resource allocation, turning on this switch increases the code utilization rate and reduces the downlink load when the data source of users in a cell is insufficient and there are remaining downlink air interface resources (including power and code resources). As a result, interference to downlink channels decreases, which improves user experience. If this switch is turned off, code utilization optimization does not take effect. If the code utilization rate in cells is higher than 70% on average during peak hours and each cell is allocated not more than 10 codes due to limited license capacity, it is good practice to perform code expansion before turning on this switch.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-scheduleMethod.html">SM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Scheduling Method</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the HSDPA Scheduling Method. PF: The differences between channel environments of users are considered in order to ensure equity among users. Enhanced PF: This algorithm is an enhancement to PF. Channel quality is considered in order to reach high resource efficiency and gain a high system capacity. Round Robin: Scheduling opportunities are allocated among users simply and effectively on a polling basis. The system throughput is low. Max C/I: This algorithm brings about the maximum system throughput, but it cannot ensures equity between users or meet users' QoS requirements. Location based EPF: Based on the Enhanced PF algorithm, the Location based EPF algorithm considers the impact of user location. Smart EPF: In heavy load scenarios, the smart EPF algorithm increases the weight of the impact of the channel quality on the scheduling priority while moderately guaranteeing the service differentiation and user fairness. In addition, this algorithm adaptively acquires its application scenarios based on machine learning.</p>
+<p>GUI Value Range: EPF(Enhanced PF), PF(PF), RR(Round Robin), MAXCI(Max C/I), EPF_LOC(Location based EPF), EPF_SMART(Smart EPF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: EPF, PF, RR, MAXCI, EPF_LOC, EPF_SMART</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: MAXCI: This algorithm brings about the maximum system throughput, but it cannot ensure equity between users or meet users' QoS requirements.</p>
+<p>RR: Scheduling opportunities are allocated among users simply and effectively on a polling basis. Different users have the same scheduling opportunities, but users are not differentiated. In addition, it does not consider channel quality, and therefore the system throughput is low.</p>
+<p>PF: The differences between channel environments of users are considered in order to ensure equity among users. But users are not differentiated.</p>
+<p>EPF: Scheduling rights values cover the QoS requirements of different services. GBRs can be ensured preferentially, and equity and differentiation among users are reflected. Channel quality is considered in order to reach high resource efficiency and gain a high system capacity. This algorithm is an enhancement to PF.</p>
+<p>EPF_LOC: Considering the EPF algorithm and user location, the users at the near of cell are scheduled with a high probability. As a result, the cell throughput increases and the throughput of cell edge users decreases.</p>
+<p>EPF_SMART: In heavy load scenarios, the smart EPF algorithm increases the weight of the impact of the channel quality on the scheduling priority while moderately guaranteeing the service differentiation and user fairness. This increases system capacity.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-locWeight.html">LOCWEIGHT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Location Weight</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight of the EPF_LOC (user location-based EPF) algorithm. A larger parameter value indicates more location factors should be considered in the user location-based HSDPA scheduling scheme that uses the EPF_LOC algorithm.</p>
+<p>GUI Value Range: 0, 1, 2, 3</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0, 1, 2, 3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large parameter value indicates a large impact of user location on scheduling weight. The users at the near of cell are scheduled with a high probability. As a result, the cell throughput increases and the throughput of cell edge users decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-indeptCarSchSw.html">INDEPTCARSCHSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Independent Carrier Scheduling Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for independent carrier scheduling of multi-carrier HSDPA users. If this switch is turned on, only the rate of a carrier for a multi-carrier HSDPA user is used as the input of the carrier scheduling weight. If this switch is turned off, the total rate of several carriers for a multi-carrier user is used as the input of the carrier scheduling weight.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is turned off, multi-carrier HSDPA users and single-carrier HSDPA users in a multi-carrier cell group have equal opportunity to be scheduled when channel conditions and SPI are the same; the multi-carrier HSDPA user rate is the same as the single-carrier HSDPA user rate, and HSDPA users with different carriers meet user-level fairness. If this switch is turned on,  multi-carrier HSDPA users have more scheduling opportunity than single-carrier HSDPA users in the multi-carrier cell group when channel conditions and SPI are the same; the multi-carrier HSDPA user rate is higher than the single-carrier HSDPA user rate, and HSDPA users with different carriers do not meet user-level fairness.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-bufferSmSw.html">BUFFERSMSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Buffer-based Scheduling Algorithm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch of buffer-based HSDPA user scheduling algorithm. If this switch is turned on, the buffer-based scheduling algorithm is enabled and users with few queue buffers are preferentially scheduled. If this switch is turned off, the scheduling algorithm is not enabled. Buffer means the data in a NodeB user queue.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is turned on, HSDPA users with few queue buffers are preferentially scheduled, improving the average throughput during which the HSDPA user queue buffers have data. If this switch is turned off, the original EPF, EPF_LOC, or EPF_SMART scheduling algorithm is used.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-mcDeltaCqiThd.html">MCDELTACQITHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Delta CQI Threshold for MC</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CQI difference threshold for multi-carrier HSDPA UEs. For a multi-carrier HSDPA UE that uses the local call as the primary well, if the result of subtracting carrier 2 CQI from carrier 1 CQI is greater than this threshold, the UE is scheduled with the lowest scheduling priority in carrier 2. (Carrier 1 is the carrier with the highest CQI, and carrier 2 is the one with the lowest CQI). Value 0 indicates that this function is disabled.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that this parameter be set to 10 if scheduling optimization needs to be performed on multi-carrier UEs with overly low CQIs.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to 0, scheduling optimization is not performed on multi-carrier HSDPA UEs with overly low CQIs. When this parameter is not set to 0, this function takes effect, and the cell HSDPA throughput is improved accordingly, but for a cell during busy hours, the experience of multi-carrier HSDPA UEs with big difference in CQIs is affected. If this parameter is set to a large value, this function takes effect in fewer scenarios.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-smartScheUeNumThld.html">SMARTSCHEUENUMTHLD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Smart Scheduling UE Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the number of UEs for which the Machine Learning based Scheduling feature is effective. When the number of HSDPA users in the cell is greater than the threshold value, activating the Machine Learning based Scheduling algorithm helps improve the cell throughput. If this parameter is set to 0, this parameter is invalid, and the NodeB adjusts the threshold based on the Machine Learning based Scheduling algorithm in real time.</p>
+<p>GUI Value Range: 0~50</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The larger the parameter value, the smaller the gain in the cell throughput and the impact on the single user throughput.The smaller the parameter value, the larger the gain in the cell throughput and the impact on the single-user throughput. If this parameter is set to 0, this parameter is invalid, and the NodeB adjusts the threshold based on the Machine Learning based Scheduling algorithm in real time.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-pwrMgn.html">PWRMGN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power Margin</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the power margin reserved for R99 channels. It specifies the power percentage relative to the maximum cell transmit power.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: This parameter indicates the reserved power as a percentage of the maximum transmit power of the cell. Increasing this value will decrease the power available to the HS-PDSCH of the cell and lower the throughput of the cell. If the value of this parameter is set to a small value and the DPCH or HS-SCCH power of the cell needs to increase within a short period of time, the DPCH or HS-SCCH performance cannot be ensured.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-hsscchPwrCMInDch.html">HSSCCHPWRCMINDCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HS-SCCH Power Control Method in CELL DCH state</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the HS-SCCH Power Control Method in CELL DCH state. Fixed Power-based Power Control: The HS-SCCH transmit power is determined depending on CEUs. This helps to save power resources. CQI-based Adaptive Power Control: The HS-SCCH transmit power is adjusted based on the CQIs and ACK/NACK feedback from users. This lowers the average HS-SCCH transmit power and improves the average throughput of the cell.</p>
+<p>GUI Value Range: CQI(CQI-based Adaptive Power Control), FIXED(Fixed Power-based Power Control)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CQI, FIXED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the value is set to FIXED, the HS-SCCH transmit power is determined depending on CEUs. This helps to save power resources. If the value is set to CQI, the HS-SCCH transmit power is adjusted based on the CQIs and ACK/NACK feedback from users. This lowers the average HS-SCCH transmit power and improves the average throughput of the cell.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-scchPwr.html">SCCHPWR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HS-SCCH Power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the power of the HS-SCCH is an offset in dB to the transmit power of the PCPICH. Relationship between the GUI value and actual value: Actual value = (GUI value - 40) x 0.25.</p>
+<p>GUI Value Range: 0~80</p>
+<p>Unit: 0.25dB</p>
+<p>Actual Value Range: -10~10, step: 0.25</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the probability of HS-SCCH decoding errors for CEUs increases. If this parameter is set to a large value, users at a short or medium distance from the base station waste large amounts of power, and the system capacity decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-hsscchFERTrgtInDCH.html">HSSCCHFERTRGTINDCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HS-SCCH FER Target in CELL DCH State</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the HS-SCCH FER Target in CELL DCH State.</p>
+<p>GUI Value Range: 1~999</p>
+<p>Unit: per mill</p>
+<p>Actual Value Range: 1~999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the HS-SCCH power accounts for a large proportion, and the power available to the HS-PDSCH. If this parameter is set to a large value, the probability of HS-SCCH decoding errors increases and the HSDPA throughput of the cell decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-rscLmSw.html">RSCLMSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Resource Limiting Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Resource Limiting Switch. The function will be enabled if this parameter is set to OPEN. When the resource usage is above the threshold, the throughput may be improved (for example, large GBRs configured for users at the cell edge).</p>
+<p>GUI Value Range: OPEN(open), CLOSE(close)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OPEN, CLOSE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to CLOSE, the resources available to GBR users are not restricted. However, the throughput may decrease, for example, when high GBRs are configured for CEUs. When this parameter is set to OPEN, the resources available to GBR users are restricted. When the resource usage is below the threshold, GBRs are met preferentially. When the resource usage is above the threshold, GBRs are not met preferentially, but the throughput may be improved (for example, large GBRs configured for users at the cell edge).</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-dynCodeSw.html">DYNCODESW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dynamic Code Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Dynamic Code Switch. The function will be enabled if this parameter is set to OPEN. When this switch is turned on, the cell codes are used efficiently, and the system capacity is improved.</p>
+<p>GUI Value Range: OPEN(open), CLOSE(close)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OPEN, CLOSE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this switch is set to OPEN, the vacant codes of R99 can be fully utilized, the cell codes are used efficiently, and the system capacity is improved. If this switch is set to CLOSE, code resources cannot be efficiently used and the cell throughput decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-dynCodeOptSw.html">DYNCODEOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dynamic Code Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for HSDPA dynamic code optimization. When this parameter is set to ON, the HSDPA dynamic code optimization algorithm takes effect. When this parameter is set to OFF, the HSDPA dynamic code optimization algorithm does not take effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this switch is turned on, the dynamic code algorithm is optimized and the NodeB can use discontinuous idle codes, increasing the available HS-PDSCH codes and improving HSDPA cell throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-sixteenQAMSw.html">CME16QAMSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">16QAM Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the 16QAM Switch. The function will be enabled if this parameter is set to OPEN. When this switch is turned on, the cell throughput improves.</p>
+<p>GUI Value Range: OPEN(open), CLOSE(close)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OPEN, CLOSE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is set to CLOSE, the cell cannot use 16QAM, and the throughput of the cell is low. If this switch is set to OPEN, the cell can use 16QAM, and the throughput of the cell is improved.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-maxPwrPHUsr.html">MXPWRPHUSR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max Power Per Hs-user</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ratio of the maximum instantaneous transmit power of a single HSDPA UE to the actual maximum transmit power of the cell.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a value smaller than the transmit power available to users, users will have a reduced possibility of scheduling and the user throughput may decrease.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-cqiFA.html">CQIFA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CQI Filter Alpha</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Channel Quality Indicator(CQI) Filter Alpha.</p>
+<p>GUI Value Range: 0~99</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~99</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is not set to 0, wave filtering is performed for CQIs reported by UEs. If this parameter is set to a large value, CQI wave filtering is smooth, the user throughput is stable, but the throughput is low. If this parameter is set to 0, CQI wave filtering is not performed. In this case, channel changes are quickly tracked, and the throughput is improved.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-maxEfachHarqRt.html">MAXEFACHHARQRT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MAX EFACH HARQ Retransmission Times</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of blind HARQ retransmissions for E-FACH users.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a small value, HARQ retransmissions cannot ensure reliable data transmission for E-FACH users. In this case, RLC layer retransmissions are required, which lowers the user throughput. When this parameter is set to a large value, a fixed number of HARQ retransmissions ensure reliable data transmission for E-FACH users. In this case, a large amount of cell resources is consumed, and the cell throughput is low.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-maxNonConverHarqRt.html">MAXNONCONVERHARQRT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MAX HARQ Retransmission Times of Non-Conversational service in CELL DCH state</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MAX HARQ Retransmission Times of Non-Conversational service in CELL DCH state.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a small value, HARQ retransmissions cannot ensure reliable data transmission for CELL-DCH users. In this case, RLC layer retransmissions are required, which lowers the user throughput. When this parameter is set to a large value, reliable data transmission can be ensured for CELL-DCH users. In this case, users in poor channel environments consume a large amount of cell resources.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-hsscchPwrCMInEfach.html">HSSCCHPWRCMINEFACH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HS-SCCH Power Control Method in CELL FACH state</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the HS-SCCH Power Control Method in CELL FACH state. Fixed Power-based Power Control: The HS-SCCH transmit power is determined considering the CEUs of the cell. Reliable HS-SCCH transmission can be ensured but the downlink power cannot efficiently used. CQI-based Adaptive Power Control: The HS-SCCH transmit power is adjusted based on the CQIs and ACK/NACK feedback from users. The probability of unreliable HS-SCCH transmission and power waste increases, and the cell throughput becomes low.</p>
+<p>GUI Value Range: CQI(CQI-based Adaptive Power Control), FIXED(Fixed Power-based Power Control)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CQI, FIXED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to CQI and the current CQI is larger than the selected CQI, power is wasted. If this parameter is set to CQI and the current CQI is smaller than the selected CQI, the probability of unreliable HS-SCCH transmission increases. In both cases, the cell throughput is low. If this parameter is set to FIXED, reliable HS-SCCH transmission can be ensured but the downlink power cannot efficiently used.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-cqiAdjAlgOfCon.html">CQIADJALGOFCON</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CQI Adjust Algorithm Switch of Conversational Service</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Channel Quality Indicator(CQI) Adjust Algorithm Switch of Conversational Service. Not CQI Adjust Algorithm: CQI correction is not performed. CQI Adjusted by RBLER: CQI correction is performed for conversational services based on the target value of the residual BLER. The residual BLER will converge to the target value.</p>
+<p>GUI Value Range: NO_CQI_ADJ(Not CQI Adjust Algorithm), CQI_ADJ_BY_RBLER(CQI Adjusted by RBLER)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO_CQI_ADJ, CQI_ADJ_BY_RBLER</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to NO_CQI_ADJ, CQI correction is not performed. If this parameter is set to CQI_ADJ_BY_RBLER, CQI correction is performed for conversational services based on the target value of the residual BLER. The residual BLER will converge to the target value.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-cqiAdjAlgOfNonCon.html">CQIADJALGOFNONCON</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CQI Adjust Algorithm Switch of non-Conversational Service</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Channel Quality Indicator(CQI) Adjust Algorithm Switch of non-Conversational Service. Not CQI Adjust Algorithm: CQI correction is not performed. CQI Adjusted by IBLER: CQI correction is performed for non-conversational services based on the fixed IBLER. The IBLER will converge to this target value. CQI Adjusted by Dynamic BLER: CQI correction is performed for non-conversational services based on the dynamic BLER. The dynamic BLER will converge to this target value.</p>
+<p>GUI Value Range: NO_CQI_ADJ(Not CQI Adjust Algorithm), CQI_ADJ_BY_IBLER(CQI Adjusted by IBLER), CQI_ADJ_BY_DYN_BLER(CQI Adjusted by Dynamic BLER)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO_CQI_ADJ, CQI_ADJ_BY_IBLER, CQI_ADJ_BY_DYN_BLER</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to NO_CQI_ADJ, CQI correction is not performed. If this parameter is set to CQI_ADJ_BY_IBLER, CQI correction is performed for non-conversational services based on the fixed IBLER. The IBLER will converge to this target value. If this parameter is set to CQI_ADJ_BY_DYN_BLER, CQI correction is performed for non-conversational services based on the dynamic BLER. The dynamic BLER will converge to this target value.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-rBlerTarget.html">RBLERTARGET</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Residual Bler Target</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the residual block error rate (RBLER) target.</p>
+<p>GUI Value Range: 1~50</p>
+<p>Unit: per mill</p>
+<p>Actual Value Range: 1~50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the residual BLER for conversational services is small, the service quality of conversational services is improved, but the system capacity decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-iBlerTarget.html">IBLERTARGET</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IBler Target</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Initial Block Error Rate(IBLER) Target.</p>
+<p>GUI Value Range: 1~50</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the IBLER for non-conversational services of HSDPA users is small. At a short distance from the base station, the user throughput is improved. However, at a medium or long distance from the base station, throughput loss may be introduced.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-cqiAdjByIblerAdjSw.html">CQIADJBYIBLERADJSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Adjustment Switch for CQI Adjusted By IBLER</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates performance adjustment for the algorithm specified by CQI_ADJ_BY_IBLER under <strong>CQIADJALGOFNONCON</strong>. When this parameter is set to OFF, the algorithm specified by CQI_ADJ_BY_IBLER under <strong>CQIADJALGOFNONCON</strong> has optimized performance of the mainstream terminals on the live network. However, performance of some terminals deteriorates, leading to negative gains. In this case, if this parameter is set to ON, the system automatically adjusts the algorithm parameters to eliminate the negative gains.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When CQIADJALGOFNONCON is set to CQI_ADJ_BY_IBLER and this parameter is set to OFF, the algorithm specified by CQI_ADJ_BY_IBLER has optimized performance of the mainstream terminals on the live network. However, performance of some terminals deteriorates, leading to negative gains. In this case, if this parameter is set to ON, the system automatically adjusts the algorithm parameters to eliminate the negative gains.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-cqiAdjByDynBlerAdjSw.html">CQIADJBYDYNBLERADJSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Adjustment Switch for CQI Adjusted By Dynamic BLER</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates performance adjustment for the algorithm specified by CQI_ADJ_BY_DYN_BLER under <strong>CQIADJALGOFNONCON</strong>. In the single-user scenario, if this parameter is set to ON, the system optimizes the algorithm specified by CQI_ADJ_BY_DYN_BLER to improve downlink throughput.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When CQIADJALGOFNONCON is set to CQI_ADJ_BY_DYN_BLER, in the single-user scenario, if this parameter is set to ON, the system optimizes the algorithm specified by CQI_ADJ_BY_DYN_BLER to improve downlink throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-secCellActDeaOnDataSM.html">SECCELLACTDEASW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Secondary DC-HSDPA,DB-HSDPA Cell Activation Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: This parameter specifies whether to enable Traffic-Based Activation and Deactivation of the Supplementary Carrier in Multi-carrier HSDPA. Multi-carrier HSDPA cells fall into DC-HSDPA cells, DC-HSDPA+MIMO cells, DB-HSDPA cells, DB-HSDPA+MIMO cells, 3C-HSDPA cells, and 4C-HSDPA cells. If this parameter is set to ON, this function takes effect. If this parameter is set to OFF, this function does not take effect. When the switch is turned on, this function helps lower the uplink load and extend the battery life of UEs.</p>
+<p>GUI Value Range: ON(ON), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When the parameter is set to ON, Traffic-Based Activation and Deactivation of the Supplementary Carrier in Multi-carrier HSDPA is enabled. This function helps reduce HS-DPCCH power for Multi-carrier HSDPA users that have low throughput, lowering the uplink load and extending the battery life of UEs.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-actSecCellThpThd.html">ACTSECCELLTHPTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Throughput Threshold for Activating Secondary Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the throughput threshold for activating the secondary cell. If the UE throughput is greater than the threshold, the secondary cell is activated.</p>
+<p>GUI Value Range: 0~1024</p>
+<p>Unit: kbps</p>
+<p>Actual Value Range: 0~1024</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 200</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELLMACHSPARA</strong> MO, the value of <strong>ACTSECCELLTHPTHD</strong> must be larger than that of <strong>DEASECCELLTHPTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter indicates a greater proportion of deactivating the secondary cell. The cell throughput and single-user throughput decrease and the uplink capacity increases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-deaSecCellThpThd.html">DEASECCELLTHPTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Throughput Threshold for Deactivating Secondary Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the throughput threshold for deactivating the secondary cell. If the UE throughput is lower than the threshold, and the size of buffered user data is greater than the value of <strong>DEASECCELLDATABUFTHD</strong>, the secondary cell is deactivated.</p>
+<p>GUI Value Range: 0~1024</p>
+<p>Unit: kbps</p>
+<p>Actual Value Range: 0~1024</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELLMACHSPARA</strong> MO, the value of <strong>ACTSECCELLTHPTHD</strong> must be larger than that of <strong>DEASECCELLTHPTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter indicates a greater proportion of deactivating the secondary cell. The cell throughput and single-user throughput decrease and the uplink capacity increases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-actSecCellDataBufThd.html">ACTSECCELLDATABUFTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Data Buffer Threshold for Activating Secondary Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the data buffer threshold for activating the secondary cell. When the size of buffered user data is lower than the threshold, the secondary cell is activated.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELLMACHSPARA</strong> MO, the value of <strong>DEASECCELLDATABUFTHD</strong> must be larger than that of <strong>ACTSECCELLDATABUFTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter indicates a greater proportion of deactivating the secondary cell. The cell throughput and single-user throughput decrease and the uplink capacity increases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-deaSecCellDataBufThd.html">DEASECCELLDATABUFTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Data Buffer Threshold for Deactivating Secondary Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the data buffer threshold for deactivating the secondary cell. When the size of buffered user data is greater than the threshold and the user throughput is lower than the value of <strong>DEASECCELLTHPTHD</strong>, the secondary cell is deactivated.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 80</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELLMACHSPARA</strong> MO, the value of <strong>DEASECCELLDATABUFTHD</strong> must be larger than that of <strong>ACTSECCELLDATABUFTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter indicates a greater proportion of deactivating the secondary cell. The cell throughput and single-user throughput decrease and the uplink capacity increases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-iicSw.html">IICSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IIC Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Intelligent Interference Control Switch. The function will be enabled if this parameter is set to OPEN. For MIMO+HSDPA co-carrier cells, when this switch is turned on, performance for HSDPA users is boosted but performance for MIMO users slightly decreases. When this switch is close, performance for MIMO users remains unchanged and performance for HSDPA users decreases.</p>
+<p>GUI Value Range: OPEN(open), CLOSE(close)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OPEN, CLOSE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: For MIMO+HSDPA co-carrier cells, if this switch is set to OPEN, performance for HSDPA users is boosted but performance for MIMO users slightly decreases. If this switch is set to CLOSE, performance for MIMO users remains unchanged and performance for HSDPA users decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-dtxAlgoSw.html">DTXALGOSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SE Hsscch DTX Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SE Hsscch DTX Switch. When this switch is turned on, Sony Ericsson terminals no longer experience PS call drops. However, it is possible to decrease the cell capacity.</p>
+<p>GUI Value Range: ON(ON), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this algorithm is set to ON, Sony Ericsson terminals no longer experience PS call drops. However, it is possible that only one HS-SCCH code is used, decreasing the cell capacity. If this switch is set to OFF, Sony Ericsson terminals may experience PS call drops.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-mimoPrimeSw.html">MIMOPRIMESW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MIMO Prime Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MIMO Prime Switch. The function will be enabled if this parameter is set to OPEN.</p>
+<p>GUI Value Range: OPEN(open), CLOSE(close)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OPEN, CLOSE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-extraPower.html">EXTRAPOWER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Extra Power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum power used for scheduled users after the scheduling.</p>
+<p>GUI Value Range: 0~40</p>
+<p>Unit: 0.25dB</p>
+<p>Actual Value Range: 0~10, step: 0.25</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that this parameter be set to 4 if remaining cell power needs to be used for scheduled users after scheduling.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large parameter value indicates the heavy downlink load, serious interference to neighboring cells, and increased service drop rate. If the parameter value is too small, the SBLER decreases insignificantly and the cell HSDPA throughput does not increase greatly.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-maxEfachHsHarqRt.html">MAXEFACHHSHARQRT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximum HARQ Retransmission Number for EFACH over HS-DPCCH</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of HARQ retransmissions when the UE in CELL_FACH supports the feedbacks over the HS-DPCCH.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 4</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a small value, HARQ retransmission cannot ensure reliable data transmission for UEs in the CELL_FACH state, and therefore, RLC layer retransmission is required. This reduces the UE throughput. When this parameter is set to a large value, HARQ retransmission ensures reliable data transmission for UEs in the CELL_FACH state and expands E-FACH coverage. However, UEs experiencing poor channel quality consume more cell resources.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-burstBlerOptSw.html">BURSTBLEROPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Optimization Switch for BLER of HSDPA Burst service</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: When this switch is turned on, estimated channel environment errors are corrected for burst services and full buffer services at the startup of data transmission to optimize the BLER.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this switch is turned on, the throughput of HSDPA burst services increases and the data transmission delay decreases. The same gains are provided for full buffer services at the startup of data transmission.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-dlBeSchWhenULUrlbSW.html">DLBESCHWHENULURLBSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL BE Schedule When UL Unreliable Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch used to control whether scheduling and Transport Format Resource Combination (TFRC) are allowed for best effort (BE) services when the uplink signal quality of HSDPA users is not reliable. If this switch is turned off, scheduling and TFRC are not allowed for BE services when the uplink signal quality of HSDPA users is not reliable. If this switch is turned on, scheduling and TFRC are allowed for BE services even when the uplink signal quality of HSDPA users is not reliable. For multi-carrier HSDPA UEs, this function takes effect only on the primary carrier.</p>
+<p>GUI Value Range: ON(ON), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Scheduling and TFRC are allowed for BE services even when the uplink signal quality of HSDPA users is not reliable. As a result, traffic and user throughput increase and service delay decreases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-extraPowerForSrb.html">EXTRAPOWERFORSRB</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Extra Power For SRB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the extra power for the SRB queue. If SRBs are carried over HSDPA, the transmit power increases when there is remaining cell power or the data volume to be transmitted decreases when there is no remaining cell power. This reduces the BLER of the SRB queue, decreases the HSDPA service drop rate, and increases the HSDPA handover success rate.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter indicates the decreased consumed power for the SRB data over the HSDPA channel, a low HSDPA handover success rate, and the light cell load. Setting this parameter to a large value increases the downlink load and decreases the RRC connection setup success rate, RAB setup success rate, and handover success rate. Therefore, do not set this parameter to a large value.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-preAllocBwOptiSw.html">PREALLOCBWOPTISW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Preallocation BW Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch used to optimize the pre-allocation bandwidth algorithm. If the switch is turned on, the NodeB optimizes the pre-allocation bandwidth algorithm, improving HSDPA throughput. If this switch is turned off, the pre-allocation bandwidth algorithm does not take effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the air interface rate or data source fluctuates, turning on this switch increases HSDPA throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-sfdcMacshsDscTmr.html">SFDCMACEHSDSCTMR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SFDC MAC-ehs Discard Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the SFDC MAC-ehs discard timer, which defines the maximum duration within which an MAC-d PDU of the inter-NodeB SFDC-HSDPA service is transmitted after it is added to an MAC-ehs queue. If the timer expires, the MAC-d PDU will be discarded. Otherwise, the MAC-d PDU will be blocked in a NodeB, which causing a UE to receive an incorrect PDU at the RLC layer. For details about this parameter, see 3GPP TS 25.321.</p>
+<p>GUI Value Range: D20(20), D40(40), D60(60), D80(80), D100(100), D120(120), D140(140), D160(160), D180(180), D200(200), D250(250), D300(300), D400(400), D500(500), D750(750), D1000(1000), D1250(1250), D1500(1500), D1750(1750), D2000(2000), D2500(2500), D3000(3000), D3500(3500), D4000(4000), D4500(4500), D5000(5000), D7500(7500)</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: D20, D40, D60, D80, D100, D120, D140, D160, D180, D200, D250, D300, D400, D500, D750, D1000, D1250, D1500, D1750, D2000, D2500, D3000, D3500, D4000, D4500, D5000, D7500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Parameter settings depend on the air interface capability in soft handover area of inter-NodeB SFDC-HSDPA UEs and traffic model. A large value of this parameter indicates a high probability that a UE receives an incorrect PDU at the RLC layer caused by data congestion in the MAC-ehs queue during high-speed transmission. A small value of this parameter indicates a high probability that the MAC-d PDU in a NodeB buffer is mistakenly discarded.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-df3cMacehsDscTmr.html">DF3CMACEHSDSCTMR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DF3C MAC-ehs Discard Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the DF3C MAC-ehs discard timer, which defines the maximum duration within which an MAC-d PDU of the inter-NodeB DF3C-HSDPA service is transmitted after it is added to an MAC-ehs queue. If the timer expires, the MAC-d PDU will be discarded. Otherwise, the MAC-d PDU will be blocked in a NodeB, which causing a UE to receive an incorrect PDU at the RLC layer. For details about this parameter, see 3GPP TS 25.321.</p>
+<p>GUI Value Range: D20(20), D40(40), D60(60), D80(80), D100(100), D120(120), D140(140), D160(160), D180(180), D200(200), D250(250), D300(300), D400(400), D500(500), D750(750), D1000(1000), D1250(1250), D1500(1500), D1750(1750), D2000(2000), D2500(2500), D3000(3000), D3500(3500), D4000(4000), D4500(4500), D5000(5000), D7500(7500)</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: D20, D40, D60, D80, D100, D120, D140, D160, D180, D200, D250, D300, D400, D500, D750, D1000, D1250, D1500, D1750, D2000, D2500, D3000, D3500, D4000, D4500, D5000, D7500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Parameter settings depend on the air interface capability in soft handover area of inter-NodeB DF3C-HSDPA UEs and traffic model. A large value of this parameter indicates a high probability that a UE receives an incorrect PDU at the RLC layer caused by data congestion in the MAC-ehs queue during high-speed transmission. A small value of this parameter indicates a high probability that the MAC-d PDU in a NodeB buffer is mistakenly discarded.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-hsdpaL2OptSw.html">HSDPAL2OPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HSDPA L2 Optition Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable Layer 2 optimization for HSDPA services. If this switch is turned on, Layer 2 optimization for HSDPA services is enabled. If this switch is turned off, Layer 2 optimization for HSDPA services is disabled.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is turned on, HSDPA resource utilization improves and downlink throughput increases in the event of limited HSDPA resources.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-pwrMgnDeltaForPt.html">PWRMGNDELTAFORPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power Margin Delta For Platinum User</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates an adjustment to the reserved power margin for R99 channels when the Platinum User Prioritizing feature has been enabled. The reserved power margin for R99 channels of a cell serving platinum users in the CS domain equals the smaller value between 100 and the sum of PWRMGN and PWRMGNDELTAFORPT. The parameter value is a percentage relative to the maximum cell transmit power.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, the available HS-PDSCH power becomes small for the cell giving priority to platinum users in the CS domain, reducing cell throughput and downlink cell load. In this situation, platinum users in the CS domain have better user experience. If this parameter is set to a small value, the available HS-PDSCH power becomes large for the cell giving priority to platinum users in the CS domain, increasing cell throughput. In this situation, user experience of platinum users in the CS domain is adversely affected but such users are still given priority in the cell.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-videoCQIThd.html">VIDEOCQITHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Video CQI Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CQI threshold for scheduling video users. If <strong>SM</strong> is set to EPF and the CQI after filtering for an HSDPA video user is below the specified threshold, absolute guarantee does not apply to the video user.</p>
+<p>GUI Value Range: 0~30</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger parameter value indicates fewer video users for absolute guarantee, smaller impacts on users that are not absolutely guaranteed, slighter impacts on cell throughput when resources are insufficient, but less significant improvements in KQIs for video users. A smaller parameter value indicates more video users for absolute guarantee, more significant improvements in KQIs for video users, but larger decreases in cell throughput when resources are insufficient.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-hsdpaFullBufDataThd.html">HSDPAFULLBUFDATATHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HSDPA Fullbuffer Data Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the full buffer service traffic threshold for HSDPA UEs.</p>
+<p>GUI Value Range: 0~84000000</p>
+<p>Unit: bit</p>
+<p>Actual Value Range: 0~84000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The larger the value of this parameter is, the closer to the actual air interface throughput the full buffer service throughput but the less the number of full buffer service samples.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-hsdpaFullBufThrouThd.html">HSDPAFULLBUFTHROUTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HSDPA Fullbuffer Throughput Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the full buffer service throughput threshold for HSDPA UEs.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: kbps</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-hsscchCqiPwrInDchOptSw.html">HSSCCHCQIPWRINDCHOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Optimization Switch for HS-SCCH CQI-based Adaptive Power Control in CELL_DCH State</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to optimize HS-SCCH CQI-based adaptive power control for UEs in CELL_DCH state. If this switch is turned on, the NodeB optimizes HS-SCCH CQI-based adaptive power control for UEs in CELL_DCH state.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Turning on this switch increases the HS-SCCH demodulation success rate over the air interface and improves network performance.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-maxExtraPwrForHSSCCHInDch.html">MAXEXTRAPWRFORHSSCCHINDCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MAX Extra Power for HS-SCCH in CELL_DCH State</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum extra power for HS-SCCH in CELL_DCH state.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, the maximum HS-SCCH transmit power for UEs in CELL_DCH state and HS-SCCH demodulation success rate increase and network performance improves, but HSDPA throughput may decrease. If this parameter is set to a small value, the maximum HS-SCCH transmit power for UEs in CELL_DCH state and HS-SCCH demodulation success rate decrease, and network performance is compromised.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-serviceCqiThd.html">SERVICECQITHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Service CQI Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the service CQI threshold for preferential service scheduling. If the CQI value of an HSDPA service is less than the threshold, preferential scheduling does not apply to the service.</p>
+<p>GUI Value Range: 0~30</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 15</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger parameter value indicates fewer candidate services being preferentially scheduled and less impact on other services, but less improvement in user experience. A smaller parameter value indicates more candidate services being preferentially scheduled and more impact on other services, but more improvement in user experience.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-efachDtchRscAllocMode.html">EFACHDTCHRSCALLOCMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">E-FACH DTCH Resource Alloc Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the power resource allocation mode for E-FACH DTCH data. If this parameter is set to JOINTALLOC, power resources are jointly allocated to E-FACH DTCH data within multiple TTIs. If this parameter is set to INDALLOC, power resources are independently allocated to E-FACH DTCH data within each TTI.</p>
+<p>GUI Value Range: JOINTALLOC(Joint Allocation), INDALLOC(Independent Allocation)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: JOINTALLOC, INDALLOC</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to JOINTALLOC, total downlink E-FACH and HSDPA throughput will improve. If this parameter is set to INDALLOC, downlink E-FACH throughput will improve during busy hours.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-harqRtSchOptSw.html">HARQRTSCHOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HARQ Retransmission Schedule Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for HARQ retransmission schedule optimization. When this parameter is set to ON, the HARQ retransmission schedule optimization algorithm takes effect. When this parameter is set to OFF, the HARQ retransmission schedule optimization algorithm does not take effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the number of invalid retransmissions over the Uu interface decreases, increasing the transmission efficiency, downlink capacity, and HSDPA throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-combiTFRCSw.html">COMBITFRCSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Combined TFRC Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the combined TFRC function takes effect. If this switch is turned on, the combined TFRC function takes effect. When the cell power resources are exhausted but the code resources are still available after the scheduling of a UE is completed, some power resources used by the UE will be released if another UE waits to be scheduled so that the new UE can send data. If this switch is turned off, the combined TFRC function does not take effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(ON)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When COMBITFRCSW is set to ON, the resource usage increases, and the cell HSDPA throughput increases.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellMachsPara-secCellStatusSyncOptSw.html">SECCELLSTATUSSYNCOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Multi-carrier HSDPA Status Synchronization Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for the multi-carrier HSDPA status synchronization optimization function. Multi-carrier HSDPA includes DC-HSDPA, DC-HSDPA+MIMO, DB-HSDPA, DB-HSDPA+MIMO, 3C-HSDPA, and 4C-HSDPA. When this switch is set to ON, the multi-carrier HSDPA status synchronization optimization function takes effect. Multi-carrier HSDPA status synchronization of new radio links between the network and UE sides are performed after the fast radio bearer setup succeeds. When this switch is set to OFF, the multi-carrier HSDPA status synchronization optimization function does not take effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON, the multi-carrier HSDPA status synchronization optimization function takes effect. Multi-carrier HSDPA status synchronization of new radio links between the network and UE sides are performed after the fast radio bearer setup succeeds. This optimizes the throughput of multi-carrier HSDPA UEs with the secondary component carrier deactivated during fast radio bearer setup, but increases the HS-SCCH Order sending amount and affects indicators such as the HS-SCCH power and HS-SCCH codeword utilization.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_ulocellmachspara__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Execute this command to modify the weight of Mac-hs scheduling parameters:
+SET ULOCELLMACHSPARA: RSCALLOCM=POWERCODE_BAL, SM=EPF, HSSCCHPWRCMINDCH=CQI, HSSCCHFERTRGTINDCH=200, RSCLMSW=OPEN, CODEOPTSW=ON, PREALLOCBWOPTISW=ON, SFDCMACEHSDSCTMR=D3500, DF3CMACEHSDSCTMR=D2500, HSDPAL2OPTSW=OFF, PWRMGNDELTAFORPT=10;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

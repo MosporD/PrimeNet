@@ -1,0 +1,327 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display CPRI Port (DSP CPRIPORT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_cpriport">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display CPRI Port (DSP CPRIPORT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_cpriport"></a><a name="dsp_cpriport"></a>
+
+
+<h1 class="topictitle1">Display CPRI Port (DSP CPRIPORT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_cpriport__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the dynamic information about a CPRI port on a BBU or a board on an RRU chain/ring.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_cpriport__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>The type of a CPRI port on a BBP, BRI, UMDU, or GTMU is CPRI and the port number ranges from 0 to 5 (set the port number based on the board hardware capability). The type of a CPRI port on a UBBPei is XCI and the port number is 0 or 1. The type of a CPRI port on a UBBPem or UBBPf0 is CPRI and the port number is 0 or 1. The type of a CPRI port on a UBBPf1 or UBBPg4 is CPRI and the port number ranges from 0 to 2. The type of a CPRI port on an RRU, RFU, AAS, CGPS, or RPCU is CPRI and the port number is 0 or 1. The type of a CPRI port on an RMU is CPRI or XCI. The number of a CPRI port ranges from 0 to 11. The number of an XCI port is 0 or 1.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The type of a CPRI port on an RHUB is CPRI or CPRI_E/CPRI_O. The number of a CPRI port is 0 or 3. The number of a CPRI_E/CPRI_O port ranges from 0 to 15.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The line rates of all UBBPei ports must be the same due to the hardware capability limitations. If the line rate of a UBBPei port is set to a fixed rate, all the UBBPei ports work at the fixed rate.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]In a separate-MPT base station deployed with CPRI MUX, when the converged board is an LBBP or WBBP and the CPRI line rates of the ports connecting to a trunk chain on the converging party are set to AUTO: </p>
+<p>- If the converging board is not a UBBPei, the CPRI line rates must not exceed 9.8 Gbit/s. </p>
+<p>- If the converging board is a UBBPei, the CPRI line rates must not exceed 39.2 Gbit/s. </p>
+<p>If links cannot be set up for the associated boards or links cannot work at the expected CPRI line rate, a negotiation for the CPRI line rate should be manually started. For details, see the help of the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If multiple modes of a separate-MPT base station share an RMU, the chains/rings connecting to the RMU work at the same line rate as the chain/ring with the maximum number of board cascading levels. If links cannot be set up for the associated boards or links cannot work at the expected CPRI line rate, run the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command to initiate a CPRI line rate negotiation.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]The Ethernet cable level test applies only to CAT6a shielded Ethernet cables. The length of an Ethernet cable to be tested must be less than or equal to 200 m. During the test, the data rate over the CPRI_E port between the RHUB and pRRU must be set to 10.1 Gbit/s, and the electrical ports on both the RHUB and pRRU must support 10.1 Gbit/s.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_cpriport__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CpriPort-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the board where the CPRI port is located. This parameter is configured automatically when the CPRI port is created. The CPRI port is used for the configuration check when an RRU chain/ring is added.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CpriPort-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board where the CPRI port is located. This parameter is configured automatically when the CPRI port is created. The CPRI port is used for the configuration check when an RRU chain/ring is added.</p>
+<p>GUI Value Range: 0~1,4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1,4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CpriPort-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board where the CPRI port is located. This parameter is configured automatically when the CPRI port is created. The CPRI port is used for the configuration check when an RRU chain/ring is added.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CpriPortPara-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of ports. The value ALL indicates that the types of all the ports on the board are queried.</p>
+<p>GUI Value Range: CPRI(CPRI), XCI(XCI), HEI(HEI), ALL(ALL), CPRI_E/CPRI_O(CPRI_E/CPRI_O)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CPRI, XCI, HEI, ALL, CPRI_E/CPRI_O</p>
+<p>MML Default Value: ALL(ALL)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CpriPort-PortNo.html">OPTN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number of the board where the CPRI port is located. This parameter is configured automatically when the CPRI port is created. A CPRI port is created automatically when a board with CPRI ports is added by running the <a href="add_brd.html">ADD BRD</a> command. The CPRI port is used for the configuration check when an RRU chain/ring is added.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CpriPort-SubPortNo.html">SPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sub Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of a sub-port on a CPRI port. This parameter is valid only when the port mode of XCI on the RMU is 2x10GE or the port is on the baseband processing board. The value NULL indicates that the connected port of the device has no subport.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_cpriport__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query the dynamic information about a CPRI port, run the following command:
+DSP CPRIPORT:;
+The result is shown as follows:
++++    0        2018-05-08 09:59:00
+O&amp;M    #42
+%%DSP CPRIPORT:;%%
+RETCODE = 0  Operation succeeded.
+
+Display CpriPort Dynamic Information
+------------------------------------
+Cabinet No.  Subrack No.  Slot No.  Port Type  Port No.  Sub Port No.  Install Status   SFP Module Type  Administrative Status  CPRI Bit Rate(bit/s)  CPRI Port Mode  CPRI Port Mux Status  Availability Status  Remaining Continuous Bandwidth(Mbit/s)  Remaining Discontinuous Bandwidth(Mbit/s)  Protocol Type  Cable Reservation Status  Network Cable Length Level
+
+0            0            3         CPRI       0         0             Not In Position  NULL             Unblocked              NULL                  NULL            Normal                Normal               NULL                                    NULL                                       CPRI           NULL                      NULL                      
+0            0            3         CPRI       1         0             Not In Position  NULL             Unblocked              NULL                  NULL            Normal                Normal               NULL                                    NULL                                       CPRI           NULL                      NULL                      
+0            0            3         CPRI       2         0             In Position      ESFP_OPTICAL     Unblocked              2.5G                  Master          Normal                Normal               1843.20                                 0                                          CPRI           NULL                      NULL                      
+0            0            3         CPRI       3         0             Not In Position  NULL             Unblocked              NULL                  NULL            Normal                Normal               NULL                                    NULL                                       CPRI           NULL                      NULL                      
+0            0            3         CPRI       4         0             Not In Position  NULL             Unblocked              NULL                  NULL            Normal                Normal               NULL                                    NULL                                       CPRI           NULL                      NULL                      
+0            0            3         CPRI       5         0             Not In Position  NULL             Unblocked              NULL                  NULL            Normal                Normal               NULL                                    NULL                                       CPRI           NULL                      NULL                      
+(Number of results = 6)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_cpriport__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the board where the CPRI port is located. This parameter is configured automatically when the CPRI port is created. The CPRI port is used for the configuration check when an RRU chain/ring is added.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the board where the CPRI port is located. This parameter is configured automatically when the CPRI port is created. The CPRI port is used for the configuration check when an RRU chain/ring is added.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the board where the CPRI port is located. This parameter is configured automatically when the CPRI port is created. The CPRI port is used for the configuration check when an RRU chain/ring is added.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the port number of the board where the CPRI port is located. This parameter is configured automatically when the CPRI port is created. A CPRI port is created automatically when a board with CPRI ports is added by running the <a href="add_brd.html">ADD BRD</a> command. The CPRI port is used for the configuration check when an RRU chain/ring is added.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Sub Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of a sub-port on a CPRI port. This parameter is valid only when the port mode of XCI on the RMU is 2x10GE or the port is on the baseband processing board. The value NULL indicates that the connected port of the device has no subport.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Install Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the in-position state of the CPRI port. If CPRI MUX/eCPRI MUX is deployed in separate-MPT scenarios, the queried value of this parameter is NULL on the converged party side.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>SFP Module Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of the optical or electrical module. If CPRI MUX/eCPRI MUX is deployed in separate-MPT scenarios, the queried value of this parameter is NULL on the converged party. If the optical or electrical module is incorrectly installed, the queried value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of the CPRI port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Administrative Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the administrative state of a CPRI port. The administrative state of a CPRI port can be BLOCKED or UNBLOCKED. The value BLOCKED indicates that the CPRI port is blocked or a breakpoint is configured near the CPRI port at the local or peer mode. The value UNBLOCKED indicates that the CPRI port is unblocked and no breakpoint is configured near the CPRI port at the local or peer mode. If CPRI MUX/eCPRI MUX is deployed in separate-MPT scenarios, the queried value of this parameter is NULL for the baseband processing board on the converged party.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>CPRI Bit Rate(bit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the rate at the CPRI port. The optical or electrical module where the port located is securely installed and a CPRI link has not been established, the queried value of this parameter is UNKNOWN. If the optical or electrical module is incorrectly installed, the queried value of this parameter is NULL. For details about the CPRI, see the CPRI specifications.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>CPRI Port Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the mode of the CPRI port. There are two modes: Maser and Slave.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>CPRI Port Mux Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the multiplexing status of a CPRI port. When the channel between the converged party and the converged party fails, "UNKNOWN" is displayed if you query the status of a CPRI port of the aggregated party and "NULL" is displayed if you query the status of a CPRI port on an RRU. The value of the CpriMuxStatus parameter for an RMU port connecting to a lower-level node is NORMAL(Normal).</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Availability Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the availability state of a CPRI port. The availability state of a CPRI port can be NORMAL, INBREAKPOIT, or NULL. The value INBREAKPOIT indicates that a breakpoint is configured on the chain/ring. In this case, the CPRI link is disconnected although fiber optic cables are connected. The breakpoint is configured to prevent temporary alarms from being reported during network operations. The value NORMAL indicates that no breakpoint is configured on the chain/ring and the CPRI port is unblocked. The value NULL indicates that the CPRI port is blocked and no breakpoint is configured near the CPRI port. If CPRI MUX/eCPRI MUX is deployed in separate-MPT scenarios, the queried value of this parameter is NULL on the converged party.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Remaining Continuous Bandwidth(Mbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth that has not been occupied. If the optical module is not in position or the type of the optical module is QSFP, this parameter value is NULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Remaining Discontinuous Bandwidth(Mbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth that is fragmented after bandwidth usage changes due to cell deletion or configuration modification and cannot be used by other cells. If the optical module is not in position or the type of the optical module is QSFP, this parameter value is NULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Protocol Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the effective protocol type of the port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cable Reservation Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether network cables are reserved for the RRU downstream port. Only certain pRRUs support this parameter. If this parameter is not supported or no network cable is reserved, the queried value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Network Cable Length Level</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the length level of the Ethernet cable between the electrical RHUB branch chain port and the first-level RRU. Level 1 indicates that the tested Ethernet cable supports a maximum data rate of 10.1 Gbit/s within the specified length range. Level 2 indicates that the tested Ethernet cable supports a maximum data rate of 3.0 Gbit/s within the specified length range. NULL indicates that the test result of the Ethernet cable length level is not available. The network cable length level is not found. The possible cause is that no link is set up between the RHUB and the pRRU at the physical layer, or the measurement is not complete after the link is set up at the physical layer.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

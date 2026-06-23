@@ -1,0 +1,206 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IKEPROPOSAL">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IKEPROPOSAL">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IKEPROPOSAL</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IKEPROPOSAL"></a><a name="IKEPROPOSAL"></a>
+
+
+<h1 class="topictitle1">IKEPROPOSAL</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IKEPROPOSAL.html"><strong>IKEPROPOSAL</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO defines a combination of security-related parameters such as encryption algorithms and authentication algorithms used by the Internet Key Exchange (IKE). The corresponding IKE security proposal is referenced by the IKE peer based on the number of the security proposal.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IKEPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring an <strong>IKEPEER</strong> MO, ensure that the <strong>IKEPROPOSAL</strong> MO that is associated with <strong>PROPID</strong> in the <strong>IKEPEER</strong> MO is configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AUTHMETH</strong> in an <strong>IKEPROPOSAL</strong> MO is set to PRE_SHARED_KEY, <strong>PKEY</strong> in an <strong>IKEPEER</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IKE_V1, <strong>DHGRP</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to DH_GROUP19 or DH_GROUP20.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IKE_V1, <strong>ENCALG</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to AES_GCM_128 or AES_GCM_256.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IKE_V1, <strong>AUTHALG</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to SHA384.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IKE_V1, <strong>PRFALG</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to HMAC_SHA384.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IDTYPE</strong> in an <strong>IKEPEER</strong> MO is set to DN, <strong>AUTHMETH</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to PRE_SHARED_KEY.</li></ul>
+</li><li>Relation with the <strong>SECURITYTEMPLATE</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>SECURITYTEMPLATE</strong> MO, if <strong>SEGWSWITCH</strong> is set to DISABLE, <strong>PROPID</strong> must be the same as <strong>PROPID</strong> in a configured <strong>IKEPROPOSAL</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AUTHMETH</strong> in the <strong>IKEPROPOSAL</strong> MO on which a <strong>SECURITYTEMPLATE</strong> MO depends is set to PRE_SHARED_KEY, <strong>PKEY</strong> in the <strong>SECURITYTEMPLATE</strong> MO must be specified.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AUTHALG</strong> in an <strong>IKEPROPOSAL</strong> MO is set to AES_XCBC_96, SHA256 or SHA384, <strong>IKEVERSION</strong> in a <strong>SECURITYTEMPLATE</strong> MO cannot be set to IKE_V1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IKEVERSION</strong> in a <strong>SECURITYTEMPLATE</strong> MO is set to IKE_V1, <strong>DHGRP</strong> in the <strong>IKEPROPOSAL</strong> MO referenced by the <strong>SECURITYTEMPLATE</strong> MO cannot be set to DH_GROUP19 or DH_GROUP20.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IKEVERSION</strong> in a <strong>SECURITYTEMPLATE</strong> MO is set to IKE_V1, <strong>ENCALG</strong> in the <strong>IKEPROPOSAL</strong> MO referenced by the <strong>SECURITYTEMPLATE</strong> MO cannot be set to AES_GCM_128 or AES_GCM_256.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IKEVERSION</strong> in a <strong>SECURITYTEMPLATE</strong> MO is set to IKE_V1, <strong>AUTHALG</strong> in the <strong>IKEPROPOSAL</strong> MO referenced by the <strong>SECURITYTEMPLATE</strong> MO cannot be set to SHA384.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IKEVERSION</strong> in a <strong>SECURITYTEMPLATE</strong> MO is set to IKE_V1, <strong>PRFALG</strong> in the <strong>IKEPROPOSAL</strong> MO referenced by the <strong>SECURITYTEMPLATE</strong> MO cannot be set to HMAC_SHA384.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IKEPROPOSAL__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IKEPROPOSAL__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IKEPROPOSAL__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ikeproposal.html">ADD IKEPROPOSAL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an IKE proposal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ikeproposal.html">DSP IKEPROPOSAL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the IKE proposal configuration that takes effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ikeproposal.html">LST IKEPROPOSAL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of an IKE proposal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_ikeproposal.html">MOD IKEPROPOSAL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify an IKE proposal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ikeproposal.html">RMV IKEPROPOSAL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an IKE proposal.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IKEPROPOSAL__tab2">Table 2</a> and <a href="#IKEPROPOSAL__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IKEPROPOSAL__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IKEPROPOSAL__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-ProposalID.html">Proposal ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the IKE proposal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-EncrAlg.html">Encryption Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the encryption algorithm used in the IKE proposal. The Data Encryption Standard (DES) is an internationally used data encryption algorithm, which uses a 56-bit key. The 3DES is also an internationally used encryption algorithm, which uses a 168-bit key. The Advanced Encryption Standard (AES) is an advanced encryption algorithm, which provides three types of key of different lengths: 128, 192, and 256 bits. Therefore, different protection levels are available. For details, see RFC2401.AES_GCM_128 and AES_GCM_256 are AEAD encryption algorithms that provide both authentication and confidentiality protection. The values AES_GCM_128 and AES_GCM_256 are supported only by the UMPTe, UMPTg, UMPTga, UBBPe(excluding UBBP15), UBBPem, UBBPep, UBBPei, UBBPex2, UBBPf0, UBBPf1, UBBPg1, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 and UBBPg9 boards.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-AuthAlg.html">Authentication Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the authentication algorithm used in the IKE proposal. IKE uses hashed message authentication code (HMAC) or cipher block chaining (CBC) for identity authentication and data integrity check. For details about HMAC, see RFC4306. HMAC currently supports four hash functions: message digest algorithm 5 (MD5), secure hash algorithm 1 (SHA1), secure hash algorithm 256 (SHA256), and secure hash algorithm 384 (SHA384). For details about the hash functions, see RFC2409. The value SHA384 is supported only by the UMPTg, UMPTga, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7, and UBBPg9 boards. MD5, SHA1, SHA256 and SHA384 verify data by means of integrity protection. SHA384, SHA256, SHA1, and MD5 provide security levels in a descending order. CBC currently supports AES_XCBC_96, which is an enhancement to CBC. For details about AES_XCBC_96, see RFC3566. In addition, AES_GCM_128 and AES_GCM_256 are AEAD encryption algorithms in the IKE proposal. They can provide both identity authentication and data integrity check. SHA256, SHA384 and AES_XCBC_96 apply only to IKEv2.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-AuthMethod.html">Authentication Method</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the authentication mode used in the IKE proposal. For details, see RFC2409 and RFC7427.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-DHGroup.html">Diffie-Hellman Group</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Diffie-Hellman (DH) group of the IKE proposal. The core technology used in an IKE proposal is the Diffie-Hellman (DH) exchange technology. The DH exchange technology is used to calculate private information based on public information. It is mathematically proven that decrypting the DH information is impractical due to calculation complexity. The Diffie-Hellman group specified by the value DH_GROUP14 or a value indicating a later algorithm provides better security but consumes more CPU resources. Therefore, set this parameter based on both the security concern and the CPU load. The values DH_GROUP19 and DH_GROUP20 are supported only by the UMPTa, UMPTb, UMPTe, UMPTg, UMPTga, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7, UBBPg9 and UMDU boards.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-SADuration.html">ISAKMP SA Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the life cycle of an ISAKMP SA. ISAKMP refers to Internet Security Association and Key Management Protocol, and SA refers to security association.</p>
+<p>IKE negotiation requires a long time to calculate Diffie-Hellman (DH) keys. It is recommended that this parameter be set to greater than 10 minutes so that the update of the ISAKMP SA does not affect the secure communication.</p>
+<p>Before the SA life cycle elapses, local and peer ends will negotiate with each other to generate a new SA to replace the original one. The new SA is used upon completion of the negotiation, and the original SA is automatically removed once its life cycle elapses.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-PrfAlg.html">PRF Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Pseudo-random Function (PRF) algorithm used in IKEv2. The PRF algorithm is used to generate the materials required for IKE authentication and encryption. For details about how to generate materials, see RFC4306. The value HMAC_SHA384 is supported only by the UMPTg, UMPTga, UBBPg2, UBBPg3, UBBPg4, UBBPg5, UBBPg6, UBBPg7 and UBBPg9 boards.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-ReauthSwitch.html">IKE Reauthentication Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the IKEv2 re-authentication. Reauthentication is done by creating a new IKE SA from scratch, creating new Child SAs within the new IKE SA, and finally deleting the old IKE SA (which deletes the old Child SAs as well). For details, see RFC5996. When this parameter is set to OFF, the BS starts the IKEv2 re-authentication only when the BS serves as the initiation end and receives the re-authentication lifetime notification from the peer end. When this parameter is set to ON, if the BS serves as the initiation end and receives the re-authentication lifetime notification from the peer end, the BS starts the IKEv2 re-authentication using the smaller one between the re-authentication lifetimes at the local and peer ends. When this parameter is set to ON, if the BS does not receive the re-authentication lifetime from the peer end, the BS starts the IKEv2 re-authentication using the re-authentication lifetime at the local end. If the value of this parameter is modified from OFF to ON via the command <a href="../mml/mod_ikeproposal.html">MOD IKEPROPOSAL</a>, the system will start one re-authentication immediately. The <a href="../mml/dsp_ikesa.html">DSP IKESA</a> command can be executed to query the IKE re-authentication lifetime used by the BS.</p>
+<p>This parameter is invalid for IKEv1.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-ReauthLifeTime.html">IKE Reauthentication Lifetime</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the life cycle of IKEv2 re-authentication. It is recommended that this parameter be set to a value greater than that of the ISAKMP SA Duration parameter. Otherwise, the ISAKMP SA Duration parameter becomes invalid.</p>
+<p>This parameter is invalid for IKEv1.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-SigHashAlgoNegSwitch.html">Signature Hash Algorithm Negotiation Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the digital signature authentication method (see RFC7427) and support signature hash algorithm negotiation.</p>
+<p>If this parameter is set to ENABLE, the digital signature authentication method is used, signature hash algorithm negotiation is supported, and the base station sends a SIGNATURE_HASH_ALGORITHMS notification packet when initiating negotiation. If this parameter is set to DISABLE, the digital signature authentication method is not used, signature hash algorithm negotiation is not supported, and the eNodeB does not send SIGNATURE_HASH_ALGORITHMS notification packets when initiating negotiation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPROPOSAL-RSAPadding.html">RSA Padding</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSA padding mode when the digital signature authentication method (see RFC7427) is used.</p>
+<p>If this parameter is set to PKCS1V15, the RSASSA_PKCS1V15 padding mode is used for RSA signatures. If this parameter is set to PSS, the RSASSA_PSS padding mode is used for RSA signatures.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IKEPROPOSAL__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IKEPROPOSAL__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPROPOSAL-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cabinet number of the board that adopts the IKE security proposal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPROPOSAL-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the subrack number of the board that adopts the IKE security proposal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPROPOSAL-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the slot number of the board that adopts the IKE security proposal.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,712 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add SCTP Link (ADD SCTPLNK)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_sctplnk">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add SCTP Link (ADD SCTPLNK)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_sctplnk"></a><a name="add_sctplnk"></a>
+
+
+<h1 class="topictitle1">Add SCTP Link (ADD SCTPLNK)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS5900, BTS5900 WCDMA, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="add_sctplnk__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an SCTP link.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_sctplnk__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]In the same routing domain, each IPv4 SCTP link must have a unique combination of the following parameters: the first or second local IP address (not set to 0.0.0.0), the first or second peer IP address (not set to 0.0.0.0), local SCTP port number, and peer SCTP port number.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]In IPv4 scenarios, before running this command, ensure that a route to the peer IP address has been added by running the <a href="add_iprt.html">ADD IPRT</a>, or <a href="add_iproute4.html">ADD IPROUTE4</a>, or <a href="add_srciprt.html">ADD SRCIPRT</a>, or <a href="add_srciproute4.html">ADD SRCIPROUTE4</a> command.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The first and second local IP addresses of an SCTP link must be configured in the same subrack. If they are configured on different boards, the value of Subboard Type must be BASE_BOARD, and the port type must be ETH, ETHTRK, or LOOPINT.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]If the local and peer IP addresses of an SCTP link are set to valid IP addresses and the two local IP addresses are on the same board, the base station does not make cross-link attempts. That is, the base station does not support the SCTP link between the first local IP address and the second peer IP address or the link between the second local IP address and the first peer IP address. The base station makes cross-link attempts only when the two local IP addresses are valid and are configured on different boards. This requires that the peer device should support this multi-homing mode.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]An SCTP packet can be divided into at most two fragments. If MTU is set to a small value, packet reassembly fails. Therefore, it is recommended that MTU be set to a value greater than 600.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]In the same routing domain, PEERIP for a remote maintenance channel must be different from LOCIP and SECLOCIP for an IPv4 SCTP link.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]In the same routing domain, before adding an SCTP link, ensure that either of the following is true:</p>
+<p>-An MLPPP group or PPP link has been configured.</p>
+<p>-LOCIP or SECLOCIP of the expected SCTP link is the same as IP of a DEVIP MO or an IPADDR4 MO, LOCALIP of an existing MLPPP group, or LOCALIP of an existing PPP link.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The BS uses the first local IP address and the first and second peer IP addresses for SCTP multi-homing when the following conditions are met:</p>
+<p>-The first local IP address of the SCTP link and the first and second peer IP addresses are valid.</p>
+<p>-The second local IP address is set to 0.0.0.0.</p>
+<p>This is true when the peer device supports SCTP multi-homing.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The BS uses the first and second local IP addresses and the first peer IP address for SCTP multi-homing when the following conditions are met:</p>
+<p>-The first and second local IP addresses of the SCTP link and the first peer IP address are valid.</p>
+<p>-The second peer IP address is set to 0.0.0.0.</p>
+<p>This is true when the peer device supports SCTP multi-homing.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]System specifications: If the WMPT is the main control board, a maximum of 20 SCTP links can be configured. If the LMPT is the main control board, a maximum of 112 SCTP links can be configured. If the GTMUb/GTMUc is the main control board, a maximum of 4 SCTP links can be configured. If the UMPTa/UMPTb/UMDU is the main control board, a maximum of 1024 SCTP links can be configured, but only a maximum of 384 SCTP links can take effect. If the UMPTe/UMPTg/UMPTga is the main control board, a maximum of 1024 SCTP links can be configured.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]Board specifications: A maximum number of 384 SCTP links can take effect on a UMDU. If the UMPTa/UMPTb is the main control board, a maximum of 384 SCTP links can take effect on a UMPTa/UMPTb/UTRPc/UCCU/LMPT/GTMUb/GTMUc/UTRP (subboard type: UEOC/UQEC/UIEC/UAEC)/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. If the UMPTe is the main control board, a maximum of 1024 SCTP links can take effect on a UMPTa/UMPTb/UMPTe/UTRPc/UCCU/LMPT/GTMUb/GTMUc/UTRP (subboard type: UEOC/UQEC/UIEC/UAEC)/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. If the UMPTg/UMPTga is the main control board, a maximum of 1024 SCTP links can take effect on a UMPTa/UMPTb/UMPTe/UMPTg/UMPTga/UTRPc/UCCU/LMPT/GTMUb/GTMUc/UTRP (subboard type: UEOC/UQEC/UIEC/UAEC)/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. If the LMPT is the main control board, a maximum of 112 SCTP links can take effect on an LMPT/UTRPc. If the WMPT is the main control board, a maximum of 20 SCTP links can take effect on a WMPT/UTRPc/UTRP (subboard type: UEOC/UQEC/UIEC/UAEC). If the GTMUb/GTMUc is the main control board, a maximum of 4 SCTP links can take effect on a GTMUb/GTMUc/UTRPc.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]If two SCTP links have the same local port number, their local IP addresses must be totally the same or totally different. In the latter case, their local IP address pairs cannot overlap.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]A UMPTa/UMPTb/UMDU/UTRPc supports associations among a maximum of 384 SCTP links. A UMPTe/UMPTg/UMPTga supports associations among a maximum of 1024 SCTP links. A UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9 supports associations among a maximum of 300 SCTP links. An LMPT supports associations among a maximum of 112 SCTP links. A WMPT supports associations among a maximum of 20 SCTP links. A UTRP supports associations among a maximum of 20 SCTP links. A GTMUb/GTMUc supports associations among a maximum of 4 SCTP links.</p>
+</li><li><p>[NodeB,eGBTS,eNodeB,gNodeB]In the same routing domain, if the first and second peer IP addresses of an SCTP link are different from the peer IPv4 address in the BLKSCTPPEERIPV4 object and the value of Block Flag for the SCTP link is UNBLOCK, the SCTP link is unblocked. In the same routing domain, if the first or second peer IP address of an SCTP link is the same as the peer IPv4 address in the BLKSCTPPEERIPV4 object or the value of Block Flag for the SCTP link is BLOCK, the SCTP link is blocked.</p>
+</li><li><p>[NodeB,eGBTS,eNodeB,gNodeB]In the same routing domain, if the first and second peer IPv6 addresses of an SCTP link are different from the peer IPv6 address in the BLKSCTPPEERIPV6 object and the value of Block Flag for the SCTP link is UNBLOCK, the SCTP link is unblocked. In the same routing domain, if the first or second peer IPv6 address of an SCTP link is the same as the peer IPv6 address in the BLKSCTPPEERIPV6 object or the value of Block Flag for the SCTP link is BLOCK, the SCTP link is blocked.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]The IPv6 SCTP link cannot be manually configured.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]In IPv6 scenarios, before running this command, ensure that a route to the peer IPv6 address has been added by running the <a href="add_iproute6.html">ADD IPROUTE6</a>, or <a href="add_srciproute6.html">ADD SRCIPROUTE6</a> command.</p>
+</li><li><p>[NodeB,eNodeB]In the same routing domain the value of PEERIP for a multi-link PPP group must be different from the values of LOCIP and SECLOCIP for an IPv4 SCTP link. In the same routing domain the value of PEERIP for a PPP link must be different from the values of LOCIP and SECLOCIP for an IPv4 SCTP link.</p>
+</li><li><p>[Co-MPT,eNodeB]When the local ip and peer ip for inside sctplnk is configured on the loopback interface, the corresponding port failure will cause the SCTP link fault.</p>
+</li><li><p>[Co-MPT,eGBTS]Because the processing capability of the GTMUb/GTMUc is limited, protocols for SCTP links configured on this board are processed by the main control board. If SCTP links are configured only on the GTMUb/GTMUc, its SCTP specifications are the same as those on the corresponding main control board. If SCTP links are configured on both the GTMUb/GTMUc and main control board, the SCTP specifications on the GTMUb/GTMUc are the same as those on the corresponding main control board.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_sctplnk__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SctpLnkNo.html">SCTPNO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Link No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the SCTP link. The value of SCTPNO in the SCTPLNK MOs configured by users ranges from 0 to 65535. The value of SCTPNO in the SCTPLNK MOs configured by the system ranges from 70000 to 79999.</p>
+<p>GUI Value Range: 0~65535,70000~79999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535,70000~79999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The value of Link No. in a manually configured SCTPLNK MO must range from 0 to 65535.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the SCTP link.</p>
+<p>Disuse statement: This parameter will be deleted in later versions (this parameter can be configured but does not take effect). Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the SCTP link.</p>
+<p>Disuse statement: This parameter will be deleted in later versions (this parameter can be configured but does not take effect). Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the SCTP link.</p>
+<p>Disuse statement: This parameter will be deleted in later versions (this parameter can be configured but does not take effect). Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 7</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-MaxStream.html">MAXSTREAM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximum Stream No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum stream number of the SCTP link.</p>
+<p>GUI Value Range: 1~34</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~34</p>
+<p>MML Default Value: 17</p>
+<p>Recommended Value: 17</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-IPVersion.html">IPVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP protocol version.</p>
+<p>GUI Value Range: IPv4(IPv4), IPv6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPv4, IPv6</p>
+<p>MML Default Value: IPv4(IPv4)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]The value of <strong>IPVERSION</strong> in an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE cannot be set to IPv6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-LocIP.html">LOCIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First Local IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the first local IP address of the SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>LOCIP</strong> parameter in the <strong>SCTPLNK</strong> MO must be a valid IP address of Class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP</strong>, <strong>SECLOCIP</strong>, <strong>PEERIP</strong>, and <strong>SECPEERIP</strong> must be mutually different except that <strong>SECLOCIP</strong> and <strong>SECPEERIP</strong> are both set to 0.0.0.0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SecLocIP.html">SECLOCIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second Local IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the second local IP address of the SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0.0.0.0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO must be a valid IP address of Class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x, but can be set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP</strong>, <strong>SECLOCIP</strong>, <strong>PEERIP</strong>, and <strong>SECPEERIP</strong> must be mutually different except that <strong>SECLOCIP</strong> and <strong>SECPEERIP</strong> are both set to 0.0.0.0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-LocIP6.html">LOCIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First Local IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the first local IPv6 address of an IPv6 SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP6</strong>, <strong>SECLOCIP6</strong>, <strong>PEERIP6</strong>, and <strong>SECPEERIP6</strong> must be mutually different except that <strong>SECLOCIP6</strong> and <strong>SECPEERIP6</strong> are both set to 0:0:0:0:0:0:0:0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SecLocIP6.html">SECLOCIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second Local IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the second local IPv6 address of an IPv6 SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0:0:0:0:0:0:0:0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP6</strong>, <strong>SECLOCIP6</strong>, <strong>PEERIP6</strong>, and <strong>SECPEERIP6</strong> must be mutually different except that <strong>SECLOCIP6</strong> and <strong>SECPEERIP6</strong> are both set to 0:0:0:0:0:0:0:0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-LocPort.html">LOCPORT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local SCTP Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local port number of the SCTP link.</p>
+<p>GUI Value Range: 1024~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1024~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-PeerIP.html">PEERIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First Peer IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the first peer IP address of the SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PEERIP</strong> in the <strong>SCTPLNK</strong> MO must be a valid IP address of Class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP</strong>, <strong>SECLOCIP</strong>, <strong>PEERIP</strong>, and <strong>SECPEERIP</strong> must be mutually different except that <strong>SECLOCIP</strong> and <strong>SECPEERIP</strong> are both set to 0.0.0.0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SecPeerIP.html">SECPEERIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second Peer IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the second peer IP address of the SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0.0.0.0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SECPEERIP</strong> in the <strong>SCTPLNK</strong> MO must be a valid IP address of Class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x, but can be set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP</strong>, <strong>SECLOCIP</strong>, <strong>PEERIP</strong>, and <strong>SECPEERIP</strong> must be mutually different except that <strong>SECLOCIP</strong> and <strong>SECPEERIP</strong> are both set to 0.0.0.0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-PeerIP6.html">PEERIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First Peer IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the first peer IPv6 address of an IPv6 SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP6</strong>, <strong>SECLOCIP6</strong>, <strong>PEERIP6</strong>, and <strong>SECPEERIP6</strong> must be mutually different except that <strong>SECLOCIP6</strong> and <strong>SECPEERIP6</strong> are both set to 0:0:0:0:0:0:0:0.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>PEERIP6</strong> must be set to a globally scoped unicast address.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SecPeerIP6.html">SECPEERIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second Peer IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the second peer IPv6 address of an IPv6 SCTP link.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0:0:0:0:0:0:0:0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>LOCIP6</strong>, <strong>SECLOCIP6</strong>, <strong>PEERIP6</strong>, and <strong>SECPEERIP6</strong> must be mutually different except that <strong>SECLOCIP6</strong> and <strong>SECPEERIP6</strong> are both set to 0:0:0:0:0:0:0:0.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>SECPEERIP6</strong> must be set to a globally scoped unicast address.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-PeerPort.html">PEERPORT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peer SCTP Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peer port number of the SCTP link.</p>
+<p>GUI Value Range: 1024~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1024~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-RtoMin.html">RTOMIN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RTO Min Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum RTO value for an SCTP link. A smaller value of this parameter indicates a shorter period required for checking link connectivity. The new RTO ranges from the minimum RTO value to the maximum RTO value.</p>
+<p>GUI Value Range: 10~59999</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 10~59999</p>
+<p>MML Default Value: 1000</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>RTOINIT</strong> must be greater than or equal to <strong>RTOMIN</strong> and less than <strong>RTOMAX</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-RtoMax.html">RTOMAX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RTO Max Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum RTO value of an SCTP link. A larger value indicates a longer period required for checking link connectivity.</p>
+<p>GUI Value Range: 11~60000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 11~60000</p>
+<p>MML Default Value: 3000</p>
+<p>Recommended Value: 3000</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>RTOINIT</strong> must be greater than or equal to <strong>RTOMIN</strong> and less than <strong>RTOMAX</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-RtoInit.html">RTOINIT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RTO Initial Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the initial RTO value of an SCTP link. A larger value indicates a longer period required for checking link connectivity.</p>
+<p>GUI Value Range: 10~59999</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 10~59999</p>
+<p>MML Default Value: 1000</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>RTOINIT</strong> must be greater than or equal to <strong>RTOMIN</strong> and less than <strong>RTOMAX</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-RtoAlpha.html">RTOALPHA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RTO Alpha Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RTO alpha value of an SCTP link. A larger value indicates less sensitivity to the link delay.</p>
+<p>GUI Value Range: 1~99</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0.01~0.99, step: 0.01</p>
+<p>MML Default Value: 12</p>
+<p>Recommended Value: 12</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-RtoBeta.html">RTOBETA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RTO Beta Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RTO beta value of an SCTP link. A larger value indicates more sensitivity to the link delay.</p>
+<p>GUI Value Range: 1~99</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~99</p>
+<p>MML Default Value: 25</p>
+<p>Recommended Value: 25</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-HBInter.html">HBINTER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Heart-beat Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the heartbeat interval for an SCTP link. The heartbeat check is independently initiated by each end of an association and then confirmed by the peer end through the HB ACK packet. When no services are carried, a link disconnection is determined if the number of heartbeat check attempts reaches the maximum retransmission attempts on an association but the HB ACK packet is not received from the peer end.</p>
+<p>GUI Value Range: 1000~60000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1000~60000</p>
+<p>MML Default Value: 5000</p>
+<p>Recommended Value: 5000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-MaxAssocRetr.html">MAXASSOCRETR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max Association Retransmission</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of retransmissions for the SCTP association. When the number of retransmissions for the association exceeds the value of this parameter, the SCTP link is disconnected and a link failure alarm is reported.</p>
+<p>GUI Value Range: 2~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2~254</p>
+<p>MML Default Value: 10</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>MAXASSOCRETR</strong> must be greater than <strong>MAXPATHRETR</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-MaxPathRetr.html">MAXPATHRETR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max Path Retransmission</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of retransmissions over a path. When the number of retransmissions over a path exceeds the value of this parameter, the path is regarded as failed if no heartbeat acknowledgment is received. If multiple paths are used, path switching is automatically performed.</p>
+<p>GUI Value Range: 1~253</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~253</p>
+<p>MML Default Value: 5</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>SCTPLNK</strong> MO, <strong>MAXASSOCRETR</strong> must be greater than <strong>MAXPATHRETR</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-ChkSumType.html">CHKSUMTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Checksum Algorithm Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of checksum algorithm. The checksum algorithms at both ends of an SCTP link must be the same.</p>
+<p>GUI Value Range: ALDER32(ALDER32), CRC32(CRC32)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ALDER32, CRC32</p>
+<p>MML Default Value: CRC32(CRC32)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SwitchBackFlag.html">AUTOSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Switch Back Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the SCTP link switches back to the primary path when it is restored and reachable. If the primary path is not reachable, the SCTP link switches to the secondary path. When this parameter is set to ENABLE, the SCTP link switches to the primary path if the primary path is restored and reachable. When this parameter is set to DISABLE and the primary path is restored and reachable, the SCTP link does not switch back to the primary path if the secondary path is also reachable, and the SCTP link switches back to the primary path if the secondary path is unreachable.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: ENABLE(Enable)</p>
+<p>Recommended Value: ENABLE(Enable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-SwitchBackHBNum.html">SWITCHBACKHBNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Heart-beat Times When Switch Back</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of heartbeats to be detected before the transmission switches back to the primary path. After the primary path is restored, the transmission switches back to the primary path when the number of heartbeats detected reaches this value.</p>
+<p>GUI Value Range: 1~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~254</p>
+<p>MML Default Value: 10</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-Tsack.html">TSACK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SACK Timeout</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time interval that one end of an SCTP link has to wait before it can send an SACK message in response to the reception of data. A larger value of this parameter indicates a longer time interval between the reception of data and the sending of the corresponding SACK message.</p>
+<p>GUI Value Range: 10~500</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 10~500</p>
+<p>MML Default Value: 200</p>
+<p>Recommended Value: 200</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-Description.html">DESCRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Description Info</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peer description information of the SCTP link.</p>
+<p>GUI Value Range: 0~67 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~67 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SCTPLNK-MaxSctpPduSize.html">MAXSCTPPDUSIZE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximum SCTP PDU Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum size of an IPv4 SCTP PDU (Protocol Data Unit). It specifies the maximum length of an SCTP PDU (excluding the IP header) transmitted on an SCTP link. If the value of this parameter is greater than the size of the IP layer MTU of the base station or intermediate transmission equipment, SCTP packets are fragmented at the IP layer. This causes a large number of fragments and affects the transmission efficiency of the intermediate transmission equipment.</p>
+<p>GUI Value Range: 580~1480</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 580~1480</p>
+<p>MML Default Value: 1464</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a value too large, a large number of packets are fragmented or lost on the transmission network. As a result, the transmission delay increases and the performance deteriorates. If this parameter is set to a value too small, the valid transmission payload decreases and the transmission network bandwidth cannot be effectively used. As a result, the transmission delay increases and the transmission performance deteriorates.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_sctplnk__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an SCTP link with the parameters as follows: Link No.: 0, IP Version:IPv4, First Local IP Address: 192.168.1.1, Local SCTP Port No.: 1024, First Peer IP Address: 192.168.1.2, Peer SCTP Port No.: 1024, Switch Back Flag: ENABLE, run the following command:
+ADD SCTPLNK: SCTPNO=0, IPVERSION=IPv4, LOCIP="192.168.1.1", SECLOCIP="0.0.0.0", LOCPORT=1024, PEERIP="192.168.1.2", SECPEERIP="0.0.0.0", PEERPORT=1024, AUTOSWITCH=ENABLE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

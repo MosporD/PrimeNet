@@ -1,0 +1,153 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Activate Configuration Data (ACT CFGFILE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="act_cfgfile">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Activate Configuration Data (ACT CFGFILE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="act_cfgfile"></a><a name="act_cfgfile"></a>
+
+
+<h1 class="topictitle1">Activate Configuration Data (ACT CFGFILE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="act_cfgfile__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to activate a configuration file. After the configuration file is successfully activated, configuration data in this file is used as system configuration. The configuration file to be activated can be the minimum configuration file that is issued with the NE software or the configuration file that matches with the NE version software backed up in the system or downloaded from the MAE.</p>
+</div></div>
+
+<div class="mmlnote"><a name="act_cfgfile__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>When a configuration file is activated repeatedly without any modification on the configuration file, a message indicating operation success is displayed after the command is executed, but the file is not activated again.</p>
+</li><li><p>The configurations of different software versions are incompatible with each other. Therefore, you can only activate the configuration file that is backed up on the current version software. The configuration takes effect during the system initialization after reset. If an incompatible configuration file is activated, the system initialization fails, and therefore the system configuration is restored to the status before activation.</p>
+</li><li><p>Execution of this command will increase the CPU usage, and CPU overload may affect UE access. Therefore, it is recommended that you run this command when the system has a light load.</p>
+</li><li><p>After a base station is reset, the system checks the validity of a file to be activated. If the file is invalid, the system restores its pre-activation configurations.</p>
+</li><li><p>After this command is executed, the current configuration data is overwritten, which may interrupt the connection with the client. It is recommended that you determine whether to enable the automatic configuration data rollback function depending on scenarios. For details, see the help of the <a href="cfm_cb.html">CFM CB</a> command.</p>
+</li><li><p>Execution of this command will delete all configuration files that are not activated.</p>
+</li><li><p>The value of the PRODUCTTYPE parameter can be changed only for main control boards supporting multimode concurrency. If the PRODUCTTYPE parameter is not specified, the system uses the current site type by default.</p>
+</li><li><p>If the EFT parameter is set to AFTER_RESET, the NE is not reset immediately. After the command is executed, all configuration operations fail. If the NE is not reset within 10 minutes, ALM-26245 Configuration Data Inconsistency will be reported. If the EFT parameter is set to IMMEDIATELY, the NE is reset immediately so that the configuration takes effect. If the services of the peer mode are set up on a local board that is to be reset, the peer services are unavailable when the board is being reset.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="act_cfgfile__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RCVMODE-MODE.html">MOD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start mode of configuration activation.</p>
+<p>GUI Value Range: LEAST(Least Mode), XML(XML Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LEAST, XML</p>
+<p>MML Default Value: XML(XML Mode)</p>
+<p>Recommended Value: XML (XML mode)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RCVMODE-EFFECTFLAG.html">EFT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Effect Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode in which the configuration takes effect. If this parameter is set to AFTER_RESET(After Reset), the configuration takes effect after boards are reset, which does not occur immediately after this command is executed. In this case, configuration operations are not allowed until the boards are reset manually or through other commands (for example, RST BRD and ACT SOFTWARE). If this parameter is set to IMMEDIATELY, the board is immediately reset.</p>
+<p>GUI Value Range: IMMEDIATELY(Immediately), AFTER_RESET(After Reset)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IMMEDIATELY, AFTER_RESET</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: IMMEDIATELY(Immediately)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RCVMODE-PRODUCTTYPE.html">PRODUCTTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Product Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of base station. When you run the ACT CFGFILE command with Mode set to LEAST and Effect Type set to IMMEDIATELY, the minimum configuration file is used during the base station startup and the value of this parameter is changed to a specified type of base station after the base station is reset.</p>
+<p>GUI Value Range: DBS3900_LTE(DBS3900_LTE), BTS3900_LTE(BTS3900_LTE), BTS3900A_LTE(BTS3900A_LTE), BTS3900L_LTE(BTS3900L_LTE), BTS3900AL_LTE(BTS3900AL_LTE), DBS3900_LampSite_LTE(DBS3900_LampSite_LTE), DBS3900_WCDMA(DBS3900_WCDMA), BTS3900_WCDMA(BTS3900_WCDMA), BTS3900A_WCDMA(BTS3900A_WCDMA), BTS3900L_WCDMA(BTS3900L_WCDMA), BTS3900AL_WCDMA(BTS3900AL_WCDMA), DBS3900_LampSite_WCDMA(DBS3900_LampSite_WCDMA), DBS3900(DBS3900), BTS3900(BTS3900), BTS3900A(BTS3900A), BTS3900L(BTS3900L), BTS3900AL(BTS3900AL), DBS3900_5G(DBS3900_5G), DBS3900_LampSite(DBS3900_LampSite), DBS3900_LampSite_5G(DBS3900_LampSite_5G), DBS5900_LTE(DBS5900_LTE), BTS5900_LTE(BTS5900_LTE), BTS5900A_LTE(BTS5900A_LTE), BTS5900L_LTE(BTS5900L_LTE), BTS5900AL_LTE(BTS5900AL_LTE), DBS5900_LampSite_LTE(DBS5900_LampSite_LTE), DBS5900_WCDMA(DBS5900_WCDMA), BTS5900_WCDMA(BTS5900_WCDMA), BTS5900A_WCDMA(BTS5900A_WCDMA), BTS5900L_WCDMA(BTS5900L_WCDMA), BTS5900AL_WCDMA(BTS5900AL_WCDMA), DBS5900_LampSite_WCDMA(DBS5900_LampSite_WCDMA), DBS5900(DBS5900), BTS5900(BTS5900), BTS5900A(BTS5900A), BTS5900L(BTS5900L), BTS5900AL(BTS5900AL), DBS5900_LampSite(DBS5900_LampSite), DBS5900_5G(DBS5900_5G), DBS5900_LampSite_5G(DBS5900_LampSite_5G), DBS3900_DCU(DBS3900_DCU), DBS5900_DCU(DBS5900_DCU)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DBS3900_LTE, BTS3900_LTE, BTS3900A_LTE, BTS3900L_LTE, BTS3900AL_LTE, DBS3900_LampSite_LTE, DBS3900_WCDMA, BTS3900_WCDMA, BTS3900A_WCDMA, BTS3900L_WCDMA, BTS3900AL_WCDMA, DBS3900_LampSite_WCDMA, DBS3900, BTS3900, BTS3900A, BTS3900L, BTS3900AL, DBS3900_5G, DBS3900_LampSite, DBS3900_LampSite_5G, DBS5900_LTE, BTS5900_LTE, BTS5900A_LTE, BTS5900L_LTE, BTS5900AL_LTE, DBS5900_LampSite_LTE, DBS5900_WCDMA, BTS5900_WCDMA, BTS5900A_WCDMA, BTS5900L_WCDMA, BTS5900AL_WCDMA, DBS5900_LampSite_WCDMA, DBS5900, BTS5900, BTS5900A, BTS5900L, BTS5900AL, DBS5900_LampSite, DBS5900_5G, DBS5900_LampSite_5G, DBS3900_DCU, DBS5900_DCU</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="act_cfgfile__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To activate the xml file of configuration data with the parameters as follows: Effect Type: IMMEDIATELY, run the following command:
+ACT CFGFILE: EFT=IMMEDIATELY;
+The result is shown as follows:
++++    0        2014-02-11 17:19:02
+O&amp;M    #1852
+%%ACT CFGFILE: EFT=IMMEDIATELY;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Activate
+     Status  =  Success
+ Session ID  =  65743
+
+---    END
+
+Example 2: To activate the xml file of configuration data with the parameters as follows: Effect Type: AFTER_RESET, run the following command:
+ACT CFGFILE: EFT=AFTER_RESET;
+The result is shown as follows:
++++    0        2014-02-11 17:19:40
+O&amp;M    #1852
+%%ACT CFGFILE: EFT=AFTER_RESET;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Activate
+     Status  =  Success
+ Session ID  =  65744
+
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,105 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="Transmission Security MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of IEEE 802.1X-based access control, IPsec, packet filtering, and IP attack defense policy. It also provides the managed object model (MOM) view of and the managed objects (MOs) related to transmission security.">
+<meta name="description" content="This section describes the functions and concepts of IEEE 802.1X-based access control, IPsec, packet filtering, and IP attack defense policy. It also provides the managed object model (MOM) view of and the managed objects (MOs) related to transmission security.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../comm/mom/trans-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Trans-Security">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Transmission Security MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Trans-Security"></a><a name="Trans-Security"></a>
+
+
+<h1 class="topictitle1">Transmission Security MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of IEEE 802.1X-based access control<span>, IPsec</span>, packet filtering, and IP attack defense policy. It also provides the managed object model (MOM) view of and the managed objects (MOs) related to transmission security.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p><strong>IEEE 802.1X-based Access Control</strong></p>
+<div class="p">IEEE 802.1X-based access control involves the following: <ul><li>Authentication client (a device to be authenticated): initiates an IEEE 802.1X-based access control procedure.</li><li>Authentication access equipment (such as a LAN switch): receives and transmits authentication messages between base stations and the authentication server at the MAC layer.</li><li>Authentication server: performs authentication on clients by using various authentication mechanisms or methods. In an LTE system, a commonly used authentication server is a Remote Authentication Dial-In User Service (RADIUS) server.
+ </li></ul>
+In IEEE 802.1X-based access control, Extensible Authentication Protocol over LAN (EAPoL) messages, which contain digital certificates of a base station, are transmitted to the RADIUS server. The RADIUS server performs authentication on the base station by using a Huawei-issued root certificate configured on the server. After the authentication server authenticates the base station and authorizes the controlled port, data can pass through the controlled port in the authorized state. This ensures that only authorized users can access the network. For details on digital certificates, see <a href="Trans-PKI.html">PKI MOM Description</a>. </div>
+<p><strong>IPsec</strong></p>
+<div class="p">IPsec is a security scheme in which operators define security policies. A security policy specifies a type of packets that need to be protected and how they should be protected. By sharing security policies, the base station can communicate with the peer end in secure mode. Concepts related to IPsec are described as follows:<ul><li>Access control list (ACL) rule and ACL<ul><li>An ACL rule defines a type of IP packets that need to be protected. The base station determines the packets to be protected according to ACL rules.</li><li>ACL rules are arranged into ACLs for convenient management. One ACL may contain multiple ACL rules. </li></ul>
+</li><li>IPv6 access control list (ACL6) rule and ACL6<ul><li>An ACL6 rule defines a type of IPv6 packets that need to be protected. The base station determines the packets to be protected according to ACL6 rules.</li><li>ACL6 rules are arranged into ACL6s for convenient management. One ACL6 may contain multiple ACL6 rules. </li></ul>
+</li><li>IPsec policy and IPsec security association (SA)<ul><li>An IPsec policy defines the protection mechanism that is used to protect a type of packets.</li><li>The base station shares an IPsec policy with the peer end by establishing an IPsec SA during an Internet Key Exchange (IKE) negotiation. An IPsec SA is a logical connection and has a lifetime. </li></ul>
+</li><li>IKE is a protocol used by the local and peer ends to establish SAs and perform identity authentication.<ul><li>IKE SAs support two status detection mechanisms: keep-alive detection and dead peer detection (DPD). In keep-alive detection, detection packets are sent periodically. In DPD, detection packets are sent only when there is no IPsec traffic. If a base station is configured with both keep-alive detection and DPD, only keep-alive detection takes effect. </li><li>There are two methods of identity authentication: digital-certificate-based authentication and PSK-based authentication. PSK is short for pre-shared key. For details on digital-certificate-based authentication, see <a href="Trans-PKI.html">PKI MOM Description</a>. For details on PSK-based authentication, see <em>Transmission Security Overview</em>. </li></ul>
+</li></ul>
+</div>
+<p><strong>Packet Filtering</strong></p>
+<p>Packet filtering is a process in which a base station accepts or discards packets according to ACL/ACL6 rules. This prevents unauthorized users from accessing the base station and implements the firewall function.</p>
+<div class="p">Both IPsec and packet filtering use ACL/ACL6 rules but for different purposes.<ul><li>In IPsec, ACL/ACL6 rules are used to determine whether outgoing packets are allowed to enter the IPsec tunnel. Only the packets allowed to enter the IPsec tunnel are encrypted. </li><li>In packet filtering, ACL/ACL6 rules are used to determine whether incoming packets are allowed to be received by a base station. If they are not allowed to be received, the base station discards them.</li></ul>
+</div>
+<p><strong>IP Attack Defense Policy</strong></p>
+<div class="p">An IP attack defense policy specifies the global configuration related to Address Resolution Protocol (ARP) spoofing, strict ARP learning, illegal packet detection, and neighbor discovery (ND) spoofing. <ul><li>In ARP spoofing, an attacker maliciously tampers with the ARP table on equipment by using ARP spoofing packets, and user packets cannot be forwarded.</li><li>In strict ARP learning, a base station learns only the ARP request packets sent by itself and the ARP response packets sent by the peer end.</li><li>Illegal packets refer to the packets filtered out in packet filtering.</li><li>In ND spoofing, an attacker maliciously tampers with the ND table on equipment by using ND spoofing packets, and user packets cannot be forwarded.</li></ul>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Trans-Security__fig1">Figure 1</a> and <a href="#Trans-Security__fig2">Figure 2</a> show the transmission security MOMs.<div class="fignone" id="Trans-Security__fig1"><a name="Trans-Security__fig1"></a><a name="fig1"></a><span class="figcap"><b>Figure 1 </b>Transmission security MOM in the old model</span>
+
+<br><span><img src="../image/mom/Transmission%20security%20MOM-Oldmodel.png"></span><br>
+</div>
+<div class="fignone" id="Trans-Security__fig2"><a name="Trans-Security__fig2"></a><a name="fig2"></a><span class="figcap"><b>Figure 2 </b>Transmission security MOM in the new model</span>
+
+<br><span><img src="../image/mom/Transmission%20security%20MOM-Newmodel.png"></span></div>
+</div>
+<div class="p">Setting up an IPsec tunnel involves the following MOs, as shown in <a href="#Trans-Security__fig5">Figure 3</a>:<ul><li>MOs related to ACL include ACL/ACL6 and ACLRULE/ACLRULE6.</li><li>MOs related to IKE include IKEPROPOSAL, IKEPEER, and IKECFG.</li><li>MOs related to IPsec SA include IPSECPROPOSAL, IPSECPOLICY, IPSECBIND (in the old model), IPSECBINDITF (in the new model), and IPSECDTNL.</li></ul>
+</div>
+<div class="p"><div class="fignone" id="Trans-Security__fig5"><a name="Trans-Security__fig5"></a><a name="fig5"></a><span class="figcap"><b>Figure 3 </b>Relationships among MOs related to IPsec</span>
+
+<br><span><img src="../image/mom/Transmission-security-figure3-3.png"></span>
+</div>
+</div>
+<p><a href="../mo/ETHPORT.html">ETHPORT</a> defines an Ethernet port. This MO includes parameters such as the speed, duplex mode, port attribute, ARP proxy flag, and MTU. It also includes information about the loopback status and statistics of received and transmitted packets. The duplex mode and port attribute must be negotiated with the peer end.</p>
+<p><strong>MOs Related to IEEE 802.1X-based Access Control</strong></p>
+<div class="p">MOs related to IEEE 802.1X-based access control are described as follows:<ul><li><a href="../mo/DOT1X.html">DOT1X</a> (in the old model)/<a href="../mo/DOT1XAUTH.html">DOT1XAUTH</a> (in the new model) defines the parameters required for IEEE 802.1X-based authentication for base stations. When a base station accesses a network supporting the IEEE 802.1X protocol, IEEE 802.1X-based access control is performed based on the parameter settings.</li></ul>
+</div>
+<p><strong>MOs Related to IPsec</strong></p>
+<div class="p">MOs related to ACL define the types of packets that need to be protected. These MOs are described as follows:<ul><li><a href="../mo/ACLRULE.html">ACLRULE</a>/<a href="../mo/ACLRULE6.html">ACLRULE6</a> defines an ACL rule. An ACL rule determines a type of IP packets that need to be protected. <a href="../mo/ACLRULE.html">ACLRULE</a> is the MO used in IPv4 transmission. <a href="../mo/ACLRULE6.html">ACLRULE6</a> is the MO used in IPv6 transmission.</li><li><a href="../mo/ACL.html">ACL</a>/<a href="../mo/ACL6.html">ACL6</a> defines an ACL. An ACL contains one or more ACL rules. <a href="../mo/ACL.html">ACL</a> is the MO used in IPv4 transmission. <a href="../mo/ACL6.html">ACL6</a> is the MO used in IPv6 transmission.</li></ul>
+</div>
+<div class="p">MOs related to IKE define the local parameters, algorithms, and common parameters for IKE interactions. These MOs are described as follows:<ul><li><a href="../mo/IKECFG.html">IKECFG</a> defines the common parameters used in IKE interactions between the base station and peer end.</li><li><a href="../mo/IKEPROPOSAL.html">IKEPROPOSAL</a> defines an IKE proposal, which includes the algorithms used in IKE interactions.</li><li><a href="../mo/IKEPEER.html">IKEPEER</a> defines an IKE peer and consists of interconnection parameters used in IKE interactions between the base station and the peer end.</li></ul>
+</div>
+<div class="p">MOs related to IPsec SA define the ACL index, IKE peer index, and IPsec proposal index for an IPsec tunnel, and the physical port on which a group of IPsec policies take effect. These MOs are described as follows:<ul><li><a href="../mo/IPSECPROPOSAL.html">IPSECPROPOSAL</a> defines an IPsec proposal. This MO includes the encapsulation mode, authentication algorithm, and encryption algorithm used in IPsec interactions. </li><li><a href="../mo/IPSECPOLICY.html">IPSECPOLICY</a> defines an IPsec policy. An IPsec policy specifies the protection mechanism that is used to protect a type of packets. This MO includes an ACL ID, IPsec proposal name, and IKE peer name. Before adding an <a href="../mo/IPSECPOLICY.html">IPSECPOLICY</a> MO, ensure that the <a href="../mo/ACL.html">ACL</a>, <a href="../mo/IPSECPROPOSAL.html">IPSECPROPOSAL</a>, and <a href="../mo/IKEPEER.html">IKEPEER</a> MOs have been configured, which are associated with the<a href="../para/IPSECPOLICY-ACLID.html">ACLID</a>, <a href="../para/IPSECPOLICY-ProposalName.html">PROPNAME</a>, and <a href="../para/IPSECPOLICY-PeerName.html">PEERNAME</a> parameters in the <a href="../mo/IPSECPOLICY.html">IPSECPOLICY</a> MO, respectively. </li><li><a href="../mo/IPSECBIND.html">IPSECBIND</a> (in the old model) defines a binding relationship between an IPsec policy group and a physical port. The MO specifies the physical port where an IPsec policy group is to be used. <a href="../mo/IPSECBIND.html">IPSECBIND</a> is the MO used in IPv4 transmission.</li><li><a href="../mo/IPSECBINDITF.html">IPSECBINDITF</a> (in the new model) defines a binding relationship between an IPsec policy group and an interface. The MO specifies the interface where an IPsec policy group is to be used.</li><li><a href="../mo/IPSECDTNL.html">IPSECDTNL</a> defines the IPsec policies and Bidirectional Forwarding Detection (BFD) sessions for the primary and secondary tunnels in an IPsec tunnel pair. An IPsec tunnel pair consists of two IPsec tunnels between the base station and SeGWs. The tunnel pair enhances reliability of secure transmission between the base station and the core network, EMS, or clock server. If one IPsec tunnel becomes faulty and the other tunnel works properly, the base station automatically switches to the normal tunnel to continue secure transmission with the core network, EMS, or clock server.</li></ul>
+</div>
+<p><strong>MOs Related to Packet Filtering</strong></p>
+<div class="p">MOs related to packet filtering are described as follows:<ul><li><a href="../mo/ACLRULE.html">ACLRULE</a>/<a href="../mo/ACLRULE6.html">ACLRULE6</a> defines an ACL rule. An ACL rule determines a type of IP packets that need to be protected.</li><li><a href="../mo/ACL.html">ACL</a>/<a href="../mo/ACL6.html">ACL6</a> defines an ACL. An ACL contains one or more ACL rules.</li><li><a href="../mo/PACKETFILTER.html">PACKETFILTER</a> defines an IP packet filtering policy. A base station obtains the header information about the packets received or to be transmitted, compares the information with the preset ACL rules, and then forwards or discards the packets according to the packet filtering policy. The header information includes the upper-layer protocol number, the source and destination addresses of each packet, and the source and destination ports of each packet.</li></ul>
+</div>
+<p><strong>IP Attack Defense Policy</strong></p>
+<div class="p">MOs related to IP attack defense policy are described as follows:<ul><li><a href="../mo/IPGUARD.html">IPGUARD</a> defines attack defense policies used at the MAC and IP layers, attack alarm switches, and attack alarm thresholds. </li><li><a href="../mo/FLOODDEFEND.html">FLOODDEFEND</a> defines the flood attack defense function and related alarm parameters. If the local end receives excessive flood packets from the peer end, the local end will spend a large number of resources processing these packets and therefore cannot provide services normally. </li><li><a href="../mo/PINGFILTER.html">PINGFILTER</a> (in the old model)/<a href="../mo/PINGFILTER6.html">PINGFILTER6</a> (in the new model) defines ping filtering entries in whitelist mode (you can ping the network segment or the host specified in this MO on a base station) or in blacklist mode (you cannot ping the network segment or host specified in this MO on a base station). The ping filtering mode can be set by running the SET PINGFILTERMODE command.</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../comm/mom/trans-mom.html" title="This chapter describes the MOMs related to transmission.">Transport MOMs</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

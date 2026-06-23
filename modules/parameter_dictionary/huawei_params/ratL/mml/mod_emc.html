@@ -1,0 +1,180 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify EMC Configuration (MOD EMC)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_emc">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify EMC Configuration (MOD EMC)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_emc"></a><a name="mod_emc"></a>
+
+
+<h1 class="topictitle1">Modify EMC Configuration (MOD EMC)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_emc__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the emergency call configuration.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_emc__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<p>EmcEnable is recommended that this parameter be set to a value in accordance with the actual emergency call capability of the operator.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_emc__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Emc-CnOperatorId.html">CnOperatorId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CN Operator ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the operator. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: This parameter has been set in the network planning, and no optimization is required. It is recommended that this parameter be set to a value in accordance with the actual emergency call capability of the operator.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Emc-EmcEnable.html">EmcEnable</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Emergency call enabled switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the operator supports emergency calls. It is recommended that this parameter be set to a value in accordance with the actual emergency call capability of the operator. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON, the eNodeB identifies emergency UEs and gives them preferential treatment in admission and congestion control. The eNodeB can hand over emergency UEs to a neighboring cell even though the neighboring cell is configured with the handover prohibition flag, is blacklisted, in the handover restriction list, or belongs to a PLMN to which a handover is not allowed. When this parameter is set to OFF, the eNodeB does not identify emergency UEs, and provides the same services for emergency UEs as common UEs.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Emc-EmcEnableInLimitedMode.html">EmcEnableInLimitedMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Emergency call enabled switch in limited mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the operator supports emergency calls initiated by UEs in the limited service state. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON, the eNodeB supports emergency calls initiated by UEs in the limited service state and will notify UEs of this fact using the IE ims-EmergencySupport-r9 with the value true in SIB1 delivered by the eNodeB. When this parameter is set to OFF, the eNodeB does not support such emergency calls and does not deliver the SIB1 containing the IE ims-EmergencySupport-r9. In this case, UEs select or reselect a cell in any RAT that supports such emergency calls and then camp on the cell.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Emc-EmcDedicatedBearerARP.html">EmcDedicatedBearerARP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">The ARP of EMC dedicated bearer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Allocation and Retention Priority (ARP) value of the dedicated bearer for an emergency call. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: In the initial stage of the network planning, the setting of this parameter is consistent with the configurations in the evolved packet core (EPC).</p>
+<p>If the EmcEnable parameter is set to ON and the ARP of a bearer set up by a UE is the same as the EmcDedicatedBearerARP parameter, the eNodeB identifies the UE as an emergency UE. In this case, UE throughput cannot exceed the upper limit that is configured in the EPC, except in admission control, congestion control, and mobility management procedures.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Emc-EmcDefaultBearerARP.html">EmcDefaultBearerARP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">The ARP of EMC default bearer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Allocation and Retention Priority (ARP) value of the default bearer for an emergency call. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: In the initial stage of the network planning, the setting of this parameter is consistent with the configurations in the evolved packet core (EPC).</p>
+<p>If the EmcEnable parameter is set to ON and the ARP of a bearer set up by a UE is the same as the EmcDefaultBearerARP parameter, the eNodeB identifies the UE as an emergency UE. In this case, UE throughput cannot exceed the upper limit that is configured in the EPC, except in admission control, congestion control, and mobility management procedures.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Emc-EmergCallOptimizationSw.html">EmergCallOptimizationSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Emergency Call Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable optimization functions of emergency calls.</p>
+<p>TM_RESTRICTION_DISABLE_SW: Indicates whether to cancel TM mode selection restriction for emergency calls. If this option is selected, emergency calls do not always use TM2 but use the same TM mode as common calls. If this option is deselected, emergency calls always use TM2 in non-single-port scenarios. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: TM_RESTRICTION_DISABLE_SW(TM_RESTRICTION_DISABLE_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TM_RESTRICTION_DISABLE_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: TM_RESTRICTION_DISABLE_SW: If this option is selected, TM mode selection for emergency calls is the same as that of common calls. As a result, the proportion of rank 2 may increase on the network, and the access success rate of emergency UEs may decrease. If this option is deselected, network performance is not affected.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_emc__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To change the value of Emergency call enabled switch to OFF for the operator with CN Operator ID of 0, run the following command:
+MOD EMC: CnOperatorId=0, EmcEnable=OFF;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

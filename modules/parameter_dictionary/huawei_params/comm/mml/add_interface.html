@@ -1,0 +1,384 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Interface (ADD INTERFACE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_interface">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Interface (ADD INTERFACE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_interface"></a><a name="add_interface"></a>
+
+
+<h1 class="topictitle1">Add Interface (ADD INTERFACE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_interface__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an interface.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_interface__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>System specifications: If a UMPTa/UMPTb/UMDU is used as the main control board, a maximum of 300 interfaces can be configured for a base station. If a UMPTe is used as the main control board, a maximum of 512 interfaces can be configured for a base station. If a UMPTg/UMPTga is used as the main control board, a maximum of 640 interfaces can be configured for a base station. If a UMPT/UMDU is used as the main control board, a maximum of 300 interfaces can be manually configured for a base station.</p>
+</li><li><p>Only the LMPT/UMPTa/UMPTb/UMPTe/UMPTg/UMPTga/UMDU/UTRPc board supports VLAN subinterfaces, and each physical port supports a maximum of sixteen VLAN subinterfaces.</p>
+</li><li><p>When the VLAN tagging switch is turned off for a normal interface configured on an Ethernet port or an Ethernet trunk, the normal interface can receive only the packets that do not carry the VLAN ID. When the VLAN tagging switch is turned on, the normal interface can receive all the packets that are not matched with VLAN subinterfaces.</p>
+</li><li><p>When a normal interface is not configured on an Ethernet port or Ethernet trunk port, the value of VLAN Tagged Switch for the port is ENABLE by default.</p>
+</li><li><p>The VLAN ID of the ARP request packet sent by the NE through a VLAN subinterface is the VLAN ID of the VLAN subinterface, and the VLAN priority of the packet is always 7.</p>
+</li><li><p>The VLAN ID and VLAN priority of the ARP request packet sent by the NE through the normal interface are configured according to the configurations of the VLANMAP, VLANCLASS, SUBNETVLAN, and default DSCP2PCPMAP objects.</p>
+</li><li><p>The VLAN ID and VLAN priority of the received ARP request packet are also carried in the ARP response packet sent by the NE.</p>
+</li><li><p>When Port Type is set to ETH or ETHTRK, the ranges of the MTU4 sizes supported by the following boards are: 46 bytes to 1800 bytes for the UMPTa/b, UMDU, LMPT, UCCU, and UTRPc boards; 46 bytes to 1500 bytes for the WMPT, GTMUb, GTMUc, UQEC, and UEOC boards; 46 bytes to 2000 bytes for the UMPTe board, 46 bytes to 9000 bytes for the UMPTg and UMPTga board. When Port Type is set to ETHCI, the range of MTU4 size supported by the UMPT, UMDU, LMPT, UCCU, UTRPc, WMPT, GTMUb, GTMUc, UQEC, and UEOC boards is 46 bytes to 1500 bytes. When this parameter is set to a value greater than MTU4 size supported by a board, MTU4 size supported by the board takes effect. It is recommended that this parameter be set to a value greater than or equal to 776. If this parameter value is less than 776, broadcast packets such as DHCP packets may experience reception or transmission failures.</p>
+</li><li><p>The UMPTa/UMPTb/UMDU supports the MTU6 value in the range of 1280 to 1800. The UMPTe supports the MTU6 value in the range of 1280 to 2000. The UMPTg/UMPTga supports the MTU6 value in the range of 1280 to 9000. When the MTU6 parameter is set to a value greater than that supported by a board, the MTU6 value supported by the board takes effect. The fragment is 8-byte-aligned.</p>
+</li><li><p>Board specifications: On a UMPTa/UMPTb/UMDU, a maximum of 300 interfaces can be used. On a UMPTe, a maximum of 512 interfaces can be used. On a UMPTg/UMPTga, a maximum of 640 interfaces can be used.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]The IPv6 function is supported only when a UMPT/UMDU board functions as the active main control board. The IPv6 function can be enabled on an interface only after enable IPV6SW.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If the interface is a tunnel interface, the interface is bound to an IPSECBINDITF MO, and fragment before IPSec encryption is disabled for the IKE peer, the internal system resets the MTU to the board maximum capability. If fragment before IPSec encryption is enabled for the IKE peer, the values of MTU4 and MTU6 in the INTERFACE MO of the TUNNELITF type are used.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_interface__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-InterfaceID.html">ITFID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Interface ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an interface. The value of ITFID in the INTERFACE MOs configured by users ranges from 0 to 1499. The value of ITFID in the INTERFACE MOs configured by the system ranges from 10000 to 19999.</p>
+<p>GUI Value Range: 0~1499,10000~19999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1499,10000~19999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, if <strong>ITFID</strong> is within the range from 0 to 1499, <strong>CTRLMODE</strong> must be set to MANUAL_MODE. In an <strong>INTERFACE</strong> MO, if <strong>ITFID</strong> is within the range from 10000 to 19999, <strong>CTRLMODE</strong> must be set to AUTO_MODE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-ItfType.html">ITFTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Interface Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of an interface, which can be normal or VLAN.</p>
+<p>GUI Value Range: NORMAL(Normal), VLAN(VLAN)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL, VLAN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>ITFTYPE</strong> is set to NORMAL, the <strong>DSCP2QUEMAPID</strong> must be set to 0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>ITFTYPE</strong> is set to NORMAL and <strong>PT</strong> is not set to LOOPINT, ETH, ETHTRK or TUNNELITF, the <strong>VRFIDX</strong> must be set to 0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>PT</strong> is set to ETHCI and <strong>ITFTYPE</strong> is set to NORMAL, <strong>TAGGED</strong> must be set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the port to which an interface belongs.</p>
+<p>GUI Value Range: PPP(PPP Link), MPGRP(Multi-link PPP Group), ETH(Ethernet Port), ETHTRK(Ethernet Trunk), LOOPINT(Loopback Interface), TUNNELITF(Tunnel Interface), ETHCI(Ethernet CI Port)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PPP, MPGRP, ETH, ETHTRK, LOOPINT, TUNNELITF, ETHCI</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to TUNNELITF, <strong>CTRLMODE</strong> can be set to AUTO_MODE or MANUAL_MODE. In an <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to OTHER, <strong>CTRLMODE</strong> must be set to MANUAL_MODE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>ITFTYPE</strong> is set to NORMAL, the <strong>DSCP2QUEMAPID</strong> must be set to 0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>PT</strong> is set to ETHCI, the <strong>VRFIDX</strong> must be set to 0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>ITFTYPE</strong> is set to NORMAL and <strong>PT</strong> is not set to LOOPINT, ETH, ETHTRK or TUNNELITF, the <strong>VRFIDX</strong> must be set to 0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>PT</strong> is set to ETHCI and <strong>ITFTYPE</strong> is set to NORMAL, <strong>TAGGED</strong> must be set to ENABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>PT</strong> is set to ETHTRK, <strong>IPV6SW</strong> must be set to DISABLE.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>INTERFACE</strong> MO, if <strong>ITFTYPE</strong> is set to NORMAL, this parameter can be set to PPP, MPGRP, ETH, ETHTRK, LOOPINT, TUNNELITF, or ETHCI.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>ITFTYPE</strong> is set to VLAN, this parameter can be set to ETH, ETHTRK, or ETHCI.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-PortId.html">PORTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the port to which an interface belongs.</p>
+<p>GUI Value Range: 0~99999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~99999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to ETH, this parameter can be set to any value in the range of 0 to 9999.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to PPP, this parameter can be set to any value in the range of 0 to 127.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to MPGRP, this parameter can be set to any value in the range of 0 to 31.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to ETHTRK, this parameter can be set to any value in the range of 0 to 23.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to LOOPINT, this parameter can be set to any value in the range of 0 to 99999.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to TUNNELITF, this parameter can be set to any value in the range of 0 to 127 or from 10000 to 19999.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to ETHCI, this parameter can be set to any value in the range of 0 to 9999.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-Tagged.html">TAGGED</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN Tagged Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the interface processes VLAN tagged packets. When this parameter is set to DISABLE, the interface of the normal type can receive only untagged packets. When this parameter is set to ENABLE, the interface of the normal type can receive both untagged and tagged packets.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: ENABLE(Enable)</p>
+<p>Recommended Value: ENABLE(Enable)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>PT</strong> is set to ETHCI and <strong>ITFTYPE</strong> is set to NORMAL, <strong>TAGGED</strong> must be set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-VlanId.html">VLANID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VLAN ID of an interface.</p>
+<p>GUI Value Range: 1~4094</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4094</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-Dscp2PCPMapId.html">DSCP2PCPMAPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP-to-PCP Mapping ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a mapping between DSCP values and VLAN priorities, which is used by an interface.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-Dscp2QUEMapId.html">DSCP2QUEMAPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP-to-Queue Mapping ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a mapping between DSCP values and queue, which is used by an interface.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>ITFTYPE</strong> is set to NORMAL, the <strong>DSCP2QUEMAPID</strong> must be set to 0.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to ETH, ETHTRK, ETHCI, this parameter can be set to any value in the range of 0 to 15.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to PPP, MPGRP, this parameter can be set to 0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-VrfIdx.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>PT</strong> is set to ETHCI, the <strong>VRFIDX</strong> must be set to 0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>ITFTYPE</strong> is set to NORMAL and <strong>PT</strong> is not set to LOOPINT, ETH, ETHTRK or TUNNELITF, the <strong>VRFIDX</strong> must be set to 0.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to ETH, ETHTRK, LOOPINT, TUNNELITF, this parameter can be set to any value in the range of 0 to 7.</li><li>In the <strong>INTERFACE</strong> MO, if <strong>PT</strong> is set to ETHCI, PPP, MPGRP, this parameter can be set to 0.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-MTU4.html">MTU4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv4 Maximum Transmission Unit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum IPv4 transmission unit supported by an interface.</p>
+<p>GUI Value Range: 46~9000</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 46~9000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If PT is set to ETH, ETHTRK or ETHCI, it is recommended that MTU4 be set to 1500.</p>
+<p>If PT is set to TUNNELITF, it is recommended that MTU4 be set to 1380.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: An excessive large parameter value leads to packet loss or excessively fragmented data packets on the transport network, resulting in a long delay and deteriorated performance. An excessive small parameter value leads to reduced available payloads for transmission, resulting in decreased transport bandwidth efficiency and deteriorated performance.</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-IPv6Switch.html">IPV6SW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: This parameter indicates whether the ability to interface IPV6 functionality is enabled.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: In IPv6 scenarios, it is recommended that this parameter be set to ENABLE.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>INTERFACE</strong> MO, when <strong>PT</strong> is set to ETHTRK, <strong>IPV6SW</strong> must be set to DISABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-MTU6.html">MTU6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 Maximum Transmission Unit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum IPv6 transmission unit supported by an interface.</p>
+<p>GUI Value Range: 1280~9000</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 1280~9000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If PT is set to ETH or ETHTRK, it is recommended that MTU6 be set to 1500.</p>
+<p>If PT is set to TUNNELITF, it is recommended that MTU6 be set to 1380.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, packet loss may occur on the transport network before the base station detects and adjusts the value to the actual Path MTU size. If this parameter is set to a small value, the valid payload of the transmission decreases and the bandwidth of the transmission network cannot be effectively used. As a result, the transmission delay increases and the transmission performance deteriorates.</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-ARPProxy.html">ARPPROXY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ARP Proxy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the ARP proxy function. If the ARP proxy function is enabled, the base station serves as an ARP proxy for a loopback interface address included in the interface address segment of the base station or for an interface IP address of a lower-level base station. If this function is disabled, the base station does not serve as an ARP proxy for the loopback interface IP address of the base station or for the interface IP address of a lower-level base station. To access either IP address in this case, an external device on the same subnet must be configured with a route.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: ENABLE(Enable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-UserLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-defined information about an interface.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/INTERFACE-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a forcible change of an Interface is made.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_interface__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an Interface with the parameters as follows: Interface ID: 0, Interface Type: NORMAL, Port Type: ETH, Port ID: 10, IPv6 Switch: DISABLE, run the following command:
+ADD INTERFACE: ITFID=0, ITFTYPE=NORMAL, PT=ETH, PORTID=10, IPV6SW=DISABLE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

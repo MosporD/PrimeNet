@@ -1,0 +1,93 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="ALD MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of antenna line devices (ALDs). It also provides the managed object model (MOM) views and describes the managed objects (MOs) related to ALDs.">
+<meta name="description" content="This section describes the functions and concepts of antenna line devices (ALDs). It also provides the managed object model (MOM) views and describes the managed objects (MOs) related to ALDs.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../comm/mom/equip-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Equip-ALD">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>ALD MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Equip-ALD"></a><a name="Equip-ALD"></a>
+
+
+<h1 class="topictitle1">ALD MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of antenna line devices (ALDs). It also provides the managed object model (MOM) views and describes the managed objects (MOs) related to ALDs.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p>ALDs consist of remote electrical tilt (RET) antennas, virtual remote tilt (VRET) antennas, tower mounted amplifiers (TMAs), sameband antenna sharing units (SASUs), Remote eAntenna Extension (RAE) units, remote vendor-defined antenna line devices (RVDs), and remote azimuth steering (RAS) units.</p>
+<p><strong>RET</strong></p>
+<div class="p">The signal coverage of an RET antenna can be changed by adjusting the tilt through remote electrical control. The structure and classification of RET antennas are described as follows:<ul><li>An RET antenna consists of a remote control unit (RCU) and some RET subunits:<ul><li>The RCU is the control unit of the RET antenna.</li><li>The RET subunits are antenna devices under independent control of the RCU.</li></ul>
+</li><li>Based on the number of RET subunits, RET antennas are classified into two types: SINGLE_RET and MULTI_RET.<ul><li>An RET antenna of the SINGLE_RET type consists of only one RET subunit.</li><li>An RET antenna of the MULTI_RET type consists of multiple RET subunits. Each subunit supports independent download of configuration files and independent setting of tilts. Therefore, this type of RET antennas is considered as a set of antennas installed in a radome.</li></ul>
+</li></ul>
+</div>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody"><p>For details on the connection between the RET antenna and the RRU/RFU, and the RET configuration, see <i><cite>ALD Management Feature Parameter Description</cite></i>.</p>
+</div></div>
+<p><strong>VRET</strong></p>
+<p>The signal coverage and coverage effect of a VRET antenna can be changed by adjusting polarization of the virtual antenna ports on the active antenna system (AAS) and by adjusting the antenna tilt through remote electrical control.
+</p>
+<p>For details on the VRET configuration, see <i><cite>AAS Feature Parameter Description</cite></i>.</p>
+<p><strong>TMA</strong></p>
+<div class="p">A TMA is a low noise amplifier installed near an antenna. It improves the signal-to-noise ratio (SNR), sensitivity, and uplink coverage of a base station. The TMA provides the following functions:<ul><li>Amplifies uplink signals to compensate for attenuation between an RET antenna and an RRU or RFU.</li><li>Balances signal amplification between the uplink and downlink.</li></ul>
+</div>
+<p>A TMA has one or two subunits, which can amplify one or two uplink radio frequency (RF) signals.</p>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody"><ul><li>The TMA manufacturers provide TMA software. A base station supports software download and TMA reset. Resetting the TMA clears all alarms without affecting the gain and working mode of the TMA.</li><li>The TMA sends RS485 signals to the RCU to enable the remote adjustment of the antenna tilt.</li><li>For details on the connection between the TMA and the RRU/RFU, the connection between the TMA and the RET antenna, and the TMA configurations, see <i><cite>ALD Management Feature Parameter Description</cite></i>.</li></ul>
+</div></div>
+<p><strong>SASU</strong></p>
+<p>An SASU is a low-noise amplifier customized by Huawei. It applies to antenna sharing scenarios where GSM and UMTS systems work on the same frequency band on a multimode base station. Antenna sharing helps operators reduce the capital expenditure (CAPEX). Currently, the SASU supports only frequency bands of 900 MHz and 2100 MHz. An SASU includes two subunits and amplifies uplink signals of both GSM and UMTS systems. </p>
+<p><strong>RAE</strong></p>
+<p>An RAE is a device on an antenna for storing antenna information, which includes antenna weight information and other antenna assistance information. After obtaining the information from the RAE, operators can perform network optimization on target. </p>
+<p><strong>RVD</strong></p>
+<p>An RVD is the general name of Huawei-defined antenna devices. These devices are used to adjust the vertical beamwidth and to set the working mode of antennas. </p>
+<p><strong>RAS</strong></p>
+<p>An RAS unit is a device used to adjust the horizontal azimuth of an antenna. By remotely setting the RAS unit, the horizontal azimuth of the antenna can be adjusted to change the signal coverage. </p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Equip-ALD__fig6">Figure 1</a> shows the ALD MOM, which is a subset of the base station MOM. <div class="fignone" id="Equip-ALD__fig6"><a name="Equip-ALD__fig6"></a><a name="fig6"></a><span class="figcap"><b>Figure 1 </b>ALD MOM</span>
+
+<br><span><img src="../image/mom/ALD-MOM.png"></span></div>
+</div>
+<div class="p">The MOs in the figure are described as follows:<ul><li><a href="../mo/ALD.html">ALD</a> is an antenna base class. This MO defines the common attributes and operations of the <a href="../mo/RET.html">RET</a> antenna and <a href="../mo/TMA.html">TMA</a>. The common attributes describe the control ports on the RRU/RFU where the <a href="../mo/RET.html">RET</a> antenna and <a href="../mo/TMA.html">TMA</a> are connected. This MO supports reset, software download, and scanning of the RET antenna and TMA.</li><li><a href="../mo/TMA.html">TMA</a> defines a TMA. </li><li><a href="../mo/TMASubunit.html">TMASubunit</a> defines a <a href="../mo/TMA.html">TMA</a> subunit. The <a href="../para/TMASubunit-Gain.html">Gain</a> parameter indicates the gain of the <a href="../mo/TMA.html">TMA</a> subunit. The gain of each TMA subunit can be set independently. The <a href="../para/TMASubunit-Mode.html">MODE</a> parameter indicates the working mode of the <a href="../mo/TMASubunit.html">TMASubUnit</a>.</li><li><a href="../mo/TMADeviceData.html">TMADeviceData</a> defines additional parameters of the <a href="../mo/TMA.html">TMA</a> subunit. These parameters do not affect the running of the <a href="../mo/TMA.html">TMA</a>. For details on the additional parameters, see 3GPP TS 25.466.</li><li><a href="../mo/RetPort.html">RetPort</a> defines an RET port on the RRU. The <a href="../mo/RET.html">RET</a> port is connected to the <a href="../mo/RET.html">RET</a> antenna for power supply and signaling exchange.</li><li><a href="../mo/AntennaPort.html">AntennaPort</a> defines an RF port on the RRU/RFU. The RF port is connected to the <a href="../mo/RET.html">RET</a> antenna or <a href="../mo/TMA.html">TMA</a> for power supply and signaling exchange. The RF port is also connected to the <a href="../mo/RET.html">RET</a> subunit or <a href="../mo/TMA.html">TMA</a> subunit, providing an RF channel to transmit RF signals. </li><li><a href="../mo/RET.html">RET</a> defines an RET antenna. </li><li><a href="../mo/RETSubunit.html">RETSubunit</a> defines an <a href="../mo/RET.html">RET</a> subunit. The <a href="../para/RETSubunit-Tilt.html">TILT</a> parameter indicates the tilt of the subunit. The tilt of each RET subunit can be set independently. This MO supports configuration file download and tilt calibration of the RET subunit.</li><li><a href="../mo/RetDeviceData.html">RetDeviceData</a> defines additional parameters of the <a href="../mo/RET.html">RET</a> subunit, which contains information about the <a href="../mo/RET.html">RET</a> antenna. These parameters do not affect the running of the <a href="../mo/RET.html">RET</a> antenna. For details on the additional parameters, see 3GPP TS 25.466.</li><li><a href="../mo/SASU.html">SASU</a> defines an SASU and applies to antenna sharing scenarios where GSM and UMTS systems work on the same frequency band in a multimode base station. With this solution, operators can use an antenna for both UMTS and GSM systems, which reduces CAPEX. This MO is used only for NodeBs. </li><li><a href="../mo/SASUSubunit.html">SASUSubunit</a> defines an SASU subunit. Each subunit amplifies an uplink RF signal for both GSM and UMTS systems. This MO is used only for NodeBs. </li><li><a href="../mo/RAE.html">RAE</a> defines an RAE unit, which is a device on an antenna for storing antenna information. The information includes antenna weight information and other antenna assistance information. A base station can obtain the information from the RAE unit or update the information on the RAE unit. </li><li><a href="../mo/RAESubunit.html">RAESubunit</a> defines an RAE subunit, which is the smallest unit for storing antenna information. </li><li><a href="../mo/RAEDeviceData.html">RAEDeviceData</a> defines parameters related to an RAE attribute group. These parameters indicate the stored antenna configuration data and the antenna capabilities.</li><li><a href="../mo/RVD.html">RVD</a> defines an RVD, which is used to adjust the vertical beamwidth and to set the working mode of an antenna. </li><li><a href="../mo/RVDSubunit.html">RVDSubunit</a> defines an RVD subunit. The <a href="../para/RVDSubunit-VBeamWidth.html">VBEAMWIDTH</a> parameter indicates the vertical beamwidth of the subunit. The <a href="../para/RVDSubunit-SdaMode.html">SDAMODE</a> parameter indicates the working mode of the subunit.</li><li><a href="../mo/RVDDeviceData.html">RVDDeviceData</a> defines parameters related to an RVD attribute group. These parameters indicate the stored antenna configuration data and the antenna capabilities.</li><li><a href="../mo/RAS.html">RAS</a> defines an RAS unit, which is used to adjust the horizontal azimuth of an antenna.</li><li><a href="../mo/RASSubunit.html">RASSubunit</a> defines an RAS subunit. The <a href="../para/RASSubunit-Azimuth.html">AZIMUTH</a> parameter indicates the horizontal azimuth of an RAS subunit.</li><li><a href="../mo/RASDeviceData.html">RASDeviceData</a> defines parameters related to an RAS attribute group. These parameters indicate the stored antenna configuration data and the antenna capabilities.</li></ul>
+</div>
+<div class="p"><a href="#Equip-ALD__fig7">Figure 2</a> shows the VRET MOM, which is a subset of the base station MOM. <div class="fignone" id="Equip-ALD__fig7"><a name="Equip-ALD__fig7"></a><a name="fig7"></a><span class="figcap"><b>Figure 2 </b>ALD MOM</span>
+
+<br><span><img src="../image/mom/ALD-fiture3-2.png"></span></div>
+</div>
+<div class="p">The MOs in the figure are described as follows:<ul><li><a href="../mo/VRET.html">VRET</a> defines a VRET antenna on the AAS. </li><li><a href="../mo/VRETSubunit.html">VRETSubUnit</a> defines a VRET subunit. Users can specify virtual antenna ports for a VRET subunit and set polarization for these ports. The virtual antenna ports of a VRET subunit have the same uplink tilt and the same downlink tilt.</li><li><a href="../mo/VAntennaPort.html">VAntennaPort</a> defines a virtual RF port on the AAS. This port provides RF channels to transmit RF signals.</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../comm/mom/equip-mom.html" title="This chapter describes the MOMs related to equipment.">Equipment MOMs</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

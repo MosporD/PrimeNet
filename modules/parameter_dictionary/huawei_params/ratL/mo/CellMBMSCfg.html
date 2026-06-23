@@ -1,0 +1,194 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellMBMSCfg">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellMBMSCfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellMBMSCfg</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellMBMSCfg"></a><a name="CellMBMSCfg"></a>
+
+
+<h1 class="topictitle1">CellMBMSCfg</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellMBMSCfg.html"><strong>CellMBMSCfg</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellMBMSCfg MO consists of the parameters related to cell MBMS service.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong>, <strong>CellEicic</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The <strong>AbsPattern</strong> parameter in the <strong>CellEicic</strong> MO that is related to the <strong>Cell</strong> MO can be configured only with subframe 0 and subframe 5 when the following conditions are met: In a <strong>Cell</strong> MO, the <strong>FddTddInd</strong> parameter is set to CELL_TDD, and the <strong>SubframeAssignment</strong> parameter is set to SA1 or SA2. In the <strong>CellMBMSCfg</strong> MO that is related to the <strong>Cell</strong> MO, the <strong>MBMSSwitch</strong> parameter is set to 1. In the <strong>CellAlgoSwitch</strong> MO that is related to the <strong>Cell</strong> MO, the <strong>EicicSwitch</strong> parameter is set to STATIC.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellPrsCfg</strong> MOs:<ul><li>If <strong>FddTddInd</strong> in a <strong>Cell</strong> MO is set to CELL_FDD and the MBMSSwitch option of <strong>MBMSSwitch</strong> is selected, the last digit of the value of <strong>PrsConfigurationIndex</strong> must be 0, 4, 5, or 9.</li><li>If <strong>FddTddInd</strong> in a <strong>Cell</strong> MO is set to CELL_FDD and the MBMSSwitch option of <strong>MBMSSwitch</strong> is selected, <strong>NumberofDlFramesforPrs</strong> must be set to SF1 or SF2 when the last digit of the value of <strong>PrsConfigurationIndex</strong> is 4 or 9, or <strong>NumberofDlFramesforPrs</strong> must be set to SF1 when the last digit of the value of <strong>PrsConfigurationIndex</strong> is 0 or 5.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellRbReserve</strong> MOs:<ul><li>If <strong>RbRsvMode</strong> in a <strong>CellRbReserve</strong> MO under a <strong>Cell</strong> MO is set to NB_DEPLOYMENT and the value of <strong>CellActiveState</strong> in this <strong>Cell</strong> MO is CELL_ACTIVE, the MBMSSwitch option of <strong>MBMSSwitch</strong> in the <strong>CellMBMSCfg</strong> MO under this <strong>Cell</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the MBMSSwitch option of the <strong>MBMSSwitch</strong> in the <strong>CellMBMSCfg</strong> MO must be deselected.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the SERVICECONTINUITYSWITCH option of the <strong>MBMSServiceSwitch</strong> in the <strong>CellMBMSCfg</strong> MO must be deselected.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the NEIGHCELLCONFIGADAPTIVESWITCH option of the <strong>NCellMbmsCfgSwitch</strong> in the <strong>CellMBMSCfg</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>CellEmtcAlgo</strong> and <strong>Cell</strong> MOs:<ul><li>Under the same cell, when the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to FALSE and the EMTC_SWITCH option of the <strong>EmtcAlgoSwitch</strong> parameter in a <strong>CellEmtcAlgo</strong> MO is selected, the <strong>MBMSSwitch</strong> parameter in a <strong>CellMBMSCfg</strong> MO must not be set to MBMSSwitch-1.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> MO:<ul><li>When the <strong>SpectrumCloudSwitch</strong> parameter in a <strong>SpectrumCloud</strong> MO is set to GL_SPECTRUM_CONCURRENCY, the MBMSSwitch option of the <strong>MBMSSwitch</strong> parameter in the associated <strong>CellMBMSCfg</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>eUCellSectorEqm</strong> MO:<ul><li>The MBMSSwitch option of the <strong>MBMSSwitch</strong> parameter in the <strong>CellMBMSCfg</strong> MO must be deselected if the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO is set to MASSIVE_MIMO_Ph2.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD and the <strong>SpectrumCloudSwitch</strong> parameter in the associated <strong>SpectrumCloud</strong> MO is set to LTE_NR_SPECTRUM_SHR, the <strong>MBMSSwitch</strong> parameter in the associated <strong>CellMBMSCfg</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>The InBandRelayDeNbSwitch option of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO and the MBMSSwitch option of the <strong>MBMSSwitch</strong> parameter in the <strong>CellMBMSCfg</strong> MO cannot be both selected.</li><li>The InBandRelayReNbSwitch option of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO and the MBMSSwitch option of the <strong>MBMSSwitch</strong> parameter in the <strong>CellMBMSCfg</strong> MO cannot be both selected.</li></ul>
+</li><li>Relation with the <strong>ContigIntraBandCarr</strong> MO:<ul><li><strong>MBMSSwitch</strong> in the <strong>CellMBMSCfg</strong> MO and CONTIG_INTRA_BAND_CARR_SW of the <strong>ContigIntraBandCarrSw</strong> parameter in the <strong>ContigIntraBandCarr</strong> MO cannot be both turned on.</li></ul>
+</li><li>Relation with the <strong>CellDynPowerSharing</strong>, <strong>CellDlschAlgo</strong>, <strong>SectorSplitCell</strong>, and <strong>SectorSplitGroup</strong> MOs:<ul><li>If the LTE_EXTREME_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO under a <strong>Cell</strong> MO is selected, and any option of the <strong>MbsfnSfCfg</strong> parameter in the <strong>CellDlschAlgo</strong> MO under this <strong>Cell</strong> MO is selected or the MBMSSwitch option of the <strong>MBMSSwitch</strong> parameter in the <strong>CellMBMSCfg</strong> MO under this <strong>Cell</strong> MO is selected, then the <strong>PwrSharingHighLoadThld</strong> parameter can only be set to 100 in the <strong>SectorSplitGroup</strong> MO that includes the <strong>SectorSplitCell</strong> MO corresponding to this <strong>Cell</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellMBMSCfg__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellMBMSCfg__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellMBMSCfg__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_serviceareaid2list.html">ADD SERVICEAREAID2LIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add the ID of the multimedia broadcast multicast service (MBMS) service area for the cell to the service area list.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellmbmscfg.html">DSP CELLMBMSCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the MBMS information for a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_dynamicservicearea.html">DSP DYNAMICSERVICEAREA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the dynamic service area ID of a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellmbmscfg.html">LST CELLMBMSCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration of multimedia broadcast multicast service (MBMS) in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_serviceareaid2list.html">LST SERVICEAREAID2LIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the ID of the multimedia broadcast multicast service (MBMS) service area to which a cell belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellmbmscfg.html">MOD CELLMBMSCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of multimedia broadcast multicast service (MBMS) in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_serviceareaid2list.html">RMV SERVICEAREAID2LIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove the ID of the multimedia broadcast multicast service (MBMS) service area to which a cell belongs.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellMBMSCfg__tab2">Table 2</a> and <a href="#CellMBMSCfg__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellMBMSCfg__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellMBMSCfg__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMBMSCfg-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local cell identity. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMBMSCfg-MBSFNSyncAreaId.html">MBSFN synchronization Area ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an MBSFN synchronization area to which a cell belongs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMBMSCfg-MBMSSwitch.html">MBMS switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the MBMS function.</p>
+<p>MBMSSwitch: If this option is selected, the MBMS function is enabled, and the cell supports the MBMS service. If this option is deselected, the MBMS function is disabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMBMSCfg-ServiceAreaIdList.html">Service Area ID List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the list of MBMS service areas to which cells belong. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMBMSCfg-MBMSServiceSwitch.html">MBMS Service Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>SERVICECONTINUITYSWITCH: Indicates whether MBMS service continuity can be maintained. MBMS service continuity can be maintained in inter-frequency networking by selecting this option.</p>
+<p>If this option is selected, MBMS service continuity can be maintained. The eNodeB broadcasts SIB15 and determines whether to perform inter-frequency handovers for MBMS service continuity on an RRC_CONNECTED UE based on the MBMS Interest Indication message sent by the UE. In addition, the eNodeB sends the service area ID (SAI) of the serving cell to neighboring cells over the X2 interface.</p>
+<p>If this option is deselected, MBMS service continuity cannot be maintained, the eNodeB does not broadcast SIB15, perform inter-frequency handovers for MBMS service continuity, or send the SAI of the serving cell. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMBMSCfg-NCellMbmsCfgSwitch.html">Neighbor Cell MBMS Config Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>NEIGHCELLCONFIGADAPTIVESWITCH: Indicates whether the neighboring cell configurations take effect adaptively. In the eMBMS feature, the MBSFN subframe configuration for a cell dynamically changes based on the MBMS session setups. Neighboring cell configurations can be dynamically updated based on the changes of MBSFN subframe configurations of neighboring cells.</p>
+<p>If this option is selected, neighboring cell configurations in the local cell are updated and broadcast according to the MBSFN subframe configurations of the neighboring cells transmitted over X2 interfaces.</p>
+<p>If this option is deselected, neighboring cell configurations use static parameter settings. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CellMBMSCfg__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CellMBMSCfg__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellMBMSCfg-MBSFNAreaId.html">MBSFN Area ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of an MBSFN area to which a cell belongs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellMBMSCfg-MBMSSessionTMGI.html">MBMS Session TMGI</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the TMGI of an MBMS session. The TMGI consists of the MCC, MNC, and ServiceID with each two parts connected by a hyphen (-). TMGIs are separated by comma (,). This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellMBMSCfg-DynamicServiceAreaIdList.html">Dynamic Service Area ID List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the dynamic list of MBSFN service areas to which cells belong. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

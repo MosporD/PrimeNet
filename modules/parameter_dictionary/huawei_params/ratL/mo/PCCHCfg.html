@@ -1,0 +1,182 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="PCCHCfg">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="PCCHCfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>PCCHCfg</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="PCCHCfg"></a><a name="PCCHCfg"></a>
+
+
+<h1 class="topictitle1">PCCHCfg</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="PCCHCfg.html"><strong>PCCHCfg</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The PCCHCfg MO consists of the parameters used to configure the Paging Control Channel (PCCH) in a cell.</p>
+<p>The PCCH is a downlink logical channel that transmits paging messages and system information modification indicators.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>BcchCfg</strong> MO:<ul><li>The product of <strong>DefaultPagingCycle</strong> in the <strong>PCCHCfg</strong> MO and <strong>ModifyPeriodCoeff</strong> in the <strong>BcchCfg</strong> MO cannot exceed 1024 radio frames, that is 10, 240 milliseconds.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>DlBandWidth</strong> in a <strong>Cell</strong> MO is set to CELL_BW_N6, CELL_BW_N15, or CELL_BW_N25, ENHNCD_HIGH_PRI_PAGING_SWITCH and ENHNCD_CSFB_PAGING_SWITCH of <strong>EnhPagingSwitch</strong> in the associated <strong>PCCHCfg</strong> MO must be set off.</li><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to FALSE, values of the <strong>DefaultPagingCycleForNb</strong> and <strong>NbForNbIoT</strong> parameters in the associated <strong>PCCHCfg</strong> MO cannot be changed and are always rf256(256 radio frames) and ONE_64TH_T(ONE_64TH_T), respectively.</li><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, values of the <strong>DefaultPagingCycle</strong>, <strong>Nb</strong>, <strong>PagingSentNum</strong>, and <strong>MaxPagingRecordsNum</strong> parameters in the associated <strong>PCCHCfg</strong> MO cannot be changed and are always rf128(128 radio frames), ONET, 1, and 16, respectively.</li><li>If the <strong>PagingStrategy</strong> parameter in the <strong>PCCHCfg</strong> MO is set to DIFFERENTIATION_BY_NB_COV_LVL, the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO must be set to TRUE.</li></ul>
+</li><li>Relation with the <strong>CellDlschAlgo</strong> MO:<ul><li>If ENHNCD_HIGH_PRI_PAGING_SWITCH or ENHNCD_CSFB_PAGING_SWITCH of <strong>EnhPagingSwitch</strong> in the <strong>PCCHCfg</strong> MO is set on, <strong>EnhPagingCR</strong> in the <strong>PCCHCfg</strong> must be set to a value less than or equal to the value of <strong>RarAndPagingCR</strong> in the <strong>CellDlschAlgo</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>BcchCfg</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, the value of the <strong>ModifyPeriodCoeffForNb</strong> parameter in the <strong>BcchCfg</strong> MO multiplied by the value of the <strong>DefaultPagingCycleForNb</strong> parameter in the <strong>PCCHCfg</strong> MO must be an integer multiple of 40.96 seconds.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#PCCHCfg__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="PCCHCfg__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="PCCHCfg__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_pcchcfg.html">LST PCCHCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the PCCH configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_pcchcfg.html">MOD PCCHCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the PCCH configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_autopagingtest.html">STR AUTOPAGINGTEST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start fault recovery detection on an NB-IoT or eMTC cell to obtain the state information after a cell recovers.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#PCCHCfg__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="PCCHCfg__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="PCCHCfg__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-DefaultPagingCycle.html">Default paging cycle</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the default paging period for the cell. It is also called the default discontinuous reception (DRX) period. If the EPC specifies a DRX period for a UE, the UE compares this period with the value of this parameter and uses the smaller one as its DRX period. If the EPC does not specify a DRX period, the UE uses the value of this parameter, which is delivered in the system information, as its DRX period. For details, see 3GPP TS 36.304. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-Nb.html">NB</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of paging occasions (a type of subframe) within a paging period. This parameter value also indicates the number of paging groups within a paging period. For details, see 3GPP TS 36.304.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-PagingSentNum.html">Paging Sent Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of paging messages transmitted to UEs over the air interface. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-MaxPagingRecordsNum.html">Maximum Number of Paging Records</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of UEs that can be included in a paging message on each paging occasion. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-PagingStrategy.html">Paging Message Sending Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy of sending paging messages. There are three policies: first in first out (FIFO), priority-based, and coverage-level-based.</p>
+<p>If the FIFO policy is used, paging messages that arrive earlier are preferentially transmitted on a paging occasion.</p>
+<p>If the priority-based policy is used, high-priority paging messages are preferentially transmitted on a paging occasion.</p>
+<p>If the coverage-level-based policy is used, different priorities are assigned to NB-IoT paging messages intended for UEs at different coverage levels and paging messages are transmitted based on the assigned priorities on a paging occasion. The coverage-level-based policy applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-EnhPagingCR.html">Enhanced Paging Code Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the code rate used for paging messages when enhanced paging is enabled. An eNodeB identifies high-priority paging and CSFB-triggered paging and uses the code rate specified by this parameter to send high-priority paging messages and CSFB-triggered paging messages. If a paging message sent from the EPC contains the Paging Priority field, the paging is high-priority paging. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-EnhPagingSwitch.html">Enhanced Paging Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable enhanced paging. This parameter applies only to cells with a 10 MHz bandwidth or higher.</p>
+<p>ENHNCD_HIGH_PRI_PAGING_SWITCH: If this option is selected, enhanced paging is enabled for high-priority paging and high-priority paging messages are transmitted at the code rate specified by the EnhPagingCR parameter in the PCCHCfg MO. If this option is deselected, high-priority paging messages are transmitted at the code rate specified by the RarAndPagingCR parameter in the CellDlschAlgo MO. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ENHNCD_CSFB_PAGING_SWITCH: If this option is selected, enhanced paging is enabled for CSFB-triggered paging and CSFB-triggered paging messages are transmitted at the code rate specified by the EnhPagingCR parameter in the PCCHCfg MO. If this option is deselected, CSFB-triggered paging messages are transmitted at the code rate specified by the RarAndPagingCR parameter in the CellDlschAlgo MO. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-DefaultPagingCycleForNb.html">NB-IoT Default Paging Cycle</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the default paging period for the cell. It is also called the default discontinuous reception (DRX) period. For details, see 3GPP TS 36.304. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-NbForNbIoT.html">NB-IoT nB</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of paging occasions (a type of subframe) of an NB-IoT cell within a paging period. This parameter value also indicates the number of paging groups within a paging period. For details, see 3GPP TS 36.304. This parameter is correlated with the repetition count of initial PDCCH transmission and the repetition count needs to be considered when this parameter is set. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-PagingTimeoutDiscardTimer.html">Paging Timeout Discard Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the paging message discarding timer. If this parameter is set to 0, the timer does not take effect. If this parameter is set to a non-zero value, the timer takes effect. The eNodeB discards paging messages not yet sent and measures the number of discarded paging messages when this timer expires. If this timer is required, it is recommended that this parameter be set to a value at least greater than a paging cycle but less than the MME paging retransmission interval. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-NbDefaultPagingCovLevel.html">Default Coverage Level of NB-IoT Paging</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the default coverage level for paging messages. Paging messages in which coverage level information is not included by the core network are scheduled based on the coverage level specified by this parameter. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-DefaultPagingCycleForEmtc.html">eMTC Default Paging Cycle</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the default paging cycle for eMTC. It is also called the DRX cycle. If the EPC delivers a DRX cycle, the eNodeB compares the cycle specified by this parameter with that delivered by the EPC and uses the smaller cycle for eMTC UEs. If the EPC does not deliver a DRX cycle, the eNodeB sends the cycle specified by this parameter to eMTC UEs through system information.</p>
+<p>Note: In accordance with 3GPP specifications, the product of the value of this parameter and that of the PagingGroupNum parameter must be greater than or equal to 1. Otherwise, the network cannot perform paging normally. As a result, UEs cannot receive paging messages. For details, see 3GPP TS 36.304. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PCCHCfg-MaxPagingQueueBufferLength.html">Max Paging Queue Buffer Length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum buffer length of a single paging queue.</p>
+<p>If this parameter is set to a value in the range of 0 to 299, the maximum buffer length of a single paging queue is not controlled. If this parameter is set to another value, the maximum buffer length of a single paging queue is controlled. When the number of buffered paging messages in a paging queue reaches this value, subsequent paging messages that need to enter this paging queue will be discarded. To prevent paging message congestion in a single paging queue from occupying excessive paging buffer resources and affecting the paging success rates of other paging queues, you are advised to set this parameter to 1000. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,335 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Inter-vendor MLB Algorithm Configuration (MOD INTERVENDORMLBALGO)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_intervendormlbalgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Inter-vendor MLB Algorithm Configuration (MOD INTERVENDORMLBALGO)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_intervendormlbalgo"></a><a name="mod_intervendormlbalgo"></a>
+
+
+<h1 class="topictitle1">Modify Inter-vendor MLB Algorithm Configuration (MOD INTERVENDORMLBALGO)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_intervendormlbalgo__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the parameter configuration of inter-vendor MLB algorithm.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_intervendormlbalgo__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_intervendormlbalgo__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local cell ID. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-DlCceUsageAdmissionThld.html">DlCceUsageAdmissionThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL CCE Usage Admission Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink CCE usage threshold for UE admission in inter-vendor MLB. If the downlink CCE usage of a local cell is greater than or equal to this threshold, the cell cannot be used as a target cell for inter-vendor MLB. If the downlink CCE usage of the cell is lower than this threshold, the eNodeB checks the uplink CCE usage, the proportion of RRC_CONNECTED UEs, and uplink and downlink PRB usages to determine whether the cell can be used as a target cell for inter-vendor MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the DlCceUsageAdmissionThld and DlCceUsageOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the DlCceUsageAdmissionThld parameter must be larger than the DlCceUsageOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a lower probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value of this parameter leads to a higher probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-DlCceUsageOffset.html">DlCceUsageOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL CCE Usage Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the downlink CCE usage. When the duration in which the downlink CCE usage is continuously greater than or equal to the sum of the values of this parameter and the DlCceUsageAdmissionThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB can initiate inter-vendor MLB based on the downlink CCE usage. When the duration in which the downlink CCE usage is continuously less than the value of the DlCceUsageAdmissionThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB stops inter-vendor MLB based on the downlink CCE usage. The sum of the values of this parameter and the DlCceUsageAdmissionThld parameter cannot exceed 100%. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the DlCceUsageAdmissionThld and DlCceUsageOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the DlCceUsageAdmissionThld parameter must be larger than the DlCceUsageOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value results in a lower probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-DlPrbUsageAdmissionThld.html">DlPrbUsageAdmissionThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL PRB Usage Admission Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink PRB usage threshold for UE admission in inter-vendor MLB. If the downlink PRB usage of a local cell is greater than or equal to this threshold, the cell cannot be used as a target cell for inter-vendor MLB. If the downlink PRB usage of the cell is lower than this threshold, the eNodeB checks the uplink PRB usage, the proportion of RRC_CONNECTED UEs, and uplink and downlink CCE usages to determine whether the cell can be used as a target cell for inter-vendor MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the DlPrbUsageAdmissionThld and PrbUsageOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the DlPrbUsageAdmissionThld parameter must be larger than the PrbUsageOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a lower probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value of this parameter leads to a higher probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-PrbUsageOffset.html">PrbUsageOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PRB Usage Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the PRB usage. When the duration in which the downlink PRB usage is continuously greater than or equal to the sum of the values of this parameter and the DlPrbUsageAdmissionThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB can initiate inter-vendor MLB based on the downlink PRB usage. When the duration in which the downlink PRB usage is continuously less than the value of the DlPrbUsageAdmissionThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB stops inter-vendor MLB based on the downlink PRB usage. The sum of the values of this parameter and the DlPrbUsageAdmissionThld parameter cannot exceed 100%. When the duration in which the uplink PRB usage is continuously greater than or equal to the sum of the values of this parameter and the UlPrbUsageAdmissionThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB can initiate inter-vendor MLB based on the uplink PRB usage. When the duration in which the uplink PRB usage is continuously less than the value of the UlPrbUsageAdmissionThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB stops inter-vendor MLB based on the uplink PRB usage. The sum of the values of this parameter and the UlPrbUsageAdmissionThld parameter cannot exceed 100%. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the DlPrbUsageAdmissionThld and PrbUsageOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the DlPrbUsageAdmissionThld parameter must be larger than the PrbUsageOffset parameter in the InterVendorMlbAlgo MO.</li><li>The sum of the values of the UlPrbUsageAdmissionThld and PrbUsageOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the UlPrbUsageAdmissionThld parameter must be larger than the PrbUsageOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value results in a lower probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-RrcConnUeNumRateAdmThld.html">RrcConnUeNumRateAdmThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRC Connected UE Number Rate Admission Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RRC_CONNECTED UE proportion threshold for UE admission in inter-vendor MLB. If the proportion of RRC_CONNECTED UEs in a neighboring cell is greater than or equal to the threshold set for the local cell, this neighboring cell cannot be used as a target cell for inter-vendor MLB. If the proportion of RRC_CONNECTED UEs in a neighboring cell is lower than this threshold, the eNodeB checks the uplink and downlink PRB usages and uplink and downlink CCE usages to determine whether this neighboring cell can be used as a target cell for inter-vendor MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 8</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the RrcConnUeNumRateAdmThld and RrcConnUeNumRateOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the RrcConnUeNumRateAdmThld parameter must be larger than the RrcConnUeNumRateOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a lower probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value of this parameter leads to a higher probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-RrcConnUeNumRateOffset.html">RrcConnUeNumRateOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRC Connected UE Number Rate Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the proportion of RRC_CONNECTED UEs. When the duration in which the proportion of RRC_CONNECTED UEs is continuously greater than or equal to the sum of the values of this parameter and the RrcConnUeNumRateAdmThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB can initiate inter-vendor MLB based on the proportion of RRC_CONNECTED UEs. When the duration in which the proportion of RRC_CONNECTED UEs is less than the value of the RrcConnUeNumRateAdmThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB stops inter-vendor MLB based on the proportion of RRC_CONNECTED UEs. The sum of the values of this parameter and the RrcConnUeNumRateAdmThld parameter cannot exceed 100%. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the RrcConnUeNumRateAdmThld and RrcConnUeNumRateOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the RrcConnUeNumRateAdmThld parameter must be larger than the RrcConnUeNumRateOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value results in a lower probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-RrcConnUeNumRateTrigThld.html">RrcConnUeNumRateTrigThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRC Connected UE Number Rate Triggering Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RRC_CONNECTED UE proportion threshold for starting inter-vendor MLB. When the proportion of RRC_CONNECTED UEs in the serving cell is less than this threshold, inter-vendor MLB cannot be started. When the proportion of RRC_CONNECTED UEs in the serving cell is greater than this threshold, inter-vendor MLB can be started. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value results in a lower probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-UlCceUsageAdmissionThld.html">UlCceUsageAdmissionThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL CCE Usage Admission Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink CCE usage threshold for UE admission in inter-vendor MLB. If the uplink CCE usage of a local cell is greater than or equal to this threshold, the cell cannot be used as a target cell for inter-vendor MLB. If the uplink CCE usage of the cell is lower than this threshold, the eNodeB checks the downlink CCE usage, the proportion of RRC_CONNECTED UEs, and uplink and downlink PRB usages to determine whether the cell can be used as a target cell for inter-vendor MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the UlCceUsageAdmissionThld and UlCceUsageOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the UlCceUsageAdmissionThld parameter must be larger than the UlCceUsageOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a lower probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value of this parameter leads to a higher probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-UlCceUsageOffset.html">UlCceUsageOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL CCE Usage Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the uplink CCE usage. When the duration in which the uplink CCE usage is continuously greater than or equal to the sum of the values of this parameter and the UlCceUsageAdmissionThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB can initiate inter-vendor MLB based on the uplink CCE usage. When the duration in which the uplink CCE usage is continuously less than the value of the UlCceUsageAdmissionThld parameter reaches the value of the MlbTrigJudgePeriod parameter in the CellMLB MO, the eNodeB stops inter-vendor MLB based on the uplink CCE usage. The sum of the values of this parameter and the UlCceUsageAdmissionThld parameter cannot exceed 100%. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the UlCceUsageAdmissionThld and UlCceUsageOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the UlCceUsageAdmissionThld parameter must be larger than the UlCceUsageOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value results in a lower probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-UlPrbUsageAdmissionThld.html">UlPrbUsageAdmissionThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL PRB Usage Admission Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink PRB usage threshold for UE admission in inter-vendor MLB. If the uplink PRB usage of a local cell is greater than or equal to this threshold, the cell cannot be used as a target cell for inter-vendor MLB. If the uplink PRB usage of the cell is lower than this threshold, the eNodeB checks the downlink PRB usage, the proportion of RRC_CONNECTED UEs, and uplink and downlink CCE usages to determine whether the cell can be used as a target cell for inter-vendor MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The sum of the values of the UlPrbUsageAdmissionThld and PrbUsageOffset parameters in the InterVendorMlbAlgo MO must be smaller than or equal to 100.</li><li>The value of the UlPrbUsageAdmissionThld parameter must be larger than the PrbUsageOffset parameter in the InterVendorMlbAlgo MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a lower probability of triggering inter-frequency handovers for inter-vendor MLB. A larger value of this parameter leads to a higher probability of triggering inter-frequency handovers for inter-vendor MLB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-MlbEnhParamAdjustmentRange.html">MlbEnhParamAdjustmentRange</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MLB Enh Param Adjustment Range</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum adjustment range of inter- and intra-frequency CIOs and the reselection Qoffset parameter after enhanced coverage-based MLB is triggered. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~6</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 1~6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a smaller adjustment range, a smaller number of UEs transferred out of the cell during the same amount of time, a slower load decrease in the serving cell if it is heavily loaded, and a smaller increase in the throughput. A larger value of this parameter leads to a larger adjustment range, a larger number of UEs transferred out of the cell during the same amount of time, a faster load decrease in the serving cell if it is heavily loaded, and a larger increase in the throughput but also more ping-pong handovers.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/InterVendorMlbAlgo-MlbEnhParamRollbackEvalPrd.html">MlbEnhParamRollbackEvalPrd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MLB Enh Param Rollback Evaluation Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the evaluation period of a parameter rollback for enhanced coverage-based MLB. From the moment the process for adjusting CIOs and the reselection Qoffset parameter is terminated, the eNodeB checks whether loads (the proportion of RRC_CONNECTED UEs, PDSCH PRB usage, PUSCH PRB usage, and uplink and downlink PDCCH CCE usages) are less than the rollback thresholds (the corresponding load admission threshold subtracted by the load offset) throughout this evaluation period. If the loads are less than the rollback thresholds, the eNodeB starts the rollback process and rolls back CIOs and the reselection Qoffset parameter step by step for target cells in each implementation period (specified by the InterFreqLoadEvalPrd parameter in the CellMLB MO). This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~180</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 1~180</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 180</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a short evaluation period, a less accurate evaluation of load fluctuations, and earlier triggering of the rollback process. A larger value of this parameter leads to a long evaluation period and a more accurate evaluation of load fluctuations, but delayed triggering of the rollback process.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_intervendormlbalgo__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the parameters of inter-vendor MLB algorithm configuration as follows: Local cell ID: 0, MLB Enhance Parameter Rollback Evaluation Period is 60 minute, run the following command:
+MOD INTERVENDORMLBALGO: LocalCellId=0, MlbEnhParamRollbackEvalPrd=60;
+The result is shown as follows:
++++    HUAWEI        2017-10-13 15:28:56
+O&amp;M    #806354948
+%%MOD INTERVENDORMLBALGO: LocalCellId=0, MlbEnhParamRollbackEvalPrd=60;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

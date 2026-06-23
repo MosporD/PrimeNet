@@ -1,0 +1,101 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add GBTS Abis Control Port (ADD GBTSABISCP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_gbtsabiscp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add GBTS Abis Control Port (ADD GBTSABISCP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_gbtsabiscp"></a><a name="add_gbtsabiscp"></a>
+
+
+<h1 class="topictitle1">Add GBTS Abis Control Port (ADD GBTSABISCP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS5900</p>
+
+<div class="mmlfunc"><a name="add_gbtsabiscp__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an Abis control port for the GBTS function. This port is used to carry the control plane data for a GBTS function. One Abis control port corresponds to one CP bearer.</p>
+<p>A control port is a set of CP bearers between the GBTS function and a BSC, that is, a set of Abis control ports.</p>
+<p>An Abis control port is uniquely identified by the control port ID and the CP bearer ID.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_gbtsabiscp__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li>Before running this command, ensure that CPBEARID in the <a href="../../comm/mml/add_cpbearer.html">ADD CPBEARER</a> command is specified and BEARTYPE is set to SCTP.</li><li>If the BSC Node Redundancy feature is not used, only one control port is required. If the BSC Node Redundancy feature is used, two control ports must be configured, which maps to the active and standby BSCs. At present, a GBTS function can be configured with a maximum of two control ports.</li><li>If the main control board is the GTMUb or the GTMUc, only one CP bearer can be bound to a control port. If the main control board is neither the GTMUb nor the GTMUc, a maximum of 12 CP bearers can be bound to a control port.</li><li>Different control ports must use different CP bearers.</li><li>If RSL Bearer Type is set to SCTP for sites on the BSC side, it is recommended that every 12 TRXs are bound to one CP bearer. For example, if the number of TRXs is less than or equal to 12, one CP bearer is required. If the number of TRXs is greater than 12 and less than or equal to 24, two CP bearers are required. This rule applies to other numbers. One CP bearer can be bound to a maximum of 18 TRXs. If RSL Bearer Type is set to LAPD for sites on the BSC side, there is no relationship between the number of TRXs and the number of required CP bearers.</li></ul>
+</div></div>
+
+<div class="mmlparam"><a name="add_gbtsabiscp__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GbtsAbisCP-abisCPId.html">ABISCPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Control Port ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a control port for a GBTS function. It is used together with CPBEARID to uniquely identify an Abis control port.</p>
+<p>GUI Value Range: 0~65534</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65534</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GbtsAbisCP-cpBearId.html">CPBEARID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CP Bear No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the control port bearing ID used by the GBTS function.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_gbtsabiscp__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an Abis control port with the parameters as follows: Control Port ID: 0, CP Bear No.: 0, run the following command: 
+ADD GBTSABISCP: ABISCPID=0, CPBEARID=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

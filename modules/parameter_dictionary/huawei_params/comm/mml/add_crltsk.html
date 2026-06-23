@@ -1,0 +1,597 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add CRL-Updating Task (ADD CRLTSK)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_crltsk">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add CRL-Updating Task (ADD CRLTSK)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_crltsk"></a><a name="add_crltsk"></a>
+
+
+<h1 class="topictitle1">Add CRL-Updating Task (ADD CRLTSK)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_crltsk__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a task of periodically updating a CRL.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_crltsk__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If the same CRL file has been loaded for a BS, running this command does not add any CRL record.</p>
+</li><li><p>If the CRL is obtained using LDAP, the distinguish name in the LDAP server must be correctly set.</p>
+</li><li><p>Board specifications: A UMPT/UMDU/LMPT/GTMUc/UTRPc/UCCU/UBBPe series (except UBBPe15)/LCOP/UBBPf series/UBBPF series/UBBPg series board supports a maximum of 6 periodic CRL updating tasks.</p>
+</li><li><p>System specifications: If the WMPT/UMPT/UMDU/LMPT/GTMUc is the main control board, a maximum of 6 tasks of periodically updating CRLs can be configured.</p>
+</li><li><p>When the <a href="add_ftpscltdport.html">ADD FTPSCLTDPORT</a> command is executed to set FTP Server IP Address to 0.0.0.0, the corresponding destination port cannot take effect in the CRLTSK MO. If the non-default port needs to be used, run the <a href="add_ftpscltdport.html">ADD FTPSCLTDPORT</a> command to configure the specified IP address.</p>
+</li><li><p>When the Using CRL's Next Update parameter is set to DISABLE(Disable), it is recommended that the CRL Updating Period parameter in the CRLTSK MO be set to a period shorter than the interval between the effective date and next update date of the certificate file.</p>
+</li><li><p>The file size of the CRL to be downloaded must be less than 2 MB. The size of a CRL in PEM format must be less than 256 KB.</p>
+</li><li><p>If no source IP address is specified for the base station, the base station uses the effective local OM IP address (you can run the <a href="dsp_omch.html">DSP OMCH</a> command to query this IP address) to establish a connection. When active and standby OM channels are configured for a base station, it is recommended that users ensure connectivity from the local IP addresses of both the active and standby OM channels to that of the server. If a source IP address is specified for the base station but the source IP address is not the IP address of the board specified by the CERTDEPLOY MO, the base station fails to connect to the CRL server.</p>
+</li><li><p>When setting the Minimum DH Length parameter for an NE, ensure that the value of this parameter is less than or equal to that configured on the peer device or ensure that the value of this parameter is DH_0 (adaptive Diffie-Hellman algorithm). Otherwise, the authentication between the NE and its peer device will fail and the CRL cannot be obtained.</p>
+</li><li><p>If you have run the <a href="rmv_crl.html">RMV CRL</a> or <a href="add_crltsk.html">ADD CRLTSK</a> command, wait two minutes before running this command to obtain the CRL. Otherwise, the CRL may fail to be obtained.</p>
+</li><li><p>When adding a CRLTSK object, ensure that the CA configuration for the issuer of the CRL file to be downloaded exist on the NE, or that the trust certificate and valid certificate chain for the issuer exist on the NE, thereby preventing CRL loading failures.</p>
+</li><li><p>When adding a CRLTSK object, ensure that the TLSPOLICY used by CRLTSK exist on the NE.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_crltsk__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-IPVersion.html">IPVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP protocol version.</p>
+<p>GUI Value Range: IPV4(IPv4), IPV6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPV4, IPV6</p>
+<p>MML Default Value: IPV4(IPv4)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>SIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 0.x.x.x or 127.x.x.x, but can be set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>SIP6</strong> must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, <strong>SLVIP</strong> must be different from <strong>IP</strong>.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, <strong>SLVIP6</strong> must be different from <strong>IP6</strong>.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>IP6</strong> in a <strong>CRLTSK</strong> MO must be set to a globally scoped unicast address.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>IP</strong> in a <strong>CRLTSK</strong> MO must be set to a valid IP address of class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x (including 0.0.0.0).</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-IP.html">IP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP address of the master FTP server or master LDAP server.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, <strong>SLVIP</strong> must be different from <strong>IP</strong>.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>IP</strong> in a <strong>CRLTSK</strong> MO must be set to a valid IP address of class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x (including 0.0.0.0).</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>IPVERSION</strong> is set to IPV4.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-IP6.html">IP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IPv6 address of the master FTP server or master LDAP server.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, <strong>SLVIP6</strong> must be different from <strong>IP6</strong>.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>IP6</strong> in a <strong>CRLTSK</strong> MO must be set to a globally scoped unicast address.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>IPVERSION</strong> is set to IPV6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-USR.html">USR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user name used to log in to an FTP server or LDAP server.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-PWD.html">PWD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Password</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the password used to log in to an FTP server or LDAP server.</p>
+<p>GUI Value Range: 0~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-IsCrlTime.html">ISCRLTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Using CRL's Next Update</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to update the CRL at the next update time specified in the CRL that is obtained during the latest update. If this parameter is set to ENABLE, the BS automatically updates the CRL when the next update time specified in the CRL arrives. If this parameter is set to DISABLE, the BS automatically updates the CRL based on the configured updating period.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-CRLPeriod.html">PERIOD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CRL Updating Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval at which the BS automatically obtains the CRL from the FTP server or LDAP server.</p>
+<p>GUI Value Range: 8~240</p>
+<p>Unit: h</p>
+<p>Actual Value Range: 8~240</p>
+<p>MML Default Value: 24</p>
+<p>Recommended Value: 24</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>ISCRLTIME</strong> is set to DISABLE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-TSKID.html">TSKID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Task ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the task for periodically obtaining the CRL.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-CRLGetMethod.html">CRLGETMETHOD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Access Method</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the method using which the BS periodically obtains a CRL.</p>
+<p>GUI Value Range: FTP(FTP), LDAP(LDAP)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FTP, LDAP</p>
+<p>MML Default Value: FTP(FTP)</p>
+<p>Recommended Value: FTP(FTP)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-DSTF.html">FILENAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name of a CRL. A file name specified with its path is supported when the access method is set to FTP.</p>
+<p>GUI Value Range: 1~128 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~128 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>FILENAME</strong> in a <strong>CRLTSK</strong> MO is recommended to enter ASCII characters. When <strong>CRLGETMETHOD</strong> is set to FTP, the name cannot be composed of only space characters (including space and tab) or contain the following characters: * ? " &lt; &gt; |. When <strong>CRLGETMETHOD</strong> is set to LDAP, the name cannot be composed of only space characters (including space and tab) or contain the following characters: \ / : * ? " &lt; &gt; |.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>FILENAME</strong> of <strong>CRLTSK</strong> MO can not be end with "\" or "/".</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>FILENAME</strong> length of <strong>CRLTSK</strong> MO can not exceed 64.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Each <strong>CRLTSK</strong> MO must have a unique <strong>FILENAME</strong>. When a <strong>CRLTSK</strong> MO is being added, the <strong>FILENAME</strong> is case-insensitive; but when a <strong>CRLTSK</strong> MO is referenced, the <strong>FILENAME</strong> is case-sensitive.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-SearchDN.html">SEARCHDN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Distinguish Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of a node found in an LDAP server.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>CRLGETMETHOD</strong> is set to LDAP.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-Port.html">PORT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number of an LDAP server.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: 389</p>
+<p>Recommended Value: 389</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>CRLGETMETHOD</strong> is set to LDAP.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-SIP.html">SIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IP address for downloading CRLs. When this parameter is set to 0.0.0.0, the effective local OM IP address serves as the source IP address to access the CRL server for updating CRL files.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0.0.0.0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>SIP</strong> must be a valid IP address of class A, B, or C. In addition, it cannot be set to the reserved IP addresses 0.x.x.x or 127.x.x.x, but can be set to 0.0.0.0.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>IPVERSION</strong> is set to IPV4.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-SIP6.html">SIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 Source Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IPv6 address for downloading CRLs. When this parameter is set to 0:0:0:0:0:0:0:0, the effective local OM IP address serves as the source IPv6 address to access the CRL server for updating CRL files.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0:0:0:0:0:0:0:0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>SIP6</strong> must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>IPVERSION</strong> is set to IPV6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-SlaveIP.html">SLVIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP address of the slave FTP server or slave LDAP server. If the certificate fails to be obtained using the IP address of the master CRL server, the IP address of the slave CRL server is used only when this parameter is not set to 0.0.0.0. If the IP address of the slave CRL server is used, the slave port number, slave user name, and slave password need be configured.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0.0.0.0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>SLVIP</strong> in a <strong>CRLTSK</strong> MO is not 0.0.0.0, this parameter must be set to a valid IP address of class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, <strong>SLVIP</strong> must be different from <strong>IP</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>IPVERSION</strong> is set to IPV4.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-SlaveIP6.html">SLVIP6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IPv6 address of the slave FTP server or slave LDAP server. If the certificate fails to be obtained using the IP address of the master CRL server, the IP address of the slave CRL server is used only when this parameter is not set to 0:0:0:0:0:0:0:0. If the IP address of the slave CRL server is used, the slave port number, slave user name, and slave password need be configured.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: 0:0:0:0:0:0:0:0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, <strong>SLVIP6</strong> must be different from <strong>IP6</strong>.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>SLVIP6</strong> in a <strong>CRLTSK</strong> MO must be set to a globally scoped unicast address or be set to 0:0:0:0:0:0:0:0.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>IPVERSION</strong> is set to IPV6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-SlaveUser.html">SLVUSR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave User Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user name for logging in to the slave FTP server or slave LDAP server.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-SlavePassword.html">SLVPWD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave Password</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the password for logging in to the slave FTP server or slave LDAP server.</p>
+<p>GUI Value Range: 0~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-SlavePort.html">SLVPORT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number of a slave LDAP server.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: 389</p>
+<p>Recommended Value: 389</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>CRLGETMETHOD</strong> is set to LDAP.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-ConnectionMode.html">CONNMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Connection Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to use the SSL to protect the security of the connection.</p>
+<p>GUI Value Range: PLAINTEXT(Plaintext), SSL(SSL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PLAINTEXT, SSL</p>
+<p>MML Default Value: SSL(SSL)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>CRLGETMETHOD</strong> is set to LDAP.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-AuthenticatePeer.html">AUTHPEER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Authenticate Peer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to authenticate the certificate of the peer end when SSL connection is used. This parameter does not take effect for TLS1.3.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: ENABLE(Enable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>CRLGETMETHOD</strong> is set to LDAP and <strong>CONNMODE</strong> is set to SSL.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-MINDHLEN.html">MINDHLEN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Minimum DH Length</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum length of the Diffie-Hellman (DH) group allowed on the NE side when SSL connection is used and the peer certificate is authenticated. If the length of the DH key sent by the peer end is less than the value of this parameter when the DH is used as the key exchange algorithm in the algorithm set for authentication and negotiation, the SSL connection-based negotiation fails. The longer the DH key, the higher the security. When the value of this parameter is set to DH_0, peer SSL connection-based negotiation succeeds in spite of the DH key length.</p>
+<p>Disuse statement: In later versions, the values DH_0, DH_512, and DH_1024 will be removed from the value range of this parameter. In the current version, this value can still be configured and take effect. Therefore, you are not advised to use the values DH_0(DH_0), DH_512(DH_512), and DH_1024(DH_1024).</p>
+<p>GUI Value Range: DH_0(Adaptive Diffie-Hellman algorithm), DH_512(512-bit Diffie-Hellman group), DH_1024(1024-bit Diffie-Hellman group), DH_2048(2048-bit Diffie-Hellman group), DH_3072(3072-bit Diffie-Hellman group), DH_4096(4096-bit Diffie-Hellman group)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DH_0, DH_512, DH_1024, DH_2048, DH_3072, DH_4096</p>
+<p>MML Default Value: DH_2048(2048-bit Diffie-Hellman group)</p>
+<p>Recommended Value: DH_2048(2048-bit Diffie-Hellman group)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>CRLGETMETHOD</strong> is set to LDAP, <strong>CONNMODE</strong> is set to SSL and <strong>AUTHPEER</strong> is set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-PolicyID.html">POLICYID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Policy ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of TLS policy configured.</p>
+<p>GUI Value Range: 0~16</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~16</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>POLICYID</strong> in a <strong>CRLTSK</strong> MO must be set to a configured value of <strong>POLICYID</strong> in an <strong>TLSPOLICY</strong> MO.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CRLTSK</strong> MO, this parameter is valid only when <strong>CRLGETMETHOD</strong> is set to LDAP, <strong>CONNMODE</strong> is set to SSL.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-Vrfidx.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CRLTSK-TlsSeccsSw.html">TLSSECCSSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TLS Secure Cipher Suite Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TLS security algorithm switch. When the switch is off, it is compatible with non-AEAD (Authenticated Encryption with Associated Data) and non-PFS (Perfect Forward Secrecy) weak security algorithm sets, which poses a security risk. When the switch is turned on, TLS does not support weak security algorithm sets other than AEAD and non-PFS, and only negotiates the security algorithm set. This parameter is invalid when a WMPT serves as the main control board. If this parameter is set to ON, the switch actually takes effect from OFF.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: ON(On)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_crltsk__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a periodic task of obtaining the CRL with the parameters as follows: IP Version: IPV4, IP Address: 192.168.23.112, Using CRL's Next Update: DISABLE, Task ID: 0, Access Method: FTP, File Name: basestation.crl, Source IP: 0.0.0.0, Slave IP Address: 192.168.21.110, run the following command:
+ADD CRLTSK: IPVERSION=IPV4, IP="192.168.23.112", ISCRLTIME=DISABLE, TSKID=0, CRLGETMETHOD=FTP, FILENAME="basestation.crl", SIP="0.0.0.0", SLVIP="192.168.21.110";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

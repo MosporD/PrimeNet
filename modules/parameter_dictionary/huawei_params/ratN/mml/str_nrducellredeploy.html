@@ -1,0 +1,89 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start NR DU Cell Redeploy (STR NRDUCELLREDEPLOY)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_nrducellredeploy">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start NR DU Cell Redeploy (STR NRDUCELLREDEPLOY)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_nrducellredeploy"></a><a name="str_nrducellredeploy"></a>
+
+
+<h1 class="topictitle1">Start NR DU Cell Redeploy (STR NRDUCELLREDEPLOY)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 5G, BTS5900, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="str_nrducellredeploy__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to re-deploy NR DU cells on the baseband equipment in one-click. When an NR DU cell reports ALM-29870 NR DU Cell TRP Unavailable with the cause being "Configuration conflict", "The baseband capability is insufficient", or "Insufficient IDX2 bandwidth", the system automatically configures the specified baseband equipment or CPRI/eCPRI direct interconnection baseband equipment for the cell. In addition, the system resets all the cells deployed on the baseband equipment serving the cell reporting the alarm with the preceding cause and deploys these cells again.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_nrducellredeploy__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If NrDuCellId is specified in this command, this command takes effect when the NR DU cell reports ALM-29870 NR DU Cell TRP Unavailable with the cause being "Configuration conflict", "The BBP capability is insufficient", or "Insufficient IDX2 bandwidth."</p>
+</li><li><p>The following will be reset and then deployed again: all TRPs of the cell, other cells whose cell instance status is normal on the baseband equipment bound to the cell TRP generating the alarm (when the cell TRP is bound to a baseband equipment) or the baseband equipment directly connected to the cell TRP over the CPRI/eCPRI port (when the cell TRP is not bound to any baseband equipment), and other cells whose cell instance status is normal on the baseband equipment where the faulty cell TRP resides.</p>
+</li><li><p>When NrDuCellId is not specified in this command, automatic reset and redeployment are triggered for all TRPs and cells associated with faulty cells that meet the preceding conditions.</p>
+</li><li><p>The DSP NRDUCELLANTENNA command can be executed to query the information about the baseband equipment serving the faulty cell TRP. If there are multiple sets of baseband equipment with the same fault, only the first faulty baseband equipment is displayed, and the redeployment is performed only on this baseband equipment.</p>
+</li><li><p>The cell setup process takes a long time. You can run the DSP DUCELL command to query the cell status during the redeployment. The latest operation type that causes the DU cell unavailable is cell reconfiguration.</p>
+</li><li><p>If this command is executed again during cell redeployment, the execution will fail with the cause value "An NR DU cell baseband resource re-deployment task already starts."</p>
+</li><li><p>After this command is executed, cells that meet the conditions are redeployed. However, the cells may not return to normal after they are redeployed. If the problem persists after multiple redeployment operations, contact Huawei technical support.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="str_nrducellredeploy__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/NRDUCell-NrDuCellId.html">NrDuCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NR DU Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an NR DU cell, which uniquely identifies the NR DU cell within a gNodeB.</p>
+<p>GUI Value Range: 0~65534</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65534</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_nrducellredeploy__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start the re-deploy of NR DU cell, NR DU Cell ID is 0, run the following command:
+STR NRDUCELLREDEPLOY: NrDuCellId=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

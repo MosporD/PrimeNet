@@ -1,0 +1,120 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start DL Load Simulation (STR DLSIM)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_dlsim">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start DL Load Simulation (STR DLSIM)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_dlsim"></a><a name="str_dlsim"></a>
+
+
+<h1 class="topictitle1">Start DL Load Simulation (STR DLSIM)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="str_dlsim__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>The command is used to start the downlink network load simulation of a specified local cell or all local cells.</p>
+<p>It is mainly used in the incipient period of the network to test the performance of the network.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_dlsim__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li>This command can be successfully executed only when the corresponding logical cell exists.</li><li>The downlink network load simulation uses the channelization codes from 112 to 127 whose SF = 128.</li><li>If downlink load simulation needs to be enabled, the corresponding channel codes must be reserved on the RNC.</li><li>Before starting the downlink load simulation, check that the power load is greater than the carrier transmit power. You can query the carrier transmit power by choosing Cell Performance Monitoring: Cell DL Carrier TX Power on the RNC.</li><li>After starting the DL load simulation, new service can not be built in the channel resource occupied by the simulation.</li><li>If the downlink load simulation is started in a cell carrying services, ensure that the simulated load is within the normal range of load value. If the simulated load is too high, the downlink channel is deteriorated and therefore the RNC terminates the valid services based on measurement reports, or call drops occur because of deteriorated SNR.</li><li>After the execution of this command, run the <a href="stp_dlsim.html">STP DLSIM</a> command to stop the downlink network load simulation of a specified local cell or all local cells.</li><li>After the execution of this command, run the <a href="mod_dlsim.html">MOD DLSIM</a> command to modify the load radio of downlink network load simulation of a specified local cell or all local cells.</li><li>After the execution of this command, run the <a href="dsp_dlsim.html">DSP DLSIM</a> command to display the current load ratio of downlink network load simulation of a specified local cell or all local cells.</li><li>After downlink network load simulation is started, do not run the <a href="blk_ulocell.html">BLK ULOCELL</a> or <a href="ubl_ulocell.html">UBL ULOCELL</a> command or adjust the cell channel power. Otherwise, the cell transmit power may become abnormal.</li><li>After the <a href="ubl_ulocell.html">UBL ULOCELL</a> command is executed, wait for a moment (at most 1 minute) until the cell output power becomes stable before executing this command. Otherwise, the cell transmit power may become abnormal.</li><li>Do not run this command when <strong>SMTHPWRSWITCH</strong> in the <strong>NODEBSMTHPWR</strong> MO is set to OPEN or <strong>SHUTDOWNFAULTDETECTSW</strong> in the <strong>NODEBALGPARA</strong> MO is set to ON. Otherwise, the cell transmit power may become abnormal when the corresponding function takes effect.</li><li>Do not run this command when <strong>DYNAMICPCPICHSWITCH</strong> in the <strong>ULOCELLALGPARA</strong> MO is set to ON. Otherwise, the cell transmit power may become abnormal.</li></ul>
+</div></div>
+
+<div class="mmlparam"><a name="str_dlsim__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DlSim-uLoCellId.html">ULOCELLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Local Cell ID.</p>
+<p>GUI Value Range: 0~268435455</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~268435455</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DlSim-lR.html">LR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Load Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Load Ratio.</p>
+<p>GUI Value Range: 1~99</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~99</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DlSim-dlSimOptSw.html">DLSIMOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink Network Load Simulation Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for downlink network load simulation optimization. When this switch is turned on, the NodeB optimizes the downlink network load simulation. When this switch is turned off, the NodeB does not optimize the downlink network load simulation.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_dlsim__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Start the downlink network load simulation of the local cell whose ID is "10" and set the load ratio as 40%:
+STR DLSIM: ULOCELLID=10, LR=40;
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

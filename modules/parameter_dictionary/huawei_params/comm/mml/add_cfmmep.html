@@ -1,0 +1,258 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add CFM MEP (ADD CFMMEP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_cfmmep">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add CFM MEP (ADD CFMMEP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_cfmmep"></a><a name="add_cfmmep"></a>
+
+
+<h1 class="topictitle1">Add CFM MEP (ADD CFMMEP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_cfmmep__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a local maintenance association end point (MEP).</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_cfmmep__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Only one local MEP can be configured in an MA of the BS.</p>
+</li><li><p>The CFMMA MO is configured before the MEP is configured. The VLAN related parameters (such as VLANID and VLANPRIO) of the MEP and the CCM TX period are inherited from the MA.</p>
+</li><li><p>During the adding of a CFMMEP MO, if an error message, indicating that the MO cannot be added because its dependent MO does not exist, is displayed, check whether the CFMMA MO exists.</p>
+</li><li><p>The MD level of the Ethernet-trunk-based CFM MEP must be greater than that of the trunk-link-based CFM MEP.</p>
+</li><li><p>System specifications: If the WMPT/GTMUb/GTMUc is the main control board, a maximum of 8 local MEPs can be configured. If the LMPT/UMPT/UMDU is the main control board, a maximum of 32 local MEPs can be configured.</p>
+</li><li><p>Board specifications: A maximum of 4 local MEPs can be configured on a WMPT/UTRP (subboard type: UEOC/UQEC). A maximum of 8 local MEPs can be configured on a GTMUb/GTMUc. A maximum of 32 local MEPs can be configured on a UMPT/UMDU/LMPT/UTRPc/UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. If the WMPT is the main control board, a maximum of 4 local MEPs can be configured on one board.</p>
+</li><li><p>[NodeB,eNodeB,gNodeB]The MD level of a non-VLAN MEP at a port must be lower than that of all single-VLAN MEPs. Only non-VLAN MEPs rather than single-VLAN MEPs can be configured on the Ethernet trunk member port.</p>
+</li><li><p>[eNodeB,gNodeB]The MEPs in one MA must have identical settings of the MD name, MA name, and VLAN ID. Otherwise, the MEPs are not regarded to be in the same MA.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_cfmmep__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-MDName.html">MDNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MD Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the MD to which the MEP belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the MD Name parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 1~43 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~43 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Digits 0 to 9 and letters a to z and A to Z are recommended for the MDNAME value of a CFM MEP.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CFMMEP</strong> MO, the total length of <strong>MANAME</strong> and <strong>MDNAME</strong> cannot exceed 44 characters.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-MAName.html">MANAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MA Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the MA to which the MEP belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the MA Name parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 1~43 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~43 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Digits 0 to 9 and letters a to z and A to Z are recommended for the MANAME value of a CFM MEP.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CFMMEP</strong> MO, the total length of <strong>MANAME</strong> and <strong>MDNAME</strong> cannot exceed 44 characters.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>MANAME</strong> in a <strong>CFMMEP</strong> MO can contain only ASCII characters. The name cannot be composed of only space characters (including space and tab) or contain the following characters: ', ", !, ?, &lt;, &gt;, and \.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-MEPID.html">MEPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MEP ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MEP ID.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the MEP ID parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 1~8191</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~8191</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the board to which the MEP belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board to which the MEP belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board to which the MEP belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of subboard on the board where the MEP is located.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type and Port ID parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH_COVERBOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>CFMMEP</strong> MO, this parameter must be set to ETH_COVERBOARD if <strong>SN</strong> is set to a value within the range of 0 to 5.</li><li>In a <strong>CFMMEP</strong> MO, this parameter can be set to BASE_BOARD or ETH_COVERBOARD if <strong>SN</strong> is set to 6 or 7.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port type of MEP.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port Type parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: ETH(Ethernet Port), ETHTRK(Ethernet Trunk)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH, ETHTRK</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMEP-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number of the MEP.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the  Port ID parameter in the CFMLOCALMEP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CFMMEP</strong> MO, if <strong>PT</strong> is set to ETH and <strong>SBT</strong> is set to ETH_COVERBOARD, the value range of this parameter is from 0 to 5.</li><li>In the <strong>CFMMEP</strong> MO, if <strong>PT</strong> is set to ETH and <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to 0 to 3.</li><li>In the <strong>CFMMEP</strong> MO, if <strong>PT</strong> is set to ETHTRK and <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to 0 or 1.</li><li>In the <strong>CFMMEP</strong> MO, if <strong>PT</strong> is set to ETHTRK and <strong>SBT</strong> is set to ETH_COVERBOARD, the value range of this parameter is from 0 to 2.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_cfmmep__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a CFM MEP with the parameters as follows: MD Name: CHINA, MA Name: SHANGHAI, MEP ID: 1000, Cabinet No.: 0, Subrack No.: 0, Slot No.: 6, Subboard Type: BASE_BOARD, Port Type: ETH, Port No.: 0, run the following command: 
+ADD CFMMEP: MDNAME="CHINA", MANAME="SHANGHAI", MEPID=1000, CN=0, SRN=0, SN=6, SBT=BASE_BOARD, PT=ETH, PN=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

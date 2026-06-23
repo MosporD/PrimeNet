@@ -1,0 +1,122 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Parameter for Periodic Cell ID Update (MOD CELLIDPRDUPT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellidprdupt">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Parameter for Periodic Cell ID Update (MOD CELLIDPRDUPT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellidprdupt"></a><a name="mod_cellidprdupt"></a>
+
+
+<h1 class="topictitle1">Modify Parameter for Periodic Cell ID Update (MOD CELLIDPRDUPT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellidprdupt__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of the cell ID periodic updating algorithm.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellidprdupt__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>The cell ID broadcast in the system information is updated after the command execution, which may affect the handovers from the local cell to its neighboring cells. Therefore, set the time at which the algorithm for periodically updating cell IDs begins to take effect to the same value for all cells in the E-UTRAN, for example, a low-traffic time point in the next morning of the command execution.In addition, for cells whose adjacent cells are provided by other vendors' equipment, this time also must be the same among all cells to decrease the impact on handovers between cells provided by different vendors' equipment.</p>
+</li><li><p>When prdUptSwitch is ON, the CGI in Uu Interface Trace maybe different with it in NCL recorded in SON log.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellidprdupt__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellIdPrdUpt-PrdUptSwitch.html">PrdUptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Period update switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for the algorithm for periodically updating cell IDs. If this parameter is set to BOOLEAN_TRUE, cell IDs are periodically updated, inserted into the system information, and broadcast to the associated UEs once the time at which the algorithm begins to take effect is reached. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellIdPrdUpt-ActionTime.html">ActionTime</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Action time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time at which the algorithm for periodically updating cell IDs begins to take effect. If the switch for the algorithm is turned on, cell IDs are periodically updated, inserted into the system information, and broadcast to the associated UEs once the time specified by this parameter is reached. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 2000-01-01T00:00:00+00:00~2099-12-31T23:59:59+00:00</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2000-01-01T00:00:00+00:00~2099-12-31T23:59:59+00:00</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2000-01-01T00:00:00+00:00</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellIdPrdUpt-Period.html">Period</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period of updating cell IDs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~365</p>
+<p>Unit: day</p>
+<p>Actual Value Range: 1~365</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellidprdupt__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To modify the configuration of the cell ID periodic updating algorithm with the parameters as follows: PrdUptSwitch: BOOLEAN_TRUE, ActionTime: 2011-05-16 16:07:43, run the following command:
+MOD CELLIDPRDUPT: PrdUptSwitch=BOOLEAN_TRUE, ActionTime=2011&amp;05&amp;16&amp;16&amp;07&amp;43;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

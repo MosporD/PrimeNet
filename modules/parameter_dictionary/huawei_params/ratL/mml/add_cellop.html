@@ -1,0 +1,680 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Cell Operator (ADD CELLOP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_cellop">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Cell Operator (ADD CELLOP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_cellop"></a><a name="add_cellop"></a>
+
+
+<h1 class="topictitle1">Add Cell Operator (ADD CELLOP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="add_cellop__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a cell operator.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_cellop__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>When a cell is active, adding a cell operator will result in automatic reset of the cell.</p>
+</li><li><p>In independent mode, one and only one CellOp MO can be configured for each cell and this MO must correspond to the primary operator.</p>
+</li><li><p>In RAN sharing with dedicated carrier mode, one and only one CellOp MO can be configured for each cell.</p>
+</li><li><p>In RAN sharing with common carrier mode or hybrid RAN sharing mode, a maximum of six CellOp MOs can be configured for each cell.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_cellop__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-TrackingAreaId.html">TrackingAreaId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local tracking area ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local tracking area identity of the cell, which uniquely identifies an operator's record of tracking area information within a cell. This parameter is used only in the eNodeB and is different from the tracking area identity configured in the tracking area list on the MME.</p>
+<p>This parameter applies to LTE FDD, LTE TDD, and NB-IoT. According to NB-IoT specifications, the TAIs planned for NB-IoT must be different from the TAIs planned for LTE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-CellReservedForOp.html">CellReservedForOp</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell reserved for operator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell is reserved for an operator.</p>
+<p>If this parameter is set to CELL_RESERVED_FOR_OP, the cell is reserved for the operator. UEs of AC11 or AC15 in their HPLMN or EHPLMN can consider this cell as a candidate cell for cell selection or reselection. UEs of AC11 or AC15 outside their HPLMN/EHPLMN and UEs of AC0 to AC9 and AC12 to AC14 consider this cell as a barred cell during cell selection or reselection.</p>
+<p>If this parameter is set to CELL_NOT_RESERVED_FOR_OP, the cell is not reserved for the operator. All UEs can consider this cell as a candidate cell for cell selection or reselection.</p>
+<p>If this parameter is set to CELL_DYNAMIC_RESERVED_FOR_OP, the cell is dynamically reserved for the operator based on the cell load. When the cell is overloaded, the cell is reserved for the operator. When the cell is lightly loaded, the cell is not reserved for the operator. The CELL_DYNAMIC_RESERVED_FOR_OP value is valid only when the AcBarAlgoSwitch parameter in the CellAlgoSwitch MO is set to ACBAR_SWITCH_DYNAMIC.</p>
+<p>This parameter applies to LTE FDD, LTE TDD, and NB-IoT.</p>
+<p>GUI Value Range: CELL_RESERVED_FOR_OP(Reserved), CELL_NOT_RESERVED_FOR_OP(Not Reserved), CELL_DYNAMIC_RESERVED_FOR_OP(Dynamic Reserved)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CELL_RESERVED_FOR_OP, CELL_NOT_RESERVED_FOR_OP, CELL_DYNAMIC_RESERVED_FOR_OP</p>
+<p>MML Default Value: CELL_NOT_RESERVED_FOR_OP(Not Reserved)</p>
+<p>Recommended Value: CELL_NOT_RESERVED_FOR_OP(Not Reserved)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to CELL_RESERVED_FOR_OP or if this parameter is set to CELL_DYNAMIC_RESERVED_FOR_OP and the cell is overloaded, the cell is reserved for the operator and UEs of access classes 0 to 9 or 12 to 14 cannot reselect to the cell. This significantly reduces the load of the cell. The related counters may change as follows: The board CPU usage, the number of RRC connection setup requests, the number of initial context setup requests, the number of random access requests, and the air interface resource usage of the cell decrease, the RRC connection setup success rate may increase, and cell traffic volume may decrease. If this parameter is set to CELL_NOT_RESERVED_FOR_OP or if this parameter is set to CELL_DYNAMIC_RESERVED_FOR_OP and the cell is lightly loaded, there is no impact.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpUlRbUsedRatio.html">OpUlRbUsedRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator uplink RB used ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the percentage of resource blocks (RBs) occupied by the operator on the physical uplink shared channel (PUSCH) when RAN sharing is enabled on the eNodeB and the RanShareModeSwitch parameter of the CellAlgoSwitch MO is set to ON(On). If the data volume is sufficient, the percentage of RBs occupied by each operator will reach the preset value. Modifications on this parameter affect the percentages of RBs occupied by operators on the PUSCH. When the OpPrbGroupshareSwitch option is selected in RAN sharing mode, this parameter is used to calculate the percentage of RBs occupied by the operator resource group on the PUSCH. The percentage of RBs occupied by an operator resource group is the sum of percentages of RBs occupied by operators in the group. This parameter takes effect only in RAN sharing with common carrier mode or in hybrid RAN sharing mode with more than one CellOp MO being configured. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 16</p>
+<p>Recommended Value: 16</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpDlRbUsedRatio.html">OpDlRbUsedRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator downlink RB used ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the percentage of resource blocks (RBs) occupied by the operator on the physical downlink shared channel (PDSCH) when RAN sharing is enabled on the eNodeB and the RanShareModeSwitch parameter of the CellAlgoSwitch MO is set to ON(On). If the data volume is sufficient, the percentage of RBs occupied by each operator will reach the preset value. Modifications on this parameter affect the percentage of RBs occupied by operators on the PDSCH. When the OpPrbGroupshareSwitch option is selected in RAN sharing mode, this parameter is used to calculate the percentage of RBs occupied by the operator resource group on the PDSCH. The percentage of RBs occupied by an operator resource group is the sum of percentages of RBs occupied by operators in the group. This parameter takes effect only in RAN sharing with common carrier mode or in hybrid RAN sharing mode with more than one CellOp MO being configured. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 16</p>
+<p>Recommended Value: 16</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMECfgNum.html">MMECfgNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MME configure number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of cell-specific MMEs. This parameter also indicates whether dedicated-MME configuration is allowed for a cell.</p>
+<p>If this parameter is set to 0, dedicated-MME configuration is not allowed for the cell and no dedicated MMEs can be configured for the cell.</p>
+<p>If this parameter is set to a value in the range of 1 to 4, dedicated-MME configuration is allowed for the cell and the number of MME parameter groups that can be configured for the cell equals the value of this parameter. Each MME parameter group consists of an MME group identifier (MMEGI) and an MME code (MMEC)</p>
+<p>GUI Value Range: CELL_MME_CFG_NUM_0(0), CELL_MME_CFG_NUM_1(1), CELL_MME_CFG_NUM_2(2), CELL_MME_CFG_NUM_3(3), CELL_MME_CFG_NUM_4(4)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CELL_MME_CFG_NUM_0, CELL_MME_CFG_NUM_1, CELL_MME_CFG_NUM_2, CELL_MME_CFG_NUM_3, CELL_MME_CFG_NUM_4</p>
+<p>MML Default Value: CELL_MME_CFG_NUM_0(0)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMEGI1.html">MMEGI1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First MME group identity</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MMEGI of the first MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 1.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMEC1.html">MMEC1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First MME code</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MMEC of the first MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 1.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMEGI2.html">MMEGI2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second MME group identity</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MMEGI of the second MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 2.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMEC2.html">MMEC2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Second MME code</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MMEC of the second MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 2.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMEGI3.html">MMEGI3</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Third MME group identity</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MMEGI of the third MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 3.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMEC3.html">MMEC3</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Third MME code</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MMEC of the third MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is greater than or equal to 3.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMEGI4.html">MMEGI4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Fourth MME group identity</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MMEGI of the fourth MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is equal to 4.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-MMEC4.html">MMEC4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Fourth MME code</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the MMEC of the fourth MME configured for a cell. This parameter can be configured only when the MMECfgNum parameter is equal to 4.</p>
+<p>When setting this parameter, ensure that the globally unique MME identifier (GUMMEI), consisting of the PLMN, MMEGI, and MMEC, must be unique.</p>
+<p>The S1 link between an MME configured for a cell and the eNodeB supporting the cell must be available, and the GUMMEI of the MME must be specified in the ServedGummeis parameter of the S1Interface MO. Otherwise, the cell cannot broadcast the PLMN in system information.</p>
+<p>If all MMEs configured for a cell cannot establish S1 links to the eNodeB supporting the cell, the cell cannot be established.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When MMECfgNum is greater than 1, among all MMEs configured in a CellOp MO, the MME group identity (MMEGI) and MME code (MMEC) of each two MMEs cannot be the same simultaneously.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpUeNumRatio.html">OpUeNumRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator Ue Number Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the percentage of activated UEs served by the operator in a cell when inter-frequency load balancing and RAN sharing are enabled. Modifications on this parameter affect the percentage of activated UEs served by operators. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 16</p>
+<p>Recommended Value: 16</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpPttUlRbHighThd.html">OpPttUlRbHighThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator PTT UL RB Utilization High Thd</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper usage threshold of the uplink PRBs that an operator allocates to PTT services in a cell. Based on the parameter value, the eNodeB determines whether to admit PTT services in the uplink. If the uplink PRB usage of PTT services is greater than the parameter value, PTT services are not admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 10</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a CellOp MO, the value of OpPttUlRbLowThd must be smaller than OpPttUlRbHighThd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates fewer uplink PRBs used by PTT services and a lower PTT service admission success rate.</p>
+<p>A larger parameter value results in the opposite effects. When PTT services are not running, the PRBs reserved for PTT services can be used by other services. Therefore, setting this parameter to a larger value does not cause PRB usage waste.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpPttUlRbLowThd.html">OpPttUlRbLowThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator PTT UL RB Utilization Low Thd</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower usage threshold of the uplink PRBs that an operator allocates to PTT services in a cell. Based on the parameter value, the eNodeB determines whether to admit PTT services in the uplink. If the uplink PRB usage of PTT services is less than the parameter value, PTT services are admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 5</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a CellOp MO, the value of OpPttUlRbLowThd must be smaller than OpPttUlRbHighThd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates that it is more difficult to convert the event of the high uplink PRB usage threshold of PTT services to the event of the low uplink PRB usage threshold of PTT services and a higher possibility that PTT services fail to be admitted.</p>
+<p>A larger parameter value indicates a higher possibility that ping-pong conversions occur between the event of the high uplink PRB usage threshold and the event of the low uplink PRB usage threshold of PTT services.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpPttDlRbHighThd.html">OpPttDlRbHighThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator PTT DL RB Utilization High Thd</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper usage threshold of the downlink PRBs that an operator allocates to PTT services in a cell. Based on the parameter value, the eNodeB determines whether to admit PTT services in the downlink. If the downlink PRB usage of PTT services is greater than the value of this parameter, PTT services are not admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 10</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a CellOp MO, the value of OpPttDlRbLowThd must be smaller than OpPttDlRbHighThd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates fewer downlink PRBs used by PTT services and a lower PTT service admission success rate.</p>
+<p>A larger parameter value results in the opposite effects. When PTT services are not running, the PRBs reserved for PTT services can be used by other services. Therefore, setting this parameter to a larger value does not cause PRB usage waste.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpPttDlRbLowThd.html">OpPttDlRbLowThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator PTT DL RB Utilization Low Thd</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower usage threshold of the downlink PRBs that an operator allocates to PTT services in a cell. Based on the parameter value, the eNodeB determines whether to admit PTT services in the downlink. If the downlink PRB usage of PTT services is less than the parameter value, PTT services are admitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 5</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a CellOp MO, the value of OpPttDlRbLowThd must be smaller than OpPttDlRbHighThd.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates that it is more difficult to convert the event of the high downlink PRB usage threshold of PTT services to the event of the low downlink PRB usage threshold of PTT services and a higher possibility that PTT services fail to be admitted.</p>
+<p>A larger parameter value indicates a higher possibility that ping-pong conversions occur between the event of the high downlink PRB usage threshold and the event of the low downlink PRB usage threshold of PTT services.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OperatorPlmnRoundPeriod.html">OperatorPlmnRoundPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator PLMN Round Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the operator-specific interval for changing the PLMN at the top of the broadcast PLMN list in round robin mode.</p>
+<p>GUI Value Range: 1~720</p>
+<p>Unit: h</p>
+<p>Actual Value Range: 1~720</p>
+<p>MML Default Value: 1</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpResourceGroupIndex.html">OpResourceGroupIndex</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator Resource Group Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of the resource group to which the operator belongs. The default value is 255, which indicates an invalid value. The OpPrbGroupshareSwitch option takes effect only when the OpResourceGroupIndex parameter is set to a valid value.</p>
+<p>GUI Value Range: 0~5,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5,255</p>
+<p>MML Default Value: 255</p>
+<p>Recommended Value: A valid operator group ID ranging from 0 to 5 must be configured when operators share resources in the form of operator group. Otherwise, the invalid value 255 is configured.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the OpPrbGroupshareSwitch option of OpResourceGroupShareSwitch in the CellAlgoSwitch MO is selected, OpResourceGroupIndex in related CellOp MOs cannot be set to 255.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-RatFreqPriorityGroupId.html">RatFreqPriorityGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RAT Frequency Priority Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the eNodeB-level inter-frequency or inter-RAT frequency priority group ID for LTE UEs of an operator. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255,65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255,65535</p>
+<p>MML Default Value: 65535</p>
+<p>Recommended Value: 65535</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpNonGbrResourceRatio.html">OpNonGbrResourceRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator Non-GBR Resource Reservation Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the proportion of resources that an operator reserves for downlink non-GBR services to the total resources of the operator when RAN sharing is enabled on the eNodeB and the RanShareModeSwitch parameter of the CellAlgoSwitch MO is set to ON(On). If this parameter is set to 0 for all operators in a cell, this parameter does not take effect. The proportion of resources reserved for downlink non-GBR services is subject to the cell-level non-GBR reservation parameter. If this parameter is set to a non-zero value for at least one operator in the cell, the cell-level non-GBR reservation parameter does not take effect. In this case, this parameter specifies the proportion of resources reserved for downlink non-GBR services of the operator. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~50</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~50</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, more resources are reserved for non-GBR services of an operator. When non-GBR and GBR UEs coexist on the network, the eNodeB schedules more resources for non-GBR UEs and fewer resources for GBR UEs. In congestion scenarios, this reduces the service satisfaction rate of GBR UEs and the number of accessed UEs. If this parameter is set to a small value, fewer resources are reserved for non-GBR services of an operator. When non-GBR and GBR UEs coexist on the network, the eNodeB schedules fewer resources for non-GBR UEs and more resources for GBR UEs. In congestion scenarios, this increases the service satisfaction rate of GBR UEs and the number of accessed UEs.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-UlAmrcMode.html">UlAmrcMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Rate Control Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink voice rate control mode for the operator. This parameter is valid only if RAN sharing with common carriers mode or hybrid RAN sharing mode is used and there is more than one CellOp MO instance for the cell.</p>
+<p>If this parameter is set to INVALID, this parameter does not take effect.</p>
+<p>If this parameter is set to ULRATECTRL_OFF, voice rate control does not take effect. If RTP packets are encrypted, this parameter must be set to ULRATECTRL_OFF.</p>
+<p>If this parameter is set to ULAMRC_ENB_CONTROL, the eNodeB adjusts the uplink AMR rate.</p>
+<p>If this parameter is set to ULAMRC_SBC_CONTROL, the eNodeB instructs the session border controller (SBC) in the EPC to adjust the uplink AMR rate. The SBC must be a Huawei SBC that supports voice rate control.</p>
+<p>If this parameter is set to ULEVSC_ENB_CONTROL, the eNodeB adjusts the uplink EVS rate.</p>
+<p>If this parameter is set to ADAPTIVE_ENB_CONTROL, the eNodeB adaptively adjusts the uplink AMR/EVS rate.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>For a specific operator, this operator-level parameter and the cell-level parameter UlAmrcMode in the CellAlgoSwitch MO take effect in the following way:</p>
+<p>1. If the cell-level parameter is set to ULRATECTRL_OFF, rate control does not take effect for the operator regardless of the operator-level parameter setting.</p>
+<p>2. If the operator-level parameter is set to ULRATECTRL_OFF, rate control does not take effect for the operator regardless of the cell-level parameter setting.</p>
+<p>3. If the operator-level parameter is set to INVALID, this parameter does not take effect. Rate control defined by the cell-level parameter takes effect for the operator.</p>
+<p>4. If the cell-level parameter and the operator-level parameter are set to other values, rate control takes effect for the operator based on the intersection of the meanings of the two parameter values. There is no intersection between any two of the ULAMRC_ENB_CONTROL, ULEVSC_ENB_CONTROL, and ULAMRC_SBC_CONTROL values. The value ADAPTIVE_ENB_CONTROL includes ULAMRC_ENB_CONTROL and ULEVSC_ENB_CONTROL but does not intersect with ULAMRC_SBC_CONTROL.</p>
+<p>DisuseStatement: The enumerated value ULAMRC_SBC_CONTROL in this parameter will be deleted in later versions. Although the configuration interface in this version supports synchronization and delivery of the setting of this enumerated value, the system does not use this enumerated value. Therefore, avoid using this enumerated value ULAMRC_SBC_CONTROL.</p>
+<p>GUI Value Range: INVALID(INVALID), ULRATECTRL_OFF(ULRATECTRL_OFF), ULAMRC_ENB_CONTROL(ULAMRC_ENB_CONTROL), ULAMRC_SBC_CONTROL(ULAMRC_SBC_CONTROL), ULEVSC_ENB_CONTROL(ULEVSC_ENB_CONTROL), ADAPTIVE_ENB_CONTROL(ADAPTIVE_ENB_CONTROL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: INVALID, ULRATECTRL_OFF, ULAMRC_ENB_CONTROL, ULAMRC_SBC_CONTROL, ULEVSC_ENB_CONTROL, ADAPTIVE_ENB_CONTROL</p>
+<p>MML Default Value: INVALID(INVALID)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If any function is enabled and the uplink channel quality is good, a high voice coding rate is used. If the uplink channel quality is poor, a low coding rate is used to improve uplink voice quality.</p>
+<p>If there is a high ratio that initial voice coding rates are tuned up to higher voice coding rates, CCE and RB resources consumed by voice services increase. In CCE-limited or full-buffer service scenarios, the traffic volume and throughput of data services are more likely to decrease. If there is a high ratio that initial voice coding rates are tuned up to lower voice coding rates, CCE and RB resources consumed by voice services decrease. In CCE-limited or full-buffer service scenarios, the traffic volume and throughput of data services are more likely to increase.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-RbSharingRatioWithOtherOp.html">RbSharingRatioWithOtherOp</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RB Sharing Ratio with Other Operator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the proportion of RBs that can be shared by the operator with other operators to the total number of RBs in the cell when the operators share cell RB resources. The value 255 indicates that there is no restriction on the proportion of RBs that can be shared by the operator with other operators. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~99,255</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~99,255</p>
+<p>MML Default Value: 255</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter indicates that more RBs can be dynamically shared, increasing the total traffic volume in the system. A smaller value of this parameter indicates that fewer RBs can be dynamically shared. As a result, one operator may have unused RBs while another operator may lack RBs, and therefore the total traffic volume in the system decreases due to inadequate resource utilization.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpLevelMlbThldAdjValue.html">OpLevelMlbThldAdjValue</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator-Level MLB Thld Adj Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the adjustment value of the inter-frequency MLB threshold for operator-level PRB-usage-based MLB. If this parameter is set to a value in the range of -50 to -1, the value indicates a decrease in the original threshold. If this parameter is set to a value in the range of 1 to 50, the value indicates an increase in the original threshold. If this parameter is set to 0, the original threshold remains unchanged. Actual PRB usage threshold for the operator = PRB usage threshold for the cell x (1 + The value of this parameter). This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -50~50</p>
+<p>Unit: %</p>
+<p>Actual Value Range: -50~50</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability of triggering PRB-usage-based inter-frequency MLB for the operator. A larger value of this parameter results in a lower probability of triggering PRB-usage-based inter-frequency MLB for the operator.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-NsaDcRatFreqPriorityGrpId.html">NsaDcRatFreqPriorityGrpId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NSA DC RAT Frequency Priority Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a RAT-specific frequency priority group for NSA DC UEs served by a base-station-level operator. The parameter value 65535 indicates that this parameter has not been set. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255,65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255,65535</p>
+<p>MML Default Value: 65535</p>
+<p>Recommended Value: 65535</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellOp-OpMaxAvailableRbRatio.html">OpMaxAvailableRbRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator Max Available RB Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the proportion of the maximum number of RBs available for the operator to the total number of RBs available in the cell when operators share the cell RB resources. This parameter is valid only when the RbSharingRatioWithOtherOp parameter is set to a value other than 255 for an operator of the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: 100</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter indicates that more RBs can be used by the operator, increasing the total traffic volume in the system. A smaller value of this parameter indicates that fewer RBs can be used by the operator. As a result, the operator may lack RBs while other operators may have unused RBs, and therefore the total traffic volume in the system decreases due to inadequate resource utilization.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_cellop__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To add a cell operator with the parameters as follows: Local cell ID: 0, Local tracking area ID: 0, MME configure number: CELL_MME_CFG_NUM_0, run the following command:
+ADD CELLOP: LocalCellId=0, TrackingAreaId=0, MMECfgNum=CELL_MME_CFG_NUM_0;
+Example 2: To add a cell operator with the parameters as follows: Local cell ID: 0, Local tracking area ID: 1, Cell reserved for operator: CELL_RESERVED_FOR_OP, Operator uplink RB used ratio: 25, Operator downlink RB used ratio: 25, MME configure number: CELL_MME_CFG_NUM_0, run the following command:
+ADD CELLOP: LocalCellId=0, TrackingAreaId=1, CellReservedForOp=CELL_RESERVED_FOR_OP, OpUlRbUsedRatio=25, OpDlRbUsedRatio=25, MMECfgNum=CELL_MME_CFG_NUM_0;
+Example 3: To add a cell operator with the parameters as follows: Local cell ID: 0, Local tracking area ID: 2, Cell reserved for operator: CELL_RESERVED_FOR_OP, Operator uplink RB used ratio: 25, Operator downlink RB used ratio: 25, MME configure number: CELL_MME_CFG_NUM_1, First MME group identity: 32769, First MME code: 1, run the following command:
+ADD CELLOP: LocalCellId=0, TrackingAreaId=2, CellReservedForOp=CELL_RESERVED_FOR_OP, OpUlRbUsedRatio=25, OpDlRbUsedRatio=25, MMECfgNum=CELL_MME_CFG_NUM_1, MMEGI1=32769, MMEC1=1;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

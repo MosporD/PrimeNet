@@ -1,0 +1,1227 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell (MOD CELL)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cell">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell (MOD CELL)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cell"></a><a name="mod_cell"></a>
+
+
+<h1 class="topictitle1">Modify Cell (MOD CELL)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cell__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cell__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If the current cell serves as a neighboring cell of another intra-eNodeB cell, the following parameters of the current cell cannot be modified: CellId and DlEarfcn. If the current cell has an intra-frequency neighboring cell, DlEarfcn of the current cell cannot be modified. In addition, DlEarfcn of the current cell cannot be modified to DlEarfcn of any neighboring E-UTRA frequency.</p>
+</li><li><p>A Cell MO includes the cell ID and related radio frequency (RF) information. It is configured by network planning engineers based on site requirements.</p>
+</li><li><p>The frequency band for an FDD cell must be one of frequency bands 1 to 14 and 17 to 21 and 23 and 25 and 28 and 29 and 31 to 32 and 50, and the frequency band for a TDD cell must be one of frequency bands 33 to 44 and 59 to 64. In specific frequency bands, the UL and DL EARFCNs of a cell must be set in compliance with the rules described in 3GPP TS 36.104.</p>
+</li><li><p>When SubframeAssignment is set to 0, the TTI Bundling function cannot be enabled. Otherwise, the services will be interrupted.</p>
+</li><li><p>Before changing an SFN cell to a non-SFN cell, ensure that all the CellAuxEnbBind MO bound to this cell are deleted.</p>
+</li><li><p>The LTE cell resets when the Cell Reference Signal Port Number parameter is modified.</p>
+</li><li><p>Check whether the UEs in the live network support the four-port CRS demodulation before changing the value of the Cell Reference Signal Port Number parameter to 4. If a UE does not support the four-port CRS demodulation, it cannot demodulate downlink signals.</p>
+</li><li><p>The number of effective CRS ports for a common cell is equal to the number of working TX channels of the cell or the configured number of CRS ports, whichever is smaller. </p>
+<p>The number of effective CRS ports for an SFN cell is equal to the number of configured TX channels of the cell or the configured number of CRS ports, whichever is smaller.</p>
+</li><li><p>The message "Configuration activation fail" may be displayed if a cell is modified when the baseband processing unit is starting up.</p>
+</li><li><p>The LTE cell resets when the CrsPortMap parameter is modified.</p>
+</li><li><p>If the CellRelayAlgoPara MO has been configured for a TDD cell, the Uplink Relay Subframe Ratio and Downlink Relay Subframe Ratio parameters in the CellRelayAlgoPara MO must be set to (1_10)1/10 before changing the uplink-to-downlink subframe configuration in the cell.</p>
+</li><li><p>The SFN primary cell label must comply with the following format: %MCC::460%MNC::01%eNodeBId::1%CellId::0%. Otherwise, some fields cannot be correctly displayed in the result of batch query on the MAE.</p>
+</li><li><p>Changing the settings of CPRICompression, UlBandWidth, and DlBandWidth may result in CPRI bandwidth insufficiency, causing the cell to become unavailable. If the CPRI bandwidth specification is not exceeded, block and then unblock the CPRI port for the cell.</p>
+</li><li><p>LTE TDD cells with a bandwidth of 1.4 MHz or 3 MHz support only normal CP and do not support subframe configuration 5. These cells cannot be configured as high-speed cells. The transmit/receive mode can be set only to 1T1R, 2T2R, or 4T4R and the CPRI compression mode only to no compression for these cells. The preamble format cannot be set to 4 for LTE TDD cells with a bandwidth of 1.4 MHz. Otherwise, these cells cannot be activated.</p>
+</li><li><p>In a Cell, if FddTddInd is set to CELL_TDD, and SubframeAssignment is set to SA1, then the AbsPattern in CellEicic could not have subframe 3 and subframe 8.</p>
+</li><li><p>Modifying CoverageLevelType will cause cell to reset.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cell__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CellName.html">CellName</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the cell.</p>
+<p>GUI Value Range: 1~99 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~99 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>In the Cell MO, the value of CellName is a string of a maximum of 99 characters. The string cannot be all null characters or contain any of the following characters: double quotation marks ("), commas (,), semicolons (;), equal signs (=), single quotation marks ('), three plus signs (+++), two or more consecutive spaces, and two or more consecutive percentage signs (%).</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CsgInd.html">CsgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Csg indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell is a closed subscriber group (CSG) cell. A CSG cell has restrictions on UE access. It broadcasts a specific CSG ID in the SIB and only those UEs of the group can access the CSG cell. BOOLEAN_FALSE indicates that the cell is not a CSG cell, and BOOLEAN_TRUE indicates that the cell is a CSG cell. Currently, Huawei eNodeBs do not support CSG cells. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>CsgInd in a Cell MO must be set to BOOLEAN_FALSE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-UlCyclicPrefix.html">UlCyclicPrefix</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink cyclic prefix length</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UL cyclic prefix length of a cell. A cyclic prefix can be a common or extended cyclic prefix. An extended cyclic prefix is generally used in a complex environment with a strong multi-path effect and long delay. In a cell, the UL cyclic prefix length can be different from the DL one. In addition, the UL or DL cyclic prefix length of a cell must be the same as that of the cell using the same BBP. For details, see 3GPP TS 36.211.</p>
+<p>GUI Value Range: NORMAL_CP(Normal), EXTENDED_CP(Extended)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL_CP, EXTENDED_CP</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NORMAL_CP(Normal)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd is set to CELL_TDD, the following requirements must be met during the setting of UlCyclicPrefix, DlCyclicPrefix, and SpecialSubframePatterns:</li><li>(1) If UlCyclicPrefix and DlCyclicPrefix are both set to NORMAL_CP, SpecialSubframePatterns can be set to SSP4, SSP5, SSP6, SSP7, SSP9, or NULL;</li><li>(2) If UlCyclicPrefix and DlCyclicPrefix are both set to EXTENDED_CP, SpecialSubframePatterns can be set to SSP3, SSP4, SSP5, or SSP6;</li><li>(3) If UlCyclicPrefix is set to EXTENDED_CP and DlCyclicPrefix is set to NORMAL_CP, SpecialSubframePatterns can be set to SSP4, SSP5, SSP6, or SSP7;</li><li>(4) If UlCyclicPrefix is set to NORMAL_CP and DlCyclicPrefix is set to EXTENDED_CP, SpecialSubframePatterns can be set to SSP3, SSP4, SSP5, or SSP6.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and MultiRruCellMode in a Cell MO is set to DIGITAL_COMBINATION, DlCyclicPrefix and UlCyclicPrefix in Cell MO must be set to NORMAL_CP.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE and SFN, respectively, DlCyclicPrefix and UlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, if TxRxMode is set to 2T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, if TxRxMode is set to 4T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-DlCyclicPrefix.html">DlCyclicPrefix</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink cyclic prefix length</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the DL cyclic prefix of a cell. A DL cyclic prefix can be a common or extended cyclic prefix. An extended cyclic prefix is generally used in a complex environment with a strong multi-path effect and long delay. In a cell, the UL cyclic prefix length can be different from the DL one. In addition, the UL or DL cyclic prefix length of a cell must be the same as that of the cell using the same BBP. For details, see 3GPP TS 36.211.</p>
+<p>GUI Value Range: NORMAL_CP(Normal), EXTENDED_CP(Extended)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL_CP, EXTENDED_CP</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NORMAL_CP(Normal)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd is set to CELL_TDD, the following requirements must be met during the setting of UlCyclicPrefix, DlCyclicPrefix, and SpecialSubframePatterns:</li><li>(1) If UlCyclicPrefix and DlCyclicPrefix are both set to NORMAL_CP, SpecialSubframePatterns can be set to SSP4, SSP5, SSP6, SSP7, SSP9, or NULL;</li><li>(2) If UlCyclicPrefix and DlCyclicPrefix are both set to EXTENDED_CP, SpecialSubframePatterns can be set to SSP3, SSP4, SSP5, or SSP6;</li><li>(3) If UlCyclicPrefix is set to EXTENDED_CP and DlCyclicPrefix is set to NORMAL_CP, SpecialSubframePatterns can be set to SSP4, SSP5, SSP6, or SSP7;</li><li>(4) If UlCyclicPrefix is set to NORMAL_CP and DlCyclicPrefix is set to EXTENDED_CP, SpecialSubframePatterns can be set to SSP3, SSP4, SSP5, or SSP6.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and MultiRruCellMode in a Cell MO is set to DIGITAL_COMBINATION, DlCyclicPrefix and UlCyclicPrefix in Cell MO must be set to NORMAL_CP.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE and SFN, respectively, DlCyclicPrefix and UlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, if TxRxMode is set to 2T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, if TxRxMode is set to 4T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the DlCyclicPrefix parameter in this Cell MO must be set to NORMAL_CP.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-NbCellFlag.html">NbCellFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT Cell Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a local cell is an NB-IoT cell. When this parameter is set to TRUE, the local cell is an NB-IoT cell. When this parameter is set to FALSE, the local cell is not an NB-IoT cell. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FALSE(FALSE)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, when NbCellFlag is set to FALSE and CustomizedBandWidthCfgInd is set to CFG: If UlBandWidth is set to CELL_BW_N6, CustomizedULBandWidth must be set to a value in the range of 12 to 14; If UlBandWidth is set to CELL_BW_N25, CustomizedULBandWidth must be set to a value in the range of 44 to 50; If UlBandWidth is set to CELL_BW_N50, CustomizedULBandWidth must be set to a value in the range of 74, 75, 80 or 87 to 100; If UlBandWidth is set to CELL_BW_N75, CustomizedULBandWidth must be set to a value in the range of 139 to 150; If UlBandWidth is set to CELL_BW_N100, CustomizedULBandWidth must be set to a value in the range of 175 to 178 or 183 to 200.</li><li>In a Cell MO, when NbCellFlag in a Cell MO is set to FALSE and CustomizedBandWidthCfgInd is set to CFG: If DlBandWidth is set to CELL_BW_N6, CustomizedDLBandWidth must be set to a value in the range of 12 to 14; If DlBandWidth is set to CELL_BW_N25, CustomizedDLBandWidth must be set to a value in the range of 44 to 50; If DlBandWidth is set to CELL_BW_N50, CustomizedDLBandWidth must be set to a value in the range of 74, 75, 80 or 87 to 100; If DlBandWidth is set to CELL_BW_N75, CustomizedDLBandWidth must be set to a value in the range of 139 to 150; If DlBandWidth is set to CELL_BW_N100, CustomizedDLBandWidth must be set to a value in the range of 175 to 178 or 183 to 200.</li><li>If NbCellFlag, PreambleFmt, and HighSpeedFlag in a Cell MO are set to FALSE, a value less than 4, and HIGH_SPEED, respectively, the following requirements must be met during the setting of CellRadius and RootSequenceIdx: (1) 1 m &lt;= CellRadius &lt;= 1000 m: the value range of RootSequenceIdx is 24~815; (2) 1000 m &lt; CellRadius &lt;= 1500 m: the value range of RootSequenceIdx is 30~811; (3) 1500 m &lt; CellRadius &lt;= 2000 m: the value range of RootSequenceIdx is 36~804; (4) 2000 m &lt; CellRadius &lt;= 2600 m: the value range of RootSequenceIdx is 42~797; (5) 2600 m &lt; CellRadius &lt;= 3500 m: the value range of RootSequenceIdx is 52~786; (6) 3500 m &lt; CellRadius &lt;= 4300 m): the value range of RootSequenceIdx is 64~779; (7) 4300 m &lt; CellRadius &lt;= 5500 m: the value range of RootSequenceIdx is 76~765; (8) 5500 m &lt; CellRadius &lt;= 6800 m: the value range of RootSequenceIdx is 90~747; (9) 6800 m &lt; CellRadius &lt;= 8600 m: the value range of RootSequenceIdx is 116~731; (10) 8600 m &lt; CellRadius &lt;= 10600 m: the value range of RootSequenceIdx is 136~706; (11) 10600 m &lt; CellRadius &lt;= 13200 m: the value range of RootSequenceIdx is 168~676; (12) 13200 m &lt; CellRadius &lt;= 17200 m: the value range of RootSequenceIdx is 204~602; (13) 17200 m &lt; CellRadius &lt;= 21500 m: the value range of RootSequenceIdx is 264~566; (14) 21500 m &lt; CellRadius &lt;= 27800 m: the value range of RootSequenceIdx is 328~498; (15) 27800 m &lt; CellRadius &lt;= 32800 m: the value range of RootSequenceIdx is 384~450.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 1 m &lt;= CellRadius &lt;= 1199 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~456, 464~488, 496~502, 506, 512, 516~618; 1199 m &lt; CellRadius &lt;= 1649 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 1649 m &lt; CellRadius &lt;= 2098 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 2098 m &lt; CellRadius &lt;= 2698 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~386, 394~398, 404~442, 448~454, 464~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618; 2698 m &lt; CellRadius &lt;= 3598 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~358, 368~376, 384~386, 394~398, 404, 408~442, 452, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618;3598 m &lt; CellRadius &lt;= 4497 m: the value range of RootSequenceIdx is 264~324, 334~344, 354~358, 368~376, 384~386, 394~396, 408~414, 422~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 4497 m &lt; CellRadius &lt;= 5547 m: the value range of RootSequenceIdx 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618; 5547 m &lt; CellRadius &lt;= 6896 m: the value range of RootSequenceIdx is 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~428, 434~440, 480~486, 500~502, 506, 512, 516~518, 536~542, 548, 552~618; 6896 m &lt; CellRadius &lt;= 8695 m: the value range of RootSequenceIdx is 264~272, 276~322, 336~338, 354~358, 368, 372~374, 408, 436~440, 482, 502, 506, 512, 516~518, 536~542, 556~594, 598~618; 8695 m &lt; CellRadius &lt;= 10794 m: the value range of RootSequenceIdx is 264~272, 276~306, 310~322, 336~338, 436~440, 502, 506, 512, 516~518, 558, 562~594, 598~610, 614; 10794 m &lt; CellRadius &lt;= 13343 m: the value range of RootSequenceIdx is 264~270, 280~300, 306, 310, 316~322, 502, 506, 562~588, 594, 598~610, 614; 13343 m &lt; CellRadius &lt;= 17391 m: the value range of RootSequenceIdx is 280~284, 306, 310, 316, 562, 572~576, 584~588, 602~610, 614.</li><li>Assume that MultiRruCellFlag is set to BOOLEAN_TRUE and MultiRruCellMode is set to MPRU_AGGREGATION, SFN, or CELL_COMBINATION in a Cell MO. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 3_TO_1, DlBandWidth must be set to CELL_BW_N75 or CELL_BW_N100. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 4_TO_1, DlBandWidth must not be set to CELL_BW_N25 or CELL_BW_N15. If NbCellFlag is set to TRUE, CpriEthCompressionRatio must be set to 2_TO_1.</li><li>If FddTddInd, MultiRruCellFlag, MultiRruCellMode, and TxRxMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, MPRU_AGGREGATION, and 4T4R, respectively, CrsPortNum in the Cell MO must be set to CRS_PORT_4 with NbCellFlag set to FALSE, or CrsPortNum in the Cell MO must be set to CRS_PORT_2 with NbCellFlag set to TRUE.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4 and HighSpeedFlag is set to ULTRA_HIGH_SPEED, the following requirements must be met during the setting of CellRadius: the value range of CellRadius is 1 m to 15000 m;</li><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and HighSpeedFlag is set to ULTRA_HIGH_SPEED, the value range of PreambleFmt is 0~3.</li><li>When the NbCellFlag and TxRxMode parameters in a Cell MO are set to TRUE and a value among 2T2R, 2T4R, or 4T4R, respectively, the CrsPortNum parameter in this Cell MO must be set to CRS_PORT_2.</li><li>When the NbCellFlag parameter in a Cell MO is set to TRUE, and the MultiRruCellFlag parameter in a Cell MO is set to BOOLEAN_TRUE, value of the MultiRruCellMode parameter must be set to MPRU_AGGREGATION or SFN.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CoverageLevelType.html">CoverageLevelType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Coverage Level Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the NB-IoT cell coverage level. A maximum of three coverage levels are supported, corresponding to 0 dB, 10 dB, and 20 dB coverage enhancement. This parameter is valid only when the NbCellFlag parameter is set to TRUE.</p>
+<p>COVERAGE_LEVEL_0: The NB-IoT cell supports 0 dB coverage enhancement only when this option is selected. This option applies only to NB-IoT.</p>
+<p>COVERAGE_LEVEL_1: The NB-IoT cell supports 10 dB coverage enhancement only when this option is selected. This option applies only to NB-IoT.</p>
+<p>COVERAGE_LEVEL_2: The NB-IoT cell supports 20 dB coverage enhancement only when this option is selected. This parameter applies only to NB-IoT.</p>
+<p>Parameter Relationship:</p>
+<p> The COVERAGE_LEVEL_1 and COVERAGE_LEVEL_2 options take effect only when the COVERAGE_EXTENSION_SWITCH option is selected. If the COVERAGE_LEVEL_1 and COVERAGE_LEVEL_2 options are selected but the COVERAGE_EXTENSION_SWITCH option is deselected, the eNodeB broadcasts the coverage level thresholds in SIB2 and allocates NPRACH resources for coverage levels 1 and 2. However, the eNodeB does not respond to the random access requests initiated by UEs at coverage levels 1 and 2.</p>
+<p>GUI Value Range: COVERAGE_LEVEL_0(COVERAGE_LEVEL_0), COVERAGE_LEVEL_1(COVERAGE_LEVEL_1), COVERAGE_LEVEL_2(COVERAGE_LEVEL_2)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: COVERAGE_LEVEL_0, COVERAGE_LEVEL_1, COVERAGE_LEVEL_2</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: COVERAGE_LEVEL_0:1, COVERAGE_LEVEL_1:0, COVERAGE_LEVEL_2:0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The CoverageLevelType parameter in the Cell MO must be set to any of the following combinations:</li><li>COVERAGE_LEVEL_0:1, COVERAGE_LEVEL_1:0, and COVERAGE_LEVEL_2:0;</li><li>COVERAGE_LEVEL_0:1, COVERAGE_LEVEL_1:1, and COVERAGE_LEVEL_2:0;</li><li>COVERAGE_LEVEL_0:1, COVERAGE_LEVEL_1:1, and COVERAGE_LEVEL_2:1.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-FreqBand.html">FreqBand</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Frequency band</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency band in which a cell operates. For details about this parameter, see 3GPP TS 36.104.</p>
+<p>The LTE-U function has been removed, and the values in the range of 252 to 255 are invalid. Although the configuration interface in this version supports synchronization and delivery of the values in this range, the system does not use these values. Therefore, avoid setting this parameter to these values.</p>
+<p>GUI Value Range: 1~256</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~256</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if WorkMode is set to LAA, FreqBand must be set to 46, 252 or 255.</li><li>In a Cell MO, if FreqBand is set to 252 or 255, WorkMode must be set to LAA.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-UlEarfcnCfgInd.html">UlEarfcnCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink EARFCN indication</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure the uplink EARFCN of the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd is set to CELL_TDD and UlEarfcnCfgInd is set to CFG, DlEarfcn and UlEarfcn must be set to the same value.</li><li>In a Cell MO, if WorkMode is set to LAA, UlEarfcnCfgInd must be set to NOT_CFG.</li><li>In a Cell MO, if WorkMode is set to LAA, TxRxMode must be set to 2T2R.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-UlEarfcn.html">UlEarfcn</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink EARFCN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UL EARFCN of the cell. It is optional, depending on the setting of the UL EARFCN configuration indicator (UlEarfcnCfgInd). If the value of this parameter is not specified, the default UL EARFCN is used, which is calculated based on the DL EARFCN. For details, see 3GPP TS 36.104. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 18000~65535,131072~134181,229376~229575</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 18000~65535,131072~134181,229376~229575</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd is set to CELL_TDD and UlEarfcnCfgInd is set to CFG, DlEarfcn and UlEarfcn must be set to the same value.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-DlEarfcn.html">DlEarfcn</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink EARFCN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DL EARFCN of a cell. For details about this parameter, see the 3GPP TS 36.104.</p>
+<p>The LTE-U function has been removed, and the values in the ranges of 255144 to 256143 and 260894 to 262143 are invalid. Although the configuration interface in this version supports synchronization and delivery of the values in these ranges, the system does not use these values. Therefore, avoid setting this parameter to these values.</p>
+<p>GUI Value Range: 0~70545,229376~229575,255144~256143,260894~262143</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~70545,229376~229575,255144~256143,260894~262143</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd is set to CELL_TDD and UlEarfcnCfgInd is set to CFG, DlEarfcn and UlEarfcn must be set to the same value.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-UlBandWidth.html">UlBandWidth</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink bandwidth of the cell. The bandwidth is expressed in the number of RBs. For example, the value CELL_BW_N25 indicates a cell bandwidth of 25 RBs and the value CELL_BW_N50 indicates a cell bandwidth of 50 RBs. For details, see 3GPP TS 36.104. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: CELL_BW_N6(1.4M), CELL_BW_N15(3M), CELL_BW_N25(5M), CELL_BW_N50(10M), CELL_BW_N75(15M), CELL_BW_N100(20M)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CELL_BW_N6, CELL_BW_N15, CELL_BW_N25, CELL_BW_N50, CELL_BW_N75, CELL_BW_N100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, when NbCellFlag is set to FALSE and CustomizedBandWidthCfgInd is set to CFG: If UlBandWidth is set to CELL_BW_N6, CustomizedULBandWidth must be set to a value in the range of 12 to 14; If UlBandWidth is set to CELL_BW_N25, CustomizedULBandWidth must be set to a value in the range of 44 to 50; If UlBandWidth is set to CELL_BW_N50, CustomizedULBandWidth must be set to a value in the range of 74, 75, 80 or 87 to 100; If UlBandWidth is set to CELL_BW_N75, CustomizedULBandWidth must be set to a value in the range of 139 to 150; If UlBandWidth is set to CELL_BW_N100, CustomizedULBandWidth must be set to a value in the range of 175 to 178 or 183 to 200.</li><li>CPRICompression in a Cell MO is set to TRIPLEX_COMPRESSION_10M, FddTddInd in this Cell MO must be set to CELL_FDD, and DlBandWidth and UlBandWidth in this Cell MO must be set to CELL_BW_N50.</li><li>When the CPRICompression parameter in the Cell MO is set to 3_2_COMPRESSION, the following conditions must be met: (1) If the FddTddInd parameter in this Cell MO is set to CELL_FDD, the TxRxMode and UlBandWidth parameters must be set to 32T32R and CELL_BW_N75 or CELL_BW_N100, respectively. (2) If the FddTddInd parameter in this Cell MO is set to CELL_TDD, the UlBandWidth parameter must be set to CELL_BW_N75 or CELL_BW_N100, respectively.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-DlBandWidth.html">DlBandWidth</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink bandwidth of the cell. The bandwidth is expressed in the number of RBs. For example, the value CELL_BW_N25 indicates a cell bandwidth of 25 RBs and the value CELL_BW_N50 indicates a cell bandwidth of 50 RBs. For details, see 3GPP TS 36.104. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: CELL_BW_N6(1.4M), CELL_BW_N15(3M), CELL_BW_N25(5M), CELL_BW_N50(10M), CELL_BW_N75(15M), CELL_BW_N100(20M)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CELL_BW_N6, CELL_BW_N15, CELL_BW_N25, CELL_BW_N50, CELL_BW_N75, CELL_BW_N100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the values of the CellActiveState, FddTddInd, and DlBandWidth parameters in a Cell MO are CELL_ACTIVE, CELL_TDD, and CELL_BW_N6, respectively, the PreambleFmt parameter in this Cell MO cannot be set to 4.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_FDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE, SFN or MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_TDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE or CELL_COMBINATION, MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>CPRICompression in a Cell MO is set to TRIPLEX_COMPRESSION_10M, FddTddInd in this Cell MO must be set to CELL_FDD, and DlBandWidth and UlBandWidth in this Cell MO must be set to CELL_BW_N50.</li><li>In a Cell MO, when NbCellFlag in a Cell MO is set to FALSE and CustomizedBandWidthCfgInd is set to CFG: If DlBandWidth is set to CELL_BW_N6, CustomizedDLBandWidth must be set to a value in the range of 12 to 14; If DlBandWidth is set to CELL_BW_N25, CustomizedDLBandWidth must be set to a value in the range of 44 to 50; If DlBandWidth is set to CELL_BW_N50, CustomizedDLBandWidth must be set to a value in the range of 74, 75, 80 or 87 to 100; If DlBandWidth is set to CELL_BW_N75, CustomizedDLBandWidth must be set to a value in the range of 139 to 150; If DlBandWidth is set to CELL_BW_N100, CustomizedDLBandWidth must be set to a value in the range of 175 to 178 or 183 to 200.</li><li>Assume that MultiRruCellFlag is set to BOOLEAN_TRUE and MultiRruCellMode is set to MPRU_AGGREGATION, SFN, or CELL_COMBINATION in a Cell MO. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 3_TO_1, DlBandWidth must be set to CELL_BW_N75 or CELL_BW_N100. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 4_TO_1, DlBandWidth must not be set to CELL_BW_N25 or CELL_BW_N15. If NbCellFlag is set to TRUE, CpriEthCompressionRatio must be set to 2_TO_1.</li><li>In a Cell MO, if FddTddInd is CELL_FDD and CPRICompression is ENHANCED_COMPRESSION, DlBandWidth can be set to CELL_BW_N50, CELL_BW_N75, CELL_BW_N100.</li><li>In a Cell MO, if FddTddInd is CELL_FDD and CPRICompression is NORMAL_COMPRESSION, DlBandWidth can be set to CELL_BW_N25, CELL_BW_N50, CELL_BW_N75, CELL_BW_N100.</li><li>In a Cell MO, if WorkMode is set to LAA, DlBandWidth must be set to CELL_BW_N100(20M).</li></ul>
+<p>-Others:</p>
+<ul><li>In a Cell MO, if FddTddInd and WorkMode are set to CELL_FDD and DL_ONLY, respectively, DlBandWidth must be set to CELL_BW_N25, CELL_BW_N50, CELL_BW_N75, or CELL_BW_N100.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CellId.html">CellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the E-UTRAN cell. The combination of this parameter and the eNodeB ID forms the E-UTRAN cell identity. The combination of the E-UTRAN cell identity and the PLMN identity forms the ECGI. For details, see 3GPP TS 36.413.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>CellId must have a unique value in each Cell MO under the same eNodeB.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-PhyCellId.html">PhyCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Physical cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the physical cell ID. For details, see 3GPP TS 36.331.</p>
+<p>GUI Value Range: 0~503</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~503</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the DeployMode parameter in the Prb MO is set to IN_BAND and the OtdoaSwitch option of the LcsSwitch parameter in the ENodeBAlgoSwitch MO and the NB_OTDOA_SWITCH option of the CellLcsSwitch parameter in the CellLcsCfg MO are selected, the NprsId parameter (if not set to 65535) in the EuPrbSectorEqm MO must be set to the same value as the PhyCellId parameter in the Cell MO for the LTE cell associated with the NB-IoT cell, or has a different mod 6 value from the PhyCellId parameter.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-AdditionalSpectrumEmission.html">AdditionalSpectrumEmission</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Additional spectrum emission</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the additional spectrum emission, which restricts the emission power of the UEs in the cell. For details, see 3GPP TS 36.101.</p>
+<p>GUI Value Range: 1~32</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~32</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-FddTddInd.html">FddTddInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell FDD TDD indication</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duplex mode of the cell. CELL_FDD indicates the FDD mode, and CELL_TDD indicates the TDD mode.</p>
+<p>GUI Value Range: CELL_FDD(FDD), CELL_TDD(TDD)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CELL_FDD, CELL_TDD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the values of the CellActiveState, FddTddInd, and DlBandWidth parameters in a Cell MO are CELL_ACTIVE, CELL_TDD, and CELL_BW_N6, respectively, the PreambleFmt parameter in this Cell MO cannot be set to 4.</li><li>If the values of the CellActiveState, FddTddInd, TxRxMode, and SubframeAssignment parameters in a Cell MO are CELL_ACTIVE, CELL_TDD, 64T64R, and SA1, respectively, the PreambleFmt parameter in this Cell MO cannot be set to 1, 2, or 3.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and PreambleFmt is set to 4, RootSequenceIdx must be set to a value smaller than or equal to 137.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and PreambleFmt is set to 4, SpecialSubframePatterns must be set to a value greater than SSP4.</li><li>In a Cell MO, if NbCellFlag is set to FALSE and FddTddInd is set to CELL_TDD, PreambleFmt and SubframeAssignment must adhere to the following constraint:</li><li>(1) If PreambleFmt is set to 0, SubframeAssignment can be set to SA0, SA1, SA2, SA3, SA5, or NULL;</li><li>(2) If PreambleFmt is set to 1, SubframeAssignment can be set to SA0, SA1, or SA3;</li><li>(3) If PreambleFmt is set to 2, SubframeAssignment can be set to SA0, SA1, or SA3;</li><li>(4) If PreambleFmt is set to 3, SubframeAssignment can be set to SA0 or SA3;</li><li>(5) If PreambleFmt is set to 4, SubframeAssignment can be set to SA0, SA1, SA2, SA3, or SA5.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_FDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE, SFN or MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_TDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE or CELL_COMBINATION, MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>CPRICompression in a Cell MO is set to TRIPLEX_COMPRESSION_10M, FddTddInd in this Cell MO must be set to CELL_FDD, and DlBandWidth and UlBandWidth in this Cell MO must be set to CELL_BW_N50.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li><li>When the CPRICompression parameter in the Cell MO is set to 3_2_COMPRESSION, the following conditions must be met: (1) If the FddTddInd parameter in this Cell MO is set to CELL_FDD, the TxRxMode and UlBandWidth parameters must be set to 32T32R and CELL_BW_N75 or CELL_BW_N100, respectively. (2) If the FddTddInd parameter in this Cell MO is set to CELL_TDD, the UlBandWidth parameter must be set to CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>In a Cell MO, if FddTddInd is set to CELL_TDD, CustomizedBandWidthCfgInd must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd is set to CELL_TDD, the following requirements must be met during the setting of UlCyclicPrefix, DlCyclicPrefix, and SpecialSubframePatterns:</li><li>(1) If UlCyclicPrefix and DlCyclicPrefix are both set to NORMAL_CP, SpecialSubframePatterns can be set to SSP4, SSP5, SSP6, SSP7, SSP9, or NULL;</li><li>(2) If UlCyclicPrefix and DlCyclicPrefix are both set to EXTENDED_CP, SpecialSubframePatterns can be set to SSP3, SSP4, SSP5, or SSP6;</li><li>(3) If UlCyclicPrefix is set to EXTENDED_CP and DlCyclicPrefix is set to NORMAL_CP, SpecialSubframePatterns can be set to SSP4, SSP5, SSP6, or SSP7;</li><li>(4) If UlCyclicPrefix is set to NORMAL_CP and DlCyclicPrefix is set to EXTENDED_CP, SpecialSubframePatterns can be set to SSP3, SSP4, SSP5, or SSP6.</li><li>In a Cell MO, PreambleFmt cannot be set to 4 if NbCellFlag is set to FALSE, FddTddInd is set to CELL_FDD.</li><li>In a Cell MO, if MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and CELL_COMBINATION, respectively, FddTddInd must be set to TDD.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and MultiRruCellMode in a Cell MO is set to DIGITAL_COMBINATION, FddTddInd in Cell MO must be set to CELL_FDD.</li><li>In a Cell MO, if CellActiveState is set to CELL_ACTIVE and FddTddInd is set to CELL_FDD, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 2T8R, 4T8R, 8T8R, or 32T32R. If CellActiveState is set to CELL_ACTIVE and FddTddInd is set to CELL_TDD, TxRxMode must be set to 1T1R, 2T2R, 4T4R, or 8T8R, 64T64R, 32T32R.</li><li>In a Cell MO, if FddTddInd, CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_TDD, CELL_ACTIVE, BOOLEAN_TRUE, and SFN, respectively, TxRxMode must be set to 2T2R, 4T4R or 8T8R.</li><li>In a Cell MO, if CellActiveState is CELL_ACTIVE, FddTddInd is set to CELL_FDD, and CPRICompression is set to NORMAL_COMPRESSION, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 2T8R, 4T8R, 8T8R, or 32T32R.</li><li>In a Cell MO, if CellActiveState is CELL_ACTIVE, FddTddInd is set to CELL_FDD, and CPRICompression is set to ENHANCED_COMPRESSION or TRIPLEX_COMPRESSION_10M, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 8T8R or 32T32R.</li><li>In a Cell MO, if FddTddInd is set to TDD, MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively, TxRxMode must be set to 2T2R.</li><li>In a Cell MO, if FddTddInd is set to FDD, MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively, TxRxMode must be set to 4T4R or 2T2R or 1T1R.</li><li>If FddTddInd, MultiRruCellFlag, and MultiRruCellMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, and SFN, respectively, TxRxMode in the Cell MO must be set to 4T4R, 2T4R, 2T2R, 1T2R or 1T1R.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag, and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE, and MPRU_AGGREGATION, respectively, TxRxMode must be set to 4T4R, 2T2R, or 1T1R.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE and SFN, respectively, DlCyclicPrefix and UlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T4R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, or 4T4P_0321.</li><li>In a Cell MO, if TxRxMode and CrsPortNum are set to 4T4R and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 4T2P_0011, 4T2P_0101, or 4T2P_0110.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 4T4R, and CRS_PORT_1, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_1, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 8T2P_00001111, 8T2P_00110011, or 8T2P_01010101.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 4T4R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, or 4T4P_0132.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 8T4P_00112233, or 8T4P_01230123.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T8R, and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 4T2P_0011, 4T2P_0101, or 4T2P_0110.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T8R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, or 4T4P_0321.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and FddTddInd in the Cell MO is set to CELL_TDD, or if MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and FddTddInd in the Cell MO is set to CELL_FDD and MultiRruCellMode in the Cell MO is set to a value other than SFN and MPRU_AGGREGATION, CrsPortMap in the Cell MO must be set to NOT_CFG.</li><li>If the FddTddInd parameter in the Cell MO is set to CELL_TDD, and InterDlCompCbfSwitch or InterDlCompDcsSwitch under the DlCompSwitch parameter in the CellAlgoSwitch MO is set to 1, IntraDlCompSwitch under the DlCompSwitch parameter in the CellAlgoSwitch MO must be set to 1.</li><li>If the FddTddInd in Cell MO is set to CELL_TDD, the TaEnhancePuschDmrs option of TaEnhance must be deselected.</li><li>When the value of RemoteInfAdpAvoidSwitch in a CellRicAlgo is set to ON, the value of FddTddInd in a CELL MO is only to be set CELL_TDD, and the value of SubframeAssignment in a CELL MO is only to be set SA2, and the value of SpecialSubframePatterns in a CELL MO is only to be set SSP5 or SSP6 or SSP7 or SSP9.</li><li>If FddTddInd, MultiRruCellFlag, MultiRruCellMode, and TxRxMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, MPRU_AGGREGATION, and 4T4R, respectively, CrsPortNum in the Cell MO must be set to CRS_PORT_4 with NbCellFlag set to FALSE, or CrsPortNum in the Cell MO must be set to CRS_PORT_2 with NbCellFlag set to TRUE.</li><li>When the FddTddInd parameter in the Cell MO is set to CELL_TDD and the TxRxMode parameter in the Cell MO is set to 64T64R or 32T32R, the EuCellStandbyMode and MultiRruCellFlag parameters in the Cell MO must be set to ACTIVE and BOOLEAN_FALSE respectively.</li><li>In a Cell MO, if FddTddInd is CELL_FDD and CPRICompression is ENHANCED_COMPRESSION, DlBandWidth can be set to CELL_BW_N50, CELL_BW_N75, CELL_BW_N100.</li><li>In a Cell MO, if FddTddInd is CELL_FDD and CPRICompression is NORMAL_COMPRESSION, DlBandWidth can be set to CELL_BW_N25, CELL_BW_N50, CELL_BW_N75, CELL_BW_N100.</li><li>When FddTddInd in a Cell MO is set to CELL_TDD, MeasPerformanceDemand in an EutranInterNFreq MO associated with this Cell MO must not be set to UNDELIVER.</li><li>In a Cell MO, if FddTddInd, TxRxMode are set to CELL_FDD, 8T8R, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, and MultiCellShareMode is set to NORMAL, CrsPortNum must be set to CRS_PORT_4 or CRS_PORT_2.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, HighSpeedFlag must be set to LOW_SPEED.</li><li>In a Cell MO, if FddTddInd is set to CELL_TDD and UlEarfcnCfgInd is set to CFG, DlEarfcn and UlEarfcn must be set to the same value.</li><li>In a Cell MO, SubframeAssignment can be set to SA0, SA1, SA2, SA3, SA5, or NULL, if FddTddInd is set to CELL_TDD.</li><li>In a Cell MO, WorkMode must be set to UL_DL or LAA if FddTddInd is set to CELL_TDD.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the SubframeAssignment parameter in this Cell MO must be set to NULL.</li><li>When the SubframeAssignment parameter in a Cell MO is set to NULL, the FddTddInd and WorkMode parameters in this Cell MO must be set to CELL_TDD and LAA respectively.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the SpecialSubframePatterns parameter in this Cell MO must be set to NULL.</li><li>When the SpecialSubframePatterns parameter in a Cell MO is set to NULL, the FddTddInd and WorkMode parameters in this Cell MO must be set to CELL_TDD and LAA respectively.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the DlCyclicPrefix parameter in this Cell MO must be set to NORMAL_CP.</li><li>If FddTddInd in a Cell MO is set to CELL_TDD, the value of VolteQualRecoveryQci1PlrThld must be less than VolteQualIfHoQci1PlrThld.</li><li>If FddTddInd in a Cell MO is set to CELL_TDD, the value of VolteQualRecoveryQci1PlrThld must be less than Qci1PlrThldForVolteQualHo.</li><li>The SriPeriodAdaptEnhancedOptSw option of the SriAlgoSwitch parameter in the CELLPUCCHALGO MO can be selected only if the FddTddInd parameter in the Cell MO is set to CELL_TDD, the PucchSwitch option of the PucchAlgoSwitch parameter in the CELLALGOSWITCH MO is selected, the TddSrsCfgMode parameter in the SRSCFG MO is set to ACCESS_ENHANCED, and the SriPeriodAdaptive parameter in the PUCCHCFG MO is set to QCIADAPTIVE or NOQCIADAPTIVE.</li></ul>
+<p>-Others:</p>
+<ul><li>In a Cell MO, if FddTddInd and WorkMode are set to CELL_FDD and DL_ONLY, respectively, DlBandWidth must be set to CELL_BW_N25, CELL_BW_N50, CELL_BW_N75, or CELL_BW_N100.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-SubframeAssignment.html">SubframeAssignment</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subframe assignment</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ratio of UL subframes to DL subframes for an LTE TDD cell. For details, see 3GPP TS 36.211. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: SA0(SA0), SA1(SA1), SA2(SA2), SA3(SA3), SA4(SA4), SA5(SA5), SA6(SA6), NULL(NULL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SA0, SA1, SA2, SA3, SA4, SA5, SA6, NULL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the values of the CellActiveState, FddTddInd, TxRxMode, and SubframeAssignment parameters in a Cell MO are CELL_ACTIVE, CELL_TDD, 64T64R, and SA1, respectively, the PreambleFmt parameter in this Cell MO cannot be set to 1, 2, or 3.</li><li>In a Cell MO, if NbCellFlag is set to FALSE and FddTddInd is set to CELL_TDD, PreambleFmt and SubframeAssignment must adhere to the following constraint:</li><li>(1) If PreambleFmt is set to 0, SubframeAssignment can be set to SA0, SA1, SA2, SA3, SA5, or NULL;</li><li>(2) If PreambleFmt is set to 1, SubframeAssignment can be set to SA0, SA1, or SA3;</li><li>(3) If PreambleFmt is set to 2, SubframeAssignment can be set to SA0, SA1, or SA3;</li><li>(4) If PreambleFmt is set to 3, SubframeAssignment can be set to SA0 or SA3;</li><li>(5) If PreambleFmt is set to 4, SubframeAssignment can be set to SA0, SA1, SA2, SA3, or SA5.</li><li>In a Cell MO, SubframeAssignment can be set to SA0, SA1, SA2, SA3, SA5, or NULL, if FddTddInd is set to CELL_TDD.</li><li>When the value of RemoteInfAdpAvoidSwitch in a CellRicAlgo is set to ON, the value of FddTddInd in a CELL MO is only to be set CELL_TDD, and the value of SubframeAssignment in a CELL MO is only to be set SA2, and the value of SpecialSubframePatterns in a CELL MO is only to be set SSP5 or SSP6 or SSP7 or SSP9.</li><li>The MultiCellShareMode parameter in the Cell MO can be set to SPLIT only if the FddTddInd parameter in the Cell MO is set to CELL_TDD and the SubframeAssignment parameter in the Cell MO is set to SA1 or SA2.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the SubframeAssignment parameter in this Cell MO must be set to NULL.</li><li>When the SubframeAssignment parameter in a Cell MO is set to NULL, the FddTddInd and WorkMode parameters in this Cell MO must be set to CELL_TDD and LAA respectively.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-SpecialSubframePatterns.html">SpecialSubframePatterns</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Special subframe patterns</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ratio of special UL subframes to special DL subframes for an LTE TDD cell. For details, see 3GPP TS 36.211. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: SSP0(SSP0), SSP1(SSP1), SSP2(SSP2), SSP3(SSP3), SSP4(SSP4), SSP5(SSP5), SSP6(SSP6), SSP7(SSP7), SSP8(SSP8), SSP9(SSP9), NULL(NULL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SSP0, SSP1, SSP2, SSP3, SSP4, SSP5, SSP6, SSP7, SSP8, SSP9, NULL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd is set to CELL_TDD, the following requirements must be met during the setting of UlCyclicPrefix, DlCyclicPrefix, and SpecialSubframePatterns:</li><li>(1) If UlCyclicPrefix and DlCyclicPrefix are both set to NORMAL_CP, SpecialSubframePatterns can be set to SSP4, SSP5, SSP6, SSP7, SSP9, or NULL;</li><li>(2) If UlCyclicPrefix and DlCyclicPrefix are both set to EXTENDED_CP, SpecialSubframePatterns can be set to SSP3, SSP4, SSP5, or SSP6;</li><li>(3) If UlCyclicPrefix is set to EXTENDED_CP and DlCyclicPrefix is set to NORMAL_CP, SpecialSubframePatterns can be set to SSP4, SSP5, SSP6, or SSP7;</li><li>(4) If UlCyclicPrefix is set to NORMAL_CP and DlCyclicPrefix is set to EXTENDED_CP, SpecialSubframePatterns can be set to SSP3, SSP4, SSP5, or SSP6.</li><li>When the value of RemoteInfAdpAvoidSwitch in a CellRicAlgo is set to ON, the value of FddTddInd in a CELL MO is only to be set CELL_TDD, and the value of SubframeAssignment in a CELL MO is only to be set SA2, and the value of SpecialSubframePatterns in a CELL MO is only to be set SSP5 or SSP6 or SSP7 or SSP9.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and PreambleFmt is set to 4, SpecialSubframePatterns must be set to a value greater than SSP4.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the SpecialSubframePatterns parameter in this Cell MO must be set to NULL.</li><li>When the SpecialSubframePatterns parameter in a Cell MO is set to NULL, the FddTddInd and WorkMode parameters in this Cell MO must be set to CELL_TDD and LAA respectively.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-Ssp6DwPTSMode.html">Ssp6DwPTSMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SSP6 DwPTS Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the DwPTS is truncated for transmission in LTE TDD cells when SSP6 is used. This parameter applies only to LTE TDD cells that work on band 39 or band 34 and use SA2+SSP6. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: TRUNCATION(TRUNCATION), NO_TRUNCATION(NO_TRUNCATION)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TRUNCATION, NO_TRUNCATION</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-EuCellStandbyMode.html">EuCellStandbyMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Standby Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the active or standby mode of the cell. A cell is in active mode by default. If this parameter is set to STANDBY, an inter-BBU SFN auxiliary cell can switch back to the standby mode to provide services if inter-BBU faults occur. Only common cells, SFN cells or MPRU_AGGREGATION cells support the standby mode.</p>
+<p>GUI Value Range: ACTIVE(Active), STANDBY(Standby)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ACTIVE, STANDBY</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, MultiRruCellFlag set to BOOLEAN_TRUE and MultiRruCellMode set to SFN or MPRU_AGGREGATION, or MultiRruCellFlag set to BOOLEAN_FALSE if EuCellStandbyMode is set to STANDBY.</li><li>When the FddTddInd parameter in the Cell MO is set to CELL_TDD and the TxRxMode parameter in the Cell MO is set to 64T64R or 32T32R, the EuCellStandbyMode and MultiRruCellFlag parameters in the Cell MO must be set to ACTIVE and BOOLEAN_FALSE respectively.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CellSpecificOffset.html">CellSpecificOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell specific offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cell specific offset for the serving cell. It affects the probability of triggering handovers from the serving cell to its neighboring cells. A smaller value of this parameter leads to a higher probability. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: dB-24(-24dB), dB-22(-22dB), dB-20(-20dB), dB-18(-18dB), dB-16(-16dB), dB-14(-14dB), dB-12(-12dB), dB-10(-10dB), dB-8(-8dB), dB-6(-6dB), dB-5(-5dB), dB-4(-4dB), dB-3(-3dB), dB-2(-2dB), dB-1(-1dB), dB0(0dB), dB1(1dB), dB2(2dB), dB3(3dB), dB4(4dB), dB5(5dB), dB6(6dB), dB8(8dB), dB10(10dB), dB12(12dB), dB14(14dB), dB16(16dB), dB18(18dB), dB20(20dB), dB22(22dB), dB24(24dB)</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: dB-24, dB-22, dB-20, dB-18, dB-16, dB-14, dB-12, dB-10, dB-8, dB-6, dB-5, dB-4, dB-3, dB-2, dB-1, dB0, dB1, dB2, dB3, dB4, dB5, dB6, dB8, dB10, dB12, dB14, dB16, dB18, dB20, dB22, dB24</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: dB0(0dB)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-QoffsetFreq.html">QoffsetFreq</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Frequency offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the specific frequency offset of the serving cell. This parameter is contained in the measurement configuration and is related to the handover difficulty between the serving cell and the neighboring cell. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: dB-24(-24dB), dB-22(-22dB), dB-20(-20dB), dB-18(-18dB), dB-16(-16dB), dB-14(-14dB), dB-12(-12dB), dB-10(-10dB), dB-8(-8dB), dB-6(-6dB), dB-5(-5dB), dB-4(-4dB), dB-3(-3dB), dB-2(-2dB), dB-1(-1dB), dB0(0dB), dB1(1dB), dB2(2dB), dB3(3dB), dB4(4dB), dB5(5dB), dB6(6dB), dB8(8dB), dB10(10dB), dB12(12dB), dB14(14dB), dB16(16dB), dB18(18dB), dB20(20dB), dB22(22dB), dB24(24dB)</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: dB-24, dB-22, dB-20, dB-18, dB-16, dB-14, dB-12, dB-10, dB-8, dB-6, dB-5, dB-4, dB-3, dB-2, dB-1, dB0, dB1, dB2, dB3, dB4, dB5, dB6, dB8, dB10, dB12, dB14, dB16, dB18, dB20, dB22, dB24</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: dB0(0dB)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a higher probability of sending measurement reports and a higher probability of handovers, increasing the number of handovers. This enables UEs to be handed over more timely. A larger value of this parameter leads to the opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-RootSequenceIdx.html">RootSequenceIdx</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Root sequence index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of the start logical root sequence used to generate preamble sequences for PRACH configuration set type A in a low-speed, high-speed, or ultra-high speed cell. Each logical root sequence maps one physical root sequence. For details about the mapping relationships, see 3GPP TS 36.211. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~837</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~837</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The logical root sequence index for each cell must be configured based on the network plan. The tool for configuring Zadoff-Chu (ZC) root sequences is recommended. During manual configuration, adhere to the following rules:</p>
+<p>1. If two adjacent cells use the same or overlapping time-frequency resources for the physical random access channel (PRACH), they must have different values of this parameter.</p>
+<p>2. If a cell uses a preamble format less than 4 and the HighSpeedFlag parameter is set to HIGH_SPEED(High speed cell flag) or ULTRA_HIGH_SPEED(Ultra high speed cell flag), this parameter must be set by referring to constraints in the parameter relationship.</p>
+<p>Note: When manually configuring root ZC sequences, ensure that both the first logical root sequence index and each subsequent logical root sequence index are within the specified value range. For details about how to calculate the number of ZC root sequences required to generate 64 preamble sequences, see 3GPP TS 36.211.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and PreambleFmt is set to 4, RootSequenceIdx must be set to a value smaller than or equal to 137.</li><li>If NbCellFlag, PreambleFmt, and HighSpeedFlag in a Cell MO are set to FALSE, a value less than 4, and HIGH_SPEED, respectively, the following requirements must be met during the setting of CellRadius and RootSequenceIdx: (1) 1 m &lt;= CellRadius &lt;= 1000 m: the value range of RootSequenceIdx is 24~815; (2) 1000 m &lt; CellRadius &lt;= 1500 m: the value range of RootSequenceIdx is 30~811; (3) 1500 m &lt; CellRadius &lt;= 2000 m: the value range of RootSequenceIdx is 36~804; (4) 2000 m &lt; CellRadius &lt;= 2600 m: the value range of RootSequenceIdx is 42~797; (5) 2600 m &lt; CellRadius &lt;= 3500 m: the value range of RootSequenceIdx is 52~786; (6) 3500 m &lt; CellRadius &lt;= 4300 m): the value range of RootSequenceIdx is 64~779; (7) 4300 m &lt; CellRadius &lt;= 5500 m: the value range of RootSequenceIdx is 76~765; (8) 5500 m &lt; CellRadius &lt;= 6800 m: the value range of RootSequenceIdx is 90~747; (9) 6800 m &lt; CellRadius &lt;= 8600 m: the value range of RootSequenceIdx is 116~731; (10) 8600 m &lt; CellRadius &lt;= 10600 m: the value range of RootSequenceIdx is 136~706; (11) 10600 m &lt; CellRadius &lt;= 13200 m: the value range of RootSequenceIdx is 168~676; (12) 13200 m &lt; CellRadius &lt;= 17200 m: the value range of RootSequenceIdx is 204~602; (13) 17200 m &lt; CellRadius &lt;= 21500 m: the value range of RootSequenceIdx is 264~566; (14) 21500 m &lt; CellRadius &lt;= 27800 m: the value range of RootSequenceIdx is 328~498; (15) 27800 m &lt; CellRadius &lt;= 32800 m: the value range of RootSequenceIdx is 384~450.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 1 m &lt;= CellRadius &lt;= 1199 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~456, 464~488, 496~502, 506, 512, 516~618; 1199 m &lt; CellRadius &lt;= 1649 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 1649 m &lt; CellRadius &lt;= 2098 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 2098 m &lt; CellRadius &lt;= 2698 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~386, 394~398, 404~442, 448~454, 464~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618; 2698 m &lt; CellRadius &lt;= 3598 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~358, 368~376, 384~386, 394~398, 404, 408~442, 452, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618;3598 m &lt; CellRadius &lt;= 4497 m: the value range of RootSequenceIdx is 264~324, 334~344, 354~358, 368~376, 384~386, 394~396, 408~414, 422~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 4497 m &lt; CellRadius &lt;= 5547 m: the value range of RootSequenceIdx 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618; 5547 m &lt; CellRadius &lt;= 6896 m: the value range of RootSequenceIdx is 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~428, 434~440, 480~486, 500~502, 506, 512, 516~518, 536~542, 548, 552~618; 6896 m &lt; CellRadius &lt;= 8695 m: the value range of RootSequenceIdx is 264~272, 276~322, 336~338, 354~358, 368, 372~374, 408, 436~440, 482, 502, 506, 512, 516~518, 536~542, 556~594, 598~618; 8695 m &lt; CellRadius &lt;= 10794 m: the value range of RootSequenceIdx is 264~272, 276~306, 310~322, 336~338, 436~440, 502, 506, 512, 516~518, 558, 562~594, 598~610, 614; 10794 m &lt; CellRadius &lt;= 13343 m: the value range of RootSequenceIdx is 264~270, 280~300, 306, 310, 316~322, 502, 506, 562~588, 594, 598~610, 614; 13343 m &lt; CellRadius &lt;= 17391 m: the value range of RootSequenceIdx is 280~284, 306, 310, 316, 562, 572~576, 584~588, 602~610, 614.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Modifications on this parameter may affect the orthogonality of the preamble sequences for the cell and its adjacent cells.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-HighSpeedFlag.html">HighSpeedFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">High speed flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the speed flag of the cell. Set this parameter to HIGH_SPEED or ULTRA_HIGH_SPEED if the cell is used to provide coverage for high-speed railways. Set this parameter to LOW_SPEED in other scenarios. This parameter can be set only to LOW_SPEED for TDD 5 MHz cells. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: LOW_SPEED(Low speed cell flag), HIGH_SPEED(High speed cell flag), ULTRA_HIGH_SPEED(Ultra high speed cell flag), EXTRA_HIGH_SPEED(Extra high speed cell flag)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LOW_SPEED, HIGH_SPEED, ULTRA_HIGH_SPEED, EXTRA_HIGH_SPEED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: LOW_SPEED(Low speed cell flag)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, CellRadius cannot be set to a value greater than 32800 m when NbCellFlag is set to FALSE, PreambleFmt is set to a value less than 4, and HighSpeedFlag is set to HIGH_SPEED.</li><li>If NbCellFlag, PreambleFmt, and HighSpeedFlag in a Cell MO are set to FALSE, a value less than 4, and HIGH_SPEED, respectively, the following requirements must be met during the setting of CellRadius and RootSequenceIdx: (1) 1 m &lt;= CellRadius &lt;= 1000 m: the value range of RootSequenceIdx is 24~815; (2) 1000 m &lt; CellRadius &lt;= 1500 m: the value range of RootSequenceIdx is 30~811; (3) 1500 m &lt; CellRadius &lt;= 2000 m: the value range of RootSequenceIdx is 36~804; (4) 2000 m &lt; CellRadius &lt;= 2600 m: the value range of RootSequenceIdx is 42~797; (5) 2600 m &lt; CellRadius &lt;= 3500 m: the value range of RootSequenceIdx is 52~786; (6) 3500 m &lt; CellRadius &lt;= 4300 m): the value range of RootSequenceIdx is 64~779; (7) 4300 m &lt; CellRadius &lt;= 5500 m: the value range of RootSequenceIdx is 76~765; (8) 5500 m &lt; CellRadius &lt;= 6800 m: the value range of RootSequenceIdx is 90~747; (9) 6800 m &lt; CellRadius &lt;= 8600 m: the value range of RootSequenceIdx is 116~731; (10) 8600 m &lt; CellRadius &lt;= 10600 m: the value range of RootSequenceIdx is 136~706; (11) 10600 m &lt; CellRadius &lt;= 13200 m: the value range of RootSequenceIdx is 168~676; (12) 13200 m &lt; CellRadius &lt;= 17200 m: the value range of RootSequenceIdx is 204~602; (13) 17200 m &lt; CellRadius &lt;= 21500 m: the value range of RootSequenceIdx is 264~566; (14) 21500 m &lt; CellRadius &lt;= 27800 m: the value range of RootSequenceIdx is 328~498; (15) 27800 m &lt; CellRadius &lt;= 32800 m: the value range of RootSequenceIdx is 384~450.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 1 m &lt;= CellRadius &lt;= 1199 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~456, 464~488, 496~502, 506, 512, 516~618; 1199 m &lt; CellRadius &lt;= 1649 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 1649 m &lt; CellRadius &lt;= 2098 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 2098 m &lt; CellRadius &lt;= 2698 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~386, 394~398, 404~442, 448~454, 464~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618; 2698 m &lt; CellRadius &lt;= 3598 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~358, 368~376, 384~386, 394~398, 404, 408~442, 452, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618;3598 m &lt; CellRadius &lt;= 4497 m: the value range of RootSequenceIdx is 264~324, 334~344, 354~358, 368~376, 384~386, 394~396, 408~414, 422~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 4497 m &lt; CellRadius &lt;= 5547 m: the value range of RootSequenceIdx 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618; 5547 m &lt; CellRadius &lt;= 6896 m: the value range of RootSequenceIdx is 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~428, 434~440, 480~486, 500~502, 506, 512, 516~518, 536~542, 548, 552~618; 6896 m &lt; CellRadius &lt;= 8695 m: the value range of RootSequenceIdx is 264~272, 276~322, 336~338, 354~358, 368, 372~374, 408, 436~440, 482, 502, 506, 512, 516~518, 536~542, 556~594, 598~618; 8695 m &lt; CellRadius &lt;= 10794 m: the value range of RootSequenceIdx is 264~272, 276~306, 310~322, 336~338, 436~440, 502, 506, 512, 516~518, 558, 562~594, 598~610, 614; 10794 m &lt; CellRadius &lt;= 13343 m: the value range of RootSequenceIdx is 264~270, 280~300, 306, 310, 316~322, 502, 506, 562~588, 594, 598~610, 614; 13343 m &lt; CellRadius &lt;= 17391 m: the value range of RootSequenceIdx is 280~284, 306, 310, 316, 562, 572~576, 584~588, 602~610, 614.</li><li>HighSpeedFlag in a Cell MO cannot be set to EXTRA_HIGH_SPEED.</li><li>In a Cell MO, if TxRxMode is set to 2T8R, HighSpeedFlag cannot be set to ULTRA_HIGH_SPEED or EXTRA_HIGH_SPEED.</li><li>In a Cell MO, if TxRxMode is set to 4T8R, HighSpeedFlag cannot be set to ULTRA_HIGH_SPEED or EXTRA_HIGH_SPEED.</li><li>If HighSpeedFlag in the Cell MO is set to HIGH_SPEED, ULTRA_HIGH_SPEED, or EXTRA_HIGH_SPEED, the TaEnhancePuschDmrs option of TaEnhance must be deselected.</li><li>The MultiCellShareMode parameter in the Cell MO can be set to SPLIT only if the HighSpeedFlag parameter in the Cell MO is set to LOW_SPEED.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, HighSpeedFlag must be set to LOW_SPEED.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4 and HighSpeedFlag is set to ULTRA_HIGH_SPEED, the following requirements must be met during the setting of CellRadius: the value range of CellRadius is 1 m to 15000 m;</li><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and HighSpeedFlag is set to ULTRA_HIGH_SPEED, the value range of PreambleFmt is 0~3.</li><li>The SriPeriodAdaptEnhancedOptSw option of the SriAlgoSwitch parameter in the CELLPUCCHALGO MO can be selected only if the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_TRUE, the HighSpeedFlag in the Cell MO is set to LOW_SPEED, the MultiRruCellMode parameter in the Cell MO is set to CELL_COMBINATION, and the TxRxMode in the Cell MO is set to 1T1R, 1T2R, 2T2R, or 2T4R; or the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_FALSE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-PreambleFmt.html">PreambleFmt</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Preamble format</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the preamble format used in the cell. For details, see 3GPP TS 36.211. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~4</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~4</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Cell radius &lt;= 1400 m: Preamble formats 0 to 3 are recommended for an FDD cell, preamble formats 0 to 4 are recommended for a TDD cell;</p>
+<p>1400 m &lt; Cell radius &lt;= 14,500 m: Preamble formats 0 to 3 are recommended;</p>
+<p>14,500 m &lt; Cell radius &lt;= 29,500 m: Preamble formats 1 to 3 are recommended;</p>
+<p>29,500 m &lt; Cell radius &lt;= 77,300 m: Preamble formats 1 and 3 are recommended;</p>
+<p>77,300 m &lt; Cell radius &lt;= 160,000 m: Preamble format 3 is recommended.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the values of the CellActiveState, FddTddInd, and DlBandWidth parameters in a Cell MO are CELL_ACTIVE, CELL_TDD, and CELL_BW_N6, respectively, the PreambleFmt parameter in this Cell MO cannot be set to 4.</li><li>If the values of the CellActiveState, FddTddInd, TxRxMode, and SubframeAssignment parameters in a Cell MO are CELL_ACTIVE, CELL_TDD, 64T64R, and SA1, respectively, the PreambleFmt parameter in this Cell MO cannot be set to 1, 2, or 3.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and PreambleFmt is set to 4, RootSequenceIdx must be set to a value smaller than or equal to 137.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and PreambleFmt is set to 4, SpecialSubframePatterns must be set to a value greater than SSP4.</li><li>In a Cell MO, if NbCellFlag is set to FALSE and FddTddInd is set to CELL_TDD, PreambleFmt and SubframeAssignment must adhere to the following constraint:</li><li>(1) If PreambleFmt is set to 0, SubframeAssignment can be set to SA0, SA1, SA2, SA3, SA5, or NULL;</li><li>(2) If PreambleFmt is set to 1, SubframeAssignment can be set to SA0, SA1, or SA3;</li><li>(3) If PreambleFmt is set to 2, SubframeAssignment can be set to SA0, SA1, or SA3;</li><li>(4) If PreambleFmt is set to 3, SubframeAssignment can be set to SA0 or SA3;</li><li>(5) If PreambleFmt is set to 4, SubframeAssignment can be set to SA0, SA1, SA2, SA3, or SA5.</li><li>In a Cell MO, CellRadius cannot be set to a value greater than 32800 m when NbCellFlag is set to FALSE, PreambleFmt is set to a value less than 4, and HighSpeedFlag is set to HIGH_SPEED.</li><li>In a Cell MO, PreambleFmt cannot be set to 4 if NbCellFlag is set to FALSE, FddTddInd is set to CELL_FDD.</li><li>If NbCellFlag, PreambleFmt, and HighSpeedFlag in a Cell MO are set to FALSE, a value less than 4, and HIGH_SPEED, respectively, the following requirements must be met during the setting of CellRadius and RootSequenceIdx: (1) 1 m &lt;= CellRadius &lt;= 1000 m: the value range of RootSequenceIdx is 24~815; (2) 1000 m &lt; CellRadius &lt;= 1500 m: the value range of RootSequenceIdx is 30~811; (3) 1500 m &lt; CellRadius &lt;= 2000 m: the value range of RootSequenceIdx is 36~804; (4) 2000 m &lt; CellRadius &lt;= 2600 m: the value range of RootSequenceIdx is 42~797; (5) 2600 m &lt; CellRadius &lt;= 3500 m: the value range of RootSequenceIdx is 52~786; (6) 3500 m &lt; CellRadius &lt;= 4300 m): the value range of RootSequenceIdx is 64~779; (7) 4300 m &lt; CellRadius &lt;= 5500 m: the value range of RootSequenceIdx is 76~765; (8) 5500 m &lt; CellRadius &lt;= 6800 m: the value range of RootSequenceIdx is 90~747; (9) 6800 m &lt; CellRadius &lt;= 8600 m: the value range of RootSequenceIdx is 116~731; (10) 8600 m &lt; CellRadius &lt;= 10600 m: the value range of RootSequenceIdx is 136~706; (11) 10600 m &lt; CellRadius &lt;= 13200 m: the value range of RootSequenceIdx is 168~676; (12) 13200 m &lt; CellRadius &lt;= 17200 m: the value range of RootSequenceIdx is 204~602; (13) 17200 m &lt; CellRadius &lt;= 21500 m: the value range of RootSequenceIdx is 264~566; (14) 21500 m &lt; CellRadius &lt;= 27800 m: the value range of RootSequenceIdx is 328~498; (15) 27800 m &lt; CellRadius &lt;= 32800 m: the value range of RootSequenceIdx is 384~450.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 1 m &lt;= CellRadius &lt;= 1199 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~456, 464~488, 496~502, 506, 512, 516~618; 1199 m &lt; CellRadius &lt;= 1649 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 1649 m &lt; CellRadius &lt;= 2098 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 2098 m &lt; CellRadius &lt;= 2698 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~386, 394~398, 404~442, 448~454, 464~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618; 2698 m &lt; CellRadius &lt;= 3598 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~358, 368~376, 384~386, 394~398, 404, 408~442, 452, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618;3598 m &lt; CellRadius &lt;= 4497 m: the value range of RootSequenceIdx is 264~324, 334~344, 354~358, 368~376, 384~386, 394~396, 408~414, 422~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 4497 m &lt; CellRadius &lt;= 5547 m: the value range of RootSequenceIdx 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618; 5547 m &lt; CellRadius &lt;= 6896 m: the value range of RootSequenceIdx is 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~428, 434~440, 480~486, 500~502, 506, 512, 516~518, 536~542, 548, 552~618; 6896 m &lt; CellRadius &lt;= 8695 m: the value range of RootSequenceIdx is 264~272, 276~322, 336~338, 354~358, 368, 372~374, 408, 436~440, 482, 502, 506, 512, 516~518, 536~542, 556~594, 598~618; 8695 m &lt; CellRadius &lt;= 10794 m: the value range of RootSequenceIdx is 264~272, 276~306, 310~322, 336~338, 436~440, 502, 506, 512, 516~518, 558, 562~594, 598~610, 614; 10794 m &lt; CellRadius &lt;= 13343 m: the value range of RootSequenceIdx is 264~270, 280~300, 306, 310, 316~322, 502, 506, 562~588, 594, 598~610, 614; 13343 m &lt; CellRadius &lt;= 17391 m: the value range of RootSequenceIdx is 280~284, 306, 310, 316, 562, 572~576, 584~588, 602~610, 614.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4 and HighSpeedFlag is set to ULTRA_HIGH_SPEED, the following requirements must be met during the setting of CellRadius: the value range of CellRadius is 1 m to 15000 m;</li><li>In a Cell MO, if NbCellFlag is set to FALSE, FddTddInd is set to CELL_TDD and HighSpeedFlag is set to ULTRA_HIGH_SPEED, the value range of PreambleFmt is 0~3.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CellRadius.html">CellRadius</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell radius</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the radius of the cell, that is, the farthest distance that a cell can cover under the condition of keeping certain network performance. If this parameter is set to a value greater than 100 km, the Extended Cell Access Radius Beyond 100km feature takes effect. Only FDD cells can be configured with a radius more than 100 km. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~200000</p>
+<p>Unit: m</p>
+<p>Actual Value Range: 1~200000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10000</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, CellRadius cannot be set to a value greater than 32800 m when NbCellFlag is set to FALSE, PreambleFmt is set to a value less than 4, and HighSpeedFlag is set to HIGH_SPEED.</li><li>If NbCellFlag, PreambleFmt, and HighSpeedFlag in a Cell MO are set to FALSE, a value less than 4, and HIGH_SPEED, respectively, the following requirements must be met during the setting of CellRadius and RootSequenceIdx: (1) 1 m &lt;= CellRadius &lt;= 1000 m: the value range of RootSequenceIdx is 24~815; (2) 1000 m &lt; CellRadius &lt;= 1500 m: the value range of RootSequenceIdx is 30~811; (3) 1500 m &lt; CellRadius &lt;= 2000 m: the value range of RootSequenceIdx is 36~804; (4) 2000 m &lt; CellRadius &lt;= 2600 m: the value range of RootSequenceIdx is 42~797; (5) 2600 m &lt; CellRadius &lt;= 3500 m: the value range of RootSequenceIdx is 52~786; (6) 3500 m &lt; CellRadius &lt;= 4300 m): the value range of RootSequenceIdx is 64~779; (7) 4300 m &lt; CellRadius &lt;= 5500 m: the value range of RootSequenceIdx is 76~765; (8) 5500 m &lt; CellRadius &lt;= 6800 m: the value range of RootSequenceIdx is 90~747; (9) 6800 m &lt; CellRadius &lt;= 8600 m: the value range of RootSequenceIdx is 116~731; (10) 8600 m &lt; CellRadius &lt;= 10600 m: the value range of RootSequenceIdx is 136~706; (11) 10600 m &lt; CellRadius &lt;= 13200 m: the value range of RootSequenceIdx is 168~676; (12) 13200 m &lt; CellRadius &lt;= 17200 m: the value range of RootSequenceIdx is 204~602; (13) 17200 m &lt; CellRadius &lt;= 21500 m: the value range of RootSequenceIdx is 264~566; (14) 21500 m &lt; CellRadius &lt;= 27800 m: the value range of RootSequenceIdx is 328~498; (15) 27800 m &lt; CellRadius &lt;= 32800 m: the value range of RootSequenceIdx is 384~450.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 1 m &lt;= CellRadius &lt;= 1199 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~456, 464~488, 496~502, 506, 512, 516~618; 1199 m &lt; CellRadius &lt;= 1649 m: the value range of RootSequenceIdx is 264~346, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 1649 m &lt; CellRadius &lt;= 2098 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~454, 464~488, 496~502, 506, 512, 516~542, 548~618; 2098 m &lt; CellRadius &lt;= 2698 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~376, 384~386, 394~398, 404~442, 448~454, 464~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618; 2698 m &lt; CellRadius &lt;= 3598 m: the value range of RootSequenceIdx is 264~324, 332~344, 354~358, 368~376, 384~386, 394~398, 404, 408~442, 452, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548~618;3598 m &lt; CellRadius &lt;= 4497 m: the value range of RootSequenceIdx is 264~324, 334~344, 354~358, 368~376, 384~386, 394~396, 408~414, 422~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4, and HighSpeedFlag is set to ULTRA_HIGH_SPEED, then the following requirements must be met during the setting of CellRadius and RootSequenceIdx: 4497 m &lt; CellRadius &lt;= 5547 m: the value range of RootSequenceIdx 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~440, 464~466, 476~488, 496~502, 506, 512, 516~518, 522, 528~542, 548, 552~618; 5547 m &lt; CellRadius &lt;= 6896 m: the value range of RootSequenceIdx is 264~272, 276~322, 334~342, 354~358, 368~376, 408~414, 424~428, 434~440, 480~486, 500~502, 506, 512, 516~518, 536~542, 548, 552~618; 6896 m &lt; CellRadius &lt;= 8695 m: the value range of RootSequenceIdx is 264~272, 276~322, 336~338, 354~358, 368, 372~374, 408, 436~440, 482, 502, 506, 512, 516~518, 536~542, 556~594, 598~618; 8695 m &lt; CellRadius &lt;= 10794 m: the value range of RootSequenceIdx is 264~272, 276~306, 310~322, 336~338, 436~440, 502, 506, 512, 516~518, 558, 562~594, 598~610, 614; 10794 m &lt; CellRadius &lt;= 13343 m: the value range of RootSequenceIdx is 264~270, 280~300, 306, 310, 316~322, 502, 506, 562~588, 594, 598~610, 614; 13343 m &lt; CellRadius &lt;= 17391 m: the value range of RootSequenceIdx is 280~284, 306, 310, 316, 562, 572~576, 584~588, 602~610, 614.</li><li>In a Cell MO, if NbCellFlag is set to FALSE, PreambleFmt is smaller than 4 and HighSpeedFlag is set to ULTRA_HIGH_SPEED, the following requirements must be met during the setting of CellRadius: the value range of CellRadius is 1 m to 15000 m;</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If the CellRadius parameter value is too small for a cell, UEs that are actually in the cell coverage but whose locations are outside the range specified by the CellRadius parameter cannot access the cell. If the CellRadius parameter value is too large for a cell, the cell serves many CEUs. As a result, the average cell throughput decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CustomizedBandWidthCfgInd.html">CustomizedBandWidthCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Customized bandwidth configure indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure a compact bandwidth for a cell. A compact bandwidth can be configured only when a standard bandwidth 1.4 MHz, 5 MHz, 10 MHz, 15 MHz, or 20 MHz has been configured. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd is set to CELL_TDD, CustomizedBandWidthCfgInd must be set to NOT_CFG.</li><li>In a Cell MO, when NbCellFlag is set to FALSE and CustomizedBandWidthCfgInd is set to CFG: If UlBandWidth is set to CELL_BW_N6, CustomizedULBandWidth must be set to a value in the range of 12 to 14; If UlBandWidth is set to CELL_BW_N25, CustomizedULBandWidth must be set to a value in the range of 44 to 50; If UlBandWidth is set to CELL_BW_N50, CustomizedULBandWidth must be set to a value in the range of 74, 75, 80 or 87 to 100; If UlBandWidth is set to CELL_BW_N75, CustomizedULBandWidth must be set to a value in the range of 139 to 150; If UlBandWidth is set to CELL_BW_N100, CustomizedULBandWidth must be set to a value in the range of 175 to 178 or 183 to 200.</li><li>In a Cell MO, when NbCellFlag in a Cell MO is set to FALSE and CustomizedBandWidthCfgInd is set to CFG: If DlBandWidth is set to CELL_BW_N6, CustomizedDLBandWidth must be set to a value in the range of 12 to 14; If DlBandWidth is set to CELL_BW_N25, CustomizedDLBandWidth must be set to a value in the range of 44 to 50; If DlBandWidth is set to CELL_BW_N50, CustomizedDLBandWidth must be set to a value in the range of 74, 75, 80 or 87 to 100; If DlBandWidth is set to CELL_BW_N75, CustomizedDLBandWidth must be set to a value in the range of 139 to 150; If DlBandWidth is set to CELL_BW_N100, CustomizedDLBandWidth must be set to a value in the range of 175 to 178 or 183 to 200.</li><li>In a Cell MO, if CustomizedBandWidthCfgInd is set to CFG, CustomizedULBandWidth and CustomizedDLBandWidth cannot both be set to 14, 50, 100, 150, or 200.</li><li>In a Cell MO, if TxRxMode is set to 2T8R, CustomizedBandWidthCfgInd cannot be set to CFG.</li><li>In a Cell MO, if TxRxMode is set to 4T8R, CustomizedBandWidthCfgInd cannot be set to CFG.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 12~14, 44~50, 139~150, or 175~178, DlPuncturedRbNum must be set to 255.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 96~100 or 193~200, DlPuncturedRbNum must be set to 255 or 0.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 92~95 or 190~192, DlPuncturedRbNum must be set to 255, 0, or 2.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 186~189, DlPuncturedRbNum must be set to 255, 0, 2, or 4.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 183~185, DlPuncturedRbNum must be set to 255, 0, 2, 4, or 6.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 88~91, DlPuncturedRbNum must be set to 255, 2, or 4.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 80, DlPuncturedRbNum must be set to 255 or 8.</li><li>The CompactBwCtrlIntrfMode parameter in a Cell MO can be set to REDUCED_LEFT or REDUCED_RIGHT only if the CustomizedBandWidthCfgInd parameter in this Cell MO is set to CFG and the TxRxMode parameter in this Cell MO is set to 2T4R, 1T1R, 1T2R, or 2T2R.</li><li>The CompactBwCtrlIntrfMode parameter in a Cell MO can be set to REDUCED only if the CustomizedDLBandWidth parameter in this Cell MO is set to 74~75, 87, 146~149, or 175~178. In other situations, the CompactBwCtrlIntrfMode parameter in a Cell MO must be set to NORMAL.</li><li>When CustomizedBandWidthCfgInd parameter in a Cell MO is set to CFG, the CompactBwCtrlIntrfMode parameter in this Cell MO can be set to REDUCED_LEFT, or REDUCED_RIGHT only if the CustomizedDLBandWidth parameter in this Cell MO is set to 74 to 75, 87, or 175 to 178.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to CFG, the spectral efficiency, the number of available RBs, and the system capacity increase. However, UEs in a cell with a compact bandwidth experience higher inter-RAT interference than those in a cell with the corresponding standard bandwidth. Therefore, the uplink and downlink throughput of UEs using RBs at both ends of the frequency band in a cell with a compact bandwidth is lower than that for UEs using the same number of RBs in a cell with the corresponding standard bandwidth.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CustomizedULBandWidth.html">CustomizedULBandWidth</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Customized uplink bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates a customized uplink bandwidth configured for a cell. A compact bandwidth can be configured only when a standard bandwidth 1.4 MHz, 5 MHz, 10 MHz, 15 MHz, or 20 MHz has been configured. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 12~14,44~50,74~75,80,87~100,139~150,175~178,183~200</p>
+<p>Unit: 0.1MHz</p>
+<p>Actual Value Range: 1.2~1.4,4.4~5.0,7.4~7.5,8.0,8.7,8.8~10.0,13.9~15.0,17.5~17.8,18.3~20.0</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 98</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, when NbCellFlag is set to FALSE and CustomizedBandWidthCfgInd is set to CFG: If UlBandWidth is set to CELL_BW_N6, CustomizedULBandWidth must be set to a value in the range of 12 to 14; If UlBandWidth is set to CELL_BW_N25, CustomizedULBandWidth must be set to a value in the range of 44 to 50; If UlBandWidth is set to CELL_BW_N50, CustomizedULBandWidth must be set to a value in the range of 74, 75, 80 or 87 to 100; If UlBandWidth is set to CELL_BW_N75, CustomizedULBandWidth must be set to a value in the range of 139 to 150; If UlBandWidth is set to CELL_BW_N100, CustomizedULBandWidth must be set to a value in the range of 175 to 178 or 183 to 200.</li><li>In a Cell MO, if CustomizedBandWidthCfgInd is set to CFG, CustomizedULBandWidth and CustomizedDLBandWidth cannot both be set to 14, 50, 100, 150, or 200.</li><li>If the CustomizedULBandWidth parameter in a Cell MO is set to 74, 75, or 87, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, or -3.</li><li>If the CustomizedULBandWidth parameter in a Cell MO is set to a value in the range of 175 to 178, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, REDUCED_LEFT, or REDUCED_RIGHT, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 8, 7, 6, 5, 4, 3, 2, 1, 0, or -1.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CustomizedDLBandWidth.html">CustomizedDLBandWidth</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Customized downlink bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates a customized downlink bandwidth configured for a cell. A compact bandwidth can be configured only when a standard bandwidth 1.4 MHz, 5 MHz, 10 MHz, 15 MHz, or 20 MHz has been configured. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 12~14,44~50,74~75,80,87~100,139~150,175~178,183~200</p>
+<p>Unit: 0.1MHz</p>
+<p>Actual Value Range: 1.2~1.4,4.4~5.0,7.4~7.5,8.0,8.7~10.0,13.9~15.0,17.5~17.8,18.3~20.0</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 98</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, when NbCellFlag in a Cell MO is set to FALSE and CustomizedBandWidthCfgInd is set to CFG: If DlBandWidth is set to CELL_BW_N6, CustomizedDLBandWidth must be set to a value in the range of 12 to 14; If DlBandWidth is set to CELL_BW_N25, CustomizedDLBandWidth must be set to a value in the range of 44 to 50; If DlBandWidth is set to CELL_BW_N50, CustomizedDLBandWidth must be set to a value in the range of 74, 75, 80 or 87 to 100; If DlBandWidth is set to CELL_BW_N75, CustomizedDLBandWidth must be set to a value in the range of 139 to 150; If DlBandWidth is set to CELL_BW_N100, CustomizedDLBandWidth must be set to a value in the range of 175 to 178 or 183 to 200.</li><li>In a Cell MO, if CustomizedBandWidthCfgInd is set to CFG, CustomizedULBandWidth and CustomizedDLBandWidth cannot both be set to 14, 50, 100, 150, or 200.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 12~14, 44~50, 139~150, or 175~178, DlPuncturedRbNum must be set to 255.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 96~100 or 193~200, DlPuncturedRbNum must be set to 255 or 0.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 92~95 or 190~192, DlPuncturedRbNum must be set to 255, 0, or 2.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 186~189, DlPuncturedRbNum must be set to 255, 0, 2, or 4.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 183~185, DlPuncturedRbNum must be set to 255, 0, 2, 4, or 6.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 88~91, DlPuncturedRbNum must be set to 255, 2, or 4.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 80, DlPuncturedRbNum must be set to 255 or 8.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74, 75, or 87, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to NORMAL, the DlPuncturedRbNum parameter in this Cell MO must be set to 255.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 8, 9, 10, 11, 12, or 13.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 87 and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, REDUCED_LEFT, or REDUCED_RIGHT, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 3, 4, 5, 6, or 7.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED_LEFT, or REDUCED_RIGHT, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 9, 10, 11, 12, or 13.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED_LEFT or REDUCED_RIGHT, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 3, 2, 1, 0, -1, -2, -3, -4, or -5.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to a value in the range of 44 to 47, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, then the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 4, 3, 2, 1, 0, or -1, and the MultiRruCellMode parameter in this Cell MO must not be set to MPRU_AGGREGATION.</li><li>The CompactBwCtrlIntrfMode parameter in a Cell MO can be set to REDUCED only if the CustomizedDLBandWidth parameter in this Cell MO is set to 74~75, 87, 146~149, or 175~178. In other situations, the CompactBwCtrlIntrfMode parameter in a Cell MO must be set to NORMAL.</li><li>When CustomizedBandWidthCfgInd parameter in a Cell MO is set to CFG, the CompactBwCtrlIntrfMode parameter in this Cell MO can be set to REDUCED_LEFT, or REDUCED_RIGHT only if the CustomizedDLBandWidth parameter in this Cell MO is set to 74 to 75, 87, or 175 to 178.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-UePowerMaxCfgInd.html">UePowerMaxCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Ue max power allowed configure indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure the maximum TX power of the UE in the cell. If the value of this parameter is not specified, the maximum power is subject to the UE capability.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (Modifications on this parameter would affect cell reselection of the UE in idle mode.)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-UePowerMax.html">UePowerMax</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max transmit power allowed</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum transmit power that a UE can apply to uplink transmission in the cell. It is used in cell selection criterion S to calculate the compensated power. If the value of this parameter is not specified, the maximum power is subject to the UE capability. For details, see 3GPP TS 36.304.</p>
+<p>GUI Value Range: -30~36</p>
+<p>Unit: dBm</p>
+<p>Actual Value Range: -30~36</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 23</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The range of the UePowerMax is -30~33.</li></ul>
+<p>Service Interrupted After Modification: No (Modifications on this parameter would affect cell reselection of the UE in idle mode.)</p>
+<p>Impact on Radio Network Performance: A larger value results in higher maximum transmit power for UEs and stronger signal strength in the local cell but higher interference to neighboring cells. A smaller value leads to the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-MultiRruCellFlag.html">MultiRruCellFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Flag of Multi-RRU Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable or disable the multi-RRU cell feature.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_FALSE(False)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and CELL_COMBINATION, respectively, FddTddInd must be set to TDD.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and MultiRruCellMode in a Cell MO is set to DIGITAL_COMBINATION, FddTddInd in Cell MO must be set to CELL_FDD.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and MultiRruCellMode in a Cell MO is set to DIGITAL_COMBINATION, DlCyclicPrefix and UlCyclicPrefix in Cell MO must be set to NORMAL_CP.</li><li>In a Cell MO, if FddTddInd, CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_TDD, CELL_ACTIVE, BOOLEAN_TRUE, and SFN, respectively, TxRxMode must be set to 2T2R, 4T4R or 8T8R.</li><li>In a Cell MO, if CellActiveState is CELL_ACTIVE, FddTddInd is set to CELL_FDD, and CPRICompression is set to NORMAL_COMPRESSION, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 2T8R, 4T8R, 8T8R, or 32T32R.</li><li>In a Cell MO, if CellActiveState is CELL_ACTIVE, FddTddInd is set to CELL_FDD, and CPRICompression is set to ENHANCED_COMPRESSION or TRIPLEX_COMPRESSION_10M, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 8T8R or 32T32R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and CELL_COMBINATION, respectively, TxRxMode must be set to 1T1R, 2T2R or 4T4R or 8T8R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and TWO_RRU_COMBINATION, respectively, TxRxMode must be set to 2T2R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and DIGITAL_COMBINATION, respectively, TxRxMode must be set to 1T1R or 2T2R.</li><li>In a Cell MO, if FddTddInd is set to TDD, MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively, TxRxMode must be set to 2T2R.</li><li>In a Cell MO, if FddTddInd is set to FDD, MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively, TxRxMode must be set to 4T4R or 2T2R or 1T1R.</li><li>If FddTddInd, MultiRruCellFlag, and MultiRruCellMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, and SFN, respectively, TxRxMode in the Cell MO must be set to 4T4R, 2T4R, 2T2R, 1T2R or 1T1R.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag, and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE, and MPRU_AGGREGATION, respectively, TxRxMode must be set to 4T4R, 2T2R, or 1T1R.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE and SFN, respectively, DlCyclicPrefix and UlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, MultiRruCellFlag set to BOOLEAN_TRUE and MultiRruCellMode set to SFN or MPRU_AGGREGATION, or MultiRruCellFlag set to BOOLEAN_FALSE if EuCellStandbyMode is set to STANDBY.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and FddTddInd in the Cell MO is set to CELL_TDD, or if MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and FddTddInd in the Cell MO is set to CELL_FDD and MultiRruCellMode in the Cell MO is set to a value other than SFN and MPRU_AGGREGATION, CrsPortMap in the Cell MO must be set to NOT_CFG.</li><li>Assume that MultiRruCellFlag is set to BOOLEAN_TRUE and MultiRruCellMode is set to MPRU_AGGREGATION, SFN, or CELL_COMBINATION in a Cell MO. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 3_TO_1, DlBandWidth must be set to CELL_BW_N75 or CELL_BW_N100. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 4_TO_1, DlBandWidth must not be set to CELL_BW_N25 or CELL_BW_N15. If NbCellFlag is set to TRUE, CpriEthCompressionRatio must be set to 2_TO_1.</li><li>When the value of RemoteInfAdpAvoidSwitch in a CellRicAlgo MO is set to ON, the value of MultiRruCellFlag in a CELL MO is only to be set BOOLEAN_FALSE.</li><li>The MultiCellShareMode parameter in the Cell MO can be set to SPLIT only if the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_FALSE.</li><li>If FddTddInd, MultiRruCellFlag, MultiRruCellMode, and TxRxMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, MPRU_AGGREGATION, and 4T4R, respectively, CrsPortNum in the Cell MO must be set to CRS_PORT_4 with NbCellFlag set to FALSE, or CrsPortNum in the Cell MO must be set to CRS_PORT_2 with NbCellFlag set to TRUE.</li><li>When the FddTddInd parameter in the Cell MO is set to CELL_TDD and the TxRxMode parameter in the Cell MO is set to 64T64R or 32T32R, the EuCellStandbyMode and MultiRruCellFlag parameters in the Cell MO must be set to ACTIVE and BOOLEAN_FALSE respectively.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_FDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE, SFN or MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_TDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE or CELL_COMBINATION, MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>The SriPeriodAdaptEnhancedOptSw option of the SriAlgoSwitch parameter in the CELLPUCCHALGO MO can be selected only if the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_TRUE, the HighSpeedFlag in the Cell MO is set to LOW_SPEED, the MultiRruCellMode parameter in the Cell MO is set to CELL_COMBINATION, and the TxRxMode in the Cell MO is set to 1T1R, 1T2R, 2T2R, or 2T4R; or the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_FALSE.</li><li>When the NbCellFlag parameter in a Cell MO is set to TRUE, and the MultiRruCellFlag parameter in a Cell MO is set to BOOLEAN_TRUE, value of the MultiRruCellMode parameter must be set to MPRU_AGGREGATION or SFN.</li><li>If the UL_RS_PWR_ADAPT_SW option of the HeavyLoadPrfmOptSwitch parameter in the CellAlgoExtSwitch MO under a Cell MO is selected, the MultiRruCellFlag and MultiRruCellMode parameters in this Cell MO must be set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-MultiRruCellMode.html">MultiRruCellMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mode of Multi-RRU Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the multi-RRU cell.</p>
+<p>GUI Value Range: SFN(SFN), CELL_COMBINATION(Cell Combination), TWO_RRU_COMBINATION(TWO RRU Combination), DIGITAL_COMBINATION(Cell Digital Combination), MPRU_AGGREGATION(MPRU_AGGREGATION)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SFN, CELL_COMBINATION, TWO_RRU_COMBINATION, DIGITAL_COMBINATION, MPRU_AGGREGATION</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SFN(SFN)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and CELL_COMBINATION, respectively, FddTddInd must be set to TDD.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and MultiRruCellMode in a Cell MO is set to DIGITAL_COMBINATION, FddTddInd in Cell MO must be set to CELL_FDD.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and MultiRruCellMode in a Cell MO is set to DIGITAL_COMBINATION, DlCyclicPrefix and UlCyclicPrefix in Cell MO must be set to NORMAL_CP.</li><li>In a Cell MO, if FddTddInd, CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_TDD, CELL_ACTIVE, BOOLEAN_TRUE, and SFN, respectively, TxRxMode must be set to 2T2R, 4T4R or 8T8R.</li><li>In a Cell MO, if CellActiveState is CELL_ACTIVE, FddTddInd is set to CELL_FDD, and CPRICompression is set to NORMAL_COMPRESSION, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 2T8R, 4T8R, 8T8R, or 32T32R.</li><li>In a Cell MO, if CellActiveState is CELL_ACTIVE, FddTddInd is set to CELL_FDD, and CPRICompression is set to ENHANCED_COMPRESSION or TRIPLEX_COMPRESSION_10M, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 8T8R or 32T32R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and CELL_COMBINATION, respectively, TxRxMode must be set to 1T1R, 2T2R or 4T4R or 8T8R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and TWO_RRU_COMBINATION, respectively, TxRxMode must be set to 2T2R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and DIGITAL_COMBINATION, respectively, TxRxMode must be set to 1T1R or 2T2R.</li><li>In a Cell MO, if FddTddInd is set to TDD, MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively, TxRxMode must be set to 2T2R.</li><li>In a Cell MO, if FddTddInd is set to FDD, MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively, TxRxMode must be set to 4T4R or 2T2R or 1T1R.</li><li>If FddTddInd, MultiRruCellFlag, and MultiRruCellMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, and SFN, respectively, TxRxMode in the Cell MO must be set to 4T4R, 2T4R, 2T2R, 1T2R or 1T1R.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag, and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE, and MPRU_AGGREGATION, respectively, TxRxMode must be set to 4T4R, 2T2R, or 1T1R.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE and SFN, respectively, DlCyclicPrefix and UlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, MultiRruCellFlag set to BOOLEAN_TRUE and MultiRruCellMode set to SFN or MPRU_AGGREGATION, or MultiRruCellFlag set to BOOLEAN_FALSE if EuCellStandbyMode is set to STANDBY.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and FddTddInd in the Cell MO is set to CELL_TDD, or if MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and FddTddInd in the Cell MO is set to CELL_FDD and MultiRruCellMode in the Cell MO is set to a value other than SFN and MPRU_AGGREGATION, CrsPortMap in the Cell MO must be set to NOT_CFG.</li><li>Assume that MultiRruCellFlag is set to BOOLEAN_TRUE and MultiRruCellMode is set to MPRU_AGGREGATION, SFN, or CELL_COMBINATION in a Cell MO. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 3_TO_1, DlBandWidth must be set to CELL_BW_N75 or CELL_BW_N100. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 4_TO_1, DlBandWidth must not be set to CELL_BW_N25 or CELL_BW_N15. If NbCellFlag is set to TRUE, CpriEthCompressionRatio must be set to 2_TO_1.</li><li>If FddTddInd, MultiRruCellFlag, MultiRruCellMode, and TxRxMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, MPRU_AGGREGATION, and 4T4R, respectively, CrsPortNum in the Cell MO must be set to CRS_PORT_4 with NbCellFlag set to FALSE, or CrsPortNum in the Cell MO must be set to CRS_PORT_2 with NbCellFlag set to TRUE.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_FDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE, SFN or MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_TDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE or CELL_COMBINATION, MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>The SriPeriodAdaptEnhancedOptSw option of the SriAlgoSwitch parameter in the CELLPUCCHALGO MO can be selected only if the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_TRUE, the HighSpeedFlag in the Cell MO is set to LOW_SPEED, the MultiRruCellMode parameter in the Cell MO is set to CELL_COMBINATION, and the TxRxMode in the Cell MO is set to 1T1R, 1T2R, 2T2R, or 2T4R; or the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_FALSE.</li><li>When the NbCellFlag parameter in a Cell MO is set to TRUE, and the MultiRruCellFlag parameter in a Cell MO is set to BOOLEAN_TRUE, value of the MultiRruCellMode parameter must be set to MPRU_AGGREGATION or SFN.</li><li>If the UL_RS_PWR_ADAPT_SW option of the HeavyLoadPrfmOptSwitch parameter in the CellAlgoExtSwitch MO under a Cell MO is selected, the MultiRruCellFlag and MultiRruCellMode parameters in this Cell MO must be set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CpriEthCompressionRatio.html">CpriEthCompressionRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CPRI Ethernet Compression Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the compression ratio of data transmitted on the CPRI port over Ethernet for an MPRU aggregation cell. Data compression on the CPRI port over Ethernet reduces the bandwidth of LTE data on the Ethernet cable between the RHUB and MPRUs, and therefore the Ethernet cable supports more carriers of different RATs. The parameter values NO_COMPRESSION, 2_TO_1, 3_TO_1, and 4_TO_1 indicate non-compression and ratios of 2:1, 3:1, and 4:1, respectively. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 2_TO_1(2:1 Compression), 3_TO_1(3:1 Compression), 4_TO_1(4:1 Compression), NO_COMPRESSION(No Compression)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2_TO_1, 3_TO_1, 4_TO_1, NO_COMPRESSION</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2_TO_1(2:1 Compression)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>Assume that MultiRruCellFlag is set to BOOLEAN_TRUE and MultiRruCellMode is set to MPRU_AGGREGATION, SFN, or CELL_COMBINATION in a Cell MO. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 3_TO_1, DlBandWidth must be set to CELL_BW_N75 or CELL_BW_N100. If NbCellFlag is set to FALSE and CpriEthCompressionRatio is set to 4_TO_1, DlBandWidth must not be set to CELL_BW_N25 or CELL_BW_N15. If NbCellFlag is set to TRUE, CpriEthCompressionRatio must be set to 2_TO_1.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CPRICompression.html">CPRICompression</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CPRI Compression</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CPRI compression type of the cell. CPRI compression is used in RRU cascading scenarios to enable more RRUs to be cascaded without changing the CPRI data rate. The parameter can be set to NO_COMPRESSION, NORMAL_COMPRESSION, ENHANCED_COMPRESSION, QUADPLEX_COMPRESSION, TRIPLEX_COMPRESSION_10M, or 3_2_COMPRESSION. The parameter value NO_COMPRESSION indicates that CPRI compression is not used. The parameter value NORMAL_COMPRESSION indicates that normal CPRI compression is used. The parameter value ENHANCED_COMPRESSION indicates that enhanced CPRI compression is used. The parameter value QUADPLEX_COMPRESSION indicates that quadruple CPRI compression is used. The parameter value TRIPLEX_COMPRESSION_10M indicates triple CPRI compression for a 10 MHz cell, which applies only to LTE FDD. The value 3_2_COMPRESSION indicates that the compression ratio of 3.2:1 is used. This compression ratio applies only to TDD cells and FDD massive MIMO cells. If the eNodeB is equipped with LBBPd boards and the CPRI data rate is 9.8 Gbit/s for LTE FDD cells or the CPRI data rate is greater than 4.9 Gbit/s for LTE TDD cells, the CPRI compression type of cells served by RRUs in the same RRU chain or ring must be the same. The LBBPc does not support CPRI compression. All types of LBBP boards do not support enhanced or quadruple CPRI compression. Only the UBBPe and UBBPg support triple CPRI compression for 10 MHz cells. Before changing the value of this parameter for a cell served by an RRU in an RRU chain or ring, ensure that all cells served by the RRUs in the chain or ring are deactivated. After the parameter value is changed, activate the cells. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NO_COMPRESSION(No Compression), NORMAL_COMPRESSION(Normal Compression), ENHANCED_COMPRESSION(Enhanced Compression), QUADPLEX_COMPRESSION(Quadplex Compression), TRIPLEX_COMPRESSION_10M(Triplex Compression for 10M), 3_2_COMPRESSION(3.2 times Compression)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO_COMPRESSION, NORMAL_COMPRESSION, ENHANCED_COMPRESSION, QUADPLEX_COMPRESSION, TRIPLEX_COMPRESSION_10M, 3_2_COMPRESSION</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NO_COMPRESSION(No Compression). For LampSite base stations, the recommended value is NORMAL_COMPRESSION(Normal Compression). Operators need to check whether the CPRI port bandwidth meets the actual bandwidth requirement. If the required bandwidth exceeds the CPRI port bandwidth obtained after normal compression, change the value from NORMAL_COMPRESSION(Normal Compression) to ENHANCED_COMPRESSION(Enhanced Compression) or QUADPLEX_COMPRESSION(Quadplex Compression).</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd is CELL_FDD and CPRICompression is NORMAL_COMPRESSION, DlBandWidth can be set to CELL_BW_N25, CELL_BW_N50, CELL_BW_N75, CELL_BW_N100.</li><li>In a Cell MO, if FddTddInd is CELL_FDD and CPRICompression is ENHANCED_COMPRESSION, DlBandWidth can be set to CELL_BW_N50, CELL_BW_N75, CELL_BW_N100.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_FDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE, SFN or MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>When the CPRICompression and FddTddInd parameters in a Cell MO are set to QUADPLEX_COMPRESSION and CELL_TDD, respectively, the MultiRruCellFlag, MultiRruCellMode, and DlBandWidth in this Cell MO must be set to BOOLEAN_TRUE or CELL_COMBINATION, MPRU_AGGREGATION, and CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>CPRICompression in a Cell MO is set to TRIPLEX_COMPRESSION_10M, FddTddInd in this Cell MO must be set to CELL_FDD, and DlBandWidth and UlBandWidth in this Cell MO must be set to CELL_BW_N50.</li><li>When the CPRICompression parameter in the Cell MO is set to 3_2_COMPRESSION, the following conditions must be met: (1) If the FddTddInd parameter in this Cell MO is set to CELL_FDD, the TxRxMode and UlBandWidth parameters must be set to 32T32R and CELL_BW_N75 or CELL_BW_N100, respectively. (2) If the FddTddInd parameter in this Cell MO is set to CELL_TDD, the UlBandWidth parameter must be set to CELL_BW_N75 or CELL_BW_N100, respectively.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-SectorEqmNum.html">SectorEqmNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Physical Cell Number of SFN Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of physical cells constituting an SFN cell. In macro eNodeBs, this parameter value equals the number of sector equipment sets serving an SFN cell. In LampSite eNodeBs, this parameter value equals the number of sector equipment groups serving an SFN cell. In macro + LampSite eNodeBs, the parameter value equals the total number of sector equipment sets and sector equipment groups serving an SFN cell. For FDD, a maximum of six physical cells can be combined to form an SFN cell. For TDD, a maximum of seven physical cells can be combined to form an SFN cell.</p>
+<p>GUI Value Range: 2~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>If the MultiRruCellMode parameter is set to SFN, the SectorEqmNum parameter must be set.</li><li>If the MultiRruCellMode parameter is not set to SFN, the SectorEqmNum parameter does not need to be set.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CrsPortNum.html">CrsPortNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CRS Port Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of ports for transmitting cell-specific reference signal (CRS). As defined in 3GPP specifications, this parameter can be set to CRS_PORT_1, CRS_PORT_2, or CRS_PORT_4. The value CRS_PORT_1 indicates that one CRS port (port 0) is configured. The value CRS_PORT_2 indicates that two CRS ports (ports 0 and 1) are configured. The value CRS_PORT_4 indicates that four CRS ports (ports 0, 1, 2, and 3) are configured.</p>
+<p>GUI Value Range: CRS_PORT_1(1 port), CRS_PORT_2(2 ports), CRS_PORT_4(4 ports)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CRS_PORT_1, CRS_PORT_2, CRS_PORT_4</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T4R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, or 4T4P_0321.</li><li>In a Cell MO, if TxRxMode and CrsPortNum are set to 4T4R and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 4T2P_0011, 4T2P_0101, or 4T2P_0110.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 4T4R, and CRS_PORT_1, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_1, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 8T2P_00001111, 8T2P_00110011, or 8T2P_01010101.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 4T4R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, or 4T4P_0132.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 8T4P_00112233, or 8T4P_01230123.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T8R, and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 4T2P_0011, 4T2P_0101, or 4T2P_0110.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T8R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, or 4T4P_0321.</li><li>The MultiCellShareMode parameter in the Cell MO can be set to SPLIT only if the CrsPortNum parameter in the Cell MO is set to CRS_PORT_2.</li><li>If FddTddInd, MultiRruCellFlag, MultiRruCellMode, and TxRxMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, MPRU_AGGREGATION, and 4T4R, respectively, CrsPortNum in the Cell MO must be set to CRS_PORT_4 with NbCellFlag set to FALSE, or CrsPortNum in the Cell MO must be set to CRS_PORT_2 with NbCellFlag set to TRUE.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, and MultiCellShareMode is set to NORMAL, CrsPortNum must be set to CRS_PORT_4 or CRS_PORT_2.</li><li>When the NbCellFlag and TxRxMode parameters in a Cell MO are set to TRUE and a value among 2T2R, 2T4R, or 4T4R, respectively, the CrsPortNum parameter in this Cell MO must be set to CRS_PORT_2.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-TxRxMode.html">TxRxMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell transmission and reception mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission and reception mode of the cell.</p>
+<p>GUI Value Range: 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 8T8R, 2T8R, 4T8R, 64T64R, 32T32R</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 8T8R, 2T8R, 4T8R, 64T64R, 32T32R</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the values of the CellActiveState, FddTddInd, TxRxMode, and SubframeAssignment parameters in a Cell MO are CELL_ACTIVE, CELL_TDD, 64T64R, and SA1, respectively, the PreambleFmt parameter in this Cell MO cannot be set to 1, 2, or 3.</li><li>When the NbCellFlag and TxRxMode parameters in a Cell MO are set to TRUE and a value among 2T2R, 2T4R, or 4T4R, respectively, the CrsPortNum parameter in this Cell MO must be set to CRS_PORT_2.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li><li>The SriPeriodAdaptEnhancedOptSw option of the SriAlgoSwitch parameter in the CELLPUCCHALGO MO can be selected only if the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_TRUE, the HighSpeedFlag in the Cell MO is set to LOW_SPEED, the MultiRruCellMode parameter in the Cell MO is set to CELL_COMBINATION, and the TxRxMode in the Cell MO is set to 1T1R, 1T2R, 2T2R, or 2T4R; or the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_FALSE.</li><li>When the CPRICompression parameter in the Cell MO is set to 3_2_COMPRESSION, the following conditions must be met: (1) If the FddTddInd parameter in this Cell MO is set to CELL_FDD, the TxRxMode and UlBandWidth parameters must be set to 32T32R and CELL_BW_N75 or CELL_BW_N100, respectively. (2) If the FddTddInd parameter in this Cell MO is set to CELL_TDD, the UlBandWidth parameter must be set to CELL_BW_N75 or CELL_BW_N100, respectively.</li><li>In a Cell MO, if CellActiveState is set to CELL_ACTIVE and FddTddInd is set to CELL_FDD, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 2T8R, 4T8R, 8T8R, or 32T32R. If CellActiveState is set to CELL_ACTIVE and FddTddInd is set to CELL_TDD, TxRxMode must be set to 1T1R, 2T2R, 4T4R, or 8T8R, 64T64R, 32T32R.</li><li>In a Cell MO, if FddTddInd, CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_TDD, CELL_ACTIVE, BOOLEAN_TRUE, and SFN, respectively, TxRxMode must be set to 2T2R, 4T4R or 8T8R.</li><li>In a Cell MO, if CellActiveState is CELL_ACTIVE, FddTddInd is set to CELL_FDD, and CPRICompression is set to NORMAL_COMPRESSION, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 2T8R, 4T8R, 8T8R, or 32T32R.</li><li>In a Cell MO, if CellActiveState is CELL_ACTIVE, FddTddInd is set to CELL_FDD, and CPRICompression is set to ENHANCED_COMPRESSION or TRIPLEX_COMPRESSION_10M, TxRxMode must be set to 1T1R, 1T2R, 2T2R, 2T4R, 4T4R, 8T8R or 32T32R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and CELL_COMBINATION, respectively, TxRxMode must be set to 1T1R, 2T2R or 4T4R or 8T8R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and TWO_RRU_COMBINATION, respectively, TxRxMode must be set to 2T2R.</li><li>In a Cell MO, if CellActiveState, MultiRruCellFlag, and MultiRruCellMode are set to CELL_ACTIVE, BOOLEAN_TRUE, and DIGITAL_COMBINATION, respectively, TxRxMode must be set to 1T1R or 2T2R.</li><li>In a Cell MO, if FddTddInd is set to TDD, MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively, TxRxMode must be set to 2T2R.</li><li>In a Cell MO, if FddTddInd is set to FDD, MultiRruCellFlag and MultiRruCellMode are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively, TxRxMode must be set to 4T4R or 2T2R or 1T1R.</li><li>If FddTddInd, MultiRruCellFlag, and MultiRruCellMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, and SFN, respectively, TxRxMode in the Cell MO must be set to 4T4R, 2T4R, 2T2R, 1T2R or 1T1R.</li><li>In a Cell MO, if FddTddInd, MultiRruCellFlag, and MultiRruCellMode are set to CELL_FDD, BOOLEAN_TRUE, and MPRU_AGGREGATION, respectively, TxRxMode must be set to 4T4R, 2T2R, or 1T1R.</li><li>In a Cell MO, if TxRxMode is set to 2T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, if TxRxMode is set to 4T8R, both UlCyclicPrefix and DlCyclicPrefix must be set to NORMAL_CP.</li><li>In a Cell MO, if TxRxMode is set to 2T8R, HighSpeedFlag cannot be set to ULTRA_HIGH_SPEED or EXTRA_HIGH_SPEED.</li><li>In a Cell MO, if TxRxMode is set to 4T8R, HighSpeedFlag cannot be set to ULTRA_HIGH_SPEED or EXTRA_HIGH_SPEED.</li><li>In a Cell MO, if TxRxMode is set to 2T8R, CustomizedBandWidthCfgInd cannot be set to CFG.</li><li>In a Cell MO, if TxRxMode is set to 4T8R, CustomizedBandWidthCfgInd cannot be set to CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T4R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, or 4T4P_0321.</li><li>In a Cell MO, if TxRxMode and CrsPortNum are set to 4T4R and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 4T2P_0011, 4T2P_0101, or 4T2P_0110.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 4T4R, and CRS_PORT_1, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_1, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 8T2P_00001111, 8T2P_00110011, or 8T2P_01010101.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 4T4R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, or 4T4P_0132.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 8T4P_00112233, or 8T4P_01230123.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T8R, and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 4T2P_0011, 4T2P_0101, or 4T2P_0110.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T8R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, or 4T4P_0321.</li><li>If FddTddInd, MultiRruCellFlag, MultiRruCellMode, and TxRxMode in a Cell MO are set to CELL_FDD, BOOLEAN_TRUE, MPRU_AGGREGATION, and 4T4R, respectively, CrsPortNum in the Cell MO must be set to CRS_PORT_4 with NbCellFlag set to FALSE, or CrsPortNum in the Cell MO must be set to CRS_PORT_2 with NbCellFlag set to TRUE.</li><li>When the FddTddInd parameter in the Cell MO is set to CELL_TDD and the TxRxMode parameter in the Cell MO is set to 64T64R or 32T32R, the EuCellStandbyMode and MultiRruCellFlag parameters in the Cell MO must be set to ACTIVE and BOOLEAN_FALSE respectively.</li><li>In a Cell MO, if FddTddInd, TxRxMode are set to CELL_FDD, 8T8R, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, and MultiCellShareMode is set to NORMAL, CrsPortNum must be set to CRS_PORT_4 or CRS_PORT_2.</li><li>In a Cell MO, if FddTddInd is CELL_FDD, TxRxMode is set to 8T8R, HighSpeedFlag must be set to LOW_SPEED.</li><li>The CompactBwCtrlIntrfMode parameter in a Cell MO can be set to REDUCED_LEFT or REDUCED_RIGHT only if the CustomizedBandWidthCfgInd parameter in this Cell MO is set to CFG and the TxRxMode parameter in this Cell MO is set to 2T4R, 1T1R, 1T2R, or 2T2R.</li><li>The FakeAntSelIdentificationSwitch option of the BfAlgoSwitch parameter in the CellAlgoSwitch MO under a Cell MO must not be selected if FddTddInd in this Cell MO is set to CELL_TDD and TxRxMode in this Cell MO is set to 1T1R or 2T2R.</li><li>In a Cell MO, if WorkMode is set to LAA, UlEarfcnCfgInd must be set to NOT_CFG.</li><li>In a Cell MO, if WorkMode is set to LAA, TxRxMode must be set to 2T2R.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CrsPortMap.html">CrsPortMap</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CRS Antenna Port Mapping</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mapping between a cell-specific reference signal (CRS) port and a transmit (TX) channel in an RRU. In cells with one or two TX channels, this parameter cannot be set. In cells with four or eight TX channels, this parameter can be set. As defined in 3GPP specifications, the CrsPortNum parameter can be set to CRS_PORT_1, CRS_PORT_2, or CRS_PORT_4. The value CRS_PORT_1 indicates that one CRS port (port 0) is configured. The value CRS_PORT_2 indicates that two CRS ports (ports 0 and 1) are configured. The value CRS_PORT_4 indicates that four CRS ports (ports 0, 1, 2 and 3) are configured. In values of this parameter, mTnP indicates that the number of TX channels configured for a cell is "m" and the number of CRS ports is "n". The parameter value 4TnP_abcd indicates that reference signals transmitted over CRS ports a, b, c, and d are mapped to TX channels 1, 2, 3, and 4 in an RRU, respectively (The TX channel number here is for reference only and may be R0A to R0D, or others). The parameter value 8TnP_abcdefgh indicates that reference signals transmitted over CRS ports a to h are mapped to TX channels 1 to 8 in an RRU, respectively. Duplicate numbers of abcd or abcdefgh indicate that virtual antenna mapping (VAM) is applied, that is, the reference signals transmitted over the CRS ports are mapped to corresponding TX channels. The parameter value NOT_CFG indicates that the mapping between a CRS port and a TX channel in an RRU is not configured, and CRS ports are mapped to TX channels in an RRU in a default manner. In TDD cells, "n" in mTnP must be equal to the CrsPortNum parameter value. For cells established on LBBPc boards, the parameter value NOT_CFG takes effect regardless of the actual parameter setting. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), 4T4P_0213(4T4P_0213), 4T4P_0231(4T4P_0231), 4T4P_0123(4T4P_0123), 4T4P_0132(4T4P_0132), 4T4P_0312(4T4P_0312), 4T4P_0321(4T4P_0321), 4T2P_0011(4T2P_0011), 4T2P_0101(4T2P_0101), 4T2P_0110(4T2P_0110), 8T2P_00001111(8T2P_00001111), 8T2P_00110011(8T2P_00110011), 8T2P_01010101(8T2P_01010101), 8T4P_00112233(8T4P_00112233), 8T4P_01230123(8T4P_01230123)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, 4T4P_0321, 4T2P_0011, 4T2P_0101, 4T2P_0110, 8T2P_00001111, 8T2P_00110011, 8T2P_01010101, 8T4P_00112233, 8T4P_01230123</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter requires TX channels in an RRU and the physical antennas be connected in the corret sequence. The recommended values of this parameter vary as follows:</p>
+<p>1. In an FDD cell served by two combined RRUs and with four TX channels and four CRS ports configured, the parameter value 4T4P_0213 is recommended.</p>
+<p>2. In an FDD cell served by an integrated RRU and with four TX channels and four CRS ports configured, the parameter value 4T4P_0321 is recommended.</p>
+<p>3. In a TDD cell with four TX channels and two CRS ports configured, the parameter value 4T2P_0011 is recommended.</p>
+<p>4. In a TDD cell with four TX channels and four CRS ports configured, the parameter value 4T4P_0213 is recommended.</p>
+<p>5. In a TDD cell in broadcast beamforming and with eight TX channels and two CRS ports configured, the parameter value 8T2P_00001111 is recommended.</p>
+<p>6. In a TDD cell in phase shift diversity and with eight TX channels and two CRS ports configured, the parameter value 8T2P_00110011 is recommended.</p>
+<p>7. In a TDD cell in broadcast beamforming and with eight TX channels and four CRS ports configured, the parameter value 8T4P_00112233 is recommended.</p>
+<p>8. In a TDD cell in phase shift diversity and with eight TX channels and four CRS ports configured, the parameter value 8T4P_01230123 is recommended.</p>
+<p>9. In an FDD cell with four TX channels and two CRS ports configured, the parameter value 4T2P_0011 is recommended.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T4R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, or 4T4P_0321.</li><li>In a Cell MO, if TxRxMode and CrsPortNum are set to 4T4R and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 4T2P_0011, 4T2P_0101, or 4T2P_0110.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 4T4R, and CRS_PORT_1, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_1, respectively, CrsPortMap must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 8T2P_00001111, 8T2P_00110011, or 8T2P_01010101.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 4T4R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, or 4T4P_0132.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_TDD, 8T8R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 8T4P_00112233, or 8T4P_01230123.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T8R, and CRS_PORT_2, respectively, CrsPortMap must be set to NOT_CFG, 4T2P_0011, 4T2P_0101, or 4T2P_0110.</li><li>In a Cell MO, if FddTddInd, TxRxMode, and CrsPortNum are set to CELL_FDD, 4T8R, and CRS_PORT_4, respectively, CrsPortMap must be set to NOT_CFG, 4T4P_0213, 4T4P_0231, 4T4P_0123, 4T4P_0132, 4T4P_0312, or 4T4P_0321.</li><li>If MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and FddTddInd in the Cell MO is set to CELL_TDD, or if MultiRruCellFlag in a Cell MO is set to BOOLEAN_TRUE and FddTddInd in the Cell MO is set to CELL_FDD and MultiRruCellMode in the Cell MO is set to a value other than SFN and MPRU_AGGREGATION, CrsPortMap in the Cell MO must be set to NOT_CFG.</li><li>In a Cell MO, if FddTddInd, TxRxMode are set to CELL_FDD, 8T8R, respectively, CrsPortMap must be set to NOT_CFG.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: For different installation orders of TX channels in RRUs and physical antennas, the setting of this parameter also determines the mapping between CRS ports and physical antenna ports. Downlink multiple-input multiple-output (MIMO) performance is determined by the polarization and spacing between antennas. Assume that TX channels in an RRU and physical antennas are connected in order. Setting this parameter to NOT_CFG has no impact on network performance. Setting this parameter to recommended values improves downlink throughput, especially in RRU combination networking. Setting this parameter to other values may degrade network performance. The recommended value for this parameter differs according to networking, the number of configured TX channels, and the number of configured CRS ports.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-UserLabel.html">UserLabel</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user label of the cell.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>In the Cell MO, the value of CellName is a string of a maximum of 99 characters. The string cannot be all null characters or contain any of the following characters: double quotation marks ("), commas (,), semicolons (;), equal signs (=), single quotation marks ('), three plus signs (+++), two or more consecutive spaces, and two or more consecutive percentage signs (%).</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-WorkMode.html">WorkMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Work mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the work mode of the cell. The DL_ONLY mode applies only to the carrier aggregation scenario.</p>
+<p>GUI Value Range: UL_DL(Uplink and downlink), DL_ONLY(Downlink only), LAA(License Assisted Access)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UL_DL, DL_ONLY, LAA</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: UL_DL(Uplink and downlink)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, WorkMode must be set to UL_DL or LAA if FddTddInd is set to CELL_TDD.</li><li>In a Cell MO, if WorkMode is set to LAA, DlBandWidth must be set to CELL_BW_N100(20M).</li><li>In a Cell MO, if WorkMode is set to LAA, FreqBand must be set to 46, 252 or 255.</li><li>In a Cell MO, if FreqBand is set to 252 or 255, WorkMode must be set to LAA.</li><li>In a Cell MO, if WorkMode is set to LAA, UlEarfcnCfgInd must be set to NOT_CFG.</li><li>In a Cell MO, if WorkMode is set to LAA, TxRxMode must be set to 2T2R.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the SubframeAssignment parameter in this Cell MO must be set to NULL.</li><li>When the SubframeAssignment parameter in a Cell MO is set to NULL, the FddTddInd and WorkMode parameters in this Cell MO must be set to CELL_TDD and LAA respectively.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the SpecialSubframePatterns parameter in this Cell MO must be set to NULL.</li><li>When the SpecialSubframePatterns parameter in a Cell MO is set to NULL, the FddTddInd and WorkMode parameters in this Cell MO must be set to CELL_TDD and LAA respectively.</li><li>When the FddTddInd and WorkMode parameters in a Cell MO are set to CELL_TDD and LAA, respectively, the DlCyclicPrefix parameter in this Cell MO must be set to NORMAL_CP.</li></ul>
+<p>-Others:</p>
+<ul><li>In a Cell MO, if FddTddInd and WorkMode are set to CELL_FDD and DL_ONLY, respectively, DlBandWidth must be set to CELL_BW_N25, CELL_BW_N50, CELL_BW_N75, or CELL_BW_N100.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to DL_ONLY for a cell operating in a 3GPP-defined normal band, preparations of handovers from inter-frequency cells to this cell and admission to this cell fail, causing related performance statistics to become abnormal.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CnOpSharingGroupId.html">CnOpSharingGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CN Operator Sharing Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the eNodeB operator group that shares the cell. This parameter must be set to a value within the range of 0 to 5 if the eNodeB works in hybrid RAN sharing mode. This parameter must be set to 255 (an invalid value) in independent RAN sharing, RAN sharing with dedicated carrier, or RAN sharing with common carrier mode.</p>
+<p>GUI Value Range: 0~5,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If a valid operator must be configured, set this parameter to a value within the range of 0 to 5. If an invalid operator must be configured, set this parameter to 255.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-IntraFreqRanSharingInd.html">IntraFreqRanSharingInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Intra Frequency RAN Sharing Indication</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether an intra-frequency neighboring cell is a shared neighboring cell. If this parameter is set to BOOLEAN_TRUE, the serving frequency is a shared frequency, and the shared operator information must be checked on the OSS before all intra-frequency neighboring cells are added. If this parameter is set to BOOLEAN_FALSE, the serving frequency is not a shared frequency, and the shared operator information does not need to be checked on the OSS before all intra-frequency neighboring cells are added. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_TRUE(True)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to BOOLEAN_TRUE, the E-UTRAN frequency is a shared frequency, and operator information of intra-frequency neighboring cells on the shared frequency must be checked on the OSS before the intra-frequency neighboring cells are added.</p>
+<p>If this parameter is set to BOOLEAN_FALSE, the E-UTRAN frequency is a non-shared frequency, and operator information of intra-frequency neighboring cells on the non-shared frequency does not need to be checked on the OSS before the intra-frequency neighboring cells are added, which avoids OSS congestion. Intra-frequency cells on the non-shared frequency can be added directly without the shared operator information delivered from the OSS, thereby accelerating neighboring cell addition and avoiding neighboring cell loss caused by OM channel exceptions.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-IntraFreqAnrInd.html">IntraFreqAnrInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IntraFreq ANR Indication</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable ANR on intra-frequency neighboring cells. The value ALLOWED indicates that this type of ANR is allowed. The value NOT_ALLOWED indicates that this type of ANR is not allowed. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_ALLOWED(NOT_ALLOWED), ALLOWED(ALLOWED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_ALLOWED, ALLOWED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ALLOWED(ALLOWED)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ALLOWED, ANR can be used to improve maintenance efficiency. If this parameter is set to NOT_ALLOWED, ANR cannot be used and manual maintenance is required.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CellRadiusStartLocation.html">CellRadiusStartLocation</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Radius Start Location</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start location of the cell coverage. This parameter is used to calculate the hysteresis in uplink timing when the Extended Cell Access Radius Beyond 100km feature takes effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100000</p>
+<p>Unit: m</p>
+<p>Actual Value Range: 0~100000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-SpecifiedCellFlag.html">SpecifiedCellFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Specified Cell Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the local cell is a specified-service cell. This parameter is configured based on the operator's policies. If this parameter is set to SPECSERCELL, the local cell is a WBB service-dedicated cell and preferentially serves WBB UEs. In this case, UEs identified as non-WBB UEs will be transferred out from the cell. This function is under license control. If this parameter is set to MBBSERCELL, the local cell is an MBB-preferred cell and preferentially serves MBB UEs. In this case, UEs identified as non-MBB UEs will be transferred out from the cell. If this parameter is set to NONE, the local cell is a common cell. In this case, WBB and MBB UEs can be transferred to this cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NONE(Common Cell), SPECSERCELL(Specified Service Cell), MBBSERCELL(MBB Service Cell)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, SPECSERCELL, MBBSERCELL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NONE(Common Cell)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-DlPuncturedRbNum.html">DlPuncturedRbNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink Punctured RB Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of downlink RBs blocked in a cell. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~13,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~13,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 12~14, 44~50, 139~150, or 175~178, DlPuncturedRbNum must be set to 255.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 96~100 or 193~200, DlPuncturedRbNum must be set to 255 or 0.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 92~95 or 190~192, DlPuncturedRbNum must be set to 255, 0, or 2.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 186~189, DlPuncturedRbNum must be set to 255, 0, 2, or 4.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 183~185, DlPuncturedRbNum must be set to 255, 0, 2, 4, or 6.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 88~91, DlPuncturedRbNum must be set to 255, 2, or 4.</li><li>In a Cell MO, if CustomizedDLBandWidth is set to a value in the range of 80, DlPuncturedRbNum must be set to 255 or 8.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74, 75, or 87, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to NORMAL, the DlPuncturedRbNum parameter in this Cell MO must be set to 255.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 8, 9, 10, 11, 12, or 13.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 87 and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, REDUCED_LEFT, or REDUCED_RIGHT, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 3, 4, 5, 6, or 7.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED_LEFT, or REDUCED_RIGHT, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 9, 10, 11, 12, or 13.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-SfnMasterCellLabel.html">SfnMasterCellLabel</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SFN Master Cell Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Used to maintain and query the information about the primary cell to which SFN secondary cells belong. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~100 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-MultiCellShareMode.html">MultiCellShareMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Multi Cell Share Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the co-RRU mode for multiple cells. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NORMAL(NORMAL), SPLIT(SPLIT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL, SPLIT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NORMAL</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The MultiCellShareMode parameter in the Cell MO can be set to SPLIT only if the HighSpeedFlag parameter in the Cell MO is set to LOW_SPEED.</li><li>The MultiCellShareMode parameter in the Cell MO can be set to SPLIT only if the FddTddInd parameter in the Cell MO is set to CELL_TDD and the SubframeAssignment parameter in the Cell MO is set to SA1 or SA2.</li><li>The MultiCellShareMode parameter in the Cell MO can be set to SPLIT only if the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_FALSE.</li><li>The MultiCellShareMode parameter in the Cell MO can be set to SPLIT only if the CrsPortNum parameter in the Cell MO is set to CRS_PORT_2.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-StandbyCellSfnRecoveTime.html">StandbyCellSfnRecoveTime</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Standby Cell SFN Recovery Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the automatic SFN recovery time of the inter-BBU cell on the secondary BBU after inter-BBU SFN faults are rectified. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~23,255</p>
+<p>Unit: h</p>
+<p>Actual Value Range: 0~23,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to 255, the SFN cell on the secondary BBU is automatically recovered after inter-BBU SFN fault rectification. A large number of online users in the standby cell upon fault rectification result in the call drop increase. When this parameter is set to a value ranging from 0 to 23, the SFN cell on the secondary BBU is recovered at a specified time after inter-BBU SFN fault rectification. If the specified time is too late, the standby cell cannot be recovered to be the SFN cell on the secondary BBU for a long time after fault rectification, causing interference on other adjacent cells and reducing network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-CompactBwCtrlIntrfMode.html">CompactBwCtrlIntrfMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Compact Bandwidth Control Interference Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interference control mode for scenarios where compact bandwidth is used. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: NORMAL(NORMAL), REDUCED(REDUCED), REDUCED_LEFT(REDUCED_LEFT), REDUCED_RIGHT(REDUCED_RIGHT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL, REDUCED, REDUCED_LEFT, REDUCED_RIGHT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the spectrum resources not in the bandwidth customized for an operator are owned by the local operator (operator A), it is recommended that this parameter be set to NORMAL.</p>
+<p>If the spectrum resources not in the bandwidth customized for an operator are owned by another operator (operator B) and the spectrum of operator B is on the same band as that of the operator A, it is recommended that this parameter be set to REDUCED.</p>
+<p>If the spectrum resources not in the bandwidth customized for an operator are owned by operator B and the high-frequency spectrum of operator A is at the edge of the band, it is recommended that this parameter be set to REDUCED_LEFT.</p>
+<p>If the spectrum resources not in the bandwidth customized for an operator are owned by operator B and the low-frequency spectrum of operator A is at the edge of the band, it is recommended that this parameter be set to REDUCED_RIGHT.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The CompactBwCtrlIntrfMode parameter in a Cell MO can be set to REDUCED only if the CustomizedDLBandWidth parameter in this Cell MO is set to 74~75, 87, 146~149, or 175~178. In other situations, the CompactBwCtrlIntrfMode parameter in a Cell MO must be set to NORMAL.</li><li>When CustomizedBandWidthCfgInd parameter in a Cell MO is set to CFG, the CompactBwCtrlIntrfMode parameter in this Cell MO can be set to REDUCED_LEFT, or REDUCED_RIGHT only if the CustomizedDLBandWidth parameter in this Cell MO is set to 74 to 75, 87, or 175 to 178.</li><li>The CompactBwCtrlIntrfMode parameter in a Cell MO can be set to REDUCED_LEFT or REDUCED_RIGHT only if the CustomizedBandWidthCfgInd parameter in this Cell MO is set to CFG and the TxRxMode parameter in this Cell MO is set to 2T4R, 1T1R, 1T2R, or 2T2R.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74, 75, or 87, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to NORMAL, the DlPuncturedRbNum parameter in this Cell MO must be set to 255.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 8, 9, 10, 11, 12, or 13.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 87 and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, REDUCED_LEFT, or REDUCED_RIGHT, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 3, 4, 5, 6, or 7.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED_LEFT, or REDUCED_RIGHT, the DlPuncturedRbNum parameter in this Cell MO must be set to 255, 9, 10, 11, 12, or 13.</li><li>If the CustomizedULBandWidth parameter in a Cell MO is set to 74, 75, or 87, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, or -3.</li><li>If the CustomizedULBandWidth parameter in a Cell MO is set to a value in the range of 175 to 178, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, REDUCED_LEFT, or REDUCED_RIGHT, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 8, 7, 6, 5, 4, 3, 2, 1, 0, or -1.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED_LEFT or REDUCED_RIGHT, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 3, 2, 1, 0, -1, -2, -3, -4, or -5.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to a value in the range of 44 to 47, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, then the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 4, 3, 2, 1, 0, or -1, and the MultiRruCellMode parameter in this Cell MO must not be set to MPRU_AGGREGATION.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-UlPuncturedRbNumOffset.html">UlPuncturedRbNumOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Punctured RB Number Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset for the number of RBs blocked in a cell in the uplink. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: -5~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: -5~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the CustomizedULBandWidth parameter in a Cell MO is set to 74, 75, or 87, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 8, 7, 6, 5, 4, 3, 2, 1, 0, -1, -2, or -3.</li><li>If the CustomizedULBandWidth parameter in a Cell MO is set to a value in the range of 175 to 178, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, REDUCED_LEFT, or REDUCED_RIGHT, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 8, 7, 6, 5, 4, 3, 2, 1, 0, or -1.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to 74 or 75, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED_LEFT or REDUCED_RIGHT, the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 3, 2, 1, 0, -1, -2, -3, -4, or -5.</li><li>If the CustomizedDLBandWidth parameter in a Cell MO is set to a value in the range of 44 to 47, and the CompactBwCtrlIntrfMode parameter in this Cell MO is set to REDUCED, then the UlPuncturedRbNumOffset parameter in this Cell MO must be set to 4, 3, 2, 1, 0, or -1, and the MultiRruCellMode parameter in this Cell MO must not be set to MPRU_AGGREGATION.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-HsCellRootSequenceIndex.html">HsCellRootSequenceIndex</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Ultra High-Speed Cell Root Sequence Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of the start logic root sequence of the preamble sequences generated by class-2 PRACH configuration sets in an ultra-high speed cell. Each logic root sequence maps one physical root sequence. For details about the mapping relationships, see 3GPP TS 36.211. This parameter is valid only when the HighSpeedFlag parameter is set to ULTRA_HIGH_SPEED and the HighSpeedR14Switch option is selected. PRACH enhancement in high mobility scenarios added in 3GPP Release 14 takes effect only when the HsCellRootSequenceIndex parameter is set to a value other than 65535. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~837,65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~837,65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The logic root sequence index configured for each cell is planned on the entire network. You are advised to use Huawei root ZC sequence planning tool for the configurations. If the indexes need to be manually configured, adhere to the following principles:</p>
+<p>1. If the PRACH time-frequency positions configured for adjacent cells are the same or overlap, the HsCellRootSequenceIndex parameter must be set to different values for these cells.</p>
+<p>2. In the Cell MO, if the PreambleFmt parameter is set to a value smaller than 4 and the HighSpeedFlag parameter is set to ULTRA_HIGH_SPEED, the constraints specified in Parameter Partnership apply.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Adjusting the value of this parameter changes the orthogonality between preamble sequences of adjacent cells.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cell__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To modify the cell with the parameters as follows: Local Cell ID: 0, Additional spectrum emission: 10, run the following command:
+MOD CELL:LocalCellId=0, AdditionalSpectrumEmission=10;
+Example 2: To modify the cell with the parameters as follows: Local Cell ID: 0, Additional spectrum emission: 20, run the following command:
+MOD CELL:LocalCellId=0, AdditionalSpectrumEmission=20;
+Example 3: To modify the cell with the parameters as follows: Local Cell ID: 0, Flag of Multi-RRU Cell: BOOLEAN_TRUE, Mode of Multi-RRU Cell: SFN, Sector equipment number of SFN cell: 3, run the following command:
+MOD CELL:LocalCellId=0, MultiRruCellFlag=BOOLEAN_TRUE, MultiRruCellMode=SFN, SectorEqmNum=3;
+Example 4: To modify the cell with the parameters as follows: Local Cell ID: 0, Cell transmission and reception mode: 4T4R, CRS Antenna Port Mapping: 4T2P_0011, run the following command:
+MOD CELL: LocalCellId=0, TxRxMode=4T4R, CrsPortMap=4T2P_0011;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

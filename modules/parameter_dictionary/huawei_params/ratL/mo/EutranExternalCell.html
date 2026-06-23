@@ -1,0 +1,262 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="EutranExternalCell">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="EutranExternalCell">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>EutranExternalCell</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="EutranExternalCell"></a><a name="EutranExternalCell"></a>
+
+
+<h1 class="topictitle1">EutranExternalCell</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="EutranExternalCell.html"><strong>EutranExternalCell</strong></a>
+      +-<a href="EutranExternalCellPlmn.html">EutranExternalCellPlmn</a>[0~5]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An EutranExternalCell MO consists of the parameters related to an external E-UTRAN cell. Each external E-UTRAN cell is under a different eNodeB from the local eNodeB and can be configured as an intra- or inter-frequency neighboring cell of one or more cells under the local eNodeB. The neighboring cell list (NCL) of an eNodeB contains the common information about its external E-UTRAN cells. If an external cell works in RAN sharing mode, additional PLMN IDs must be added for the external cell. If a connection setup request or update message transmitted over an X2 interface contains information about cells under the peer eNodeB, the local eNodeB automatically configures the cells as external E-UTRAN cells. If one of the external E-UTRAN cells works in eRAN sharing with common carrier mode or in hybrid RAN sharing mode, additional PLMN IDs are automatically configured for the external E-UTRAN cell.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="eNodeBFunction.html">eNodeBFunction</a></li><li><p>Possible children:</p>
+<a href="EutranExternalCellPlmn.html">EutranExternalCellPlmn</a>[0~5]</li><li>Relation with the <strong>eNodeBFunction</strong>, <strong>ENodeBSharingMode</strong>, and <strong>CnOperator</strong> MOs:<ul><li>When the value of <strong>eNodeBId</strong> in an <strong>EutranExternalCell</strong> MO is the same as that in the <strong>eNodeBFunction</strong> MO, the values of <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>EutranExternalCell</strong> MO depend on the value of <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO: If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ, <strong>Mcc</strong> and <strong>Mnc</strong> in an <strong>EutranExternalCell</strong> MO must be set to values different from those in any <strong>CnOperator</strong> MO. If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to INDEPENDENT or SHARED_FREQ, <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>EutranExternalCell</strong> MO must be set to values different from those in the <strong>CnOperator</strong> MO that represents the primary operator.</li></ul>
+</li><li>Relation with the <strong>EutranIntraFreqNCell</strong>, <strong>CnOperator</strong>, <strong>eNodeBFunction</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>Before adding an inter-eNodeB <strong>EutranIntraFreqNCell</strong> MO, ensure that the associated <strong>EutranExternalCell</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>EutranIntraFreqNCell</strong> and <strong>Cell</strong> MOs:<ul><li>Before adding an inter-eNodeB <strong>EutranIntraFreqNCell</strong>, ensure that the associated <strong>EutranExternalCell</strong> MO has been configured, and the <strong>NbCellFlag</strong> of the server <strong>Cell</strong> of the inter-eNodeB intra-frequency neighboring cell must be same with the <strong>NbCellFlag</strong> of <strong>EutranExternalCell</strong>.</li><li>The carrier frequency calculated based on <strong>DlEarfcn</strong> in the <strong>EutranExternalCell</strong> MO that represents an inter-eNodeB <strong>EutranIntraFreqNCell</strong> must be the same as the carrier frequency calculated based on <strong>DlEarfcn</strong> in the local <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong>, <strong>CnOperator</strong>, <strong>eNodeBFunction</strong>, <strong>ENodeBSharingMode</strong>, and <strong>Cell</strong> MOs:<ul><li>Before adding an inter-eNodeB <strong>EutranInterFreqNCell</strong> MO, ensure that the associated <strong>EutranExternalCell</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong> and <strong>Cell</strong> MOs:<ul><li>Before adding an inter-eNodeB <strong>EutranInterFreqNCell</strong> MO, ensure that the associated <strong>EutranExternalCell</strong> MO has been configured, and the <strong>NbCellFlag</strong> of the server <strong>Cell</strong> of the inter-eNodeB <strong>EutranInterFreqNCell</strong> MO must be same with the <strong>NbCellFlag</strong> of <strong>EutranExternalCell</strong>.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, and <strong>DlEarfcn</strong> in the local <strong>Cell</strong> MO belongs to an LTE FDD frequency band, the carrier frequency calculated based on <strong>DlEarfcn</strong> in the <strong>EutranExternalCell</strong> MO that represents an inter-eNodeB <strong>EutranInterFreqNCell</strong> MO must be different from the carrier frequency calculated based on <strong>DlEarfcn</strong> in the local <strong>Cell</strong> MO.</li><li>Before adding an inter-eNodeB inter-frequency neighboring cell, ensure that the associated <strong>EutranExternalCell</strong> MO has been configured, and the <strong>NbCellFlag</strong> of the server <strong>Cell</strong> of the inter-eNodeB <strong>EutranInterFreqNCell</strong> MO must be same with the <strong>NbCellFlag</strong> of <strong>EutranExternalCell</strong>.</li></ul>
+</li><li>Relation with the <strong>EutranBlkNCell</strong>, <strong>CnOperator</strong>, <strong>eNodeBFunction</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>In inter-eNodeB scenarios, before an inter-eNodeB cell is configured as a blacklisted neighboring E-UTRAN cell (represented by the <strong>EutranBlkNCell</strong> MO) of the serving cell, the <strong>EutranExternalCell</strong> MO associated with the <strong>EutranBlkNCell</strong> MO must be configured first.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong> and <strong>Prb</strong> MOs:<ul><li>If an inter-eNodeB inter-frequency neighboring cell is to be configured using an <strong>EutranInterFreqNCell</strong> MO for a local cell whose <strong>NbCellFlag</strong> is set to TRUE, the carrier frequency identified by the combination of <strong>DlEarfcn</strong> and <strong>DlFreqOffset</strong> in the <strong>EutranExternalCell</strong> MO that the <strong>EutranInterFreqNCell</strong> MO depends on cannot be the same as the carrier frequency identified by the combination of <strong>DlEarfcn</strong> and <strong>DlFreqOffset</strong> or by <strong>DlEarfcn</strong> and <strong>DlBandWidth</strong> in the <strong>Cell</strong> corresponding to <strong>LteDlRbIndex</strong> in the <strong>Prb</strong> MO with <strong>AnchorCarrierFlag</strong> set to TRUE for the local cell.</li></ul>
+</li><li>Relation with the <strong>EutranIntraFreqNCell</strong>, <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, and <strong>SfnEdgeRruRelation</strong> MOs:<ul><li><strong>PhyCellId</strong> in the <strong>EutranExternalCell</strong> MO associated with an <strong>EutranIntraFreqNCell</strong> MO (representing an inter-eNodeB intra-frequency neighboring cell of the local cell) can be the same as <strong>PhyCellId</strong> in the <strong>Cell</strong> MO representing the local cell if both conditions are met: (1) The SuperCombCellSwitch option of <strong>SfnAlgoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected in the local cell; (2) All values of parameters Mcc, Mnc, eNodeBId, and CellId in the <strong>EutranIntraFreqNCell</strong> MO are the same with values of parameters Mcc, Mnc, EnodeBId, and NeighborCellId in at least one <strong>SfnEdgeRruRelation</strong> MO configured for the local cell. If either condition is not met, <strong>PhyCellId</strong> in the <strong>EutranExternalCell</strong> MO cannot be the same as <strong>PhyCellId</strong> in the <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong>, <strong>EutranInterNFreq</strong>, and <strong>Cell</strong> MOs:<ul><li><strong>DlEarfcn</strong> in the <strong>EutranExternalCell</strong> MO corresponding to an inter-eNodeB <strong>EutranInterFreqNCell</strong> MO must be the same as <strong>DlEarfcn</strong> in an <strong>EutranInterNFreq</strong> MO.</li><li>In inter-eNodeB scenarios, the value of <strong>DlEarfcn</strong> in the <strong>EutranExternalCell</strong> MO associated with an <strong>EutranInterFreqNCell</strong> MO of a <strong>Cell</strong> MO must be the same as one of the values of <strong>DlEarfcn</strong> in the <strong>EutranInterNFreq</strong> MOs associated with this <strong>Cell</strong> MO and the values of <strong>DlFreqOffset</strong> and <strong>DlFreqOffset</strong> must be the same.</li></ul>
+</li><li>Relation with the <strong>EutranIntraFreqNCell</strong>, <strong>Cell</strong>, and <strong>Prb</strong> MOs:<ul><li>In inter-eNodeB scenarios, if <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE and an <strong>EutranIntraFreqNCell</strong> MO is to be added for this <strong>Cell</strong> MO, a <strong>Prb</strong> MO whose <strong>AnchorCarrierFlag</strong> is TRUE must be configured first for this <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong>, <strong>Cell</strong>, and <strong>Prb</strong> MOs:<ul><li>In inter-eNodeB scenarios, if <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE and an <strong>EutranInterFreqNCell</strong> MO is to be added for this <strong>Cell</strong> MO, a <strong>Prb</strong> MO whose <strong>AnchorCarrierFlag</strong> is TRUE must be configured first for this <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>eNodeBFunction</strong>, <strong>ENodeBSharingMode</strong>, <strong>CnOperator</strong>, and <strong>CnOpSharingGroup</strong> MOs:<ul><li>If <strong>eNodeBId</strong> in an <strong>EutranExternalCell</strong> MO is set to the same value as <strong>eNodeBId</strong> in the <strong>eNodeBFunction</strong> MO and <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED, the combination of <strong>Mcc</strong> and <strong>Mnc</strong> in this <strong>EutranExternalCell</strong> MO must be different from that of <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>CnOperator</strong> MO referenced by <strong>PrimaryOperatorId</strong> in any <strong>CnOpSharingGroup</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranBlkNCell</strong>, <strong>Cell</strong>, and <strong>EutranInterNFreq</strong> MOs:<ul><li>In inter-eNodeB scenarios, the value of <strong>DlEarfcn</strong> in the <strong>EutranExternalCell</strong> MO associated with an <strong>EutranBlkNCell</strong> MO must be the same as the value of either <strong>DlEarfcn</strong> in the corresponding <strong>Cell</strong> MO or <strong>DlEarfcn</strong> in the <strong>EutranInterNFreq</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranBlkNCell</strong> and <strong>Cell</strong> MOs:<ul><li>In inter-eNodeB scenarios, values of <strong>DlEarfcn</strong> and <strong>PhyCellId</strong> in the <strong>EutranExternalCell</strong> MO associated with an <strong>EutranBlkNCell</strong> MO cannot be the same as values of <strong>DlEarfcn</strong> and <strong>PhyCellId</strong> in the corresponding <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranIntraFreqNCell</strong> and <strong>Prb</strong> MOs:<ul><li>If an inter-eNodeB intra-frequency neighboring cell is to be configured using an <strong>EutranIntraFreqNCell</strong> MO for a local cell whose <strong>NbCellFlag</strong> is set to TRUE, the carrier frequency identified by the combination of <strong>DlEarfcn</strong> and <strong>DlFreqOffset</strong> in the <strong>EutranExternalCell</strong> MO that the <strong>EutranIntraFreqNCell</strong> MO depends on must be the same as the carrier frequency identified by the combination of <strong>DlEarfcn</strong> and <strong>DlFreqOffset</strong> or by <strong>DlEarfcn</strong> and <strong>DlBandWidth</strong> in the <strong>Cell</strong> corresponding to <strong>LteDlRbIndex</strong> in the <strong>Prb</strong> MO with <strong>AnchorCarrierFlag</strong> set to TRUE for the local cell.</li></ul>
+</li><li>Relation with the <strong>NODE</strong> MO:<ul><li><strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, a maximum of 2304 <strong>EutranExternalCell</strong> MOs can be configured in the same eNodeB.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>A maximum of 3*256 <strong>EutranExternalCell</strong> MOs can be configured in the same eNodeB if the parameter <strong>TYPE</strong> in <strong>MDU</strong> MO is set to MDUC.</li></ul>
+</li><li>Relation with the <strong>EutranExternalCell</strong> MO:<ul><li>A maximum of 2304 <strong>EutranExternalCell</strong> MOs can be configured in the same eNodeB when equipped with LMPT or UMPTa/b/e or UMPTga board.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#EutranExternalCell__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="EutranExternalCell__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="EutranExternalCell__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_eutranexternalcell.html">ADD EUTRANEXTERNALCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an external E-UTRAN cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_eutranexternalcellband.html">ADD EUTRANEXTERNALCELLBAND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add the parameters related to the external E-UTRAN cell slave band.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_eutranexternalcell.html">LST EUTRANEXTERNALCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the parameters related to the external E-UTRAN cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_eutranexternalcellband.html">LST EUTRANEXTERNALCELLBAND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the parameters related to the external E-UTRAN cell slave band.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_eutranexternalcell.html">MOD EUTRANEXTERNALCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of an external E-UTRAN cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_eutranexternalcell.html">RMV EUTRANEXTERNALCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove one or more external E-UTRAN cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_eutranexternalcellband.html">RMV EUTRANEXTERNALCELLBAND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove the parameters related to the external E-UTRAN cell slave band.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#EutranExternalCell__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="EutranExternalCell__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="EutranExternalCell__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-Mcc.html">Mobile country code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mobile country code of the external E-UTRAN cell.</p>
+<p>The PLMN consists of the MCC and the MNC.</p>
+<p>The MCC consists of three digits.</p>
+<p>The MNC consists of two to three digits.</p>
+<p>For example, if the MCC is 123 and the MNC is 45, then the PLMN ID is 12345.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-Mnc.html">Mobile network code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mobile network code of the external E-UTRAN cell.</p>
+<p>The PLMN consists of the MCC and the MNC.</p>
+<p>The MCC consists of three digits.</p>
+<p>The MNC consists of two to three digits.</p>
+<p>For example, if the MCC is 123 and the MNC is 45, then the PLMN ID is 12345.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-eNodeBId.html">eNodeB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eNodeB ID of the external E-UTRAN cell. It uniquely identifies an eNodeB within a PLMN. The 28-bit E-UTRAN cell ID is comprised of the cell ID and the eNodeB ID (represented by the most significant 20 bits). The cell global identity (CGI) of an E-UTRAN cell is comprised of the E-UTRAN cell ID and the PLMN ID. For details, see 3GPP TS 36.413.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-CellId.html">Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell ID of the external E-UTRAN cell. It uniquely identifies a cell within an eNodeB. The 28-bit E-UTRAN cell ID is comprised of the cell ID (represented by the least significant eight bits) and the eNodeB ID. An E-UTRAN cell ID and a PLMN ID compose an E-UTRAN CGI (ECGI). For details, see 3GPP TS 36.413.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-DlEarfcn.html">Downlink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DL EARFCN of the external E-UTRAN cell. For details, see 3GPP TS 36.104.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-UlEarfcnCfgInd.html">Uplink EARFCN indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to configure the uplink E-UTRA absolute radio frequency channel number (EARFCN) for the external E-UTRAN cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-UlEarfcn.html">Uplink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink E-UTRA absolute radio frequency channel number (EARFCN) of the external E-UTRAN cell. If the value of this parameter is not specified, the default uplink EARFCN is used, which is calculated based on the downlink EARFCN. For details about this parameter, see 3GPP TS 36.104. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-PhyCellId.html">Physical cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the physical cell identifier (PCI) of the external E-UTRAN cell. For details, see 3GPP TS 36.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-Tac.html">Tracking area code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the tracking area code (TAC) of the external E-UTRAN cell. Two TAC values 0x0000(0) and 0xFFFE(65534) are reserved according to the protocol and will not be used in future versions. Therefore, do not use 0 or 65534 as a TAC value in TAC planning or configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-CellName.html">Cell name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the external E-UTRAN cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-EutranExternalCellSlaveBand.html">External E-UTRAN Cell Slave Band</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates slave frequency bands of an external E-UTRAN cell. If the operating frequency of an external E-UTRAN cell belongs to multiple frequency bands, the downlink frequency of the frequency band with the highest priority is configured by the DlEarfcn parameter, and frequency bands with other priorities are configured by the EutranExternalCellSlaveBand parameter and added in descending order based on frequency band priorities. The frequency band priorities of an external E-UTRAN cell are determined in network planning. It is recommended that the frequency bands supporting UEs that comply with 3GPP TS 36.331 V8.16.0, 3GPP TS 36.331 V9.1.0, 3GPP TS 36.331 V10.5.0, or a later vision be configured as slave frequency bands.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-RoamingAreaHoInd.html">Roaming Area Handover Indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the external cell can be selected for handovers during roaming. This parameter is set to NO(No) by default.</p>
+<p>If this parameter is set to YES(Yes), this external cell can be selected for handovers during roaming. If this parameter is set to NO(No), this external cell cannot be selected for handovers during roaming.</p>
+<p>If the PLMN of the external cell is included in the SPID-based handover-allowable HPLMN list or this parameter is set to YES(Yes), this external cell can be selected as a target cell for handovers.</p>
+<p>In the boundaries of roaming areas and non-roaming areas, you are advised to set this parameter to YES(Yes) to ensure that cells in roaming areas can be selected for handovers. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-SpecifiedCellFlag.html">Specified Cell Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the external cell is a specified-service cell. Set this parameter based on the operator policy. If this parameter is set to SPECSERCELL, the external cell is a specified-service cell, and non-WBB UEs cannot be transferred to this cell. If this parameter is set to MBBSERCELL, the external cell is a cell that provides only MBB services, and WBB UEs cannot be transferred to this cell. If this parameter is set to NONE, the external cell is a common cell, and both WBB and MBB UEs can be transferred to this cell. The value of this parameter must be the same as that of the SpecifiedCellFlag parameter in the Cell MO associated to the external cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-AnrFlag.html">ANR flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an external cell is automatically detected by ANR. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-HighSpeedFlag.html">High Speed Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the adjacent cell is a high-speed or ultra-high-speed cell. The high-speed or ultra-high-speed attribute of an adjacent cell is modified through the X2 interface setup or update message of an X2 interface connecting an adjacent eNodeB. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-UlFreqOffset.html">Uplink Frequency Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency offset of the PRB uplink central frequency to the uplink frequency. This parameter takes effect only when UlEarfcnCfgInd is set to CFG(Configure). Otherwise, the offset is calculated based on the uplink/downlink symmetric system. For details, see 3GPP TS 36.101. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-DlFreqOffset.html">Downlink Frequency Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency offset of the PRB downlink central frequency to the downlink frequency. For details, see 3GPP TS 36.101. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-NbCellFlag.html">NB-IoT Cell Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an external E-UTRAN cell is an NB-IoT cell. When this parameter is set to TRUE, the external cell is an NB-IoT cell. When this parameter is set to FALSE, the external cell is not an NB-IoT cell. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-NclUpdateMode.html">NCL Update Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the external-cell update mode.</p>
+<p>MFBI_UPDATE_MODE: If this switch is off, the secondary band for the external cell can be set by operators, updated through the X2 interface, and updated based on UE measurements. If this switch is on, the secondary band for the external cell can be set by operators and updated through the X2 interface, but it cannot be updated based on UE measurements. After the secondary band for the external cell is updated through the X2 interface, the eNodeB automatically turns on the MFBI_UPDATE_MODE switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-SupportEmtcFlag.html">Support eMTC Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode of an external cell, which can be LTE only, eMTC only, and LTE/eMTC dual-mode. This parameter can be queried on the neighboring eNodeB providing the external cell, through an X2 interface. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-AggregationAttribute.html">Aggregation Attribute</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the aggregation attributes of an external E-UTRAN cell.</p>
+<p>MASTER_PLMN_RESERVED_FLAG: Indicates whether to reserve the primary PLMN ID of the external E-UTRAN cell. If this option is selected, the primary PLMN ID of the external E-UTRAN cell is reserved and this cell cannot be selected as a target cell for UEs served by the primary PLMN. If this option is deselected, this cell can be selected as a target cell for UEs served by the primary PLMN. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranExternalCell-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the control policy on ANR-related MOs, which can be defined by the user or be based on the automatic neighbor relation (ANR) algorithm. When this parameter is set to MANUAL_MODE, this MO can be modified or removed only by users. A failure message is displayed when a user adds an existing MO (with identical keywords). When this parameter is set to AUTO_MODE, this MO can be modified or removed by users or the ANR algorithm. The MO removal is successful even if the MO does not exist. If an MO does not exist, it can be added by both users and the ANR algorithm. If an existing MO is to be added, the MO is modified when a user performs the addition, but it cannot be added by the ANR algorithm. The policy specified by this parameter also applies to the EutranExternalCellPlmn MOs under this MO. When this MO is automatically added by the ANR algorithm, this parameter is set to AUTO_MODE by default. When this MO is added by a user, this parameter can be set to either AUTO_MODE or MANUAL_MODE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

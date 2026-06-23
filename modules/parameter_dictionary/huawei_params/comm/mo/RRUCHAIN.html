@@ -1,0 +1,496 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="RRUCHAIN">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="RRUCHAIN">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>RRUCHAIN</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="RRUCHAIN"></a><a name="RRUCHAIN"></a>
+
+
+<h1 class="topictitle1">RRUCHAIN</h1>
+
+<div>
+<div class="section"><pre>
+<a href="Equipment.html">EQUIPMENT</a>
+  +-<a href="RRUCHAIN.html"><strong>RRUCHAIN</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An RRUCHAIN MO manages an RRU topology in aspects of the RRU chain/ring number, the networking modes, the backup modes, the cabinet number, subrack number, and slot number of the head and tail of the chain/ring, the position of the breakpoints, the number of RRU levels on the chain/ring, and the number of boards.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Equipment.html">EQUIPMENT</a></li><li>Relation with the <strong>BBP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TYPE</strong> is set to UBBP and <strong>CPRIITFTYPE</strong> is set to XCI_QSFP in a <strong>BBP</strong> MO, <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO associated with the <strong>BBP</strong> MO must be set to TRUNK_CHAIN.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>AT</strong> is set to PEERPORT and <strong>LSN</strong> is not set to 255 in an <strong>RRUCHAIN</strong> MO, a UBBP with <strong>CPRIITFTYPE</strong> set to XCI_QSFP, CPRI_QSFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS cannot be configured in the slot specified by <strong>LSN</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TT</strong> is set to CHAIN or LOADBALANCE, <strong>AT</strong> is set to PEERPORT, and <strong>LSN</strong> is set to 255 in an <strong>RRUCHAIN</strong> MO, a UBBP with <strong>CPRIITFTYPE</strong> set to XCI_QSFP, CPRI_QSFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS cannot be configured in slot 2 or 3 in the BBU subrack specified by <strong>HCN</strong> and <strong>HSRN</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TT</strong> is set to TRUNK_CHAIN, <strong>AT</strong> is set to PEERPORT, and <strong>LSN</strong> is set to 255 in an <strong>RRUCHAIN</strong> MO, a UBBP with <strong>CPRIITFTYPE</strong> set to XCI_QSFP, CPRI_QSFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS cannot be connected to the port corresponding to slot 2 or 3 in the BBU subrack.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]An <strong>RRUCHAIN</strong> MO must belong to a UBBP with <strong>CPRIITFTYPE</strong> set to XCI_QSFP, CPRI_QSFP or CPRI_QSFPPLUS if the <strong>RRUCHAIN</strong> MO meets the following conditions: 1. <strong>TT</strong> is set to TRUNK_CHAIN. 2. <strong>PROTOCOL</strong> is set to CPRI. 3. <strong>CONNSN1</strong> is set to a value different from <strong>CONNSN2</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RRUCHAIN</strong> MO, when <strong>TT</strong> is set to CHAIN, <strong>AT</strong> is not set to PEERPORT, and <strong>HSPN</strong> is set to 1, or when <strong>TT</strong> is set to RING or LOADBALANCE, <strong>CPRIITFTYPE</strong> in the <strong>BBP</strong> MO meeting the following conditions must be set to CPRI_SFPPLUS or CPRI_QSFPPLUS:</li><li>1. The <strong>BBP</strong> MO is associated with <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. When <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO is not set to CHAIN and <strong>TSPN</strong> is set to 1, the <strong>BBP</strong> MO is associated with <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RRUCHAIN</strong> MO, when <strong>TT</strong> is set to TRUNK_CHAIN and <strong>AT</strong> is not set to PEERPORT, <strong>CPRIITFTYPE</strong> in the <strong>BBP</strong> MO meeting the following conditions must be set to CPRI_SFPPLUS or CPRI_QSFPPLUS:</li><li>1. When <strong>CONNPORTNUM</strong> in the <strong>RRUCHAIN</strong> MO is set to a value greater than or equal to 1 and <strong>CONNSPN1</strong> is set to 1, the <strong>BBP</strong> MO is associated with <strong>CONNCN1</strong>, <strong>CONNSRN1</strong>, and <strong>CONNSN1</strong>.</li><li>2. When <strong>CONNPORTNUM</strong> in the <strong>RRUCHAIN</strong> MO is set to a value greater than or equal to 2 and <strong>CONNCN2</strong> is set to 1, the <strong>BBP</strong> MO is associated with <strong>CONNCN2</strong>, <strong>CONNCN2</strong>, and <strong>CONNCN2</strong>.</li><li>3. When <strong>CONNPORTNUM</strong> in the <strong>RRUCHAIN</strong> MO is set to a value greater than or equal to 3 and <strong>CONNSPN3</strong> is set to 1, the <strong>BBP</strong> MO is associated with <strong>CONNCN3</strong>, <strong>CONNSRN3</strong>, and <strong>CONNSN3</strong>.</li><li>4. When <strong>CONNPORTNUM</strong> in the <strong>RRUCHAIN</strong> MO is set to 4 and <strong>CONNSPN4</strong> is set to 1, the <strong>BBP</strong> MO is associated with <strong>CONNCN4</strong>, <strong>CONNSRN4</strong>, and <strong>CONNSN4</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RRUCHAIN</strong> MO, when <strong>TT</strong> is set to CHAIN, <strong>AT</strong> is not set to PEERPORT, <strong>PROTOCOL</strong> is set to eCPRI, and <strong>HSPN</strong> is set to 1, or when <strong>TT</strong> is set to LOADBALANCE and <strong>PROTOCOL</strong> is set to eCPRI, <strong>CPRIITFTYPE</strong> in the <strong>BBP</strong> MO meeting the following conditions must be set to CPRI_QSFPPLUS:</li><li>1. When <strong>HPN</strong> in the <strong>RRUCHAIN</strong> MO is set to 2, the <strong>BBP</strong> MO is associated with <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong>.</li><li>2. In the <strong>RRUCHAIN</strong> MO, when <strong>TT</strong> is set to LOADBALANCE, <strong>PROTOCOL</strong> is set to eCPRI, <strong>TSPN</strong> is set to 1, and <strong>TPN</strong> is set to 2, the <strong>BBP</strong> MO is associated with <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RRUCHAIN</strong> MO, when <strong>TT</strong> is set to RING and the combination of <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> is not the same as the combination of <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong>, the <strong>TYPE</strong> of <strong>BBP</strong> MO where the <strong>RRUCHAIN</strong> MO is configured is the same or the <strong>TYPE</strong> of one <strong>BBP</strong> MO is UBBP or UBBP-W.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TYPE</strong> in the <strong>BBP</strong> MO specified by the <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO is set to LPMP, <strong>AT</strong> and <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO must be set to LOCALPORT and CHAIN, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TYPE</strong> in the <strong>BBP</strong> MO specified by the <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO is set to LPMP, <strong>HPN</strong> in the <strong>RRUCHAIN</strong> MO must be set to 0, 1, or 2.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RRUCHAIN</strong> MO, the board specified by <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> or that specified by <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> cannot be a board specified by a <strong>BBP</strong> MO in which <strong>TYPE</strong> is set to LCOP.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RRUCHAIN</strong> MO, when <strong>CR</strong> is set to 24.3G, <strong>TYPE</strong> must be set to UBBP-W, UBBP or board type is <strong>RHUB</strong> for the baseband processing board for this MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]An <strong>RRUCHAIN</strong> MO must belong to a UBBP-W or UBBP if <strong>PROTOCOL</strong> is set to eCPRI in the <strong>RRUCHAIN</strong> MO.</li><li>[gNodeB]In an <strong>RRUCHAIN</strong> MO, if <strong>TT</strong> is set to TRUNK_CHAIN, <strong>PROTOCOL</strong> is set to CPRI, and <strong>AT</strong> is not set to PEERPORT, then the <strong>BBP</strong> MOs with <strong>TYPE</strong> set to UBBP or UBBP-W MOs corresponding to the following boards must have been configured:</li><li>1. Board specified by <strong>CONNCN1</strong>, <strong>CONNSRN1</strong>, and <strong>CONNSN1</strong> if <strong>CONNPORTNUM</strong> is set to a value greater than or equal to 1 in this <strong>RRUCHAIN</strong> MO</li><li>2. Board specified by <strong>CONNCN2</strong>, <strong>CONNSRN2</strong>, and <strong>CONNSN2</strong> if <strong>CONNPORTNUM</strong> is set to a value greater than or equal to 2 in this <strong>RRUCHAIN</strong> MO</li><li>3. Board specified by <strong>CONNCN3</strong>, <strong>CONNSRN3</strong>, and <strong>CONNSN3</strong> if <strong>CONNPORTNUM</strong> is set to a value greater than or equal to 3 in this <strong>RRUCHAIN</strong> MO</li><li>4. Board specified by <strong>CONNCN4</strong>, <strong>CONNSRN4</strong>, and <strong>CONNSN4</strong> if <strong>CONNPORTNUM</strong> is set to 4 in this <strong>RRUCHAIN</strong> MO.</li><li>[gNodeB]An <strong>RRUCHAIN</strong> MO must belong to a UBBP with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS if the <strong>RRUCHAIN</strong> MO meets the following conditions: 1. <strong>TT</strong> is set to TRUNK_CHAIN. 2. <strong>PROTOCOL</strong> is set to CPRI. 3. <strong>AT</strong> is not set to PEERPORT. 4. <strong>CONNPORTNUM</strong> is set to a value greater than 2.</li><li>[gNodeB]In an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to TRUNK_CHAIN, <strong>AT</strong> not set to PEERPORT, and <strong>PROTOCOL</strong> set to CPRI:</li><li>1. If the value of <strong>CONNPORTNUM</strong> is greater than or equal to 1 and that of <strong>CONNCR1</strong> is greater than or equal to 39.2G, the board specified by <strong>CONNCN1</strong>, <strong>CONNSRN1</strong>, and <strong>CONNSN1</strong> must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to XCI_QSFP, CPRI_QSFP or CPRI_QSFPPLUS or with <strong>TYPE</strong> set to UBBP-W. If the value of <strong>CONNCR1</strong> is less than 39.2G, the board must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or be a <strong>BRI</strong> MO.</li><li>2. If the value of <strong>CONNPORTNUM</strong> is greater than or equal to 2 and that of <strong>CONNCR2</strong> is greater than or equal to 39.2G, the board specified by <strong>CONNCN2</strong>, <strong>CONNSRN2</strong>, and <strong>CONNSN2</strong> must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to XCI_QSFP, CPRI_QSFP or CPRI_QSFPPLUS or with <strong>TYPE</strong> set to UBBP-W. If the value of <strong>CONNCR2</strong> is less than 39.2G, the board must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or be a <strong>BRI</strong> MO.</li><li>3. If the value of <strong>CONNPORTNUM</strong> is greater than or equal to 3 and that of <strong>CONNCR3</strong> is less than 39.2G, the board specified by <strong>CONNCN3</strong>, <strong>CONNSRN3</strong>, and <strong>CONNSN3</strong> must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or be a <strong>BRI</strong> MO.</li><li>4. If the value of <strong>CONNPORTNUM</strong> is 4 and that of <strong>CONNCR4</strong> is less than 39.2G, the board specified by <strong>CONNCN4</strong>, <strong>CONNSRN4</strong>, and <strong>CONNSN4</strong> must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or be a <strong>BRI</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CXU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>RRUCHAIN</strong> MO is connected to a <strong>CXU</strong> MO with <strong>AT</strong> set to PEERPORT, <strong>CS</strong> in the <strong>CXU</strong> MO cannot set to GO, GT, GL, GLFTD, GU, GUT, GUL, GULFTD, GM, GTM, GLM, GLFTDM, GUM, GUTM, GULM, or GULFTDM.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an RRU chain/ring specified by an <strong>RRUCHAIN</strong> MO connects to a <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU, then the <strong>RRUCHAIN</strong> MO must meet the following conditions:</li><li>- <strong>TT</strong> is set to TRUNK_CHAIN.</li><li>- <strong>CONNCN1</strong> is set to the same value as <strong>CONNCN2</strong>.</li><li>- <strong>CONNSRN1</strong> is set to the same value as <strong>CONNSRN2</strong>.</li><li>- <strong>CONNSN1</strong> is set to the same value as <strong>CONNSN2</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The total number of <strong>CXU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If a <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU corresponds to an <strong>RRUCHAIN</strong> MO, <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO must be set to TRUNK_CHAIN.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO is set to LOADBALANCE, the number of <strong>RFU</strong> MOs specified by <strong>RCN</strong> and <strong>RRU</strong> MOs specified by <strong>RCN</strong> and with <strong>RT</strong> not set to MPRF must be 0 or 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>RRU</strong> MO is located must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PROTOCOL</strong> in the <strong>RRUCHAIN</strong> MO associated with an <strong>RRU</strong> MO is not set to eCPRI, SPEC_100M_AND_60M_NR in <strong>CUSTOMEDRFSPECSW</strong> cannot be set to 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RRUCHAIN</strong> MO where the <strong>RRU</strong> MO is located, when <strong>TT</strong> is set to LOADBALANCE and <strong>HSRN</strong> is less than 60, <strong>RS</strong> cannot be set to UO or GO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE is connected to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU and the <strong>RRU</strong> MO, <strong>RS</strong> in the <strong>RRU</strong> MO cannot be set to UO and GO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CONNPORTNUM</strong> is set to a value greater than 1 and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, only one level of <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>RT</strong> in the <strong>RRU</strong> MO is set to MRIU, <strong>TT</strong> in the <strong>RRUCHAIN</strong> associated with the <strong>RRU</strong> MO must be set to CHAIN or LOADBALANCE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>PROTOCOL</strong> in an <strong>RRUCHAIN</strong> MO corresponding to the <strong>RRU</strong> MO is set to eCPRI, <strong>RS</strong> must be set to TDL, NO or TN.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PROTOCOL</strong> is set to eCPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be configured with a maximum of four <strong>RRU</strong> MOs.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RRUCHAIN</strong> MO, if <strong>PROTOCOL</strong> is set to eCPRI, the total number of <strong>RRU</strong> MOs corresponding to <strong>RCN</strong> must be 0 or 1.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to the <strong>RHUB</strong> MO, the total number of <strong>RRU</strong> MOs with <strong>RT</strong> set to MPMU on the branch chain/ring must be less than or equal to 2.</li><li>[Co-MPT, NodeB, eNodeB]The total number of <strong>RRU</strong> MOs with <strong>RT</strong> set to MPMU configured on the <strong>RRUCHAIN</strong> MO must be less than or equal to 6.</li><li>[gNodeB]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU.</li></ul>
+</li><li>Relation with the <strong>RFU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>RFU</strong> MO is located must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RRUCHAIN</strong> MO where the <strong>RFU</strong> MO is located, when <strong>TT</strong> is set to LOADBALANCE, <strong>RS</strong> cannot be set to UO or GO.</li></ul>
+</li><li>Relation with the <strong>CPRIPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RRUCHAIN</strong> MO, if <strong>TT</strong> is set to CHAIN and <strong>AT</strong> is not set to PEERPORT, or when <strong>TT</strong> is set to RING or when <strong>TT</strong> is set to LOADBALANCE and <strong>AT</strong> is not set to PEERPORT, the <strong>CPRIPORT</strong> MO meeting the following conditions must be already configured:</li><li>1. The <strong>CPRIPORT</strong> MO is associated with <strong>HCN</strong>, <strong>HSRN</strong>, <strong>HSN</strong>, <strong>HPN</strong>, and <strong>HSPN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. When <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO is not set to CHAIN, the <strong>CPRIPORT</strong> MO is associated with <strong>TCN</strong>, <strong>TSRN</strong>, <strong>TSN</strong>, <strong>TPN</strong>, and <strong>TSPN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RRUCHAIN</strong> MO, if <strong>TT</strong> is set to TRUNK_CHAIN and <strong>AT</strong> is not set to PEERPORT, the <strong>CPRIPORT</strong> MO meeting the following conditions must be already configured:</li><li>1. When the value of <strong>CONNPORTNUM</strong> in the <strong>RRUCHAIN</strong> MO is greater than or equal to 1, the <strong>CPRIPORT</strong> MO is associated with <strong>CONNCN1</strong>, <strong>CONNSRN1</strong>, <strong>CONNSN1</strong>, <strong>CONNPN1</strong>, and <strong>CONNSPN1</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. When the value of <strong>CONNPORTNUM</strong> in the <strong>RRUCHAIN</strong> MO is greater than or equal to 2, the <strong>CPRIPORT</strong> MO is associated with <strong>CONNCN2</strong>, <strong>CONNSRN2</strong>, <strong>CONNSN2</strong>, <strong>CONNPN2</strong>, and <strong>CONNSPN2</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>3. When the value of <strong>CONNPORTNUM</strong> in the <strong>RRUCHAIN</strong> MO is greater than or equal to 3, the <strong>CPRIPORT</strong> MO is associated with <strong>CONNCN3</strong>, <strong>CONNSRN3</strong>, <strong>CONNSN3</strong>, <strong>CONNPN3</strong>, and <strong>CONNSPN3</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>4. When the value of <strong>CONNPORTNUM</strong> in the <strong>RRUCHAIN</strong> MO is 4, the <strong>CPRIPORT</strong> MO is associated with <strong>CONNCN4</strong>, <strong>CONNSRN4</strong>, <strong>CONNSN4</strong>, <strong>CONNPN4</strong>, and <strong>CONNSPN4</strong> in the <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RHUB</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TT</strong> in an <strong>RRUCHAIN</strong> MO is set to LOADBALANCE, the number of <strong>RHUB</strong> MOs associated with the <strong>RRUCHAIN</strong> MO must be less than or equal to 1.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When an <strong>RRUCHAIN</strong> MO is configured on the <strong>RHUB</strong> MO, <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO cannot be set to RING.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>RHUB</strong> MO is located must have been configured.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>RRUCHAIN</strong> MO, if <strong>TT</strong> is set to TRUNK_CHAIN and <strong>RCN</strong> is referenced by an <strong>RHUB</strong> MO, the configurations of the <strong>RRUCHAIN</strong> MO must meet the following requirements:</li><li>1. When <strong>CONNPORTNUM</strong> is set to 2, <strong>CONNCR1</strong> and <strong>CONNCR2</strong> must be set to the same value.</li><li>2. When <strong>CONNPORTNUM</strong> is set to 3, <strong>CONNCR1</strong>, <strong>CONNCR2</strong>, and <strong>CONNCR3</strong> must be set to the same value.</li><li>3. When <strong>CONNPORTNUM</strong> is set to 4, <strong>CONNCR1</strong>, <strong>CONNCR2</strong>, <strong>CONNCR3</strong>, and <strong>CONNCR4</strong> must be set to the same value.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>RRUCHAIN</strong> MO, if <strong>TT</strong> is set to TRUNK_CHAIN and <strong>RCN</strong> is referenced by an <strong>RHUB</strong> MO, the configurations of the <strong>RRUCHAIN</strong> MO must meet the following requirements:</li><li>When <strong>CONNPORTNUM</strong> is set to 2, <strong>CONNCN1</strong> and <strong>CONNCN2</strong> must be set to the same value, <strong>CONNSRN1</strong> and <strong>CONNSRN2</strong> must be set to the same value, <strong>CONNSN1</strong> and <strong>CONNSN2</strong> must be set to the same value, and <strong>CONNPN1</strong> and <strong>CONNPN2</strong> must be set to different values.</li><li>When <strong>CONNPORTNUM</strong> is set to 3, <strong>CONNCN1</strong>, <strong>CONNCN2</strong>, and <strong>CONNCN3</strong> must be set to the same value, <strong>CONNSRN1</strong>, <strong>CONNSRN2</strong>, and <strong>CONNSRN3</strong> must be set to the same value, <strong>CONNSN1</strong>, <strong>CONNSN2</strong>, and <strong>CONNSN3</strong> must be set to the same value, and <strong>CONNPN1</strong>, <strong>CONNPN2</strong>, and <strong>CONNPN3</strong> must be set to different values.</li><li>When <strong>CONNPORTNUM</strong> is set to 4, <strong>CONNCN1</strong>, <strong>CONNCN2</strong>, <strong>CONNCN3</strong>, and <strong>CONNCN4</strong> must be set to the same value, <strong>CONNSRN1</strong>, <strong>CONNSRN2</strong>, <strong>CONNSRN3</strong>, and <strong>CONNSRN4</strong> must be set to the same value, <strong>CONNSN1</strong>, <strong>CONNSN2</strong>, <strong>CONNSN3</strong>, and <strong>CONNSN4</strong> must be set to the same value, and <strong>CONNPN1</strong>, <strong>CONNPN2</strong>, <strong>CONNPN3</strong>, and <strong>CONNPN4</strong> must be set to different values.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The total number of <strong>RHUB</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 4.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>CR</strong> in an <strong>RRUCHAIN</strong> MO where the <strong>RHUB</strong> MO is located cannot be set to MANUAL.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TP</strong> in the <strong>RRU</strong> MO is set to BRANCH, the <strong>RHUB</strong> MO or a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must be configured in the cabinet specified by <strong>RCN</strong> in the <strong>RRU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CXU</strong> and <strong>RRUCHAIN</strong> Mos:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>CXU</strong> MO is located must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>CR</strong> in an <strong>RRUCHAIN</strong> MO where an <strong>CXU</strong> MO is located cannot be set to MANUAL.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>RRUCHAIN</strong> MO, the maximum number of corresponding <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS is 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the value of <strong>CXUTYPE</strong> in a <strong>CXU</strong> MO is CGPS, the value of <strong>TT</strong> in an <strong>RRUCHAIN</strong> MO corresponding to the <strong>CXU</strong> MO must be CHAIN, or RING with <strong>BM</strong> set to COLD.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the value of <strong>CXUTYPE</strong> in a <strong>CXU</strong> MO is RPCU, the value of <strong>TT</strong> in an <strong>RRUCHAIN</strong> MO corresponding to the <strong>CXU</strong> MO must be CHAIN.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>RRUCHAIN</strong> is connected to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU and the <strong>RRU</strong> MO, <strong>RS</strong> in the <strong>RRU</strong> MO must be included in the working mode of the RMU.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRU</strong> MO in which <strong>RT</strong> is set to AIRU cannot be configured on the same trunk chain as the <strong>CXU</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>CXU</strong> MO cannot be configured on the same trunk chain as the <strong>RRU</strong> MO in which <strong>RT</strong> is set to AIRU.</li><li>[eGBTS]If <strong>TP</strong> in the <strong>RRU</strong> MO is set to BRANCH, a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must be configured in the cabinet specified by <strong>RCN</strong> in the <strong>RRU</strong> MO.</li><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, the total number of <strong>RRU</strong>, and <strong>CXU</strong> MOs in the <strong>RRUCHAIN</strong> MO must be less than or equal to seven.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>RRU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO and <strong>CPRIITFTYPE</strong> is set to CPRI_SFP and <strong>TYPE</strong> is not set to UBBP-W in the <strong>BBP</strong> MO to which this <strong>RRUCHAIN</strong> MO belongs, <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU cannot be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TYPE</strong> is set to UBBP and <strong>CPRIITFTYPE</strong> is set to CPRI_QSFP in a <strong>BBP</strong> MO, the <strong>BBP</strong> MO can be associated only with the <strong>RRU</strong> MO in which <strong>RT</strong> is set to AIRU.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The total number of <strong>RRU</strong>, <strong>RFU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 21.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]A maximum of 192 <strong>RRUCHAIN</strong> MOs can be configured on the <strong>RHUB</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>RHUB</strong>, and <strong>RRU</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]A BBP supports a maximum of 96 <strong>RRU</strong> MOs with <strong>RT</strong> set to MPMU.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]A BBP supports a maximum of 24 <strong>RHUB</strong> MOs.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong>, <strong>RRU</strong>, <strong>CXU</strong>, <strong>RFU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If sector equipment antennas are distributed on multiple radio frequency units, these radio frequency units can neither be configured on different branches of trunk chains, nor be configured in hybrid networking modes including the branches of trunk chain.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>RT</strong> in the <strong>RRU</strong> MO is set to <strong>TP</strong> and <strong>TP</strong> in the <strong>RRU</strong> MO is set to TRUNK, <strong>RCN</strong> in the <strong>RRU</strong> MO cannot connect to the <strong>RRUCHAIN</strong> MO which is on the <strong>RHUB</strong>.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>AAMU</strong> MO is located must have been configured.</li><li>[Co-MPT, NodeB, eNodeB]<strong>CR</strong> in an <strong>RRUCHAIN</strong> MO where an <strong>AAMU</strong> MO is located cannot be set to MANUAL.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>BRI</strong>, and <strong>GTMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>RRUCHAIN</strong> MO, when <strong>TT</strong> is set to RING and the combination of <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> is not the same as the combination of <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong>, this <strong>RRUCHAIN</strong> cannot be configured on the <strong>BRI</strong>, <strong>GTMU</strong>, or <strong>BBP</strong> with <strong>TYPE</strong> set to GBBP.</li><li>[eGBTS]For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and <strong>AT</strong> set to a value other than PEERPORT, or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to RING or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE and <strong>AT</strong> set to a value other than PEERPORT, the following MO must have been configured:</li><li>1. A <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to a value other than CHAIN, a <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> in the <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RFU</strong> and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TP</strong> in the <strong>RFU</strong> MO is set to BRANCH, the <strong>RRUCHAIN</strong> MO specified by <strong>RCN</strong> in this <strong>RFU</strong> MO must be connected to an RMU.</li></ul>
+</li><li>Relation with the <strong>CXU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, <strong>AAMU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PROTOCOL</strong> is set to eCPRI and <strong>TT</strong> is set to CHAIN or LOADBALANCE in an <strong>RRUCHAIN</strong> MO, then only <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EQUIPMENT</strong> and <strong>RRU</strong> MOs:<ul><li>[Co-MPT, eGBTS, eNodeB, gNodeB]When <strong>PROTOCOL</strong> in an <strong>EQUIPMENT</strong> MO is set to TDL_IR and <strong>PROTOCOL</strong> in the <strong>RRUCHAIN</strong> MO associated with the <strong>RRU</strong> MO is set to DEFAULT, if <strong>RT</strong> in the <strong>RRU</strong> MO is not set to MPMU or MPRF, the values of <strong>CN</strong> and <strong>SN</strong> in the <strong>RRU</strong> MO cannot be greater than 0.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RRU</strong>, and <strong>RFU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>BM</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RFU</strong> MO is located is set to HOT, the total number of <strong>AAMU</strong>, <strong>RRU</strong>, and <strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be 0 or 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>BM</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RRU</strong> MO is located is set to HOT, the total number of <strong>AAMU</strong>, <strong>RRU</strong>, and <strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be 0 or 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>BM</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>AAMU</strong> MO is located is set to HOT, the total number of <strong>AAMU</strong>, <strong>RRU</strong>, and <strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be 0 or 1.</li><li>[gNodeB]If <strong>BM</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RRU</strong> MO is located is set to HOT, the total number of <strong>RRU</strong>, and <strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be 0 or 1.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>BRI</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>RRUCHAIN</strong> MO, if <strong>TT</strong> is set to TRUNK_CHAIN, <strong>PROTOCOL</strong> is set to CPRI, and <strong>AT</strong> is not set to PEERPORT, then the <strong>BBP</strong> MOs with <strong>TYPE</strong> set to UBBP or UBBP-W or the <strong>BRI</strong> MOs corresponding to the following boards must have been configured:</li><li>1. Board specified by <strong>CONNCN1</strong>, <strong>CONNSRN1</strong>, and <strong>CONNSN1</strong> if <strong>CONNPORTNUM</strong> is set to a value greater than or equal to 1 in this <strong>RRUCHAIN</strong> MO.</li><li>2. Board specified by <strong>CONNCN2</strong>, <strong>CONNSRN2</strong>, and <strong>CONNSN2</strong> if <strong>CONNPORTNUM</strong> is set to a value greater than or equal to 2 in this <strong>RRUCHAIN</strong> MO.</li><li>3. Board specified by <strong>CONNCN3</strong>, <strong>CONNSRN3</strong>, and <strong>CONNSN3</strong> if <strong>CONNPORTNUM</strong> is set to a value greater than or equal to 3 in this <strong>RRUCHAIN</strong> MO.</li><li>4. Board specified by <strong>CONNCN4</strong>, <strong>CONNSRN4</strong>, and <strong>CONNSN4</strong> if <strong>CONNPORTNUM</strong> is set to 4 in this <strong>RRUCHAIN</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]An <strong>RRUCHAIN</strong> MO must belong to a UBBP with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or a <strong>BRI</strong> if the <strong>RRUCHAIN</strong> MO meets the following conditions: 1. <strong>TT</strong> is set to TRUNK_CHAIN. 2. <strong>PROTOCOL</strong> is set to CPRI. 3. <strong>AT</strong> is not set to PEERPORT. 4. <strong>CONNPORTNUM</strong> is set to a value greater than 2.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to TRUNK_CHAIN, <strong>AT</strong> not set to PEERPORT, and <strong>PROTOCOL</strong> set to CPRI:</li><li>1. If the value of <strong>CONNPORTNUM</strong> is greater than or equal to 1 and that of <strong>CONNCR1</strong> is greater than or equal to 39.2G, the board specified by <strong>CONNCN1</strong>, <strong>CONNSRN1</strong>, and <strong>CONNSN1</strong> must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to XCI_QSFP, CPRI_QSFP or CPRI_QSFPPLUS or with <strong>TYPE</strong> set to UBBP-W. If the value of <strong>CONNCR1</strong> is less than 39.2G, the board must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or be a <strong>BRI</strong> MO.</li><li>2. If the value of <strong>CONNPORTNUM</strong> is greater than or equal to 2 and that of <strong>CONNCR2</strong> is greater than or equal to 39.2G, the board specified by <strong>CONNCN2</strong>, <strong>CONNSRN2</strong>, and <strong>CONNSN2</strong> must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to XCI_QSFP, CPRI_QSFP or CPRI_QSFPPLUS or with <strong>TYPE</strong> set to UBBP-W. If the value of <strong>CONNCR2</strong> is less than 39.2G, the board must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or be a <strong>BRI</strong> MO.</li><li>3. If the value of <strong>CONNPORTNUM</strong> is greater than or equal to 3 and that of <strong>CONNCR3</strong> is less than 39.2G, the board specified by <strong>CONNCN3</strong>, <strong>CONNSRN3</strong>, and <strong>CONNSN3</strong> must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or be a <strong>BRI</strong> MO.</li><li>4. If the value of <strong>CONNPORTNUM</strong> is 4 and that of <strong>CONNCR4</strong> is less than 39.2G, the board specified by <strong>CONNCN4</strong>, <strong>CONNSRN4</strong>, and <strong>CONNSN4</strong> must be a <strong>BBP</strong> MO with <strong>CPRIITFTYPE</strong> set to CPRI_SFP, CPRI_SFPPLUS, or CPRI_QSFPPLUS or be a <strong>BRI</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CXU</strong>, <strong>RRUCHAIN</strong> and <strong>EQUIPMENT</strong> Mos:<ul><li>[Co-MPT, eGBTS, eNodeB, gNodeB]If <strong>PROTOCOL</strong> in an <strong>EQUIPMENT</strong> MO is set to TDL_IR, a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to CGPS or <strong>CXUTYPE</strong> set to RPCU cannot be configured under an <strong>RRUCHAIN</strong> MO with <strong>PROTOCOL</strong> set to DEFAULT.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponding to the <strong>RRU</strong> MO, <strong>RFU</strong> MO, or <strong>AAMU</strong> MO is configured on a <strong>CXU</strong> in which <strong>CXUTYPE</strong> is set to RMU, <strong>TP</strong> in the <strong>RRU</strong> MO, <strong>RFU</strong> MO, or <strong>AAMU</strong> MO must be set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong> and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TP</strong> in the <strong>AAMU</strong> MO is set to BRANCH, a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must be configured in the cabinet specified by <strong>RCN</strong> in the <strong>AAMU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, the total number of <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs in the <strong>RRUCHAIN</strong> MO must be less than or equal to seven.</li></ul>
+</li><li>Relation with the <strong>AARU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE is connected to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU and an <strong>AARU</strong> MO, <strong>RS</strong> in the <strong>AARU</strong> MO cannot be set to UO and GO.</li></ul>
+</li><li>Relation with the <strong>AARU</strong> and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> is connected to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU and an <strong>AARU</strong> MO, <strong>RS</strong> in the <strong>AARU</strong> MO must be included in the working mode of the RMU.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, and <strong>EQUIPMENT</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>PROTOCOL</strong> in an <strong>EQUIPMENT</strong> MO is set to TDL_IR, the <strong>RRU</strong> or <strong>RFU</strong> MO with <strong>RS</strong> including both TDL and NO cannot be configured in the <strong>RRUCHAIN</strong> MO with <strong>PROTOCOL</strong> set to DEFAULT.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, <strong>CXU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>AAMU</strong> MOs</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU</li><li>3. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, <strong>RHUB</strong>, <strong>CXU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU and <strong>TP</strong> set to BRANCH.</li><li>2. <strong>AAMU</strong> MOs with <strong>TP</strong> set to BRANCH.</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU.</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU and <strong>TP</strong> set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>CXU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to RMU, <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU or <strong>RHUB</strong>.</li><li>[eGBTS]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong>s with <strong>CXUTYPE</strong> set to RMU.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]When <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in an <strong>RRUCHAIN</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>RHUB</strong> MO, respectively, the <strong>RT</strong> in the <strong>RRU</strong> MO that is configured on this <strong>RRUCHAIN</strong> MO must be set to MPMU or MPRF.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]<strong>AT</strong> in an <strong>RRUCHAIN</strong> MO where an <strong>MDU</strong> MO is located cannot be set to PEERPORT.</li></ul>
+</li><li>Relation with the <strong>SUBRACK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]When <strong>TYPE</strong> in the <strong>SUBRACK</strong> MO is set to BLADEBBU, <strong>AT</strong> in the <strong>RRUCHAIN</strong> MO under <strong>SUBRACK</strong> must not be set to PEERPORT.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs:<ul><li>[NodeB, eNodeB]For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and <strong>AT</strong> set to a value other than PEERPORT, or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to RING or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE and <strong>AT</strong> set to a value other than PEERPORT, the following MO must have been configured:</li><li>1. A <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, <strong>MDU</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to a value other than CHAIN, a <strong>BBP</strong> MO, <strong>BRI</strong> MO, <strong>GTMU</strong> MO, <strong>RHUB</strong> MO, <strong>MDU</strong> MO, or <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> in the <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, <strong>CXU</strong>, and <strong>EDC</strong> MOs:<ul><li>[Co-MPT]For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and <strong>AT</strong> set to a value other than PEERPORT, or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to RING or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE and <strong>AT</strong> set to a value other than PEERPORT, the following MO must have been configured:</li><li>1. A <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, <strong>MDU</strong>, <strong>EDC</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to a value other than CHAIN, a <strong>BBP</strong> MO, <strong>BRI</strong> MO, <strong>GTMU</strong> MO, <strong>RHUB</strong> MO, <strong>MDU</strong> MO, or <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> in the <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, and <strong>CXU</strong> MOs:<ul><li>[eGBTS]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>AAMU</strong> MOs</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li><li>[gNodeB]The total number of <strong>RRU</strong>, <strong>RFU</strong>, and <strong>CXU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 21.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs:<ul><li>[gNodeB]For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and <strong>AT</strong> set to a value other than PEERPORT, or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to RING or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE and <strong>AT</strong> set to a value other than PEERPORT, the following MO must have been configured:</li><li>1. A <strong>BBP</strong>, <strong>RHUB</strong>, <strong>MDU</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to a value other than CHAIN, a <strong>BBP</strong> MO, <strong>RHUB</strong> MO, <strong>MDU</strong> MO, or <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> in the <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]When <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in an <strong>RRUCHAIN</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>RHUB</strong> MO, respectively, the <strong>RT</strong> in the <strong>RRU</strong> MO that is configured on this <strong>RRUCHAIN</strong> MO must be set to MPMU or MPRF.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> and <strong>RFU</strong> MOs:<ul><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponding to the <strong>RRU</strong> MO or <strong>RFU</strong> MO is configured on a <strong>CXU</strong> in which <strong>CXUTYPE</strong> is set to RMU, <strong>TP</strong> in the <strong>RRU</strong> MO or <strong>RFU</strong> MO must be set to BRANCH.</li><li>[gNodeB]The total number of <strong>RRU</strong>and<strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 21.</li><li>[gNodeB]If <strong>PROTOCOL</strong> is set to eCPRI and <strong>TT</strong> is set to CHAIN or LOADBALANCE in an <strong>RRUCHAIN</strong> MO, then only <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs:<ul><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU and <strong>TP</strong> set to BRANCH.</li><li>2. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU.</li><li>3. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU and <strong>TP</strong> set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>CXU</strong>, <strong>RRU</strong>, and <strong>RFU</strong> MOs:<ul><li>[gNodeB]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to RMU, <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU or <strong>RHUB</strong>.</li></ul>
+</li><li>Relation with the <strong>CXU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]If <strong>PROTOCOL</strong> is set to eCPRI and <strong>TT</strong> is set to CHAIN or LOADBALANCE in an <strong>RRUCHAIN</strong> MO, then only <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, and <strong>RFU</strong> MOs:<ul><li>[gNodeB]If <strong>BM</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RFU</strong> MO is located is set to HOT, the total number of <strong>RRU</strong>, and <strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be 0 or 1.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#RRUCHAIN__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="RRUCHAIN__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="RRUCHAIN__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_rruchain.html">ADD RRUCHAIN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an RRU chain/ring before adding an RRU to the chain/ring. There are two types of RRU chains/rings: TRUNK and BRANCH. TRUNK indicates that RRUs or RFUs are located on the main chain/ring connected to the optical port on the baseband processing board. BRANCH indicates that RRUs or RFUs are connected to an RHUB or RMU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/cmb_rruchain.html">CMB RRUCHAIN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to combine two RRU chains into a cold backup RRU ring. The cold backup mode is described in the backup mode parameter of the <a href="../mml/mod_rruchain.html">MOD RRUCHAIN</a> command.</p>
+<p>To improve the reliability of RRU chains, use a fiber optic cable to connect two RRUs on the tails of two chains. Then, run this command to combine them into a ring.</p>
+<p>When two RRU chains are combined successfully, the number of the first chain is used as the number of the newly created ring by default.</p>
+<p>If the original two RRU chains have no breakpoints, the new ring has no breakpoint.</p>
+<p>If only one RRU chain has breakpoints, breakpoints 1 and 2 of the new ring coincide.</p>
+<p>If both the original RRU chains have breakpoints, the new ring has two breakpoints. The position of breakpoint 1 is that of the breakpoint on the first RRU chain. The position of breakpoint 2 is the level of the new ring minus the position of the breakpoint on the second RRU chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cprilbr.html">DSP CPRILBR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the current line rate of the specified chain/ring and the maximum line rates of the remote equipment controller (REC) and each remote equipment (RE).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_rruchain.html">DSP RRUCHAIN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query running information about RRU chains/rings..</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_rruchain.html">LST RRUCHAIN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configurations of RRU chains/rings.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_rruchain.html">MOD RRUCHAIN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of an RRU chain/ring.</p>
+<p>To modify the number of ports, the positions of the optical ports at the RRU chain head/ring head/ring tail, or the networking mode of the RRU chain/ring, perform the following steps:</p>
+<p>1. Run this command to set breakpoints at the optical port on the chain/ring to be modified.</p>
+<p>Only one breakpoint (breakpoint 0) needs to be set for a chain or trunk chain.</p>
+<p>Two breakpoints need to be set for a ring or load sharing topology. The position of the first breakpoint is 0, and the position of the second breakpoint is the level of the board.</p>
+<p>2. Adjust cable connections, and modify the configurations. Ensure that physical cable connections are consistent with the data configurations.</p>
+<p>3. Run this command to remove the breakpoints by setting the positions of breakpoints 1 and 2 to 255.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_rruchain.html">RMV RRUCHAIN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an RRU chain/ring.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_cprilnkloop.html">SET CPRILNKLOOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set a loopback on devices of a CPRI link. After a loopback is set on a CPRI link, a CPRI link performance test can be started to check the quality of the CPRI link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_cprilbrneg.html">STR CPRILBRNEG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start negotiation on the common public radio interface (CPRI) line rate of a specified chain/ring. If the link cannot recover for 5 minutes or a longer time after the topology changes, try to recover the link by running this command.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_cprilnktst.html">STR CPRILNKTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start the performance test on a CPRI link. After the performance test is performed on a CPRI link, the performance test results will be reported, including the valid performance test period, actual loopback type, number of errored seconds, number of severely errored seconds, number of unavailable seconds, and number of bit errors. These results are used to check the quality of the CPRI link.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#RRUCHAIN__tab2">Table 2</a> and <a href="#RRUCHAIN__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="RRUCHAIN__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="RRUCHAIN__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-RRUChainId.html">Chain No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the RRU chain/ring. It uniquely identifies a chain within a base station.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-TopoType.html">Topo Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the topology. In a ring topology, service data is transmitted on the fiber optic cable that carries the HDLC link. In a load sharing topology, service data is transmitted on two fiber optic cables simultaneously, which enhances the transmission capability. The physical connection in the ring topology is similar to that in the load sharing topology. The trunk chain enables multiple CPRI fiber optic cables to simultaneously transmit service data.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-BackupMode.html">Backup Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the backup mode of the RRU chain/ring. There are two modes: cold backup and hot backup. Cold backup indicates that when the link on one end of the chain/ring fails, services are interrupted for a short period of time, and then re-established on the other end of the chain/ring. Hot backup indicates that when the link on one end of the chain/ring fails, services are taken over by the other end of the chain/ring immediately. There is only one RRU on the chain/ring in hot backup mode. In the RRUCHAIN MO, if TT is set to RING and BM is set to HOT, the head CPRI port and the tail CPRI port of the RRU ring must be on different baseband processing boards.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-HeadCabinetNo.html">Head Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board where the head CPRI port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-HeadSubrackNo.html">Head Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board where the head CPRI port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-HeadSlotNo.html">Head Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board where the head CPRI port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-HeadPortNo.html">Head Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the head CPRI port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-TailCabinetNo.html">Tail Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board where the tail CPRI port is located. If there is no tail, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-TailSubrackNo.html">Tail Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board where the tail CPRI port is located. If there is no tail, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-TailSlotNo.html">Tail Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board where the tail CPRI port is located. If there is no tail, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-TailPortNo.html">Tail Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the tail CPRI port. If there is no tail, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-BreakPosition1.html">BreakPoint Position1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates breakpoint position 1 on the chain/ring. When this parameter is set to 255, the breakpoint is disabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-BreakPosition2.html">BreakPoint Position2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates breakpoint position 2 on the chain/ring. When this parameter is set to 255, the breakpoint is disabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-AccessType.html">Access Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the access type of the board on an RRU chain/ring. When Access Type is set to LOCALPORT, the BBP connects to the board on an RRU chain/ring through CPRI ports. When Access Type is set to PEERPORT, the local BBP connects to the peer BBP through a IDX2 ports and the peer BBP connects to a board on an RRU chain/ring.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CpriRate.html">CPRI Line Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the user-defined rate. The value AUTO indicates that auto-negotiation is used. The value MANUAL indicates that the rate is set manually and the rate must be set to a fixed value for each board on the RRU chain/ring. Other values indicate the corresponding fixed rates. If the CPRI link fails with this parameter set to a fixed rate, the RRU cannot work with this CPRI rate.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-LocalSlotNo.html">Local Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the converged party in CPRI MUX/eCPRI MUX. If this parameter is set to 255, the slot number of the converged party is not specified. When the converging party is in a BBU3900, this parameter can be left unspecified. When the converging party is in a BBU3910, BBU5900 or BBU5900A, this parameter must be specified.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-ProtocolType.html">Protocol Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the communication protocol used by the chain/ring. The value DEFAULT indicates that the chain/ring uses the protocol specified in the Equipment MO. The protocol specified by this parameter prevails when it differs from that specified in the Equipment MO.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-SevereBerThreshold.html">Severely Errored Second Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for a SES in CPRI link performance measurement results. A second is an SES if the bit error rate on a CPRI link is greater than the value of this parameter within this second.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNPORTNUM.html">Connect Port Num</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of ports used for a trunk chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNCN1.html">Port 1 Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board a port of which works as port 1 of the trunk chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSRN1.html">Port 1 Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board a port of which works as port 1 of the trunk chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSN1.html">Port 1 Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board a port of which works as port 1 of the trunk chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNPN1.html">Port 1 Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port number of the board a port of which works as port 1 of the trunk chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNCR1.html">Port 1 CPRI Line Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the line rate of port 1 of the trunk chain. The value AUTO indicates that the auto-negotiation mode is used. The value MANUAL indicates that the rate is set manually and the rate must be set to a fixed value for each board on the RRU chain/ring. Other values indicate the corresponding fixed rates.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSBT1.html">Port 1 Severely Errored Second Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for a severely errored second (SES) in CPRI link performance measurement results. A second is an SES if the bit error rate on a CPRI link is greater than the value of this parameter within this second.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNCN2.html">Port 2 Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board a port of which works as port 2 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSRN2.html">Port 2 Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board a port of which works as port 2 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSN2.html">Port 2 Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board a port of which works as port 2 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNPN2.html">Port 2 Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port number of the board a port of which works as port 2 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNCR2.html">Port 2 CPRI Line Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the line rate of port 2 of the trunk chain. The value AUTO indicates that the auto-negotiation mode is used. Other values indicate the corresponding fixed rates. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSBT2.html">Port 2 Severely Errored Second Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for a SES in CPRI link performance measurement results. A second is an SES if the bit error rate on a CPRI link is greater than the value of this parameter within this second. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNCN3.html">Port 3 Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board a port of which works as port 3 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSRN3.html">Port 3 Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board a port of which works as port 3 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSN3.html">Port 3 Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board a port of which works as port 3 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNPN3.html">Port 3 Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port number of the board a port of which works as port 3 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNCR3.html">Port 3 CPRI Line Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the line rate of port 3 of the trunk chain. The value AUTO indicates that the auto-negotiation mode is used. Other values indicate the corresponding fixed rates. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSBT3.html">Port 3 Severely Errored Second Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for a severely errored second (SES) in CPRI link performance measurement results.A second is an SES if the bit error rate on a CPRI link is greater than the value of this parameter within this second. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNCN4.html">Port 4 Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board a port of which works as port 4 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSRN4.html">Port 4 Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board a port of which works as port 4 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSN4.html">Port 4 Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board a port of which works as port 4 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNPN4.html">Port 4 Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port number of the board a port of which works as port 4 of the trunk chain. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNCR4.html">Port 4 CPRI Line Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the line rate of port 4 of the trunk chain. The value AUTO indicates that the auto-negotiation mode is used. Other values indicate the corresponding fixed rates. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSBT4.html">Port 4 Severely Errored Second Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for a SES in CPRI link performance measurement results. A second is an SES if the bit error rate on a CPRI link is greater than the value of this parameter within this second. The value of this parameter is NULL if the current port is not used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-UserDefRateNegoSw.html">User-Defined Rate Negotiation Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the user-defined rate negotiation switch. If this switch is turned on, users can specify a bit rate set and a rate change period for automatic rate negotiation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-BitRateSet.html">Bit Rate Set</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the bit rate set for rate negotiation. This parameter takes effect only when the user-defined rate negotiation switch is turned on. If this bit rate set does not overlap with the rate set supported by the port, the rate set supported by the port is used for rate negotiation by default.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-RateChangePeriod.html">Rate Change Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration of a port working in each negotiated rate. This parameter takes effect only when the user-defined rate negotiation switch is turned on.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-RESVBW.html">Reserved Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the bandwidth reserved for other applications.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-LocalCabinetNo.html">Local Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the converged party in CPRI MUX/eCPRI MUX. The Local Cabinet No. parameter and the Local Subrack No. parameter must be both set to 255 or neither set to 255. If they are both set to 255, the converging party and converged party are deployed in the same subrack. If they are not set to 255, the deployment depends on the configurations.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-LocalSubrackNo.html">Local Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the converged party in CPRI MUX/eCPRI MUX. The Local Cabinet No. parameter and the Local Subrack No. parameter must be both set to 255 or neither set to 255. If they are both set to 255, the converging party and converged party are deployed in the same subrack. If they are not set to 255, the deployment depends on the configurations.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-HeadSubPortNo.html">Head SubPort No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the head CPRI sub-port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-TailSubPortNo.html">Tail SubPort No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the tail CPRI sub-port. If there is no tail or the tail has no sub-ports, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSPN1.html">Port 1 SubPort No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the sub-port through which port 1 connects to the trunk chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSPN2.html">Port 2 SubPort No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the sub-port through which port 2 connects to the trunk chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSPN3.html">Port 3 SubPort No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the sub-port through which port 3 connects to the trunk chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RRUCHAIN-CONNSPN4.html">Port 4 SubPort No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the sub-port through which port 4 connects to the trunk chain.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="RRUCHAIN__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="RRUCHAIN__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RRUCHAIN-ChainLevel.html">Chain Level</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the level of the RRU chain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RRUCHAIN-RRUNum.html">Board Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of boards on the RRU chain/ring.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

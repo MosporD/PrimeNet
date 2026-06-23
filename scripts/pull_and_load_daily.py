@@ -22,7 +22,7 @@ def main() -> int:
     rc = _run("pull_all_raw_daily.py")
     if rc != 0:
         return rc
-    return _run("load_raw_daily_to_databases.py")
+    return _run(os.path.join("pipeline", "load_raw_daily_to_databases.py"))
 
 
 if __name__ == "__main__":

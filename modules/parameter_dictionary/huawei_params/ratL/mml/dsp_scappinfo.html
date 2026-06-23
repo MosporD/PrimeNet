@@ -1,0 +1,112 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display SC Application Info (DSP SCAPPINFO)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_scappinfo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display SC Application Info (DSP SCAPPINFO)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_scappinfo"></a><a name="dsp_scappinfo"></a>
+
+
+<h1 class="topictitle1">Display SC Application Info (DSP SCAPPINFO)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="dsp_scappinfo__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the information about the applications (video services) that service classification supports. The information includes operator-defined and system default application information. The eNodeB supports query of a maximum of 350 pieces of information. The domain name is not case sensitive. Characters in lower case take effect, and the query result shows domain names in lower case.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_scappinfo__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_scappinfo__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<p>None.</p>
+</div></div>
+
+<div class="mmlexample"><a name="dsp_scappinfo__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To display the application(video) information of Service Classification supported, run the following command:
+DSP SCAPPINFO:;
+and then return the following result:
++++    161        2015-09-29 20:59:42
+O&amp;M    #806354972
+%%DSP SCAPPINFO:;%%
+RETCODE = 0  Operation succeeded.
+
+Display Sc Application Info
+---------------------------
+App Index  Application Identification Type  Application DNS Info           Application IPv4  Application IPv6  App Desc     Configuration Type
+
+0          DNS                              *---sn-*c.youtube.com*         NULL              NULL              YouTube      Default Config    
+1          DNS                              *---sn-*googlevideo.com*       NULL              NULL              YouTube      Default Config    
+2          DNS                              *fbcdn-video*akamaihd.net*     NULL              NULL              Facebook     Default Config    
+3          DNS                              *video.xx.fbcdn.net*           NULL              NULL              Facebook     Default Config
+
+(Number of results = 4)
+
+
+---    END
+</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_scappinfo__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody"><table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder"><tr><th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>App Index</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the application index. In the command output of DSP SCAPPINFO for querying applications supported by SC, each piece of displayed application DNS information has an index. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Application Identification Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the application identification method. If the AppIdentType parameter is set to DNS, the AppDns parameter must be set. If the AppIdentType parameter is set to IPv4, the AppIpv4 parameter must be set. If the AppIdentType parameter is set to IPv6, the AppIpv6 parameter must be set. You are advised to set the IP address for an application when the application is not configured with a domain name. You must not set both an IP address and a domain name for an application at the same time. If the AppIdentType parameter is set to TCPPORT, the TCP port number does not need to be configured and port 80, 8080, or 443 takes effect by default. The value 100 of the AppDnsId parameter is reserved for TCP link setup acceleration. That is, when the AppDnsId parameter is set to 100, the AppIdentType parameter can be set to only TCPPORT. If the AppIdentType parameter is set to WTCP, the WTCP service identification does not need to be configured but the AppDnsId parameter must be set to 101. The value 101 of the AppDnsId parameter is reserved for WTCP. That is, when the AppDnsId parameter is set to 101, the AppIdentType parameter can be set to only WTCP. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Application DNS Info</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the information about the domain name of the to-be-identified application, and it can contain only the following characters: lower-case letters (a to z), digits (0 to 9), wildcard character (*), hyphens (-), full stops (.), and at-signs (@). This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Application IPv4</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the IPv4 address of an application, which is used for application (website) identification based on IP addresses. This parameter must be set only if the AppIdentType parameter is set to IPv4. A single IPv4 address specified by the AppIpv4 parameter can be repeatedly configured for auxiliary application domain names associated with different main domain names. In other cases, it is not recommended that a single IPv4 address be repeatedly configured for different application domain names. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Application IPv6</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the IPv6 address of an application, which is used for application (website) identification based on IP addresses. This parameter must be set only if the AppIdentType parameter is set to IPv6. A single IPv6 address specified by the AppIpv6 parameter can be repeatedly configured for auxiliary application domain names associated with different main domain names. In other cases, it is not recommended that a single IPv6 address be repeatedly configured for different application domain names. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>App Desc</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the description that defines an application. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Configuration Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the configuration type of the to-be-identified DNS. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+</table>
+</div></div>
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

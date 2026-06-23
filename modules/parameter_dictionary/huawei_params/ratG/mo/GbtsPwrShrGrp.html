@@ -1,0 +1,204 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="GBTSPWRSHRGRP">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="GbtsPwrShrGrp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>GBTSPWRSHRGRP</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="GbtsPwrShrGrp"></a><a name="GbtsPwrShrGrp"></a>
+
+
+<h1 class="topictitle1">GBTSPWRSHRGRP</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="GbtsFunction.html">GBTSFUNCTION</a>
+    +-<a href="GbtsPwrShrGrp.html"><strong>GBTSPWRSHRGRP</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The GBTSPWRSHRGRP MO manages the multi-mode dynamic power sharing group served by the GBTS function and enable the multi-mode dynamic power sharing function. The multi-mode dynamic power sharing function involves GU dynamic power sharing and GL dynamic power sharing. In a GU refarming scenario, if the GSM and UMTS networks share the same RF module, the GU dynamic power sharing function can be enabled.In a GL refarming scenario, if the GSM and LTE networks share the same RF module, the GL dynamic power sharing function can be enabled.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="GbtsFunction.html">GBTSFUNCTION</a></li><li>Relation with the <strong>GTRXGROUPSECTOREQM</strong> MO:<ul><li>The sector equipment used by <strong>GBTSPWRSHRGRP</strong> must have been bound to <strong>GTRXGROUPSECTOREQM</strong>.</li></ul>
+</li><li>Relation with the <strong>GBTSPWRSHRGRP</strong> MO:<ul><li>Different <strong>GBTSPWRSHRGRP</strong>s must use different sector equipment.</li><li>If <strong>SECTOREQMID</strong> for <strong>GTRXGROUPSECTOREQM</strong> is used by <strong>SECTOREQMID1</strong> or <strong>SECTOREQMID2</strong> for <strong>GBTSPWRSHRGRP</strong>, <strong>WORKMODE</strong> for <strong>GTRXGROUP</strong> bound to <strong>GTRXGROUPSECTOREQM</strong> must be set to INDEPENDENT.</li><li>If the <strong>PWRSHRTYPE</strong> for <strong>GBTSPWRSHRGRP</strong>  is set to GLPWRSHR, the <strong>SECTOREQMID1</strong> and <strong>SECTOREQMID2</strong> must serve the same sector.</li><li>If <strong>LOCELLTYPE</strong> for <strong>GLOCELL</strong> is set to MULTISITE_CELL, sector equipment bound to all <strong>GTRXGROUP</strong>s under <strong>GLOCELL</strong> cannot be used by <strong>GBTSPWRSHRGRP</strong>.</li></ul>
+</li><li>Relation with the <strong>GTRXGROUP</strong> MO:<ul><li>If <strong>SECTOREQMID</strong> under <strong>GTRXGROUPSECTOREQM</strong> is referenced by <strong>SECTOREQMID1</strong> or <strong>SECTOREQMID2</strong> under <strong>GBTSPWRSHRGRP</strong>, <strong>SNDMD</strong> under <strong>GTRXGROUP</strong> bound to <strong>GTRXGROUPSECTOREQM</strong> must be set to SINGLESND.</li></ul>
+</li><li>Relation with the <strong>GTRXGROUP</strong>, <strong>GTRXGROUPSECTOREQM</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>The transmit antennas for <strong>SECTOREQM</strong> referenced by <strong>GBTSPWRSHRGRP</strong>, and those referenced by <strong>GTRXGROUP</strong> for which <strong>SNDMD</strong> is set to DIVERSITY cannot be located on the same virtual antenna.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong> MO:<ul><li>When <strong>PWRSHRTYPE</strong> in <strong>GBTSPWRSHRGRP</strong> is set to GUPWRSHR or GLPWRSHR, transmit antennas of <strong>SECTOREQM</strong>s in <strong>GBTSPWRSHRGRP</strong>s cannot be located on the same virtual antenna.</li></ul>
+</li><li>Relation with the <strong>GTRXGROUPSECTOREQM</strong> and <strong>SECTOREQM</strong> MOs:<ul><li><strong>PWRSHRTYPE</strong> in <strong>GBTSPWRSHRGRP</strong> is set to GLPWRSHR, and transmit antennas of two <strong>SECTOREQM</strong>s that bound to the <strong>GBTSPWRSHRGRP</strong> are configured on different RF modules. If among the different RF modules, transmit antennas of an RF module are configured on the <strong>SECTOREQM</strong> that bound to a <strong>GTRXGROUP</strong>, transmit antennas bound to the <strong>GTRXGROUP</strong> and those bound to the <strong>GBTSPWRSHRGRP</strong> must be located on the same virtual antenna.</li><li>When <strong>GTRXGROUP</strong> is bound to <strong>GTRXGROUPSECTOREQM</strong> under which <strong>SERVETYPE</strong> is set to AUX, the TX antenna referenced by <strong>GTRXGROUP</strong> must differ from that referenced by <strong>GBTSPWRSHRGRP</strong>, and the antennas cannot belong to the same virtual antenna.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#GbtsPwrShrGrp__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="GbtsPwrShrGrp__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="GbtsPwrShrGrp__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_gbtspwrshrgrp.html">ADD GBTSPWRSHRGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a multi-mode dynamic power sharing group served by the GBTS function and enable the multi-mode dynamic power sharing function.</p>
+<p>The multi-mode dynamic power sharing function involves GU dynamic power sharing and GL dynamic power sharing. In a GU refarming scenario, if the GSM and UMTS networks share the same RF module, the GU dynamic power sharing function can be enabled. In a GL refarming scenario, if the GSM and LTE networks share the same RF module, the GL dynamic power sharing function can be enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_gbtspwrshrgrp.html">DSP GBTSPWRSHRGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of the multi-mode dynamic power sharing group, including PWRSHRTYPE, SECTOREQMID1, SECTOREQMID2, and PWRSHRGRPSTATUS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_gbtspwrshrgrp.html">LST GBTSPWRSHRGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration information about a multi-mode dynamic power sharing group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_gbtspwrshrgrp.html">MOD GBTSPWRSHRGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the attribute of a multi-mode dynamic power sharing group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_gbtspwrshrgrp.html">RMV GBTSPWRSHRGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a multi-mode dynamic power sharing group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#GbtsPwrShrGrp__tab2">Table 2</a> and <a href="#GbtsPwrShrGrp__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="GbtsPwrShrGrp__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="GbtsPwrShrGrp__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShrGrpId.html">Power Sharing Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the identity of a power sharing group. It uniquely identifies a power sharing group in a GBTS function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShrType.html">Power Sharing Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the GX power sharing type. The values of this parameter are OFF(Off), GUPWRSHR(GU Power Sharing), and GLPWRSHR(GL Power Sharing). OFF indicates that the multi-mode dynamic power sharing algorithm is disabled. GUPWRSHR indicates that GSM and UMTS dynamic power sharing algorithm is enabled. GLPWRSHR indicates that GSM and LTE dynamic power sharing algorithm is enabled. GX dynamic power sharing algorithm means that the GSM network shares power with the UMTS or LTE network when the TRXs of both networks in GX mode use the same power amplifier. This algorithm aims to improve the power usage and the quality of the UMTS or LTE network when the peak hours for the two networks are different or their traffic is unbalanced.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-sectorEqmId1.html">Sector Equipment ID 1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the sector equipment identity 1 for a power sharing group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-sectorEqmId2.html">Sector Equipment ID 2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the sector equipment identity 2 for a power sharing group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareTrxNum.html">Min. Number of GSM Non-BCCH TRXs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum number of GSM non-BCCH TRXs configured on the sector equipment of the power sharing group during power sharing between GSM and another RAT (UMTS or LTE). Power sharing between GSM and another RAT is allowed only when the number of GSM non-BCCH TRXs on the sector equipment bound to the power sharing group is greater than or equal to the value of this parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrSharePwrLoad.html">GSM Single PA Power Threshold for GX Power Sharing</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the allowed maximum power of single RF channel in GSM and UMTS or GSM and LTE power sharing mode. GX power sharing is supported only when the power of single RF channel is lower than the value of this parameter. This ensures that the GSM network quality is not affected.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareRsvFactor.html">Power Reserve Coef. Claiming GSM Single PA Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold that the GSM network decides to reduce the shared power. When the residual power of the current timeslot of the GSM network is less than the product of PWRSHAREGSMIDLERSVPWR and PWRSHARERSVFACTOR, the GSM network reduces the shared power.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareGsmIdleTh.html">GSM Idle Channel Threshold for GX Power Sharing</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Determines the number of idle channels for PWRSHAREGSMIDLERSVPWR or PWRSHAREGSMBUSYRSVPWR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareGsmIdleHs.html">GSM Idle Channel Hysteresis for GX Power Sharing</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of protection idle channels. It is used in parallel with PWRSHAREGSMIDLETH to prevent the system from being handed over frequently between busy and idle status.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareGsmIdleRsvPwr.html">GSM Idle Power Reserve for GX Power Sharing</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the GSM power reserve when the GX power sharing mode is used during off-peak hours. If the number of current idle channels is greater than or equal to the sum of PWRSHAREGSMIDLETH and PWRSHAREGSMIDLEHS, the GSM network has a low traffic load. This parameter can be used to reduce the power reserve and increase the power sharing range. 65535 indicates that no power is reserved.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareGsmBusyRsvPwr.html">GSM Busy Power Reserve for GX Power Sharing</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the GSM power reserve when the GX power sharing mode is used during peak hours. If the number of current idle channels is less than the difference between PWRSHAREGSMIDLETH and PWRSHAREGSMIDLEHS, the GSM network has a high traffic load. This parameter can be used to increase the power reserve and avoid GSM peak clipping. 65535 indicates that no power is reserved.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareRcvPwr.html">Max. Shared Power Accepted by Target Network</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum shared power that the target network can accept according to the RF channel power configuration of the target network. The GSM network power shared with the target network cannot exceed the value of this parameter. 65535 indicates that the target network does not support power sharing.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareRcvPwrPd.html">Max. Power Shared by GSM in a Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum power shared by the GSM network in each period. This prevents the power of the target network from being increased overly fast, which results in a sharp decrease in network coverage. In each GX power sharing period, the power shared by the GSM network must be less than or equal to PWRSHARERCVPWRPD. 65535 indicates that the target network does not support power sharing.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShareTm.html">Time for Enabling GX Power Sharing</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time when the GU or GL power sharing function needs to be enabled according to the GX traffic distribution on the live network.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="GbtsPwrShrGrp__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="GbtsPwrShrGrp__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GbtsPwrShrGrp-pwrShrGrpStatus.html">Power Sharing Group Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual status of a power sharing group: UNEFFECTIVE, START, and STOP. UNEFFECTIVE indicates that the current configuration data of the power sharing group does not meet requirements and therefore the power sharing function cannot be performed. START indicates that the power sharing function is being performed. STOP indicates that the power sharing function is disabled or it is not time for starting the power sharing function although the current configuration data of the power sharing group meets requirements.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

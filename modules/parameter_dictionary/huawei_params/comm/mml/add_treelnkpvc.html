@@ -1,0 +1,637 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Tree Link PVC (ADD TREELNKPVC)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_treelnkpvc">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Tree Link PVC (ADD TREELNKPVC)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_treelnkpvc"></a><a name="add_treelnkpvc"></a>
+
+
+<h1 class="topictitle1">Add Tree Link PVC (ADD TREELNKPVC)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="add_treelnkpvc__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to dynamically add a treelink permanent virtual channel (PVC).</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_treelnkpvc__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,NodeB]Before running this command, ensure that the physical port that carries the tree link PVC has been configured. The type of the physical port can be IMA group, UNI link, fractional ATM link, or STM1. In addition, the tree link PVC to be added must have a different combination of VPI and VCI from any existing PVC on the same physical port.</p>
+</li><li><p>[Co-MPT,NodeB]When configuring logical resources, the BS checks bandwidths according to bandwidth configuration rules. For details, see the notes of the <a href="add_aal2path.html">ADD AAL2PATH</a> command.</p>
+</li><li><p>[Co-MPT,NodeB]The bandwidth of a tree link PVC must be narrower than or equal to the physical bandwidth of the physical port that carries the tree link PVC. The type of the physical port can be IMA group, UNI link, fractional ATM link, or STM1.</p>
+</li><li><p>[Co-MPT,NodeB]If ST (type of the service carried by the PVC) is set to CBR, a waste of bandwidth may occur and the aggregation efficiency of HUB-type nodes may be affected, because the constant bit rate (CBR) service is assigned a fixed bandwidth. Therefore, ST cannot be set to CBR.</p>
+</li><li><p>[Co-MPT,NodeB]If VST (switching type) of a tree link PVC is set to VP_SWITCH, neither VPI of the source port nor that of the destination port can be set to 1.</p>
+</li><li><p>[Co-MPT,NodeB]If the PVC of a lower-level node needs to be configured to carry the CBR service, either of the following settings of SCR (sustainable cell rate) of the PVC on the HUB-type node is recommended: (1) If RU (rate unit) is set to KBPS, SCR = PCR - 1, where PCR is the peak cell rate of the PVC on the lower-level node; (2) If RU is set to CELL/S, SCR = PCR - 3.</p>
+</li><li><p>[Co-MPT,NodeB]Before adding a treelink PVC to a transmission resource group, ensure that the transmission resource group has been configured.</p>
+</li><li><p>[Co-MPT,NodeB]The source port must be different from the destination port.</p>
+</li><li><p>[Co-MPT,NodeB]The sum of the following numbers cannot exceed 200: (1) Twice the number of the Tree Link PVC objects configured on this board (2) Total number of the following objects configured on this board: OMCH in which the Bearer Type parameter is set to ATM(ATM), AAL2PATH, and SAALLNK.</p>
+</li><li><p>[Co-MPT,NodeB]System specifications: If the WMPT/UMPT/UMDU is the main control board, a maximum of 96 PVCs can be configured.</p>
+</li><li><p>[Co-MPT,NodeB]Board specifications: A maximum of 96 PVCs can be configured on a WMPT/UMPTa/UMPTb/UMDU/UTRP (subboard type: UAEC).</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_treelnkpvc__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-usTreeLinkNo.html">NO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Tree Link PVC No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the treelink PVC number.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucJnVcg.html">JNRSCGRP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Join Transmission Resource Group</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the treelink PVC joins a transmission resource group.</p>
+<p>GUI Value Range: DISABLE(DISABLE), ENABLE(ENABLE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(DISABLE)</p>
+<p>Recommended Value: DISABLE(DISABLE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucVPType.html">VST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Tree Link PVC Switch Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switching type of a treelink PVC, which is classified into VC_SWITCH and VP_SWITCH.</p>
+<p>GUI Value Range: VC_SWITCH(VC_SWITCH), VP_SWITCH(VP_SWITCH)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: VC_SWITCH, VP_SWITCH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucCabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the board is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucIngressSubrack.html">SRCSRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the source port for the treelink PVC.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, <strong>SRCSRN</strong> must be the same as <strong>DSTSRN</strong>.</li><li>[Co-MPT, NodeB]The source and destination ports cannot be configured on the same port with the same slot number and subboard type. That is, in a <strong>TREELNKPVC</strong> MO, the combination of <strong>DSTSRN</strong>, <strong>DSTSN</strong>, <strong>DSTSBT</strong>, <strong>DSTPT</strong>, and <strong>DSTPN</strong> must be different from that of <strong>SRCSRN</strong>, <strong>SRCSN</strong>, <strong>SRCSBT</strong>, <strong>SRCPT</strong>, and <strong>SRCPN</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucIngressIubBoardNo.html">SRCSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the source port for the treelink PVC.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucIngressSubboardType.html">SRCSBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subboard type of the board providing the source port for the treelink PVC.</p>
+<p>GUI Value Range: UNCHANNELLED_COVERBOARD(Unchannelled Cover Board), E1_COVERBOARD(E1 Cover Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNCHANNELLED_COVERBOARD, E1_COVERBOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if the value of <strong>SRCSN</strong> is within the range from 0 to 5, this parameter can be set to UNCHANNELLED_COVERBOARD or E1_COVERBOARD.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>SRCSN</strong> is set to 6 or 7, this parameter must be set to BASE_BOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucIngressPortType.html">SRCPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the source port for the treelink PVC.</p>
+<p>GUI Value Range: IMA(IMA Group), UNI(UNI Link), FRAATM(FRAATM Link), STM1(STM1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IMA, UNI, FRAATM, STM1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if <strong>SRCSBT</strong> is set to BASE_BOARD or E1_COVERBOARD, this parameter can be set to IMA, UNI, or FRAATM.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>SRCSBT</strong> is set to UNCHANNELLED_COVERBOARD, this parameter must be set to STM1.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucIngressPortNo.html">SRCPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the source port for the treelink PVC.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, this parameter can be set to 0 or 1 if <strong>SRCSBT</strong> is set to BASE_BOARD and <strong>SRCPT</strong> is set to IMA.</li><li>In the <strong>TREELNKPVC</strong> MO, the value range of this parameter is from 0 to 3 if <strong>SRCSBT</strong> is set to BASE_BOARD and <strong>SRCPT</strong> is set to UNI or FRAATM.</li><li>In the <strong>TREELNKPVC</strong> MO, the value range of this parameter is from 0 to 3 if <strong>SRCSBT</strong> is set to E1_COVERBOARD and <strong>SRCPT</strong> is set to IMA.</li><li>In the <strong>TREELNKPVC</strong> MO, the value range of this parameter is from 0 to 7 if <strong>SRCSBT</strong> is set to E1_COVERBOARD and <strong>SRCPT</strong> is set to UNI or FRAATM.</li><li>In the <strong>TREELNKPVC</strong> MO, this parameter must be set to 0 if <strong>SRCSBT</strong> is set to UNCHANNELLED_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucIngressVcgId.html">SRCRSCGRP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the transmission resource group to which the source port for the treelink PVC belongs.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-usIngressVpi.html">SRCVPI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port VPI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the virtual path identifier (VPI) of the source port for the treelink PVC.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>VST</strong> is set to VP_SWITCH, neither <strong>SRCVPI</strong> nor <strong>DSTVPI</strong> can be set to 1.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-usIngressVci.html">SRCVCI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port VCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the virtual channel identifier (VCI) of the source port for the treelink PVC.</p>
+<p>GUI Value Range: 32~511</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 32~511</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucEgressSubrack.html">DSTSRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the destination port for the treelink PVC.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, <strong>SRCSRN</strong> must be the same as <strong>DSTSRN</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucEgressIubBoardNo.html">DSTSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the source port for the treelink PVC.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucEgressSubboardType.html">DSTSBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subboard type of the board providing the destination port for the treelink PVC.</p>
+<p>GUI Value Range: UNCHANNELLED_COVERBOARD(Unchannelled Cover Board), E1_COVERBOARD(E1 Cover Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNCHANNELLED_COVERBOARD, E1_COVERBOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if the value of <strong>DSTSN</strong> is within the range from 0 to 5, this parameter can be set to UNCHANNELLED_COVERBOARD or E1_COVERBOARD.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>DSTSN</strong> is set to 6 or 7, this parameter must be set to BASE_BOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucEgressPortType.html">DSTPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the destination port for the treelink PVC.</p>
+<p>GUI Value Range: IMA(IMA Group), UNI(UNI Link), FRAATM(FRAATM Link), STM1(STM1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IMA, UNI, FRAATM, STM1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if <strong>DSTSBT</strong> is set to BASE_BOARD or E1_COVERBOARD, this parameter can be set to IMA, UNI, and FRAATM.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>DSTSBT</strong> is set to UNCHANNELLED_COVERBOARD, this parameter must be set to STM1.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucEgressPortNo.html">DSTPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the destination port for the treelink PVC.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if <strong>DSTSBT</strong> and <strong>DSTPT</strong> are set to BASE_BOARD and IMA respectively, this parameter can be set to 0 or 1.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>DSTSBT</strong> is set to BASE_BOARD and <strong>DSTPT</strong> is set to UNI or FRAATM, the value range of this parameter is from 0 to 7.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>DSTSBT</strong> and <strong>DSTPT</strong> are set to E1_COVERBOARD and IMA respectively, the value range of this parameter is from 0 to 3.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>DSTSBT</strong> is set to E1_COVERBOARD and <strong>DSTPT</strong> is set to UNI or FRAATM, the value range of this parameter is from 0 to 7.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>DSTSBT</strong> is set to UNCHANNELLED_COVERBOARD, this parameter must be set to 0.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucEgressVcgId.html">DSTRSCGRP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the transmission resource group to which the destination port for the treelink PVC belongs.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-usEgressVpi.html">DSTVPI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port VPI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the virtual path identifier (VPI) of the destination port for the treelink PVC.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>VST</strong> is set to VP_SWITCH, neither <strong>SRCVPI</strong> nor <strong>DSTVPI</strong> can be set to 1.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-usEgressVci.html">DSTVCI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port VCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the virtual channel identifier (VCI) of the destination port for the treelink PVC.</p>
+<p>GUI Value Range: 32~511</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 32~511</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-RateUnit.html">RU</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rate Unit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rate unit of the peak cell rate (PCR), minimum cell rate (MCR), and sustainable cell rate (SCR). 1 cell/s is equal to 0.424 kbit/s. If the rate is converted from cell/s to kbit/s, the result value must be rounded down to the nearest integer. For example, 73 cell/s is converted into 30 kbit/s.</p>
+<p>GUI Value Range: KBPS(kbit/s), CELL/S(cell/s)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: KBPS, CELL/S</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: KBPS(kbit/s)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ucSt.html">ST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearer Service Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: In terms of flow control, services are classified into four categories: the Real-Time Variable Bit Rate (RTVBR) service, Non-Real-Time Variable Bit Rate (NRTVBR) service, Unspecified Bit Rate Plus (UBR+) service, and Unspecified Bit Rate (UBR) service.</p>
+<p>GUI Value Range: RTVBR(RTVBR), NRTVBR(NRTVBR), UBR+(UBR+), UBR(UBR)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RTVBR, NRTVBR, UBR+, UBR</p>
+<p>MML Default Value: RTVBR(RTVBR)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ulPeakCellRate.html">PCR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peak Cell Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peak rate of transmitting cells on an ATM connection, such as a VPC or VCC.</p>
+<p>GUI Value Range: 30~49529</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 30~49529</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> and <strong>RU</strong> are set to UBR+ and KBPS, respectively, <strong>MCR</strong> must be less than <strong>PCR</strong>.</li><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to UBR+ and <strong>RU</strong> is set to CELL/S, <strong>MCR</strong> must be less than <strong>PCR</strong> after the rate unit is changed to kbit/s and both rates are rounded down.</li><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR and <strong>RU</strong> is set to KBPS, <strong>SCR</strong> must be less than <strong>PCR</strong>.</li><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR and <strong>RU</strong> is set to CELL/S, <strong>SCR</strong> must be less than <strong>PCR</strong> after the rate unit is changed to kbit/s and both rates are rounded down.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, this parameter can be set to any value within the range of 31 to 21000 if <strong>RU</strong> is set to KBPS and <strong>ST</strong> is set to RTVBR, NRTVBR, or UBR+.</li><li>In a <strong>TREELNKPVC</strong> MO, this parameter can be set to any value within the range of 30 to 21000 if <strong>RU</strong> is set to KBPS and <strong>ST</strong> is set to UBR.</li><li>In a <strong>TREELNKPVC</strong> MO, this parameter can be set to any value within the range of 74 to 49529 if <strong>RU</strong> is set to CELL/S and <strong>ST</strong> is set to RTVBR, NRTVBR, or UBR+.</li><li>In a <strong>TREELNKPVC</strong> MO, this parameter can be set to any value within the range of 71 to 49529 if <strong>RU</strong> is set to CELL/S and <strong>ST</strong> is set to UBR.</li><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to UBR+, the value of this parameter must be greater than that of <strong>MCR</strong>.</li><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR, the value of this parameter must be greater than that of <strong>SCR</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-usSustainCellRate.html">SCR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sustain Cell Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the average cell rate that is measured in a certain period of time.</p>
+<p>GUI Value Range: 30~49526</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 30~49526</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR and <strong>RU</strong> is set to KBPS, <strong>SCR</strong> must be less than <strong>PCR</strong>.</li><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR and <strong>RU</strong> is set to CELL/S, <strong>SCR</strong> must be less than <strong>PCR</strong> after the rate unit is changed to kbit/s and both rates are rounded down.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, this parameter can be set to any value within the range of 30 to 20999 if <strong>RU</strong> is set to KBPS and <strong>ST</strong> is set to URTVBR or NRTVBR.</li><li>In a <strong>TREELNKPVC</strong> MO, this parameter can be set to any value within the range of 71 to 49526 if <strong>RU</strong> is set to CELL/S and <strong>ST</strong> is set to RTVBR or NRTVBR.</li><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR, the value of this parameter must be less than <strong>PCR</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-usMinCellSize.html">MCR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Min Cell Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rate of transmitting cells on an ATM connection while ensuring the transmission quality.</p>
+<p>GUI Value Range: 30~49526</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 30~49526</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> and <strong>RU</strong> are set to UBR+ and KBPS, respectively, <strong>MCR</strong> must be less than <strong>PCR</strong>.</li><li>[Co-MPT, NodeB]In a <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to UBR+ and <strong>RU</strong> is set to CELL/S, <strong>MCR</strong> must be less than <strong>PCR</strong> after the rate unit is changed to kbit/s and both rates are rounded down.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if <strong>RU</strong> and <strong>ST</strong> are set to KBPS and UBR+ respectively, the value range of this parameter is from 30 to 20999.</li><li>In the <strong>TREELNKPVC</strong> MO, if <strong>RU</strong> and <strong>ST</strong> are set to CELL/S and UBR+ respectively, the value range of this parameter is from 71 to 49526.</li><li>[Co-MPT, NodeB]In the <strong>TREELNKPVC</strong> MO, if <strong>ST</strong> is set to UBR+, the value of this parameter must be less than <strong>PCR</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-usMaxBurstSize.html">MBS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max Burst Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of cells transmitted at the PCR.</p>
+<p>GUI Value Range: 3~10000</p>
+<p>Unit: cell</p>
+<p>Actual Value Range: 3~10000</p>
+<p>MML Default Value: 1000</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-ulCDVT.html">CDVT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Delay Variation Tolerance</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time delay for transmitting a cell burst from the source port to the destination port.</p>
+<p>GUI Value Range: 1024~13300000</p>
+<p>Unit: 0.1microsecond</p>
+<p>Actual Value Range: 102.4~1330000, step: 0.1</p>
+<p>MML Default Value: 10240</p>
+<p>Recommended Value: 10240</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TREELNKPVC-aucDescription.html">DESCRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Description</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the description of the treelink PVC.</p>
+<p>GUI Value Range: 0~67 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~67 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_treelnkpvc__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a tree link PVC with the parameters as follows: Tree Link PVC No.: 0, Join Transmission Resource Group: DISABLE, Tree Link PVC Switch Type: VC_SWITCH, Cabinet No.: 0, Source Subrack No.: 0, Source Slot No.: 6, Source Subboard Type: BASE_BOARD, Source Port Type: UNI, Source Port No.: 1, Source Port VPI: 1, Source Port VCI: 33, Destination Subrack No.: 0, Destination Slot No.: 5, Destination Subboard Type: E1_COVERBOARD, Destination Port Type: UNI, Destination Port No.: 2, Destination Port VPI: 35, Destination Port VCI: 35, Rate Unit: KBPS, Bearer Service Type: RTVBR, Peak Cell Rate: 31, Sustain Cell Rate: 30, run the following command: 
+ADD TREELNKPVC: NO=0, JNRSCGRP=DISABLE, VST=VC_SWITCH, CN=0, SRCSRN=0, SRCSN=6, SRCSBT=BASE_BOARD, SRCPT=UNI, SRCPN=1, SRCVPI=1, SRCVCI=33, DSTSRN=0, DSTSN=5, DSTSBT=E1_COVERBOARD, DSTPT=UNI, DSTPN=2, DSTVPI=35, DSTVCI=35, RU=KBPS, ST=RTVBR, PCR=31, SCR=30;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

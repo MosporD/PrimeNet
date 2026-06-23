@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PrimeNet — Network Health — {{ rat_label }} {{ vendor_label }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=5.4">
+
+</head>
+
+<body class="nh-page"
+
+      data-vendor="{{ vendor }}"
+
+      data-rat="{{ rat }}"
+
+      data-vendor-label="{{ vendor_label }}"
+
+      data-rat-label="{{ rat_label }}">
+
+    <header class="nh-header">
+
+        <div class="nh-header-left">
+
+            <a href="/network-health" class="nh-home-link" title="Change RAT / Vendor">&#8962;</a>
+
+            <div class="nh-context-badge">
+
+                <span class="nh-context-rat">{{ rat_label }}</span>
+
+                <span class="nh-context-sep">·</span>
+
+                <span class="nh-context-vendor">{{ vendor_label }}</span>
+
+            </div>
+
+        </div>
+
+        <div class="nh-header-right">
+
+            <span class="nh-stage-badge">{{ stage_label }}</span>
+
+            <span class="nh-user">{{ user.username }}</span>
+
+        </div>
+
+    </header>
+
+
+
+    <div class="nh-workspace" id="nh-workspace">
+
+        <aside class="nh-sidebar">
+
+            <div class="nh-sidebar-head">
+
+                <div class="nh-sidebar-context">
+
+                    <div class="nh-sidebar-rat">{{ rat_label }}</div>
+
+                    <img src="/parameter_dictionary/static/images/{{ vendor }}_logo.png"
+
+                         alt="{{ vendor_label }}" class="nh-sidebar-vendor-logo">
+
+                </div>
+
+            </div>
+
+            <div class="nh-sidebar-section">
+
+                <div class="nh-section-label">Area</div>
+
+                <div class="nh-area-list" id="nh-area-list"></div>
+
+            </div>
+
+            <div class="nh-sidebar-section">
+
+                <div class="nh-section-label">RNC</div>
+
+                <div class="nh-rnc-box" id="nh-rnc-box">—</div>
+
+            </div>
+
+            <div class="nh-sidebar-section nh-cluster-section">
+
+                <div class="nh-section-label">Cluster</div>
+
+                <div class="nh-cluster-grid" id="nh-cluster-grid"></div>
+
+            </div>
+
+        </aside>
+
+
+
+        <section class="nh-center">
+
+            <div class="nh-center-toolbar">
+
+                <label class="nh-cell-search-wrap">
+
+                    <span class="nh-cell-search-label">Cell</span>
+
+                    <input type="search" id="nh-cell-search" class="nh-cell-search"
+
+                           placeholder="Search cell name…" autocomplete="off" aria-label="Search cells">
+
+                </label>
+
+                <div class="nh-change-filters" role="group" aria-label="Sort table">
+
+                    <button type="button" class="nh-change-btn" data-change="decreased">Decreased</button>
+
+                    <button type="button" class="nh-change-btn active" data-change="increased">Increased</button>
+
+                    <button type="button" class="nh-change-btn" data-change="no_change">No Change</button>
+
+                </div>
+
+            </div>
+
+            <div class="nh-table-title" id="nh-table-title">—</div>
+
+            <div class="nh-table-wrap">
+
+                <table class="nh-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Cell Name</th>
+
+                            <th class="num">Pre</th>
+
+                            <th class="num">Post</th>
+
+                            <th class="num">Delta</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="nh-tbody">
+
+                        <tr><td colspan="4" class="nh-empty">Loading KPIs…</td></tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <aside class="nh-charts">
+
+            <div class="nh-chart-head" id="nh-chart-title">Select a cell</div>
+
+            <div class="nh-charts-row">
+
+                <div class="nh-chart-block">
+
+                    <div class="nh-chart-label">Daily</div>
+
+                    <div class="nh-chart-canvas-wrap">
+                        <canvas id="nh-chart-daily" aria-label="Daily KPI trend"></canvas>
+                    </div>
+
+                    <div class="nh-chart-empty" id="nh-chart-daily-empty" hidden>No daily data</div>
+
+                </div>
+
+                <div class="nh-chart-block">
+
+                    <div class="nh-chart-label">Hourly</div>
+
+                    <div class="nh-chart-canvas-wrap">
+                        <canvas id="nh-chart-hourly" aria-label="Hourly KPI trend"></canvas>
+                    </div>
+
+                    <div class="nh-chart-empty" id="nh-chart-hourly-empty" hidden>No hourly data</div>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+
+
+    <footer class="nh-kpi-footer" id="nh-kpi-footer" aria-label="KPI selection">
+
+        <div class="nh-kpi-footer-toolbar">
+
+            <span class="nh-kpi-footer-label">KPI</span>
+
+            <label class="nh-kpi-search-wrap">
+
+                <span class="nh-kpi-search-label">Search</span>
+
+                <input type="search" id="nh-kpi-search" class="nh-kpi-search"
+
+                       placeholder="Filter KPIs…" autocomplete="off" aria-label="Search KPIs">
+
+            </label>
+
+            <select id="nh-kpi-select" class="nh-kpi-select" aria-label="Select KPI">
+
+                <option value="">Loading KPIs…</option>
+
+            </select>
+
+            <span class="nh-kpi-count" id="nh-kpi-count"></span>
+
+            <span class="nh-tabs-loading" id="nh-tabs-loading">Loading KPIs…</span>
+
+        </div>
+
+        <nav class="nh-tabs" id="nh-tabs" role="tablist" aria-label="KPI tabs"></nav>
+
+    </footer>
+
+
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.6"></script>
+
+    <script src="{{ url_for('performance.static', filename='chart.umd.min.js') }}"></script>
+
+    <script src="{{ url_for('network_health.static', filename='network_health.js') }}?v=5.4"></script>
+
+</body>
+
+</html>
+

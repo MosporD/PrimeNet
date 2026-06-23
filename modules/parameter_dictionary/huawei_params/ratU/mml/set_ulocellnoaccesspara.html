@@ -1,0 +1,143 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Noaccessalm Para (SET ULOCELLNOACCESSPARA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_ulocellnoaccesspara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Noaccessalm Para (SET ULOCELLNOACCESSPARA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_ulocellnoaccesspara"></a><a name="set_ulocellnoaccesspara"></a>
+
+
+<h1 class="topictitle1">Set Noaccessalm Para (SET ULOCELLNOACCESSPARA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="set_ulocellnoaccesspara__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>This command is used to set parameters for sleeping cells. Sleeping cells refer to cells that no users access in a specified period of time.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_ulocellnoaccesspara__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li>The NOUETIMER and NOFSTRLTIMER parameters have different application scenarios. Check whether the cell allows new access requests of UEs before setting these two parameters. When the cell allows handovers but does not allow new access requests, set the NOFSTRLTIMER parameter to 0 and the NOUETIMER parameter to a value greater than 0. When the cell allows new access requests, set the NOUETIMER parameter to 0 and the NOFSTRLTIMER parameter to a value greater than 0.</li><li>The SET ULOCELLNOACCESSPARA command is controlled by the SLEEPINGCELLDETECTOPTION in the SET NODEBALGPARA command. When the SLEEPINGCELLDETECTOPTION parameter is set to 0, the NodeB detects no traffic but does not report an alarm. In addition, self-healing is not performed.</li><li>When the NOUETIMER parameter is set to 0, the history traffic-based decision on whether RlSetup is 0 due to a fault is disabled. When the NOUETIMER parameter is set to a value other than 0, the history traffic-based decision on whether RlSetup is 0 due to a fault is enabled and the shortest decision period is configurable.</li><li>When the NOFSTRLTIMER parameter is set to 0, the history traffic-based decision on whether FST_RLS is 0 due to a fault is disabled. When the NOFSTRLTIMER parameter is set to a value other than 0, the history traffic-based decision on whether FST_RLS is 0 is enabled and the shortest decision period is configurable.</li><li>The AUTORCVRMTHD parameter takes effect only when the value of the SLEEPINGCELLDETECTOPTION parameter is not set to 0. The AUTORCVRMTHD parameter values are NONE(NONE), CELLRESTART(CELLRESTART), BBRESOURCERESET(BBRESOURCERESET), BBOARDRESET(BBOARDRESET), and CELLRFMODULERESET(CELLRFMODULERESET). The valid scopes of these values are in ascending order. When a NodeB detects a sleeping cell, the NodeB performs self-healing operations in ascending order of valid scopes of these values and the highest level is the value of the AUTORCVRMTHD parameter. For example, when the AUTORCVRMTHD parameter is set to BBRESOURCERESET(BBRESOURCERESET), the self-healing methods used for a NodeB to resolve a sleeping cell problem include CELLRESTART(CELLRESTART) and BBRESOURCERESET(BBRESOURCERESET) but does not include BBOARDRESET(BBOARDRESET) and CELLRFMODULERESET(CELLRFMODULERESET). When the level of a self-healing operation needs to be changed, the NodeB starts a new detection procedure and attempts to restore services. As a result, if No Traffic alarms have been reported, the alarms will be cleared after the level is changed. If services are not restored, the alarms will be reported again.</li><li>The BLADEBBU and BBU3910C do not support self-healing methods include BBOARDRESET(Baseband Board Restart).</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_ulocellnoaccesspara__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellNoAccessPara-uLoCellId.html">ULOCELLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local cell ID.</p>
+<p>GUI Value Range: 0~268435455</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~268435455</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellNoAccessPara-noRlSetupTimerLen.html">NOUETIMER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timer Length Of the Cell Without RL Setup</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period of no services in a cell. Value 0 means that the timer is disabled. If there are no services in the cell for a period longer than the duration specified by this parameter value, the NodeB reports the alarm ALM-28209 Cell No Traffic. For details about how to clear the alarm ALM-28209 Cell No Traffic, see the alarm reference.</p>
+<p>GUI Value Range: 0~72</p>
+<p>Unit: h</p>
+<p>Actual Value Range: 0~72</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellNoAccessPara-noFstRlsTimerLen.html">NOFSTRLTIMER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timer Length Of Cell Without RL Setup (First RLS)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period of no initial access requests in a cell. 0 means that the timer is disabled. If there are no initial access requests in the cell for a period longer than the duration specified by this parameter value, the NodeB reports the alarm ALM-28209 Cell No Traffic. For details about how to clear the alarm ALM-28209 Cell No Traffic, see the alarm reference.</p>
+<p>GUI Value Range: 0~72</p>
+<p>Unit: h</p>
+<p>Actual Value Range: 0~72</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCellNoAccessPara-recoverMethod.html">AUTORCVRMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Auto Recovery Method</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the auto recovery method when no services are carried in the cell or no user originates initial access for a period.</p>
+<p>GUI Value Range: NONE(No Operation), CELLRESTART(Cell Reestablishment), CELLRFMODULERESET(Cell-related RF Module Restart), BBRESOURCERESET(Intra-Baseband Board Resource Restart), BBOARDRESET(Baseband Board Restart)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, CELLRESTART, CELLRFMODULERESET, BBRESOURCERESET, BBOARDRESET</p>
+<p>MML Default Value: NONE(No Operation)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>The BLADEBBU and BBU3910C do not support BBOARDRESET.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_ulocellnoaccesspara__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the cell as a sleeping cell as follows: Local Cell ID: 14600, Timer Length Of the Cell Without RL Setup: 0, Timer Length Of Cell Without RL Setup (First RLS): 24, Auto Recovery Method: NONE, run the following command:
+SET ULOCELLNOACCESSPARA: ULOCELLID=14600, NOUETIMER=0, NOFSTRLTIMER=24, AUTORCVRMTHD=NONE;
+
+To set the cell as a sleeping cell allowing only handovers with the parameters as follows: Local Cell ID: 14601, Timer Length Of the Cell Without RL Setup: 12, Timer Length Of Cell Without RL Setup (First RLS): 0, Auto Recovery Method: NONE, run the following command:
+SET ULOCELLNOACCESSPARA: ULOCELLID=14601, NOUETIMER=12, NOFSTRLTIMER=0, AUTORCVRMTHD=NONE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

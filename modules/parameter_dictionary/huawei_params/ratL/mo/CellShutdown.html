@@ -1,0 +1,180 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellShutdown">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellShutdown">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellShutdown</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellShutdown"></a><a name="CellShutdown"></a>
+
+
+<h1 class="topictitle1">CellShutdown</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellShutdown.html"><strong>CellShutdown</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellShutDown MO consists of the parameters related to intelligent power-off of carriers in the same coverage. This feature applies to scenarios where the local cell has inter-frequency neighboring cells under the same eNodeB. If the local cell and its intra-eNodeB inter-frequency neighboring cells are all lightly loaded and the PRB usage of the local cell meets the conditions for intelligent power-off of carriers in the same coverage, the local cell enters intelligent power-off of carriers in the same coverage mode after all UEs are diverted to these inter-frequency neighboring cells. Then, if the intra-eNodeB inter-frequency neighboring cells become heavily loaded, the local cell automatically exits intelligent power-off of carriers in the same coverage mode. With this feature, the power consumption is reduced. A cell enters intelligent power-off of carriers in the same coverage mode when all the following conditions are met: (1) the local cell has at least an intra-eNodeB inter-frequency neighboring cell whose intelligent power-off of carriers switch is enabled and the UL or DL PRB usage threshold is set to 0, which is also called a basic cell; (2) the basic cell works properly and serves the same PLMNs as the local cell; (3) intelligent power-off of carriers switch is enabled in the local cell and the time is within the duration when intelligent power-off of carriers in the same coverage is active in both cells; (4) both cells are lightly loaded and the PRB usage of the local cell meets the conditions to start intelligent power-off of carriers in the same coverage; (5) (this condition is required when there are ongoing services in the local cell) inter-frequency handover is enabled.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellMLB</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>When option InterFreqMlbSwitch or InterFreqBlindMlbSwitch of <strong>MlbAlgoSwitch</strong> in <strong>CellAlgoSwitch</strong> is selected, <strong>MlbTriggerMode</strong> in <strong>CellMLB</strong> is set to PRB_ONLY or PRB_OR_UE_NUMBER and <strong>CellShutdownSwitch</strong> in <strong>CellShutdown</strong> is set to a value other than OFF, the sum of <strong>InterFreqMlbThd</strong> and <strong>LoadOffset</strong> in the <strong>CellMLB</strong> MO must be greater than that of <strong>DlPrbThd</strong> and <strong>DlPrbOffset</strong> in the <strong>CellShutdown</strong> MO. In addition, the sum of <strong>InterFreqMlbThd</strong> and <strong>LoadOffset</strong> in the <strong>CellMLB</strong> MO must be greater than that of <strong>UlPrbThd</strong> and <strong>UlPrbOffset</strong> in the <strong>CellShutdown</strong> MO.</li><li>When option InterFreqMlbSwitch or InterFreqBlindMlbSwitch of <strong>MlbAlgoSwitch</strong> in <strong>CellAlgoSwitch</strong> is selected, <strong>MlbTriggerMode</strong> in <strong>CellMLB</strong> is set to PRB_ONLY or PRB_OR_UE_NUMBER and <strong>CellShutdownSwitch</strong> in <strong>CellShutdown</strong> is set to a value other than OFF, <strong>InterFreqMlbThd</strong> in the <strong>CellMLB</strong> MO must be greater than <strong>DlPrbThd</strong> in the <strong>CellShutdown</strong> MO. In addition, <strong>InterFreqMlbThd</strong> in the <strong>CellMLB</strong> MO must be greater than <strong>UlPrbThd</strong> in the <strong>CellShutdown</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO under this <strong>Cell</strong> MO must be set to OFF or ON.</li><li>If the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO under a <strong>Cell</strong> MO is set to a value other than OFF and at least one of the <strong>UlPrbThd</strong> and <strong>DlPrbThd</strong> parameters in the <strong>CellShutdown</strong> MO is set to 0, then the <strong>WorkMode</strong> parameter in the <strong>Cell</strong> MO cannot be set to DL_ONLY or LAA.</li></ul>
+</li><li>Relation with the <strong>CellChPwrCfg</strong> MO:<ul><li>The <strong>PdcchPowerIncreaseOffset</strong> parameter in the <strong>CellChPwrCfg</strong> MO can be set to a non-zero value only when the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO is set to OFF.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>LteNrSpctShrCellGrp</strong> MOs:<ul><li>If the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is set to LTE_NR_SPECTRUM_SHR and the <strong>LteNrCoCarrCoCpriDataSw</strong> parameter in the <strong>LteNrSpctShrCellGrp</strong> MO is set to ON, the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SectorSplitCell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO must not be set to ON_CO_COV_AUTO_IDENT.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in this <strong>Cell</strong> MO is set to 8T8R, the cell specified by this <strong>Cell</strong> MO is added in a <strong>SectorSplitCell</strong> MO under a <strong>SectorSplitGroup</strong> MO, and the <strong>BeamDeploymentMode</strong> parameter in this <strong>SectorSplitGroup</strong> MO is set to NOT_CFG, then the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutDown</strong> MO must be set to OFF.</li><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, a <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, and the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO is set to ON, the <strong>DlPrbThd</strong> and <strong>UlPrbThd</strong> parameters in the <strong>CellShutdown</strong> MO must not be set to 0.</li></ul>
+</li><li>Relation with the <strong>SectorSplitGroup</strong>, <strong>SectorSplitCell</strong>, and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in this <strong>Cell</strong> MO is set to 8T8R, the cell specified by this <strong>Cell</strong> MO is added in a <strong>SectorSplitCell</strong> MO under a <strong>SectorSplitGroup</strong> MO, and the <strong>BeamDeploymentMode</strong> parameter in this <strong>SectorSplitGroup</strong> MO is set to MODE_3, then the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutDown</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>SectorSplitCell</strong>, <strong>Cell</strong>, and <strong>SectorSplitGroup</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD, the cell specified by this <strong>Cell</strong> MO is added in a <strong>SectorSplitCell</strong> MO under a <strong>SectorSplitGroup</strong> MO, and the <strong>BeamDeploymentMode</strong> parameter in this <strong>SectorSplitGroup</strong> MO is set to MODE_3, then the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutDown</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, <strong>SectorSplitGroup</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>If <strong>CellShutdownSwitch</strong> in the <strong>CellShutdown</strong> MO under a <strong>Cell</strong> MO is not set to OFF, <strong>CellBeamMode</strong> in the <strong>eUCellSectorEqm</strong> MO under this <strong>Cell</strong> MO is set to MASSIVE_MIMO_Ph2, and the number of <strong>SectorSplitCell</strong> MOs under the <strong>SectorSplitGroup</strong> MO in which the cell specified by this <strong>Cell</strong> MO is included is greater than or equal to 2, then neither of <strong>DlPrbThd</strong> and <strong>UlPrbThd</strong> in the <strong>CellShutdown</strong> MO can be set to 0.</li></ul>
+</li><li>Relation with the <strong>eUCellSectorEqm</strong>, <strong>Cell</strong>, <strong>SectorSplitGroup</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>If <strong>CellBeamMode</strong> in the <strong>eUCellSectorEqm</strong> MO under a <strong>Cell</strong> MO is set to MASSIVE_MIMO_Ph2 and the number of <strong>SectorSplitCell</strong> MOs under the <strong>SectorSplitGroup</strong> MO in which the cell specified by this <strong>Cell</strong> MO is included is greater than or equal to 2, <strong>CellShutdownSwitch</strong> in the <strong>CellShutdown</strong> MO under this <strong>Cell</strong> MO cannot be set to ON_CO_COV_AUTO_IDENT.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, and <strong>SectorSplitGroup</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameters in the <strong>CELL</strong> MO are set to CELL_FDD, the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> is set to MASSIVE_MIMO_Ph2, and the number of <strong>SectorSplitCell</strong> MOs under the <strong>SectorSplitGroup</strong> MO in which the cell specified by this <strong>Cell</strong> MO is included is greater than or equal to 2, the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO cannot be set to ON_MULTI_CARRIER_HIER_SHUTDOWN.</li><li>If the <strong>FddTddInd</strong> parameter in the <strong>CELL</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R, and the number of <strong>SectorSplitCell</strong> MOs under the <strong>SectorSplitGroup</strong> MO in which the cell specified by this <strong>Cell</strong> MO is included is greater than or equal to 2, the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO cannot be set to ON_MULTI_CARRIER_HIER_SHUTDOWN.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>MDU</strong> MOs:<ul><li>If the value of the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is CELL_ACTIVE and the <strong>TYPE</strong> parameter in the <strong>MDU</strong> MO is set to MDUC, the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO cannot be set to ON_MULTI_CARRIER_HIER_SHUTDOWN.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellRbReserve</strong> MOs:<ul><li>If the <strong>RbRsvMode</strong> parameter in a <strong>CellRbReserve</strong> MO under a <strong>Cell</strong> MO is set to NB_DEPLOYMENT, the value of the <strong>CellActiveState</strong> parameter in this <strong>Cell</strong> MO is CELL_ACTIVE, and the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO under this <strong>Cell</strong> MO is set to a value other than OFF and ON, then either the <strong>UlPrbThd</strong> or <strong>DlPrbThd</strong> parameter in this <strong>CellShutdown</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>CellEmtcAlgo</strong> MO:<ul><li>If the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO under a <strong>Cell</strong> MO is set to a value other than OFF and at least one of the <strong>UlPrbThd</strong> and <strong>DlPrbThd</strong> parameters in the <strong>CellShutdown</strong> MO is set to 0, then the EMTC_SWITCH and EMTC_ONLY_CELL_SWITCH options of the <strong>EmtcAlgoSwitch</strong> parameter in the <strong>CellEmtcAlgo</strong> MO under the <strong>Cell</strong> MO cannot be both selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellSiMap</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>CELL</strong> MO is set to CELL_FDD, the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO under this <strong>Cell</strong> MO is set to a value other than OFF, and at least one of the <strong>UlPrbThd</strong> and <strong>DlPrbThd</strong> parameters in this <strong>CellShutdown</strong> MO is set to 0, then the ForbidCellSiSwitch option of the <strong>SiSwitch</strong> parameter in the <strong>CellSiMap</strong> MO under the <strong>Cell</strong> MO cannot be selected.</li></ul>
+</li><li>Relation with the <strong>ContigIntraBandCarr</strong> MO:<ul><li>If the CONTIG_INTRA_BAND_CARR_SW option of the <strong>ContigIntraBandCarrSw</strong> parameter in the <strong>ContigIntraBandCarr</strong> MO under a <strong>Cell</strong> MO is selected and the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO under this <strong>Cell</strong> MO is set to a value other than OFF, either the <strong>UlPrbThd</strong> or <strong>DlPrbThd</strong> parameter in this <strong>CellShutdown</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> MO:<ul><li>When the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is set to LTE_NR_SPECTRUM_SHR, and if the <strong>CellShutdownSwitch</strong> parameter in the <strong>CellShutdown</strong> MO is set to a value other than OFF(Off) for the cell, the <strong>UlPrbThd</strong> parameter in the <strong>CellShutdown</strong> MO and the <strong>DlPrbThd</strong> parameter in the <strong>CellShutdown</strong> cannot be both unequal to 0.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellShutdown__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellShutdown__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellShutdown__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellshutdown.html">DSP CELLSHUTDOWN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the dynamic information about intelligent power-off of carriers in the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellshutdown.html">LST CELLSHUTDOWN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of intelligent power-off of carriers in the same coverage.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellshutdown.html">MOD CELLSHUTDOWN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of intelligent power-off of carriers.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellShutdown__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellShutdown__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellShutdown__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within a base station.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-CellShutdownSwitch.html">Intelligent power-off of carriers switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable intelligent power-off of carriers.</p>
+<p>If this parameter is set to ON and the cell meets specific conditions, intelligent power-off of carriers is performed and the eNodeB does not identify co-coverage cells automatically.</p>
+<p>If this parameter is set to ON_CO_COV_AUTO_IDENT, coverage analysis will be started for the cell. The proportion of overlapping coverage between the capacity cell and basic cells and the proportion of coverage holes that may be generated after the capacity cell is shut down are analyzed based on inter-frequency MRs. The analysis results are used to determine whether to enable intelligent power-off of carriers.</p>
+<p>If this parameter is set to ON_MULTI_CARRIER_HIER_SHUTDOWN, coverage analysis will be started for the cell. The total load of multiple carriers in the coverage area of the cell is calculated based on the co-coverage identification result, and the total load is then compared with the PRB thresholds (specified by DlPrbThd and UlPrbThd in the CellShutdown MO) and offsets (specified by DlPrbOffset and UlPrbOffset in the CellShutdown MO) set for the capacity cell to determine whether to trigger hierarchical intelligent power-off of multiple carriers.</p>
+<p>If this parameter is set to OFF, intelligent power-off of carriers does not take effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-StartTime.html">Start time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the start time of intelligent power-off of carriers.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-StopTime.html">Stop time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the stop time of intelligent power-off of carriers. If the stop time is earlier than or the same as the start time, the stop time is assumed to be a time of the next day.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-DlPrbThd.html">Downlink PRB threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For FDD and TDD cells, this parameter indicates the downlink PRB usage threshold for starting intelligent power-off of carriers. For NB-IoT cells, this parameter indicates the downlink subcarrier usage threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-DlPrbOffset.html">Downlink PRB offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For FDD and TDD cells, this parameter indicates the offset to the downlink PRB usage for stopping intelligent power-off of carriers. The downlink PRB usage threshold for stopping intelligent power-off of carriers is equal to the sum of the value of this parameter and the value of the DlPrbThd parameter in the CellShutdown MO. For NB-IoT cells, this parameter indicates the offset to the downlink subcarrier usage.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-UlPrbThd.html">Uplink PRB threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For FDD and TDD cells, this parameter indicates the uplink PRB usage threshold for starting intelligent power-off of carriers. For NB-IoT cells, this parameter indicates the uplink subcarrier usage threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-UlPrbOffset.html">Uplink PRB offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For FDD and TDD cells, this parameter indicates the offset to the uplink PRB usage for stopping intelligent power-off of carriers. The uplink PRB usage threshold for stopping intelligent power-off of carriers is equal to the sum of the value of this parameter and the value of the UlPrbThd parameter in the CellShutdown MO. For NB-IoT cells, this parameter indicates the offset to the uplink subcarrier usage.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-ForceShutdownUENumThd.html">Force Shutdown UE Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE quantity threshold for forcible cell shutdown in intelligent power-off of carriers. If a capacity cell meets the conditions for triggering intelligent power-off of carriers, the eNodeB hands over UEs in the capacity cell to a basic cell within 60s. At the end of the 60-second period, if the number of RRC_CONNECTED UEs in the capacity cell is smaller than or equal to this threshold and no UEs with QCI 1 exist in the capacity cell, the eNodeB shuts down the capacity cell. If there are UEs in the capacity cell when the eNodeB is shutting down the cell, service drops occur on these UEs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-PunishTime.html">Punish Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration of penalty on triggering condition evaluation for the intelligent power-off of carriers feature if UEs in the capacity cell cannot be completely transferred to basic cells after intelligent power-off of carriers is triggered.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-InterBbuCarrierShutdownSw.html">Inter-BBU Carrier Shutdown Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether intelligent power-off of carriers in the same coverage supports inter-BBU carrier shutdown. If this parameter is set to ON, intelligent power-off of carriers in the same coverage supports inter-BBU carrier shutdown, and inter-BBU carrier shutdown is performed when certain conditions are met. If this parameter is set to OFF, intelligent power-off of carriers in the same coverage does not support inter-BBU carrier shutdown. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellShutdown-UENumThd.html">UE Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE quantity threshold for triggering intelligent power-off of carriers in the cell. If the number of RRC_CONNECTED UEs in the capacity cell is less than this threshold and the loads of the capacity cell and basic cell meet the preset uplink and downlink PRB usage thresholds for triggering intelligent power-off of carriers, intelligent power-off of carriers is started for the capacity cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

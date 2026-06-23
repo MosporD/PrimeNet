@@ -1,0 +1,129 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NCellSrsMeasPara">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NCellSrsMeasPara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NCellSrsMeasPara</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NCellSrsMeasPara"></a><a name="NCellSrsMeasPara"></a>
+
+
+<h1 class="topictitle1">NCellSrsMeasPara</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="NCellSrsMeasPara.html"><strong>NCellSrsMeasPara</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The NCellSrsMeasPara MO consists of parameters related to cell-level sounding reference signal (SRS) automatic neighboring cell measurement. The SRS automatic neighboring cell measurement function automatically selects neighboring cells for the local cell and performs SRS measurements. This reduces manual configurations.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the UL_ICS_SWITCH option under the <strong>UlIcSwitch</strong> parameter is selected, the <strong>SrsAutoNCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO must be set to ON.</li><li>When the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to TRUE and the UlJointReceptionSwitch option of the <strong>UplinkCompSwitch</strong> parameter in the associated <strong>CellAlgoSwitch</strong> MO is selected, the NCellDmrsMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in the associated <strong>NCellSrsMeasPara</strong> MO must be selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>The NCellDmrsMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in an <strong>NCellSrsMeasPara</strong> MO can be selected only when the <strong>HighSpeedFlag</strong> parameter in the associated <strong>Cell</strong> MO is set to LOW_SPEED.</li><li>The NCellSrsTimeMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO must be deselected if the <strong>DlBandWidth</strong> parameter in the <strong>Cell</strong> MO is set to CELL_BW_N25</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>The NCellDmrsMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in an <strong>NCellSrsMeasPara</strong> MO can be selected only when the UlHetnetCompOnUlRsrpSw option of the <strong>UplinkCompSwitch</strong> parameter in the associated <strong>CellAlgoSwitch</strong> MO is deselected.</li><li>The <strong>SrsAutoNCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO must be set to ON(On) if the InterCellDmimoJTSwitch option of the <strong>DMIMOAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>CellUlschAlgo</strong> MO:<ul><li>The NCellDmrsMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in an <strong>NCellSrsMeasPara</strong> MO can be selected only when the <strong>UlHoppingType</strong> parameter in the associated <strong>CellUlschAlgo</strong> MO is set to HOPPING_OFF.</li></ul>
+</li><li>Relation with the <strong>SRSCfg</strong> MO:<ul><li>The NCellDmrsMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in an <strong>NCellSrsMeasPara</strong> MO must be deselected if the <strong>SrsCfgInd</strong>, <strong>FddSrsCfgMode</strong>, and <strong>SrsSubframeCfg</strong> parameters in the associated <strong>SRSCfg</strong> MO are set to BOOLEAN_TRUE, DEFAULTMODE, and a value among SC3, SC4, or SC5, respectively.</li></ul>
+</li><li>Relation with the <strong>CellCspcPara</strong> MO:<ul><li>The NCellDmrsMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in an <strong>NCellSrsMeasPara</strong> MO can be selected only when the <strong>CellCspcSwitch</strong> parameter in the associated <strong>CellCspcPara</strong> MO is set to OFF.</li></ul>
+</li><li>Relation with the <strong>CellPcAlgo</strong> MO:<ul><li>The <strong>SrsPcStrategy</strong> parameter in the <strong>CellPcAlgo</strong> MO can be set to SRSPC_SINR_ADAPTIVE only if the <strong>SrsAutoNCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO is set to ON.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellPcAlgo</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>The <strong>SrsPcStrategy</strong> parameter in the <strong>CellPcAlgo</strong> MO can be set to SRSPC_SINR_ADAPTIVE only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, no <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, and the NCellSrsTimeMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> MO:<ul><li>When the <strong>SrsAutoNCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO is set to OFF, the <strong>SpectrumCloudSwitch</strong> parameter can be set to LTE_NR_UPLINK_SPECTRUM_SHR.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD and the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO under this <strong>Cell</strong> MO is set to LTE_NR_SPECTRUM_SHR, the <strong>SrsAutoNCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO under this <strong>Cell</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, <strong>PUSCHCfg</strong>, <strong>CellUlIcAlgo</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>When the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and no <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, the MASSIVE_MIMO_SRS_IC_SW option of the <strong>SrsIcSwitch</strong> parameter in the <strong>CellUlIcAlgo</strong> MO can be selected only if the SrsTimeMeasSwitch option of the <strong>SrsAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, the <strong>SrsAutoNCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO is set to ON, the NCellSrsTimeMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO is selected, the <strong>GroupHoppingEnabled</strong> in the <strong>PUSCHCfg</strong> MO is set to BOOLEAN_FALSE, and the <strong>SeqHoppingEnabled</strong> parameter in the <strong>PUSCHCfg</strong> MO is set to BOOLEAN_FALSE.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SectorSplitCell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, the <strong>SrsAutoNCellMeasSwitch</strong> parameter in the <strong>NCellSrsMeasPara</strong> MO must not be set to ON.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NCellSrsMeasPara__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NCellSrsMeasPara__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NCellSrsMeasPara__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ncellsrsmeaspara.html">LST NCELLSRSMEASPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list settings of parameters related to SRS automatic neighboring cell measurement of specified cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_ncellsrsmeaspara.html">MOD NCELLSRSMEASPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the settings of parameters related to automatic SRS measurement on neighboring cells.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NCellSrsMeasPara__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NCellSrsMeasPara__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NCellSrsMeasPara__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NCellSrsMeasPara-LocalCellId.html">Local Cell Id</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NCellSrsMeasPara-SrsAutoNCellMeasSwitch.html">SRS Auto Neighbour Cell Measurement Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether a cell supports SRS automatic neighboring cell measurements. If this parameter is set to ON(On), the UlHetnetCompOnUlRsrpSw and UlHetnetCompManualNcellCfgSw options of the UplinkCompSwitch parameter do not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NCellSrsMeasPara-NCellSrsMeasA3Offset.html">SRS or DMRS Auto Neighbour Cell Measurement A3 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for events related to the SRS automatic neighboring cell measurement or DMRS neighboring cell measurement. This offset is the difference between the signal quality of a neighboring cell and that of the serving cell. A larger value of this parameter requires better signal quality of a neighboring cell for sending measurement reports of the SRS automatic neighboring cell measurement or DMRS neighboring cell measurement. SRS automatic neighboring cell measurement applies to LTE FDD and LTE TDD. DMRS neighboring cell measurement applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NCellSrsMeasPara-NCellMeasSwitch.html">Neighbouring Cell Measurement Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable neighboring cell measurement algorithms.</p>
+<p>NcellDmrsMeasSwitch: Indicates whether to enable DMRS measurement for neighboring cells. If this option is selected, DMRS measurement is enabled for neighboring cells. If this option is deselected, DMRS measurement is disabled for neighboring cells. When this option is selected, the setting of the SrsAutoNCellMeasSwitch parameter does not take effect. This option applies only to LTE FDD and NB-IoT.</p>
+<p>NcellSrsTimeMeasSwitch: Indicates whether to enable time-domain measurement of SRSs from neighboring cells. If this option is selected, the eNodeB supports time-domain measurement of SRSs from neighboring cells. If this option is deselected, the eNodeB does not support time-domain measurement of SRSs from neighboring cells and supports only frequency-domain measurement of the SRSs. This option takes effect only if measurement of SRSs from neighboring cells is triggered. Such measurement can be triggered by UL CoMP or automatic measurement of SRSs from neighboring cells (controlled by the SrsAutoNCellMeasSwitch parameter in the NCellSrsMeasPara MO). This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

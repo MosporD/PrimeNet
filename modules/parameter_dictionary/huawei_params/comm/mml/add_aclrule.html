@@ -1,0 +1,544 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add ACL Rule (ADD ACLRULE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_aclrule">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add ACL Rule (ADD ACLRULE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_aclrule"></a><a name="add_aclrule"></a>
+
+
+<h1 class="topictitle1">Add ACL Rule (ADD ACLRULE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_aclrule__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a rule to an access control list (ACL).</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_aclrule__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before running this command, ensure that the associated ACL has been configured.</p>
+</li><li><p>In the same ACL, the source or destination IP address range as well as the source or destination port number range of different ACL rules that have the same ACL ID and different ACL rule IDs cannot have any inclusion or overlapping relationships. Otherwise, the ACL rules conflict.</p>
+</li><li><p>If multiple ACL rules exist, the ACL rules for automatically establishing SCTP links and IP paths are preferentially matched when data flows enter the base station for packet filtering by ACL rules. Then, other ACL rules are used for packet filtering based on ACL rule IDs in ascending order.</p>
+</li><li><p>Board specifications: On a UMPTa/UMPTb/UMDU/UTRPc, a maximum of 1536 ACL rules can be used. Among the ACL rules, a maximum of 1000 ACL rules automatically configured for packet filtering and manually configured ACL rules can be used, a maximum of 1024 ACL rules automatically configured for packet filtering in end point configuration mode can be used, and a maximum of 256 ACL rules automatically configured for IPSec in end point configuration mode can be used. On a UMPTe, a maximum of 3072 ACL rules can be used. Among the ACL rules, a maximum of 1000 ACL rules automatically configured for packet filtering and manually configured ACL rules can be used, a maximum of 2048 ACL rules automatically configured for packet filtering in end point configuration mode can be used, and a maximum of 384 ACL rules automatically configured for IPSec in end point configuration mode can be used. On a UMPTg/UMPTga, a maximum of 6092 ACL rules can be used. Among the ACL rules, a maximum of 1000 ACL rules automatically configured for packet filtering and manually configured ACL rules can be used, a maximum of 4708 ACL rules automatically configured for packet filtering in end point configuration mode can be used, and a maximum of 384 ACL rules automatically configured for IPSec in end point configuration mode can be used. On an LMPT, a maximum of 512 ACL rules can be used. On a WMPT/UTRP (subboard type: UEOC/UQEC), a maximum of 48 ACL rules can be used. On a GTMUc, a maximum of 128 ACL rules can be used. In a single high-level rule, a maximum of 24 ACLRULEs can be used on a UTRP (subboard type: UEOC/UQEC). The number of layer-2 ACL rules based on the MAC layer must not exceed 64.</p>
+</li><li><p>System specifications: If a WMPT is used as the main control board, a maximum of 48 ACL rules can be configured for a base station and a maximum of 24 ACL rules can be configured in each ACL. If a GTMUb/GTMUc is used as the main control board, a maximum of 128 ACL rules can be configured for a base station. If a UMPTa/UMPTb/UMDU is used as the main control board, a maximum of 1536 ACL rules can be configured for a base station. If a UMPTe is used as the main control board, a maximum of 3072 ACL rules can be configured for a base station. If a UMPTg/UMPTga is used as the main control board, a maximum of 6092 ACL rules can be configured for a base station. If an LMPT is used as the main control board, a maximum of 868 ACL rules can be configured for a base station. If a UMPT/UMDU is used as the main control board, the total number of manually configured ACL rules and ACL rules automatically configured for packet filtering must not exceed 1000. If a GTMUb/GTMUc/UMPT/UMDU/LMPT is used as the main control board, the maximum number of layer 2 ACLRULEs based on the MAC layer information is 64.</p>
+</li><li><p>For successfully configured ACL rules that have not taken effect, you can query them only by running the <a href="lst_aclrule.html">LST ACLRULE</a> command rather than the <a href="dsp_aclrule.html">DSP ACLRULE</a> command.</p>
+</li><li><p>A maximum of 16 ACL rules can be configured in one layer 2 ACL.</p>
+</li><li><p>If multiple ACL rules protect the same data flow, the SAs successfully negotiated by these ACL rules also protect this data flow. As a result, the encryption and decryption of this data flow may be performed by different SAs, resulting a fault. Therefore, data flows protected by multiple ACL rules should be exclusive, which can be configured by users.</p>
+</li><li><p>If an ACL rule is manually configured with Action set to DENY(Deny), Protocol Type set to IP(IP) and both Source IP Address and Destination IP Address matching all IP addresses, the ACL rule will be changed to the last rule in the packet filtering ACL group during the validation of the ACL rule ID, that is, the ACL rule ID is changed to 90000. In addition, when Source IP Address or Destination IP Address is set to 0.0.0.0, the Source Wildcard or Destination Wildcard parameter that has actually taken effect is 255.255.255.255.</p>
+</li><li><p>An ACL rule takes effect on the board where ACL takes effect. If the ACL MO does not take effect on any board because it does not have a bearer MO (packet filtering, packet filtering policy, IPsec policy group binding, or IPsec policy group binding interface), the ACL rule will also not take effect.</p>
+</li><li><p>User-configured ACL rules count in the specifications of automatically setup ACL rules even if the user-configured ACL rules are not referenced by any bearer.</p>
+</li><li><p>When packet filtering ACL rules are automatically configured by the system or manually configured by users, data forwarding performance fluctuates temporarily.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If an ACL MO is referenced by an IPSECPOLICY MO, the ACL MO cannot be configured with multiple ACLRULE MOs of the permit type that have inclusive relationships. Otherwise, any of the following may occur: IPsec SA negotiation fails; IPsec SA negotiation succeeds but is deleted later; different IPsec SA negotiation results are obtained when the narrow down switch is turned on.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If an ACLRULE MO is referenced by an IPSECPOLICY MO of the IPv4 type in IPsec scenarios, neither Source Port Operate nor Destination Port Operate in the ACLRULE MO can be set to OP_NEQ (Not Equivalent).</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If an ACLRULE MO is referenced by an IPSECPOLICY of the IPv4 type in IPsec scenarios, Match DSCP in the ACLRULE MO cannot be set to YES (Yes).</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]In IPSec scenarios, if an ACL rule list with configuration conflicts described in the preceding two notes exists and is referenced by an IPSECPOLICY MO, exceptions such as IPSec SA negotiation failures and frequent switchovers may occur on the device (depending on the peer configurations).</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]On a BS, the total number of ACLRULE MOs and ACLRULE6 MOs must be less than or equal to 6092.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If the UMPTa/UMPTb/UMDU is the main control board, a maximum of 1536 ACLRULE MOs and ACLRULE6 MOs can take effect on a BS. If the UMPTe is the main control board, a maximum of 3072 ACLRULE MOs and ACLRULE6 MOs can take effect on a BS. If the UMPTg/UMPTga is the main control board, a maximum of 6092 ACLRULE MOs and ACLRULE6 MOs can take effect on a BS.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_aclrule__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-ACLID.html">ACLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ACL ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the access control list (ACL) to which an ACL rule belongs.</p>
+<p>GUI Value Range: 3000~4999,7000~7999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3000~4999,7000~7999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The ACL ID and rule ID of an ACL rule that is manually configured must range from 3000 to 4999 and 1 to 65535, respectively.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-RuleID.html">RULEID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rule ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an ACL rule. The values 1 to 65535 indicate ACL rules manually configured by users or automatically generated for packet filtering. (When the value of ACL Rule Automatic Setup and Deletion Switch of packet filtering is ON, IDs from 50000 to 59999 cannot be used for manually configured ACL rules and are used for automatically generated ACL rules for packet filtering only.) The values 65431 to 65536 indicate the ACL rules automatically generated during DHCP detection. The values 70000 to 79999 indicate ACL rules automatically generated for packet filtering in endpoint configuration mode. The values 80000 to 89999 indicate ACL rules automatically generated for IPsec in endpoint configuration mode.</p>
+<p>GUI Value Range: 1~65535,70000~89999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~65535,70000~79999,80000~89999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The ACL ID and rule ID of an ACL rule that is manually configured must range from 3000 to 4999 and 1 to 65535, respectively.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-Action.html">ACTION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Action</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the action taken on the data that matches an ACL rule. When an ACL rule is bound to packet filtering, the base station allows the data that matches the rule to transmit if this parameter is set to PERMIT, and discards the data if this parameter is set to DENY. When an ACL rule is referenced by an IPSec policy, the base station encrypts or decrypts the data that matches the rule if this parameter is set to PERMIT, and does not encrypt or decrypt the data if this parameter is set to DENY.</p>
+<p>GUI Value Range: DENY(Deny), PERMIT(Permit)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DENY, PERMIT</p>
+<p>MML Default Value: PERMIT(Permit)</p>
+<p>Recommended Value: PERMIT(Permit)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-ProtocolType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Protocol Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the protocol type of the data to which an ACL rule is applied.</p>
+<p>GUI Value Range: IP(IP), ICMP(ICMP), TCP(TCP), UDP(UDP), SCTP(SCTP)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IP, ICMP, TCP, UDP, SCTP</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-SrcIP.html">SIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IP address of data to which an ACL rule is applied. To add an ACL rule that is applicable to data of all source IP addresses, set this parameter to 0.0.0.0.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-SrcWildcart.html">SWC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Wildcard</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the wildcard of a source IP address. The wildcard is used to determine which bits can be neglected when IP address matching is being performed. It can be considered as the inverse of the corresponding subnet mask.</p>
+<p>GUI Value Range: Valid wildcard of the IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid wildcard of the IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-MatchSrcPort.html">SMPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Match Source Port</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to check the source port number of each data stream before applying an ACL rule.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ACLRULE</strong> MO, <strong>MFRG</strong> and <strong>SMPT</strong> cannot be both set to YES.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-SrcOp.html">SOP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port Operate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the filtering condition for a source port. If this parameter is set to OP_LT, the ACL rule is applied to the data stream whose source port number is smaller than or equal to the configured port number. If this parameter is set to OP_GT, the ACL rule is applied to the data stream whose source port number is larger than or equal to the configured port number. If this parameter is set to OP_EQ, the ACL rule is applied to the data stream whose source port number is equal to the configured port number. If this parameter is set to OP_NEQ, the ACL rule is applied to the data stream whose source port number is not equal to the configured port number. If this parameter is set to OP_RANGE, the ACL rule is applied to the data stream whose source port number is within the configured range. OP_NEQ is available only for the LMPT, UMPT, UMDU, UTRPc, UCCU and SMPT.</p>
+<p>GUI Value Range: OP_LT(Less or Equal), OP_GT(Greater or Equal), OP_EQ(Equivalent), OP_NEQ(Not Equivalent), OP_RANGE(Range)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OP_LT, OP_GT, OP_EQ, OP_NEQ, OP_RANGE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-SrcPort1.html">SPT1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source port number used when SMPT is set to YES. If SOP is set to OP_RANGE, this parameter indicates the smallest source port number. If SOP is not set to OP_RANGE, this parameter indicates a specific source port number.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ACLRULE</strong> MO, if <strong>SOP</strong> is set to OP_RANGE, <strong>SPT1</strong> must be less than or equal to <strong>SPT2</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-SrcPort2.html">SPT2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source port number used when SMPT is set to YES. If SOP is set to OP_RANGE, this parameter indicates the largest source port number. This parameter is valid only when SOP is set to OP_RANGE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ACLRULE</strong> MO, if <strong>SOP</strong> is set to OP_RANGE, <strong>SPT1</strong> must be less than or equal to <strong>SPT2</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-DstIP.html">DIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination IP address of data to which an ACL rule is applied. To add an ACL rule that is applicable to data of all destination IP addresses, set this parameter to 0.0.0.0.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-DstWildcart.html">DWC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Wildcard</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the wildcard of a destination IP address. The wildcard is used to determine which bits can be neglected when IP address matching is being performed. It can be considered as the inverse of the corresponding subnet mask.</p>
+<p>GUI Value Range: Valid wildcard of the IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid wildcard of the IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-MatchDstPort.html">DMPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Match Destination Port</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to check the destination port number of each data stream before applying an ACL rule.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ACLRULE</strong> MO, <strong>MFRG</strong> and <strong>DMPT</strong> cannot be both set to YES.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-DstPortOp.html">DOP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port Operate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the filtering condition for the destination port. This parameter is valid only when DMPT is set to YES. If this parameter is set to OP_LT, the ACL rule is applied to the data stream whose destination port number is smaller than or equal to the configured port number. If this parameter is set to OP_GT, the ACL rule is applied to the data stream whose destination port number is larger than or equal to the configured port number. If this parameter is set to OP_EQ, the ACL rule is applied to the data stream whose destination port number is equal to the configured port number. If this parameter is set to OP_NEQ, the ACL rule is applied to the data stream whose destination port number is not equal to the configured port number. If this parameter is set to OP_RANGE, the ACL rule is applied to the data stream whose destination port number is within the configured range. This parameter can be set to OP_NEQ only for the LMPT, UMPT, UMDU, UTRPc, UCCU, and SMPT.</p>
+<p>GUI Value Range: OP_LT(Less or Equal), OP_GT(Greater or Equal), OP_EQ(Equivalent), OP_NEQ(Not Equivalent), OP_RANGE(Range)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OP_LT, OP_GT, OP_EQ, OP_NEQ, OP_RANGE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-DstPort1.html">DPT1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination port number used when DMPT is set to YES. If DOP is set to OP_RANGE, this parameter indicates the smallest destination port number. If DOP is not set to OP_RANGE, this parameter indicates a specific destination port number.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ACLRULE</strong> MO, if <strong>DOP</strong> is set to OP_RANGE, <strong>DPT1</strong> must be less than or equal to <strong>DPT2</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-DstPort2.html">DPT2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination port number used when DMPT is set to YES. If DOP is set to OP_RANGE, this parameter indicates the largest destination port number. This parameter is valid only when DOP is set to OP_RANGE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ACLRULE</strong> MO, if <strong>DOP</strong> is set to OP_RANGE, <strong>DPT1</strong> must be less than or equal to <strong>DPT2</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-MatchDSCP.html">MDSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Match DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to check the DSCP of each data stream before applying the ACL rule.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-DSCP.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the differentiated services code point (DSCP).</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-MatchFragment.html">MFRG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Match Fragment Message</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to match the fragment message. The ACL rules for matching fragment messages apply to only packet filtering and does not apply to the IPSec function. When this parameter is set to NO, whether a packet is fragmented is not checked. When this parameter is set to YES, this rule applies only to the middle and last fragments but does not apply to the first fragment or packets that are not fragmented.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. (In the current version, configuration synchronization and configuration delivery are still supported but this parameter does not take effect any more. Whether packets are fragmented is not checked by default.) Therefore, avoid setting this parameter to YES(Yes).</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ACLRULE</strong> MO, <strong>MFRG</strong> and <strong>SMPT</strong> cannot be both set to YES.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ACLRULE</strong> MO, <strong>MFRG</strong> and <strong>DMPT</strong> cannot be both set to YES.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-VLANIDOp.html">VLANIDOP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID Operate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the filter criteria for VLAN IDs. This parameter is valid only when the ACL ID ranges from 4000 to 4999. When this parameter is set to OP_EQ, only the VLAN ID specified by VLANID1 is a valid. When this parameter is set to OP_RANGE, all the VLAN IDs within the range of VLANID1 to VLANID2 are valid. When this parameter is set to OP_NOVLAN, only packets without VLAN tags are valid.</p>
+<p>GUI Value Range: OP_EQ(Equivalent), OP_RANGE(Range), OP_NOVLAN(No Vlan)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OP_EQ, OP_RANGE, OP_NOVLAN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-VLANID1.html">VLANID1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a VLAN to which service data belongs. When Source Port Operate is set to OP_EQ, this parameter specifies the ID of the matching VLAN. When Source Port Operate is set to OP_RANGE, this parameter specifies the smallest ID of the matching VLANs.</p>
+<p>GUI Value Range: 1~4094</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4094</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>ACLID</strong> ranges from 4000 to 4999 and <strong>VLANIDOP</strong> is set to OP_RANGE, <strong>VLANID1</strong> must be less than <strong>VLANID2</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-VLANID2.html">VLANID2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a VLAN to which service data belongs. When Source Port Operate is set to OP_RANGE, this parameter specifies the largest ID of the matching VLANs. This parameter is valid only when Source Port Operate is set to OP_RANGE.</p>
+<p>GUI Value Range: 1~4094</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4094</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>ACLID</strong> ranges from 4000 to 4999 and <strong>VLANIDOP</strong> is set to OP_RANGE, <strong>VLANID1</strong> must be less than <strong>VLANID2</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a forcible change of an ACL rule is made. When this parameter is set to NO(No), the system checks whether the change affects upper-layer services. If the change affects upper-layer services, the forcible change will fail. When this parameter is set to YES(Yes), the system does not check whether the change affects upper-layer services. Upper-layer services include the following: active/standby OM channel (OMCH), DNS service (DNSSRV), certificate issuance (CA), CRL update (CRLTSK), IP clock link (IPCLKLINK), NTP (NTPC), ABIS CP/IUB CP/S1 CP/X2 CP/M2 CP/ECO CP/eX2 CP/SO CP/UX2 CP/XW CP/gNBCUX2 CP/gNBCUNg CP/gNBCUXn CP (SCTPLNK/SCTPHOST/SCTPPEER), and ABIS UP/IPPATH of unknown service type/IUB UP/UX2 UP/S1 UP/X2 UP/eX2 UP/XW UP/gNBCUX2 UP/gNBCUS1 UP/gNBCUNg UP/gNBCUXn UP (IPPATH/USERPLANEHOST/USERPLANEPEER). Only the change of the ACL rule that is manually configured with Protocol Type set to IP and Match DSCP set to NO in IPsec networking is checked. This parameter is invalid when a WMPT, LMPT, GTMUb, or GTMUc serves as the main control board.</p>
+<p>Pay attention to the following when using this parameter:</p>
+<p>1. The system checks whether a forcible change of an ACL rule affects upper-layer services based on the configuration data instead of based on the actual running status of these services.</p>
+<p>2. If an NE is configured with an SRCIPRT, SRCIPROUTE4, PPPLNK, or MPGRP MO, the system does not check whether a forcible change of an ACL rule affects upper-layer services.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_aclrule__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an ACL rule with the parameters as follows: ACL ID: 3000, Rule ID: 10, Protocol Type: IP, Source IP Address: 192.168.5.5, Source Wildcard: 0.0.0.255, Destination IP Address: 192.168.5.6, Destination Wildcard: 0.0.0.255, Match DSCP: YES, DSCP: 25, run the following command: 
+ADD ACLRULE: ACLID=3000, RULEID=10, PT=IP, SIP="192.168.5.5", SWC="0.0.0.255", DIP="192.168.5.6", DWC="0.0.0.255", MDSCP=YES, DSCP=25;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,184 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify IPv6 ACL Rule (MOD ACLRULE6)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_aclrule6">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify IPv6 ACL Rule (MOD ACLRULE6)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_aclrule6"></a><a name="mod_aclrule6"></a>
+
+
+<h1 class="topictitle1">Modify IPv6 ACL Rule (MOD ACLRULE6)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_aclrule6__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify an IPv6 Access Control List (ACL) rule.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_aclrule6__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>[Co-MPT,eNodeB,gNodeB]Running this command may interrupt the services that reference the IPv6 ACL rule. For details, see "Service Interrupted After Modification" of each parameter.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If an ACLRULE6 can be queried by running the <a href="lst_aclrule6.html">LST ACLRULE6</a> command and the value of the "Auto Config Flag" field is "Auto Created", the ACLRULE6 object is automatically created by the system and cannot be modified by users.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If an IPv6 ACL rule used by an IPSec policy has Protocol Type set to a non-IP type, Match Source Port set to Yes, or Match Destination Port set to Yes, ensure that the IPv6 ACL rule contains PMTU data flows. Otherwise, PMTU data flows will be discarded and PMTU discovery will fail.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_aclrule6__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-ACLID.html">ACLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 ACL ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IPv6 access control list (ACL) to which the IPv6 access control rule belongs.</p>
+<p>GUI Value Range: 3000~3999,7000~7999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3000~3999,7000~7999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]The values of ACL ID and Rule ID in a manually configured ACLRULE6 MO must range from 3000 to 3999 and from 1 to 65535, respectively.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-RuleID.html">RULEID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 Rule ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IPv6 ACL rule. The values 1 to 65535 indicate IPv6 ACL rules configured by users. The values 65431 to 65536 indicate the IPv6 ACL rules automatically generated during DHCP detection. The values 70000 to 79999 indicate packet filtering IPv6 ACL rules configured by the system (packet filtering ACL rules are not supported in IPv6 configuration currently). The values 80000 to 89999 indicate IPv6 IPsec ACL rules configured by the system.</p>
+<p>GUI Value Range: 1~65535,70000~89999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~65535,70000~79999,80000~89999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]The values of ACL ID and Rule ID in a manually configured ACLRULE6 MO must range from 3000 to 3999 and from 1 to 65535, respectively.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-SrcIP.html">SIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IPv6 address of data to which an IPv6 ACL rule is applied.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-SrcPfxLen.html">SPFXLEN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Address Prefix Length</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the prefix length of a source IPv6 address. The prefix length is used to determine which bits must be compared for matching when IPv6 address matching is being performed.</p>
+<p>GUI Value Range: 0~128</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-DstIP.html">DIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination IPv6 address of the data to which an IPv6 ACL rule is applied.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-DstPfxLen.html">DPFXLEN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Address Prefix Length</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the prefix length of a destination IPv6 address. The prefix length is used to determine which bits must be compared for matching when IPv6 address matching is being performed.</p>
+<p>GUI Value Range: 0~128</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_aclrule6__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify an IPv6 ACL rule with the parameters as follows: IPv6 ACL ID: 3000, IPv6 Rule ID: 10, Source IPv6 Address: 2001:DB8::2, Source Address Prefix Length: 32, Destination IPv6 Address: 2001:DB8::1, Destination Address Prefix Length: 32, run the following command: 
+MOD ACLRULE6: ACLID=3000, RULEID=10, SIP="2001:DB8::2", SPFXLEN=32, DIP="2001:DB8::1", DPFXLEN=32;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,477 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell Backoff Algorithm Configuration (MOD CELLBACKOFF)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellbackoff">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell Backoff Algorithm Configuration (MOD CELLBACKOFF)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellbackoff"></a><a name="mod_cellbackoff"></a>
+
+
+<h1 class="topictitle1">Modify Cell Backoff Algorithm Configuration (MOD CELLBACKOFF)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellbackoff__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify parameters related to load balancing by transferring UEs with low spectral efficiency in a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellbackoff__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellbackoff__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-InterFreqBackoffPrbThd.html">InterFreqBackoffPrbThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Inter-Frequency Backoff PRB Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB usage threshold for triggering inter-frequency MLB for low-efficiency UEs. When the UE quantity-related trigger conditions are met and the cell load is greater than or equal to the value of this parameter plus the load offset, inter-frequency MLB is triggered for low-efficiency UEs. When the UE quantity-related exit conditions are met or the cell load is lower than the value of this parameter, inter-frequency MLB is stopped for low-efficiency UEs. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellBackOff MO, the RBPriMcsSelectStopPrbThd parameter must be set to a value smaller than that of the InterFreqBackoffPrbThd parameter.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter decreases the possibility that low-efficiency UEs are handed over from the local cell during inter-frequency MLB, thereby decreasing the average cell throughput and the number of handovers. A small value of this parameter increases this possibility, thereby increasing the average cell throughput and the number of handovers.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-InterFreqBackoffUeNumThd.html">InterFreqBackoffUeNumThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Inter-Frequency Backoff UE Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the number of synchronized UEs for triggering inter-frequency MLB for low-efficiency UEs. When the PRB usage-related trigger conditions are met and the number of synchronized UEs in the local cell is greater than or equal to the value of this parameter plus the offset of the minimum number of UEs for MLB, inter-frequency MLB is triggered for low-efficiency UEs. When the PRB usage-related exit conditions are met or the number of synchronized UEs in the local cell is less than the value of this parameter, inter-frequency MLB is stopped for low-efficiency UEs. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~10000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter decreases the possibility that low-efficiency UEs are handed over from the local cell during inter-frequency MLB, thereby decreasing the average cell throughput and the number of handovers. A small value of this parameter increases this possibility, thereby increasing the average cell throughput and the number of handovers.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-RBPriMcsSelectTrigPrbThd.html">RBPriMcsSelectTrigPrbThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RB Priority MCS Selection Trigger PRB Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB usage threshold for triggering RB priority-based MCS index selection. When inter-frequency MLB for low-efficiency UEs is enabled and the PRB usage of the cell is less than the value of this parameter, RB priority-based MCS index selection can be performed. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellBackOff MO, the RBPriMcsSelectTrigPrbThd parameter must be set to a value smaller than that of the RBPriMcsSelectStopPrbThd parameter.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the accuracy with which low-efficiency UEs are identified. In this case, the BLER of the UE decreases, though the performance of MLB for low-efficiency UEs does not improve obviously and the average cell throughput decreases. A small value of this parameter increases the accuracy with which low-efficiency UEs are identified. In this case, the performance of MLB for low-efficiency UEs improves obviously and the average cell throughput increases, though the BLER of the UE increases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-RBPriMcsSelectStopPrbThd.html">RBPriMcsSelectStopPrbThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RB Priority MCS Selection Stop PRB Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB usage threshold for stopping RB priority-based MCS index selection. When inter-frequency MLB for low-efficiency UEs is enabled and the PRB usage of the cell is greater than or equal to the value of this parameter, RB priority-based MCS index selection cannot be performed. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 30</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellBackOff MO, the RBPriMcsSelectTrigPrbThd parameter must be set to a value smaller than that of the RBPriMcsSelectStopPrbThd parameter.</li><li>In the CellBackOff MO, the RBPriMcsSelectStopPrbThd parameter must be set to a value smaller than that of the InterFreqBackoffPrbThd parameter.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the accuracy with which low-efficiency UEs are identified. In this case, the BLER of the UE decreases, though the performance of MLB for low-efficiency UEs does not improve obviously and the average cell throughput decreases. A small value of this parameter increases the accuracy with which low-efficiency UEs are identified. In this case, the performance of MLB for low-efficiency UEs improves obviously and the average cell throughput increases, though the BLER of the UE increases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LowestEffDlMcsThd.html">LowestEffDlMcsThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Lowest Efficiency DL MCS Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink MCS index threshold for selecting extra-low-efficiency UEs for MLB. The eNodeB considers a UE as a low-efficiency UE when either of the following conditions are met: (a) The downlink MCS index of the UE is less than the value of this parameter. (b) The downlink MCS index of the UE is greater than or equal to the value of this parameter and is less than or equal to the value of the LowEffDlMcsThd parameter, and the PRB usage criteria are met. This parameter also indicates the downlink MCS index threshold for selecting low-efficiency UEs for inter-frequency load steering in massive MIMO scenarios. The eNodeB considers a UE as a low-efficiency UE if the downlink MCS index of the UE is lower than this threshold. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~28</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~28</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellBackOff MO, the LowestEffDlMcsThd parameter must be set to a value smaller than or equal to that of the LowEffDlMcsThd parameter.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the possibility that a UE is selected as a low-efficiency UE, thereby improving the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput. A small value of this parameter decreases this possibility, thereby decreasing the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LowEffDlMcsThd.html">LowEffDlMcsThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Low Efficiency DL MCS Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink MCS index threshold for selecting low-efficiency UEs for MLB. The eNodeB considers a UE as a low-efficiency UE when the PRB usage-related conditions are met and the downlink MCS index of the UE is greater than or equal to the value of the LowestEffDlMcsThd parameter and is less than or equal to the value of this parameter. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~28</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~28</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellBackOff MO, the LowestEffDlMcsThd parameter must be set to a value smaller than or equal to that of the LowEffDlMcsThd parameter.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the possibility that a UE is selected as a low-efficiency UE, thereby improving the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput. A small value of this parameter decreases this possibility, thereby decreasing the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LowEffDlFactorA.html">LowEffDlFactorA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Low Efficiency DL Factor A</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates downlink factor A for selecting low-efficiency UEs for MLB. The eNodeB considers a UE as a low-efficiency UE when the downlink MCS index is lower than the value of the LowEffDlFactorK parameter plus the product of the UE's PRB usage and the value of this parameter. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1, step: 0.001</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 125</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the possibility that a UE is selected as a low-efficiency UE, thereby improving the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput. A small value of this parameter decreases this possibility, thereby decreasing the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LowEffDlFactorK.html">LowEffDlFactorK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Low Efficiency DL Factor K</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates downlink factor K for selecting low-efficiency UEs for MLB. The eNodeB considers a UE as a low-efficiency UE when the downlink MCS index is less than the value of this parameter plus the product of the UE's PRB usage and the value of the LowEffDlFactorA parameter. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the possibility that a UE is selected as a low-efficiency UE, thereby improving the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput. A small value of this parameter decreases this possibility, thereby decreasing the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LowestEffUlMcsThd.html">LowestEffUlMcsThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Lowest Efficiency UL MCS Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lowest-efficiency uplink MCS index threshold for selecting low-efficiency UEs for MLB. The eNodeB considers a UE as a low-efficiency UE when either of the following conditions are met: The uplink MCS index of the UE is less than the value of this parameter. The uplink MCS index of the UE is greater than or equal to the value of this parameter and is less than or equal to the value of the LowEffUlMcsThd parameter, and the PRB usage-related conditions are met. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~28</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~28</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellBackOff MO, the LowestEffUlMcsThd parameter must be set to a value smaller than or equal to that of the LowEffUlMcsThd parameter.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the possibility that a UE is selected as a low-efficiency UE, thereby improving the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput. A small value of this parameter decreases this possibility, thereby decreasing the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LowEffUlMcsThd.html">LowEffUlMcsThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Low Efficiency UL MCS Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink MCS index threshold for selecting low-efficiency UEs for MLB. The eNodeB considers a UE as a low-efficiency UE when the PRB usage-related conditions are met and the uplink MCS index of the UE is greater than or equal to the value of the LowestEffUlMcsThd parameter and is less than or equal to the value of this parameter. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~28</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~28</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the CellBackOff MO, the LowestEffUlMcsThd parameter must be set to a value smaller than or equal to that of the LowEffUlMcsThd parameter.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the possibility that a UE is selected as a low-efficiency UE, thereby improving the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput. A small value of this parameter decreases this possibility, thereby decreasing the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LowEffUlFactorA.html">LowEffUlFactorA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Low Efficiency UL Factor A</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates uplink factor A for selecting low-efficiency UEs for MLB. The eNodeB considers a UE as a low-efficiency UE when the uplink MCS index is lower than the value of the LowEffUlFactorK parameter plus the product of the UE's PRB usage and the value of this parameter. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1, step: 0.001</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 125</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the possibility that a UE is selected as a low-efficiency UE, thereby improving the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput. A small value of this parameter decreases this possibility, thereby decreasing the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-LowEffUlFactorK.html">LowEffUlFactorK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Low Efficiency UL Factor K</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates uplink factor K for selecting low-efficiency UEs for MLB. The eNodeB considers a UE as a low-efficiency UE when the uplink MCS index is lower than the value of this parameter plus the product of the UE's PRB usage and the value of the LowEffUlFactorA parameter. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A large value of this parameter increases the possibility that a UE is selected as a low-efficiency UE, thereby improving the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput. A small value of this parameter decreases this possibility, thereby decreasing the performance of inter-frequency MLB for low-efficiency UEs and the average cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-UlHeavyTrafficTtiProporThd.html">UlHeavyTrafficTtiProporThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Heavy Traffic TTI Proportion Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink heavy-traffic TTI proportion threshold for identifying UEs with heavy uplink traffic. If the proportion of heavy-traffic TTIs to the total number of TTIs in which the UE is scheduled exceeds the threshold specified by this parameter within a period defined by UlHeavyTrafficJudgePeriod, the UE is identified as a UE with heavy uplink traffic. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the Uplink Traffic-based MLB to LTE FDD feature is enabled, a small value of this parameter leads to a slight increase in the uplink throughput of UEs with heavy uplink traffic and an increase in the number of handovers in the cell; a large value of this parameter leads to a large increase in the uplink throughput of UEs with heavy uplink traffic and a decrease in the number of handovers in the cell. For the functions controlled by the UlExperiBasedTrafficSteerSw and UlTrafficSteeringSw options of the EnhancedMlbAlgoSwitch parameter, a smaller value of this parameter results in a higher probability of identifying UEs with heavy uplink traffic and greater increase in uplink perceived data rates, but the downlink user experience is affected because UEs in FDD cells cannot be selected for downlink load transfer to TDD cells; a larger value of this parameter results in a lower probability of identifying UEs with heavy uplink traffic and smaller increase in uplink perceived data rates.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-UlTrafficMlbUeNumThd.html">UlTrafficMlbUeNumThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Traffic MLB UE Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of the number of uplink-sync UEs for triggering uplink-traffic-based MLB and service steering intended for guaranteeing uplink experience. If the number of uplink-sync UEs is greater than or equal to this threshold plus the offset to the number of UEs for triggering MLB, uplink-traffic-based MLB and service steering intended for guaranteeing uplink experience are triggered. If the number of uplink-sync UEs is less than this threshold, uplink-traffic-based MLB and service steering intended for guaranteeing uplink experience stop. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~10000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter leads to a high probability that UEs with heavy uplink traffic are transferred during MLB, increasing the uplink throughput of UEs and number of handovers in the cell. A large value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-UlHeavyTrafficJudgePeriod.html">UlHeavyTrafficJudgePeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Heavy Traffic Judge Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period of identifying UEs with heavy uplink traffic. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~200</p>
+<p>Unit: 0.1s</p>
+<p>Actual Value Range: 0.1~20, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: For a TDD cell with the Uplink Traffic-based MLB to LTE FDD feature enabled, a smaller value of this parameter results in a higher probability of transferring UEs with heavy traffic in the uplink for MLB, increasing the number of handovers but facilitating uplink UE throughput maximization in the TDD cell; a larger value of this parameter results in the opposite effects. For the functions controlled by the UlExperiBasedTrafficSteerSw and UlTrafficSteeringSw options of the EnhancedMlbAlgoSwitch parameter, setting this parameter to a proper value improves the uplink user experience.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-HoInRejectPrbThd.html">HoInRejectPrbThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Handover In Reject PRB Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB usage threshold for triggering rejection of incoming handover requests of UEs from inter-duplex-mode cells after inter-frequency low-efficient MLB is triggered. When the InterFreqBackoffSwitch option of the BackoffAlgoSwitch parameter is selected and the IfBackoffHoInRejectSwitch option of the MlbMatchOtherFeatureMode parameter is selected, the eNodeB rejects incoming handover requests of UEs from inter-duplex-mode cells if the PRB usage of the target cell is greater than or equal to this threshold. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 60</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a smaller value, the eNodeB is more likely to reject incoming handover requests of UEs from inter-duplex-mode cells after inter-frequency low-efficient MLB is triggered, more gains are obtained from inter-frequency low-efficient MLB, and the handover success rate in the inter-duplex-mode cell is more likely to decrease. If this parameter is set to a larger value, the eNodeB is less likely to reject incoming handover requests of UEs from inter-duplex-mode cells after inter-frequency low-efficient MLB is triggered, fewer gains are obtained from inter-frequency low-efficient MLB, and the handover success rate in the inter-duplex-mode cell is less likely to decrease.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-HoInRejectUeNumThd.html">HoInRejectUeNumThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Handover In Reject UE Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UE quantity threshold for triggering rejection of incoming handover requests of UEs from inter-duplex-mode cells after inter-frequency low-efficient MLB is triggered. When the InterFreqBackoffSwitch option of the BackoffAlgoSwitch parameter is selected and the IfBackoffHoInRejectSwitch option of the MlbMatchOtherFeatureMode parameter is selected, the eNodeB rejects incoming handover requests of UEs from inter-duplex-mode cells if the number of synchronized UEs in the cell is greater than or equal to this threshold. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~10000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a smaller value, the eNodeB is more likely to reject incoming handover requests of UEs from inter-duplex-mode cells after inter-frequency low-efficient MLB is triggered, more gains are obtained from inter-frequency low-efficient MLB, and the handover success rate in the inter-duplex-mode cell is more likely to decrease. If this parameter is set to a larger value, the eNodeB is less likely to reject incoming handover requests of UEs from inter-duplex-mode cells after inter-frequency low-efficient MLB is triggered, fewer gains are obtained from inter-frequency low-efficient MLB, and the handover success rate in the inter-duplex-mode cell is less likely to decrease.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-RejectedHoInCause.html">RejectedHoInCause</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rejected Handover In Cause</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the handover cause values carried by incoming handover requests of UEs from inter-duplex-mode cells that must be rejected after inter-frequency low-efficient MLB is triggered. After inter-frequency low-efficient MLB is triggered, if the cause value indicated by the selected option of this parameter is contained in an incoming handover request of a UE from an inter-duplex-mode cell, the eNodeB rejects the handover request. If the cause value indicated by the selected option of this parameter is not contained in the handover request, the eNodeB accepts the handover request. This parameter is valid only if the IfBackoffHoInRejectSwitch option of the MlbMatchOtherFeatureMode parameter is selected. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: REDUCE_LOAD(REDUCE_LOAD), RSRC_OPTIMIS(RSRC_OPTIMIS), HO_OPTIMIS(HO_OPTIMIS)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: REDUCE_LOAD, RSRC_OPTIMIS, HO_OPTIMIS</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: REDUCE_LOAD:Off, RSRC_OPTIMIS:Off, HO_OPTIMIS:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the option of this parameter indicating the cause value carried by an incoming handover request of a UE from an inter-duplex-mode cell is selected, the eNodeB rejects the handover request. If the option of this parameter indicating the cause value is deselected, the eNodeB accepts the handover request. If more options of this parameter are selected, more gains are obtained from inter-frequency low-efficient MLB, and the handover success rate in the inter-duplex-mode cell is more likely to deteriorate. If fewer options of this parameter are selected, fewer gains are obtained from inter-frequency low-efficient MLB, and the success rate in the inter-duplex-mode cell handover is less likely to deteriorate.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-BackoffCAUserHOSw.html">BackoffCAUserHOSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Backoff CA User HO Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable load balancing for low-efficiency CA UEs.</p>
+<p>If this parameter is set to ON, load balancing is enabled for low-efficiency CA UEs. The eNodeB selects low-efficiency CA UEs and initiates blind handovers for low-efficiency FDD+TDD CA UEs. If this parameter is set to OFF, load balancing is disabled for low-efficiency CA UEs. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the eNodeB selects low-efficiency CA UEs and preferentially performs blind handovers for low-efficiency FDD+TDD CA UEs, reducing the impact of inter-frequency measurement on user perception. However, the handover success rate decreases if SCC handover parameters are improperly set. If this parameter is set to OFF, the eNodeB does not select low-efficiency CA UEs for load balancing.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellBackOff-BackoffMlbEnhSw.html">BackoffMlbEnhSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Backoff MLB Enhancement Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable MLB enhancement for low-efficiency UEs.</p>
+<p>ADAPTIVE_MCS_THLD_SW: Indicates whether to enable MCS index threshold adaptation. If this option is selected, MCS index threshold adaptation is performed during UE selection after MLB for low-efficiency UEs is enabled. If this option is deselected, a fixed MCS index threshold is used to select UEs after MLB for low-efficiency UEs is enabled. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: ADAPTIVE_MCS_THLD_SW(ADAPTIVE_MCS_THLD_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ADAPTIVE_MCS_THLD_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ADAPTIVE_MCS_THLD_SW:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: ADAPTIVE_MCS_THLD_SW: If this option is selected and the LowestEffUlMcsThd parameter in the CellBackOff MO is set to a larger value, more low-efficiency UEs can be selected for MLB. If this option is deselected, network performance is not affected.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellbackoff__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the cell Backoff Algorithm Configuration with the parameters as follows: Local cell ID: 0, Inter-Frequency Backoff PRB Threshold: 60, run the following command:
+MOD CELLBACKOFF: LocalCellId=0, InterFreqBackoffPrbThd=60;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

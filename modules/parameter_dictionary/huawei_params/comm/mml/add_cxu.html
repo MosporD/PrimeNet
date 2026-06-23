@@ -1,0 +1,369 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add CXU (ADD CXU)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_cxu">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add CXU (ADD CXU)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_cxu"></a><a name="add_cxu"></a>
+
+
+<h1 class="topictitle1">Add CXU (ADD CXU)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_cxu__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a CXU to a specified RRU chain/ring.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_cxu__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Before a CXU is added, an RRU chain/ring must be added by running the <a href="add_rruchain.html">ADD RRUCHAIN</a> command.</p>
+</li><li><p>The CGPS supports the chain topology and cold backup ring topology only.</p>
+</li><li><p>The RPCU supports the chain topology only.</p>
+</li><li><p>If a CGPS or RPCU is to be added to the chain, the CGPS or RPCU must be located at the chain tail or any position behind the breakpoint.</p>
+</li><li><p>If a CGPS is to be added to the cold backup ring, the CGPS can be located at any position between the two breakpoints if the configured breakpoints do not coincide. If the configured breakpoints coincide, the CGPS can be located only at the coincident position.</p>
+</li><li><p>After a CGPS is added between two breakpoints on the cold backup ring, the value of the second breakpoint and the level of the board before the CGPS increase by 1 automatically.</p>
+</li><li><p>After a CXU is added to an RRU chain/ring, the original board in a position farther than or same as the position of the newly added CXU is automatically moved backwards.</p>
+</li><li><p>After a CXU is added, if links cannot be set up for the CXU or links cannot work at the highest CPRI line rate, run the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command to initiate negotiation.</p>
+</li><li><p>If CXU Type is set to RMU, the RRU chain/ring supports only one level of RMUs. If CXU Type is set to CGPS, the RRU chain/ring supports a maximum of four levels of CGPSs.</p>
+</li><li><p>The RMU supports the trunk chain topology only.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_cxu__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the CXU is located.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>AAMU</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs.</li><li>[eGBTS]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs.</li><li>[gNodeB]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the CXU is located.</p>
+<p>GUI Value Range: 60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>AAMU</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs.</li><li>[eGBTS]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs.</li><li>[gNodeB]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where the CXU is located.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>AAMU</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs.</li><li>[eGBTS]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs.</li><li>[gNodeB]Each <strong>CXU</strong> MO must have a unique combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> among all <strong>RRU</strong>, <strong>RHUB</strong>, and <strong>CXU</strong> MOs.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-RRUChainId.html">RCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Chain/Ring No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the RRU or RFU chain/ring where the CXU is located.</p>
+<p>GUI Value Range: 0~249</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~249</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-CXUType.html">CXUTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CXU Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the CXU.</p>
+<p>GUI Value Range: RMU(RMU), CGPS(CGPS), RPCU(RPCU)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RMU, CGPS, RPCU</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]A <strong>BBPLINK</strong> MO is required with <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong>, or with <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong>, set to the same values as <strong>LCN</strong>, <strong>LSRN</strong>, and <strong>LSN</strong> in the <strong>RRUCHAIN</strong> MO, respectively, when all of the following conditions are met for the <strong>RRUCHAIN</strong> MO: (1) <strong>AT</strong> is set to PEERPORT. (2) Neither <strong>LCN</strong> nor <strong>LSRN</strong> is set to 255. (3) When <strong>TT</strong> is set to CHAIN, the combination of <strong>LCN</strong> and <strong>HCN</strong> is different from the combination of <strong>LSRN</strong> and <strong>HSRN</strong>; or when <strong>TT</strong> is set to TRUNK_CHAIN, the combination of <strong>LCN</strong> and <strong>CONNCN1</strong> is different from the combination of <strong>LSRN</strong> and <strong>CONNSRN</strong>. (4) The first-level board for the <strong>RRUCHAIN</strong> is not a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU.</li><li>[gNodeB]A <strong>BBPLINK</strong> MO is required with <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong>, or with <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong>, set to the same values as <strong>LCN</strong>, <strong>LSRN</strong>, and <strong>LSN</strong> in the <strong>RRUCHAIN</strong> MO, respectively, when all of the following conditions are met for the <strong>RRUCHAIN</strong> MO: (1) <strong>AT</strong> is set to PEERPORT. (2) Neither <strong>LCN</strong> nor <strong>LSRN</strong> is set to 255. (3) When <strong>TT</strong> is set to CHAIN, the combination of <strong>LCN</strong> and <strong>HCN</strong> is different from the combination of <strong>LSRN</strong> and <strong>HSRN</strong>; or when <strong>TT</strong> is set to TRUNK_CHAIN, the combination of <strong>LCN</strong> and <strong>CONNCN1</strong> is different from the combination of <strong>LSRN</strong> and <strong>CONNSRN</strong>. (4) The first-level board for the <strong>RRUCHAIN</strong> is not a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-InsertPos.html">PS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CXU Position</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the position of the CXU on the RRU chain/ring. It is calculated from the start port one by one.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB]The value of <strong>PS</strong> in the <strong>CXU</strong> MO must be different from those of the following parameters in other MOs which correspond to the same <strong>RRUCHAIN</strong> MO: </li><li>1. <strong>PS</strong> in other <strong>CXU</strong> MOs</li><li>2. <strong>PS</strong> in <strong>RRU</strong> MOs</li><li>3. <strong>PS</strong> in <strong>RFU</strong> MOs</li><li>4. <strong>PS</strong> in <strong>AAMU</strong> MOs</li><li>5. <strong>PS</strong> in <strong>RHUB</strong> MOs.</li><li>[Co-MPT, NodeB, eNodeB]The value of <strong>PS</strong> in the <strong>CXU</strong> MO must be less than the total number of <strong>CXU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, <strong>AAMU</strong>, and <strong>RHUB</strong> MOs which correspond to the same <strong>RRUCHAIN</strong> MO.</li><li>[eGBTS]The value of <strong>PS</strong> in the <strong>CXU</strong> MO must be different from those of the following parameters in other MOs which correspond to the same <strong>RRUCHAIN</strong> MO: </li><li>1. <strong>PS</strong> in other <strong>CXU</strong> MOs</li><li>2. <strong>PS</strong> in <strong>RRU</strong> MOs</li><li>3. <strong>PS</strong> in <strong>RFU</strong> MOs</li><li>4. <strong>PS</strong> in <strong>AAMU</strong> MOs.</li><li>[eGBTS]The value of <strong>PS</strong> in the <strong>CXU</strong> MO must be less than the total number of <strong>CXU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>AAMU</strong> MOs which correspond to the same <strong>RRUCHAIN</strong> MO.</li><li>[gNodeB]The value of <strong>PS</strong> in the <strong>CXU</strong> MO must be different from those of the following parameters in other MOs which correspond to the same <strong>RRUCHAIN</strong> MO: </li><li>1. <strong>PS</strong> in other <strong>CXU</strong> MOs</li><li>2. <strong>PS</strong> in <strong>RRU</strong> MOs</li><li>3. <strong>PS</strong> in <strong>RFU</strong> MOs</li><li>4. <strong>PS</strong> in <strong>RHUB</strong> MOs.</li><li>[gNodeB]The value of <strong>PS</strong> in the <strong>CXU</strong> MO must be less than the total number of <strong>CXU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs which correspond to the same <strong>RRUCHAIN</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-CXUWorkStandard.html">CS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CXU Work Standard</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the working standard of the CXU. This parameter takes effect only for the RMU.</p>
+<p>GUI Value Range: GO(GSM_ONLY), UO(UMTS_ONLY), LO(LTE_FDD), TDL(LTE_TDD), MO(NB-IoT), GU(GSM_UMTS), GL(GSM_LTE), GT(GSM_LTE_TDD), GM(GSM_NB-IoT), UL(UMTS_LTE), UT(UMTS_LTE_TDD), UM(UMTS_NB-IoT), LFTD(LTE_FDD_TDD), LM(LTE_FDD_NB-IoT), TL(TDS_TDL), TM(LTE_TDD_NB-IoT), CM(CDMA_NB-IoT), GUL(GSM_UMTS_LTE), GUT(GSM_UMTS_LTE_TDD), GUM(GSM_UMTS_NB-IoT), GLFTD(GSM_LTE_FDD_TDD), GLM(GSM_LTE_FDD_NB-IoT), GTM(GSM_LTE_TDD_NB-IoT), ULFTD(UMTS_LTE_FDD_TDD), ULM(UMTS_LTE_FDD_NB-IoT), UTM(UMTS_LTE_TDD_NB-IoT), LFTDM(LTE_FDD_TDD_NB-IoT), CLM(CDMA_LTE_FDD_NB-IoT), GULFTD(GSM_UMTS_LTE_FDD_TDD), GULM(GSM_UMTS_LTE_FDD_NB-IoT), GUTM(GSM_UMTS_LTE_TDD_NB-IoT), GLFTDM(GSM_LTE_FDD_TDD_NB-IoT), ULFTDM(UMTS_LTE_FDD_TDD_NB-IoT), GULFTDM(GSM_UMTS_LTE_FDD_TDD_NB-IoT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: GO, UO, LO, TDL, MO, GU, GL, GT, GM, UL, UT, UM, LFTD, LM, TL, TM, CM, GUL, GUT, GUM, GLFTD, GLM, GTM, ULFTD, ULM, UTM, LFTDM, CLM, GULFTD, GULM, GUTM, GLFTDM, ULFTDM, GULFTDM</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-CXUName.html">CXUNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CXU Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CXU name.</p>
+<p>GUI Value Range: 0~99 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~99 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-RemoteFlag.html">REMOTEFLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Remote Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a CXU is far away from the BBU. You can define whether a CXU is far away from the BBU as required. If you do not need to define this information, use the default value.</p>
+<p>GUI Value Range: UNDEFINED(Undefined), REMOTE(Remote), NOT_REMOTE(Not Remote)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNDEFINED, REMOTE, NOT_REMOTE</p>
+<p>MML Default Value: UNDEFINED(Undefined)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-Userlabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-defined CXU descriptions. You can use this parameter to record the information about the CXU.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-MNTMode.html">MNTMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maintenance Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maintenance mode of a CXU. The value INSTALL indicates device creation caused by network capability expansion, device reparenting, or access of a new device to the network. The value EXPAND indicates the subrack or carrier capacity expansion of a device. The value UPGRADE indicates a device upgrade. The value TESTING indicates that an installed device is being commissioned. ExpandStatus1 to ExpandStatus10 can be used by users to define maintenance modes. The default value of this parameter is Normal.</p>
+<p>GUI Value Range: NORMAL(NORMAL), INSTALL(INSTALL), EXPAND(EXPAND), UPGRADE(UPGRADE), TESTING(TESTING), ExpandStatus1(ExpandStatus1), ExpandStatus2(ExpandStatus2), ExpandStatus3(ExpandStatus3), ExpandStatus4(ExpandStatus4), ExpandStatus5(ExpandStatus5), ExpandStatus6(ExpandStatus6), ExpandStatus7(ExpandStatus7), ExpandStatus8(ExpandStatus8), ExpandStatus9(ExpandStatus9), ExpandStatus10(ExpandStatus10)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL, INSTALL, EXPAND, UPGRADE, TESTING, ExpandStatus1, ExpandStatus2, ExpandStatus3, ExpandStatus4, ExpandStatus5, ExpandStatus6, ExpandStatus7, ExpandStatus8, ExpandStatus9, ExpandStatus10</p>
+<p>MML Default Value: NORMAL(NORMAL)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the value of <strong>MNTMODE</strong> is not NORMAL, the value of <strong>ST</strong> must be less than <strong>ET</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-StartTime.html">ST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Start Time of Status Setting</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start time of maintenance status of the CXU. If this parameter is not specified, the start time of the maintenance status is 2000-01-01 00:00:00.</p>
+<p>GUI Value Range: 2000-01-01T00:00:00+00:00~2037-12-31T23:59:59+00:00</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2000-01-01T00:00:00+00:00~2037-12-31T23:59:59+00:00</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-EndTime.html">ET</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">End Time of Status Setting</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the end time of the maintenance mode for the CXU. If this parameter is not specified, the maintenance mode ends at 2037-12-31 23:59:59.</p>
+<p>GUI Value Range: 2000-01-01T00:00:00+00:00~2037-12-31T23:59:59+00:00</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2000-01-01T00:00:00+00:00~2037-12-31T23:59:59+00:00</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-MMSetRemark.html">MMSETREMARK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maintenance Mode Setting Remark</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the remarks of maintenance status of the CXU.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CXU-LocationName.html">LOCATIONNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Location Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the location information of a CXU. Set this parameter to the location name of the site. The location name of the site is configured in the Location object. This parameter must be set to the same value for RF modules serving the same sector.</p>
+<p>GUI Value Range: 0~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_cxu__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a CXU with the parameters as follows: Cabinet No.: 0, Subrack No.: 60, Slot No.: 0, CXU Type: CGPS, Chain/Ring No.: 0, CXU Position: 0, run the following command:
+ADD CXU: SRN=60, CXUTYPE=CGPS, PS=0, RCN=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

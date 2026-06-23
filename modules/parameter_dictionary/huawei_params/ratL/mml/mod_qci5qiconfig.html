@@ -1,0 +1,142 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify 5QI Configuration (MOD QCI5QICONFIG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_qci5qiconfig">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify 5QI Configuration (MOD QCI5QICONFIG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_qci5qiconfig"></a><a name="mod_qci5qiconfig"></a>
+
+
+<h1 class="topictitle1">Modify 5QI Configuration (MOD QCI5QICONFIG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_qci5qiconfig__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify 5QI configurations on the eNodeB, which is connected to the 5GC.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_qci5qiconfig__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_qci5qiconfig__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Qci5qiConfig-Nr5qi.html">Nr5qi</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NR 5G QoS Identifier</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the 5G QoS Identifier (5QI) of a QoS flow that needs to be mapped to a QCI. Different 5QIs represent different QoS specifications such as the packet delay budget, packet loss rate, average window, and service type (whether the service is a GBR service or not). For details, see 3GPP TS 23.501.</p>
+<p>When a new 5QI is configured on the core network:</p>
+<p>1. If no Qci5qiConfig MO is added for this 5QI, this 5QI is mapped to QCI 9 by default.</p>
+<p>2. If a Qci5qiConfig MO is added for this 5QI but the QCI mapped to this 5QI is not configured on the base station side, the base station processes this 5QI as if the mapping between the 5QI and QCI is not configured.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the Nr5qi parameter in the Qci5qiConfig MO is set to 1-5,65,66,69,75, the default Qci mapping relationship cannot be modified or deleted.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Qci5qiConfig-AsReflectiveQosSwitch.html">AsReflectiveQosSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Access Service Reflective QoS Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the AS reflective QoS function. For details about reflective QoS, see 3GPP TS 23.501. If the parameter is set to ON, the UE can obtain the mapping between QoS flows and the DRBs by monitoring the QoS flow identity (QFI) of the data packet transmitted on each DRB. If this parameter is set to OFF, this function is disabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON and multiple QoS flows are mapped to the same DRB, the RRC signaling overhead can be reduced. If this parameter is set to OFF, the mapping between all QoS flows and DRBs needs to be sent to UEs through RRC signaling. When multiple QoS flows are mapped to the same DRB, extra RRC signaling overhead is generated.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Qci5qiConfig-Qci.html">Qci</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">QoS Class Identifier</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the QCI that is mapped to the 5QI. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the system by default. The default value is as follows:</p>
+<p>Nr5qi 1: 1</p>
+<p>Nr5qi 2: 2</p>
+<p>Nr5qi 3: 3</p>
+<p>Nr5qi 4: 4</p>
+<p>Nr5qi 5: 5</p>
+<p>Nr5qi 6: 6</p>
+<p>Nr5qi 7: 7</p>
+<p>Nr5qi 8: 8</p>
+<p>Nr5qi 9: 9</p>
+<p>Nr5qi 65: 65</p>
+<p>Nr5qi 66: 66</p>
+<p>Nr5qi 69: 69</p>
+<p>Nr5qi 70: 70</p>
+<p>Nr5qi 75: 75</p>
+<p>Nr5qi 79: 79</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the Nr5qi parameter in the Qci5qiConfig MO is set to 1-5,65,66,69,75, the default Qci mapping relationship cannot be modified or deleted.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_qci5qiconfig__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify 5QI configurations on the eNodeB with the parameters as follows: NR 5G QoS Identifier: 254, QoS Class Identifier: 9, run the following command:
+MOD QCI5QICONFIG: Nr5qi=254, Qci=9;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

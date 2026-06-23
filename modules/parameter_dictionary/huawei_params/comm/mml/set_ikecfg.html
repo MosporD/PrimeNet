@@ -1,0 +1,284 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Basic IKE Configuration (SET IKECFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_ikecfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Basic IKE Configuration (SET IKECFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_ikecfg"></a><a name="set_ikecfg"></a>
+
+
+<h1 class="topictitle1">Set Basic IKE Configuration (SET IKECFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_ikecfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the global parameters related to the basic IKE configurations.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_ikecfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If IDType of the IKE Peer is set to FQDN and AUTHMETH of the IKE security proposal is set to PRE_SHARED_KEY, run this command to set Local Name, and keep Local Name as same as Remote Name of the IKE peer of other end if Remote Name exists.</p>
+</li><li><p>The timeout duration within which the local end waits for keepalive packets must be at least three times the time interval at which the peer end sends the keepalive packets. Otherwise, keepalive negotiation fails.</p>
+</li><li><p>If IKEVERSION of an IKE peer is set to IKE_V2, sending keep-alive messages is not allowed. Therefore in this case, IKEKLI and IKEKLT do not take effect.</p>
+</li><li><p>Dead Peer Detection (DPD) is configured on a per IKE peer basis, whereas keep-alive message detection is configured for all IKE peers on a BS.</p>
+</li><li><p>If a BS is enabled with keep-alive message detection and DPD is configured for an IKE peer, this IKE peer preferentially uses DPD. In this case, the keep-alive message of this IKE peer will not expire.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_ikecfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-LocalName.html">IKELNM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IKE local name.</p>
+<p>GUI Value Range: 0~31 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~31 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-KeepaliveInterval.html">IKEKLI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Interval for Sending Keepalive Packets</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval for sending keepalive packets. When this parameter is set to 0, keepalive packets are not sent. When this parameter is not set to 0, check the timer for waiting for keepalive packets on the peer end. It is recommended that the timer length be greater than or equal to a value three times of this parameter value.</p>
+<p>Disuse statement: In later versions, this parameter will be removed. In the current version, this parameter can still be configured and take effect. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0,20~28800</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0,20~28800</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-KeepaliveTimeout.html">IKEKLT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Keepalive Timeout</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the timeout duration for waiting for the keepalive packets. If this parameter is set to 0, keepalive packets are not sent.</p>
+<p>Disuse statement: In later versions, this parameter will be removed. In the current version, this parameter can still be configured and take effect. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0,60~28800</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0,60~28800</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: You are advised to set the timeout duration for waiting for keepalive packets to three times the interval for sending keepalive packets of the IKE basic configuration that is set at the peer end.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-NATKeepaliveTimeout.html">NATKLI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Interval for Sending NAT Keepalive Packets</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval for sending network address translation (NAT) keepalive packets. This parameter is valid only when the NAT traversal function of IPsec is enabled.</p>
+<p>GUI Value Range: 5~300</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 5~300</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-DSCP.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DSCP for IKE negotiation packets.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-IPSecSwitchBack.html">IPSECSWITCHBACK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Redundancy Switch Back</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to allow a switchback to the master IKE peer after its negotiation recovers when the IPSec redundancy function is enabled.</p>
+<p>If this parameter is set to OFF, the base station automatically stops the negotiation with the master IKE peer (IPv4 or IPv6) when the negotiation with the master IKE peer fails and the negotiation with a slave IKE peer succeeds. In this case, the IKE negotiation failure alarm for the master IKE peer is not cleared. If the negotiation with a slave IKE peer succeeds previously but fails now, and if the negotiation with the slave IKE peer with the lowest priority still fails, the negotiation with the master IKE peer is started immediately even if this parameter is set to OFF. After the negotiation with the master IKE peer succeeds, the system immediately switches back to the master IKE peer and clears the IKE negotiation failure alarm for the master IKE peer.</p>
+<p>If this parameter is set to ON, the negotiation with the master IKE peer (IPv4 or IPv6) does not stop when the negotiation with the master IKE peer fails and services are switched to a slave IKE peer. In this case, the IKE negotiation failure alarm for the master IKE peer is cleared only when the negotiation with the master IKE peer succeeds. If the negotiation with the master IKE peer succeeds but the negotiation with a slave IKE peer fails, the system immediately switches services back to the master IKE peer. If the negotiation with a slave IKE peer succeeds, the system switches back to the master IKE peer after the specific timer expires. (The timer length is the sum of the IPSec switchback wait time and the random IPSec switchback delay.) If you run the <a href="set_ikecfg.html">SET IKECFG</a> command to forbid the switchback when the master and slave IKE peers are being switched (in the switchback wait period), the system immediately stops the negotiation of the primary channel.</p>
+<p>If this parameter is set to IPV4_ON+IPV6_OFF, the IPv4 switchback is enabled but the IPv6 switchback is disabled. This option is valid only for the UMPT/UMDU board that supports IPv6.</p>
+<p>If this parameter is set to IPV4_OFF+IPV6_ON, the IPv4 switchback is disabled but the IPv6 switchback is enabled. This option is valid only for the UMPT/UMDU board that supports IPv6.</p>
+<p>GUI Value Range: OFF(Off), ON(On), IPV4_ON+IPV6_OFF(IPv4 On and IPv6 Off), IPV4_OFF+IPV6_ON(IPv4 Off and IPv6 On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON, IPV4_ON+IPV6_OFF, IPV4_OFF+IPV6_ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-IPSecSwitchBackWaitTime.html">IPSECSBWAITTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Redundancy Switch Back Wait Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration before a switchover from the slave IKE peer to the master IKE peer in the IPSec redundancy function. If the master IKE peer that has been switched over to the slave IKE peer due to failed negotiation succeeds in the negotiation again, the duration from the negotiation success to the back switchover equals the duration specified by this parameter plus a random delay generated with the IPSec Redundancy Switch Back Random Delay Time parameter specified. If the <a href="set_ikecfg.html">SET IKECFG</a> command is executed to modify the value of this parameter during a back switchover, the modified value does not take effect until the next back switchover.</p>
+<p>GUI Value Range: 2~15</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 2~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-IPSecSwitchBackRandomDelayTime.html">IPSECSBRANDTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Redundancy Switch Back Random Delay Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the random delay before a switchover from the slave IKE peer to the master IKE peer in the IPSec redundancy function. When this parameter is set to N, a random delay that ranges from 0 to N is added to the duration before a back switchover. When this parameter is set to 0, no random delay is added to the duration before a back switchover. If the master IKE peer that has been switched over to the slave IKE peer due to failed negotiation succeeds in the negotiation again, the duration from the negotiation success to the back switchover equals the duration specified by the IPSec Redundancy Switch Back Wait Time parameter plus a random delay generated with this parameter specified. If the <a href="set_ikecfg.html">SET IKECFG</a> command is executed to modify the value of this parameter during a back switchover, the modified value does not take effect until the next back switchover.</p>
+<p>GUI Value Range: 0~120</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~120</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-IPSecSwitchOverWaitTime.html">IPSECSOWAITTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Redundancy Switchover Wait Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration before a switchover from the master IKE peer to the slave IKE peer in the IPSec redundancy function. If a master IKE peer fails the negotiation, the slave IKE peer initiates negotiation after a period that equals the duration specified by this parameter plus a random delay generated with the IPSec Redundancy Switchover Random Delay Time parameter specified. If the <a href="set_ikecfg.html">SET IKECFG</a> command is executed to modify the value of this parameter during the slave IKE peer negotiation, the modified value does not take effect until the next switchover.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-IPSecSwitchOverRandomDelayTime.html">IPSECSORANDTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Redundancy Switchover Random Delay Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the random delay before a switchover from the masker IKE peer to the slave IKE peer in the IPSec redundancy function. If a master IKE peer fails the negotiation, the slave IKE peer initiates negotiation after a period that equals the duration specified by the IPSec Redundancy Switchover Wait Time parameter plus a random delay generated with this parameter specified. When this parameter is set to N, a random delay that ranges from 0 to N is added to the duration before the negotiation. When this parameter is set to 0, no random delay is added to the duration before the negotiation. If the <a href="set_ikecfg.html">SET IKECFG</a> command is executed to modify the value of this parameter during the slave IKE peer negotiation, the modified value does not take effect until the next switchover.</p>
+<p>GUI Value Range: 0~120</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~120</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IKECFG-IPSecBindMode.html">IPSECBINDMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Bind Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the binding mode of an IPsec policy group, which can be global mode and single-interface mode. The two modes are mutually exclusive. In global mode, an IPsec policy group and packet filtering policies can be bound only to a normal interface, and the IPsec and packet filtering policies take effect on the normal interface and all VLAN subinterfaces in the default routing domain of the physical port to which the normal interface belongs. In single-interface mode, the IPsec policies take effect only on the interface bound to the IPsec policy group and packet filtering policies take effect only on the interface bound to the packet filtering policies. This parameter is valid only for IPv4 IPsec and packet filtering policies.</p>
+<p>GUI Value Range: SINGLE(Single), ALL(All)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLE, ALL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SINGLE(Single)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_ikecfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the IKE basic configuration with the parameters as follows: Local Name: IKECFG1, Interval for Sending Keepalive Packets: 20, Keepalive Timeout: 60, Interval for Sending NAT Keepalive Packets: 20, DSCP: 48, IPSec Redundancy Switch Back: ON, IPSec Redundancy Switch Back Wait Time: 2, IPSec Redundancy Switch Back Random Delay Time: 30, IPSec Redundancy Switchover Wait Time: 5, IPSec Redundancy Switchover Random Delay Time: 60, IPSec Bind Mode: SINGLE, run the following command:
+SET IKECFG: IKELNM="IKECFG1", IKEKLI=20, IKEKLT=60, NATKLI=20, DSCP=48, IPSECSWITCHBACK=ON, IPSECSBWAITTIME=2, IPSECSBRANDTIME=30, IPSECSOWAITTIME=5, IPSECSORANDTIME=60, IPSECBINDMODE=SINGLE;
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

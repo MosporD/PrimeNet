@@ -1,0 +1,108 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start Transmission Quality Report (STR TRANSQUALITYRPT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_transqualityrpt">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start Transmission Quality Report (STR TRANSQUALITYRPT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_transqualityrpt"></a><a name="str_transqualityrpt"></a>
+
+
+<h1 class="topictitle1">Start Transmission Quality Report (STR TRANSQUALITYRPT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="str_transqualityrpt__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to start counting transmission quality reports. The transmission quality report collects information about packet reception and transmission on a transmission link, packet loss, error bits, and delay. The report is used for monitoring the transmission performance of a BS.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_transqualityrpt__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[NodeB]If the number of transmission quality reports reaches the user-defined statistical threshold or the <a href="stp_transqualityrpt.html">STP TRANSQUALITYRPT</a> command is executed during statistics collection, the statistical task stops.</p>
+</li><li><p>[NodeB]You cannot modify the statistical period and number of measurement times when transmission quality reports are being counted. You must run the <a href="stp_transqualityrpt.html">STP TRANSQUALITYRPT</a> command to stop counting the number of transmission quality reports.</p>
+</li><li><p>[NodeB]You cannot start an E1/T1 online performance test, E1/T1 offline performance test, E1/T1 routine test, STM-1 online performance test, STM-1 offline performance test, STM-1 routine test, or an IMA test when the number of transmission quality reports is being counted.</p>
+</li><li><p>[NodeB]When the number of transmission quality reports is being counted, do not use the CLEAR function of the following DSP commands to reset a parameter to 0: <a href="dsp_ethport.html">DSP ETHPORT</a>, <a href="dsp_ethtrk.html">DSP ETHTRK</a>, <a href="dsp_fraatm.html">DSP FRAATM</a>, <a href="dsp_imagrp.html">DSP IMAGRP</a>, <a href="dsp_imalnk.html">DSP IMALNK</a>, <a href="dsp_mpgrp.html">DSP MPGRP</a>, <a href="dsp_ppplnk.html">DSP PPPLNK</a>, and <a href="dsp_unilnk.html">DSP UNILNK</a>. Otherwise, the statistics may be incorrect.</p>
+</li><li><p>[NodeB]To upload the transmission quality report, run the <a href="uld_file.html">ULD FILE</a> command with SRCF set to BRDLOG.</p>
+</li><li><p>[NodeB]Measuring packet loss on IP paths is implemented based on IP PM detection. IP PM detection is a method for monitoring IP transmission quality by using forward monitoring (FM) and backward reporting (BR) packets. The detection result is the packet loss on uplink IP paths.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="str_transqualityrpt__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRANSQUALITYRPT-Interval.html">INTV</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Statistic Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time interval for collecting statistics about the transmission quality report.</p>
+<p>GUI Value Range: 5MIN(5 Minutes), 15MIN(15 Minutes), 30MIN(30 Minutes), 1H(1 Hour), 12H(12 Hours), 24H(24 Hours)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 5MIN, 15MIN, 30MIN, 1H, 12H, 24H</p>
+<p>MML Default Value: 24H(24 Hours)</p>
+<p>Recommended Value: 24H(24 Hours)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRANSQUALITYRPT-Count.html">COUNT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Statistic Times</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of times that transmission quality reports are counted. If the number of times that transmission quality reports are counted reaches this parameter value, the statistical task stops automatically.</p>
+<p>GUI Value Range: 1~288</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~288</p>
+<p>MML Default Value: 1</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>INTV</strong> is set to 5MIN, the parameter can be set to any value in the range of 1 to 288. If <strong>INTV</strong> is set to 15MIN, the parameter can be set to any value in the range of 1 to 96. If <strong>INTV</strong> is set to 30MIN, the parameter can be set to any value in the range of 1 to 48. If <strong>INTV</strong> is set to 1H, the parameter can be set to any value in the range of 1 to 24. If <strong>INTV</strong> is set to 12H, the parameter can be set to 1 or 2. If <strong>INTV</strong> is set to 24H, the parameter must be set to 1.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_transqualityrpt__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start collecting statistics about the transmission quality report with the parameters as follows: Statistic Interval: 5MIN, Statistic Times: 10, run the following command:
+STR TRANSQUALITYRPT:INTV=5MIN, COUNT=10;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

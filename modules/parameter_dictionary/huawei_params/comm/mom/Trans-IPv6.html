@@ -1,0 +1,301 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="IPv6 MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of IPv6. It also provides the managed object model (MOM) views and describes the managed objects (MOs) related to IPv6.">
+<meta name="description" content="This section describes the functions and concepts of IPv6. It also provides the managed object model (MOM) views and describes the managed objects (MOs) related to IPv6.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../comm/mom/trans-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Trans-IPv6">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPv6 MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Trans-IPv6"></a><a name="Trans-IPv6"></a>
+
+
+<h1 class="topictitle1">IPv6 MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of IPv6. It also provides the managed object model (MOM) views and describes the managed objects (MOs) related to IPv6.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p>IPv4 has a limited number of available IP addresses. IPv6, an improved IP version, has been introduced to overcome IP address exhaustion. </p>
+<div class="p">IPv4/IPv6 dual-stack is a technique that supports both IPv4 and IPv6. This technique is used during IPv4-to-IPv6 transition. A node that supports IPv4/IPv6 dual-stack is called a dual-stack node. A dual-stack node can work in any of the following modes:<ul><li>IPv6-only mode</li><li>IPv4-only mode</li><li>IPv4/IPv6 dual-stack mode</li></ul>
+The base station type determines MO configurations.<ul><li>If a base station functions as an IPv4 node, only IPv4-related MOs need to be configured.</li><li>If a base station functions as an IPv6 node, only IPv6-related MOs need to be configured.</li><li>If a base station functions as a dual-stack node, both IPv4- and IPv6-related MOs need to be configured.</li></ul>
+</div>
+<p>The IPv6-related MOs are different from the IPv4-related MOs for a base station. This document focuses on IPv6-related MOs. For details on IPv4-related MOs and MOs shared by IPv4 and IPv6, see <a href="Trans-IPv4.html">IPv4 MOM Description</a> and <a href="Trans-Maintenance.html">Transmission Maintenance and Test MOM Description</a>. </p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Trans-IPv6__fig2">Figure 1</a> shows the IPv6-related MOs. <div class="fignone" id="Trans-IPv6__fig2"><a name="Trans-IPv6__fig2"></a><a name="fig2"></a><span class="figcap"><b>Figure 1 </b>IPv6 MOM</span>
+
+<br><span><img src="../image/mom/IPv6-MOM-Newmodel.png"></span></div>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody">In <a href="#Trans-IPv6__fig2">Figure 1</a>, the MOs in gray are IPv6-specific MOs, and the MOs in white are shared by IPv4 and IPv6. </div></div>
+</div>
+<p>IPv6-related MOs are defined as follows:</p>
+<ul><li><a href="../mo/PMTUCFG.html">PMTUCFG</a> defines the global path maximum transmission unit (PMTU) detection configurations, including the detection mode, User Datagram Protocol (UDP) port number, detection period, PMTU aging period, and differentiated services code point (DSCP). </li><li><a href="../mo/IPROUTE6.html">IPROUTE6</a> defines an IPv6 static route. An associated <a href="../mo/INTERFACE.html">INTERFACE</a> MO must be created before an <a href="../mo/IPROUTE6.html">IPROUTE6</a> MO. The ITFID parameter in the <a href="../mo/IPROUTE6.html">IPROUTE6</a> MO must be already configured in the <a href="../mo/INTERFACE.html">INTERFACE</a> MO.</li><li><a href="../mo/INTERFACE.html">INTERFACE</a> defines an interface. When the value of IPV6SW in an <a href="../mo/INTERFACE.html">INTERFACE</a> MO is ENABLE, the interface supports the IPv6 function.</li><li><a href="../mo/IPADDR6.html">IPADDR6</a> defines an IPv6 address for an interface. The IPv6 address must be a global unicast address. An associated <a href="../mo/INTERFACE.html">INTERFACE</a> MO must be created before an <a href="../mo/IPADDR6.html">IPADDR6</a> MO. The ITFID parameter in the <a href="../mo/IPADDR6.html">IPADDR6</a> MO must be already configured in the <a href="../mo/INTERFACE.html">INTERFACE</a> MO.</li><li><a href="../mo/OMCH.html">OMCH</a> defines an OM channel between a base station and an EMS. When the value of BEAR in an <a href="../mo/OMCH.html">OMCH</a> MO is IPV6, this MO defines an IPv6-based OM channel, including the IPv6 addresses of the base station and EMS. </li></ul>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody">For the definitions of other MOs listed in <a href="#Trans-IPv6__table1">Table 1</a>, see <a href="Trans-IPv4.html">IPv4 MOM Description</a>. </div></div>
+<div class="p">The MOs configured for a base station vary depending on whether the base station functions as an IPv4 or IPv6 node. <a href="#Trans-IPv6__table1">Table 1</a> describes the differences between IPv4- and IPv6-related MOs. 
+<div class="tablenoborder"><a name="Trans-IPv6__table1"></a><a name="table1"></a><table cellpadding="4" cellspacing="0" summary="" id="Trans-IPv6__table1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Differences between IPv4- and IPv6-related MOs</caption>
+
+<thead align="left">
+<tr>
+<th class="cellrowborder" valign="bottom" width="10%" id="mcps1.4.2.6.2.2.6.1.1"><p>Protocol Layer</p>
+</th>
+
+<th class="cellrowborder" valign="bottom" width="18%" id="mcps1.4.2.6.2.2.6.1.2"><p>Configuration Mode</p>
+</th>
+
+<th class="cellrowborder" valign="bottom" width="14.000000000000002%" id="mcps1.4.2.6.2.2.6.1.3"><p>IPv4 MO</p>
+</th>
+
+<th class="cellrowborder" valign="bottom" width="13%" id="mcps1.4.2.6.2.2.6.1.4"><p>IPv6 MO</p>
+</th>
+
+<th class="cellrowborder" valign="bottom" width="45%" id="mcps1.4.2.6.2.2.6.1.5"><p>Description</p>
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+<tr>
+<td class="cellrowborder" rowspan="6" valign="top" width="10%" headers="mcps1.4.2.6.2.2.6.1.1 "><p>Data link layer</p>
+</td>
+
+<td class="cellrowborder" rowspan="6" valign="top" width="18%" headers="mcps1.4.2.6.2.2.6.1.2 "><p>Endpoint mode and link mode</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="14.000000000000002%" headers="mcps1.4.2.6.2.2.6.1.3 "><p><a href="../mo/ETHPORT.html">ETHPORT</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" width="13%" headers="mcps1.4.2.6.2.2.6.1.4 "><p><a href="../mo/ETHPORT.html">ETHPORT</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" width="45%" headers="mcps1.4.2.6.2.2.6.1.5 "><p>This MO defines an Ethernet port and is shared by base stations that function as IPv4 and IPv6 nodes, respectively.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.1 "><p><a href="../mo/INTERFACE.html">INTERFACE</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.2 "><p><a href="../mo/INTERFACE.html">INTERFACE</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.3 "><p>This MO defines an IP interface and is shared by base stations that function as IPv4 and IPv6 nodes, respectively.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.1 "><p><a href="../mo/VLANMAP.html">VLANMAP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.2 "><p><a href="../mo/INTERFACE.html">INTERFACE</a></p>
+</td>
+
+<td class="cellrowborder" rowspan="4" valign="top" headers="mcps1.4.2.6.2.2.6.1.3 "><div class="p">VLAN configurations for a base station that functions as an IPv4 node are different from those for a base station that functions as an IPv6 node. <ul><li>A VLAN is configured by using the VLANMAP, DSCPMAP, SUBNETVLAN and VLANCLASS MOs when a base station functions as an IPv4 node. </li><li>A VLAN is configured by using the IPITF6 and SUBNETVLAN MOs when a base station functions as an IPv6 node. </li></ul>
+</div>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.1 "><p><a href="../mo/VLANCLASS.html">VLANCLASS</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.2 "><p>N/A</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.1 "><p><a href="../mo/DSCPMAP.html">DSCPMAP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.2 "><p>N/A</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.1 "><p><a href="../mo/SUBNETVLAN.html">SUBNETVLAN</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.2 "><p><a href="../mo/SUBNETVLAN.html">SUBNETVLAN</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="3" valign="top" width="10%" headers="mcps1.4.2.6.2.2.6.1.1 "><p>Network layer</p>
+</td>
+
+<td class="cellrowborder" rowspan="3" valign="top" width="18%" headers="mcps1.4.2.6.2.2.6.1.2 "><p>Endpoint mode and link mode</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="14.000000000000002%" headers="mcps1.4.2.6.2.2.6.1.3 "><p><a href="../mo/DEVIP.html">DEVIP</a>/<a href="../mo/IPADDR4.html">IPADDR4</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" width="13%" headers="mcps1.4.2.6.2.2.6.1.4 "><p><a href="../mo/IPADDR6.html">IPADDR6</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" width="45%" headers="mcps1.4.2.6.2.2.6.1.5 "><p>These MOs define IPv4 and IPv6 addresses, respectively.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.1 "><p><a href="../mo/IPRT.html">IPRT</a>/<a href="../mo/IPROUTE4.html">IPROUTE4</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.2 "><p><a href="../mo/IPROUTE6.html">IPROUTE6</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.3 "><p>These MOs define destination IPv4 and IPv6 routes, respectively.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.1 "><p><a href="../mo/RSCGRP.html">RSCGRP</a>/<a href="../mo/IPRSCGRP.html">IPRSCGRP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.2 "><p><a href="../mo/RSCGRP.html">RSCGRP</a>/<a href="../mo/IPRSCGRP.html">IPRSCGRP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.6.2.2.6.1.3 "><p>These MOs define the transmission resource group. If there are no passing-by data flows, a user-defined transmission resource group is not required.</p>
+</td>
+
+</tr>
+
+</tbody>
+
+
+
+<tbody>
+<tr>
+<td class="cellrowborder" rowspan="7" valign="top" width="10%"><p>Transport/Application layer</p>
+</td>
+
+<td class="cellrowborder" rowspan="2" valign="top" width="18%"><p>Link mode</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="14.000000000000002%"><p><a href="../mo/SCTPLNK.html">SCTPLNK</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" width="13%"><a href="../mo/SCTPLNK.html">SCTPLNK</a></td>
+
+<td class="cellrowborder" valign="top" width="45%"><p>Only the IP address formats are different between IPv4 and IPv6 in the SCTPLNK MO. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p><a href="../mo/IPPATH.html">IP path</a></p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>None</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>Only the endpoint mode is supported by IPv6.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="4" valign="top"><p>Endpoint mode</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p><a href="../mo/EPGROUP.html">EPGROUP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top"><p><a href="../mo/EPGROUP.html">EPGROUP</a></p>
+</td>
+
+<td class="cellrowborder" rowspan="4" valign="top"><p>These MOs define the endpoint information about local and peer ends when S1 signaling links and local links are configured in endpoint mode, and these MOs are shared by base stations that function as IPv4 and IPv6 nodes, respectively.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p><a href="../mo/SCTPHOST.html">SCTPHOST</a></p>
+</td>
+
+<td class="cellrowborder" valign="top"><p><a href="../mo/SCTPHOST.html">SCTPHOST</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p><a href="../mo/SCTPPEER.html">SCTPPEER</a></p>
+</td>
+
+<td class="cellrowborder" valign="top"><p><a href="../mo/SCTPPEER.html">SCTPPEER</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p><a href="../mo/SCTPTEMPLATE.html">SCTPTEMPLATE</a></p>
+</td>
+
+<td class="cellrowborder" valign="top"><p><a href="../mo/SCTPTEMPLATE.html">SCTPTEMPLATE</a></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top"><p>Endpoint mode and link mode</p>
+</td>
+
+<td class="cellrowborder" valign="top"><p><a href="../mo/OMCH.html">OMCH</a></p>
+</td>
+
+<td class="cellrowborder" valign="top"><p><a href="../mo/OMCH.html">OMCH</a></p>
+</td>
+
+<td class="cellrowborder" valign="top"><p>These MOs define the OM channel between a base station and an EMS. </p>
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+</div>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../comm/mom/trans-mom.html" title="This chapter describes the MOMs related to transmission.">Transport MOMs</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,229 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Synchronous Ethernet Clock (ADD SYNCETH)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_synceth">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Synchronous Ethernet Clock (ADD SYNCETH)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_synceth"></a><a name="add_synceth"></a>
+
+
+<h1 class="topictitle1">Add Synchronous Ethernet Clock (ADD SYNCETH)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_synceth__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a synchronous-Ethernet clock link.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_synceth__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>After a synchronous-Ethernet reference clock is added, the synchronous-Ethernet clock is only an optional reference clock source for the system.</p>
+</li><li><p>No synchronous-Ethernet clock link can be configured on an Ethernet port if the speed of the port is set to 10M.</p>
+</li><li><p>Adding an input link to a 1000 Mbit/s electrical port that is negotiated to work in master mode will interrupt the port for about 3 seconds. During the interruption, operations related to the ETHPORT may fail.</p>
+</li><li><p>If the synchronous-Ethernet link is configured, the synchronous-Ethernet clock signal can be transferred to the next-level NE if the two NEs are cascaded by Ethernet.</p>
+</li><li><p>If a synchronous-Ethernet link is added to a 1000 Mbit/s electrical port, ensure that the peer device do not work in slave mode. If the peer device works in slave mode, services will be interrupted or the OM channel will be disconnected.</p>
+</li><li><p>Configuring the synchronous Ethernet output link will temporarily interrupt the port where the output link is located for 3 to 15 seconds. During the interruption, operations related to the ETHPORT may fail.</p>
+</li><li><p>If a synchronous Ethernet output link has been configured and a synchronous Ethernet input link is added, the port where the input link is located is temporarily interrupted for 3 to 15 seconds. During the interruption, operations related to the ETHPORT may fail.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_synceth__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SyncEth-SyncethNo.html">LN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SyncEth Clock No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the synchronous-Ethernet clock link. A maximum of two links can be configured currently.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>SYNCETH</strong> MO, when the value of <strong>TYPE</strong> is set to IN, the value of <strong>LN</strong> must be 0. When the value of <strong>TYPE</strong> is set to OUT, the value of <strong>LN</strong> must be 1.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SyncEth-Type.html">TYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SyncEth Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of a synchronous-Ethernet clock link. It indicates whether the corresponding synchronous-Ethernet port is an input or output port. An input port is used to import clock signals to the NE, and an output port is used to export clock signals to other NEs. Only the synchronous-Ethernet clock of input type can serve as a clock source.</p>
+<p>GUI Value Range: IN(Input), OUT(Output)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IN, OUT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SyncEth-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the synchronous-Ethernet clock link is configured.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SyncEth-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the synchronous-Ethernet clock link is configured.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SyncEth-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where the synchronous-Ethernet clock link is configured.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SyncEth-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the port where the synchronous-Ethernet clock link is configured.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When an <strong>MPT</strong> is configured in the slot corresponding to the <strong>SN</strong> in the <strong>SYNCETH</strong> MO, <strong>PN</strong> is set to 0 or 1. When a <strong>TRP</strong> MO is configured in the slot corresponding to the <strong>SN</strong> in the <strong>SYNCETH</strong>, the value of <strong>PN</strong> ranges from 0 to 3.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SyncEth-SSMSelection.html">SSM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SSM Selection</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether handling of SSM frames is supported. The setting of this parameter is consistent with the setting on the Ethernet clock server.</p>
+<p>The synchronization status message (SSM) carries clock quality information, which is specified in ITU-T.</p>
+<p>This parameter is valid only when the synchronous-Ethernet clock link is of the input type.</p>
+<p>GUI Value Range: DISABLE(DISABLE), ENABLE(ENABLE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(DISABLE)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SyncEth-Priority.html">PRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of the clock source. The value 1 indicates that the current clock source has the highest priority, and the value 4 indicates that the current clock source has the lowest priority.</p>
+<p>GUI Value Range: 1~4</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4</p>
+<p>MML Default Value: 4</p>
+<p>Recommended Value: 4</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_synceth__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a synchronous-Ethernet clock link with the parameters as follows: SyncEth Clock No.: 0, Slot No.: 6, Port No.: 0, run the following command:
+ADD SYNCETH: LN=0, SN=6, PN=0;
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

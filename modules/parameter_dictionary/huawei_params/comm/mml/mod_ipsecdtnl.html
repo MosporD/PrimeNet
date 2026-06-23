@@ -1,0 +1,276 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify IPSec Dual Tunnel (MOD IPSECDTNL)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_ipsecdtnl">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify IPSec Dual Tunnel (MOD IPSECDTNL)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_ipsecdtnl"></a><a name="mod_ipsecdtnl"></a>
+
+
+<h1 class="topictitle1">Modify IPSec Dual Tunnel (MOD IPSECDTNL)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_ipsecdtnl__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of an IPSec tunnel pair.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_ipsecdtnl__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The master and slave IPsec policies referenced by the IPsec tunnel pair must be configured. In addition, the IPsec policies must be bound to ports and one IPsec policy can be bound to only one port.</p>
+</li><li><p>Services will be interrupted if the new IPSec tunnel is faulty. Use this command with caution.</p>
+</li><li><p>The local IP address cannot be set to 0.0.0.0 for the IKEPEER object that is referenced by the primary or secondary IPSec policy of each IPSec tunnel pair.</p>
+</li><li><p>Two IPSec policies of the same IPSec tunnel pair must reference the same ACL, and the ACL cannot be referenced by any other IPSec policies.</p>
+</li><li><p>If the BFD detection switch has been turned on, ensure that the primary and secondary BFD sessions have been configured for the IPSec tunnel pair to be added before running this command. In addition, ensure that the source and destination IP addresses of either BFD session are the same as the local and peer IP addresses in the IKEPEER object that is referenced by the IPSec policy of the associated IPSec tunnel respectively in the same routing domain.</p>
+</li><li><p>An IPSec policy can be referenced only by one IPSec tunnel pair.</p>
+</li><li><p>The encapsulation mode must be set to TUNNEL for the IPSec proposal that is referenced by the primary or secondary IPSec policy of each IPSec tunnel pair.</p>
+</li><li><p>For one IPSec tunnel pair, the IKE peers associated with the primary and secondary IPSec policies must be different from each other.</p>
+</li><li><p>After parameters related to IPSec dual-tunnel are modified, except IPSec Dual Tunnel Switch Back and IPSec Switch Back Wait Time, the primary tunnel is preferentially used regardless of whether services are carried on the primary or secondary tunnel.</p>
+</li><li><p>If parameters related to the IPSec dual-tunnel, expect IPSec Dual Tunnel Switch Back and IPSec Switch Back Wait Time, are modified, information about switchovers between the primary and secondary IPSec tunnels is cleared in the output of the <a href="dsp_ipsecdtnl.html">DSP IPSECDTNL</a> command.</p>
+</li><li><p>It is recommended that the IPSec Switch Back Wait Time parameter be set to a value greater than 10s to prevent ping-pong switchovers due to intermittent disconnection of the primary tunnel.</p>
+</li><li><p>If the user runs the <a href="mod_ipsecdtnl.html">MOD IPSECDTNL</a> command to change the value of the IPSec Switch Back Wait Time parameter during a back switchover, the changed value does not take effect until the next back switchover.</p>
+</li><li><p>An automatically created IPSECPOLICY MO does not support IPSec tunnel pair.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_ipsecdtnl__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-DualId.html">DUALID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Dual Tunnel ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the IPSec tunnel pair. It uniquely identifies a pair of primary and secondary IPSec tunnels.</p>
+<p>GUI Value Range: 0~49</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~49</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-MasterGroupName.html">MSPGN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Master Policy Group Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the primary IPSec policy group.</p>
+<p>GUI Value Range: 1~15 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPSECDTNL</strong> MO, only one of the following parameter groups can be the same: <strong>MSPGN</strong> and <strong>SSPGN</strong>; <strong>MSPSN</strong> and <strong>SSPSN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-MasterSeqNo.html">MSPSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Master IPSec Sequence No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the primary IPSec policy. The primary IPSec tunnel uses the primary IPSec policy, which is identified by this parameter and the MSPGN parameter together.</p>
+<p>GUI Value Range: 1~10000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPSECDTNL</strong> MO, only one of the following parameter groups can be the same: <strong>MSPGN</strong> and <strong>SSPGN</strong>; <strong>MSPSN</strong> and <strong>SSPSN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-SlaveGroupName.html">SSPGN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave Policy Group Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the secondary IPSec policy group.</p>
+<p>GUI Value Range: 1~15 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPSECDTNL</strong> MO, only one of the following parameter groups can be the same: <strong>MSPGN</strong> and <strong>SSPGN</strong>; <strong>MSPSN</strong> and <strong>SSPSN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-SlaveSeqNo.html">SSPSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave IPSec Sequence No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the secondary IPSec policy. The secondary IPSec tunnel uses the secondary IPSec policy, which is identified by this parameter and the SSPGN parameter together.</p>
+<p>GUI Value Range: 1~10000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPSECDTNL</strong> MO, only one of the following parameter groups can be the same: <strong>MSPGN</strong> and <strong>SSPGN</strong>; <strong>MSPSN</strong> and <strong>SSPSN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-BFDDetectSwitch.html">BFDDTCTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BFD Detect Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the BFD function. When this parameter is set to OFF, the NE does not enable the BFD function. When this parameter is set to ON, the NE enables the BFD function.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>BFDDTCTSW</strong> parameter in the <strong>IPSECDTNL</strong> MO is set to OFF, the <strong>DPD</strong> parameter in the <strong>IKEPEER</strong> MOs referenced by the <strong>IPSECPOLICY</strong> MO for the primary IPSec tunnel and the <strong>IPSECPOLICY</strong> MO for the secondary IPSec tunnel in the <strong>IPSECDTNL</strong> MO must be set to PERIODIC.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-MasterBFDSessionID.html">MBFDSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Master Tunnel's BFD Session ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the BFD session referenced by the primary IPSec tunnel.</p>
+<p>GUI Value Range: 0~95,100~195</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~95,100~195</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-SlaveBFDSessionID.html">SBFDSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slave Tunnel's BFD Session ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the BFD session referenced by the secondary IPSec tunnel.</p>
+<p>GUI Value Range: 0~95,100~195</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~95,100~195</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-IPSecDualTunnelSwitchBack.html">IPSECSWITCHBACK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Dual Tunnel Switch Back</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether services can be switched back to the primary tunnel from the secondary tunnel after the former recovers in IPSec dual-tunnel scenarios. When this parameter is set to OFF, the NE does not enable the IPSec dual-tunnel switch back function. When this parameter is set to ON, the NE enables the IPSec dual-tunnel switch back function. If the secondary tunnel that carries services becomes faulty and the primary tunnel is working properly, services are switched to the primary tunnel immediately regardless of the setting of this parameter.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECDTNL-IPSecSwitchBackWaitTime.html">IPSECSWITCHBACKTM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Switch Back Wait Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period from the time the primary tunnel recovers to the time services are switched back to the primary tunnel in the case that services have been switched to the secondary tunnel after the primary tunnel is faulty in IPSec dual-tunnel scenarios. If the user runs the <a href="mod_ipsecdtnl.html">MOD IPSECDTNL</a> command to change the value of this parameter during a back switchover, the changed value does not take effect until the next back switchover. The primary tunnel must keep working properly during the switchover. If the primary tunnel is disconnected, the time counting restarts. It is recommended that this parameter be set to a value greater than 10s to prevent ping-pong switchovers due to intermittent disconnection of the primary tunnel.</p>
+<p>GUI Value Range: 1~900</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~900</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 120</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_ipsecdtnl__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of the IPSec tunnel pair with the parameters as follows: IPSec Dual Tunnel ID: 0, Master IPSec Sequence No.: 3, run the following command:
+MOD IPSECDTNL: DUALID=0, MSPSN=3;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

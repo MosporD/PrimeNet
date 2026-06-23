@@ -1,0 +1,248 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add CFM MA (ADD CFMMA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_cfmma">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add CFM MA (ADD CFMMA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_cfmma"></a><a name="add_cfmma"></a>
+
+
+<h1 class="topictitle1">Add CFM MA (ADD CFMMA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_cfmma__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a connectivity fault management (CFM) maintenance association (MA).</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_cfmma__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Before running this command, ensure that the associated CFM maintenance domain (MD) has been configured.</p>
+</li><li><p>A VLAN must be bound to a CFM MA if the MA is used for continuity check (CC) on Ethernet ports or Ethernet trunks. VLANs cannot be bound to a CFM MA if the MA is used for CC on ports in Ethernet trunks.</p>
+</li><li><p>When adding a CFM MA, if an error message is displayed, indicating that the object on which the CFM MA depends has not been configured and the addition is prohibited, check whether the associated CFM MD has been configured.</p>
+</li><li><p>System specifications: If the WMPT/GTMUb/GTMUc is the main control board, a maximum of 8 CFM MAs can be configured. If the LMPT/UMPT/UMDU is the main control board, a maximum of 32 CFM MAs can be configured.</p>
+</li><li><p>The CCM TX Interval of Maintenance Association between the two ends must be the same. Otherwise, the configuration data inconsistency fault will not appear on the local station.</p>
+</li><li><p>Board specifications: A maximum of 4 CFM MAs can be configured on a WMPT/UTRP (subboard type: UEOC/UQEC). A maximum of 8 CFM MAs can be configured on a GTMUb/GTMUc. A maximum of 32 CFM MAs can be configured on a UMPT/UMDU/LMPT/UTRPc/UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9.</p>
+</li><li><p>The CCM TX Interval parameter cannot be set to 10 ms for a GTMUb board. If this parameter is set to 10 ms, the parameter value that actually takes effect is 100 ms.</p>
+</li><li><p>[NodeB]The VLANs that are bound to MAs must each be unique. That is, a VLAN cannot be bound to two MAs.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_cfmma__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-MDName.html">MDNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MD Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the MD to which the MA belongs.</p>
+<p>GUI Value Range: 1~43 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~43 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Digits 0 to 9 and letters a to z and A to Z are recommended for the MDNAME value of a CFM MA.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CFMMA</strong> MO, the total length of <strong>MANAME</strong> and <strong>MDNAME</strong> cannot exceed 44 characters.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-MAName.html">MANAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MA Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the MA.</p>
+<p>GUI Value Range: 1~43 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~43 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Digits 0 to 9 and letters a to z and A to Z are recommended for the MANAME value of a CFM MA.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>MANAME</strong> in a <strong>CFMMA</strong> MO can contain only ASCII characters. The name cannot be composed of only space characters (including space and tab) or contain the following characters: ', ", !, ?, &lt;, &gt;, and \.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CFMMA</strong> MO, the total length of <strong>MANAME</strong> and <strong>MDNAME</strong> cannot exceed 44 characters.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates cabinet number of the board to which the MA belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter takes effect when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, and can be configured but does not take effect when Transmission Configuration Mode is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates subrack number of the board to which the MA belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter takes effect when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, and can be configured but does not take effect when Transmission Configuration Mode is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates slot number of the board to which the MA belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter takes effect when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, and can be configured but does not take effect when Transmission Configuration Mode is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 7</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-BindingVLAN.html">BNDVLAN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Binding VLAN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the MA is associated with the VLAN.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: YES(Yes)</p>
+<p>Recommended Value: YES(Yes)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-VLANID.html">VLANID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the VLAN with which the MA is associated.</p>
+<p>GUI Value Range: 1~4094</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4094</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-VLANPri.html">VLANPRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of the VLAN with which the MA is associated.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFMMA-CCMInterval.html">CCMINTL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CCM TX Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval at which the CFM MA transmits continuity check messages (CCMs).</p>
+<p>GUI Value Range: 10ms(10ms), 100ms(100ms), 1s(1s), 10s(10s), 1min(1min), 10min(10min)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 10ms, 100ms, 1s, 10s, 1min, 10min</p>
+<p>MML Default Value: 1s(1s)</p>
+<p>Recommended Value: 1s(1s)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_cfmma__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a CFM MA with the parameters as follows: MD Name: CHINA, MA Name: SHANGHAI, Cabinet No.: 0, Subrack No.: 0, Slot No.: 6, Binding VLAN: YES, VLAN ID: 3, run the following command: 
+ADD CFMMA: MDNAME="CHINA", MANAME="SHANGHAI", CN=0, SRN=0, SN=6, BNDVLAN=YES, VLANID=3;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

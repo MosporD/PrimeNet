@@ -1,0 +1,307 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start E1/T1 Offline Performance Test (STR E1T1OFFLTST)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_e1t1offltst">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start E1/T1 Offline Performance Test (STR E1T1OFFLTST)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_e1t1offltst"></a><a name="str_e1t1offltst"></a>
+
+
+<h1 class="topictitle1">Start E1/T1 Offline Performance Test (STR E1T1OFFLTST)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS5900, BTS5900 WCDMA, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="str_e1t1offltst__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to start an E1/T1 offline BER test.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_e1t1offltst__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]An E1/T1 offline performance test is used to determine the BER of an E1/T1 link. Before starting the test, set the E1/T1 port at the peer end to remote loopback or set the E1/T1 port at the local end to local loopback or physical loopback. The test is invalid if no loopback is specified.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]When the E1/T1 port at the peer end is set to remote loopback or physical loopback is implemented at the local end, there is a possibility that the physical layer cannot detect the existence of the physical loopback due to bit errors on the link. As a result, you may run the <a href="dsp_e1t1.html">DSP E1T1</a> command to check whether the associated E1/T1 ports are in physical loopback state. Note that the E1/T1 offline performance test can be started only when physical loopback is in effect implemented.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]A loopback is specified for the E1/T1 offline performance test. This may disrupt services.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The E1/T1 high BER detection stops when an E1/T1 offline performance test is started. In this case, the status of the E1/T1 high BER errors is not updated.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]When an E1/T1 offline performance test is started, a Pseudo-Random Binary Sequence (PRBS) is transmitted on the E1/T1 link. The PRBS is a type of test data that does not have a frame format. Therefore, frame synchronization loss occurs on the E1/T1 link.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]If Period Report Switch is set to ON, the test result is reported every other second. If Period Report Switch is set to OFF, you can obtain the test result after the test duration expires or after the <a href="stp_e1t1offltst.html">STP E1T1OFFLTST</a> command is executed.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]After the test duration expires, the total BER and total number of error bits within the test duration are reported irrespective of whether Period Report Switch is set to ON.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]Each time only one user can start the E1/T1 offline performance test on an E1/T1 port. If multiple users start such tests on an E1/T1 port, a failure will be reported.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]You cannot start an E1/T1 online performance test and an E1/T1 offline performance test simultaneously on the same port.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The offline performance test can be enabled on multiple ports of the same board.</p>
+</li><li><p>[eNodeB]An E1/T1 offline performance test can be started in slot 6 or 7 only when the main control board is a UMPTa/UMPTb. An E1/T1 offline performance test can be started in slot 6 only when the main control board is a UMDU.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="str_e1t1offltst__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/E1T1TEST-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the port is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/E1T1TEST-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the port is located.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/E1T1TEST-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board where the port is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/E1T1TEST-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where a port is located.</p>
+<p>GUI Value Range: BASE_BOARD(Base Board), E1_COVERBOARD(E1 Cover Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BASE_BOARD, E1_COVERBOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eGBTS, eNodeB, gNodeB]If <strong>SN</strong> is within the range from 0 to 5, this parameter must be set to E1_COVERBOARD.</li><li>If <strong>SN</strong> is set to 6 or 7, this parameter must be set to BASE_BOARD.</li><li>[NodeB]If <strong>SN</strong> is within the range from 0 to 5, this parameter must be set to E1_COVERBOARD.</li><li>If <strong>SN</strong> is set to 6 or 7, this parameter must be set to BASE_BOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/E1T1TEST-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SBT</strong> is set to BASE_BOARD, the value range of this parameter is from 0 to 3.</li><li>If <strong>SBT</strong> is set to E1_COVERBOARD, the value range of this parameter is from 0 to 7.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/E1T1TEST-PeriodReportSwitch.html">SW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Period Report Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to report the test result periodically. If this parameter is set to ON, the number of bit errors and Bit Error Rate (BER) are periodically reported for each period of 1s. If this parameter is set to OFF, the test result is reported only after the E1/T1 online performance test is stopped. The reported test result involves the total number of bit errors and BER.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(Off)</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/E1T1TEST-TestTime.html">TM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Test Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration of the E1/T1 offline test. When the time of the test reaches this value, the test is automatically stopped.</p>
+<p>GUI Value Range: 1~720</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 1~720</p>
+<p>MML Default Value: 1</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_e1t1offltst__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start the E1/T1 offline performance test with the parameters as follows: Slot No.: 6, Subboard Type: BASE_BOARD, run the following command:
+STR E1T1OFFLTST: SN=6, SBT=BASE_BOARD;
+The result is shown as follows:
++++    0        2010-08-14 19:11:12
+O&amp;M    #4908
+%%STR E1T1OFFLTST: SN=6, SBT=BASE_BOARD;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END
+
++++    0        2010-08-14 19:12:23
+O&amp;M    #4916
+%%STR E1T1OFFLTST: SN=6, SBT=BASE_BOARD;%%
+RETCODE = 0  Operation succeeded.
+
+E1T1 OFF LINE TEST Result
+-------------------------
+                                  Cabinet No.  =  0
+                                  Subrack No.  =  0
+                                     Slot No.  =  6
+                                Subboard Type  =  Base Board
+                                     Port No.  =  0
+                                  Remain Time  =  0:00'00"
+                                     Duration  =  0:01'00"
+      Bit Error Rate(E1)/Error Block Rate(T1)  =  1.000000E+00        
+Bit Error Number (E1)/Error Block Number (T1)  =  122880000
+(Number of results = 1)
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="str_e1t1offltst__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the cabinet where the port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the subrack where the port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the board where the port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subboard Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of sub-board on the board where a port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the port number.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Remain Time</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the remaining time.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Duration</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates how long the test has been conducted.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Bit Error Rate(E1)/Error Block Rate(T1)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bit error rate in the test result.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Bit Error Number (E1)/Error Block Number (T1)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of bit errors in the test result.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

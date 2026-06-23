@@ -1,0 +1,253 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="ACLRULE">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="ACLRULE">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>ACLRULE</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="ACLRULE"></a><a name="ACLRULE"></a>
+
+
+<h1 class="topictitle1">ACLRULE</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="ACL.html">ACL</a>
+    +-<a href="ACLRULE.html"><strong>ACLRULE</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An ACLRULE MO is used to define the rules in an access control list (ACL). The BS identifies and classifies the data flows based on the rules.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="ACL.html">ACL</a></li><li>Relation with the <strong>PACKETFILTERING</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>ACLAUTOSWITCH</strong> is set to OFF, and <strong>FM</strong> in a <strong>PACKETFILTERING</strong> MO is set to ADV_ACL, and <strong>ACLTYPE</strong> in a <strong>PACKETFILTERING</strong> MO is set to IPV4, at least one <strong>ACLRULE</strong> MO which is created manually is included in the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>FM</strong> in a <strong>PACKETFILTERING</strong> MO is set to L2_ACL, at least one <strong>ACLRULE</strong> MO is included in the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PACKETFILTERING</strong> MO, if <strong>ACLAUTOSWITCH</strong> is set to ON, manually added ACL rules cannot be numbered from 50000 to 59999 because those ACL rule IDs are used by automatically created ACL rules. That is, <strong>RULEID</strong> cannot be set to any value from 50000 to 59999 for a manually created ACL rule. In the <strong>ACLRULE</strong> MO, if the value of <strong>AUTOCFGFLAG</strong> for an ACL rule is MANUAL_CREATED, this ACL rule is manually created.</li></ul>
+</li><li>Relation with the <strong>ACLRULE</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Each <strong>ACLRULE</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE in one <strong>ACL</strong> MO must have a unique configuration. Two <strong>ACLRULE</strong> MOs have the same configuration if the following values are the same in the two MOs: calculation result of <strong>SIP</strong> and <strong>SWC</strong> by using a wildcard; calculation result of <strong>DIP</strong> and <strong>DWC</strong> by using a wildcard; values of <strong>ACTION</strong>, <strong>PT</strong>, <strong>SMPT</strong>, <strong>SOP</strong>, <strong>SPT1</strong>, <strong>SPT2</strong>, <strong>DMPT</strong>, <strong>DOP</strong>, <strong>DPT1</strong>, <strong>DPT2</strong>, <strong>MDSCP</strong>, <strong>DSCP</strong>, and <strong>MFRG</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Each <strong>ACLRULE</strong> MO in one <strong>ACL</strong> MO must have a unique configuration. Two <strong>ACLRULE</strong> MOs have the same configuration if the following condition is met: The two <strong>ACLRULE</strong> MOs have the same combination of <strong>ACTION</strong>, <strong>VLANIDOP</strong>, <strong>VLANID1</strong>, and <strong>VLANID2</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of 16 <strong>ACLRULE</strong> MOs can be configured in one <strong>ACL</strong> MO when <strong>ACLID</strong> in the <strong>ACLRULE</strong> MO is within the range of 4000 to 4999.</li><li>[Co-MPT, eNodeB, gNodeB]The total number of <strong>ACLRULE</strong> MOs that can be manually configured and automatically created for packet filtering cannot exceed 1000 in a base station.</li><li>[NodeB]A maximum of 24 <strong>ACLRULE</strong> MOs can be configured in one <strong>ACL</strong> MO.</li><li>[eGBTS]A maximum of 128 <strong>ACLRULE</strong> MOs can be configured in one <strong>ACL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring an <strong>IPSECPOLICY</strong> MO, ensure that an <strong>ACLRULE</strong> MO is configured for the <strong>ACL</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>ACLAUTOSWITCH</strong> is set to OFF, and <strong>FM</strong> in a <strong>PACKETFILTER</strong> MO is set to ADV_ACL or ADV_AND_L2, at least one <strong>ACLRULE</strong> MO which is created manually is included in the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>FM</strong> in a <strong>PACKETFILTER</strong> MO is set to L2_ACL or ADV_AND_L2, at least one <strong>ACLRULE</strong> MO is included in the <strong>ACL</strong> MO corresponding to <strong>ACLID2</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PACKETFILTER</strong> MO, if <strong>ACLAUTOSWITCH</strong> is set to ON, manually added ACL rules cannot be numbered from 50000 to 59999 because those ACL rule IDs are used by automatically created ACL rules. That is, <strong>RULEID</strong> cannot be set to any value from 50000 to 59999 for a manually created ACL rule. In the <strong>ACLRULE</strong> MO, if the value of <strong>AUTOCFGFLAG</strong> for an ACL rule is MANUAL_CREATED, this ACL rule is manually created.</li></ul>
+</li><li>Relation with the <strong>ACL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>ACLRULE</strong> MO is manually configured, the corresponding <strong>ACL</strong> MO must also be manually configured.</li></ul>
+</li><li>Relation with the <strong>IPSECBIND</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by <strong>IPSECBIND</strong> on a transmission board is 264.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by <strong>IPSECBIND</strong> on a main control board is 512.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, a maximum of 512 <strong>ACLRULE</strong> MOs can be manually created in a base station.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, <strong>INTERFACE</strong>, and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a transmission board is 264.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a main control board is 512.</li><li>[gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a transmission board is 264.</li><li>[gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a main control board is 512.</li></ul>
+</li><li>Relation with the <strong>ACLRULE6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]On a BS, the total number of <strong>ACLRULE</strong> MOs and <strong>ACLRULE6</strong> MOs must be less than or equal to 6092.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>IPSECBIND</strong>, and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBIND</strong> on one board is 128.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong>, <strong>MPT</strong>, <strong>IPSECBIND</strong>, and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists and the LMPT board is not in an <strong>HAGRP</strong> MO, the maximum of <strong>ACLRULE</strong> MO with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBIND</strong> MO on the LMPT board is 128.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>ACLRULE6</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is set to IPV4+IPV6, the <strong>ACL6</strong> MO associated with the <strong>IPSECPOLICY</strong> MO must contain an <strong>ACLRULE6</strong> MO, and the <strong>ACL</strong> MO associated with the <strong>IPSECPOLICY</strong> MO must contain an <strong>ACLRULE</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is set to IPV4+IPV6, <strong>ACTION</strong> in the <strong>ACLRULE</strong> MO and <strong>ACTION</strong> in the <strong>ACLRULE6</strong> MO used by the <strong>IPSECPOLICY</strong> MO must be set to PERMIT.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is set to IPV4 and <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to IPV6, <strong>ACTION</strong> in the <strong>ACLRULE</strong> MO used by the <strong>IPSECPOLICY</strong> MO must be set to PERMIT.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, <strong>IKEPEER</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBINDITF</strong> that reference <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV4 on one board is 128.</li><li>[gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBINDITF</strong> that reference <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV4 on one board is 128.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>ACLRULE</strong> MOs must be less than or equal to 128 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>IPSECBIND</strong>, <strong>IPSECPOLICY</strong>, <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]When the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured, the maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by <strong>IPSECBIND</strong> on one board is 128.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, <strong>GTMU</strong>, <strong>MPT</strong>, <strong>APPLICATION</strong>, <strong>IKEPEER</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eGBTS]When the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on one board is 128.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#ACLRULE__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="ACLRULE__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="ACLRULE__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_aclrule.html">ADD ACLRULE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a rule to an access control list (ACL).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_aclrule.html">DSP ACLRULE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the information about the effective ACL rules.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_aclrule.html">LST ACLRULE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of an access control list (ACL) rule.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_aclrule.html">MOD ACLRULE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify an access control list (ACL) rule.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_aclrule.html">RMV ACLRULE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an ACL rule from an ACL.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#ACLRULE__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="ACLRULE__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="ACLRULE__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-ACLID.html">ACL ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the access control list (ACL) to which an ACL rule belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-RuleID.html">Rule ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an ACL rule. The values 1 to 65535 indicate ACL rules manually configured by users or automatically generated for packet filtering. (When the value of ACL Rule Automatic Setup and Deletion Switch of packet filtering is ON, IDs from 50000 to 59999 cannot be used for manually configured ACL rules and are used for automatically generated ACL rules for packet filtering only.) The values 65431 to 65536 indicate the ACL rules automatically generated during DHCP detection. The values 70000 to 79999 indicate ACL rules automatically generated for packet filtering in endpoint configuration mode. The values 80000 to 89999 indicate ACL rules automatically generated for IPsec in endpoint configuration mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-Action.html">Action</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the action taken on the data that matches an ACL rule. When an ACL rule is bound to packet filtering, the base station allows the data that matches the rule to transmit if this parameter is set to PERMIT, and discards the data if this parameter is set to DENY. When an ACL rule is referenced by an IPSec policy, the base station encrypts or decrypts the data that matches the rule if this parameter is set to PERMIT, and does not encrypt or decrypt the data if this parameter is set to DENY.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-ProtocolType.html">Protocol Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the protocol type of the data to which an ACL rule is applied.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-SrcIP.html">Source IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the source IP address of data to which an ACL rule is applied. To add an ACL rule that is applicable to data of all source IP addresses, set this parameter to 0.0.0.0.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-SrcWildcart.html">Source Wildcard</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the wildcard of a source IP address. The wildcard is used to determine which bits can be neglected when IP address matching is being performed. It can be considered as the inverse of the corresponding subnet mask.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-MatchSrcPort.html">Match Source Port</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to check the source port number of each data stream before applying an ACL rule.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-SrcOp.html">Source Port Operate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filtering condition for a source port. If this parameter is set to OP_LT, the ACL rule is applied to the data stream whose source port number is smaller than or equal to the configured port number. If this parameter is set to OP_GT, the ACL rule is applied to the data stream whose source port number is larger than or equal to the configured port number. If this parameter is set to OP_EQ, the ACL rule is applied to the data stream whose source port number is equal to the configured port number. If this parameter is set to OP_NEQ, the ACL rule is applied to the data stream whose source port number is not equal to the configured port number. If this parameter is set to OP_RANGE, the ACL rule is applied to the data stream whose source port number is within the configured range. OP_NEQ is available only for the LMPT, UMPT, UMDU, UTRPc, UCCU and SMPT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-SrcPort1.html">Source Port 1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the source port number used when SMPT is set to YES. If SOP is set to OP_RANGE, this parameter indicates the smallest source port number. If SOP is not set to OP_RANGE, this parameter indicates a specific source port number.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-SrcPort2.html">Source Port 2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the source port number used when SMPT is set to YES. If SOP is set to OP_RANGE, this parameter indicates the largest source port number. This parameter is valid only when SOP is set to OP_RANGE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-DstIP.html">Destination IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination IP address of data to which an ACL rule is applied. To add an ACL rule that is applicable to data of all destination IP addresses, set this parameter to 0.0.0.0.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-DstWildcart.html">Destination Wildcard</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the wildcard of a destination IP address. The wildcard is used to determine which bits can be neglected when IP address matching is being performed. It can be considered as the inverse of the corresponding subnet mask.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-MatchDstPort.html">Match Destination Port</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to check the destination port number of each data stream before applying an ACL rule.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-DstPortOp.html">Destination Port Operate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filtering condition for the destination port. This parameter is valid only when DMPT is set to YES. If this parameter is set to OP_LT, the ACL rule is applied to the data stream whose destination port number is smaller than or equal to the configured port number. If this parameter is set to OP_GT, the ACL rule is applied to the data stream whose destination port number is larger than or equal to the configured port number. If this parameter is set to OP_EQ, the ACL rule is applied to the data stream whose destination port number is equal to the configured port number. If this parameter is set to OP_NEQ, the ACL rule is applied to the data stream whose destination port number is not equal to the configured port number. If this parameter is set to OP_RANGE, the ACL rule is applied to the data stream whose destination port number is within the configured range. This parameter can be set to OP_NEQ only for the LMPT, UMPT, UMDU, UTRPc, UCCU, and SMPT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-DstPort1.html">Destination Port 1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination port number used when DMPT is set to YES. If DOP is set to OP_RANGE, this parameter indicates the smallest destination port number. If DOP is not set to OP_RANGE, this parameter indicates a specific destination port number.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-DstPort2.html">Destination Port 2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination port number used when DMPT is set to YES. If DOP is set to OP_RANGE, this parameter indicates the largest destination port number. This parameter is valid only when DOP is set to OP_RANGE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-MatchDSCP.html">Match DSCP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to check the DSCP of each data stream before applying the ACL rule.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-DSCP.html">DSCP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the differentiated services code point (DSCP).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-MatchFragment.html">Match Fragment Message</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to match the fragment message. The ACL rules for matching fragment messages apply to only packet filtering and does not apply to the IPSec function. When this parameter is set to NO, whether a packet is fragmented is not checked. When this parameter is set to YES, this rule applies only to the middle and last fragments but does not apply to the first fragment or packets that are not fragmented.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an object can be modified or deleted by the system. The value MANUAL_MODE means that only the user can modify or delete the object. The value AUTO_MODE means only the system can modify or delete the object.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-VLANIDOp.html">VLAN ID Operate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filter criteria for VLAN IDs. This parameter is valid only when the ACL ID ranges from 4000 to 4999. When this parameter is set to OP_EQ, only the VLAN ID specified by VLANID1 is a valid. When this parameter is set to OP_RANGE, all the VLAN IDs within the range of VLANID1 to VLANID2 are valid. When this parameter is set to OP_NOVLAN, only packets without VLAN tags are valid.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-VLANID1.html">VLAN ID 1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a VLAN to which service data belongs. When Source Port Operate is set to OP_EQ, this parameter specifies the ID of the matching VLAN. When Source Port Operate is set to OP_RANGE, this parameter specifies the smallest ID of the matching VLANs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-VLANID2.html">VLAN ID 2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a VLAN to which service data belongs. When Source Port Operate is set to OP_RANGE, this parameter specifies the largest ID of the matching VLANs. This parameter is valid only when Source Port Operate is set to OP_RANGE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ACLRULE-AutoCfgFlag.html">Auto Config Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object is created by the system. MANUAL_CREATED means that the object is configured by the user manually. AUTO_CREATED means that the object is created by the system.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

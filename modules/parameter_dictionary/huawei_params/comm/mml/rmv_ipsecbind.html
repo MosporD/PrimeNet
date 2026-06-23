@@ -1,0 +1,215 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Remove Binding from IPSec Policy Group to Port (RMV IPSECBIND)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="rmv_ipsecbind">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Remove Binding from IPSec Policy Group to Port (RMV IPSECBIND)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="rmv_ipsecbind"></a><a name="rmv_ipsecbind"></a>
+
+
+<h1 class="topictitle1">Remove Binding from IPSec Policy Group to Port (RMV IPSECBIND)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="rmv_ipsecbind__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to remove the binding of an IPSec policy group to a port. The execution of this command terminates the protection mechanism applied to the data streams flowed through the port.</p>
+</div></div>
+
+<div class="mmlnote"><a name="rmv_ipsecbind__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The binding of an IPSec policy group to a port cannot be removed if the IPSec policy group is referenced by an IPSec tunnel pair.</p>
+</li><li><p>If the master and slave IKE peers are configured in different IPSec policy groups, you must remove the IPSECBIND MO of the slave IKE peer before removing the IPSECBIND MO of the master IKE peer.</p>
+</li><li><p>When the master and slave IKE peers are configured in different IPSec policy groups, if the user remove the IPSECBIND references the slave IKE peer in use, the system will use the slave IKE peer of a lower priority for negotiation. If there is not exist any other slave IKE peers, a switchover is performed from slave IKE tunnel to the master IKE tunnel regardless of whether back switchover is enabled.</p>
+</li><li><p>When the user remove the IPSECBIND references the master IKE peer, the master IKE tunnel is reused regardless of whether the master or slave IKE peer is used currently.</p>
+</li><li><p>This operation may interrupt the services or OM channels. It is recommended that you determine whether to enable the automatic configuration data rollback function depending on scenarios. For details, see the help of the <a href="cfm_cb.html">CFM CB</a> command.</p>
+</li><li><p>When an IPSECBIND MO is removed, if the IPSECPOLICY, IPSECPROPOSAL, ACL, IKEPEER and IKEPROPOSAL objects, which the IPSECBIND MO directly or indirectly depends on, do not have a bearer MO (PACKETFILTER, IPSECBIND) on the board where the IPSECBIND MO has taken effect, the IPSECPOLICY, IPSECPROPOSAL, ACL, IKEPEER and IKEPROPOSAL objects will not take effect on the board.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="rmv_ipsecbind__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBIND-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the port to which the IPSec policy group is bound.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Interface ID parameter in the IPSECBINDITF MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBIND-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the port to which the IPSec policy group is bound.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Interface ID parameter in the IPSECBINDITF MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBIND-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the port to which the IPSec policy group is bound.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Interface ID parameter in the IPSECBINDITF MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBIND-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board with the port to which the IPSec policy group is bound.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Interface ID parameter in the IPSECBINDITF MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH_COVERBOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPSECBIND</strong> MO, if <strong>SN</strong> is within the range from 0 to 5, this parameter must be set to ETH_COVERBOARD.</li><li>In the <strong>IPSECBIND</strong> MO, if <strong>SN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBIND-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of port to which the IPSec policy group is bound.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Interface ID parameter in the IPSECBINDITF MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: ETH(Ethernet Port), ETHTRK(Ethernet Trunk), ETHCI(Ethernet CI Port)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH, ETHTRK, ETHCI</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPSECBIND</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to ETH, ETHTRK or ETHCI.</li><li>In the <strong>IPSECBIND</strong> MO, if <strong>SBT</strong> is set to ETH_COVERBOARD, this parameter can be set to ETH or ETHTRK.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBIND-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the port to which the IPSec policy group is bound.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Interface ID parameter in the IPSECBINDITF MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPSECBIND</strong> MO, this parameter can be set to 0 if <strong>PT</strong> is set to ETHCI. </li><li>In an <strong>IPSECBIND</strong> MO, this parameter can be set to 0 to 3 if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH. </li><li>In an <strong>IPSECBIND</strong> MO, this parameter can be set to 0 or 1 if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETHTRK.</li><li>In an <strong>IPSECBIND</strong> MO, this parameter can be set to a value within the range of 0 to 5 if <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH. </li><li>In an <strong>IPSECBIND</strong> MO, this parameter can be set to a value within the range of 0 to 2 if <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETHTRK.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBIND-PolicyGroupName.html">SPGN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Policy Group Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the IPSec policy group.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Policy Group Name parameter in the IPSECBINDITF MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 1~15 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="rmv_ipsecbind__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To remove the binding of an IPSec policy group to a port with the parameters as follows: Slot No.: 6, Subboard Type: BASE_BOARD, Port Type: ETH, Port No.: 0, Policy Group Name: policy, run the following command: 
+RMV IPSECBIND: SN=6, SBT=BASE_BOARD, PT=ETH, PN=0, SPGN="policy";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

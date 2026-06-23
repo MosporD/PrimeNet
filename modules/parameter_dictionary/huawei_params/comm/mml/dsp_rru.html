@@ -1,0 +1,809 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display RRU/RFU (DSP RRU)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_rru">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display RRU/RFU (DSP RRU)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_rru"></a><a name="dsp_rru"></a>
+
+
+<h1 class="topictitle1">Display RRU/RFU (DSP RRU)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_rru__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the dynamic information about an RRU or RFU. The information to be queried is as follows: the number of RX and TX channels, the number of carriers on each RX channel and TX channel, Maximum output power on the TX channel, the uplink channel gain, and other information about the RRU or RFU.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_rru__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>If two or more RRUs or RFUs are displayed in the command output, the corresponding cabinet number, subrack number, and slot number must be specified to query the information of a single RRU or RFU.</p>
+</li><li><p>The length of the fiber optic cable between the BBU and RF module in the command output is inaccurate due to factors such as the refractive index. The longer the fiber optic cable, the smaller the error. The relationship between the length of the fiber optic cable and the error is as follows and is for reference only: When the length of the fiber optic cable is smaller than 600 m, the error is large. When the length of the fiber optic cable ranges from 600 m to 2 km, the error is within 10%. When the length of the fiber optic cable ranges from 2 km to 12 km, the error is within 5%. When the length of the fiber optic cable is greater than 12 km, the error is within 2.5%. In eCPRI scenarios, when the optical fiber length is less than 1 km, the error rate is high. When the optical fiber length is greater than 1 km, the error rate is about 10%. When the optical fiber length is greater than 10 km, the error rate is about 5%. When the optical fiber length is greater than 20 km, the error rate is about 3%.</p>
+</li><li><p>If an RF module works in cold backup mode, the fiber optic cable length displayed under Display RRU/RFU Dynamic Information or Display Length of Fiber Optic Cable Connecting to RRU/RFU refers to the length of the fiber optic cable in use between the BBU and RF module.</p>
+</li><li><p>If an RF module works in load sharing or hot backup mode, the fiber optic cable length displayed under Display RRU/RFU Dynamic Information refers to the length of the shorter fiber optic cable between the RF module and BBU. The lengths of both fiber optic cables between them are displayed under Display Length of Fiber Optic Cable Connecting to RRU/RFU.</p>
+</li><li><p>If an MPMU supports MPRFs, the length of fiber optic cables between the base station and RF modules is the same as that of fiber optic cables between the base station and MPRFs. In the queried dynamic information about an MPMU or MPRF, the length of fiber optic cables measured between the base station and RF modules is inaccurate and used for reference only because the MPMU is connected to an RHUB using a cable other than a fiber optic cable.</p>
+</li><li><p>In a multimode base station, when the RF Desensitivity(dB) parameter is set to different values in different modes, the maximum value takes effect. Therefore, the value of the RF Desensitivity(dB) parameter displayed in the output of the <a href="dsp_rru.html">DSP RRU</a> command may be different from the configured value.</p>
+</li><li><p>When the <a href="blk_brd.html">BLK BRD</a> command is executed to block an RF unit using the eCPRI protocol, the length of optical fiber between the base station and the RF unit cannot be queried.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_rru__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUPara-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the RRU or RFU is located.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>CN</strong> in the <strong>RRU</strong> MO is set to 0~15.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUPara-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the RRU or RFU is located.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of <strong>SRN</strong> in the <strong>RRU</strong> MO ranges from 60 to 254. The value of <strong>SRN</strong> in the <strong>RFU</strong> MO ranges from 4 to 5.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUPara-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the RRU or RFU.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TYPE</strong> in the <strong>CABINET</strong> MO where the <strong>RFU</strong> MO is located is set to BTS3900AL, the value of <strong>SN</strong> in the <strong>RFU</strong> MO ranges from 0 to 8. Otherwise, the value of <strong>SN</strong> in the <strong>RFU</strong> MO ranges from 0 to 5. When the value of <strong>SRN</strong> in the <strong>RRU</strong> MO is set to 60, <strong>SN</strong> in the <strong>RRU</strong> MO ranges from 0 to 5. When the value of <strong>SRN</strong> in the <strong>RRU</strong> MO ranges from 61 to 254, the value of <strong>SN</strong> in the <strong>RRU</strong> MO ranges from 0 to 3.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>SN</strong> in the <strong>RRU</strong> MO is set to a value greater than 0 and <strong>RT</strong> in the <strong>RRU</strong> MO is not set to MPRF, <strong>SRN</strong> in the <strong>RRU</strong> MO must be set to 60, and <strong>TYPE</strong> in the <strong>CABINET</strong> MO where the <strong>RRU</strong> MO is located must be set to RFC5906 or IFS5906.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RtmAldReuse.html">FLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ALD Reuse Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the ALD should be inquired. Value ON indicates that the ALD should be inquired. Value NULL indicates that the ALD should not be inquired.</p>
+<p>GUI Value Range: ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-LocationName.html">LOCATIONNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Location Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the location information of an RRU. Set this parameter to the location name of the site. The location name of the site is configured in the Location object. LocationName must be set to the same value for RF modules serving the same sector.</p>
+<p>GUI Value Range: 0~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_rru__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">1. To display the dynamic attributes of the RRU or RFU with the parameters as follows: Cabinet No.: 0, Subrack No.: 81, Slot No.: 0, run the following command:
+DSP RRU: CN=0, SRN=81, SN=0;
+The result is shown as follows:
++++    0        2009-12-12 09:01:52                                                                                            
+O&amp;M    #83                                                                                                                          
+%%DSP RRU: CN=0, SRN=81, SN=0;%%                                                                                                       
+RETCODE = 0  Operation succeeded.                                                                                                   
+                                                                                                                                    
+Display RRU/RFU Dynamic Information                                                                                                 
+-----------------------------------                                                                                                 
+                                                            Cabinet No.  =  0                                                                
+                                                            Subrack No.  =  81                                                               
+                                                               Slot No.  =  0                                                                
+                                                       Access Direction  =  Access from chain head or ring head                              
+                                                  Number of RX channels  =  2                                                                
+                                                  Number of TX channels  =  2                                                                
+                                   Number of carriers on the RX channel  =  LTE_FDD:2 GSM:8 UMTS:6                                                                
+                                   Number of carriers on the TX channel  =  LTE_FDD:2 GSM:8 UMTS:4                                                                
+                         Maximum output power on the TX channel(0.1dBm)  =  490                                                              
+                                                 UL channel gain(0.1dB)  =  470                                                              
+                                                     UL Support Feature  =  UL Feature Supported                                             
+                                             Low Current Protect Switch  =  Enable                       
+                                                             Antenna ID  =  NULL                                                    
+                                                       Antenna Location  =  NULL
+                                   PA Efficiency Improvement Capability  =  Disable
+The length of the fiber optic cable between the BBU and RF module(100m)  =  0
+                               RRU/RFU Maximum Delay of Its Channel(ns)  =  100000
+                                                   RF Desensitivity(dB)  =  0
+                                    RF DC Power Off Alarm Detect Switch  =  ON
+                            Battery Output Undervoltage Threshold(0.1V)  =  441
+                                               Current Maintenance Mode  =  NORMAL
+                                                      Power Supply Type  =  DC
+                                                 DC Input Voltage(0.1V)  =  526
+                                                Fan Installation Status  =  Unknown
+                                                           Install Type  =  NULL
+                                       The Value of The Circuit Breaker  =  2*100A
+                                Configuration Exceed Specification Flag  =  NO
+                                                        Dormancy Switch  =  NULL
+                                                     Reserved Bandwidth  =  NULL
+                                                        Cable Length(m)  =  NULL
+                                                       Calibration Type  =  External
+(Number of results = 1)
+
+Display RRU/RFU the length of the fiber optic cable
+---------------------------------------------------
+                                                            Cabinet No.  =  0
+                                                            Subrack No.  =  81
+                                                               Slot No.  =  0
+                                         Cabinet No. of Interface Board  =  0
+                                         Subrack No. of Interface Board  =  0
+                                            Slot No. of Interface Board  =  3
+                                            Port No. of Interface Board  =  2
+                                          SubPort No. of Interface Board = 0
+                                                  Port No. of RF Module  =  0
+The length of the fiber optic cable between the BBU and RF module(100m)  =  0
+(Number of results = 1)
+
+
+---    END
+
+2. To list the running information about all RRUs or RFUs, run the following command:
+DSP RRU:;
+The result is shown as follows:
++++    0        2010-03-04 16:08:55
+O&amp;M    #465
+%%DSP RRU:;%%
+RETCODE = 0  Operation succeeded.
+
+Display RRU/RFU Dynamic Information
+-----------------------------------
+     Cabinet No.  =  0
+     Subrack No.  =  60
+        Slot No.  =  0
+Access Direction  =  Access from chain head or ring head
+(Number of results = 1)
+
+
+---    END
+
+3. To display the dynamic attributes of the AAU supporting beamforming with the parameters as follows: Cabinet No.: 0, Subrack No.: 60, Slot No.: 0, run the following command:
+DSP RRU: CN=0, SRN=60, SN=0;
+The result is shown as follows:
++++    0        2015-11-18 15:34:50
+O&amp;M    #40
+%%DSP RRU: CN=0, SRN=60, SN=0;%%
+RETCODE = 0  Operation succeeded.
+
+Display RRU/RFU Dynamic Information
+-----------------------------------
+                                                            Cabinet No.  =  0
+                                                            Subrack No.  =  60
+                                                               Slot No.  =  0
+                                                       Access Direction  =  Access from chain head or ring head
+                                                  Number of RX channels  =  8
+                                                  Number of TX channels  =  8
+                                   Number of carriers on the RX channel  =  NULL
+                                   Number of carriers on the TX channel  =  NULL
+                         Maximum output power on the TX channel(0.1dBm)  =  508
+                                                 UL channel gain(0.1dB)  =  395
+                                                     UL Support Feature  =  UL Feature Supported
+                                             Low Current Protect Switch  =  NULL
+                                                             Antenna ID  =  NULL
+                                                       Antenna Location  =  NULL
+                                   PA Efficiency Improvement Capability  =  Disable
+The length of the fiber optic cable between the BBU and RF module(100m)  =  0
+                               RRU/RFU Maximum Delay of Its Channel(ns)  =  NULL
+                                                   RF Desensitivity(dB)  =  0
+                                    RF DC Power Off Alarm Detect Switch  =  NULL
+                            Battery Output Undervoltage Threshold(0.1V)  =  NULL
+                                               Current Maintenance Mode  =  NORMAL
+                                                      Power Supply Type  =  UNKNOWN
+                                                 DC Input Voltage(0.1V)  =  NULL
+                                                Fan Installation Status  =  Unknown
+                                                           Install Type  =  NULL
+                                       The Value of The Circuit Breaker  =  2*100A
+                                Configuration Exceed Specification Flag  =  NO
+                                                        Dormancy Switch  =  NULL
+                                                     Reserved Bandwidth  =  NULL
+                                                        Cable Length(m)  =  NULL
+                                                       Calibration Type  =  External
+(Number of results = 1)
+
+Display RRU Downlink Capability
+-------------------------------
+Band 1 DL Minimum Frequency(0.1MHz)  =  25750
+Band 1 DL Maximum Frequency(0.1MHz)  =  26350
+           Band 1 DL Bandwidth(MHz)  =  LTE_TDD:60
+Band 2 DL Minimum Frequency(0.1MHz)  =  NULL
+Band 2 DL Maximum Frequency(0.1MHz)  =  NULL
+           Band 2 DL Bandwidth(MHz)  =  NULL
+Band 3 DL Minimum Frequency(0.1MHz)  =  NULL
+Band 3 DL Maximum Frequency(0.1MHz)  =  NULL
+           Band 3 DL Bandwidth(MHz)  =  NULL
+(Number of results = 1)
+
+Display RRU Uplink Capability
+-----------------------------
+Band 1 UL Minimum Frequency(0.1MHz)  =  25750
+Band 1 UL Maximum Frequency(0.1MHz)  =  26350
+           Band 1 UL Bandwidth(MHz)  =  LTE_TDD:60
+Band 2 UL Minimum Frequency(0.1MHz)  =  NULL
+Band 2 UL Maximum Frequency(0.1MHz)  =  NULL
+           Band 2 UL Bandwidth(MHz)  =  NULL
+Band 3 UL Minimum Frequency(0.1MHz)  =  NULL
+Band 3 UL Maximum Frequency(0.1MHz)  =  NULL
+           Band 3 UL Bandwidth(MHz)  =  NULL
+(Number of results = 1)
+
+Display RRU/RFU the length of the fiber optic cable
+---------------------------------------------------
+                                                            Cabinet No.  =  0
+                                                            Subrack No.  =  60
+                                                               Slot No.  =  0
+                                         Cabinet No. of Interface Board  =  0
+                                         Subrack No. of Interface Board  =  0
+                                            Slot No. of Interface Board  =  3
+                                            Port No. of Interface Board  =  2
+                                          SubPort No. of Interface Board = 0
+                                                  Port No. of RF Module  =  0
+The length of the fiber optic cable between the BBU and RF module(100m)  =  0
+(Number of results = 1)
+
+
+---    END
+
+4. When the SDR interconnection switch is turned off, display the dynamic attributes of the RRU or RFU with the parameters as follows: Cabinet No.: 0, Subrack No.: 80, Slot No.: 0, run the following command:
+DSP RRU: CN=0, SRN=80, SN=0;
+The result is shown as follows:
++++    V28_2_38_2        2020-11-06 10:13:33
+O&amp;M    #2379
+%%DSP RRU: CN=0, SRN=80, SN=0;%%
+RETCODE = 0  Operation succeeded.
+
+Display RRU/RFU Dynamic Information
+-----------------------------------
+                                                            Cabinet No.  =  0
+                                                            Subrack No.  =  80
+                                                               Slot No.  =  0
+                                                       Access Direction  =  Access from chain head or ring head
+                                                  Number of RX channels  =  2
+                                                  Number of TX channels  =  2
+                                   Number of carriers on the RX channel  =  LTE_FDD:2 UMTS:8 NBIOT:1 NR_FDD:2
+                                   Number of carriers on the TX channel  =  LTE_FDD:1 UMTS:4 NBIOT:1 NR_FDD:1
+                         Maximum output power on the TX channel(0.1dBm)  =  490
+                                                 UL channel gain(0.1dB)  =  395
+                                                     UL Support Feature  =  UL Feature Supported
+                                             Low Current Protect Switch  =  Enable
+                                                             Antenna ID  =  NULL
+                                                       Antenna Location  =  NULL
+                                   PA Efficiency Improvement Capability  =  Enable
+The length of the fiber optic cable between the BBU and RF module(100m)  =  0
+                               RRU/RFU Maximum Delay of Its Channel(ns)  =  NULL
+                                                   RF Desensitivity(dB)  =  0
+                                    RF DC Power Off Alarm Detect Switch  =  NULL
+                            Battery Output Undervoltage Threshold(0.1V)  =  NULL
+                                               Current Maintenance Mode  =  NORMAL
+                                                      Power Supply Type  =  DC
+                                                 DC Input Voltage(0.1V)  =  527
+                                                Fan Installation Status  =  Unknown
+                                                           Install Type  =  NULL
+                                       The Value of The Circuit Breaker  =  NULL
+                                Configuration Exceed Specification Flag  =  NO
+                                                        Dormancy Switch  =  NULL
+                                                     Reserved Bandwidth  =  NULL
+                                                        Cable Length(m)  =  NULL
+                                                       Calibration Type  =  NULL
+(Number of results = 1)
+
+Display RRU/RFU the length of the fiber optic cable
+---------------------------------------------------
+                                                            Cabinet No.  =  0
+                                                            Subrack No.  =  80
+                                                               Slot No.  =  0
+                                         Cabinet No. of Interface Board  =  0
+                                         Subrack No. of Interface Board  =  60
+                                            Slot No. of Interface Board  =  0
+                                            Port No. of Interface Board  =  0
+                                         SubPort No. of Interface Board  =  0
+                                                  Port No. of RF Module  =  1
+The length of the fiber optic cable between the BBU and RF module(100m)  =  0
+(Number of results = 1)
+
+Display the information about the peer NE
+-----------------------------------------
+     Cabinet No.  =  0
+     Subrack No.  =  80
+        Slot No.  =  0
+   Peer Standard  =  COMM
+    Peer NE Name  =  38_21
+   Peer App Type  =  eNodeB
+Peer Cabinet No.  =  0
+Peer Subrack No.  =  80
+   Peer Slot No.  =  0
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_rru__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the cabinet where the RRU or RFU is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the subrack where the RRU or RFU is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the RRU or RFU.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Access Direction</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the access direction of the service plane.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of RX channels</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of RX channels of the RRU or RFU. Set this parameter to the number of antenna ports on the RF module. The system creates RX channels based on the number of configured channels. For 8-channel TDD or FDD RRUs, the RX channels are numbered from 1 in ascending order, and channels 1 to 8 corresponds to antenna ports A to H. For other RRUs/RFUs, RX channels are numbered from 0 in ascending order, and channels 0 to 15 correspond to antenna ports A to P. Ensure that sufficient RX channels are configured before using an RX channel No. For example, if R0D is used, at least four RX channels must have been configured. Operations cannot be performed on a single channel for AAUs capable of beamforming. Therefore, this parameter does not take effect on such AAUs and the recommended value is 0.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of TX channels</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of TX channels of the RRU or RFU. Set this parameter to the number of antenna ports on the RF module. The system creates TX channels based on the number of configured channels. For 8-channel TDD or FDD RRUs, the TX channels are numbered from 1 in ascending order, and channels 1 to 8 corresponds to antenna ports A to H. For other RRUs/RFUs, TX channels are numbered from 0 in ascending order, and channels 0 to 15 correspond to antenna ports A to P. Ensure that sufficient TX channels are configured before using an TX channel No. For example, if R0D is used, at least four TX channels must have been configured. Operations cannot be performed on a single channel for AAUs capable of beamforming. Therefore, this parameter does not take effect on such AAUs and the recommended value is 0.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of carriers on the RX channel</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of carriers on each RX channel.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of carriers on the TX channel</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of carriers on each TX channel.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Maximum output power on the TX channel(0.1dBm)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the total output power of TX channels in the RRU/RFU. The precision deviation is &plusmn;0.5 dB. For details, see the description of Output Power in the product description of the corresponding RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>UL channel gain(0.1dB)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the UL channel gain.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>UL Support Feature</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the RRU or RFU supports the UL features. This parameter takes effect for UMTS only.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Low Current Protect Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the undercurrent protection switch. If an undercurrent alarm is generated, the ALD power switch for this RRU or RFU is automatically turned off only when this parameter is set to ENABLE. If this parameter is set to NULL, the RRU/RFU undercurrent protection function setting is not changed. If NULL is displayed in the DSP RRU command output, the RRU/RFU does not support undercurrent protection. Only UMTS currently supports this function.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Antenna ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the serial number of the RU in the AAU. The serial numbers of antennas on other RF modules are invalid.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Antenna Location</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the RU in the AAU. The value of this parameter is NULL for other RF modules. The slots of RUs are numbered from 0 in ascending order from bottom to top.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>PA Efficiency Improvement Capability</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether an RF module supports the power amplifier efficiency improvement. This parameter takes effect in UMTS, LTE or NR.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>The length of the fiber optic cable between the BBU and RF module[100m(100ft)]</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the length of the fiber optic cable between the BBU and RF module. NULL indicates an invalid value.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>RRU/RFU Maximum Delay of Its Channel(ns)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum compensation in antenna delay supported by an RF module. The propagation delay from the output port of an RF unit to the antenna port is compensated. If no TMA is configured, this parameter is set to the propagation delay of the feeder. If the TMA is configured, this parameter also includes the delay of the TMA. NULL indicates that the compensation in antenna delay cannot be queried.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>RF Desensitivity(dB)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the RF desensitization intensity of the RRU or RFU. When the air interface is under the impact of strong blocking or interference, the anti-interference capability of RF modules can be improved by decreasing the gain on RX channels and lowering the receiver sensitivity. For example, when the parameter is set to 10 dB, the uplink receiver sensitivity is lowered by 10 dB. Therefore, the anti-interference capability is improved. Currently, this parameter can only be set to 0 dB or 10 dB for RRU3804 and WRFU. The RRU3808, RRU3201, RRU3203, and LRFU do not support this function.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Current Maintenance Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the current maintenance mode of the RRU.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ALD Reuse Flag</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the ALD is reused. Value 0 indicates that the ALD is not reused. Value 1 indicates that the ALD is reused. This parameter takes effect only to UMTS.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>RF DC Power Off Alarm Detect Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the switch for detecting the abnormal input of the power supply. Some RF modules need to check the DC voltage to determine whether they are about to be powered off. If this switch is turned on, RF modules detect the voltage. If the voltage is abnormal, ALM-26564 RF Unit DC Input Power Failure is reported. This parameter takes effect only for the RF modules for which the value of DC Input Voltage is not NULL in the output of the <a href="dsp_rru.html">DSP RRU</a> command.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Battery Output Undervoltage Threshold(0.1V)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the output undervoltage threshold of storage batteries. This parameter is valid only if the switch controlling the detection of the RF Unit DC Input Power Failure alarm. The value NULL indicates that RF modules do not support this parameter. This parameter takes effect only for the RF modules for which the value of DC Input Voltage is not NULL in the output of the <a href="dsp_rru.html">DSP RRU</a> command.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Power Supply Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the power supply type of the RF module. The value UNKNOWN indicates that the power supply type of the RF module cannot be queried.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>DC Input Voltage(0.1V)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the DC input voltage of the RF module. The value NULL indicates that the DC input voltage of the RF module cannot be queried.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Fan Installation Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the installation status of the fan in the RF module, which can be Uninstalled, Installed, and Unknown. When the base station supports the fan installation but the fan is not installed, Uninstalled is displayed. When the base station supports the fan installation and the fan is installed, Installed is displayed. When the RF module does not support the fan, or the base station does not support the fan function, Unknown is displayed.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Install Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the AAU installation mode, including horizontal installation and vertical installation. The value NULL indicates that the installation mode of the AAU cannot be queried.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>The Value of The Circuit Breaker</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the circuit breaker value of the power module that is connected to an RF module. The value NULL indicates that the queried RF module does not support querying of this parameter and is displayed only in the <a href="dsp_rru.html">DSP RRU</a> command output.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Configuration Exceed Specification Flag</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the configuration of an RF module has exceeded specifications. If the value of this parameter is YES, view Configuration Exceed Specification Info for detailed information. The value of this parameter is UNKNOWN when the base station version is not supported or detailed specification information cannot be obtained.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Configuration Exceed Specification Info</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates that configuration of an RF module has exceeded specifications. Configuration exceeding specifications indicates that multimode data configuration of an RF module has exceeded hardware specifications, including the specifications for power, bandwidth, and number of carriers. This will lead to service exception of certain RATs that are configured on this module.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 1 DL Minimum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the minimum downlink frequency supported by the RRU or RFU band 1. For example, if this parameter is set to 9650, the minimum downlink frequency of the RRU or RFU is 9650 x 0.1 MHz, which equals to 965 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 1 DL Maximum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum downlink frequency supported by the RRU or RFU band 1. For example, if this parameter is set to 9850, the maximum downlink frequency of the RRU or RFU is 9850 x 0.1 MHz, which equals to 985 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 1 DL Bandwidth(MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth in band 1 supported by each TX channel in the downlink. This bandwidth is an instantaneous bandwidth.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 2 DL Minimum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the minimum downlink frequency supported by the RRU or RFU band 2. This parameter is NULL, when the RRU or RFU does not support multiple bands. For example, if this parameter is set to 9650, the minimum downlink frequency of the RRU is 9650 x 0.1 MHz, which equals to 965 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 2 DL Maximum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum downlink frequency supported by the RRU or RFU band 2. This parameter is NULL, when the RRU or RFU does not support multiple bands. For example, if this parameter is set to 9850, the maximum downlink frequency of the RRU is 9850 x 0.1 MHz, which equals to 985 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 2 DL Bandwidth(MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth in band 2 supported by each TX channel in the downlink. This bandwidth is an instantaneous bandwidth. This parameter is NULL when the RRU or RFU does not support multiple bands.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 3 DL Minimum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the minimum downlink frequency supported by the RRU or RFU band 3. This parameter is NULL, when the RRU or RFU does not support multiple bands. For example, if this parameter is set to 9650, the minimum downlink frequency of the RRU is 9650 x 0.1 MHz, which equals to 965 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 3 DL Maximum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum downlink frequency supported by the RRU or RFU band 3. This parameter is NULL, when the RRU or RFU does not support multiple bands. For example, if this parameter is set to 9850, the maximum downlink frequency of the RRU is 9850 x 0.1 MHz, which equals to 985 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 3 DL Bandwidth(MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth in band 3 supported by each TX channel in the downlink. This bandwidth is an instantaneous bandwidth. This parameter is NULL when the RRU or RFU does not support multiple bands.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 1 UL Minimum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the minimum uplink frequency supported by the RRU or RFU band 1. For example, if this parameter is set to 9250, the minimum uplink frequency of the RRU is 9250 x 0.1 MHz, which equals to 925 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 1 UL Maximum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum uplink frequency supported by the RRU or RFU band 1. For example, if this parameter is set to 9450, the maximum uplink frequency of the RRU is 9450 x 0.1 MHz, which equals to 945 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 1 UL Bandwidth(MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth supported by each RX channel band 1 in the uplink. This bandwidth is an instantaneous bandwidth.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 2 UL Minimum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the minimum uplink frequency supported by the RRU or RFU band 2.This parameter is NULL,when the RRU does not support multiple bands. For example, if this parameter is set to 9250, the minimum uplink frequency of the RRU is 9250 x 0.1 MHz, which equals to 925 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 2 UL Maximum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum uplink frequency supported by the RRU or RFU band 2.This parameter is NULL,when the RRU does not support multiple bands. For example, if this parameter is set to 9850, the maximum uplink frequency of the RRU is 9850 x 0.1 MHz, which equals to 985 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 2 UL Bandwidth(MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth supported by each RX channel band 2 in the uplink. This bandwidth is an instantaneous bandwidth. This parameter is NULL when the RRU does not support multiple bands.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 3 UL Minimum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the minimum uplink frequency supported by the RRU or RFU band 3.This parameter is NULL,when the RRU does not support multiple bands. For example, if this parameter is set to 9250, the minimum uplink frequency of the RRU is 9250 x 0.1 MHz, which equals to 925 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 3 UL Maximum Frequency(0.1MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum uplink frequency supported by the RRU or RFU band 3.This parameter is NULL,when the RRU does not support multiple bands. For example, if this parameter is set to 9850, the maximum uplink frequency of the RRU is 9850 x 0.1 MHz, which equals to 985 MHz.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Band 3 UL Bandwidth(MHz)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth supported by each RX channel band 3 in the uplink. This bandwidth is an instantaneous bandwidth. This parameter is NULL when the RRU does not support multiple bands.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Dormancy Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the RRU deep dormancy switch. RRU deep dormancy is enabled if this switch is turned on. RRU deep dormancy is disabled if this switch is turned off. This parameter is NULL when the RRU does not support deep dormancy. The effective status of RRU deep dormancy can be queried using the <a href="dsp_rru.html">DSP RRU</a> command. When Dormancy Switch is set to ON, you need to set the start time and end time of the dormancy period. If you do not set the start time and end time, the dormancy period is 00:00:00 to 06:00:00. This parameter is valid only when RRU type is set to MPMU, MRRU, or AIRU.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Reserved Bandwidth</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the bandwidth reserved for other applications.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No. of Interface Board</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the cabinet housing the interface board.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No. of Interface Board</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the subrack housing the interface board.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No. of Interface Board</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the slot housing the interface board.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port No. of Interface Board</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the port on the interface board.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>SubPort No. of Interface Board</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the sub-port number of the interface board.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port No. of RF Module</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the port on the RF unit.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Latest Start Time of High Temperature Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the latest start time of the high temperature mode for an RF module. In high temperature mode, the RF module works within the claimed maximum supported temperature range. The format of the parameter value is YYYY-MM-DD HH:MM:SS.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Latest End Time of High Temperature Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the latest end time of the high temperature mode for an RF module. The format of the parameter value is YYYY-MM-DD HH:MM:SS. If the RF module is still in high temperature mode, the parameter value is "Uncompleted."</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cable Length[m(ft)]</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the length of the power cable for the RF module. The value is displayed only after the result is obtained using the <a href="str_rxucabletest.html">STR RXUCABLETEST</a> command. The calculation results are displayed separately according to the signal propagation speeds defined by the European standard and American standard. Users can query this parameter value to obtain the power cable length based on the types of cables used onsite. The value AVG indicates that the system cannot accurately obtain the length of the power cable of the RF module. According to the calculation result of the average algorithm, the length of the cable between the RF module and the power module cannot be accurately expressed. The value NULL indicates that the length of the power cable is not queried or is not supported.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Calibration Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the effective channel calibration mode of the RF module. The value NULL indicates that the RF units do not support the query of this parameter.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer Standard</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the RAT of the peer end. The RATs include UMTS, GSM, LTE, LTE TDD, NR, COMM, and COMM2. COMM and COMM2 are the RATs of co-MPT base stations.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer NE Name</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the name of the peer NE. The value NULL indicates that the peer NE does not support the report of this field.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer App Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the application type of the peer NE. The value NULL indicates that the peer NE has no applications, or does not support the report of this field.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the RRU on the peer NE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the RRU on the peer NE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the RRU on the peer NE.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

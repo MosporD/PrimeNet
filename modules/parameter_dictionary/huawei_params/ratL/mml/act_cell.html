@@ -1,0 +1,90 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Activate Cell (ACT CELL)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="act_cell">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Activate Cell (ACT CELL)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="act_cell"></a><a name="act_cell"></a>
+
+
+<h1 class="topictitle1">Activate Cell (ACT CELL)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="act_cell__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to activate a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="act_cell__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Only an unblocked cell can be properly set up.</p>
+</li><li><p>Before running this command, ensure that cell operators are configured.</p>
+</li><li><p>Before running this command, ensure that carrier resources are configured.</p>
+</li><li><p>The cell activation failure may be caused by the unavailability of carrier resources. The preparation of carrier resources takes a few seconds. After carrier resources are available, the cell will be automatically activated. You are advised to query the cell status by running the DSP CELL command 10 seconds later. If the cell is still not activated, check whether an alarm is reported. If an alarm is reported, clear the alarm by referring to eNodeB Alarm Reference.</p>
+</li><li><p>When you activate cells with different antenna modes established on the same BBP, check the cell specifications and networking if the following message is displayed: The antenna modes of the cells established on the BBP conflict with each other. If the number of established cells is within the cell specifications, reset the BBP to rectify the problem.</p>
+</li><li><p>If a cell fails to be activated within the internal protection time because a fault occurs in the baseband resources bound to the cell or the baseband resources bound to the cell are occupied by another cell, run the DSP CELL command to query the cell status after the internal protection time ends. If the cell is still unavailable according to the query results, check for related alarms and handle the activation failure based on the alarm handling suggestions. The internal protection time lasts (eNodeBResModeAlgo.BbpResAutoRecfgTimer - 8) minutes. If the eNodeBResModeAlgo.BbpResAutoRecfgTimer parameter value is less than 8, the internal binding algorithm does not take effect.</p>
+</li><li><p>The BBP to which the RF module for a cell is directly connected and the BBP used by this cell cannot be located in different BBUs.</p>
+</li><li><p>Before activating an SFN cell, ensure that the value of the SectorEqmNum parameter in the Cell MO corresponding to this SFN cell is greater than or equal to the number of eUCellSectorEqm MOs for the cell.</p>
+</li><li><p>Before running this command, ensure that the RRU cascading level, cell bandwidth, and CPRI compression configuration meet the CPRI bandwidth and data rate requirements. Otherwise, the command execution fails.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="act_cell__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="act_cell__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To activate a cell with the local cell ID of 0, run the following command:
+ACT CELL:LocalCellId=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

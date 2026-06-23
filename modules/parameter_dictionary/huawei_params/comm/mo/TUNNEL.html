@@ -1,0 +1,269 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="TUNNEL">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="TUNNEL">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>TUNNEL</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="TUNNEL"></a><a name="TUNNEL"></a>
+
+
+<h1 class="topictitle1">TUNNEL</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="TUNNEL.html"><strong>TUNNEL</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A TUNNEL MO is used to set the parameters related to backplane communication when co-transmission is implemented between radio access technologies.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>RSCGRP</strong> MO is set to TUNNEL, the <strong>TUNNEL</strong> MO corresponding to <strong>PN</strong> in the <strong>RSCGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>TUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]All the <strong>TUNNEL</strong> MOs configured for a BS can only cross two subracks.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Each <strong>TUNNEL</strong> MO must have a unique combination of <strong>SCN</strong>, <strong>DCN</strong>, <strong>SSRN</strong>, <strong>DSRN</strong>, <strong>SSN</strong>, and <strong>DSN</strong>.</li></ul>
+</li><li>Relation with the <strong>SUBIF</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A <strong>TUNNEL</strong> MO and a <strong>SUBIF</strong> MO cannot both be configured.</li></ul>
+</li><li>Relation with the <strong>VRF</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A <strong>TUNNEL</strong> MO and a <strong>VRF</strong> MO whose <strong>VRFIDX</strong> is set to 1 to 7 cannot both be configured.</li></ul>
+</li><li>Relation with the <strong>IPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> are set to IF and TUNNEL, respectively in an <strong>IPRT</strong> MO, <strong>IFNO</strong> in the <strong>IPRT</strong> MO must be the same as <strong>TUNNELID</strong> in the associated <strong>TUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>LR</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>LR</strong> MO is set to TUNNEL, the associated <strong>TUNNEL</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When removing a <strong>TUNNEL</strong> MO, the system automatically removes the <strong>LR</strong> MO that depends on the <strong>TUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in a <strong>PACKETFILTER</strong> MO is set to TUNNEL, the <strong>TUNNEL</strong> MO corresponding to <strong>PN</strong> in the <strong>PACKETFILTER</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the logical protection group where the <strong>SSN</strong> of the <strong>TUNNEL</strong> MO is located, the value of <strong>SN</strong> in the <strong>HAGRP</strong> MO must be the same as the value of <strong>SSN</strong> in the <strong>TUNNEL</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the logical protection group where the <strong>DSN</strong> of the <strong>TUNNEL</strong> MO is located, the value of <strong>SN</strong> in the <strong>HAGRP</strong> MO must be the same as the value of <strong>DSN</strong> in the <strong>TUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SRCIPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>RTTYPE</strong> and <strong>IFT</strong> parameters under the <strong>SRCIPRT</strong> MO are set to IF and TUNNEL, respectively, the <strong>IFNO</strong> parameter under the <strong>SRCIPRT</strong> MO must be set to the same value as that of the <strong>TUNNELID</strong> parameter under the <strong>TUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, the <strong>TUNNEL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>TUNNEL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> and <strong>JNRSCGRP</strong> in an <strong>IPPATH</strong> MO are set to TUNNEL and DISABLE, respectively, the associated <strong>TUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>DLFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>DLFLOWCTRLPARA</strong> MO is set to TUNNEL, the associated <strong>TUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ULFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>ULFLOWCTRLPARA</strong> MO is set to TUNNEL, the associated <strong>TUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>DLFLOWCTRLPARA</strong> and <strong>ULFLOWCTRLPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS]When removing a <strong>TUNNEL</strong> MO, the system automatically removes the <strong>DLFLOWCTRLPARA</strong> and <strong>ULFLOWCTRLPARA</strong> MOs that depend on the <strong>TUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GPM</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>PT</strong> and <strong>RSCGRPID</strong> in a <strong>GPM</strong> MO are set to TUNNEL and DEFAULTPORT, respectively, the associated <strong>TUNNEL</strong> MO must have been configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#TUNNEL__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="TUNNEL__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="TUNNEL__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_tunnel.html">ADD TUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a tunnel that is for backplane communication when co-transmission is implemented between radio access technologies.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_tunnel.html">DSP TUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of a tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_tunnel.html">LST TUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configurations of a tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_tunnel.html">MOD TUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configurations of a tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_tunnel.html">RMV TUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a tunnel.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#TUNNEL__tab2">Table 2</a> and <a href="#TUNNEL__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="TUNNEL__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="TUNNEL__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNEL-SrcCabinetNo.html">Source Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the source cabinet where the tunnel is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNEL-SrcSubrackNo.html">Source Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the source subrack where the tunnel is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNEL-SrcSlotNo.html">Source Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the source slot where the tunnel is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNEL-TunnelNo.html">Tunnel No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of the tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNEL-DstCabinetNo.html">Destination Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the destination cabinet where the tunnel is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNEL-DstSubrackNo.html">Destination Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the destination subrack where the tunnel is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNEL-DstSlotNo.html">Destination Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the destination slot where the tunnel is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNEL-TunnelType.html">Tunnel Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the tunnel.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="TUNNEL__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="TUNNEL__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TUNNEL-RcvByte.html">Number of RX Bytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes received through the tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TUNNEL-RcvPacket.html">Number of RX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual number of packets received through a tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TUNNEL-SendByte.html">Number of TX Bytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual number of bytes sent through the tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TUNNEL-SendPacket.html">Number of TX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual number of packets sent through the tunnel.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#TUNNEL__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="TUNNEL__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="TUNNEL__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455856.html">VS.TUNNEL.TxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Bytes Transmitted in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455857.html">VS.TUNNEL.TxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets Transmitted in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455856.html">VS.TUNNEL.RxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Bytes Received in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455857.html">VS.TUNNEL.RxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets Received in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455860.html">VS.TUNNEL.TxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum Transmit Rate in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455860.html">VS.TUNNEL.TxMinSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Minimum Transmit Rate in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455860.html">VS.TUNNEL.TxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average Transmit Rate in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455860.html">VS.TUNNEL.RxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum Receive Rate in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455860.html">VS.TUNNEL.RxMinSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Minimum Receive Rate in the Tunnel</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455860.html">VS.TUNNEL.RxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average Receive Rate in the Tunnel</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

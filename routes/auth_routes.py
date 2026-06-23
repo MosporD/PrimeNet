@@ -4,17 +4,83 @@ Handles login, logout, registration, and dashboard access
 """
 
 import logging
-import sqlite3
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, make_response
+import threading
+import time
+from collections import defaultdict, deque
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, make_response, g
 from database_enhanced import (
     create_user, authenticate_user, create_session,
     get_user_by_session, delete_session, log_activity, is_password_change_required
 )
-from sync_config import METADATA_DB
-from sync.metadata_active_sql import perf_per_tech_union_sql_with_activity
+from db.runtime import connect_metadata, execute_query
+from modules.sync.metadata_active_sql import perf_per_tech_union_sql_with_activity
 
 logger = logging.getLogger(__name__)
 auth_bp = Blueprint('auth', __name__)
+
+_LOGIN_RATE_LIMIT_ATTEMPTS = 5
+_LOGIN_RATE_LIMIT_WINDOW_SEC = 2 * 60
+_login_rate_lock = threading.Lock()
+_login_attempts_by_ip = defaultdict(deque)
+_login_attempts_by_ip_user = defaultdict(deque)
+
+
+def _login_client_ip() -> str:
+    forwarded = (request.headers.get('X-Forwarded-For') or '').strip()
+    if forwarded:
+        return forwarded.split(',')[0].strip() or 'unknown'
+    return (request.remote_addr or 'unknown').strip() or 'unknown'
+
+
+def _prune_login_attempts(buf: deque, now_ts: float) -> None:
+    cutoff = now_ts - _LOGIN_RATE_LIMIT_WINDOW_SEC
+    while buf and buf[0] < cutoff:
+        buf.popleft()
+
+
+def _login_rate_limit_remaining(ip: str, username: str) -> tuple[bool, int]:
+    now_ts = time.time()
+    key_user = f'{ip}:{(username or "").lower()}'
+    with _login_rate_lock:
+        ip_buf = _login_attempts_by_ip[ip]
+        user_buf = _login_attempts_by_ip_user[key_user]
+        _prune_login_attempts(ip_buf, now_ts)
+        _prune_login_attempts(user_buf, now_ts)
+        ip_limited = len(ip_buf) >= _LOGIN_RATE_LIMIT_ATTEMPTS
+        user_limited = len(user_buf) >= _LOGIN_RATE_LIMIT_ATTEMPTS
+        if not ip_limited and not user_limited:
+            return False, 0
+        next_retry_ip = int(max(1, _LOGIN_RATE_LIMIT_WINDOW_SEC - (now_ts - ip_buf[0]))) if ip_buf else 1
+        next_retry_user = int(max(1, _LOGIN_RATE_LIMIT_WINDOW_SEC - (now_ts - user_buf[0]))) if user_buf else 1
+        return True, max(next_retry_ip, next_retry_user)
+
+
+def _record_login_failure(ip: str, username: str) -> None:
+    now_ts = time.time()
+    key_user = f'{ip}:{(username or "").lower()}'
+    with _login_rate_lock:
+        ip_buf = _login_attempts_by_ip[ip]
+        user_buf = _login_attempts_by_ip_user[key_user]
+        _prune_login_attempts(ip_buf, now_ts)
+        _prune_login_attempts(user_buf, now_ts)
+        ip_buf.append(now_ts)
+        user_buf.append(now_ts)
+
+
+def _clear_login_failures(ip: str, username: str) -> None:
+    key_user = f'{ip}:{(username or "").lower()}'
+    with _login_rate_lock:
+        _login_attempts_by_ip_user.pop(key_user, None)
+
+
+def reset_login_rate_limits() -> None:
+    """Clear in-memory login lockouts (e.g. after policy change or admin reset)."""
+    with _login_rate_lock:
+        _login_attempts_by_ip.clear()
+        _login_attempts_by_ip_user.clear()
+
+
+reset_login_rate_limits()
 
 _DEFAULT_SITE_COLUMNS = [
     {'key': '2G', 'title': '2G', 'subtitle': 'GSM / EDGE', 'count': 0},
@@ -39,15 +105,15 @@ def get_operational_site_stats():
     """
     union = perf_per_tech_union_sql_with_activity()
     sql = f'''
-        SELECT technology, site_id
+        SELECT technology, vendor, site_id
         FROM ({union}) v
         WHERE activity_status = 'Active'
           AND site_id IS NOT NULL
           AND TRIM(COALESCE(CAST(site_id AS TEXT), '')) != ''
     '''
     try:
-        conn = sqlite3.connect(METADATA_DB, timeout=15)
-        rows = conn.execute(sql).fetchall()
+        conn = connect_metadata()
+        rows = [dict(r) for r in execute_query(conn, sql).fetchall()]
         conn.close()
     except Exception as e:
         logger.exception('Dashboard operational site stats failed: %s', e)
@@ -55,15 +121,20 @@ def get_operational_site_stats():
         return cols, 0
 
     buckets = {
-        '2G': set(),
-        '3G': set(),
-        '4G-FDD': set(),
-        '4G-TDD': set(),
-        '5G': set(),
+        '2G': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
+        '3G': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
+        '4G-FDD': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
+        '4G-TDD': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
+        '5G': {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}},
     }
-    for tech, site_id in rows:
-        if tech in buckets:
-            buckets[tech].add(site_id)
+    for row in rows:
+        tech = row.get('technology')
+        site_id = row.get('site_id')
+        vendor = str(row.get('vendor') or '').strip().title()
+        if tech in buckets and site_id is not None:
+            buckets[tech]['all'].add(site_id)
+            if vendor in ('Huawei', 'Nokia'):
+                buckets[tech]['vendors'][vendor].add(site_id)
 
     order = [
         ('2G', '2G', 'GSM / EDGE'),
@@ -75,13 +146,24 @@ def get_operational_site_stats():
     columns = []
     all_sites = set()
     for key, title, subtitle in order:
-        s = buckets.get(key, set())
+        bucket = buckets.get(key, {'all': set(), 'vendors': {'Huawei': set(), 'Nokia': set()}})
+        s = bucket['all']
         all_sites |= s
+        huawei_count = len(bucket['vendors']['Huawei'])
+        nokia_count = len(bucket['vendors']['Nokia'])
         columns.append({
             'key': key,
             'title': title,
             'subtitle': subtitle,
             'count': len(s),
+            'vendor_counts': {
+                'Huawei': huawei_count,
+                'Nokia': nokia_count,
+            },
+            'children': [
+                {'label': 'Huawei', 'count': huawei_count},
+                {'label': 'Nokia', 'count': nokia_count},
+            ],
         })
     return columns, len(all_sites)
 
@@ -154,16 +236,28 @@ def register():
 def login():
     """Authenticate user and create session"""
     try:
-        data = request.get_json()
-        username = data.get('username')
+        data = (getattr(g, 'sanitized_json', None) or request.get_json() or {})
+        username = (data.get('username') or '').strip()
         password = data.get('password')
+        client_ip = _login_client_ip()
 
-        if not all([username, password]):
+        limited, retry_after = _login_rate_limit_remaining(client_ip, username)
+        if limited:
+            response = jsonify({
+                'error': 'Too many login attempts. Try again later.',
+                'retry_after_seconds': retry_after,
+            })
+            response.status_code = 429
+            response.headers['Retry-After'] = str(retry_after)
+            return response
+
+        if not username or password is None or password == '':
             return jsonify({'error': 'Username and password required'}), 400
 
         success, user = authenticate_user(username, password)
 
         if success and user:
+            _clear_login_failures(client_ip, username)
             session_token = create_session((user.get('id') if isinstance(user, dict) else user[0]))
             log_activity((user.get('id') if isinstance(user, dict) else user[0]), 'login', f'User {username} logged in')
             must_change_password = bool(user.get('must_change_password')) if isinstance(user, dict) else is_password_change_required({
@@ -182,13 +276,23 @@ def login():
                 }
             }))
 
-            response.set_cookie('session_token', session_token, httponly=True)
+            secure_cookie = (request.headers.get('X-Forwarded-Proto') == 'https') or request.is_secure
+            response.set_cookie(
+                'session_token',
+                session_token,
+                httponly=True,
+                secure=secure_cookie,
+                samesite='Lax',
+                path='/',
+            )
             return response
         else:
+            _record_login_failure(client_ip, username)
             return jsonify({'error': 'Invalid credentials'}), 401
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Login error')
+        return jsonify({'error': 'Internal server error'}), 500
 
 @auth_bp.route('/api/logout', methods=['POST'])
 def logout():
@@ -204,11 +308,48 @@ def logout():
             delete_session(session_token)
 
         response = make_response(jsonify({'success': True}))
-        response.set_cookie('session_token', '', expires=0)
+        secure_cookie = (request.headers.get('X-Forwarded-Proto') == 'https') or request.is_secure
+        response.set_cookie(
+            'session_token',
+            '',
+            expires=0,
+            httponly=True,
+            secure=secure_cookie,
+            samesite='Lax',
+            path='/',
+        )
         return response
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    except Exception:
+        logger.exception('Logout error')
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+def _is_owner(user) -> bool:
+    if not user:
+        return False
+    role = user.get('role') if isinstance(user, dict) else (user[6] if len(user) > 6 else '')
+    return str(role or '').strip().lower() == 'admin'
+
+
+@auth_bp.route('/api/dashboard/pm-health', methods=['GET'])
+def dashboard_pm_health():
+    """PM database health (Owner / admin only)."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+
+    force = (request.args.get('refresh') or '').strip().lower() in ('1', 'true', 'yes')
+    try:
+        from core.pm_health import get_pm_health_cached
+
+        payload = get_pm_health_cached(force_refresh=force)
+        return jsonify({'success': True, **payload})
+    except Exception:
+        logger.exception('PM health check failed')
+        return jsonify({'success': False, 'error': 'PM health check failed'}), 500
 
 
 @auth_bp.route('/api/dashboard/operational-sites', methods=['GET'])

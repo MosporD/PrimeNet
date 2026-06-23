@@ -1,0 +1,166 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellLowPower">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellLowPower">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellLowPower</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellLowPower"></a><a name="CellLowPower"></a>
+
+
+<h1 class="topictitle1">CellLowPower</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellLowPower.html"><strong>CellLowPower</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellLowPower MO consists of the parameters related to the low power consumption mode of a cell. The eNodeB enters the low power consumption mode when the eNodeB receiving a command for forcibly entering the low power consumption mode or an alarm indicating that the mains input is abnormal (Specific Problem: AC Failure) is reported. The service time of an eNodeB can be prolonged by taking the following measures in low power consumption mode: (1) reducing the transmit power for services in a cell; (2) reducing the transmit power for reference signals in a cell; (3) shutting down half of the transmit diversity channels in a cell; (4) shutting down all transmit diversity channels in a cell. A cell enters the low power consumption mode when both of the following conditions are met: (1) The switch for the low power consumption mode is turned on. (2) The switch for forcibly entering the low power consumption mode is turned on; alternatively, the low power consumption mode can be used at the current time, and an alarm indicating that the mains input is abnormal (Specific Problem: AC Failure) is reported.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>SECTOREQM</strong>, <strong>Cell</strong>, and <strong>eUCellSectorEqm</strong> MOs:<ul><li>When the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD and the <strong>ANTCFGMODE</strong> parameter in the <strong>SECTOREQM</strong> MO referenced by the <strong>Cell</strong> MO is set to BEAM(BEAM), the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO must not be set to ON(On).</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, <strong>LowPwrSwitch</strong> in the <strong>CellLowPower</strong> must be set OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellRbReserve</strong> MOs:<ul><li>When the <strong>RbRsvMode</strong> parameter in a <strong>CellRbReserve</strong> MO is set to NB_DEPLOYMENT(NB_DEPLOYMENT), the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO under the same cell as the <strong>CellRbReserve</strong> MO must be set to Off.</li></ul>
+</li><li>Relation with the <strong>eUCellSectorEqm</strong> MO:<ul><li>When the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO is set to MASSIVE_MIMO_Ph1 or MASSIVE_MIMO_Ph2, the <strong>LowPwrSwitch</strong> parameter in <strong>CellLowPower</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>CellChPwrCfg</strong> MO:<ul><li>The <strong>PdcchPowerIncreaseOffset</strong> parameter in the <strong>CellChPwrCfg</strong> MO can be set to a non-zero value only when the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO is set to OFF.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD and the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO under this <strong>Cell</strong> MO is set to LTE_NR_SPECTRUM_SHR, the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO under this <strong>Cell</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SectorSplitCell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in this <strong>Cell</strong> MO is set to 8T8R, the cell specified by this <strong>Cell</strong> MO is added in a <strong>SectorSplitCell</strong> MO under a <strong>SectorSplitGroup</strong> MO, and the <strong>BeamDeploymentMode</strong> parameter in this <strong>SectorSplitGroup</strong> MO is set to NOT_CFG, then the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO must be set to OFF.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 32T32R or 64T64R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, then the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SpectrumCloud</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>SpectrumCloudSwitch</strong> parameter in the associated <strong>SpectrumCloud</strong> MO is set to LTE_NR_SPECTRUM_SHR or LTE_NR_COORD_SPECTRUM_SHR, the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO cannot be set to ON for this cell.</li></ul>
+</li><li>Relation with the <strong>SectorSplitGroup</strong>, <strong>SectorSplitCell</strong>, and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in this <strong>Cell</strong> MO is set to 8T8R, the cell specified by this <strong>Cell</strong> MO is added in a <strong>SectorSplitCell</strong> MO under a <strong>SectorSplitGroup</strong> MO, and the <strong>BeamDeploymentMode</strong> parameter in this <strong>SectorSplitGroup</strong> MO is set to MODE_3, then the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>ContigIntraBandCarr</strong> MO:<ul><li><strong>LowPwrSwitch</strong> in the <strong>CellLowPower</strong> MO and CONTIG_INTRA_BAND_CARR_SW of the <strong>ContigIntraBandCarrSw</strong> parameter in the <strong>ContigIntraBandCarr</strong> MO cannot be both turned on.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, <strong>CellAlgoSwitch</strong>, and <strong>CellRfShutdown</strong> MOs:<ul><li>If the value of the <strong>CellActiveState</strong> parameter in a <strong>Cell</strong> MO is CELL_ACTIVE, the <strong>FddTddInd</strong> and <strong>TxRxMode</strong> parameters in this <strong>Cell</strong> MO are set to CELL_FDD and 8T8R, respectively, and the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO under this <strong>Cell</strong> MO is set to NORMAL, then the DynAdjVoltSwitch option of the <strong>DynAdjVoltSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO under this <strong>Cell</strong> MO must be set deselected, the <strong>LowPwrSwitch</strong> parameter in the <strong>CellLowPower</strong> MO under this <strong>Cell</strong> MO must be set to OFF, and the <strong>RfShutdownSwitch</strong> parameter in the <strong>CellRfShutdown</strong> MO under this <strong>Cell</strong> MO must also be set to OFF.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellLowPower__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellLowPower__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellLowPower__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_celllowpower.html">LST CELLLOWPOWER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the low power consumption mode in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_celllowpower.html">MOD CELLLOWPOWER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of the low power consumption mode in a cell. The eNodeB enters the low power consumption mode when it receives a command for forcibly entering the low power consumption mode or an alarm indicating that the mains input is abnormal (specific problem: AC failure).</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellLowPower__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellLowPower__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellLowPower__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within a BS. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-LowPwrSwitch.html">Low power consumption mode switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for the functionality of the low power consumption mode. The cell can enter the low power consumption mode only when this parameter is set to ON and specific conditions are met. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-LowPwrOrder.html">Low power consumption mode order</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for forcibly entering the low power consumption mode. When both this switch and the functionality switch are set to ON, the cell enters the low power consumption mode as soon as the wait time for entering the mode elapses, regardless of whether the cell is within the low power consumption period. When the functionality switch is set to ON but this switch is set to OFF and if a mains input out of range (Specific Problem: AC Failure) alarm is reported, the cell enters the low power consumption mode as soon as the wait time for entering the mode elapses on condition that the cell is within the low power consumption period. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-StartTime.html">Start time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the start time of the low power consumption mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-StopTime.html">Stop time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the stop time of the low power consumption mode. If the stop time is earlier than or the same as the start time, the stop time is assumed to be a time of the next day. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-CellUsedPwrReduceTimeLen.html">Cell used power reduce time length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration in which the transmit power for services is reduced in the cell in low power consumption mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-RsPwrReduceTimeLen.html">Reference signal power reduce time length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration in which the reference signal transmit power is reduced in the cell in low power consumption mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-RfShutDownTimeLen.html">RF shutdown time length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration in which RF channels are shut down in the cell in low power consumption mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-CellUsedPwrRatio.html">Cell used power ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the percentage of the transmit power for services to the total transmit power for services when the low power consumption mode is implemented by means of reducing the transmit power for services. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-RsPwrAdjOffset.html">Reference signal power adjust offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the amount by which the reference signal transmit power is reduced in the cell in low power consumption mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-EnterTimeLen.html">Time length for entering the low power consumption mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration when the cell stays in normal mode before entering the low power consumption mode. In low power consumption mode, a cell automatically takes the following actions in sequence: 1. lowers the transmit power for services; 2. lowers the transmit power for reference signals; 3. shuts down some RF channels in the cell; 4. shuts down the cell. This duration smooths the transition from the normal mode to the low power consumption mode for the cell. If the conditions for the cell to enter the low power consumption mode are no longer met during this period of time, the cell will not enter the low power consumption mode; otherwise, it enters the low power consumption mode and takes the preceding actions in sequence. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellLowPower-BakPwrSavPolicy.html">Back power save policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the backup power saving policy of the eNodeB when the mains supply is cut off and the eNodeB is powered by storage batteries. The degradation duration in each policy is automatically configured as follows: If this parameter is set to POLICY3, the duration of service power degradation and that of reference signal power degradation are both 120 minutes, and the maximum duration of RF channel intelligent shutdown is 1440 minutes. If this parameter is set to POLICY2, the duration of service power degradation, reference signal power degradation, and RF channel intelligent shutdown is all 120 minutes. If this parameter is set to POLICY1, the duration of service power degradation, that of reference signal power degradation, and that of RF channel intelligent shutdown are all 0 minutes. If this parameter is set to POLICY1, POLICY2 or POLICY3, the ratio of available service power to total service power is 50%, the adjustment offset for reference signal power is -1 dB, and the wait time for entering the low power consumption mode is 5 minutes. If this parameter is set to CUSTOMIZED, you can customize the duration of power degradation, the ratio of available service power to total service power, the adjustment offset for reference signal power, and the wait time for entering the low power consumption mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

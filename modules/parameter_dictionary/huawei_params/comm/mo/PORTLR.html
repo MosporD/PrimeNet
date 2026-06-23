@@ -1,0 +1,153 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="PORTLR">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="PORTLR">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>PORTLR</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="PORTLR"></a><a name="PORTLR"></a>
+
+
+<h1 class="topictitle1">PORTLR</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="PORTLR.html"><strong>PORTLR</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO is used to set the rate of uplink and downlink data transmitted over a physical port. By setting the data rate, the transmission rate and reception rate on the Ethernet port, MLPPP group, Tunnel, and Ethernet trunk are limited, data is transmitted to the external network at a specified rate, and the QoS is guaranteed.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>BACKTUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>PORTLR</strong> MO is set to TUNNEL, the associated <strong>BACKTUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>PORTLR</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]An <strong>PORTLR</strong> MO can be configured on only one <strong>BACKTUNNEL</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Only one <strong>PORTLR</strong> MO can be configured on one port.</li></ul>
+</li><li>Relation with the <strong>ETHPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>PORTLR</strong> MO is set to ETH, the associated <strong>ETHPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before adding an <strong>ETHTRUNKLNK</strong> MO, ensure that an <strong>PORTLR</strong> MO is not configured for the associated <strong>ETHPORT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNK</strong> and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>PORTLR</strong> MO is set to ETHTRK, the associated <strong>ETHTRUNK</strong> MO must have been configured, and at least one <strong>ETHTRUNKLNK</strong> MO is included in the <strong>ETHTRUNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]An <strong>IPRSCGRP</strong> MO whose RSCGRPNO is not AUTOPORT and an <strong>PORTLR</strong> MO can be configured on only one <strong>BACKTUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>PORTLR</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in an <strong>PORTLR</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#PORTLR__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="PORTLR__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="PORTLR__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_portlr.html">ADD PORTLR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add the data rate of a physical port. Rate limitation is implemented between the data link layer and the physical layer. The length of a packets measures only the header of the data link layer, not the header of the physical layer. If the port type is set to MPGRP, rate limitation is performed only at the IP layer, but not at the MP header.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_portlr.html">LST PORTLR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of all the port rates.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_portlr.html">MOD PORTLR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration for the data rate of a physical port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_portlr.html">RMV PORTLR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove the data rate of a physical port.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#PORTLR__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="PORTLR__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="PORTLR__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PORTLR-PortLrID.html">Port Rate Limit ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port rate limit ID.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PORTLR-PortType.html">Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port type.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PORTLR-PortID.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port ID.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PORTLR-CommittedInformationRate.html">UL Committed Information Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UL committed information rate after rate limitation is configured at a port. The precision of the UL committed information rate supported by the UMPTa, UMPTb, UMPTe, UMPTg, UMPTga, UMDU or GTMUc is 64 kbit/s, the precision supported by the other board is 32 kbit/s. If the configured UL committed information rate is not a multiple of the precision, the UL committed information rate is rounded up. For the GTMUb, the value of CIR ranges from 64 to 100000. If this parameter is set to a value greater than the maximum allowed value or less than the minimum allowed value, the maximum or the minimum allowed value takes effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PORTLR-CommittedBurstSize.html">Committed Burst Size</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Committed Burst Size (CBS) after rate limitation is configured at a port. The minimum rate supported by the UMPTa, UMPTb, UMPTe, UMPTg, UMPTga, UMDU or GTMUc is 64 kbit/s. For the GTMUb, the value of CBS ranges from 63 kbit to 256 kbit. If this parameter is set to a value greater than the maximum allowed value or less than the minimum allowed value, the maximum or the minimum allowed value takes effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PORTLR-ExcessBurstSize.html">Excessive Burst Size</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Excess Burst Size (EBS) after rate limitation is configured at a port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PORTLR-RxCIR.html">DL Committed Information Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DL committed information rate after rate limitation is configured at a port. The parameter does not take effect in GSM and NR. For UMTS, if the downlink flow control switch is set to DYNAMIC_BW_SHAPING or STATIC_BW_SHAPING, this parameter is valid. If the downlink flow control switch is set to BW_SHAPING_ONOFF_TOGGLE, this parameter is valid when traffic congestion is detected. In other cases, this parameter is invalid. For LTE, this parameter computes the value of Physical Port Down Link Admission. The minimum rate supported by the UMPTa, UMPTb, UMPTe, UMPTg, UMPTga or UMDU is 64 kbit/s.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

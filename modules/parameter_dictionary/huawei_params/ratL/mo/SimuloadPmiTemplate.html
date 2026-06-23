@@ -1,0 +1,180 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="SimuloadPmiTemplate">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="SimuloadPmiTemplate">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>SimuloadPmiTemplate</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="SimuloadPmiTemplate"></a><a name="SimuloadPmiTemplate"></a>
+
+
+<h1 class="topictitle1">SimuloadPmiTemplate</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellSimuLoad.html">CellSimuLoad</a>
+        +-<a href="SimuloadPmiTemplate.html"><strong>SimuloadPmiTemplate</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A SimuloadPmiTemplate MO consists of parameters related to a PMI template. If the SimuLoadTransMode parameter is set to TM4 or TM9, a SimuloadPmiTemplate MO must be configured for a CellSimuLoad MO to enable this CellSimuLoad MO to take effect.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="CellSimuLoad.html">CellSimuLoad</a></li><li>Relation with the <strong>Cell</strong> and <strong>CellSimuLoad</strong> MOs:<ul><li>Consider that <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO is set to TM9. If <strong>TxRxMode</strong> in the corresponding <strong>Cell</strong> MO is set to 2T2R, 2T4R, or 2T8R, <strong>CellSimuloadPmi</strong> in a <strong>SimuloadPmiTemplate</strong> MO under this <strong>CellSimuLoad</strong> MO must be set to a value in the range of 0 to 3.</li><li>If <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO is set to TM4 and <strong>CrsPortNum</strong> in the related <strong>Cell</strong> MO is set to CRS_PORT_2, <strong>CellSimuloadPmi</strong> in associated <strong>SimuloadPmiTemplate</strong> MOs must be set to a value ranging from 0 to 3.</li></ul>
+</li><li>Relation with the <strong>SimuloadPmiTemplate</strong> MO:<ul><li>The sum of values of <strong>CellSimuloadPmiCfgDuration</strong> in <strong>SimuloadPmiTemplate</strong> MOs cannot be greater than 2000 ms.</li></ul>
+</li><li>Relation with the <strong>CellSimuLoad</strong> MO:<ul><li>If <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO is set to TM4 or TM9, a maximum of 16 <strong>SimuloadPmiTemplate</strong> MOs can be configured under this <strong>CellSimuLoad</strong> MO.</li><li>If <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO is not set to TM4 or TM9, no <strong>SimuloadPmiTemplate</strong> MOs can be configured under this <strong>CellSimuLoad</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected, <strong>PmiType</strong> in related <strong>SimuloadPmiTemplate</strong> MOs must be set to Emimo.</li><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected and <strong>CellSimuloadRank</strong> in a <strong>SimuloadPmiTemplate</strong> MO is set to RANK_2, <strong>CellSimuloadPmiExtend0</strong> and <strong>CellSimuloadPmiExtend1</strong> must be set to 11 and 10, respectively.</li><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected and <strong>CellSimuloadRank</strong> in a <strong>SimuloadPmiTemplate</strong> MO is set to RANK_2, <strong>CellSimuloadPmiExtend0</strong> and <strong>CellSimuloadPmiExtend1</strong> must be set to 11 and 10, respectively.</li><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected and <strong>CellSimuloadRank</strong> in a <strong>SimuloadPmiTemplate</strong> MO is set to RANK_2, <strong>CellSimuloadPmiExtend0</strong> and <strong>CellSimuloadPmiExtend1</strong> must be set to 11 and 10, respectively.</li><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is deselected, <strong>PmiType</strong> in related <strong>SimuloadPmiTemplate</strong> MOs must be set to Normal.</li><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected, <strong>CellSimuloadRank</strong> in the related <strong>SimuloadPmiTemplate</strong> MO must be set to RANK_1 or RANK_2.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, <strong>eUCellSectorEqm</strong>, <strong>PDSCHCfg</strong>, and <strong>CellAlgoExtSwitch</strong> MOs:<ul><li>The SINGLE_CA_PWR_SHARE_SW_FOR_4T option of <strong>TxChnPowerCfgSw</strong> in the <strong>PDSCHCfg</strong> MO for a cell must be deselected if any of the following condition is met: <strong>TxRxMode</strong> in the <strong>Cell</strong> MO is set to a value other than 4T4R, <strong>FddTddInd</strong> in the <strong>Cell</strong> MO is set to CELL_TDD, <strong>CrsPortNum</strong> in the <strong>Cell</strong> MO is set to a value other than CRS_PORT_4, <strong>CellSimuloadPmi</strong> in the <strong>SimuloadPmiTemplate</strong> MO is set to 4, 5, 6, or 7, the 4TxTM9MuMimoSwitch, Virtual4T4Rswitch, or New4TcodebookSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected, the Dl256QamAccessorySwitch option of <strong>Dl256QamAlgoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected, or <strong>CellBeamMode</strong> in the <strong>eUCellSectorEqm</strong> MO is set to ADVANCED_BEAMFORMING, or Tm9FourLayerPairSwitch of <strong>WttxMuMimoSwitch</strong> in a <strong>CellAlgoExtSwitch</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>CellDlpcPdsch</strong>, <strong>Cell</strong>, and <strong>eUCellSectorEqm</strong> MOs:<ul><li>When <strong>FddTddInd</strong> in <strong>Cell</strong> is configured as CELL_TDD, or <strong>NbCellFlag</strong> in <strong>Cell</strong> is configured as TRUE, or <strong>CrsPortNum</strong> in <strong>Cell</strong> is not configured as CRS_PORT_4, or <strong>TxRxMode</strong> in <strong>Cell</strong> is not configured as 4T4R, or <strong>CellBeamMode</strong> in <strong>eUCellSectorEqm</strong> is not NORMAL, or <strong>SimuloadPmiTemplate</strong> in <strong>CellSimuloadPmi</strong> is configured as 4, 5, 6, or 7, <strong>RemainingPwrUseStrategy</strong> in <strong>CellDlpcPdsch</strong> must be configured as OFF.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#SimuloadPmiTemplate__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="SimuloadPmiTemplate__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="SimuloadPmiTemplate__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_simuloadpmitemplate.html">ADD SIMULOADPMITEMPLATE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a simuload PMI template in simulated load configurations with transmission mode 4 or 9. A maximum of 16 PMI templates can be added for a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_simuloadpmitemplate.html">DSP SIMULOADPMITEMPLATE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query information about simuload PMI templates.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_simuloadpmitemplate.html">LST SIMULOADPMITEMPLATE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list settings of parameters related to simuload PMI templates in simulated load configurations with the transmission mode 4 or 9.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_simuloadpmitemplate.html">MOD SIMULOADPMITEMPLATE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the settings of parameters related to simuload PMI templates in simulated load configurations with the transmission mode 4 or 9.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_simuloadpmitemplate.html">RMV SIMULOADPMITEMPLATE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove simuload PMI templates in simulated load configurations with the transmission modes 4 and 9. If only the LocalCellId parameter is specified during command execution, all PMI templates configured for the cell are removed. If parameters LocalCellId, CellSimuloadPmi, and CellSimuloadRank are specified during command execution, the PMI template specified by these parameters is removed.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#SimuloadPmiTemplate__tab2">Table 2</a> and <a href="#SimuloadPmiTemplate__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="SimuloadPmiTemplate__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="SimuloadPmiTemplate__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of a cell, which uniquely identifies the cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-SimuloadPmiTemplateId.html">Simuload PMI Template ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of a PMI template used in interference simulation. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-CellSimuloadPmi.html">Cell Simuload PMI</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PMI used in interference simulation with the SimuLoadTransMode parameter set to TM4 or TM9. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-CellSimuloadRank.html">Cell Simuload Rank</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the rank for the PMI used in interference simulation with the SimuLoadTransMode parameter set to TM4 or TM9. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-CellSimuloadPmiCfgDuration.html">Cell Simuload PMI Config Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration of interference simulation using the PMI with the SimuLoadTransMode parameter set to TM4 or TM9. The total configured duration of interference simulation using the PMIs in all PMI templates configured for a cell is the PMI polling cycle. The configuration-dependent probability of scheduling a PMI is equal to the configured duration of interference simulation using this PMI divided by the PMI polling cycle. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-CellSimuloadPmiExtend0.html">Cell Simuload PMI Extend 0</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PMI for TM4 during virtual 4T4R feature load simulation. This parameter indicates the PMI for beam 0 (the left beam serving the virtual 4T4R cell) during load simulation. PMI values used for load simulation in a cell must be unique. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-CellSimuloadPmiExtend1.html">Cell Simuload PMI Extend 1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PMI for TM4 during virtual 4T4R feature load simulation. This parameter indicates the PMI for beam 1 (the left beam serving the virtual 4T4R cell) during load simulation. PMI values used for load simulation in a cell must be unique. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-PmiType.html">PMI Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell type for load simulation. If the cell is a normal cell, set this parameter to Normal. If the cell is an eMIMO cell, set this parameter to Virtual4T4R. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="SimuloadPmiTemplate__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="SimuloadPmiTemplate__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-CellSimuloadPmiPeriod.html">Cell Simuload PMI Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the PMI polling cycle used in load simulation with the SimuLoadTransMode parameter is set to TM4 or TM9. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/SimuloadPmiTemplate-CellSimuloadPmiSchDuration.html">Cell Simuload PMI Schedule Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the scheduling duration for the PMI used in interference simulation with the SimuLoadTransMode parameter set to TM4 or TM9. The total configured duration of interference simulation using the PMIs in all PMI templates configured for a cell is the PMI polling cycle. The actual probability of scheduling a PMI is equal to the scheduling duration for this PMI divided by the PMI polling cycle. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,315 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Clock Synchronization Mode (SET CLKSYNCMODE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_clksyncmode">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Clock Synchronization Mode (SET CLKSYNCMODE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_clksyncmode"></a><a name="set_clksyncmode"></a>
+
+
+<h1 class="topictitle1">Set Clock Synchronization Mode (SET CLKSYNCMODE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_clksyncmode__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the clock synchronization mode of a BS, the GSM frame bit offset, the GSM Frame Sync Switch, the frame synchronization switch, the locked system clock source, the Enhanced SYSCLK failure check switch, the low-precision frame No. synchronization switch and the Major Standard Change Optimization Switch.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_clksyncmode__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Setting LTE TDD and NR TDD to frequency synchronization mode will interrupt services.</p>
+</li><li><p>If the current clock source is provided by an IEEE 1588 V2 clock link on a UTRPc port, changing the clock synchronization mode from frequency synchronization to time synchronization disconnects links carried over the port for about 3s.</p>
+</li><li><p>When the clock synchronization mode is changed from frequency synchronization to time synchronization, if the current clock source is an IEEE1588 V2 clock, Clock Net Mode is set to UNICAST, and Profile Type is set to 1588V2, 1588V2_16.1 and G.8275.2, check whether IEEE1588 V2 time synchronization needs to be enabled hop by hop with bearer network engineers or whether the ATR or XXX switch needs to be turned on on the base station side. Otherwise, services will become unavailable.</p>
+</li><li><p>The frame synchronization function applies to the Cloud BB that works in frequency synchronization mode. In addition, this function can be enabled only for an NE that connects to the clock source indirectly.</p>
+</li><li><p>The frame synchronization function takes effect only when the system clock source is an IEEE 1588 V2 clock source or interconnection clock source.</p>
+</li><li><p>The GSM frame synchronization switch must be turned off when an NE does not require time synchronization. Before turning on the GSM frame synchronization switch, plan the frame offset and TSC to avoid inter-cell interference.</p>
+</li><li><p>In the backup of the first-level USU3910, the standby main control board in the BBU does not support the D-MIMO function.</p>
+</li><li><p>In a multi-mode BS (excluding the D-MIMO scenarios), the system clock will not lock to Inter-sysclk.</p>
+</li><li><p>The Enhanced SYSCLK Failure Check Switch parameter can be specified when only one reference clock source is configured.</p>
+</li><li><p>When the clock synchronization mode of a BBU is frequency synchronization, the low-precision frame No. synchronization function cannot be enabled simultaneously with the functions of frame synchronization or CIoT frame No. synchronization.</p>
+</li><li><p>The low-precision frame No. synchronization function can be used in CIoT frame No. synchronization. With this function enabled, the system frame No. (SFN) and hyper system frame No. (HSFN) are aligned when the initial time shift after the lock of the system clock is longer than 1s. This function applies only when the IP clock source is used in unicast networking mode and compliant with the IEEE 1588V2 or 1588V2_16.1 protocol.</p>
+</li><li><p>Only the UMPT and LMPT support the function of low-precision frame No. synchronization.</p>
+</li><li><p>In hybrid clock synchronization mode, Locked System Clock Source must be set to LOCAL.</p>
+</li><li><p>In hybrid clock synchronization mode, Clock Working Mode can be set to AUTO, MANUAL, or FREE. When this parameter is set to MANUAL, Selected Clock Source, Clock Source No., and IP Clock Time Synchronization Mode must be set to IPCLK, AUTO, and OFF, respectively.</p>
+</li><li><p>If the BBU is interconnected with the DCU and the clock reference source on the BBU side is set to PEERCLK, the clock synchronization mode on the BBU side supports only time synchronization.</p>
+</li><li><p>Only the UMPT supports the loose time synchronization mode.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_clksyncmode__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-ClkSyncMode.html">CLKSYNCMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Clock Synchronization Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the clock synchronization mode of a BS, which can be frequency synchronization or time synchronization.</p>
+<p>GUI Value Range: FREQ(FREQ), TIME(TIME), HYBRID(HYBRID)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FREQ, TIME, HYBRID</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PROFILETYPE</strong> in the <strong>IPCLKLNK</strong> MO is set to G.8265.1, <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO must be set to FREQ or HYBRID.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PROFILETYPE</strong> in the <strong>IPCLKLNK</strong> MO is set to G.8275.1, <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO must be set to TIME.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IPMODE</strong> in the <strong>IPCLKLNK</strong> MO is set to IPV6, <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO must be set to FREQ.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CLKSYNCMODE</strong> and <strong>MODE</strong> and <strong>CLKSRC</strong> in a <strong>TASM</strong> MO are set to TIME and MANUAL and IPCLK, respectively, <strong>SYNMODE</strong> must be set to OFF.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>TASM</strong> MO, if <strong>CLKSYNCMODE</strong> is set to TIME and <strong>LOOSETIME</strong> is set to ON, <strong>MODE</strong> cannot be set to AUTO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>TASM</strong> MO, if <strong>CLKSYNCMODE</strong> is set to TIME, <strong>LOOSETIME</strong> is set to ON, and <strong>MODE</strong> is set to MANUAL, <strong>CLKSRC</strong> must be set to IPCLK or PEERCLK.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-FrameBitOffset.html">GSM_FBOFFSET</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">GSM Frame Bit Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates GSM frame bit offset. This parameter applies to GSM only.</p>
+<p>GUI Value Range: 0~80</p>
+<p>Unit: 1/8bit</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-FrameSyncSwitch.html">FRAMESYNCSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Frame Sync Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frame synchronization switch. This switch applies to the Cloud BB that works in frequency synchronization mode. In addition, it can be set to on only for an NE that connects to the clock source indirectly to realize frame synchronization between this NE and the upper-level NE.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>TASM</strong>, when <strong>LPFNSYNCSW</strong> is set to ON, <strong>FRAMESYNCSW</strong> cannot be set to ON and <strong>FNSYNCSW</strong> cannot be set to ON.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-SysClkSrc.html">SYSCLKSRC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Locked System Clock Source</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the locked system clock source, which is obtained from the local standard clock or interconnection system clock. The local standard clock is a clock synchronized with the reference clock of the local NE or multimode base station. The interconnection system clock is the standard clock obtained from the interconnection port.</p>
+<p>GUI Value Range: LOCAL(Local Standard Clock), INTER_SYSCLK(Interconnection System Clock)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LOCAL, INTER_SYSCLK</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the values of <strong>SYSCLKSRC</strong> and <strong>CLOUDSRC</strong> in the <strong>TASM</strong> MO are INTER_SYSCLK and ENABLE, respectively, the value of any <strong>SRN</strong> parameter in the corresponding <strong>GPS</strong> MO must be less than or equal to 60.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-GSM_FRAMESYNCSW.html">GSMFRAMESYNCSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">GSM Frame Sync Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the GSM frame synchronization switch. This parameter controls the GSM adjustment frame number and frame phase. In addition, this parameter is valid only for GSM NEs.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-ENSYSCLKCHKSW.html">ENSYSCLKCHKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Enhanced SYSCLK Failure Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the enhanced system clock failure check is enabled. If this parameter is set to ON, the enhanced system clock failure check is enabled.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-LpFnSyncSw.html">LPFNSYNCSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Low Precision Frame No. Synchronization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch of low-precision frame No. synchronization. When this switch is turned on, the frame No. synchronization function is enabled, and the SFN and HSFN are automatically aligned after the system clock is locked. When this switch is turned off, the frame No. synchronization function is disabled. This switch applies to NB-IoT and eDRX.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>TASM</strong>, when <strong>LPFNSYNCSW</strong> is set to ON, <strong>FRAMESYNCSW</strong> cannot be set to ON and <strong>FNSYNCSW</strong> cannot be set to ON.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-LockSwitch.html">MSCHANGEOPTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Major Standard Change Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to optimize the major standard change mechanism. The major standard change mechanism is optimized only if this parameter is set to ON. The parameter is valid if a GL separate-MPT base station uses time synchronization and GSM and LTE are deployed in the same BBU.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-HoldingDuration.html">HOLDINGDURATION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Holding Duration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the holding duration of the system clock of the base station. This parameter is valid only when the reference source is SYNCETH+IPCLK and the synchronization mode is time synchronization. Only NR and LTE TDD support this function.</p>
+<p>GUI Value Range: DEFAULT(DEFAULT), 24_HOURS(24 Hours), 48_HOURS(48 Hours), 72_HOURS(72 Hours), 96_HOURS(96 Hours), 108_HOURS(108 Hours), 120_HOURS(120 Hours), 132_HOURS(132 Hours), 144_HOURS(144 Hours), 156_HOURS(156 Hours), 168_HOURS(168 Hours)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULT, 24_HOURS, 48_HOURS, 72_HOURS, 96_HOURS, 108_HOURS, 120_HOURS, 132_HOURS, 144_HOURS, 156_HOURS, 168_HOURS</p>
+<p>MML Default Value: DEFAULT(DEFAULT)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-PhaseDeviationThreshold.html">PDALMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Phase Deviation Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the alarm reporting threshold for multi-source phase difference detection. If this parameter is set to a small value, alarms may be reported frequently.</p>
+<p>GUI Value Range: 500~3000</p>
+<p>Unit: ns</p>
+<p>Actual Value Range: 500~3000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-LooseTime.html">LOOSETIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Loose Time Synchronization</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the loose time synchronization function. This function provides low-precision time synchronization for a base station. If this function is enabled, loose time synchronization is supported. If this function is disabled, loose time synchronization is not supported.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>TASM</strong> MO, if <strong>CLKSYNCMODE</strong> is set to TIME and <strong>LOOSETIME</strong> is set to ON, <strong>MODE</strong> cannot be set to AUTO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>TASM</strong> MO, if <strong>CLKSYNCMODE</strong> is set to TIME, <strong>LOOSETIME</strong> is set to ON, and <strong>MODE</strong> is set to MANUAL, <strong>CLKSRC</strong> must be set to IPCLK or PEERCLK.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, R, N, L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_clksyncmode__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To set clock synchronization mode with parameters as follows:
+clock synchronization mode: FREQ, run the following command:
+SET CLKSYNCMODE: CLKSYNCMODE=FREQ;
+
+Example 2: To set clock synchronization mode with parameters as follows:
+clock synchronization mode: TIME, run the following command:
+SET CLKSYNCMODE: CLKSYNCMODE=TIME;
+
+Example 3: To set locked system clock source with parameters as follows:
+locked system clock source: INTER_SYSCLK, run the following command:
+SET CLKSYNCMODE: SYSCLKSRC=INTER_SYSCLK;
+
+Example 4: To set frame synchronization switch with parameters as follows:
+clock synchronization mode: FREQ, frame synchronization switch: ON, run the following command:
+SET CLKSYNCMODE: CLKSYNCMODE=FREQ, FRAMESYNCSW=ON;
+
+Example 5: To set loose time synchronization with parameters as follows:
+clock synchronization mode: TIME, loose time synchronization: ON, run the following command:
+SET CLKSYNCMODE: CLKSYNCMODE=TIME, LOOSETIME=ON;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,204 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell EDT Configuration (MOD CELLEDTCONFIG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_celledtconfig">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell EDT Configuration (MOD CELLEDTCONFIG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_celledtconfig"></a><a name="mod_celledtconfig"></a>
+
+
+<h1 class="topictitle1">Modify Cell EDT Configuration (MOD CELLEDTCONFIG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_celledtconfig__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify EDT parameters for a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_celledtconfig__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>Modifying the NumberofEdtTbsType parameter will result in automatic reset of the NB-IoT cell.</p>
+</li><li><p>Modifying the EDT_SWITCH option of the EdtAlgoSwitch parameter will result in automatic reset of the NB-IoT cell.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_celledtconfig__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellEdtConfig-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within a base station. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellEdtConfig-EdtDlDataWaitingTimer.html">EdtDlDataWaitingTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">EDT DL Data Waiting Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer governing the period during which the eNodeB waits for downlink data from the core network when a UE initiates an EDT service. The timer length specified by this parameter must be less than the timer length specified by the CellRachCECfg.EdtContentionResTimer parameter when the EDT service does not use early contention resolution. Otherwise, the UE EDT service cannot be normally performed.</p>
+<p>The eNodeB starts this timer when it receives an RRCConnectionResume message carrying data or an RRCEarlyDataRequest message.</p>
+<p>If downlink data indication is received from the core network before the timer expires or the volume of downlink data that arrives before the timer expires is larger than the maximum data volume allowed for an EDT service, the timer will be stopped.</p>
+<p>After the timer expires, the eNodeB starts EDT in the downlink. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 1~200</p>
+<p>Unit: 100ms</p>
+<p>Actual Value Range: 100~20000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a too small value, there is a high probability that the timer expires before the core network delivers downlink data. As a result, the downlink data delivery may fail. If this parameter is set to a too large value, downlink service delays increase for UEs, and there is a high probability that UE EDT services are abnormal because the eNodeB fails to deliver the contention resolution MCE or Msg4.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellEdtConfig-EdtEarlyContentionResMode.html">EdtEarlyContentionResMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">EDT Early Contention Resolution Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the early contention resolution mode used for EDT in a cell. If this parameter is set to OFF, early contention resolution is not supported. In this case, SRB0 and the contention resolution MCE must be delivered at the same time. If this parameter is set to SRB0_CONTENTION_RES_SPLIT_SCH, SRB0 and the contention resolution MCE are separately scheduled. If this parameter is set to ADAPTIVE, the cell adaptively determines whether to use early contention resolution based on the value of the contention resolution timer. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: OFF(OFF), SRB0_CONTENTION_RES_SPLIT_SCH(SRB0_CONTENTION_RES_SPLIT_SCH), ADAPTIVE(ADAPTIVE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, SRB0_CONTENTION_RES_SPLIT_SCH, ADAPTIVE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ADAPTIVE(ADAPTIVE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF and the value of the EDT downlink data waiting timer is too large and that of the contention resolution timer is too small, the probability that UEs cannot receive Msg4 due to scheduling delay increases and UEs even cannot access the network. If this parameter is set to SRB0_CONTENTION_RES_SPLIT_SCH or ADAPTIVE, the contention resolution MCE occupies air interface resources, causing downlink traffic volume to decrease.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellEdtConfig-EdtMtSchToneNum.html">EdtMtSchToneNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Preferential Tone Num for EDT Multi-tone Sch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of tones preferentially used when multi-tone scheduling is used for EDT services. This parameter takes effect only for UEs at coverage level 0. Single-tone scheduling is used for UEs at coverage levels 1 and 2. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: TONE_1(TONE_1), TONE_3(TONE_3), TONE_6(TONE_6), TONE_12(TONE_12)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TONE_1, TONE_3, TONE_6, TONE_12</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: TONE_1(TONE_1)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger number of tones for multi-tone scheduling leads to a shorter delay of Msg3 in EDT and lower UE power consumption in areas with good coverage. A smaller number of tones for multi-tone scheduling leads to a longer delay of Msg3 in EDT and higher UE power consumption.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellEdtConfig-EdtSchStrategy.html">EdtSchStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">EDT Sch Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the scheduling policy used when there are EDT services in a cell. If this parameter is set to NON_EDT_PRIORITY, scheduling of non-EDT services is preferentially guaranteed. If this parameter is set to DEFAULT, scheduling is based on fairness without differentiating between service types. If this parameter is set to EDT_PREFERRED, scheduling of EDT services is preferentially guaranteed. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: NON_EDT_PRIORITY(NON_EDT_PREFERRED), DEFAULT(DEFAULT), EDT_PREFERRED(EDT_PREFERRED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NON_EDT_PRIORITY, DEFAULT, EDT_PREFERRED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DEFAULT(DEFAULT)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to NON_EDT_PRIORITY, scheduling of non-EDT services is preferentially guaranteed and this will cause the EDT service access success rate to decrease in case of congestion. If this parameter is set to EDT_PREFERRED, scheduling of EDT services is preferentially guaranteed and this will cause the non-EDT service access success rate to decrease in case of congestion.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellEdtConfig-NumberofEdtTbsType.html">NumberofEdtTbsType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Number of EDT TBS Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of different TBSs that can be used for the transmission of Msg3 for EDT. If this parameter is set to ONE, the TBS used for the transmission of Msg3 for EDT initiated by a UE must be the same as that used for the transmission of system information. If this parameter is set to TWO, a maximum of two different TBSs can be used for the transmission of Msg3 for EDT. If this parameter is set to FOUR, a maximum of four different TBSs can be used for the transmission of Msg3 for EDT. For details, see 3GPP TS 36.213. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: ONE(ONE), TWO(TWO), FOUR(FOUR)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ONE, TWO, FOUR</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FOUR(FOUR)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in more flexible matching between TBSs and the data transmitted by UEs performing EDT services, which helps decrease UE power consumption. However, more resources are consumed in the cell for monitoring different TBSs.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellEdtConfig-EdtAlgoSwitch.html">EdtAlgoSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">EDT Algorithm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable EDT.</p>
+<p>EDT_SWITCH: Indicates whether to enable EDT in the cell. If this option is selected, the cell supports EDT and UEs can perform EDT services in the cell. If this option is deselected, the cell does not support EDT. This option applies only to NB-IoT.</p>
+<p>EDT_L_VALUE_COMPAT_SWITCH: Indicates whether to determine the value of L based on Msg3 for EDT. If this option is selected, the value of L for NB-IoT UEs involved in single-tone transmission is determined based on the repetition count of Msg3 on the NPUSCH. If this option is deselected, the value of L is fixed at 1 for NB-IoT UEs involved in single-tone transmission. This option applies only to NB-IoT.</p>
+<p>GUI Value Range: EDT_SWITCH(EDT_SWITCH), EDT_L_VALUE_COMPAT_SWITCH(EDT_L_VALUE_COMPAT_SWITCH)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: EDT_SWITCH, EDT_L_VALUE_COMPAT_SWITCH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: EDT_SWITCH:Off, EDT_L_VALUE_COMPAT_SWITCH:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: EDT_SWITCH: If this option is selected, UEs in idle mode can transmit data using EDT, reducing the air interface delay and power consumption. However, EDT requires dedicated RACH resources to be configured, decreasing the cell uplink traffic volume. If this option is deselected, UEs can transmit data after an RRC connection is set up.</p>
+<p>EDT_L_VALUE_COMPAT_SWITCH: If this option is selected, NB-IoT UEs for which the repetition count of Msg3 for EDT is 8 or greater and the value of L is 4 cannot access the network normally. If this option is deselected, NB-IoT UEs for which the repetition count of Msg3 for EDT is 8 or greater and the value of L is 1 cannot access the network normally.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_celledtconfig__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify cell edt config with the parameters as follows: Local cell ID: 1, Preferential Tone Num for EDT Multi-tone Sch: TONE_3, run the following command:
+MOD CELLEDTCONFIG: LocalCellId=1, EdtMtSchToneNum=TONE_3;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,193 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellSimuLoad">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellSimuLoad">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellSimuLoad</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellSimuLoad"></a><a name="CellSimuLoad"></a>
+
+
+<h1 class="topictitle1">CellSimuLoad</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellSimuLoad.html"><strong>CellSimuLoad</strong></a>
+        +-<a href="SimuloadPmiTemplate.html">SimuloadPmiTemplate</a>[0~16]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellSimuLoad MO consists of the parameters related to simulated load configuration of a cell. When there are few UEs accessing the cell or the number of UEs that can access the cell is limited, the load simulation is started to test the DL scheduling. During the test, parameters such as the RB usage and power utilization are monitored to evaluation the effect of DL scheduling.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li><p>Possible children:</p>
+<a href="SimuloadPmiTemplate.html">SimuloadPmiTemplate</a>[0~16]</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If <strong>BfAlgoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is set to Off, <strong>SimuLoadTransMode</strong> in the <strong>CellSimuLoad</strong> MO cannot be set to TM7 or TM8.</li><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected, <strong>SimuLoadTransMode</strong> in the related <strong>CellSimuLoad</strong> MO must be set to TM4.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>TxRxMode</strong> in a <strong>Cell</strong> MO is set to 1T1R or 1T2R, <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO under this <strong>Cell</strong> MO must be set to TM1.</li><li>Consider that <strong>MultiRruCellMode</strong> in a <strong>Cell</strong> MO is not set to CELL_COMBINATION or MPRU_AGGREGATION. If <strong>CrsPortNum</strong> in the <strong>Cell</strong> MO is set to CRS_PORT_1, <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO under this <strong>Cell</strong> MO cannot be set to TM4.</li><li>If <strong>FddTddInd</strong> in a <strong>Cell</strong> MO is set to CELL_TDD and <strong>MultiRruCellMode</strong> in the same <strong>Cell</strong> MO is set to CELL_COMBINATION or MPRU_AGGREGATION and the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is deselected, <strong>SimuLoadTransMode</strong> in the <strong>CellSimuLoad</strong> MO cannot be set to TM4 or TM9.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>Consider that <strong>MultiRruCellMode</strong> in a <strong>Cell</strong> MO is not set to CELL_COMBINATION or MPRU_AGGREGATION. If the TM9Switch option of <strong>EnhMIMOSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO under this <strong>Cell</strong> MO is deselected, <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO under this <strong>Cell</strong> MO cannot be set to TM9.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SimuloadPmiTemplate</strong> MOs:<ul><li>Consider that <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO is set to TM9. If <strong>TxRxMode</strong> in the corresponding <strong>Cell</strong> MO is set to 2T2R, 2T4R, or 2T8R, <strong>CellSimuloadPmi</strong> in a <strong>SimuloadPmiTemplate</strong> MO under this <strong>CellSimuLoad</strong> MO must be set to a value in the range of 0 to 3.</li><li>If <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO is set to TM4 and <strong>CrsPortNum</strong> in the related <strong>Cell</strong> MO is set to CRS_PORT_2, <strong>CellSimuloadPmi</strong> in associated <strong>SimuloadPmiTemplate</strong> MOs must be set to a value ranging from 0 to 3.</li></ul>
+</li><li>Relation with the <strong>SimuloadPmiTemplate</strong> MO:<ul><li>If <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO is set to TM4 or TM9, a maximum of 16 <strong>SimuloadPmiTemplate</strong> MOs can be configured under this <strong>CellSimuLoad</strong> MO.</li><li>If <strong>SimuLoadTransMode</strong> in a <strong>CellSimuLoad</strong> MO is not set to TM4 or TM9, no <strong>SimuloadPmiTemplate</strong> MOs can be configured under this <strong>CellSimuLoad</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SymbolPwrSaving</strong> MO:<ul><li>If the <strong>TrigBndlSchDlAvgPrbThld</strong> parameter in the <strong>SymbolPwrSaving</strong> MO is not set to 0 for a cell, the number of <strong>CellSimuLoad</strong> MO instances in the same Cell must be 0</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellSimuLoad__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellSimuLoad__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellSimuLoad__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_cellsimuload.html">ADD CELLSIMULOAD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start a cell simulated load control configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellsimuload.html">DSP CELLSIMULOAD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query a cell load simulation configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellsimuload.html">LST CELLSIMULOAD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the parameters about simulated load control for a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellsimuload.html">MOD CELLSIMULOAD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify a cell simulated load control configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_cellsimuload.html">RMV CELLSIMULOAD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove the cell simulated load configuration.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellSimuLoad__tab2">Table 2</a> and <a href="#CellSimuLoad__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellSimuLoad__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellSimuLoad__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellSimuLoad-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellSimuLoad-SimLoadCfgIndex.html">Configure Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a simulated load configuration. One eNodeB can store a maximum of 10 simulated load configurations. They are identified by indexes ranging from 0 to 9 and correspond to RB usage thresholds (specified by the SimuLoadRbThd parameter) 10% to 100% at a step of 10%. For example, the RB usage thresholds for simulated load configurations 1 and 4 are 20% and 50%, respectively. Alternatively, you can also manually specify the RB usage threshold for a simulated load configuration by setting the SimuLoadRbThd parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellSimuLoad-SimuLoadTransMode.html">SimuLoad transmission mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the transmission mode adopted by the simulated load configuration, including:</p>
+<p>TM1: indicates transmission mode 1 for the simulated load configuration.</p>
+<p>TM2: indicates transmission mode 2 for the simulated load configuration.</p>
+<p>TM4: indicates transmission mode 4 for the simulated load configuration.</p>
+<p>TM7: indicates transmission mode 7 for the simulated load configuration.</p>
+<p>TM8: indicates transmission mode 8 for the simulated load configuration.</p>
+<p>TM9: indicates transmission mode 9 for the simulated load configuration.</p>
+<p>Load simulation for TM4 and TM9 is used in 4T/8T MIMO cells to simulate interference for 4T/8T transmissions.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellSimuLoad-AutoRmvTime.html">Cell Simuload Automatic Remove Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period of time exceeding which the cell simulated load is automatically removed. After this parameter value is changed, the time for automatically removing the cell simulated load restarts. If this parameter is changed to a value the same as the previous value of this parameter, the time does not restart. If this parameter is set to 0, the cell simulated load will not be automatically removed.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CellSimuLoad__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CellSimuLoad__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellSimuLoad-SimuLoadRbNum.html">SimuLoad allocated RB Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of RBs allocated to a simulated load configuration in downlink scheduling. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellSimuLoad-CommercRbNum.html">Commercial service RB number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of RBs allocated for commercial services in downlink scheduling. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellSimuLoad-SimuLoadPower.html">SimuLoad allocated power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the power allocated to a simulated load configuration in downlink scheduling. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellSimuLoad-CommercPower.html">Commercial service power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the power allocated for commercial services in downlink scheduling. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellSimuLoad-SimuLoadUserNum.html">SimuLoad allocated user Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of UEs allocated for a simulated load configuration in downlink scheduling. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellSimuLoad-CommercUserNum.html">Commercial service user number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of users to be scheduled in each transmission time interval (TTI) in downlink scheduling. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellSimuLoad-AutoRmvRemainTime.html">Cell Simuload Automatic Remove Remain Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the remaining time before the cell simulated load is automatically removed.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,587 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="TASM">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Tasm">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>TASM</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Tasm"></a><a name="Tasm"></a>
+
+
+<h1 class="topictitle1">TASM</h1>
+
+<div>
+<div class="section"><pre>
+<a href="Equipment.html">EQUIPMENT</a>
+  +-<a href="Tasm.html"><strong>TASM</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The Tasm MO is the system clock. It is created by the system automatically and can be changed to another reference clock source according to the priority and availability.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Not involved</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Equipment.html">EQUIPMENT</a></li><li>Relation with the <strong>BITS</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and BITS, respectively, the corresponding <strong>BITS</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>LINECLK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and LINECLK, respectively, the corresponding <strong>LINECLK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>TASM</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>TASM</strong> MO, <strong>HOLDINGDURATION</strong> can be set to a value other than DEFAULT only if <strong>MODE</strong> is set to MANUAL and <strong>CLKSRC</strong> is set to SYNCETH+IPCLK.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>TASM</strong> MO, if <strong>ATRSW</strong> is set to ON and <strong>MODE</strong> is set to MANUAL, <strong>CLKSRC</strong> cannot be set to SYNCETH+IPCLK.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>TASM</strong> MO, if <strong>CLKSYNCMODE</strong> is set to HYBRID, <strong>SYSCLKSRC</strong> must be set to LOCAL.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to HYBRID, the <strong>TASM</strong> MO must meet any of the following conditions: 1. <strong>MODE</strong> is set to MANUAL. <strong>CLKSRC</strong> is set to IPCLK. <strong>SRCNO</strong> is set to AUTO. <strong>SYNMODE</strong> is set to OFF. 2. <strong>MODE</strong> is set to AUTO or FREE.</li></ul>
+</li><li>Relation with the <strong>IPCLKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>AUTOCMPSTSW</strong> in an <strong>IPCLKLNK</strong> MO can be set to ON only when <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to TIME and <strong>CNM</strong> in the <strong>IPCLKLNK</strong> MO is set to L2_MULTICAST.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> is set to MANUAL and <strong>CLKSRC</strong> is set to <strong>TASM</strong> MO, the corresponding <strong>IPCLKLNK</strong> MO in which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CLKSYNCMODE</strong> in a <strong>TASM</strong> MO is set to HYBRID and two <strong>IPCLKLNK</strong> MOs are configured, <strong>IPSYNCMODE</strong> in the two MOs must not be both set to TIME.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs are configured, <strong>DELAYTYPE</strong> in these MOs must be set to the same value if <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to HYBRID.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to HYBRID, then in an <strong>IPCLKLNK</strong> MO, <strong>ICPT</strong> must be set to PTP, <strong>CNM</strong> must be set to UNICAST, and <strong>DEVTYPE</strong> must be set to OC_SLAVE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to HYBRID and <strong>PROFILETYPE</strong> in an <strong>IPCLKLNK</strong> MO is set to G.8265.1, <strong>IPSYNCMODE</strong> in this <strong>IPCLKLNK</strong> MO must be set to FREQ.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>DELAYTYPE</strong> in <strong>IPCLKLNK</strong> must be set to E2E, when <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to TIME and <strong>LOOSETIME</strong> is set to ON.</li></ul>
+</li><li>Relation with the <strong>GPS</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and GPS, respectively, the corresponding <strong>GPS</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>GPS</strong> and <strong>SYNCETH</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and GPS+SYNCETH, respectively, the corresponding <strong>GPS</strong> and <strong>SYNCETH</strong> MOs must have been configured.</li></ul>
+</li><li>Relation with the <strong>SYNCETH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and SYNCETH, respectively, the corresponding <strong>SYNCETH</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>SYNCETH</strong> and <strong>IPCLKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> is set to MANUAL and <strong>CLKSRC</strong> is set to SYNCETH+IPCLK in the <strong>TASM</strong> MO, the corresponding <strong>SYNCETH</strong> MO and <strong>IPCLKLNK</strong> MO in which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED must have been configured.</li></ul>
+</li><li>Relation with the <strong>PEERCLK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and PEERCLK, respectively, the corresponding <strong>PEERCLK</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PNT</strong> in a <strong>PEERCLK</strong> MO is set to BBU, <strong>SRCNO</strong> in the <strong>TASM</strong> MO on the board cannot be set to AUTO.</li></ul>
+</li><li>Relation with the <strong>TOD</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and TOD, respectively, the corresponding <strong>TOD</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>INTERCLK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> and <strong>CLKSRC</strong> in the <strong>TASM</strong> MO are set to MANUAL and INTERCLK, respectively, the corresponding <strong>INTERCLK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>TIMESRC</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>TASM</strong> MO for a board, if <strong>FNSYNCSW</strong> is set to ON and <strong>CLKSYNCMODE</strong> is set to FREQ, in the <strong>TIMESRC</strong> MO for the board, <strong>TIMESRC</strong> must set to NTP and <strong>AUTOSWITCH</strong> must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>EQUIPMENT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> and <strong>INTERSUBRACKCLKALIGNMODE</strong> in an <strong>EQUIPMENT</strong> MO are set to OFF and INDEPENDENT_GNSS_CLK, respectively, <strong>MODE</strong> in the associated <strong>TASM</strong> MO cannot be set to FREE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> and <strong>INTERSUBRACKCLKALIGNMODE</strong> in an <strong>EQUIPMENT</strong> MO are set to OFF and INDEPENDENT_GNSS_CLK, respectively, then <strong>CLKSYNCMODE</strong> in the associated <strong>TASM</strong> MO must be set to TIME.</li></ul>
+</li><li>Relation with the <strong>EQUIPMENT</strong> and <strong>GPS</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> and <strong>INTERSUBRACKCLKALIGNMODE</strong> in an <strong>EQUIPMENT</strong> MO are set to OFF and INDEPENDENT_GNSS_CLK, respectively, and if <strong>MODE</strong> in the <strong>TASM</strong> MO is set to MANUAL, then <strong>CLKSRC</strong> in the <strong>TASM</strong> MO must be set to GPS and the corresponding <strong>GPS</strong> must be configured on the BBU.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> and <strong>INTERSUBRACKCLKALIGNMODE</strong> in an <strong>EQUIPMENT</strong> MO are set to OFF and INDEPENDENT_GNSS_CLK, respectively, and if <strong>MODE</strong> in the <strong>TASM</strong> MO is set to AUTO, then a <strong>GPS</strong> MO must be configured on the BBU.</li></ul>
+</li><li>Relation with the <strong>EQUIPMENT</strong>, <strong>BITS</strong>, <strong>TOD</strong>, <strong>LINECLK</strong>, <strong>IPCLKLNK</strong>, <strong>INTERCLK</strong>, <strong>SYNCETH</strong>, and <strong>PEERCLK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> and <strong>INTERSUBRACKCLKALIGNMODE</strong> in an <strong>EQUIPMENT</strong> MO are set to OFF and INDEPENDENT_GNSS_CLK, respectively, and if <strong>MODE</strong> in the <strong>TASM</strong> MO is set to AUTO, then only the <strong>GPS</strong> MO can be configured and other clock link MOs cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SYNCETH</strong>, <strong>INTERCLK</strong>, <strong>LINECLK</strong>, <strong>TOD</strong>, <strong>PEERCLK</strong>, and <strong>BITS</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CLKSYNCMODE</strong> in a <strong>TASM</strong> MO is set to HYBRID, the <strong>SYNCETH</strong>, <strong>INTERCLK</strong>, <strong>LINECLK</strong>, <strong>PEERCLK</strong>, <strong>TOD</strong>, or <strong>BITS</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>GPS</strong> and <strong>IPCLKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>TASM</strong> MO, if <strong>CLKSYNCMODE</strong> is set to HYBRID and <strong>IPSYNCMODE</strong> is set to TIME, the <strong>GPS</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>EQUIPMENT</strong> and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> is set to OFF and <strong>INTERSUBRACKCLKALIGNMODE</strong> is set to PEER_RF_CLK in an <strong>EQUIPMENT</strong> MO and if <strong>AT</strong> in the <strong>APPLICATION</strong> MO is set to NodeB, <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO must be set to FREQ.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> is set to OFF and <strong>INTERSUBRACKCLKALIGNMODE</strong> is set to PEER_RF_CLK in an <strong>EQUIPMENT</strong> MO, and if <strong>AT</strong> in the <strong>APPLICATION</strong> MO is set to eNodeB or gNodeB, then <strong>CLKSYNCMODE</strong> must be set to TIME, <strong>LOOSETIME</strong> must be set to OFF, and <strong>ATRSW</strong> must be set to OFF in the <strong>TASM</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#Tasm__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="Tasm__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="Tasm__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_aissstat.html">DSP AISSSTAT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the Phase Lock status of soft synchronization over the Air interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_clkda.html">DSP CLKDA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the initial DA value, center DA value, and current DA value of a clock.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_clkmutuallock.html">DSP CLKMUTUALLOCK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the major standard for clock mutual lock on an MBTS. The clock on the side of the major standard for clock mutual lock is used as the criterion clock.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_clkrecord.html">DSP CLKRECORD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to display the records of clock status. The main control board stores the latest 100 records. The board records the clock status when users change the clock source, current DA value, clock working mode, or center DA value or when the system automatically calibrates the clock that operates for a long time.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_clksrc.html">DSP CLKSRC</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of all configured clock sources. The status of each clock source depends on the availability of its associated clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_clkstat.html">DSP CLKSTAT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of the system clock.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_clkthd.html">DSP CLKTHD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the clock tracing mode of a specified main control board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_clktst.html">DSP CLKTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to display the clock quality test monitoring result. The result shows the frequency or phase offset of the current clock source. The offset indicates the quality of the clock.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cloudsrc.html">DSP CLOUDSRC</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to display whether the local BBU Serves as the reference clock source in the Cloud BB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_darecord.html">DSP DARECORD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to display the records of center DA values. The main control board stores the latest 100 records. The board records the center DA value each time the value is changed by users or the system. The system changes the center DA to the average of current DA when system clock is in the locked state for 96 hours.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_fnsynctime.html">DSP FNSYNCTIME</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the Cellular Internet of Thing (CIoT) frame No. status, including the time when the hyper system frame No. (HSFN) is 0 and the status of the frame No. synchronization switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_freqdiffrslt.html">DSP FREQDIFFRSLT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the result of a reference clock excessive frequency deviation check.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipclkalgo.html">DSP IPCLKALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to display the dynamic information in the algorithm for an IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_phasediff.html">DSP PHASEDIFF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to query the phase offset between the active and standby reference clock sources when both the clock sources are configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_sysclksrc.html">DSP SYSCLKSRC</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to query the locked system clock source and the equipment serial number (ESN) of the NE where the locked source is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_tstclkout.html">DSP TSTCLKOUT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the types of outputted test clocks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_aiss.html">LST AISS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the air interface soft synchronization parameters.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_clkdatarecord.html">LST CLKDATARECORD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of an IP clock.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_clkmode.html">LST CLKMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the clock source in use and the working mode of the clock.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_clksrcbkpmode.html">LST CLKSRCBKPMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the backup mode of GPS clock sources or TOD clock sources.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_clksyncmode.html">LST CLKSYNCMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the clock synchronization mode of a BS, the GSM frame bit offset, the GSM Frame Sync Switch, the frame synchronization switch, the locked system clock source, the Enhanced SYSCLK Failure Check Switch, the low-precision frame No. synchronization switch and the Major Standard Change Optimization Switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cloudsrc.html">LST CLOUDSRC</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration of Cloud BB Clock Reference Source Flag.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_fnsynctime.html">LST FNSYNCTIME</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the Cellular Internet of Thing (CIoT) Frame No. parameters, including the time when the hyper system frame No. (HSFN) is 0 and the status of the frame No. synchronization switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ipclkalgo.html">LST IPCLKALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration of the clock algorithm for an IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_leapsecondsinfo.html">LST LEAPSECONDSINFO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the information of the leap second offset between the UTC and the GPS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_localclkql.html">LST LOCALCLKQL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the clock quality level of a BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_centerda.html">MOD CENTERDA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to change the center DA value of an NE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_currda.html">MOD CURRDA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to change the current DA value of the NE. When the clock of the NE works in free-running mode, the current DA value changes with the center DA value. When an external reference clock is available, the current DA value changes with the frequency of the reference clock, that is, the current DA value is adjusted on the basis of the frequency deviation during software phase-locking. If the reference clock is locked for 96 hours, it is an indication that the reference is stable. In this case, the average of current DA values in this period is used as the center DA value. Each time the NE or the main control board is reset, the current DA value is automatically overwritten by the center DA value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_aiss.html">SET AISS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set parameters related to air interface soft synchronization.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_clkmode.html">SET CLKMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the working mode of the reference clock source.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_clkmutuallock.html">SET CLKMUTUALLOCK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the major standard for clock mutual lock on a multimode base station. The clock on the major standard side is used as the standard clock.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_clksrcbkpmode.html">SET CLKSRCBKPMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the backup mode of the GPS or TOD clock source whose signals are introduced by a main control board. The backup mode is controlled by the Clock Source Backup Mode parameter. When this parameter is set to BRDBKMODE, the primary main control board introduces clock signals from the clock source regardless of whether the GPS or TOD clock link is configured on the active or standby board. When this parameter is set to CLKSRCBRDCFG, the active and standby boards can be configured with both GPS clock links or both TOD clock links, and the standby board introduces clock signals from the clock source if it is configured with a GPS or TOD clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_clksyncmode.html">SET CLKSYNCMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the clock synchronization mode of a BS, the GSM frame bit offset, the GSM Frame Sync Switch, the frame synchronization switch, the locked system clock source, the Enhanced SYSCLK failure check switch, the low-precision frame No. synchronization switch and the Major Standard Change Optimization Switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_clkthd.html">SET CLKTHD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the clock tracing mode of a specified main control board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_cloudsrc.html">SET CLOUDSRC</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set whether the local NE serves as the reference clock source in the Cloud BB. When the NE is enabled, the other NEs in the Cloud BB can share the reference clock source of the local NE by adding an interconnection clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_fnsynctime.html">SET FNSYNCTIME</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the Cellular Internet of Thing (CIoT) Frame No. parameters, including the time when the hyper system frame No. (HSFN) is 0 and the status of the frame No. synchronization switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_ipclkalgo.html">SET IPCLKALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the clock algorithm parameters for an IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_leapsecondsinfo.html">SET LEAPSECONDSINFO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the information of the leap second offset between the UTC and the GPS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_localclkql.html">SET LOCALCLKQL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the clock quality level of a BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_tstclkout.html">SET TSTCLKOUT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the types of test clocks to be outputted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/stp_clktst.html">STP CLKTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to stop the clock quality test monitoring.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_clktst.html">STR CLKTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start a clock quality test monitoring. The test time, frequency offset, and phase offset are saved as test records. A maximum of 100 test records can be saved. If there are more than 100 test records, the historical records will be overwritten.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_freqdiffchk.html">STR FREQDIFFCHK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to check the cause of an excessive frequency deviation when ALM-26262 External Clock Reference Problem is reported and the alarm cause is Excessive Frequency Difference Between Clock Reference and Local Crystal Oscillator.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#Tasm__tab2">Table 2</a> and <a href="#Tasm__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="Tasm__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="Tasm__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-ClkSrcNo.html">Clock Source No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the clock link number of the reference clock source. When the Selected Clock Source parameter is set to GPS+SYNCETH, this parameter indicates the number of the GPS clock link. When the Selected Clock Source parameter is set to SYNCETH+IPCLK, this parameter indicates the number of the IP clock link. When this parameter is set to AUTO, the system selects an available clock link from those of the specified reference clock source. If there is more than one clock link and the selected clock link fails, another available clock link will be used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-ManualSpecSrc.html">Selected Clock Source</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the user-selected clock source.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-WorkMode.html">Clock Working Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the working mode of the system clock. Manual indicates that a clock source must be specified by the user. Auto indicates that the system automatically selects a clock source based on the priority and availability of the clock source. Free indicates that the system clock works in free-running mode, that is, the system clock does not trace any reference clock source.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-Algorithm.html">Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the clock algorithm mode for the IP clock link. In DEFAULT mode that is also called the adaption mode, and the system adjusts the filtering period and sampling period based on the network quality in this mode. In CLASSA mode, the Free Count, Search Count, Hold Count, Lock Count, and Sample Time parameters are set to 4, 4, 4, 10, and 2400, respectively. In CLASSB mode, the Free Count, Search Count, Hold Count, Lock Count, and Sample Time parameters are set to 4, 4, 4, 10, and 4800, respectively. In CUSTOM mode, the filtering period and sampling period are set by the customer. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-FreeCount.html">Free Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filtering period of the IP clock link when the IP clock works in free-running mode. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-SearchCount.html">Search Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filtering period of the IP clock link when the IP clock works in fast-tracking mode. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-HoldCount.html">Hold Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filtering period of the IP clock link when the IP clock works in hold mode. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-LockCount.html">Lock Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filtering period of the IP clock link when the IP clock works in locked mode. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-Sampletime.html">Sample Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the sampling period of the IP clock link. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-SynMode.html">IP Clock Time Synchronization Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode of scheduled synchronization for the IP clock link. In ABSOLUTE mode, the system clock obtains synchronization signals from the clock server at a fixed time every few days until the system clock is stable. In RELATIVE mode, the system clock obtains synchronization signals from the clock server at regular intervals until the system clock is stable. In OFF mode, the system clock obtains only messages from the clock server in real time. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-Period.html">Synchronization Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the synchronization period of the IP clock link. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-TM.html">Synchronization Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the start time of scheduled synchronization for the IP clock link. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-ClkSyncMode.html">Clock Synchronization Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the clock synchronization mode of a BS, which can be frequency synchronization or time synchronization.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-HoldingDuration.html">Holding Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the holding duration of the system clock of the base station. This parameter is valid only when the reference source is SYNCETH+IPCLK and the synchronization mode is time synchronization. Only NR and LTE TDD support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-BackupMode.html">Clock Source Backup Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the backup mode of the reference clock sources. This parameter applies only to backup of GPS clock sources or TOD clock sources whose signals are introduced by a main control board. When this parameter is set to BRDBKMODE, only the primary main control board can introduce clock signals from the clock source. When this parameter is set to CLKSRCBRDCFG, the board in the specified slot introduces clock signals from the clock source.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-QualityLevel.html">Quality Level</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the clock quality level of the BS. The values for this parameter are listed in quality descending order. QL-PRC indicates the highest quality level.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-ATRSwitch.html">Adaptive Timing Recovery Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the adaptive scheduled recovery switch for an IP clock link. The function is used to make the BS and the IPCLK Server exchange handshake messages directly. The network between them transfers packages only and the packages will be filtered by the package delay vibrates which Adaptive Timing Recovery (ATR) of BS imported to the network. The time synchronization with the server will be realized.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-AissFreq.html">Air Soft Syn Phase Adjustment Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the adjustment period of the frame clock phase when the Air interface soft synchronization Phase Lock function is enabled on the NE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-AissNetMode.html">Soft-Synchronized Network Adaption Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the adaption mode of the soft synchronous transport network. The value of this parameter depends on the synchronous status of the transport network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-AissOp.html">Air Interface Soft Synchronization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the Air interface Soft synchronization Phase Lock function is enabled on the NE, which can be set to ON or OFF. ON indicates that the switch for the Air interface soft synchronization phase lock function is set to on and OFF indicates that the Air interface soft synchronization phase lock function is set to off.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-Day.html">Day</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of timing synchronization days of the IP clock. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-FrameBitOffset.html">GSM Frame Bit Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates GSM frame bit offset. This parameter applies to GSM only.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-SysClkSrc.html">Locked System Clock Source</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the locked system clock source, which is obtained from the local standard clock or interconnection system clock. The local standard clock is a clock synchronized with the reference clock of the local NE or multimode base station. The interconnection system clock is the standard clock obtained from the interconnection port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-CloudSrc.html">Cloud BB Clock Reference Source Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the local BBU serves as the clock reference source in the Cloud BB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-FrameSyncSwitch.html">Frame Sync Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frame synchronization switch. This switch applies to the Cloud BB that works in frequency synchronization mode. In addition, it can be set to on only for an NE that connects to the clock source indirectly to realize frame synchronization between this NE and the upper-level NE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-GSM_FRAMESYNCSW.html">GSM Frame Sync Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the GSM frame synchronization switch. This parameter controls the GSM adjustment frame number and frame phase. In addition, this parameter is valid only for GSM NEs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-AissStandard.html">Air Interface Soft Synchronization Standard</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the standard where the Air interface soft synchronization function is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-ENSYSCLKCHKSW.html">Enhanced SYSCLK Failure Check Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the enhanced system clock failure check is enabled. If this parameter is set to ON, the enhanced system clock failure check is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-FnsyncSw.html">CIoT Frame No. Synchronization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the CIoT frame No. synchronization function. The value ON indicates that this function is enabled. The value OFF indicates that this function is disabled. This parameter takes effect only when frequency synchronization is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-FnsyncDate.html">Date</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the date to be set for the CIoT Frame No. This parameter is set in compliance with the GPS. The format is as follows: YYYY-MM-DD. For example, 2006-09-08 indicates September 8th of 2006.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-FnsyncTime.html">Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time to be set for the CIoT Frame No. This parameter is set in compliance with the GPS. The format is as follows: HH:MM:SS. For example, 10:20:05.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-LeapSecondsChangeDate.html">Leap Seconds Change Date</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the date when the leap seconds changed. This parameter is set in compliance with the UTC. The format is as follows: YYYY-MM-DD. For example, 2006-09-08 indicates September 8th of 2006.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-LeapSecondsChangeTime.html">Leap Seconds Change Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time when the leap seconds changed. This parameter is set in compliance with the UTC. The format is as follows: HH:MM:SS. For example, 10:20:05.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-CurrentUtcToGpsLeapSeconds.html">Current Leap Second Offset Between UTC and GPS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the current leap second offset between the UTC and the GPS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-NextUtcToGpsLeapSeconds.html">Next Leap Second Offset Between UTC and GPS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the next leap second offset between the UTC and the GPS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-LpFnSyncSw.html">Low Precision Frame No. Synchronization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch of low-precision frame No. synchronization. When this switch is turned on, the frame No. synchronization function is enabled, and the SFN and HSFN are automatically aligned after the system clock is locked. When this switch is turned off, the frame No. synchronization function is disabled. This switch applies to NB-IoT and eDRX.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-LockSwitch.html">Major Standard Change Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to optimize the major standard change mechanism. The major standard change mechanism is optimized only if this parameter is set to ON. The parameter is valid if a GL separate-MPT base station uses time synchronization and GSM and LTE are deployed in the same BBU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-PhaseDeviationThreshold.html">Phase Deviation Alarm Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the alarm reporting threshold for multi-source phase difference detection. If this parameter is set to a small value, alarms may be reported frequently.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/Tasm-LooseTime.html">Loose Time Synchronization</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the loose time synchronization function. This function provides low-precision time synchronization for a base station. If this function is enabled, loose time synchronization is supported. If this function is disabled, loose time synchronization is not supported.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="Tasm__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="Tasm__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-CurrentSrcStatus.html">Current Clock Source State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of the clock source that is currently traced by the board, which can be Normal, Lost, Unavailable, Jitter, Unknown, Frequency Deviation, Phaseoutscope, Inconsistent Clock References, or Current Clock Source Type and Clock Synchronization Mode Mismatch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-PllStatus.html">PLL Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the PLL status of the board. It also indicates whether the system clock is stable. The PLL status of the board can be Fast tracking, Locked, Holdover, or Free running.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-CurrentSrc.html">Current Clock Source</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the clock source that is being used by the NE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of the cabinet where the system clock is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of the subrack where the system clock is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of the slot where the system clock is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-AissState.html">Air Interface Soft Synchronization Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of soft synchronization over the Air interface during Phase Lock, including Phase Lock Not Started, Phase Lock Succeeded, Phase Lock Tracking, and Phase Lock Failed.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-ESN.html">ESN of NE Where Locked Source Is Located</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ESN of the NE where the locked clock source is located. If frequency synchronization is used, the value of this parameter is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-FnSyncState.html">CIoT Sync State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates CIoT synchronization status.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-HoldTime.html">Holding Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the duration in which the base station enters the holding state after the reference source is lost.The value of this parameter is NULL when PLL Status is not Holdover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/Tasm-SuspiciousState.html">Suspicious State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the suspicious status of the reference clock source. Grouping is based on the phase offset between the current source and the backup source. If the phase offset between two sources is less than Phase Deviation Alarm Threshold, such sources form a group. If the number of reference sources in a group is the largest among all groups and no group with the same number exists, the reference sources in the group is regarded as non-suspicious. Otherwise, they are regarded as suspicious. If the phase value cannot be obtained, the status is regarded as unknown.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,477 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="IPv4 MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of IPv4. It also provides the managed object model (MOM) views and describes the managed objects (MOs) related to IPv4.">
+<meta name="description" content="This section describes the functions and concepts of IPv4. It also provides the managed object model (MOM) views and describes the managed objects (MOs) related to IPv4.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../comm/mom/trans-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Trans-IPv4">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPv4 MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Trans-IPv4"></a><a name="Trans-IPv4"></a>
+
+
+<h1 class="topictitle1">IPv4 MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of IPv4.
+It also provides the managed object model (MOM) views and describes
+the managed objects (MOs) related to IPv4. </p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p><a href="#Trans-IPv4__fig1">Figure 1</a> shows the generic protocol stack for IPv4 transmission on
+a base station. Transport protocol layers are divided into the control
+plane and user plane for processing signaling and user data, respectively.
+The control plane uses Stream Control Transmission Protocol (SCTP)
+links, and the user plane uses Internet Protocol (IP) paths.  </p>
+<p>The fundamental protocol part, control plane, and user plane provide
+the transport bearer service for the application layer. For principles
+of transport protocol layers, see the corresponding feature parameter
+description document for each RAT.</p>
+<div class="fignone" id="Trans-IPv4__fig1"><a name="Trans-IPv4__fig1"></a><a name="fig1"></a><span class="figcap"><b>Figure 1 </b>Generic protocol stack for IPv4 transmission on a base station</span>
+
+<br><span><img src="../image/mom/IPv4-protocol.png"></span></div>
+<div class="p">MOs
+related to IPv4 transmission can be configured in endpoint mode and
+in link mode.<ul><li>In link mode, a conventional transmission configuration mode,
+the control-plane bearer Stream Control Transmission Protocol (SCTP)
+link and the user-plane bearer Internet Protocol (IP) path must be
+configured for a transmission link. The port information is negotiated
+by two ends on the transmission link.</li><li>In endpoint mode, the two ends of a transmission link must be
+configured, for example, IP addresses. If the endpoint mode is used,
+the system automatically creates SCTP links and IP paths based on
+the port information. </li></ul>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Trans-IPv4__fig2">Figure 2</a> shows the MOM for the control plane of a base station.<div class="fignone" id="Trans-IPv4__fig2"><a name="Trans-IPv4__fig2"></a><a name="fig2"></a><span class="figcap"><b>Figure 2 </b>MOM for the control plane of a base station</span>
+
+<br><span><img src="../image/mom/IPv4-MOM-CP.png"></span></div>
+</div>
+<p>In <a href="#Trans-IPv4__fig2">Figure 2</a>, <a href="../mo/EPGROUP.html">EPGROUP</a>, <a href="../mo/SCTPHOST.html">SCTPHOST</a>, <a href="../mo/SCTPPEER.html">SCTPPEER</a>, and <a href="../mo/SCTPTEMPLATE.html">SCTPTEMPLATE</a> are used in endpoint
+mode, and <a href="../mo/SCTPLNK.html">SCTPLNK</a> and <a href="../mo/CPBEARER.html">CPBEARER</a> are used in link mode. </p>
+<div class="p"><a href="#Trans-IPv4__fig3">Figure 3</a> shows the MOM for the user plane of
+a base station.<div class="fignone" id="Trans-IPv4__fig3"><a name="Trans-IPv4__fig3"></a><a name="fig3"></a><span class="figcap"><b>Figure 3 </b>MOM for the user plane of a base station</span>
+
+<br><span><img src="../image/mom/IPv4-MOM-UP.png"></span></div>
+</div>
+<p>In <a href="#Trans-IPv4__fig3">Figure 3</a>, <a href="../mo/EPGROUP.html">EPGROUP</a>, <a href="../mo/USERPLANEHOST.html">USERPLANEHOST</a>, and <a href="../mo/USERPLANEPEER.html">USERPLANEPEER</a> are used in endpoint
+mode, and <a href="../mo/IPPATH.html">IPPATH</a> is used in link
+mode. </p>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody"><a href="../mo/USERPLANEHOST.html">USERPLANEHOST</a> and <a href="../mo/USERPLANEPEER.html">USERPLANEPEER</a> automatically
+set up connections on the user plane. <a href="../mo/USERPLANEPEER.html">USERPLANEPEER</a> does not need
+to be configured because it is automatically generated through the
+automatic neighbor relation (ANR) procedure or is generated based
+on the peer end information contained in the signaling messages during
+call services. </div></div>
+<div class="p"><a href="#Trans-IPv4__fig4">Figure 4</a>, <a href="#Trans-IPv4__fig5">Figure 5</a>, and <a href="#Trans-IPv4__fig6">Figure 6</a> show the IPv4 MOM, which
+is a subset of the base station MOM. <a href="#Trans-IPv4__fig4">Figure 4</a> and <a href="#Trans-IPv4__fig5">Figure 5</a> show the IPv4-related MOs in the old model. <a href="#Trans-IPv4__fig6">Figure 6</a> shows the IPv4-related MOs in the new model.<div class="fignone" id="Trans-IPv4__fig4"><a name="Trans-IPv4__fig4"></a><a name="fig4"></a><span class="figcap"><b>Figure 4 </b>IPv4 MOM (IP over Ethernet) in the old model</span>
+
+<br><span><img src="../image/mom/IPv4-MOM-IPoEth.png"></span></div>
+<div class="fignone" id="Trans-IPv4__fig5"><a name="Trans-IPv4__fig5"></a><a name="fig5"></a><span class="figcap"><b>Figure 5 </b>IPv4 MOM (IP over E1) in the old model</span>
+
+<br><span><img src="../image/mom/IPv4-MOM-IPoE1.png"></span></div>
+<div class="fignone" id="Trans-IPv4__fig6"><a name="Trans-IPv4__fig6"></a><a name="fig6"></a><span class="figcap"><b>Figure 6 </b>IPv4 MOM in the new model</span>
+
+<br><span><img src="../image/mom/IPv4-MOM-Newmodel.png"></span></div>
+</div>
+<div class="p"><a href="#Trans-IPv4__table1">Table 1</a> describes the MOs related to IPv4
+transmission.
+<div class="tablenoborder"><a name="Trans-IPv4__table1"></a><a name="table1"></a><table cellpadding="4" cellspacing="0" summary="" id="Trans-IPv4__table1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>MOs related to IPv4 transmission</caption>
+
+<thead align="left">
+<tr>
+<th class="cellrowborder" valign="bottom" width="12.345679012345679%" id="mcps1.4.2.8.2.2.5.1.1"><p>Protocol Layer</p>
+</th>
+
+<th class="cellrowborder" valign="bottom" width="14.814814814814813%" id="mcps1.4.2.8.2.2.5.1.2"><p>Configuration Mode</p>
+</th>
+
+<th class="cellrowborder" valign="bottom" width="17.283950617283953%" id="mcps1.4.2.8.2.2.5.1.3"><p>MO</p>
+</th>
+
+<th class="cellrowborder" valign="bottom" width="55.55555555555556%" id="mcps1.4.2.8.2.2.5.1.4"><p>Description</p>
+</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+<tr>
+<td class="cellrowborder" rowspan="10" valign="top" width="12.345679012345679%" headers="mcps1.4.2.8.2.2.5.1.1 "><p>Data link layer</p>
+</td>
+
+<td class="cellrowborder" rowspan="10" valign="top" width="14.814814814814813%" headers="mcps1.4.2.8.2.2.5.1.2 "><p>Endpoint mode and link mode</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="17.283950617283953%" headers="mcps1.4.2.8.2.2.5.1.3 "><p><a href="../mo/ETHPORT.html">ETHPORT</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" width="55.55555555555556%" headers="mcps1.4.2.8.2.2.5.1.4 "><ul><li>This MO defines an Ethernet port for connection to an NE.</li><li>This MO includes parameters such as the speed, duplex mode, port
+attribute, ARP proxy flag, and maximum transmission unit (MTU). </li><li>The duplex mode and port attribute must be negotiated with the
+peer end.</li></ul>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/ETHTRK.html">ETHTRK</a>/<a href="../mo/ETHTRUNK.html">ETHTRUNK</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines an Ethernet trunk. An Ethernet trunk binds
+multiple Ethernet ports into a trunk, achieving load sharing and enhancing
+transmission reliability.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/VLANMAP.html">VLANMAP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><div class="p">This MO defines the next-hop VLAN mapping and is used to
+attach different VLAN tags to the data packets according to their
+next-hop IP addresses. The mapping modes are classified into single
+VLAN and VLAN group:<ul><li>In single VLAN mode, next-hop IP addresses are directly mapped
+to VLAN tags.</li><li>In VLAN group mode, next-hop IP addresses are mapped to VLAN groups
+and then to VLAN tags in the VLAN groups based on the differentiated
+services code points (DSCPs) and types of data packets.</li></ul>
+</div>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/VLANCLASS.html">VLANCLASS</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><div class="p">This MO defines VLAN priority mapping and is used to map
+VLAN tags based on traffic types of services. There are two mapping
+modes:<ul><li>If the traffic type is user data, VLAN tags are mapped based on
+the DSCPs of user data packets.</li><li>If the traffic type is not user data, VLAN tags are mapped based
+on the traffic type.</li></ul>
+</div>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/DSCPMAP.html">DSCPMAP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines the mapping between a DSCP and a VLAN priority.
+If no VLAN priority is specified when a VLANMAP MO is configured,
+the VLAN priority is specified for user data based on mapping rules
+defined in the DSCP2VLANPRI MO.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/DSCP2PCPMAP.html">DSCP2PCPMAP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines the table of mappings between DSCPs and
+VLAN priorities. The corresponding DSCP2PCPMAP MO must be specified
+when an INTERFACE MO is configured. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/SUBNETVLAN.html">SUBNETVLAN</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines a subnet VLAN mapping by attaching a VLAN
+tag to a data packet based on its source or destination IP address.
+For details on the procedures for dividing VLANs and tagging VLANs,
+see the corresponding feature parameter description document. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/E1T1.html">E1T1</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines an E1 or T1 port for connecting to the transport
+network and consists of parameters such as line coding scheme and
+frame format for the port. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/PPPLNK.html">PPPLNK</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines a Point-to-Point Protocol (PPP) link. PPP
+is usually used for setting up a direct connection between two nodes
+and provides functions such as connection authentication and header
+compression. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/MPGRP.html">MPGRP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines a Multi-Link Point-to-Point Protocol (MLPPP)
+link, which enables spread spectrum communication between multiple
+PPP links. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="6" valign="top" width="12.345679012345679%" headers="mcps1.4.2.8.2.2.5.1.1 "><p>Network layer</p>
+</td>
+
+<td class="cellrowborder" rowspan="6" valign="top" width="14.814814814814813%" headers="mcps1.4.2.8.2.2.5.1.2 "><p>Endpoint mode and link mode</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="17.283950617283953%" headers="mcps1.4.2.8.2.2.5.1.3 "><p><a href="../mo/DEVIP.html">DEVIP</a>/<a href="../mo/IPADDR4.html">IPADDR4</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" width="55.55555555555556%" headers="mcps1.4.2.8.2.2.5.1.4 "><p>This MO defines the device IP address of an IP port. Before
+configuring this MO, ensure that the associated ETHPORT MO has been
+configured. The <a href="../mo/DEVIP.html">DEVIP</a>/<a href="../mo/IPADDR4.html">IPADDR4</a> MO defines the following IP
+addresses:</p>
+<ul><li>Device IP address used by an SCTP link or IP path on an S1 or
+X2 interface</li><li>Device IP address of an OM channel</li></ul>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/IPRT.html">IPRT</a>/<a href="../mo/IPROUTE4.html">IPROUTE4</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><ul><li>This MO defines a static IP route. A routing table is configured
+to implement data forwarding.</li><li>During the configuration of the control plane and user plane of
+an S1 or X2 interface, IP routes to the peer end are required. </li><li>During the configuration of an S1 or X2 interface, IP routes are
+not required when a base station is connected to the core network
+or another base station through a layer 2 network. However, IP routes
+are required when a base station is connected to the core network
+or another base station through a layer 3 network. </li><li>During the configuration of an OM channel, IP routes are not required
+when a base station is connected to the EMS through a layer 2 network,
+but are required when a base station is connected to the EMS through
+a layer 3 network. IP routes are also required if route binding is
+disabled for the OM channel.</li></ul>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/SRCIPRT.html">SRCIPRT</a>/<a href="../mo/SRCIPROUTE4.html">SRCIPROUTE4</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines source-based routing, which is a type of
+policy-based routing and is used to configure a static IP route based
+on the source address to implement data forwarding. </p>
+<p>Source-based
+routing takes precedence over destination-based routing. The destination-based
+routing is used only when no route can be found based on the source-based
+routing.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/LOOPBACK.html">LOOPBACK</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines a loopback interface, which is a virtual
+interface. A loopback interface can be configured with a loopback
+IP address. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/INTERFACE.html">INTERFACE</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO is used to configure IP-layer interfaces, classify
+these interfaces into normal interfaces and VLAN subinterfaces, and
+configure IP addresses and packet filtering. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/RSCGRP.html">RSCGRP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>These MOs define the transmission resource group. If there
+are no passing-by data flows, a user-defined transmission resource
+group is not required.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="9" valign="top" width="12.345679012345679%" headers="mcps1.4.2.8.2.2.5.1.1 "><p>Transport/Application layer</p>
+</td>
+
+<td class="cellrowborder" rowspan="3" valign="top" width="14.814814814814813%" headers="mcps1.4.2.8.2.2.5.1.2 "><p>Link mode</p>
+</td>
+
+<td class="cellrowborder" valign="top" width="17.283950617283953%" headers="mcps1.4.2.8.2.2.5.1.3 "><p><a href="../mo/SCTPLNK.html">SCTPLNK</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" width="55.55555555555556%" headers="mcps1.4.2.8.2.2.5.1.4 "><p>This MO defines an SCTP link for the control plane.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/CPBEARER.html">CP CPBEARER</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines bearers for the control ports at the application
+layer.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/IPPATH.html">IPPATH</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><ul><li>This MO defines an IP path for the user plane of an S1 or X2 interface. </li><li>If an IP path needs to be added to a user-defined transmission
+resource group, set the <a href="../para/IPPATH-RscGroupNo.html">RSCGRPID</a> parameter in the IPPATH MO to the value of the <a href="../para/RSCGRP-RscGrpNo.html">RSCGRPID</a> parameter in the
+user-defined RSCGRP MO.</li></ul>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" rowspan="5" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p>Endpoint mode</p>
+ </td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p><a href="../mo/EPGROUP.html">EPGROUP</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.3 "><p>This MO defines a transmission node resource set, which
+can be a set of control-plane endpoints, a set of user-plane endpoints,
+or a set of control- and user-plane endpoints. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/SCTPHOST.html">SCTPHOST</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines information of an SCTP host. During establishment
+of the control plane, an SCTP link is automatically set up based on
+the configured SCTP host and SCTP peer. When the security self-setup
+function is enabled on an SCTP host, a security host must be configured
+for the SCTP host. One SCTP host IP address can reference only one
+security host. </p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/SCTPPEER.html">SCTPPEER</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines information of an SCTP peer. In X2 self-setup
+scenarios, this MO can be automatically generated. In other scenarios,
+this MO must be manually configured. <span>In security
+scenarios, if an IPsec address is configured in this MO, IPsec negotiation
+is automatically set up between the SCTP host end and the SCTP peer
+end. </span></p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/USERPLANEHOST.html">USERPLANEHOST</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines information of a user-plane host. During
+self-setup of the user plane, a user-plane link is automatically set
+up based on the user-plane host and user-plane peer. The user-plane
+host and user-plane peer can be manually configured or automatically
+generated.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p><a href="../mo/USERPLANEPEER.html">USERPLANEPEER</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p>This MO defines information of a user-plane peer and can
+be manually configured or automatically generated.</p>
+</td>
+
+</tr>
+
+<tr>
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.1 "><p>Endpoint mode and link mode</p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.2 "><p><a href="../mo/OMCH.html">OMCH</a></p>
+</td>
+
+<td class="cellrowborder" valign="top" headers="mcps1.4.2.8.2.2.5.1.3 "><p>This MO defines a maintenance channel between a base station
+and an EMS. The EMS manages and maintains the base station through
+the maintenance channel. </p>
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+</div>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody"><ol><li>During the configuration of an OM channel:<ul><li>If only one OM channel is required, configure only the active
+OM channel.</li><li>If active and standby OM channels are required, configure both
+an active OM channel and a standby OM channel. The system preferentially
+uses the active OM channel. If the active OM channel is faulty, the
+base station switches to the standby OM channel as required by the
+EMS. </li></ul>
+The active/standby role of an OM channel is specified by the
+FLAG parameter.</li><li>MOs related to VLANs must be configured in VLAN networking scenarios.</li></ol>
+</div></div>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../comm/mom/trans-mom.html" title="This chapter describes the MOMs related to transmission.">Transport MOMs</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

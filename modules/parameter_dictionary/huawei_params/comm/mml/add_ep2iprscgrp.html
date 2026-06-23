@@ -1,0 +1,171 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Mapping from End Point to IP Transmission Resource Group (ADD EP2IPRSCGRP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ep2iprscgrp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Mapping from End Point to IP Transmission Resource Group (ADD EP2IPRSCGRP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ep2iprscgrp"></a><a name="add_ep2iprscgrp"></a>
+
+
+<h1 class="topictitle1">Add Mapping from End Point to IP Transmission Resource Group (ADD EP2IPRSCGRP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_ep2iprscgrp__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add mapping from End Point to IP Transmission Resource Group.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ep2iprscgrp__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before adding a mapping between an end point and an IP transmission resource group, ensure that the IPRSCGRP MO has been added by running the <a href="add_iprscgrp.html">ADD IPRSCGRP</a> command.</p>
+</li><li><p>A base station supports a maximum of 456 mappings between end points and IP transmission resource groups. If the GTMUb/GTMUc is the main control board, a base station supports a maximum of 64 mappings between end points and IP transmission resource groups.</p>
+</li><li><p>A base station supports two types of mapping between an end point and an IP transmission resource group: end point group mapping and end point mapping. </p>
+<p>    End point group mapping: Add all user plane peers in the EPGROUP to the specified IP transmission resource group.</p>
+<p>    End point mapping: Add the specified user plane peer to the specified IP transmission resource group. </p>
+<p>If an end point added to the IP transmission resource group through the end point group mapping and end point mapping conflict, use the end point mapping to add end points to the IP transmission resource group. If no IP transmission resource group is specified for a user plane peer, the internal user plane path that is automatically set up between the local base station and the corresponding user plane peer joins the default IP transmission resource group.</p>
+</li><li><p>In the two types of mapping between an end point and a transmission resource group, the same end point group or end point cannot be added to different IP transmission resource groups of the same physical port.</p>
+</li><li><p>If the port type for the local IP address of a user-plane host is a loopback interface, the following principles are complied with when the automatically established user-plane link is added to the transmission resource group:</p>
+<p>1. If the loopback interface is on the same board as the actual service outbound interface and the outbound interface is the same as the IP transmission resource group interface configured in an EP2IPRSCGRP object, services are carried in the IP transmission resource group specified in the EP2IPRSCGRP object. If the loopback interface is on the same board as the actual service outbound interface but the outbound interface is different from the IP transmission resource group interface configured in an EP2IPRSCGRP object, services are carried in default IP transmission resource group with the actual service outbound interface.</p>
+<p>2. If the loopback interface is on a different board from the actual service outbound interface, services are carried in the default IP transmission resource group with the actual service outbound interface.</p>
+</li><li><p>Running this command may interrupt ongoing services carried on the base station.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ep2iprscgrp__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2IPRSCGRP-mappingId.html">MAPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mapping ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a mapping between end points and IP transmission resource groups.</p>
+<p>GUI Value Range: 0~455</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~455</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2IPRSCGRP-mappingType.html">MT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mapping Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mapping mode between the service and the IP transmission resource group. Two mapping modes are supported: endpoint group mode and endpoint mode. If this parameter is set to ENDPOINT_GROUP, all user-plane peer endpoints in the endpoint group can be added to the specified IP transmission resource group. If this parameter is set to ENDPOINT_NODE, the specified user-plane peer endpoints can be added to the specified IP transmission resource group. When both the endpoint group mode and the endpoint mode are available for mapping all service flows of the same EPPATH to the IP transmission resource group, the endpoint mode is preferentially used for the mapping.</p>
+<p>GUI Value Range: ENDPOINT_GROUP(EndPoint Group), ENDPOINT_NODE(EndPoint Node)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ENDPOINT_GROUP, ENDPOINT_NODE</p>
+<p>MML Default Value: ENDPOINT_GROUP(EndPoint Group)</p>
+<p>Recommended Value: ENDPOINT_GROUP(EndPoint Group)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2IPRSCGRP-endPointId.html">ENDPOINTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">End Point ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the end point group or user plane peer to be added to the specified IP transmission resource group.</p>
+<p>GUI Value Range: 0~65535,70000~79999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535,70000~79999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>MT</strong> parameter in the <strong>EP2IPRSCGRP</strong> MO is set to ENDPOINT_GROUP, this parameter uses the value of the End Point Group ID parameter (the value range of this parameter is 0~65535) in the <strong>EPGROUP</strong> MO. In this case, all data flows in the EP group whose destination addresses are generated by USERPLANEPEER MO can be mapped to the specified transmission resource group.</li><li>When the <strong>MT</strong> parameter in the <strong>EP2IPRSCGRP</strong> MO is set to ENDPOINT_NODE, this parameter uses the value of the User Plane Peer ID parameter (the value range of this parameter is 0~65535 and 70000~79999) in the USERPLANEPEER MO. In this case, all data flows whose destination addresses are generated by the USERPLANEPEER MO can be mapped to the specified transmission resource group.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2IPRSCGRP-resourceGroupID.html">IPRSCGRPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the IP transmission resource group to which a node maps.</p>
+<p>GUI Value Range: 0~150014</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~150014</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2IPRSCGRP-userLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the description of the end point mapping to IP resource group. This parameter takes effect only in LTE and NR.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ep2iprscgrp__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add mapping from End Point to IP Transmission Resource with the parameters as follows: Mapping ID: 0, Mapping Type:EndPoint Group, End Point ID: 0, IP Transmission Resource Group ID: 0, run the following command:
+ADD EP2IPRSCGRP: MAPID=0, MT=ENDPOINT_GROUP, ENDPOINTID=0, IPRSCGRPID=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

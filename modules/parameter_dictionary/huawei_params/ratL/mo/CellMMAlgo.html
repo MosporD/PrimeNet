@@ -1,0 +1,248 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellMMAlgo">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellMMAlgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellMMAlgo</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellMMAlgo"></a><a name="CellMMAlgo"></a>
+
+
+<h1 class="topictitle1">CellMMAlgo</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellMMAlgo.html"><strong>CellMMAlgo</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellMMAlgo MO consists of parameters used to configure algorithms related to Massive MIMO.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, and <strong>BfAnt</strong> MOs:<ul><li>When the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE(Active) and the <strong>BeamGainLimitSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO is set to ON(On), the <strong>BfAnt</strong> MO associated with the <strong>WeightNO</strong> parameter in the <strong>eUCellSectorEqm</strong> MO bound to the cell must exist, and the <strong>CoverageScenario</strong> parameter in the <strong>BfAnt</strong> MO must not be set to SCENARIO_3(HBW 45 Degree, VBW 8 Degree), SCENARIO_4(HBW 25 Degree, VBW 8 Degree), SCENARIO_8(HBW 25 Degree, VBW 17 Degree), SCENARIO_9(HBW 15 Degree, VBW 17 Degree), or SCENARIO_13(HBW 15 Degree, VBW 35 Degree).</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>The MU_PAIRING_MCS_EXACT_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only when the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured and the MuBfSwitch option of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected.</li><li>The PRECISE_PAIRING_OPT_SW option of the <strong>PreciseMubfOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only when the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured and the MuBfSwitch option of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, and <strong>CellUlschAlgo</strong> MOs:<ul><li>When the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 32T32R, and no <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, the <strong>EnhancedVmimoSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to ON only if the PUSCH_RECEIVE_ENH_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SectorSplitCell</strong> MOs:<ul><li>When the <strong>FddTddInd</strong> and <strong>TxRxMode</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD and 64T64R or 32T32R respectively and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured, the PUSCH_RECEIVE_ENH_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, <strong>CellAlgoSwitch</strong>, <strong>SRSCfg</strong>, and <strong>CellBf</strong> MOs:<ul><li>The <strong>MaxBfRankPara</strong> parameter in the <strong>CellBf</strong> MO can be set to FOUR_LAYER_BF only when all of the following conditions are met: 1. The <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD. 2. The <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R. 3. The <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured. 4. The <strong>CrsPortNum</strong> parameter in the <strong>Cell</strong> MO is set to CRS_PORT_2. 5. The MM_ANT_SEL_ENH_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO is selected. 6. The TM9Switch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected. 7. The <strong>SrsResExpansionSwitch</strong> parameter in the <strong>SRSCfg</strong> MO is set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The MM_ACCESS_CONTROL_OPT_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>AcBarAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is set to ACBAR_SWITCH_DYNAMIC or the EABAlgoSwitch option of the <strong>MTCCongControlSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected.</li><li>The DL_CLUSTER_PAIRING_SW option of the <strong>PreciseMubfOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO under a <strong>Cell</strong> MO can be selected only when all the following conditions are met: The <strong>TxRxMode</strong> parameter in this <strong>Cell</strong> MO is set to 64T64R or 32T32R, the MuBfSwitch and SplitSDMASwitch options of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO under this <strong>Cell</strong> MO are selected and deselected, respectively, and the PRECISE_PAIRING_OPT_SW option of the <strong>PreciseMubfOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO is deselected.</li><li>The <strong>MubfTbsForecastPairLyrThld</strong> parameter in the <strong>CellMMAlgo</strong> MO under a <strong>Cell</strong> MO is not equal to zero only when all the following conditions are met: (1) The <strong>FddTddInd</strong> in the <strong>Cell</strong> is set to CELL_TDD; (2) The <strong>TxRxMode</strong> parameter in this <strong>Cell</strong> MO is set to 64T64R or 32T32R; (3) The MuBfSwitch options of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO under this <strong>Cell</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, <strong>ENodeBAlgoSwitch</strong>, and <strong>UeCooperationPara</strong> MOs:<ul><li>The MM_ANT_SEL_ENH_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only if the <strong>FddTddInd</strong> and <strong>TxRxMode</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD and 64T64R or 32T32R respectively, the BfSwitch option of the <strong>BfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, and the UeSRSAntSelectCtrlSwitch option of the <strong>CompatibilityCtrlSwitch</strong> parameter in the <strong>ENODEBALGOSWITCH</strong> MO is deselected, the SpecUeIdentifySwitch option of the <strong>SpecUserCooperationSwitch</strong> parameter in the <strong>UECOOPERATIONPARA</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellBf</strong> MOs:<ul><li>The UE_STATUS_BASED_MLB_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the SRS_LMT_AND_ABN_UE_IDENT_SW option of the <strong>UeIdentificationSwitch</strong> parameter in the <strong>CellBf</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellBf</strong>, <strong>SectorSplitCell</strong>, <strong>ENodeBAlgoSwitch</strong>, <strong>CellAlgoSwitch</strong>, and <strong>CellBfMimoParaCfg</strong> MOs:<ul><li>The TM8_PORT_ALLOC_OPT_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only when all of the following conditions are met: 1. The <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD. 2. The <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R. 3. The <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured. 4. The <strong>Tm8PairingOptSwitch</strong> parameter in the <strong>CellBf</strong> MO is set to ON. 5. The UeSRSAntSelectCtrlSwitch option of the <strong>CompatibilityCtrlSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is deselected. 6. The FakeAntSelIdentificationSwitch option of the <strong>BfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected. 7. The NON_AS_UE_MAX_BF_RANK_CTRL_SW option of the <strong>BfMimoAlgoOptSwitch</strong> parameter in the <strong>CellBfMimoParaCfg</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, and <strong>CellBf</strong> MOs:<ul><li>The MUBF_PWR_ENH_SW option of the <strong>PreciseMubfOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO can be selected only when all of the following conditions are met: 1. The <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD. 2. The <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R. 3. The <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured. 4. The <strong>MubfPowerNormAdptFactor</strong> parameter in the <strong>CellBf</strong> MO is set to 0. 5. The <strong>MovingUeMuBfScheme</strong> parameter in the <strong>CellBf</strong> MO is not set to HEAVY_LOAD_SCHEME, LIGHT_LOAD_SCHEME, or SPLIT_SDMA_SCHEME.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellMMAlgo__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellMMAlgo__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellMMAlgo__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_mmbigeventlearnthld.html">DSP MMBIGEVENTLEARNTHLD</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the learned massive MIMO big event threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellmmalgo.html">LST CELLMMALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the settings of parameters for the Massive MIMO algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellmmalgo.html">MOD CELLMMALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the settings of parameters for the Massive MIMO algorithm.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellMMAlgo__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellMMAlgo__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellMMAlgo__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of a cell, which uniquely identifies a cell within an eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-BeamGainLimitSwitch.html">Beam Gain Limit Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the beam gains of massive MIMO. If this parameter is set to ON(On) and the number of admitted UEs is smaller than or equal to three, the eNodeB forcibly performs MIMO for these UEs. If this parameter is set to ON(On) and the number of admitted UEs is greater than three, the eNodeB adaptively changes the transmission mode for these UEs. If this parameter is set to OFF(Off), the eNodeB adaptively performs beamforming or MIMO for UEs. This parameter takes effect only when the BfMimoAdaptiveSwitch parameter in the CellBfMimoParaCfg MO is set to MIMO_BF_ADAPTIVE(MIMO_BF_ADAPTIVE) or TxD_BF_ADAPTIVE(TxD_BF_ADAPTIVE). This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-MMAlgoOptSwitch.html">Massive MIMO Algorithm Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable massive MIMO optimization algorithms.</p>
+<p>MUBF_UE_POWER_FIXED_SWITCH: Indicates whether to assign fixed power to paired UEs. This option takes effect only in massive MIMO scenarios. If this option is selected, the base station assigns fixed power to paired UEs. If this option is deselected, the base station does not assign fixed power to paired UEs. This option applies only to LTE TDD.</p>
+<p>PUSCH_RECEIVE_ENH_SWITCH: Indicates whether to enable enhanced PUSCH reception. If this option is selected, enhanced PUSCH reception is enabled. If this option is deselected, enhanced PUSCH reception is disabled. This option takes effect only in massive MIMO scenarios. It is recommended that this option be selected in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+<p>MU_PAIRING_MCS_EXACT_SWITCH: Indicates whether to enable optimized MCS index selection for UE pairing. If this option is selected, optimized MCS index selection for UE pairing is enabled. If this option is deselected, the baseline MCS index selection algorithm is used. This option takes effect only in massive MIMO scenarios. It is recommended that this option be selected in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+<p>MUBF_ABNORMAL_UE_OPT_SWITCH: Indicates whether to enable optimization for UEs of extremely low efficiency. If this option is selected, the base station identifies UEs of extremely low efficiency and transfers such UEs to inter-frequency cells. If this option is deselected, the optimization is disabled. This option applies only to LTE TDD.</p>
+<p>DL_RB_ASSIGN_OPT_SWITCH: Indicates whether to enable optimized downlink RB allocation. If this option is selected, optimized downlink RB allocation is enabled. If this option is deselected, optimized downlink RB allocation is disabled. This option takes effect only in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+<p>MU_PAIRING_VOLTE_SWITCH: Indicates whether VoLTE UEs can be paired for MU beamforming. If this option is selected, VoLTE UEs can be paired for MU beamforming. If this option is deselected, VoLTE UEs cannot be paired for MU beamforming. This option applies only to LTE TDD.</p>
+<p>MM_DL_SCH_AND_MCS_OPT_SWITCH: Indicates whether to enable downlink scheduling and MCS optimization in massive MIMO scenarios. If this option is selected, the optimization is enabled. If this option is deselected, the optimization is disabled. This option applies only to LTE TDD.</p>
+<p>SRS_SDNR_SWITCH: Indicates whether to enable the SRS space-domain noise reduction (SDNR) function. If this option is selected, the SRS SDNR function is enabled. If this option is deselected, this function does not take effect. This option applies only to LTE TDD.</p>
+<p>MM_ANT_SEL_ENH_SWITCH: Indicates whether to enable SRS transmission by four antennas in turn. If this option is selected, this function is enabled. If this option is deselected, this function is disabled. This option takes effect only in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+<p>MM_ACCESS_CONTROL_OPT_SWITCH: Indicates whether to enable access control optimization to ensure that the user-experienced rate reaches the target value during major events in massive MIMO scenarios. If this option is selected, access control optimization takes effect. If this option is deselected, access control optimization does not take effect. This option applies only to LTE TDD.</p>
+<p>TM9_HIGH_ORDER_PAIRING_SWITCH: Indicates whether to enable downlink TM9 high-order pairing for massive MIMO. If this option is selected, TM9 high-order pairing is enabled. If this option is deselected, TM9 high-order pairing is disabled. This option applies only to LTE TDD.</p>
+<p>DL_CORR_UE_PAIRING_OPT_SWITCH: Indicates whether to enable UE pairing optimization based on downlink correlation in MU beamforming scenarios. If this option is selected, this function takes effect. If this option is deselected, this function does not take effect. This option applies only to LTE TDD.</p>
+<p>UE_STATUS_BASED_MLB_SWITCH: Indicates whether to enable MLB between massive MIMO common cells and non-massive MIMO cells or between massive MIMO common cells and massive MIMO split cells based on UE status identification results. If this option is selected, this type of MLB takes effect. If this option is deselected, this type of MLB does not take effect. This option applies only to LTE TDD.</p>
+<p>TM8_PORT_ALLOC_OPT_SWITCH: Indicates whether to enable port allocation optimization for massive MIMO TM8 pairing. If this option is selected, port allocation optimization for massive MIMO TM8 pairing is enabled. If this option is deselected, this function does not take effect. This option applies only to LTE TDD.</p>
+<p>ABN_UE_PAIRING_PROT_SWITCH: Indicates whether to enable multi-UE pairing protection for defective UEs. If this option is selected, this function is enabled. If this option is deselected, this function does not take effect. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-MassiveMimoInitDeltaCqi.html">Massive MIMO Initial Delta CQI</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the initial CQI adjustment value for UEs paired for massive MIMO. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-ASplitSdmaSrsLmtUePropThld.html">Adaptive Split SDMA SRS Limit UE Prop Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the proportion of UEs with insufficient SRSs in a cell for adaptation between entry to and exit from split SDMA in massive MIMO scenarios. If the SplitSdmaAdaptionPeriod parameter is set to FORCE_SPLIT_SDMA, split SDMA takes effect regardless of the setting of this parameter. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-ASplitSdmaTm9UePropThld.html">Adaptive Split SDMA TM9 UE Proportion Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the proportion of closed-loop TM9 UEs in a cell for triggering adaptation between entry to and exit from split SDMA in massive MIMO scenarios. If the SplitSdmaAdaptionPeriod parameter is set to FORCE_SPLIT_SDMA, split SDMA takes effect regardless of the setting of this parameter. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-SplitSdmaUeIdenSrsSinrThld.html">Split SDMA UE Identification SRS SINR Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SRS SINR threshold for identifying UEs available for split SDMA in massive MIMO scenarios. A UE is identified as available for split SDMA only if the SRS SINR of the UE is smaller than this threshold for a specific number of consecutive times. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-MmVmimoOuterLoopInitialOfs.html">MM VMIMO Outer-Loop Initial Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates an offset used to determine the initial outer-loop SINR adjustment value after uplink MU-MIMO pairing in massive MIMO cells or in 8T8R cells with the space-domain-preferred pairing algorithm enabled. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-MubfSinrThldOfsBefSrsBal.html">MUBF SINR Thld Ofs Before SRS Balance</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the SINR threshold before SRS balancing for downlink MU beamforming pairing in cells. A UE can participate in MU beamforming pairing only if the SINR of the UE reaches the sum of the SINR threshold before SRS balancing and this offset. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-BfWeightType.html">Beamforming Weight Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the massive MIMO beamforming weight type. If this parameter is set to PEBF, the PE beamforming weight selection algorithm is used. If this parameter is set to ADAPT, the adaptive weight selection algorithm is used. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-PreciseMubfOptSwitch.html">Precise MUBF Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the precise MU beamforming optimization algorithm.</p>
+<p>PRECISE_PAIRING_OPT_SW: Indicates whether to enable the precise UE pairing optimization algorithm. If this option is selected, the eNodeB implements a downlink multi-user pairing process aimed to improve spectral efficiency in massive MIMO cells and selects an MCS index more suitable for paired UEs. This improves the downlink cell throughput. If this option is deselected, the precise MU beamforming optimization algorithm is disabled. This option applies only to LTE TDD.</p>
+<p>ABN_WBB_UE_PRI_SUPPRESS_SW: Indicates whether to enable the suppression of the downlink scheduling priority for abnormal WBB UEs in massive MIMO cells. If this option is selected, there is a lower probability for abnormal WBB UEs to be scheduled. If this option is deselected, the suppression does not take effect. This option applies only to LTE TDD.</p>
+<p>DL_CLUSTER_PAIRING_SW: Indicates whether the downlink cluster pairing algorithm takes effect. If this option is selected, the downlink cluster pairing algorithm is used for massive MIMO cells. If this option is deselected, the cluster pairing algorithm is disabled. This option applies only to LTE TDD.</p>
+<p>MUBF_PWR_ENH_SW: Indicates whether to enable MU beamforming power enhancement in massive MIMO scenarios. If this option is selected, the power of antennas with weak power is enhanced based on the antenna power difference without affecting the orthogonality among paired UEs. If this option is deselected, the original orthogonalization remains unchanged. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-BfGainThldSaturatedUeIdent.html">BF Gain Thld for Saturated UE Identification</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the beamforming gain threshold for identifying UEs with saturated power in massive MIMO scenarios. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-OutloopThldStrtdUeIdent.html">Outloop Thld for Saturated UE Identification</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SU beamforming outer-loop threshold for identifying UEs with saturated power in massive MIMO scenarios. The default value 127 indicates that the power saturation avoidance algorithm does not take effect. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-SplitSdmaBeamRsrpIsltnThld.html">Split SDMA Beam RSRP Isolation Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP isolation threshold for split SDMA UEs in massive MIMO scenarios. If the RSRP isolation between the target beams of two UEs is greater than this threshold, split SDMA can be performed for the two UEs. If the RSRP isolation between the target beams of two UEs is less than or equal to this threshold, split SDMA cannot be performed for the two UEs. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-MmParamIntelSelectSw.html">Massive MIMO Param Intelligent Selection Sw</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable intelligent selection for massive MIMO parameters.</p>
+<p>BIG_EVENT_THLD_LEARN_SW: Indicates whether to enable massive MIMO big event threshold learning. If this option is selected, massive MIMO big event threshold learning is enabled. If this option is deselected, massive MIMO big event threshold learning is disabled. In this case, the default user number threshold for triggering massive MIMO big event assurance is used. This option applies only to LTE TDD.</p>
+<p>BIG_EVENT_PDCCH_CAPC_ADAPT_SW: Indicates whether to enable PDCCH capacity adaptation in massive MIMO big event scenarios. If this option is selected, PDCCH capacity adaptation is enabled. If this option is deselected, PDCCH capacity adaptation is disabled. This option applies only to LTE TDD.</p>
+<p>BIG_EVENT_AUTO_ASSURANCE_SW: Indicates whether to enable automatic assurance for massive MIMO big events. If this option is selected, automatic assurance for massive MIMO big events is enabled. If this option is deselected, automatic assurance for massive MIMO big events is disabled. This option applies only to LTE TDD.</p>
+<p>BIG_EVENT_NON_GBR_BUNDLING_SW: Indicates whether to enable non-GBR packet bundling in big event scenarios. If this option is selected and the NonGbrBundlingSwitch option of the DlSchSwitch parameter in the CellAlgoSwitch MO is also selected, non-GBR packet bundling is enabled in big event scenarios. If the NonGbrBundlingSwitch option is deselected, non-GBR packet bundling cannot be enabled. If this option is deselected, non-GBR packet bundling is disabled in big event scenarios. This option takes effect only if the BIG_EVENT_AUTO_ASSURANCE_SW option is selected. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-MubfTbsForecastPairLyrThld.html">MUBF TBS Forecast Pairing Layer Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of pairing layers for TBS prediction. If the number of downlink pairing layers of a cell is greater than or equal to this threshold, TBS prediction takes effect. If this parameter is set to 0, TBS prediction does not take effect. If UMPTe or UMPTga is used, the AI_ENHANCEMENT_SWITCH option of the ServiceMode parameter in the eNodeBResModeAlgo MO must also be selected for TBS prediction to take effect. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-MmParamIntelSelectDlUxThld.html">MM Param Intel Selection DL User Exp Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink experience threshold for intelligent massive MIMO parameter selection. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-MmParamIntelSelectUlUxThld.html">MM Param Intel Selection UL User Exp Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink experience threshold for intelligent massive MIMO parameter selection. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-LowSrsSinrUePairLayerThld.html">Low SRS SINR UE Pairing Layer Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of MU beamforming pairing layers for low-SRS-SINR UE pairing optimization. If this parameter is set to 0 or 1, low-SRS-SINR UE pairing optimization does not take effect. If this parameter is set to a value greater than 1, the optimization takes effect and this parameter indicates the maximum number of pairing layers for low-SRS-SINR UEs. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-DlSubfPrbUsageRestrThld.html">DL SUBF PRB Usage Restriction Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for enabling downlink PRB usage restriction for SU beamforming UEs. If this parameter is set to 100, downlink PRB usage restriction for SU beamforming UEs does not take effect. If this parameter is not set to 100, this function takes effect. In this case, if the PRB usage of SU beamforming UEs is greater than this threshold, this function is enabled and the eNodeB restricts the scheduling of SU beamforming UEs. This parameter applies only to massive MIMO or 8T adaptive MU beamforming scenarios. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-LargePktThldUpperLimit.html">Large-Packet Thld Upper Limit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper limit of the large packet threshold for enabling user-experience-based scheduling enhancement and optimization. If this parameter is set to 0, the function does not take effect. If both the DlSchPriIncreaseUeProp parameter in the CellDlschAlgo MO and this parameter are not set to 0, the function takes effect. In this case, this parameter indicates the upper limit of the number of TTIs for determining whether a UE is a large-packet UE. This parameter applies only to massive MIMO scenarios. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-AbnUePktDelayThld.html">Abnormal UE Packet Delay Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable downlink scheduling interval protection for defective UEs. If this parameter is set to a non-zero value, this function is enabled. If this parameter is set to 0, this function is disabled. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMMAlgo-ActiveUeNumThld.html">Active UE Number Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for the number of UEs to be scheduled used in the function of downlink scheduling interval protection for defective UEs. A larger value of this parameter indicates a higher probability that the function takes effect in heavy-traffic scenarios. A smaller value of this parameter indicates a higher probability that the function takes effect in light-traffic scenarios. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

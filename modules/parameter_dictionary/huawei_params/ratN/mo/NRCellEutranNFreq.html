@@ -1,0 +1,176 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NRCellEutranNFreq">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NRCellEutranNFreq">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NRCellEutranNFreq</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NRCellEutranNFreq"></a><a name="NRCellEutranNFreq"></a>
+
+
+<h1 class="topictitle1">NRCellEutranNFreq</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="NRCell.html">NRCell</a>
+    +-<a href="NRCellEutranNFreq.html"><strong>NRCellEutranNFreq</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An NRCellEutranNFreq MO consists of the common parameters related to a neighboring E-UTRAN frequency. The parameters include the priority for cell reselection and the measurement bandwidth. They are used in measurement configuration and SIB5 for inter-RAT cell reselection. For details, see 3GPP TS 38.331.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NRCell.html">NRCell</a></li><li>Relation with the <strong>gNBEutraExternalCell</strong> MO:<ul><li><strong>DlEarfcn</strong> in a <strong>gNBEutraExternalCell</strong> MO must be set to a value configured in the associated <strong>NRCellEutranNFreq</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRCell</strong> MO:<ul><li>A maximum of 64 <strong>NRCellEutranNFreq</strong> instances can be configured for each <strong>NRCell</strong>.</li></ul>
+</li><li>Relation with the <strong>NRCellEutraNRelation</strong> and <strong>gNBEutraExternalCell</strong> MOs:<ul><li>The value of <strong>DlEarfcn</strong> in a <strong>gNBEutraExternalCell</strong> MO corresponding to an <strong>NRCellEutraNRelation</strong> MO must be the same as the value of <strong>DlEarfcn</strong> in an <strong>NRCellEutranNFreq</strong> MO corresponding to the <strong>NRCellEutraNRelation</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRCellOpPolicy</strong> and <strong>gNBFreqPriorityGroup</strong> MOs:<ul><li>If <strong>gNBFreqPriorityGroupId</strong> in an <strong>NRCellOpPolicy</strong> MO is not set to 255, the value of <strong>DlEarfcn</strong> in all the <strong>gNBFreqPriorityGroup</strong> MOs with <strong>RatType</strong> set to EUTRAN must be existent in the <strong>NRCellEutranNFreq</strong> MOs corresponding to <strong>NrCellId</strong> in the <strong>NRCellOpPolicy</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRCellReselConfig</strong> MO:<ul><li>The value of <strong>CellReselPriority</strong> in the <strong>NRCellReselConfig</strong> MO for a cell must be different from the summed value of <strong>EutranFreqReselPriority</strong> and <strong>EutranFreqReselSubPriority</strong> in the <strong>NRCellEutranNFreq</strong> MO for the same cell.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> and <strong>NODE</strong> MOs:<ul><li>If <strong>TYPE</strong> in the <strong>MPT</strong> MO is not set to UMPT, the <strong>NRCellEutranNFreq</strong> MO instance cannot be added.</li><li>If <strong>BRDSPEC</strong> in the <strong>MPT</strong> MO is set to UMPTe, the board type is UMPTe.</li><li>If <strong>BRDSPEC</strong> in the <strong>MPT</strong> MO is set to UMPTga, the board type is UMPTga. Otherwise, the board type is UMPTg.</li><li>If the board type is UMPTg and <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, the number of <strong>NRCellEutranNFreq</strong> MO instances must be less than or equal to 72 x 32.</li><li>If the board type is UMPTg and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRCellEutranNFreq</strong> MO instances must be less than or equal to 144 x 32.</li><li>If the board type is UMPTga and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRCellEutranNFreq</strong> MO instances must be less than or equal to 72 x 32.</li><li>If the board type is UMPTga, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM2, the number of <strong>NRCellEutranNFreq</strong> MO instances must be less than or equal to 36 x 32.</li><li>If the board type is UMPTga, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM, the <strong>NRCellEutranNFreq</strong> MO instance cannot be added.</li><li>If the board type is UMPTe and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRCellEutranNFreq</strong> MO instances must be less than or equal to 72 x 32.</li><li>If the board type is UMPTe, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM2, the number of <strong>NRCellEutranNFreq</strong> MO instances must be less than or equal to 36 x 32.</li><li>If the board type is UMPTe, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM, the <strong>NRCellEutranNFreq</strong> MO instance cannot be added.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NRCellEutranNFreq__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NRCellEutranNFreq__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NRCellEutranNFreq__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_nrcelleutrannfreq.html">ADD NRCELLEUTRANNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an inter-RAT neighboring E-UTRAN frequency.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nrcelleutrannfreq.html">LST NRCELLEUTRANNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list inter-RAT neighboring E-UTRAN frequency configurations.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nrcelleutrannfreq.html">MOD NRCELLEUTRANNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify a neighboring E-UTRAN frequency.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_nrcelleutrannfreq.html">RMV NRCELLEUTRANNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a neighboring E-UTRAN frequency.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NRCellEutranNFreq__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NRCellEutranNFreq__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NRCellEutranNFreq__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-NrCellId.html">NR Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an NR cell, which uniquely identifies the cell within a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-DlEarfcn.html">Downlink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DL EARFCN of an inter-RAT neighboring E-UTRAN cell. For details about this parameter, see 3GPP TS 36.104.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-EutranFreqHighPriReselThld.html">E-UTRAN Frequency High Priority Resel Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RX level threshold for reselecting to a cell on a high-priority E-UTRAN frequency. If the cell reselection priority of the target frequency is higher than that of the serving cell, this threshold is used as the RX level threshold for a UE to reselect from the serving cell to the cell on the target frequency. After measurements are started for cells on the target frequency, the UE reselects to a cell on the frequency only if the RX level of the cell is higher than the threshold specified by this parameter for the corresponding time-to-trigger. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-EutranFreqLowPriReselThld.html">E-UTRAN Frequency Low Priority Resel Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RX level threshold for reselecting to a cell on a low-priority E-UTRAN frequency. If the absolute priority of the target frequency is lower than that of the serving cell, this threshold is used as the RX level threshold for a UE to reselect from the serving cell to the cell on the target frequency. After measurements are started for cells on the target frequency, the UE reselects to a cell on the frequency only if the RX level of the cell is higher than the threshold specified by this parameter and that of the serving cell is lower than a specific reselection threshold for the corresponding time-to-trigger. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-EutranFreqReselPriority.html">E-UTRAN Frequency Resel Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell reselection priority of an E-UTRAN frequency. The value 0 indicates the lowest priority. The value 255 indicates that no reselection priority is configured for the E-UTRAN frequency. For how UEs process the reselection priority of frequencies, see 3GPP TS 38.304.</p>
+<p>A UE calculates the sum of this parameter and the cell reselection sub-priority of an E-UTRAN frequency (specified by NRCellEutranNFreq.EutranFreqReselSubPriority) and compares the sum with the cell reselection priority of the serving cell (specified by NRCellReselConfig.CellReselPriority). The target frequency for cell reselection is determined based on the result.</p>
+<p>If the sum is greater than the cell reselection priority of the serving cell, the UE initiates a measurement on the neighboring E-UTRAN frequency. If the signal quality of a cell on the neighboring E-UTRAN frequency meets requirements throughout the time specified by NRCellReselConfig.EutranCellReselTimer, the UE starts reselection to that cell. If the sum is smaller than the cell reselection priority of the serving cell, the UE initiates a measurement on the neighboring frequency only when the signal quality of the serving cell is poor. When the signal quality of the serving cell is lower than the threshold specified by NRCellReselConfig.ServFreqLowPriRsrpReselThd throughout the time defined by the E-UTRAN cell reselection timer, the signal quality of a cell on the neighboring frequency is higher than the threshold specified by NRCellEutranNFreq.EutranFreqLowPriReselThld, and the UE has camped on the serving cell for more than 1s, the UE starts cell reselection. The sum of reselection priorities and that of reselection sub-priorities must be different between RATs. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-FreqSpecificOffset.html">Frequency-specific Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency-specific offset of an E-UTRAN frequency. This parameter determines the probability of triggering event B1/B2 measurement reports. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-MeasurementBandwidth.html">Measurement Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the measurement bandwidth of an inter-RAT neighboring E-UTRAN cell. The setting of this parameter depends on the bandwidth configuration of the neighboring E-UTRAN cell. In E-UTRAN, a cell bandwidth is expressed in units of resource blocks (RBs). Cell bandwidths 1.4 MHz, 3 MHz, 5 MHz, 10 MHz, 15 MHz, and 20 MHz correspond to 6, 15, 25, 50, 75, and 100 RBs, respectively. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-MinimumRxLevel.html">Minimum RX Level</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum RX level required for an inter-RAT E-UTRAN cell to become a candidate for cell selection. The level is included in criteria S and used in the evaluation of cell selection. During the evaluation for cell reselection, the following calculation applies: Srxlev = Measured RSRP value of a cell on the target frequency - Value of this parameter - Compensated power. If Srxlev for a cell is better than a threshold for the corresponding time-to-trigger, reselection to the cell is started. For details, see 3GPP TS 36.304.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-ConnFreqPriority.html">Frequency Priority for Connected Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency priority for handover or redirection for UEs not running voice services. Frequencies with higher priorities are delivered preferentially. A larger value of this parameter indicates a higher priority. If this parameter is set to 0 for a frequency, this frequency will not be selected as the target frequency for blind redirection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-EutranFreqReselSubPriority.html">E-UTRAN Frequency Resel Sub-Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell reselection sub-priority of an E-UTRAN frequency.</p>
+<p>If this parameter is set to ZERO, the reselection sub-priority of an E-UTRAN frequency is not delivered.</p>
+<p>A UE calculates the sum of this parameter and the reselection priority of an E-UTRAN frequency (specified by NRCellEutranNFreq.EutranFreqReselPriority) and compares the sum with the cell reselection priority of the serving cell (specified by NRCellReselConfig.CellReselPriority). The target frequency for cell reselection is determined based on the result.</p>
+<p>If the sum is greater than the cell reselection priority of the serving cell, the UE initiates a measurement on the neighboring E-UTRAN frequency. If the signal quality of a cell on the neighboring E-UTRAN frequency meets requirements throughout the time specified by NRCellReselConfig.EutranCellReselTimer, the UE starts reselection to that cell. If the sum is smaller than the cell reselection priority of the serving cell, the UE initiates a measurement on the neighboring frequency only when the signal quality of the serving cell is poor. When the signal quality of the serving cell is lower than the threshold specified by NRCellReselConfig.ServFreqLowPriRsrpReselThd throughout the time defined by the E-UTRAN cell reselection timer, the signal quality of a cell on the neighboring frequency is higher than the threshold specified by NRCellEutranNFreq.EutranFreqLowPriReselThld, and the UE has camped on the serving cell for more than 1s, the UE starts cell reselection. The sum of reselection priorities and that of reselection sub-priorities must be different between RATs. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-VoltePriority.html">VoLTE Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of a neighboring E-UTRAN frequency for carrying VoLTE services. If this parameter is set to 255 for a neighboring E-UTRAN frequency, the frequency does not support VoLTE during EPS fallback, emergency call fallback, and VoNR-to-VoLTE switching. If this parameter is set to a value in the range of 0 to 16, a larger value indicates a higher priority. The base station selects frequencies to be measured based on this priority and UEs preferentially select the frequency with a high priority for measurement. If this parameter is set to 0, the frequency is not selected as the target frequency for EPS fallback through blind redirection and VoNR-to-VoLTE switching through blind redirection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellEutranNFreq-AggregationAttribute.html">Aggregation Attribute</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the aggregation attributes of a neighboring E-UTRAN frequency.</p>
+<p>SEPARATED_FREQ_SPEC_SHR_FLAG: Indicates whether a neighboring E-UTRAN frequency is a secondary operator's frequency in RAN sharing with special dedicated carrier mode. If this option is selected, the neighboring E-UTRAN frequency is a secondary operator's frequency in RAN sharing with special dedicated carrier mode. If this option is deselected, the neighboring E-UTRAN frequency is not a secondary operator's frequency in RAN sharing with special dedicated carrier mode. This option applies only to two-operator sharing with special dedicated carrier, not to two-operator sharing with common carrier.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

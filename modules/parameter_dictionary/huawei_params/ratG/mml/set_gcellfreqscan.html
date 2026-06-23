@@ -1,0 +1,180 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set GBTS Local Cell Frequency Scan (SET GCELLFREQSCAN)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_gcellfreqscan">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set GBTS Local Cell Frequency Scan (SET GCELLFREQSCAN)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_gcellfreqscan"></a><a name="set_gcellfreqscan"></a>
+
+
+<h1 class="topictitle1">Set GBTS Local Cell Frequency Scan (SET GCELLFREQSCAN)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS5900</p>
+
+<div class="mmlfunc"><a name="set_gcellfreqscan__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to start the uplink frequency scan test in a specified local cell. In the uplink frequency scan test, the uplink receive levels of specified frequencies are scanned when the TCH/F is idle. The interference of uplink frequencies can be obtained from this test. Therefore, the test provides a reference for selecting appropriate working frequencies in network optimization.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_gcellfreqscan__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li>The local cell where an uplink frequency scan is to be started must have been configured. Otherwise, the command execution fails.</li><li>The logical cell bound to the local cell where an uplink frequency scan is to be started must have been configured and activated.</li><li>After the uplink frequency scan test is started in the cell, the TRX involved in the scan test automatically exits from the power reduction mode if the GBTS function enables the backup power saving function.</li><li>The uplink frequency scan test cannot be performed together with the BTS deployment call tests.</li><li>The uplink frequency scan test and the CDMA network interference test cannot be simultaneously conducted under the same logical cell.</li><li>ALLSECTOR and SECTORID are valid only in multi-site cells.</li><li>In a multi-site cell, if ALLSECTOR is not specified, start an uplink frequency scan for the sector with the minimum sector number under a local cell.</li><li>In a multi-site cell, the uplink frequency scan occupies a TCH/F. The occupied TCH/F cannot be used for services, and the channel status is displayed as Faulty.</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_gcellfreqscan__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GLoCell-gLoCellId.html">GLOCELLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the identity of a local cell. It uniquely identifies a local cell served by a GBTS function.</p>
+<p>GUI Value Range: 0~268435455</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~268435455</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GLoCell-startTime.html">STARTTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Start Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start time of the frequency scan. If the start time is not specified, the frequency scan is started immediately.</p>
+<p>GUI Value Range: 00:00:00~23:59:59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00:00:00~23:59:59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GLoCell-duration.html">DURATION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Duration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duration of the frequency scan.</p>
+<p>GUI Value Range: 5~1440</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 5~1440</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GLoCell-freqList.html">FREQLIST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Frequency List</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency list. When multiple frequencies are specified, use &amp; between two frequencies. A maximum of 124 frequencies can be specified.</p>
+<p>GUI Value Range: 0~1023</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1023</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GLoCell-allSector.html">ALLSECTOR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Whether all sectors or Not</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether all sectors under the local cell are scanned during the uplink frequency scan. The values of this parameter are YES and NO.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GLoCell-sectorId.html">SECTORID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the No. of a sector.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_gcellfreqscan__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start an uplink frequency scan test with the parameters as follows: Local Cell ID: 88, Duration(min): 60, Frequency List: 51&amp;72, run the following command:
+SET GCELLFREQSCAN: GLOCELLID=88, DURATION=60, FREQLIST=51&amp;72;
+
+To start an uplink frequency scan test with the parameters as follows: Local Cell ID: 88, Duration(min): 60, Frequency List: 51&amp;72, Whether all sector or Not: NO, Sector ID: 12, run the following command:
+SET GCELLFREQSCAN: GLOCELLID=88, DURATION=60, FREQLIST=51&amp;72, ALLSECTOR=NO, SECTORID=12;
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

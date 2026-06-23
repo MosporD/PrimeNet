@@ -1,0 +1,428 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add BFD Session (ADD BFDSESSION)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_bfdsession">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add BFD Session (ADD BFDSESSION)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_bfdsession"></a><a name="add_bfdsession"></a>
+
+
+<h1 class="topictitle1">Add BFD Session (ADD BFDSESSION)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_bfdsession__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a Bidirectional Forwarding Detection (BFD) session. BFD, a protocol for fast link fault detection, provides a low-overhead and short-duration method of detecting link failures.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_bfdsession__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before running this command, ensure that the peer NE supports the BFD function. The peer end cannot be configured with more than one BFD session connected to the same BFD session of the local end. Otherwise, intermittent failures occur on the link.</p>
+</li><li><p>The source and destination IP addresses of a BFD session must be different from each other.</p>
+</li><li><p>The BS does not support inter-board BFD sessions.</p>
+</li><li><p>Each BFD session must have a unique destination IP address in the same routing domain.</p>
+</li><li><p>If the hop type is single hop and the source IP port is an Ethernet port in the BFD session to be added, the source and destination IP addresses must be on the same network segment.</p>
+</li><li><p>The minimum TX and RX intervals in use may be different from the intervals set by running this command. To query the intervals in use, run the <a href="dsp_bfdsession.html">DSP BFDSESSION</a> command.</p>
+</li><li><p>If a single-hop reliability-type BFD session is inactive (including the session states specified by the values Admin Down and Down), the route with the next-hop IP address set to the same value as the destination IP address of the BFD session is disabled. If the BFD session is active, the route with the next-hop IP address set to the same value as the destination IP address of the BFD session is enabled.</p>
+</li><li><p>If a multi-hop reliability-type BFD session is inactive, the routes whose destination IP address is the same as that of the BFD session and whose destination subnet mask has 32 bits are disabled one by one in descending order of priority. If the lowest-priority route is still unreachable, all disabled routes are enabled. If detection on low-priority routes is successful, the BFD detection is activated, and disabled high-priority routes of will not be enabled.</p>
+</li><li><p>Configure a BFD session as a single-hop one if it is to facilitate BFD on two devices with no layer 3 network device in between.</p>
+</li><li><p>Configure a BFD session as a multiple-hop one if it is to facilitate BFD on two devices with one or multiple layer 3 network devices in between.</p>
+</li><li><p>System specifications: If the WMPT is the main control board, a maximum of 32 BFD sessions can be configured. If the LMPT/UMPT/UMDU is the main control board, a maximum of 96 BFD sessions can be configured. If the GTMUb/GTMUc is the main control board, a maximum of 16 BFD sessions can be configured.</p>
+</li><li><p>Board specifications: A maximum of 4 BFD sessions can be configured on a WMPT and the session number must range from 0 to 3. A maximum of 96 BFD sessions can be configured on an LMPT/UMPT/UMDU/UTRPc/UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. A maximum of 6 BFD sessions can be configured on a GTMUb/GTMUc and the session number must range from 0 to 5. A maximum of 4 BFD sessions can be configured on a UTRP (subboard type: UEOC/UQEC/UIEC/UAEC) and the session number must range from 0 to 3.</p>
+</li><li><p>If a single-hop BFD session is faulty, the source-based IP route whose next hop IP address is the destination IP address of this BFD session will be disabled. This is not the case for a multi-hop BFD session.</p>
+</li><li><p>The key with the minimum key ID is used for negotiation in BFD authentication. Ensure that the key ID and key are the same as those at the peer end; otherwise, the negotiation will fail.</p>
+</li><li><p>Currently, the UMPT, UMDU, LMPT, UTRPc and GTMUc support BFD authentication.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]When the port type is set to PPP or MPGRP, BFD authentication is not supported.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]If a BFD session is carried on a PPP link or an MLPPP link, it is recommended that the minimum RX and TX intervals be both set to 300 ms. Otherwise, intermittent failures occur on the link.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_bfdsession__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet No. to which a BFD session belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. To mitigate the risk, it is recommended that this parameter not be used.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack No. to which a BFD session belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. To mitigate the risk, it is recommended that this parameter not be used.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot No. to which a BFD session belongs.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. To mitigate the risk, it is recommended that this parameter not be used.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-SessionID.html">BFDSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Session ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a BFD session. The session ID plus 1 is the local discriminator of the BFD session. The local discriminator must be consistent with the configuration at the peer end.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Session ID and My Discriminator parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~95</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~95</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the VRF Index parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-SourceIP.html">SRCIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IP address of a BFD session. The source IP address of a BFD session must be a device IP address of a specified board (for example, the IP address of an Ethernet port or a port that carries a PPP link or MP group) or a logical IP address (for example, the IP address of a loopback port), but cannot be set to the same value as the IP address of a remote maintenance channel or a negotiated IP address. Note that a BFD session cannot be configured as a single-hope session if its source IP address is a logical IP address.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Source IP parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SRCIP</strong> in a <strong>BFDSESSION</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x (including 0.0.0.0).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SRCIP</strong> must be different from <strong>DSTIP</strong> in a <strong>BFDSESSION</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-DstIP.html">DSTIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination IP address of a BFD session. The destination IP address must be a valid IP address, and cannot be set to 0.0.0.0 or any existing IP addresses in the system. If Virtual Router Redundancy Protocol (VRRP) is used in the network, two BFD sessions must be configured with the destination IP addresses set to the active and standby physical IP addresses of the virtual router, respectively.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Destination IP parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>DSTIP</strong> in a <strong>BFDSESSION</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x (including 0.0.0.0).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SRCIP</strong> must be different from <strong>DSTIP</strong> in a <strong>BFDSESSION</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-HopType.html">HT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Hop Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the hop type of a BFD session. The single-hop BFD session is used to perform point-to-point detection at the data link layer, and often used in layer 2 networking scenarios. The multi-hop BFD session is used to perform end-to-end connectivity checks at the transport layer, and often used in layer 3 networking scenarios.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Hop Type parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: SINGLE_HOP(Single Hop), MULTI_HOP(Multiple Hops)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLE_HOP, MULTI_HOP</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>BFDSESSION</strong> MO, if <strong>SRCIP</strong> is set to a logical IP address, <strong>HT</strong> cannot be set to SINGLE_HOP.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-MinTxInterval.html">MINTI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Min TX Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum interval at which a BFD session transmits control packets.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Min TX Interval parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 10~1000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 10~1000</p>
+<p>MML Default Value: 100</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-MinRxInterval.html">MINRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Min RX Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum interval at which a BFD session receives control packets.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Min RX Interval parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 10~1000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 10~1000</p>
+<p>MML Default Value: 100</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-DetectMultiplier.html">DM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Detection Multiplier</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the detection multiplier of a BFD session.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Detection Multiplier parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 3~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3~10</p>
+<p>MML Default Value: 3</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-SessionCatalog.html">CATLOG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Session Catalog</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of a BFD session. If this parameter is set to MAINTENANCE, this BFD session is used only for continuity check (CC). If this parameter is set to RELIABILITY, the BFD session is used to trigger route interlock. Route interlock enables the standby route to take over once the active route becomes faulty, and therefore prevents service interruption caused by route failures.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Session Catalog parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: MAINTENANCE(Maintenance), RELIABILITY(Reliability)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MAINTENANCE, RELIABILITY</p>
+<p>MML Default Value: RELIABILITY(Reliability)</p>
+<p>Recommended Value: RELIABILITY(Reliability)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-DSCP.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Differentiated Services Code Point (DSCP). The priority has a positive correlation with the value of this parameter.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the DSCP parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: 48</p>
+<p>Recommended Value: 48</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-VER.html">VER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Protocol Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the protocol version of a BFD session.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Protocol Version parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: DRAFT4(DRAFT4), STANDARD(STANDARD)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DRAFT4, STANDARD</p>
+<p>MML Default Value: STANDARD(STANDARD)</p>
+<p>Recommended Value: STANDARD(STANDARD)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>BFDAUTHSW</strong> parameter in the <strong>BFDSESSION</strong> MO is set to ON, the <strong>VER</strong> parameter in the <strong>BFDSESSION</strong> MO must be STANDARD.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-BFDAuthSwitch.html">BFDAUTHSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BFD Authentication Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a BFD session supports BFD authentication. You are advised to enable the BFD Authentication Switch.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the BFD Authentication Switch parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: ON(On), OFF(Off)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: ON(On)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-BFDAuthType.html">BFDAUTHTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BFD Authentication Algorithm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the algorithm used during BFD authentication.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the BFD Authentication Algorithm parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: MD5(MD5), MeMD5(MeMD5), SHA1(SHA1), MeSHA1(MeSHA1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MD5, MeMD5, SHA1, MeSHA1</p>
+<p>MML Default Value: SHA1(SHA1)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BFDSESSION-KeyChainID.html">KEYCHAINID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BFD Authentication Key Chain ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a configured BFD key chain.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the BFD Authentication Key Chain ID parameter in the BFD MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_bfdsession__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a BFD session with the parameters as follows: Slot No.: 6, Session ID: 0, Source IP: 192.168.2.24, Destination IP: 172.16.17.2, Hop Type: SINGLE_HOP, DSCP: 32, run the following command: 
+ADD BFDSESSION: SN=6, BFDSN=0, SRCIP="192.168.2.24", DSTIP="172.16.17.2", HT=SINGLE_HOP, DSCP=32;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

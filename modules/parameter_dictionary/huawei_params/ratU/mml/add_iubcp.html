@@ -1,0 +1,142 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Iub Control Port (ADD IUBCP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_iubcp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Iub Control Port (ADD IUBCP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_iubcp"></a><a name="add_iubcp"></a>
+
+
+<h1 class="topictitle1">Add Iub Control Port (ADD IUBCP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="add_iubcp__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add the active/standby NodeB control port (NCP) or active/standby communication control port (CCP). The traffic on the NCP/CCP can be carried by IP transport or ATM transport. In IP transport mode, the NCP/CCP is carried on the SCTP link. In ATM transport mode, the NCP/CCP is carried on the SAAL link.</p>
+<p>When both active and standby NCPs/CCPs are configured and channel switchover is enabled, the standby NCP/CCP becomes the active one and automatically takes over its services after the active NCP/CCP is faulty. If channel switchover is disabled, an active/standby switchover will not be triggered even if the active or standby NCP/CCP is faulty.</p>
+<p>To support the disaster tolerance scheme for the RNC, the IUBCP can be set to either the primary homing mode or secondary homing mode. By default, the IUBCP is set to the primary homing mode. If the default configuration needs to be modified, ensure that disaster tolerance has been configured for the RNC.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_iubcp__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li>Before running this command, ensure that NODEBFUNCTION exists.</li><li>Before running this command, ensure that <strong>CPBEARID</strong> referenced by the IUBCP has been added successfully by running the <a href="../../comm/mml/add_cpbearer.html">ADD CPBEARER</a> command.</li><li>Before running this command, ensure that the bearer SAAL or SCTP link is configured.</li><li>One SAAL or SCTP link can carry only one Iub control port.</li><li>Identical parameter settings must be made at the RNC before a standby Iub control port can take effect.</li><li>It is recommended that the active CCP or NCP be configured on an SAAL link.</li><li>In a dual-stack scenario (enabling active/standby switchover by running the <a href="../../comm/mml/set_cpswitch.html">SET CPSWITCH</a> command), active and standby Iub control ports must be carried on an SAAL link and an SCTP link, respectively; In an active/standby scenario, active and standby Iub control ports can be carried on two SAAL links, respectively.</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_iubcp__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IubCp-cpType.html">CPPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of Iub control port. The control port type is classified into NodeB Control Port (NCP) and Communication Control Port (CCP). The NCP carries a common signaling channel, while the CCP carries a dedicated signaling channel of a cell. There is only one NCP and multiple CCPs in the system.</p>
+<p>GUI Value Range: NCP(NCP Port), CCP(CCP Port)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NCP, CCP</p>
+<p>MML Default Value: NCP(NCP Port)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The number of <strong>IUBCP</strong> MOs under which <strong>CPPT</strong> is set to CCP cannot exceed 96.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IubCp-cpBearId.html">CPBEARID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CPBear ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CP bearer ID.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IubCp-ccpPortNo.html">CPPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CP Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the Iub control port.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IubCp-belong.html">BELONG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Belong Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the flag of the transport channel to which an Iub control port belongs.</p>
+<p>GUI Value Range: MASTER(MASTER), SLAVE(SLAVE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MASTER, SLAVE</p>
+<p>MML Default Value: MASTER(MASTER)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_iubcp__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an Iub control port with the parameters as follows: Port Type: NCP,  CPBear Id: 0, run the following command: 
+ADD IUBCP: CPPT=NCP, CPBEARID=0, BELONG=MASTER;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

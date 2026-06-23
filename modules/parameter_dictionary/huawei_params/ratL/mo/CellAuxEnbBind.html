@@ -1,0 +1,131 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellAuxEnbBind">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellAuxEnbBind">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellAuxEnbBind</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellAuxEnbBind"></a><a name="CellAuxEnbBind"></a>
+
+
+<h1 class="topictitle1">CellAuxEnbBind</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellAuxEnbBind.html"><strong>CellAuxEnbBind</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellAuxEnbBind MO consists of parameters used to configure a binding relationship between a single frequency network (SFN) cell and an auxiliary eNodeB.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>FddTddInd</strong> in a <strong>Cell</strong> MO is set to CELL_TDD, a maximum of six <strong>CellAuxEnbBind</strong> and <strong>CellAuxDuBind</strong> MOs can be configured under the <strong>Cell</strong> MO. If <strong>FddTddInd</strong> in a <strong>Cell</strong> MO is set to CELL_FDD, a maximum of five <strong>CellAuxEnbBind</strong> and <strong>CellAuxDuBind</strong> MOs can be configured in total under the <strong>Cell</strong> MO.</li><li>If the <strong>MultiRruCellMode</strong> parameter in the <strong>Cell</strong> object is not set to SFN, the <strong>CellAuxEnbBind</strong> object with the same <strong>LocalCellId</strong> parameter of the <strong>Cell</strong> object cannot exist.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, <strong>eUCellSectorEqm</strong>, <strong>EuSectorEqmGroup</strong>, and <strong>CellAuxDuBind</strong> MOs:<ul><li>Assume that: The <strong>FddTddInd</strong>, <strong>MultiRruCellFlag</strong>, and <strong>MultiRruCellMode</strong> parameters in the <strong>Cell</strong> MO are set to CELL_FDD, BOOLEAN_TRUE, and SFN, respectively, the AsfnFastAttSwitch option of the <strong>SfnAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected, and the <strong>CellAuxDuBind</strong>, and <strong>CellAuxEnbBind</strong> MOs are not configured. Then: The TM9Switch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only when either of the following conditions is met: (a) The <strong>SfnDlSchSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is set to JOINT. (b) The sum of the number of <strong>eUCellSectorEqm</strong> MO instances and the number of <strong>EuSectorEqmGroup</strong> MO instances is 2 and the <strong>SfnDlSchSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is set to ADAPTIVE.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>When the SuperCombCellSwitch option of the <strong>SfnAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is ON, the <strong>CellAuxEnbBind</strong> MO cannot be configured for this cell.</li></ul>
+</li><li>Relation with the <strong>DdCellGroup</strong> MO:<ul><li><strong>CellAuxEnbBind</strong> MO instances cannot be configured for the cells specified by the <strong>LocalCellId1</strong> and <strong>LocalCellId2</strong> parameters in a <strong>DdCellGroup</strong> MO instance.</li></ul>
+</li><li>Relation with the <strong>eNodeBFunction</strong> MO:<ul><li>The value of the <strong>EnodebId</strong> parameter in an <strong>CellAuxEnbBind</strong> MO and the <strong>eNodeBId</strong> parameter in the <strong>eNodeBFunction</strong> MO cannot be the same.</li></ul>
+</li><li>Relation with the <strong>eNodeBFunction</strong> and <strong>CellAuxDuBind</strong> MOs:<ul><li>A maximum of 216 <strong>CellAuxEnbBind</strong>, <strong>CellAuxDuBind</strong> MOs can be configured in total in the eNodeB.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>EuSectorEqmGroup</strong>, <strong>CellAuxDuBind</strong>, <strong>eUCellSectorEqm</strong>, <strong>EuPrbSectorEqm</strong>, and <strong>EuPrbSectorEqmGroup</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE(TRUE), the <strong>eUCellSectorEqm</strong>, <strong>EuSectorEqmGroup</strong>, <strong>CellAuxDuBind</strong> and <strong>CellAuxEnbBind</strong> MOs could not be configured; When the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> is set to FALSE, the <strong>EuPrbSectorEqm</strong>, <strong>EuPrbSectorEqmGroup</strong> could not be configured.</li></ul>
+</li><li>Relation with the <strong>CellDynPowerSharing</strong> and <strong>CellAuxDuBind</strong> MOs:<ul><li>When the LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, no CellAuxEnbBind and CellAuxDuBind MO can be added.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> MO:<ul><li>When the <strong>SpectrumCloudSwitch</strong> parameter in a <strong>SpectrumCloud</strong> MO is set to GL_SPECTRUM_CONCURRENCY, UL_SPECTRUM_SHARING, DC_HSDPA_BASED_UL_SPECTRUM_SHR or UL_SPECTRUM_SHR_PH2_WITH_GSM, the <strong>CellAuxEnbBind</strong> MO cannot be configured for this cell.</li></ul>
+</li><li>Relation with the <strong>CellDlschAlgo</strong>, <strong>Cell</strong>, and <strong>CellAuxDuBind</strong> MOs:<ul><li>If the <strong>AdaptPilotOffPrbThld</strong> parameter in the <strong>CellDlschAlgo</strong> MO for a cell is set to a value greater than 0, the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO for this cell must be set to CELL_FDD and the <strong>CellAuxEnbBind</strong> and <strong>CellAuxDuBind</strong> MOs cannot be added for this cell.</li></ul>
+</li><li>Relation with the <strong>ContigIntraBandCarr</strong>, <strong>Cell</strong>, and <strong>CellAuxDuBind</strong> MOs:<ul><li>If the CONTIG_INTRA_BAND_CARR_SW option of the <strong>ContigIntraBandCarrSw</strong> parameter in the <strong>ContigIntraBandCarr</strong> MO under a <strong>Cell</strong> MO is selected, the <strong>CellAuxEnbBind</strong>, and <strong>CellAuxDuBind</strong> MOS cannot be configured under this <strong>Cell</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellAuxEnbBind__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellAuxEnbBind__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellAuxEnbBind__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_cellauxenbbind.html">ADD CELLAUXENBBIND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add single frequency network (SFN) cell binding relationship to an auxiliary eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellauxenbbind.html">LST CELLAUXENBBIND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list a single frequency network (SFN) cell binding relationship to an auxiliary eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_cellauxenbbind.html">RMV CELLAUXENBBIND</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a single frequency network (SFN) cell binding relationship to an auxiliary eNodeB.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellAuxEnbBind__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellAuxEnbBind__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellAuxEnbBind__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellAuxEnbBind-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of a cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellAuxEnbBind-EnodebId.html">Slave site eNodeB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the auxiliary eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellAuxEnbBind-Mcc.html">Mobile Country Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mobile country code (MCC) of the operator that operates an auxiliary eNodeB. This parameter applies only to LTE FDD and LTE TDD. This parameter is valid only when the USU3910 is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellAuxEnbBind-Mnc.html">Mobile Network Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mobile network code (MNC) of the operator that operates an auxiliary eNodeB. The value of this parameter is a string of two or three decimal digits. This parameter applies only to LTE FDD and LTE TDD. This parameter is valid only when the USU3910 is used.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

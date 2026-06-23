@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Parser - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('xml_parser.static', filename='xml_parser.css') }}?v=1.0">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation Header -->
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">← Dashboard</a>
+                    <h1>📄 XML Parser</h1>
+                    <p>Convert XML configuration files to Excel format</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Upload Section -->
+            <div class="upload-section">
+                <h2>Upload XML File</h2>
+                <form id="upload-form" enctype="multipart/form-data">
+                    <div class="file-input-wrapper">
+                        <input type="file" id="xml-file" name="file" accept=".xml" required>
+                        <label for="xml-file" class="file-label">
+                            <span class="file-icon">📁</span>
+                            <span class="file-text">Choose XML file...</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-primary">Upload & Parse</button>
+                </form>
+                <div id="upload-status" class="status-message"></div>
+            </div>
+
+            <!-- Parameter Filter Section -->
+            <div id="filter-section" class="filter-section" style="display: none;">
+                <h2>Filter Parameters (Optional)</h2>
+                <p class="section-description">Select specific parameters to include in the Excel output. Leave empty to include all parameters.</p>
+
+                <div class="filter-controls">
+                    <input type="text" id="param-search" placeholder="Search parameters..." class="search-input">
+                    <div class="filter-actions">
+                        <button onclick="selectAllParams()" class="btn-secondary">Select All</button>
+                        <button onclick="deselectAllParams()" class="btn-secondary">Deselect All</button>
+                        <button onclick="saveFilterProfile()" class="btn-secondary">Save Profile</button>
+                        <button onclick="loadFilterProfile()" class="btn-secondary">Load Profile</button>
+                    </div>
+                </div>
+
+                <div id="parameters-list" class="parameters-list"></div>
+
+                <div class="action-buttons">
+                    <button onclick="generateExcel()" class="btn-primary btn-large">Generate Excel</button>
+                    <button onclick="skipFilter()" class="btn-secondary btn-large">Skip Filter (All Parameters)</button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="results-section" style="display: none;">
+                <h2>Conversion Complete</h2>
+                <div class="results-info">
+                    <p id="results-message"></p>
+                    <button onclick="downloadFile()" class="btn-success btn-large">
+                        📥 Download Excel File
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script src="{{ url_for('xml_parser.static', filename='xml_parser.js') }}?v=1.0"></script>
+</body>
+</html>

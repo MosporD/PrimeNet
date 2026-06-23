@@ -1,0 +1,398 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="EPGROUP">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="EPGROUP">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>EPGROUP</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="EPGROUP"></a><a name="EPGROUP"></a>
+
+
+<h1 class="topictitle1">EPGROUP</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="EPGROUP.html"><strong>EPGROUP</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The EPGROUP MO consists of transmission end points, which can be control plane end points, user-plane end points, or both types of end points.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>PACKETFILTER</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD and <strong>PACKETFILTERSWITCH</strong> in an <strong>EPGROUP</strong> MO is set to ENABLE, a <strong>PACKETFILTER</strong> MO must exist and <strong>FM</strong> in this <strong>PACKETFILTER</strong> MO cannot be set to L2_ACL.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> and <strong>PACKETFILTERING</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>PACKETFILTERSWITCH</strong> in an <strong>EPGROUP</strong> MO is set to ENABLE, a <strong>PACKETFILTERING</strong> MO must be configured and <strong>FM</strong> in this <strong>PACKETFILTERING</strong> MO cannot be set to L2_ACL.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>PACKETFILTERSWITCH</strong> in an <strong>EPGROUP</strong> MO is set to ENABLE, a <strong>PACKETFILTERING</strong> MO must be configured and <strong>ACLTYPE</strong> in a <strong>PACKETFILTERING</strong> MO cannot be set to IPV6.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>USERPLANEHOST</strong> MOs referenced by the same <strong>EPGROUP</strong> MO have the same <strong>IPVERSION</strong> set to IPv4, the <strong>IPSECSWITCH</strong> of these <strong>USERPLANEHOST</strong> MOs must also be the same.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>USERPLANEHOST</strong> MOs referenced by the same <strong>EPGROUP</strong> MO have the same <strong>IPVERSION</strong> set to IPv4, the <strong>SEGWSWITCH</strong> of <strong>SECURITYHOST</strong> MO referenced by these <strong>USERPLANEHOST</strong> MOs must also be the same.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>EPGROUP</strong> MO, all <strong>USERPLANEHOST</strong> MOs with <strong>IPVERSION</strong> set to IPv4 must reference the same <strong>SECURITYHOST</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, for the <strong>USERPLANEHOST</strong> MOs referenced by the same <strong>EPGROUP</strong> MO with <strong>IPVERSION</strong> set to IPv4, the <strong>LOCIPV4</strong> of these <strong>USERPLANEHOST</strong> MOs must be different.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>UPHOSTID</strong> referenced by <strong>USERPLANEHOSTREFS</strong> in an <strong>EPGROUP</strong> MO must be <strong>UPHOSTID</strong> in a configured <strong>USERPLANEHOST</strong> MO. In addition, if <strong>IPVERSION</strong> in the <strong>USERPLANEHOST</strong> MO is set to IPv4, the value of <strong>VRFIDX</strong> in the <strong>USERPLANEHOST</strong> MO must be the same as that of <strong>VRFIDX</strong> in the <strong>EPGROUP</strong> MO. If <strong>IPVERSION</strong> in the <strong>USERPLANEHOST</strong> MO is set to IPv6, the value of <strong>VRFIDX</strong> in the <strong>USERPLANEHOST</strong> MO must be the same as that of <strong>IPV6VRFIDX</strong> in the <strong>EPGROUP</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If the <strong>USERPLANEHOST</strong> MOs referenced by the same <strong>EPGROUP</strong> MO have the same <strong>IPVERSION</strong> set to IPv6, the <strong>SEGWSWITCH</strong> of <strong>SECURITYHOST</strong> MO referenced by these <strong>USERPLANEHOST</strong> MOs must also be the same.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, for the <strong>USERPLANEHOST</strong> MOs referenced by the same <strong>EPGROUP</strong> MO with <strong>IPVERSION</strong> set to IPv6, the <strong>LOCIPV6</strong> of these <strong>USERPLANEHOST</strong> MOs must be different.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>EPGROUP</strong> MO, all <strong>USERPLANEHOST</strong> MOs with <strong>IPVERSION</strong> set to IPv6 must reference the same <strong>SECURITYHOST</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If a <strong>USERPLANEHOST</strong> MO with <strong>MULTICASTLISTENERSW</strong> set to ENABLE is configured in an <strong>EPGROUP</strong> MO, a <strong>USERPLANEPEER</strong> MO of the <strong>AUTOCFGFLAG</strong> which is MANUAL_CREATED cannot be configured in the <strong>EPGROUP</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If a <strong>USERPLANEHOST</strong> MO with <strong>MULTICASTLISTENERSW</strong> set to ENABLE is configured in an <strong>EPGROUP</strong> MO, a maximum of one <strong>USERPLANEHOST</strong> MO can be configured in the <strong>EPGROUP</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If a <strong>USERPLANEHOST</strong> MO with <strong>MULTICASTLISTENERSW</strong> set to ENABLE is configured in an <strong>EPGROUP</strong> MO, <strong>PACKETFILTERSWITCH</strong> cannot be set to ENABLE in the <strong>EPGROUP</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If a <strong>USERPLANEHOST</strong> MO with <strong>FLAG</strong> set to SLAVE is configured in an <strong>EPGROUP</strong> MO, <strong>IPVERSION</strong> in the <strong>USERPLANEHOST</strong> MOs that are referenced by the <strong>EPGROUP</strong> MO must be set to the same value, either IPv4 or IPv6.</li><li>[Co-MPT, eNodeB, gNodeB]If a <strong>USERPLANEHOST</strong> MO with <strong>FLAG</strong> set to SLAVE is configured in an <strong>EPGROUP</strong> MO, a <strong>USERPLANEHOST</strong> MO with <strong>FLAG</strong> set to MASTER must have been configured in this <strong>EPGROUP</strong> MO.</li><li>[eGBTS]<strong>UPHOSTID</strong> referenced by <strong>USERPLANEHOSTREFS</strong> in an <strong>EPGROUP</strong> MO must be the same as <strong>UPHOSTID</strong> in a configured <strong>USERPLANEHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> and <strong>USERPLANEPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain of the IPv4 configuration, if there are <strong>USERPLANEHOST</strong> MOs with the same <strong>LOCIPV4</strong> configured in different <strong>EPGROUP</strong> MOs, the same <strong>USERPLANEPEER</strong> MO is only allowed to be configured in one of these <strong>EPGROUP</strong> MOs.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain of the IPv6 configuration, if there are <strong>USERPLANEHOST</strong> MOs with the same <strong>LOCIPV6</strong> configured in different <strong>EPGROUP</strong> MOs, the same <strong>USERPLANEPEER</strong> MO is only allowed to be configured in one of these <strong>EPGROUP</strong> MOs.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> and <strong>SCTPHOST</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>EPGROUP</strong> MOs whose <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 plus the number of <strong>EPGROUP</strong> MOs whose <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 that have been created and are to be automatically created by the system must be less than or equal to 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO, the number of <strong>EPGROUP</strong> MOs whose <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 plus the number of <strong>EPGROUP</strong> MOs whose <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 that have created and are to be automatically created by the system must be less than or equal to 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is disabled for the <strong>GTRANSPARA</strong> MO, the number of <strong>EPGROUP</strong> MOs whose <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 plus the number of <strong>EPGROUP</strong> MOs whose <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 to be automatically created by the system in simplified mode must be less than or equal to 1.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of existing <strong>EPGROUP</strong> MOs in a base station plus the number of <strong>EPGROUP</strong> MOs to be automatically created in simplified mode cannot exceed 74.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of <strong>SCTPHOSTREFS</strong> parameters in all the <strong>EPGROUP</strong> MOs in a base station plus the number of <strong>SCTPHOST</strong> MOs whose <strong>SIMPLEMODESWITCH</strong> are not set to SIMPLE_MODE_OFF and who are not in the <strong>EPGROUP</strong> MO cannot exceed 64.</li></ul>
+</li><li>Relation with the <strong>EPGROUP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>USERPLANEHOSTREFS</strong> and <strong>USERPLANEPEERREFS</strong> in an <strong>EPGROUP</strong> MO with <strong>TYPEFLAG</strong> set to CENTRALIZED_EX2 must be empty.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The total number of members in the <strong>USERPLANEPEERREFS</strong> parameters in all <strong>EPGROUP</strong> MOs of a base station must be less than or equal to 3300.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The total number of members in the <strong>USERPLANEHOSTREFS</strong> parameters in all <strong>EPGROUP</strong> MOs of a base station must be less than or equal to 384.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The total number of members in the <strong>SCTPPEERREFS</strong> parameters in all <strong>EPGROUP</strong> MOs of a base station must be less than or equal to 1024.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The total number of members in the <strong>SCTPHOSTREFS</strong> parameters in all <strong>EPGROUP</strong> MOs of a base station must be less than or equal to 64.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> (not 0.0.0.0) in an <strong>SCTPHOST</strong> MO cannot be set to the same value as any of <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> in an <strong>SCTPPEER</strong> MO when the following conditions are met: The <strong>SCTPHOST</strong> and <strong>SCTPPEER</strong> MOs are referenced by the same <strong>EPGROUP</strong> MO; <strong>IPVERSION</strong> in the <strong>SCTPHOST</strong> MO is set to IPv4; <strong>IPVERSION</strong> in the <strong>SCTPPEER</strong> MO is set to IPv4.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> (not null) in an <strong>SCTPHOST</strong> MO cannot be set to the same value as any of <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> in an <strong>SCTPPEER</strong> MO when the following conditions are met: The <strong>SCTPHOST</strong> and <strong>SCTPPEER</strong> MOs are referenced by the same <strong>EPGROUP</strong> MO; <strong>IPVERSION</strong> in the <strong>SCTPHOST</strong> MO is set to IPv6; <strong>IPVERSION</strong> in the <strong>SCTPPEER</strong> MO is set to IPv6.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> in an <strong>EPGROUP</strong> MO is set to eNodeB, the values of the <strong>ENBINTERFACE</strong> parameters in any two of the <strong>EPGROUP</strong> MOs cannot be the same.</li><li>[Co-MPT, eNodeB, gNodeB]The <strong>EPGROUP</strong> MO with <strong>ENBINTERFACE</strong> set to DUX2_U&amp;DUEX2_NON_IDEAL cannot co-exist with the <strong>EPGROUP</strong> MO with <strong>ENBINTERFACE</strong> set to DUX2_U or DUEX2_NON_IDEAL.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> in an <strong>EPGROUP</strong> MO is set to gNodeB, the values of the <strong>GNBINTERFACE</strong> parameter in any two of the <strong>EPGROUP</strong> MOs cannot be the same.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> is set to eNodeB and <strong>ENBINTERFACE</strong> is set to DUW1 in the <strong>EPGROUP</strong> MO, a maximum of one <strong>SCTPPEER</strong> MO can be configured.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> is set to gNodeB and <strong>GNBINTERFACE</strong> is set to GNBDUF1 in the <strong>EPGROUP</strong> MO, a maximum of one <strong>SCTPPEER</strong> MO can be configured.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> in an <strong>EPGROUP</strong> MO is set to eNodeB, the <strong>EPGROUP</strong> MOs with <strong>ENBINTERFACE</strong> set to DUX2_U are used only for the user plane, and <strong>SCTPHOST</strong> and <strong>SCTPPEER</strong> MOs cannot be added to these <strong>EPGROUP</strong> MOs.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> in an <strong>EPGROUP</strong> MO is set to gNodeB, the <strong>EPGROUP</strong> MOs with <strong>GNBINTERFACE</strong> set to GNBX2_U or GNBS1_U are used only for the user plane, and <strong>SCTPHOST</strong> and <strong>SCTPPEER</strong> MOs cannot be added to these <strong>EPGROUP</strong> MOs.</li><li>[eGBTS]<strong>SCTPHOSTREFS</strong> and <strong>SCTPPEERREFS</strong> in an <strong>EPGROUP</strong> MO must be empty.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>TYPEFLAG</strong> for the <strong>EPGROUP</strong> MO that meets the following conditions must be set to COMMON: <strong>CTRLMODE</strong> for the <strong>EPGROUP</strong> MO is set to MANUAL_MODE; the <strong>EPGROUP</strong> MO corresponds to <strong>CPEPGROUPID1</strong>, <strong>UPEPGROUPID1</strong>, <strong>CPEPGROUPID2</strong>, and <strong>UPEPGROUPID2</strong> for an <strong>SCTPHOST</strong> MO; for the <strong>SCTPHOST</strong> MO, neither <strong>SIMPLEMODESWITCH</strong> is set to SIMPLE_MODE_OFF nor <strong>UPEPGROUP1TYPE</strong> is set to CENTRALIZED_EX2.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>TYPEFLAG</strong> must be set to CENTRALIZED_EX2 for the <strong>EPGROUP</strong> MO that meets the following conditions: <strong>CTRLMODE</strong> for the <strong>EPGROUP</strong> MO is set to MANUAL_MODE; the <strong>EPGROUP</strong> MO corresponds to <strong>UPEPGROUPID1</strong> for the <strong>SCTPHOST</strong> MO whose <strong>SIMPLEMODESWITCH</strong> is not set to SIMPLE_MODE_OFF and <strong>UPEPGROUP1TYPE</strong> is set to CENTRALIZED_EX2.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong>, <strong>UPEPGROUPID1</strong>, <strong>CPEPGROUPID2</strong>, and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>VRFIDX</strong> in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong>, <strong>UPEPGROUPID1</strong>, <strong>CPEPGROUPID2</strong>, and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO, respectively, must all be 0.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>SCTPHOST</strong> MO in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong> and <strong>CPEPGROUPID2</strong> for an <strong>SCTPHOST</strong> MO whose <strong>SIMPLEMODESWITCH</strong> is not set to SIMPLE_MODE_OFF must be the same as the latter <strong>SCTPHOST</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>SCTPHOST</strong> MO in which the <strong>SIMPLEMODESWITCH</strong> parameter is not set to SIMPLE_MODE_OFF can only exist in the <strong>EPGROUP</strong> MO which has the same <strong>CPEPGROUPID1</strong> or <strong>CPEPGROUPID2</strong> as the <strong>SCTPHOST</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>LNKPFMSW</strong> in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong>, <strong>UPEPGROUPID1</strong>, <strong>CPEPGROUPID2</strong>, and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>SCTPHOSTID</strong> referenced by <strong>SCTPHOSTREFS</strong> in an <strong>EPGROUP</strong> MO must be <strong>SCTPHOSTID</strong> in a configured <strong>SCTPHOST</strong> MO. In addition, if <strong>IPVERSION</strong> in the <strong>SCTPHOST</strong> MO is set to IPv4, the value of <strong>VRFIDX</strong> in the <strong>SCTPHOST</strong> MO must be the same as that of <strong>VRFIDX</strong> in the <strong>EPGROUP</strong> MO. If <strong>IPVERSION</strong> in the <strong>SCTPHOST</strong> MO is set to IPv6, the value of <strong>VRFIDX</strong> in the <strong>SCTPHOST</strong> MO must be the same as that of <strong>IPV6VRFIDX</strong> in the <strong>EPGROUP</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>UPEPGROUPID1</strong> for the <strong>SCTPHOST</strong> MO whose <strong>SIMPLEMODESWITCH</strong> is not set to SIMPLE_MODE_OFF and <strong>UPEPGROUP1TYPE</strong> is set to CENTRALIZED_EX2 cannot be referenced by <strong>CPEPGROUPID1</strong>, <strong>UPEPGROUPID1</strong>, <strong>CPEPGROUPID2</strong>, and <strong>UPEPGROUPID2</strong> for another <strong>SCTPHOST</strong> MO whose <strong>SIMPLEMODESWITCH</strong> is not set to SIMPLE_MODE_OFF.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]Only one <strong>SCTPHOST</strong> MO whose <strong>IPVERSION</strong> is IPv4 can be configured for the <strong>SCTPHOSTREFS</strong> in the same <strong>EPGROUP</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If different <strong>SCTPHOST</strong> MOs, for which <strong>SIMPLEMODESWITCH</strong> is not set to SIMPLE_MODE_OFF and <strong>UPEPGROUP1TYPE</strong> is not set to CENTRALIZED_EX2, reference the same user-plane end point group ID, <strong>SIGIP1V4</strong> for these <strong>SCTPHOST</strong> MOs must be the same.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>STATICCHK</strong> in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong>, <strong>UPEPGROUPID1</strong>, <strong>CPEPGROUPID2</strong>, and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>IPPMSWITCH</strong> in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong>, <strong>UPEPGROUPID1</strong>, <strong>CPEPGROUPID2</strong>, and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li><li>[Co-MPT, eNodeB, gNodeB]Only one <strong>SCTPHOST</strong> MO whose <strong>IPVERSION</strong> is IPv6 can be configured for the <strong>SCTPHOSTREFS</strong> in the same <strong>EPGROUP</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>SIMPLEMODESWITCH</strong> in an <strong>SCTPHOST</strong> MO is turned on, <strong>APPTYPE</strong> in the <strong>EPGROUP</strong> MOs that correspond to the following of the <strong>SCTPHOST</strong> MO must be set to NULL: <strong>CPEPGROUPID1</strong>, <strong>UPEPGROUPID1</strong>, <strong>CPEPGROUPID2</strong>, and <strong>UPEPGROUPID2</strong>.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>GTRANSPARA</strong>, and <strong>DEVIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>SCTPHOST</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> are valid, and <strong>SIGIP1V4</strong> is configured on a different board from the <strong>DEVIP</strong> MO to which <strong>SIGIP2V4</strong> belongs, then <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MO referencing the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>GTRANSPARA</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>SCTPHOST</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> are valid, and <strong>SIGIP1V4</strong> is configured on a different board from the <strong>IPADDR4</strong> MO to which <strong>SIGIP2V4</strong> belongs, then <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MO referencing the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> and <strong>USERPLANEHOST</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>IPSECSWITCH</strong> in the <strong>USERPLANEHOST</strong> MOs of the <strong>EPGROUP</strong> MOs corresponding to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO, respectively, must be set to DISABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>IPVERSION</strong> in the <strong>USERPLANEHOST</strong> MOs of the <strong>EPGROUP</strong> MOs corresponding to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO, respectively, cannot be set to IPv6.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO in the <strong>EPGROUP</strong> MO that meets the following conditions must have the same value as <strong>SIGIP1V4</strong> for the <strong>SCTPHOST</strong> MO: the <strong>EPGROUP</strong> MO corresponds to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> for the <strong>SCTPHOST</strong> MO; for the <strong>SCTPHOST</strong> MO, neither <strong>SIMPLEMODESWITCH</strong> is set to SIMPLE_MODE_OFF nor <strong>UPEPGROUP1TYPE</strong> is set to CENTRALIZED_EX2.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> and <strong>USERPLANEPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>IPSECSWITCH</strong> in the <strong>USERPLANEPEER</strong> MOs of the <strong>EPGROUP</strong> MOs corresponding to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO, respectively, must be set to DISABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>SIMPLEMODESWITCH</strong> parameter in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, <strong>IPVERSION</strong> in the <strong>USERPLANEPEER</strong> MOs of the <strong>EPGROUP</strong> MOs corresponding to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO, respectively, cannot be set to IPv6.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>SCTPPEER</strong> MOs in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong> and <strong>CPEPGROUPID2</strong> in an <strong>SCTPHOST</strong> MO cannot be in another <strong>EPGROUP</strong> MO when any one of the following conditions is met: (1) The <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is set to S1SIMPLE_MODE_ON and S1SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO; (2) The <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is set to X2SIMPLE_MODE_ON and X2SIMPLE_MODE in the <strong>EPCFGMODE</strong> is enabled for the <strong>GTRANSPARA</strong> MO; (3) The <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is set to EX2SIMPLE_MODE_ON and EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB](1) <strong>SIMPLEMODESWITCH</strong> is set to S1SIMPLE_MODE_ON for an <strong>SCTPHOST</strong> MO and S1SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO. (2) <strong>SIMPLEMODESWITCH</strong> is set to X2SIMPLE_MODE_ON for an <strong>SCTPHOST</strong> MO and X2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO. (3) <strong>SIMPLEMODESWITCH</strong> is set to EX2SIMPLE_MODE_ON for an <strong>SCTPHOST</strong> MO and EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO. If any of the preceding conditions is true, any two different <strong>EPGROUP</strong> MOs that meet the following conditions cannot have the same <strong>USERPLANEPEER</strong> MO: (1) The <strong>EPGROUP</strong> MO corresponds to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> for the <strong>SCTPHOST</strong> MO. (2) The <strong>EPGROUP</strong> MO has the same <strong>SIGIP1V4</strong> as the <strong>SCTPHOST</strong> MO and corresponds to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID1</strong> for an <strong>SCTPHOST</strong> MO whose <strong>UPEPGROUP1TYPE</strong> is not set to CENTRALIZED_EX2.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the following conditions are met, the <strong>EPGROUP</strong> MO corresponding to <strong>UPEPGROUPID1</strong> or <strong>UPEPGROUPID2</strong> for the <strong>SCTPHOST</strong> MO whose <strong>SIMPLEMODESWITCH</strong> is not set to SIMPLE_MODE_OFF and <strong>UPEPGROUP1TYPE</strong> is not set to CENTRALIZED_EX2 must have different <strong>USERPLANEPEER</strong> from other <strong>EPGROUP</strong> MOs: (1) <strong>SIMPLEMODESWITCH</strong> is set to S1SIMPLE_MODE_ON for the <strong>SCTPHOST</strong> MO and S1SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO, <strong>SIMPLEMODESWITCH</strong> is set to X2SIMPLE_MODE_ON for the <strong>SCTPHOST</strong> MO and X2SIMPLE_MODE in the <strong>EPCFGMODE</strong> is enabled for the <strong>GTRANSPARA</strong> MO, <strong>SIMPLEMODESWITCH</strong> is set to EX2SIMPLE_MODE_ON for the <strong>SCTPHOST</strong> MO and EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO. (2) The <strong>EPGROUP</strong> MO that has different <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> from the <strong>SCTPHOST</strong> MO has a <strong>USERPLANEHOST</strong> MO and <strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO is the same as <strong>SIGIP1V4</strong> for the <strong>SCTPHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>SCTPPEER</strong> MO in which <strong>SIMPLEMODESWITCH</strong> is set to SIMPLE_MODE_ON can only exist in one <strong>EPGROUP</strong> MO. In addition, <strong>EPGROUPID</strong> in this <strong>EPGROUP</strong> MO must be the same as <strong>EPGROUPID</strong> in the <strong>SCTPPEER</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>SCTPPEERID</strong> referenced by <strong>SCTPPEERREFS</strong> in an <strong>EPGROUP</strong> MO must be <strong>SCTPPEERID</strong> in a configured <strong>SCTPPEER</strong> MO. In addition, if <strong>IPVERSION</strong> in the <strong>SCTPPEER</strong> MO is set to IPv4, the value of <strong>VRFIDX</strong> in the <strong>SCTPPEER</strong> MO must be the same as that of <strong>VRFIDX</strong> in the <strong>EPGROUP</strong> MO. If <strong>IPVERSION</strong> in the <strong>SCTPPEER</strong> MO is set to IPv6, the value of <strong>VRFIDX</strong> in the <strong>SCTPPEER</strong> MO must be the same as that of <strong>IPV6VRFIDX</strong> in the <strong>EPGROUP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> and <strong>SCTPPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of <strong>SCTPPEERREFS</strong> parameters in all the <strong>EPGROUP</strong> MOs in a base station plus the number of <strong>SCTPPEER</strong> MOs whose <strong>SIMPLEMODESWITCH</strong> are not set to SIMPLE_MODE_OFF and who are not in the <strong>EPGROUP</strong> MOs cannot exceed 1024.</li></ul>
+</li><li>Relation with the <strong>USERPLANEPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>UPPEERID</strong> referenced by <strong>USERPLANEPEERREFS</strong> in an <strong>EPGROUP</strong> MO must be <strong>UPPEERID</strong> in a configured <strong>USERPLANEHOST</strong> MO. In addition, if <strong>IPVERSION</strong> in the <strong>USERPLANEPEER</strong> MO is set to IPv4, the value of <strong>VRFIDX</strong> in the <strong>USERPLANEPEER</strong> MO must be the same as that of <strong>VRFIDX</strong> in the <strong>EPGROUP</strong> MO. If <strong>IPVERSION</strong> in the <strong>USERPLANEPEER</strong> MO is set to IPv6, the value of <strong>VRFIDX</strong> in the <strong>USERPLANEPEER</strong> MO must be the same as that of <strong>IPV6VRFIDX</strong> in the <strong>EPGROUP</strong> MO.</li><li>[eGBTS]<strong>UPPEERID</strong> referenced by <strong>USERPLANEPEERREFS</strong> in an <strong>EPGROUP</strong> MO must be the same as <strong>UPPEERID</strong> in a configured <strong>USERPLANEPEER</strong> MO.</li></ul>
+</li><li>Relation with the <strong>VRF</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The VRF domains corresponding to <strong>VRFIDX</strong> and <strong>IPV6VRFIDX</strong> in an <strong>EPGROUP</strong> MO must already be configured.</li><li>[eGBTS]The VRF instance used by an <strong>EPGROUP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> and <strong>SCTPPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the same routing domain of the IPv4 type, if multiple <strong>SCTPHOST</strong> MOs that are referenced by different <strong>EPGROUP</strong> MOs have <strong>PN</strong> set to the same value and the value of <strong>SIGIP1V4</strong> or <strong>SIGIP2V4</strong> in one <strong>SCTPHOST</strong> MO is the same as the value of <strong>SIGIP1V4</strong> or <strong>SIGIP2V4</strong> in another <strong>SCTPHOST</strong> MO, then the same <strong>SCTPPEER</strong> MO can be configured in only one of the <strong>EPGROUP</strong> MOs.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>SIMPLEMODESWITCH</strong> in an <strong>SCTPHOST</strong> MO is not set to SIMPLE_MODE_OFF, the <strong>SCTPPEER</strong> MOs in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong> <strong>CPEPGROUPID2</strong> in the <strong>SCTPHOST</strong> MO must meet the following conditions: Both <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> are set to DISABLE; <strong>IPVERSION</strong> is not set to IPv6.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain of the IPv6 type, if multiple <strong>SCTPHOST</strong> MOs that are referenced by different <strong>EPGROUP</strong> MOs have <strong>PN</strong> set to the same value and the value of <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong> in one <strong>SCTPHOST</strong> MO is the same as the value of <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong> in another <strong>SCTPHOST</strong> MO, then the same <strong>SCTPPEER</strong> MO can be configured in only one of the <strong>EPGROUP</strong> MOs.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTERING</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>PT</strong> and <strong>ACLTYPE</strong> in a <strong>PACKETFILTERING</strong> MO are set to INTERFACE and IPV4, respectively, and <strong>PT</strong> in the referenced <strong>INTERFACE</strong> MO is set to TUNNELITF, <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]On a base station, if <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is different from <strong>IPVERSION</strong> in the referenced <strong>IKEPEER</strong> MO, <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>SCTPHOST</strong>, and <strong>SCTPPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The SCTP configurations of EndPoint conflict with the configurations of a manually configured <strong>SCTPLNK</strong> MO. The following two groups of four-tuple parameters must be different: One group of four-tuple parameters consists of the following parameters: <strong>SIGIP1V4</strong> or <strong>SIGIP2V4</strong> (when the value of <strong>SIGIP2V4</strong> is not 0.0.0.0) in the <strong>SCTPHOST</strong> MO with <strong>IPVERSION</strong> set to IPv4 in the <strong>EPGROUP</strong> MO, <strong>PN</strong>, <strong>SIGIP1V4</strong> or <strong>SIGIP2V4</strong> (when the value of <strong>SIGIP2V4</strong> is not 0.0.0.0) in the <strong>SCTPPEER</strong> MO with <strong>IPVERSION</strong> set to IPv4 in the <strong>EPGROUP</strong> MO, <strong>PN</strong>. The other group of four-tuple parameters consists of the following parameters: <strong>LOCIP</strong> or <strong>SECLOCIP</strong> (when the value of <strong>SECLOCIP</strong> is not 0.0.0.0) in the <strong>SCTPLNK</strong> MO whose <strong>CTRLMODE</strong> is set to MANUAL_MODE, <strong>PEERIP</strong> or <strong>SECPEERIP</strong> (when the value of <strong>SECPEERIP</strong> is not 0.0.0.0), <strong>LOCPORT</strong>, <strong>PEERPORT</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, when <strong>SCTPHOST</strong> MO and <strong>SCTPPEER</strong> MO are configured in one <strong>EPGROUP</strong> MO simultaneously and their IP version are IPv6, the <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong>(<strong>SIGIP2V6</strong> is not set to 0::0), <strong>PN</strong> of <strong>SCTPHOST</strong> MO and the <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong>(<strong>SIGIP2V6</strong> is not set to 0::0), <strong>PN</strong> of <strong>SCTPPEER</strong> MO cannot conflict with the <strong>SCTPLNK</strong> MO's four-tuple parameters.</li><li>[Co-MPT, eNodeB, gNodeB]The SCTP configurations of EndPoint conflict with the configurations of a manually configured <strong>SCTPLNK</strong> MO. The following two groups of four-tuple parameters must be different: One group of four-tuple parameters consists of the following parameters: <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong> (when the value of <strong>SIGIP2V6</strong> is not 0::0) in the <strong>SCTPHOST</strong> MO with <strong>IPVERSION</strong> set to IPv6 in the <strong>EPGROUP</strong> MO, <strong>PN</strong>, <strong>SIGIP1V6</strong> or <strong>SIGIP2V6</strong> (when the value of <strong>SIGIP2V6</strong> is not 0::0) in the <strong>SCTPPEER</strong> MO with <strong>IPVERSION</strong> set to IPv6 in the <strong>EPGROUP</strong> MO, <strong>PN</strong>. The other group of four-tuple parameters consists of the following parameters: <strong>LOCIP6</strong> or <strong>SECLOCIP6</strong> (when the value of <strong>SECLOCIP6</strong> is not 0::0) in the <strong>SCTPLNK</strong> MO whose <strong>CTRLMODE</strong> is set to MANUAL_MODE, <strong>PEERIP6</strong> or <strong>SECPEERIP6</strong> (when the value of <strong>SECPEERIP6</strong> is not 0::0), <strong>LOCPORT</strong>, <strong>PEERPORT</strong>.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, <strong>TYPEFLAG</strong> in the <strong>EPGROUP</strong> MO must be set to COMMON.</li></ul>
+</li><li>Relation with the <strong>DFU</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>APPTYPE</strong> in the <strong>EPGROUP</strong> MO is set to eNodeB or gNodeB, <strong>APPTYPE</strong> in the <strong>DFU</strong> MO must have been set to the corresponding value.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>GTPU</strong>, and <strong>GEPMODELPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If a <strong>USERPLANEHOST</strong> MO with <strong>FLAG</strong> set to SLAVE is configured in an <strong>EPGROUP</strong> MO, then <strong>STATICCHK</strong> in the <strong>GTPU</strong> MO must be set to ENABLE. In addition, <strong>STATICCHKMODE</strong> in the <strong>GEPMODELPARA</strong> MO must be set to EPSTATICCHK, and <strong>STATICCHK</strong> in the <strong>EPGROUP</strong> MO must be set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>EPGROUP</strong> MOs must be less than or equal to 8 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>NODE</strong> MO:<ul><li>[Co-MPT]An <strong>EPGROUP</strong> MO cannot be configured on a <strong>PRODUCTTYPE</strong> MO with <strong>PRODUCTTYPE</strong> set to DBS3900 DCU or DBS5900 DCU.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#EPGROUP__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="EPGROUP__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="EPGROUP__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_epgroup.html">ADD EPGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_sctphost2epgrp.html">ADD SCTPHOST2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an SCTP host to an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_sctppeer2epgrp.html">ADD SCTPPEER2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an SCTP peer to an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_uphost2epgrp.html">ADD UPHOST2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a user-plane host to an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_uppeer2epgrp.html">ADD UPPEER2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a user-plane peer to an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/chk_epgroup.html">CHK EPGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the user-plane end point groups of which the configurations conflict and the interface type of the conflict.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/clr_uppeer2epgrp.html">CLR UPPEER2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a user-plane peer that is automatically established from an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_epgroup.html">DSP EPGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to display the information of user-plane links in an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_epunusedpeer.html">DSP EPUNUSEDPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the peer data list that is not added to any end point group, including the user plane, signaling plane, and security peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_epupalminfo.html">DSP EPUPALMINFO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the historical fault information about user-plane paths in a user-plane endpoint group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_epgroup.html">LST EPGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of end point groups.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_sctphost2epgrp.html">LST SCTPHOST2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the SCTP hosts in an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_sctppeer2epgrp.html">LST SCTPPEER2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the SCTP peers in an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_uphost2epgrp.html">LST UPHOST2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the user-plane hosts in an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_uppeer2epgrp.html">LST UPPEER2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the user-plane peers in an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_epgroup.html">MOD EPGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_epgroup.html">RMV EPGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_sctphost2epgrp.html">RMV SCTPHOST2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an SCTP host from an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_sctppeer2epgrp.html">RMV SCTPPEER2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an SCTP peer from an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_uphost2epgrp.html">RMV UPHOST2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a user-plane host from an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_uppeer2epgrp.html">RMV UPPEER2EPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a user-plane peer from an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/syn_epgroup.html">SYN EPGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to synchronize end point MOs with corresponding generated link MOs (such as SCTPLNK and CPBEARER) to ensure that the end point MOs are consistent with corresponding generated link MOs.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#EPGROUP__tab2">Table 2</a> and <a href="#EPGROUP__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="EPGROUP__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="EPGROUP__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-epGroupId.html">End Point Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the end point group to which an end point belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of an IPv4 VRF instance.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-IPv6VrfIndex.html">IPv6 VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of an IPv6 VRF instance. This parameter takes effect only in LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-sctpHostRefs.html">SCTP Host ID List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the list of all SCTP hosts in the end point group. This parameter takes effect only in UMTS, LTE, and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-sctpPeerRefs.html">SCTP Peer ID List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the list of all SCTP peers in the end point group. This parameter takes effect only in UMTS, LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-userPlaneHostRefs.html">User Plane Host ID List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the list of all user-plane hosts in the end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-userPlanePeerRefs.html">User Plane Peer ID List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the list of all user-plane peers in the end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-packetFilterSwitch.html">Packet Filter ACL Rule Auto-Setup-Deletion SW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the ACL rule self-configuration function for packet filtering. When this parameter is set to ENABLE(Enable), the system automatically generates packet filtering rules for all links of the local and peer end points. If this parameter is set to DISABLE(Disable), the system does not generate packet filtering rules. When the <a href="../mml/mod_epgroup.html">MOD EPGROUP</a> command is executed to change the value of this parameter from ENABLE(Enable) to DISABLE(Disable), the system automatically deletes the packet filtering rules related to links of the local and peer end points.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-userLabel.html">User Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the description of an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-TypeFlag.html">Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of an end point group. When this parameter is set to COMMON, the local end point group is a common group. When this parameter is set to CENTRALIZED_EX2, the local end point group is dedicated group for the centralized eX2. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-LinkPfmSwitch.html">Link Performance Statistics Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch controlling link performance measurement for user plane. When this parameter is set to ENABLE for an endpoint group, the base station performs link performance measurement for this endpoint group. When this parameter is set to DISABLE for an endpoint group, the base station does not perform link performance measurement for this endpoint group. This parameter takes effect only on the UMPT, UTRPc, or UMDU board. The measurement results must be parsed using the maintenance tool.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object can be modified or deleted by the system. The value MANUAL_MODE means that both the system and the user can modify or delete the object. The value AUTO_MODE means that only the system can modify or delete the object.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-AutoCfgFlag.html">Auto Config Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object is created by the system. The value MANUAL_CREATED means that the object is configured by the user manually. The value AUTO_CREATED means that the object is created by the system.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-StaticChkSwitch.html">Static Check Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the GTP-U static detection function takes effect on user-plane links in an endpoint group. When this parameter is set to ENABLE(Enable), the GTP-U static detection function is enabled on all user-plane links in an endpoint group. When this parameter is set to DISABLE(Disable), the GTP-U static detection function is disabled on all user-plane links in an endpoint group. This parameter is valid only when <strong>STATICCHKMODE</strong> is set to EPSTATICCHK(Endpoint Group Static Check) in the <strong>GEPMODELPARA</strong> MO. This parameter takes effect only for LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-IPPMSwitch.html">IP PM Automatic Setup and Deletion Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the IP PM session self-configuration function. If this parameter is set to ENABLE(Enable), the system will automatically generate IP PM sessions for links related to the local and peer end points. If this parameter is set to DISABLE(Disable), the system will not automatically generate IP PM sessions. If the value of this parameter is changed from ENABLE(Enable) to DISABLE(Disable) using the <a href="../mml/mod_epgroup.html">MOD EPGROUP</a> command, the system will delete the automatically generated IP PM sessions for links related to the local and peer end points. This parameter is valid only for the user-plane links over the LTE S1 interface. IP PM is a Huawei proprietary protocol. Ensure that IP PM is supported by and has been enabled on the CN equipment before turning on this switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-IPPMDscp.html">IP PM DSCP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the differentiated services code point (DSCP) of an IP PM session that is automatically generated by a base station. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-AppType.html">Application Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the application referenced by a DFU. The application provides the running environment for the DFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-eNodeBInterface.html">eNodeB Interface</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eNodeB interface that uses the endpoint group. When this parameter is set to DUX2_U, the endpoint group is used by the eNodeB to automatically generate the DUX2 object. Only the DUX2_U and DUEX2_NON_IDEAL options can be selected together. Other options must be selected separately. This parameter takes effect only for CU-DU Split.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-gNodeBInterface.html">gNodeB Interface</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the gNodeB interface that uses the endpoint group. When this parameter is set to GNBDUF1, the endpoint group is used by the gNodeB to automatically generate the GNBDUF1 object. Currently, only one option can be selected. This parameter takes effect only for CU-DU Split.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EPGROUP-IPVerPreference.html">IP Protocol Version Preference</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP protocol version that is preferentially used to automatically establish a control-plane link or user-plane path when the SCTP local IP address or user-plane local IP address in an EPGROUP MO is dual-stack and the IP address of the peer device is also dual-stack. If this parameter is set to IPv4, the IPv4 protocol is used to set up a control-plane link or user-plane path in the EPGROUP MO with the dual-stack peer device. If this parameter is set to IPv6, the IPv6 protocol is used to set up a control-plane link or user-plane path in the EPGROUP MO with the dual-stack peer device. Only one IP protocol can be selected to set up a control-plane link or user-plane path. IPv4 and IPv6 cannot be backed up for each other. This parameter is invalid when the local address or the IP address of the peer device is single-stack. This parameter takes effect only for LTE and NR.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="EPGROUP__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="EPGROUP__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-sctpHostList.html">SCTP Host List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the list of all SCTP hosts in the end point group. This parameter takes effect only in UMTS, LTE, and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-sctpPeerList.html">SCTP Peer List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the list of all SCTP peers in the end point group. This parameter takes effect only in UMTS, LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-userPlaneHostList.html">User Plane Host List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the list of all user plane hosts in the end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-userPlanePeerList.html">User Plane Peer List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the list of all user plane peers in the end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-ConfigConflictState.html">Configuration Conflict State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether there is an end point group configuration conflict.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-ConfigConflictInfo.html">Configuration Conflict Information</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the information about an end point group configuration conflict.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-IPVersion.html">IP Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the version of the user-plane peer to an end point group IP address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-PeerIPv4.html">Peer IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPv4 Address of the user-plane peer to an end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-PeerIPv6.html">Peer IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPv6 Address of the user-plane peer to an end point group. This parameter takes effect only in LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-UnusedSctpPeerList.html">Unused SCTP Peer List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the list of SCTP peers that are not added to any end point group. This parameter takes effect only in UMTS, LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-UnusedUserPlanePeerList.html">Unused User Plane Peer List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the list of user plane peers that are not added to the end point group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/EPGROUP-UnusedSecurityPeerList.html">Unused Security Peer List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the list of security peers that are not referenced by a signaling peer or a user plane peer. This parameter takes effect only in LTE and NR.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

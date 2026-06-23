@@ -1,0 +1,113 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellSrsAdaptiveCfg">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellSrsAdaptiveCfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellSrsAdaptiveCfg</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellSrsAdaptiveCfg"></a><a name="CellSrsAdaptiveCfg"></a>
+
+
+<h1 class="topictitle1">CellSrsAdaptiveCfg</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellSrsAdaptiveCfg.html"><strong>CellSrsAdaptiveCfg</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellSrsAdaptiveCfg MO consists of parameters related to user-level SRS adaptation. If the SrsPeriodAdaptive parameter is set to ON, the cell adaptively configures the SRS-related parameters. If this parameter is set to OFF, the cell uses fixed SRS configurations.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellUSParaCfg</strong>, <strong>SRSCfg</strong>, and <strong>CellRicAlgo</strong> MOs:<ul><li>When the <strong>UsSrsGuaranteeSwitch</strong> parameter in the <strong>CellUSParaCfg</strong> MO is set to 8_USERS_GUARANTEE(8_USERS_GUARANTEE), 16_USERS_GUARANTEE(16_USERS_GUARANTEE), or 24_USERS_GUARANTEE(24_USERS_GUARANTEE), the <strong>SrsPeriodAdaptive</strong> parameter in the <strong>CellSrsAdaptiveCfg</strong> MO must be set to ON(On), the SrvBasedSRSAdjAlgo option of the <strong>SrsCfgPolicySwitch</strong> parameter in the <strong>SRSCfg</strong> MO must be deselected, and the <strong>MuteUpPTSSymNum</strong> parameter in the <strong>CellRicAlgo</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>ENodeBAlgoSwitch</strong>, <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, <strong>SectorSplitCell</strong>, <strong>SRSCfg</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>When the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE, and <strong>FddTddInd</strong> in this <strong>Cell</strong> MO is set to CELL_FDD, and the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO under related <strong>Cell</strong> MO is set to MASSIVE_MIMO_Ph2, and related <strong>SectorSplitGroup</strong> MO includes one or two <strong>SectorSplitCell</strong> MO instances, and the MM_SRS_ALLOC_OPT_SWITCH option of the <strong>UlResManageOptSw</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected, all of the following conditions must be met: (a) The <strong>SrsCfgInd</strong> parameter in the <strong>SRSCfg</strong> MO is set to BOOLEAN_TRUE. (b) The <strong>FddSrsCfgMode</strong> parameter in the <strong>SRSCfg</strong> MO is set to DEFAULTMODE. (c) The <strong>SrsPeriodAdaptive</strong> parameter in the <strong>CellSrsAdaptiveCfg</strong> MO is set to ON. (d) The SrsSubframeRecfSwitch option of the <strong>SrsAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>In a <strong>CellAlgoSwitch</strong>, if SuperCombCellSwitch under <strong>SfnAlgoSwitch</strong> is set to On, <strong>SrsPeriodAdaptive</strong> in <strong>CellSrsAdaptiveCfg</strong> must be configured to Off.</li><li>In a <strong>CellAlgoSwitch</strong>, if SuperCombCellSwitch under <strong>SfnAlgoSwitch</strong> is set to ON, <strong>UserSrsPeriod</strong> in <strong>CellSrsAdaptiveCfg</strong> can not be configured to ms5.</li><li>In a <strong>CellAlgoSwitch</strong>, if SuperCombCellSwitch under <strong>SfnAlgoSwitch</strong> is set to ON, <strong>UserSrsPeriod</strong> in <strong>CellSrsAdaptiveCfg</strong> can not be configured to ms10.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellSrsAdaptiveCfg__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellSrsAdaptiveCfg__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellSrsAdaptiveCfg__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellsrsadaptivecfg.html">LST CELLSRSADAPTIVECFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the parameters related to SRS adaptation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellsrsadaptivecfg.html">MOD CELLSRSADAPTIVECFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the parameters related to SRS adaptation.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellSrsAdaptiveCfg__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellSrsAdaptiveCfg__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellSrsAdaptiveCfg__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellSrsAdaptiveCfg-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellSrsAdaptiveCfg-SrsPeriodAdaptive.html">SRS Period Adaptive Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable SRS reporting period adaptation. If this parameter is set to ON(On), the SRS reporting period adaptively changes based on the SRS algorithm. If this parameter is set to OFF(Off), the SRS reporting period is specified by the UserSrsPeriod parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellSrsAdaptiveCfg-UserSrsPeriod.html">User SRS Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the fixed SRS reporting period. This parameter takes effect only when the SrsPeriodAdaptive parameter is set to OFF(Off). This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

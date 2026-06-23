@@ -1,0 +1,1047 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add RRU/RFU (ADD RRU)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_rru">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add RRU/RFU (ADD RRU)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_rru"></a><a name="add_rru"></a>
+
+
+<h1 class="topictitle1">Add RRU/RFU (ADD RRU)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_rru__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an RRU or RFU on a specified chain/ring.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_rru__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before an RRU or RFU is added, an RRU or RFU chain/ring must be added by running the <a href="add_rruchain.html">ADD RRUCHAIN</a> command.</p>
+</li><li><p>Before adding an RFU, ensure that the corresponding subrack is added.</p>
+</li><li><p>If an RRU or RFU is added to the chain, the RRU or RFU must be added to the chain tail or any position behind the breakpoint.</p>
+</li><li><p>If an RRU or RFU is to be added to the ring, the RRU or RFU can be added to any position between the two breakpoints if the configured breakpoints do not coincide. If the configured breakpoints coincide, the RRU or RFU can be added only to the coincident position.</p>
+</li><li><p>After an RRU or RFU is added between two breakpoints on the ring, the value of the second breakpoint and the RRU or RFU level increases by 1 automatically.</p>
+</li><li><p>After an RRU or RFU is added to the chain/ring, the original RRU or RFU with a position equal to or greater than the position of the newly added RRU or RFU is automatically moved backwards.</p>
+</li><li><p>The number of RRUs in a chain/ring should be in the range of the maximum specifications that RRU supported.</p>
+</li><li><p>In the hot backup ring topology, only one RRU or RFU can be configured on the chain or ring, and the the RRU or RFU can work only in UO or LO mode.</p>
+</li><li><p>In load sharing mode, the working standard of an RRU on the main chain/ring cannot be set to GO or UO.</p>
+</li><li><p>When the RRU type is PRRU(PRRU3801), the parameter VSWR alarm post-processing switch, VSWR alarm post-processing threshold and VSWR alarm threshold are invalid.</p>
+</li><li><p>If the RRU is in TDS/TDL/TL mode, the VSWR alarm post-processing threshold parameter can be set to a value greater than or equal to that of the VSWR alarm threshold parameter. For RRU/RFUs in other modes, the VSWR alarm post-processing threshold parameter must be set to a value greater than that of the VSWR alarm threshold parameter.</p>
+</li><li><p>After an RRU or RFU is added, if links cannot be set up for the associated RRUs or RFUs or links cannot work at the highest CPRI line rate, you need to run the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command to initiate negotiation.</p>
+</li><li><p>If Protocol Type of EQUIPMENT is set to TDL_IR and Protocol Type of the chain/ring carrying RF modules is set to CPRI, and if VSWR alarm threshold and VSWR alarm post-processing threshold are set to the same value, these thresholds cannot take effect on the RF modules.</p>
+</li><li><p>If an RRU or RFU is in maintenance mode, the RRU-related or RFU-related alarm reporting mechanism will change and the RRU or RFU performance data is identified as untrusted data.</p>
+</li><li><p>If the RRU type parameter is set to MPMU, the Maintenance Mode parameter must be set to NORMAL.</p>
+</li><li><p>When an RRU/RFU and a BBU are served by the same power supply system, set the Power Supply Group ID parameter of the RRU/RFU to 0.</p>
+</li><li><p>The&nbsp;WiFi&nbsp;Switch&nbsp;parameter&nbsp;takes&nbsp;effect&nbsp;only&nbsp;for&nbsp;the&nbsp;MPMUs&nbsp;which&nbsp;support&nbsp;Wi-Fi&nbsp;and&nbsp;does&nbsp;not&nbsp;take&nbsp;effect&nbsp;for&nbsp;other&nbsp;RRUs.</p>
+</li><li><p>In load sharing mode, breakpoints are not required when an RRU is to be added to a branch chain connecting to an RHUB.</p>
+</li><li><p>When the RRU type is MRIU, the following parameters are invalid: VSWR alarm post-processing switch, VSWR alarm post-processing threshold, VSWR alarm threshold, RF Desensitivity, Low Current Protect Switch, ALD Reuse Flag, PA Efficiency Improvement Switch, Interference Frequency, Receive Frequency Band Mutual Aid Switch, RF DC Power Off Alarm Detect Switch, Battery Output Undervoltage Threshold, LED Switch, WiFi Switch, DL Signal Quality Detection Switch, DL Signal Quality Detection Period, DL Signal Quality Detection Sensitivity, RF Specifications Customization Switch, and The Value of The Circuit Breaker.</p>
+</li><li><p>When the system is being upgraded, the RRU enters or exits the dormancy mode at the specified time after the upgrade is complete.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If multiple modes of a separate-MPT base station share an RMU, the chains/rings connecting to the RMU work at the same line rate as the chain/ring with the maximum number of board cascading levels. If links cannot be set up for the associated RRUs or links cannot work at the expected CPRI line rate, run the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command to initiate negotiation.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]In load sharing mode, only one RRU/RFU can be added to the chain/ring.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When the RRU type is MPMU(pRRU3901), the system adds in-position RRUs of the MPRF type and the following parameters are invalid for these RRUs: VSWR alarm post-processing switch, VSWR alarm post-processing threshold, VSWR alarm threshold, RF Desensitivity, Low Current Protect Switch, ALD Reuse Flag, RU Specification, and PA Efficiency Improvement Switch.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If an RRU is to be added to a branch chain/ring which connects to an RHUB, the RRU type must be MPMU and the branch chain/ring must have been configured.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When the RRU type is MPMU, the following parameters are invalid: RF Desensitivity, Low Current Protect Switch, ALD Reuse Flag, RU Specification, and PA Efficiency Improvement Switch.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When the RRU type is MPMU(pRRU3901), the following parameters are invalid: Number of RX channels and Number of TX channels.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_rru__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUPara-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the RRU or RFU is located.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>CN</strong> in the <strong>RRU</strong> MO is set to 0~15.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUPara-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the RRU or RFU is located.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of <strong>SRN</strong> in the <strong>RRU</strong> MO ranges from 60 to 254. The value of <strong>SRN</strong> in the <strong>RFU</strong> MO ranges from 4 to 5.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUPara-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the RRU or RFU.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TYPE</strong> in the <strong>CABINET</strong> MO where the <strong>RFU</strong> MO is located is set to BTS3900AL, the value of <strong>SN</strong> in the <strong>RFU</strong> MO ranges from 0 to 8. Otherwise, the value of <strong>SN</strong> in the <strong>RFU</strong> MO ranges from 0 to 5. When the value of <strong>SRN</strong> in the <strong>RRU</strong> MO is set to 60, <strong>SN</strong> in the <strong>RRU</strong> MO ranges from 0 to 5. When the value of <strong>SRN</strong> in the <strong>RRU</strong> MO ranges from 61 to 254, the value of <strong>SN</strong> in the <strong>RRU</strong> MO ranges from 0 to 3.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>SN</strong> in the <strong>RRU</strong> MO is set to a value greater than 0 and <strong>RT</strong> in the <strong>RRU</strong> MO is not set to MPRF, <strong>SRN</strong> in the <strong>RRU</strong> MO must be set to 60, and <strong>TYPE</strong> in the <strong>CABINET</strong> MO where the <strong>RRU</strong> MO is located must be set to RFC5906 or IFS5906.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-TopoPos.html">TP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Topo Position</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the position where the RRU or RFU is installed in the topology. There are two types of positions for the RRU or RFU: TRUNK and BRANCH. BRANCH indicates that the RRU is connected to the RHUB. TRUNK indicates that the RRU or RFU is located on the main chain/ring. The main chain/ring is connected to the optical port on the baseband processing board.The LampSite high-power modules must be configured as the main chain/ring (TRUNK), and the LampSite low-power modules must be configured as a branch (BRANCH).</p>
+<p>GUI Value Range: TRUNK(TRUNK), BRANCH(BRANCH)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TRUNK, BRANCH</p>
+<p>MML Default Value: TRUNK(TRUNK)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The total number of <strong>RRU</strong> and <strong>RFU</strong> MOs on the <strong>RRUCHAIN</strong> MO specified by <strong>RCN</strong> must be smaller than or equal to 36. In addition, the total number of <strong>RRU</strong> and <strong>RFU</strong> MOs with <strong>TP</strong>, <strong>TP</strong> not set to BRANCH must be smaller than or equal to 21.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RRUChainId.html">RCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Chain No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the RRU or RFU chain/ring.</p>
+<p>GUI Value Range: 0~249</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~249</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The total number of <strong>RRU</strong> and <strong>RFU</strong> MOs on the <strong>RRUCHAIN</strong> MO specified by <strong>RCN</strong> must be smaller than or equal to 36. In addition, the total number of <strong>RRU</strong> and <strong>RFU</strong> MOs with <strong>TP</strong>, <strong>TP</strong> not set to BRANCH must be smaller than or equal to 21.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-InsertPos.html">PS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Position</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the position of the RRU, RFU, or RHUB on the chain/ring. It is calculated from the start port one by one.</p>
+<p>GUI Value Range: 0~20</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RRU</strong> MO or <strong>RFU</strong> MO is located is set to RING, one of the following conditions must be met: 1. When <strong>BRKPOS1</strong> and <strong>BRKPOS2</strong> in the <strong>RRUCHAIN</strong> MO are not set to the same value and neither of them is set to 255, <strong>PS</strong> in the <strong>RRU</strong> MO or <strong>PS</strong> in the <strong>RFU</strong> MO must be greater than or equal to <strong>BRKPOS1</strong> and be smaller than or equal to <strong>BRKPOS2</strong>; 2. When <strong>BRKPOS1</strong> and <strong>BRKPOS2</strong> in the <strong>RRUCHAIN</strong> MO are set to the same value other than 255, <strong>PS</strong> in the <strong>RRU</strong> MO or <strong>PS</strong> in the <strong>RFU</strong> MO must be the same as <strong>BRKPOS1</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RRU</strong> MO or <strong>RFU</strong> MO is located is set to RING, and <strong>TP</strong> in the <strong>RRU</strong> MO or <strong>TP</strong> in the <strong>RFU</strong> MO is set to TRUNK, the <strong>RRU</strong> MO or <strong>RFU</strong> MO cannot be removed when one of the following conditions is met: 1. <strong>BRKPOS1</strong> is set to 255; 2. <strong>BRKPOS1</strong> and <strong>BRKPOS2</strong> are not set to the same value, and <strong>PS</strong> in the <strong>RRU</strong> MO or <strong>PS</strong> in the <strong>RFU</strong> MO is smaller than <strong>BRKPOS1</strong> or is greater than or equal to <strong>BRKPOS2</strong>; 3. <strong>BRKPOS1</strong> and <strong>BRKPOS2</strong> are set to the same value.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RRU</strong> MO or <strong>RFU</strong> MO is located is set to CHAIN, and <strong>TP</strong> in the <strong>RRU</strong> MO or <strong>TP</strong> in the <strong>RFU</strong> MO is set to TRUNK, the <strong>RRU</strong> MO or <strong>RFU</strong> MO cannot be removed when one of the following two conditions is met: 1. <strong>BRKPOS1</strong> is set to 255, and <strong>PS</strong> in the <strong>RRU</strong> MO or <strong>PS</strong> in the <strong>RFU</strong> MO is not equal to the number of devices on the trunk minus 1; 2. If <strong>BRKPOS1</strong> is not set to 255, and <strong>PS</strong> in the <strong>RRU</strong> MO or <strong>PS</strong> in the <strong>RFU</strong> MO is smaller than <strong>BRKPOS1</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When a <strong>CXU</strong> MO is configured in an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and the RRU chain/ring connects to a board in a BBU or RMU, the following conditions must be met: </li><li>1. The value of <strong>PS</strong> in the <strong>CXU</strong> MO is greater than or equal to that of <strong>BRKPOS1</strong> if <strong>BRKPOS1</strong> in the <strong>RRUCHAIN</strong> MO is not set to 255. </li><li>2. The value of <strong>PS</strong> in the <strong>CXU</strong> equals the number of devices configured in the <strong>RRUCHAIN</strong> MO if <strong>BRKPOS1</strong> in the <strong>RRUCHAIN</strong> MO is not set to 255.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When a <strong>CXU</strong> MO is configured in an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and the RRU chain/ring connects to a board in a BBU or RMU, the <strong>CXU</strong> MO cannot be removed if the following conditions are met: </li><li>1. <strong>BRKPOS1</strong> is set to 255 and the value of <strong>PS</strong> in the <strong>CXU</strong> MO does not equal the difference between the number of devices configured in the <strong>RRUCHAIN</strong> MO and one. </li><li>2. <strong>BRKPOS1</strong> is not set to 255 and the value of <strong>PS</strong> in the <strong>CXU</strong> MO is less than that of <strong>BRKPOS1</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>TT</strong> in an <strong>RRUCHAIN</strong> MO associated with the <strong>RRU</strong> or <strong>RFU</strong> MO is set to CHAIN, and <strong>TP</strong> in the <strong>RRU</strong> or <strong>RFU</strong> MO is set to TRUNK, one of the following conditions must be met: </li><li>1. When <strong>BRKPOS1</strong> in the <strong>RRUCHAIN</strong> MO is not set to 255, the value of <strong>PS</strong> in the <strong>RRU</strong> or <strong>RFU</strong> MO must be greater than or equal to that of <strong>BRKPOS1</strong>. </li><li>2. When <strong>BRKPOS1</strong> in the <strong>RRUCHAIN</strong> MO is set to 255, the value of <strong>PS</strong> in the <strong>RRU</strong> or <strong>RFU</strong> MO must equal the total number of <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs on the main chain/ring corresponding to the <strong>RRUCHAIN</strong> MO.</li><li>[NodeB, eGBTS]When <strong>TT</strong> in an <strong>RRUCHAIN</strong> MO associated with the <strong>RRU</strong> or <strong>RFU</strong> MO is set to CHAIN, and <strong>TP</strong> in the <strong>RRU</strong> or <strong>RFU</strong> MO is set to TRUNK, one of the following conditions must be met: </li><li>1. When <strong>BRKPOS1</strong> in the <strong>RRUCHAIN</strong> MO is not set to 255, the value of <strong>PS</strong> in the <strong>RRU</strong> or <strong>RFU</strong> MO must be greater than or equal to that of <strong>BRKPOS1</strong>. </li><li>2. When <strong>BRKPOS1</strong> in the <strong>RRUCHAIN</strong> MO is set to 255, the value of <strong>PS</strong> in the <strong>RRU</strong> or <strong>RFU</strong> MO must equal the total number of <strong>RRU</strong> and <strong>RFU</strong> MOs on the main chain/ring corresponding to the <strong>RRUCHAIN</strong> MO.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ParaInfo-RRUType.html">RT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the RRU or RFU.</p>
+<p>GUI Value Range: MRRU, LRRU, MRXU, PRRU, GRRU, ORRU, AIRU, MRIU, MPMU, MRFU, WRFU, LRFU, MTXU, GRFU</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MRRU, LRRU, MRXU, PRRU, GRRU, ORRU, AIRU, MRIU, MPMU, MRFU, WRFU, LRFU, MTXU, GRFU</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-WorkStandard.html">RS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RF Unit Working Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the working standard of the RRU or RFU. For an eCPRI AAU, modifying the working mode of the AAU may cause the AAU to reset.</p>
+<p>Disuse statement:</p>
+<p>GUI Value Range: GO(GSM_ONLY), UO(UMTS_ONLY), LO(LTE_FDD), TDL(LTE_TDD), MO(NB-IoT), RO(RFA_ONLY), GU(GSM_UMTS), GL(GSM_LTE), GT(GSM_LTE_TDD), GM(GSM_NB-IoT), UL(UMTS_LTE), UT(UMTS_LTE_TDD), UM(UMTS_NB-IoT), LFTD(LTE_FDD_TDD), LM(LTE_FDD_NB-IoT), TL(TDS_TDL), CU(CDMA_UMTS), CL(CDMA_LTE), CM(CDMA_NB-IoT), UR(UMTS_RFA), LR(LTE_FDD_RFA), TR(LTE_TDD_RFA), TM(LTE_TDD_NB-IoT), RM(RFA_NB-IoT), WL(WiMAX_LTE), GUL(GSM_UMTS_LTE), GUT(GSM_UMTS_LTE_TDD), GUM(GSM_UMTS_NB-IoT), GLFTD(GSM_LTE_FDD_TDD), GLM(GSM_LTE_FDD_NB-IoT), ULFTD(UMTS_LTE_FDD_TDD), ULM(UMTS_LTE_FDD_NB-IoT), CLM(CDMA_LTE_FDD_NB-IoT), ULR(UMTS_LTE_FDD_RFA), UTR(UMTS_LTE_TDD_RFA), UTM(UMTS_LTE_TDD_NB-IoT), URM(UMTS_RFA_NB-IoT), LRM(LTE_FDD_RFA_NB-IoT), TRM(LTE_TDD_RFA_NB-IoT), LFTDR(LTE_FDD_TDD_RFA), LFTDM(LTE_FDD_TDD_NB-IoT), ULFTDR(UMTS_LTE_FDD_TDD_RFA), ULRM(UMTS_LTE_FDD_RFA_NB-IoT), GULFTD(GSM_UMTS_LTE_FDD_TDD), GULM(GSM_UMTS_LTE_FDD_NB-IoT), GLFTDM(GSM_LTE_FDD_TDD_NB-IoT), LFTDRM(LTE_FDD_TDD_RFA_NB-IoT), UTRM(UMTS_LTE_TDD_RFA_NB-IoT), ULFTDM(UMTS_LTE_FDD_TDD_NB-IoT), ULFTDRM(UMTS_LTE_FDD_TDD_RFA_NB-IoT), NO(NR_ONLY), TN(LTE_TDD_NR), TLN(TDS_TDL_NR), LN(LTE_FDD_NR), LFTDN(LTE_FDD_TDD_NR), CN(CDMA_NR), CLN(CDMA_LTE_NR), GN(GSM_NR), GTN(GSM_LTE_TDD_NR), GLN(GSM_LTE_FDD_NR), GLFTDN(GSM_LTE_FDD_TDD_NR), UN(UMTS_NR), UTN(UMTS_LTE_TDD_NR), ULN(UMTS_LTE_FDD_NR), ULFTDN(UMTS_LTE_FDD_TDD_NR), CUN(CDMA_UMTS_NR), GUN(GSM_UMTS_NR), GUTN(GSM_UMTS_LTE_TDD_NR), GULN(GSM_UMTS_LTE_NR), GULFTDN(GSM_UMTS_LTE_FDD_TDD_NR), GLFTDMN(GSM_LTE_FDD_TDD_NB-IoT_NR), MN(NB-IoT_NR), LMN(LTE_FDD_NB-IoT_NR), CMN(CDMA_NB-IoT_NR), CLMN(CDMA_LTE_FDD_NB-IoT_NR), GMN(GSM_NB-IoT_NR), GLMN(GSM_LTE_FDD_NB-IoT_NR), UMN(UMTS_NB-IoT_NR), ULMN(UMTS_LTE_FDD_NB-IoT_NR), GUMN(GSM_UMTS_NB-IoT_NR), GULMN(GSM_UMTS_LTE_FDD_NB-IoT_NR), RN(RFA_NR), URN(UMTS_RFA_NR), LRN(LTE_FDD_RFA_NR), TRN(LTE_TDD_RFA_NR), TMN(LTE_TDD_NB-IoT_NR), RMN(RFA_NB-IoT_NR), ULRN(UMTS_LTE_FDD_RFA_NR), UTRN(UMTS_LTE_TDD_RFA_NR), URMN(UMTS_RFA_NB-IoT_NR), ULFTDRN(UMTS_LTE_FDD_TDD_RFA_NR), ULRMN(UMTS_LTE_FDD_RFA_NB-IoT_NR), LRMN(LTE_FDD_RFA_NB-IoT_NR), LFTDRN(LTE_FDD_TDD_RFA_NR), LFTDMN(LTE_FDD_TDD_NB-IoT_NR), LFTDRMN(LTE_FDD_TDD_RFA_NB-IoT_NR), UTRMN(UMTS_LTE_TDD_RFA_NB-IoT_NR), TRMN(LTE_TDD_RFA_NB-IoT_NR), UTMN(UMTS_LTE_TDD_NB-IoT_NR), ULFTDRMN(UMTS_LTE_FDD_TDD_RFA_NB-IoT_NR)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: GO, UO, LO, TDL, MO, RO, GU, GL, GT, GM, UL, UT, UM, LFTD, LM, TL, CU, CL, CM, UR, LR, TR, TM, RM, WL, GUL, GUT, GUM, GLFTD, GLM, ULFTD, ULM, CLM, ULR, UTR, UTM, URM, LRM, TRM, LFTDR, LFTDM, ULFTDR, ULRM, GULFTD, GULM, GLFTDM, LFTDRM, UTRM, ULFTDM, ULFTDRM, NO, TN, TLN, LN, LFTDN, CN, CLN, GN, GTN, GLN, GLFTDN, UN, UTN, ULN, ULFTDN, CUN, GUN, GUTN, GULN, GULFTDN, GLFTDMN, MN, LMN, CMN, CLMN, GMN, GLMN, UMN, ULMN, GUMN, GULMN, RN, URN, LRN, TRN, TMN, RMN, ULRN, UTRN, URMN, ULFTDRN, ULRMN, LRMN, LFTDRN, LFTDMN, LFTDRMN, UTRMN, TRMN, UTMN, ULFTDRMN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-RRUName.html">RN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RRU name. For LampSite, this parameter indicates the RRU name and location, and the symbol "@" is used to separate RRU name and location.</p>
+<p>GUI Value Range: 0~99 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~99 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RxBranchNum.html">RXNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Number of RX channels</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of RX channels of the RRU or RFU. Set this parameter to the number of antenna ports on the RF module. The system creates RX channels based on the number of configured channels. For 8-channel TDD or FDD RRUs, the RX channels are numbered from 1 in ascending order, and channels 1 to 8 corresponds to antenna ports A to H. For other RRUs/RFUs, RX channels are numbered from 0 in ascending order, and channels 0 to 15 correspond to antenna ports A to P. Ensure that sufficient RX channels are configured before using an RX channel No. For example, if R0D is used, at least four RX channels must have been configured. Operations cannot be performed on a single channel for AAUs capable of beamforming. Therefore, this parameter does not take effect on such AAUs and the recommended value is 0.</p>
+<p>GUI Value Range: 0~64</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-TxBranchNum.html">TXNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Number of TX channels</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of TX channels of the RRU or RFU. Set this parameter to the number of antenna ports on the RF module. The system creates TX channels based on the number of configured channels. For 8-channel TDD or FDD RRUs, the TX channels are numbered from 1 in ascending order, and channels 1 to 8 corresponds to antenna ports A to H. For other RRUs/RFUs, TX channels are numbered from 0 in ascending order, and channels 0 to 15 correspond to antenna ports A to P. Ensure that sufficient TX channels are configured before using an TX channel No. For example, if R0D is used, at least four TX channels must have been configured. Operations cannot be performed on a single channel for AAUs capable of beamforming. Therefore, this parameter does not take effect on such AAUs and the recommended value is 0.</p>
+<p>GUI Value Range: 0~64</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-VswrAlmSwitch.html">ALMPROCSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VSWR alarm post-processing switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VSWR alarm post-processing switch. The pRRU (pRRU3801) does not support this parameter.</p>
+<p>When the switch is set to on and the VSWR is greater than the VSWR alarm post-processing threshold: (1) The TX channel will be shut down if the transmit power is greater than or equal to the hardware maximum output power of the TX channel minus 3 dB. (2) The TX channel will not be shut down if the transmit power is less than the hardware maximum output power of the TX channel minus 3 dB.</p>
+<p>When the switch is set to off and the VSWR is greater than the VSWR alarm post-processing threshold, the RF module will reduce the total transmit power of TX channels by 3 dB to avoid damage caused by high VSWR and provide as many services as possible. Different scenarios are described as follows:</p>
+<p>(1) An RF module degrades its power by decreasing the TX power of carriers sharing TX channels by 3 dB. In GSM mode, non-BCCH carriers on the TX channel are shut down to degrade the RF module's power. If there is only a BCCH carrier on the TX channel where a severe VSWR alarm is generated, to ensure services, the transmit power of the BCCH carrier is reduced so that the TX channel power is reduced by 3 dB.</p>
+<p>(2) In the scenario where two TX channels are configured with transmit diversity and MIMO, the TX power of one channel is decreased by 3 dB if a major VSWR alarm is generated in this channel. Meanwhile, the TX power of the other channel also needs to be decreased by 3 dB for the power balance of TX channels.</p>
+<p>(3) In the scenario where multiple modes share TX channels and a major VSWR alarm is generated in one channel, this TX channel is shut down if the switch is set to ON in any mode. The power of this channel is degraded if this switch is set to OFF in all the modes.</p>
+<p>GUI Value Range: ON(ON), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-VswrAlmThrhld.html">ALMPROCTHRHLD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VSWR alarm post-processing threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VSWR alarm post-processing threshold. If the VSWR alarm post-processing switch is set to ON and the VSWR is greater than the threshold, post-processing is performed to shut down the TX channel. In this case, the TX channel cannot be open automatically after the VSWR is normal. If this parameter is set to different values in different modes of a multimode base station, the smallest value takes effect in all the modes.</p>
+<p>GUI Value Range: 14~100</p>
+<p>Unit: 0.1</p>
+<p>Actual Value Range: 1.4~10, step: 0.1</p>
+<p>MML Default Value: 30</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-VswrReAlmThrhld.html">ALMTHRHLD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VSWR alarm threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VSWR alarm threshold. When the current VSWR is greater than the threshold, a VSWR Abnormal alarm is reported.</p>
+<p>It is recommended that the VSWR alarm threshold be set according to the VSWR required by the engineering quality to reduce the probability that the VSWR alarm is reported falsely.</p>
+<p>To stabilize the false alarm probability to 1%, 0.1%, and 0.01%, you need to set the VSWR alarm threshold to the following recommended values:</p>
+<p>When the VSWR required by the engineering quality is smaller than or equal to 1.4, the recommended thresholds are 1.8, 2.0, and 2.4, respectively.</p>
+<p>When the VSWR required by the engineering quality is smaller than or equal to 1.5, the recommended thresholds are 2.0, 2.2, and 2.6, respectively.</p>
+<p>If this parameter is set to different values in different modes of a multimode base station, the smallest value takes effect in all the modes.</p>
+<p>GUI Value Range: 14~30</p>
+<p>Unit: 0.1</p>
+<p>Actual Value Range: 1.4~3, step: 0.1</p>
+<p>MML Default Value: 20</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-Rfds.html">RFDS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RF Desensitivity</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RF desensitization intensity of the RRU or RFU. When the air interface is under the impact of strong blocking or interference, the anti-interference capability of RF modules can be improved by decreasing the gain on RX channels and lowering the receiver sensitivity. For example, when the parameter is set to 10 dB, the uplink receiver sensitivity is lowered by 10 dB. Therefore, the anti-interference capability is improved. Currently, this parameter can only be set to 0 dB or 10 dB for RRU3804 and WRFU. The RRU3808, RRU3201, RRU3203, and LRFU do not support this function.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~10</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When the air interface is under strong blocking or interference, the anti-interference capability of RF modules can be improved by decreasing the gain on RX channels and lowering the receiver sensitivity.</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-Lcpswitch.html">LCPSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Low Current Protect Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the undercurrent protection switch. If an undercurrent alarm is generated, the ALD power switch for this RRU or RFU is automatically turned off only when this parameter is set to ENABLE. If this parameter is set to NULL, the RRU/RFU undercurrent protection function setting is not changed. If NULL is displayed in the DSP RRU command output, the RRU/RFU does not support undercurrent protection. Only UMTS currently supports this function.</p>
+<p>GUI Value Range: Enable(Enable), Disable(Disable), NULL(NULL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Enable, Disable, NULL</p>
+<p>MML Default Value: Enable(Enable)</p>
+<p>Recommended Value: Enable(Enable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-AldReuse.html">FLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ALD Reuse Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the ALD is reused. Value 0 indicates that the ALD is not reused. Value 1 indicates that the ALD is reused. This parameter takes effect only to UMTS.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RUSpecification.html">RUSPEC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RU Specification</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of an RF module. If the user does not need to forcibly verify the RU specifications using the MAE-Deployment, this parameter can be left unspecified. Leaving this parameter unspecified has no impact on the base station. If the user needs to forcibly verify the RU specifications using the MAE-Deployment, this parameter must be set to the hardware type of the RF module. After this parameter is specified, the MAE-Deployment checks the configurations of power, carrier, and receive and transmit capabilities based on the value of this parameter. This ensures that these configurations are correct before they take effect. When this parameter is specified, it must be set to the hardware type of the RF module. For example, this parameter must be set to RRU3908_V1 for RRU3908_V1, RRU3029 for RRU3029, and MRFU_V1 for MRFU_V1.</p>
+<p>GUI Value Range: 0~63 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-PAEffSwitch.html">PAEFFSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PA Efficiency Improvement Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the power amplifier efficiency improvement switch for an RF module. When this parameter is set to ON, the power amplifier efficiency of an RF module is improved. When this parameter is set to OFF, the power amplifier efficiency of an RF module is not improved. You can run the DSP RRU command to check whether an RF module supports the power amplifier efficiency improvement. This parameter takes effect on RRUs or RFUs working in UMTS, LTE or NR mode and using the CPRI protocol.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-SlaveCpriRate.html">SCR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Slave CPRI Line Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slave CPRI line rate of an RRU. If this parameter is set to a fixed value, this configuration takes effect only when the CPRI line rate of the RRU chain/ring where the RRU is located is set to MANUAL. In other scenarios,  the slave CPRI line rate is negotiated and the negotiated result can be queried using the <a href="dsp_cprilbr.html">DSP CPRILBR</a>.</p>
+<p>GUI Value Range: 1.25(1.25), 2.5(2.5), 3.0(3.0), 4.9(4.9), 6.1(6.1), 9.8(9.8), 10.1(10.1), 24.3(24.3), 40.4(4*10.1), 97.2(4*24.3), AUTO(Auto)</p>
+<p>Unit: Gbit/s</p>
+<p>Actual Value Range: 1.25, 2.5, 3.0, 4.9, 6.1, 9.8, 10.1, 24.3, 40.4, 97.2, AUTO</p>
+<p>MML Default Value: AUTO(Auto)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-IffReq.html">IFFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Interference Frequency</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interference frequency. This parameter is set by the user during network planning to avoid the external signal interference around the current received frequency, and accordingly improve the receiver sensitivity of the system. It is recommended that you leave this parameter unspecified if there is no external signal interference.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: 100kHz</p>
+<p>Actual Value Range: 0~6553500, step: 100</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RxFreqBandMutualSw.html">RXFREQBANDMUTUALSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Receive Frequency Band Mutual Aid Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the receive frequency band mutual aid function on an RF module. When this switch is set to off, the RF module can receive signals from a single frequency band. When this switch is set to on, the RF module can receive signals from multiple frequency bands.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-RemoteFlag.html">REMOTEFLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Remote Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether an RRU is far away from the BBU. You can define whether an RRU is far away from the BBU as required. If you do not need to define this information, use the default value.</p>
+<p>GUI Value Range: UNDEFINED(Undefined), REMOTE(Remote), NOT_REMOTE(Not Remote)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNDEFINED, REMOTE, NOT_REMOTE</p>
+<p>MML Default Value: UNDEFINED(Undefined)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-USERLABEL.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-defined RRU descriptions.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-MNTMode.html">MNTMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maintenance Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maintenance mode of an RRU. The value INSTALL indicates device creation caused by network capability expansion, device reparenting, or access of a new device to the network. The value EXPAND indicates the subrack or carrier capacity expansion of a device. The value UPGRADE indicates a device upgrade. The value TESTING indicates that an installed device is being commissioned. ExpandStatus1 to ExpandStatus10 can be used by users to define maintenance modes. The default value of this parameter is NORMAL.</p>
+<p>GUI Value Range: NORMAL(NORMAL), INSTALL(INSTALL), EXPAND(EXPAND), UPGRADE(UPGRADE), TESTING(TESTING), ExpandStatus1(ExpandStatus1), ExpandStatus2(ExpandStatus2), ExpandStatus3(ExpandStatus3), ExpandStatus4(ExpandStatus4), ExpandStatus5(ExpandStatus5), ExpandStatus6(ExpandStatus6), ExpandStatus7(ExpandStatus7), ExpandStatus8(ExpandStatus8), ExpandStatus9(ExpandStatus9), ExpandStatus10(ExpandStatus10)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL, INSTALL, EXPAND, UPGRADE, TESTING, ExpandStatus1, ExpandStatus2, ExpandStatus3, ExpandStatus4, ExpandStatus5, ExpandStatus6, ExpandStatus7, ExpandStatus8, ExpandStatus9, ExpandStatus10</p>
+<p>MML Default Value: NORMAL(NORMAL)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-StartTime.html">ST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Start Time of Status Setting</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start time of maintenance status of the RRU. This time refers to the local time (including the DST offset) on the NE. If this parameter is not specified, the start time of the maintenance status is 2000-01-01 00:00:00.</p>
+<p>GUI Value Range: 2000-01-01T00:00:00+00:00~2037-12-31T23:59:59+00:00</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2000-01-01T00:00:00+00:00~2037-12-31T23:59:59+00:00</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li><strong>ST</strong> in the <strong>RE</strong> MO must be earlier than <strong>ET</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-EndTime.html">ET</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">End Time of Status Setting</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the end time of maintenance status of the RRU. This time refers to the local time (including the DST offset) on the NE. If this parameter is not specified, the maintenance status ends at 2037-12-31 23:59:59.</p>
+<p>GUI Value Range: 2000-01-01T00:00:00+00:00~2037-12-31T23:59:59+00:00</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2000-01-01T00:00:00+00:00~2037-12-31T23:59:59+00:00</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li><strong>ET</strong> in the <strong>RE</strong> MO must be later than <strong>ST</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-MMSetRemark.html">MMSETREMARK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maintenance Mode Setting Remark</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the remarks of maintenance status of the RRU.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-RFDCPWROFFALMDETECTSW.html">RFDCPWROFFALMDETECTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RF DC Power Off Alarm Detect Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for detecting the abnormal input of the power supply. Some RF modules need to check the DC voltage to determine whether they are about to be powered off. If this switch is turned on, RF modules detect the voltage. If the voltage is abnormal, ALM-26564 RF Unit DC Input Power Failure is reported. This parameter takes effect only for the RF modules for which the value of DC Input Voltage is not NULL in the output of the <a href="dsp_rru.html">DSP RRU</a> command.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-BATTOUTPUNDERVOLTTHLD.html">BATTOUTPUNDERVOLTTHLD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Battery Output Undervoltage Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the output undervoltage threshold of storage batteries. This parameter is valid only if the switch controlling the detection of the RF Unit DC Input Power Failure alarm. The value NULL indicates that RF modules do not support this parameter. This parameter takes effect only for the RF modules for which the value of DC Input Voltage is not NULL in the output of the <a href="dsp_rru.html">DSP RRU</a> command.</p>
+<p>GUI Value Range: 350~556</p>
+<p>Unit: 0.1V</p>
+<p>Actual Value Range: 35~55.6, step: 0.1</p>
+<p>MML Default Value: 430</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-LedSwitch.html">LEDSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LED Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the led switch of the RRU. This parameter takes effect only for MPMUs and some MRRUs. This parameter can be set but is invalid for the RRUs that do not support LED configuration.</p>
+<p>GUI Value Range: ON(ON), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: ON(ON)</p>
+<p>Recommended Value: ON(ON)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-PowerSupplyGroupID.html">PSGID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power Supply Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a group which consists of one or multiple RRUs/RFUs served by the same power supply system. This parameter must be set to the same value for RRUs/RFUs served by the same power supply system. This parameter must be set to different values for RRUs/RFUs served by different power supply systems. The value NULL indicates that the RF module does not support this parameter.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-WifiSwitch.html">WIFISW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">WiFi Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for the Wi-Fi function of an RRU. If the value of this parameter is changed from OFF(OFF) to ON(ON) for an RRU, the RRU needs to be manually reset.Only the MPMU board supports this function. GSM and NR do not support this function.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: ON(ON)</p>
+<p>Recommended Value: ON(ON)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-LocationName.html">LOCATIONNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Location Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the location information of an RRU. Set this parameter to the location name of the site. The location name of the site is configured in the Location object. LocationName must be set to the same value for RF modules serving the same sector.</p>
+<p>GUI Value Range: 0~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RfTxSignDetectSwitch.html">RFTXSIGNDETECTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Signal Quality Detection Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink signal quality detection switch for the RF module. Downlink signal quality can be detected when this parameter is set to ON.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RfTxSignDetectPeriod.html">RFTXSIGNDETECTPERIOD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Signal Quality Detection Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink signal quality detection period for the RF module. This parameter takes effect only when DL Signal Quality Detection Switch is set to ON.</p>
+<p>GUI Value Range: DAY(DAY), HOUR(HOUR)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DAY, HOUR</p>
+<p>MML Default Value: DAY(DAY)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RfTxSignDetectThrhld.html">RFTXSIGNDETECTTHLD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Signal Quality Detection Sensitivity</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink signal quality detection sensitivity for the RF module. This parameter takes effect only when DL Signal Quality Detection Switch is set to ON.</p>
+<p>GUI Value Range: HIGH(HIGH), MIDDLE(MIDDLE), LOW(LOW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: HIGH, MIDDLE, LOW</p>
+<p>MML Default Value: MIDDLE(MIDDLE)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-CustomedRFSpecSW.html">CUSTOMEDRFSPECSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RF Specifications Customization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable customization of RF specifications. Select customized RF specifications as required. This specification is customized for a specific RF module and does not take effect for RF modules that do not support this specification.</p>
+<p>GUI Value Range: SPEC_1900M_45M_IBW_LTE(SPEC_1900M_45M_IBW_LTE), SPEC_2600M_EXPAND_LTE_TDD(SPEC_2600M_EXPAND_LTE_TDD), SPEC_SUPPORT_TWO_LTE_CARRIERS(SPEC_SUPPORT_TWO_LTE_CARRIERS), SPEC_1900M_60M_IBW_LTE(SPEC_1900M_60M_IBW_LTE), SPEC_1800M_45M_IBW_LTE(SPEC_1800M_45M_IBW_LTE), SPEC_1800M_55M_IBW_LTE(SPEC_1800M_55M_IBW_LTE), SPEC_2100M_60M_IBW_LTE(SPEC_2100M_60M_IBW_LTE), SPEC_2100M_45M_IBW_LTE(SPEC_2100M_45M_IBW_LTE), SPEC_1.8G_55M_2.1G_60M_IBW_LTE(SPEC_1.8G_55M_2.1G_60M_IBW_LTE), SPEC_NONSTANDARD_BW_ENHANCE(SPEC_NONSTANDARD_BW_ENHANCE), SPEC_LOOSE_PSD_LIMIT(SPEC_LOOSE_PSD_LIMIT), SPEC_SUB6G_CR_NUM_ENH_NR_TDD(SPEC_SUB6G_CR_NUM_ENH_NR_TDD), SPEC_SUB6G_PFM_ENH_NR_TDD(SPEC_SUB6G_PFM_ENH_NR_TDD), SPEC_2.1G_55M_IBW_LTE(SPEC_2.1G_55M_IBW_LTE), SPEC_100M_AND_60M_NR(SPEC_100M_AND_60M_NR), SPEC_AWS_70M_PCS_60M_IBW_LTE(SPEC_AWS_70M_PCS_60M_IBW_LTE), SPEC_1.8G_45M_2.1G_45M_IBW_LTE(SPEC_1.8G_45M_2.1G_45M_IBW_LTE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SPEC_1900M_45M_IBW_LTE, SPEC_2600M_EXPAND_LTE_TDD, SPEC_SUPPORT_TWO_LTE_CARRIERS, SPEC_1900M_60M_IBW_LTE, SPEC_1800M_45M_IBW_LTE, SPEC_1800M_55M_IBW_LTE, SPEC_2100M_60M_IBW_LTE, SPEC_2100M_45M_IBW_LTE, SPEC_1.8G_55M_2.1G_60M_IBW_LTE, SPEC_NONSTANDARD_BW_ENHANCE, SPEC_LOOSE_PSD_LIMIT, SPEC_SUB6G_CR_NUM_ENH_NR_TDD, SPEC_SUB6G_PFM_ENH_NR_TDD, SPEC_2.1G_55M_IBW_LTE, SPEC_100M_AND_60M_NR, SPEC_AWS_70M_PCS_60M_IBW_LTE, SPEC_1.8G_45M_2.1G_45M_IBW_LTE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-DormancySW.html">DORMANCYSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dormancy Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RRU deep dormancy switch. RRU deep dormancy is enabled if this switch is turned on. RRU deep dormancy is disabled if this switch is turned off. This parameter is NULL when the RRU does not support deep dormancy. The effective status of RRU deep dormancy can be queried using the <a href="dsp_rru.html">DSP RRU</a> command. When Dormancy Switch is set to ON, you need to set the start time and end time of the dormancy period. If you do not set the start time and end time, the dormancy period is 00:00:00 to 06:00:00. This parameter is valid only when RRU type is set to MPMU, MRRU, or AIRU.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-DormancyStartTime.html">DORMANCYSTARTTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dormancy Start Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start time of RRU deep dormancy. A start time later than an end time indicates that RRU deep dormancy ends in the next day.</p>
+<p>GUI Value Range: 00:00:00~23:59:59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00:00:00~23:59:59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 00:00:00</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-DormancyStopTime.html">DORMANCYSTOPTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dormancy Stop Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the end time of RRU deep dormancy.</p>
+<p>GUI Value Range: 00:00:00~23:59:59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00:00:00~23:59:59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 06:00:00</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-DormancyTimer.html">DORMANCYTIMER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dormancy Waiting Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the waiting time before a cell enters the forcible dormancy state. After the start time of the dormancy period is reached, new users are not allowed to access the cell and online users are handed over to other cells. If there is no UE in the cell, the cell is deactivated immediately. Otherwise, the cell is deactivated when the waiting time expires. This parameter takes effect only for MRRU and AIRU. If the start time of the dormancy period plus the waiting time exceeds the end time of the dormancy period, forcible cell deactivation is not triggered.</p>
+<p>GUI Value Range: 1~1440</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 1~1440</p>
+<p>MML Default Value: 5</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-CIRCUITBREAKERVALUE.html">CIRCUITBREAKERVALUE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">The Value of The Circuit Breaker</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the circuit breaker value of the power module that is connected to an RF module. The value NULL indicates that the queried RF module does not support querying of this parameter and is displayed only in the <a href="dsp_rru.html">DSP RRU</a> command output.</p>
+<p>GUI Value Range: default(Default), 1_63A(1*63A), 1_80A(1*80A), 1_100A(1*100A), 1_125A(1*125A), 2_63A(2*63A), 2_80A(2*80A), 2_100A(2*100A), 2_125A(2*125A)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: default, 1_63A, 1_80A, 1_100A, 1_125A, 2_63A, 2_80A, 2_100A, 2_125A</p>
+<p>MML Default Value: default(Default)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RE-RxHwAlmDetectSw.html">RXHWALMDETECTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RX Hardware Alarm Detection Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the hardware alarm detection switch for the RX channel. When this parameter is set to ON, the hardware alarm detection switch is turned on for the RX channel. In this case, if the RX channel hardware is faulty, ALM-26532 RF Unit Hardware Fault is reported. When this parameter is set to OFF, the hardware alarm detection switch is turned off for the RX channel.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-TXDUPSW.html">TXDUPSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Branch Duplication Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the TX branch duplication function. This function is designed for specific MPMU modules and does not take effect for RF modules of other types. It is recommended that this function be disabled in MIMO scenarios and enabled in SISO scenarios.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON), DEFAULT(DEFAULT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON, DEFAULT</p>
+<p>MML Default Value: DEFAULT(DEFAULT)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RFU-TEMPERATUREALMDETENHSW.html">TEMPERATUREALMDETENHSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Temperature Alarm Detection Enh Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the alarm detection enhancement function for the temperature exception for an RFU. If this switch is turned on, the system determines whether to report ALM-26525 RF Unit Temperature Unacceptable based on the RFU board temperature and user-defined RFU temperature alarm threshold. It reminds users to clean up site dust in a timely manner.</p>
+<p>GUI Value Range: ON(ON), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RFU-TEMPERATUREALMTHLD.html">TEMPERATUREALMTHLD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Temperature Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the temperature alarm threshold of the RFU. If the temperature of an RFU board is higher than this threshold, ALM-26525 RF Unit Temperature Unacceptable is reported. The value NULL indicates that the queried RF module does not support querying of this parameter.</p>
+<p>GUI Value Range: 40~85(metric system);104~185(imperial system)</p>
+<p>Unit: degree Celsius(metric system);degree Fahrenheit(imperial system)</p>
+<p>Actual Value Range: 40~85(metric system);104~185(imperial system)</p>
+<p>MML Default Value: 60(metric system);140(imperial system)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-CALPORTCONSTATUS.html">CALPORTCONSTATUS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Calibration Port Connection Status</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the connection status of the RF module calibration port.</p>
+<p>GUI Value Range: CONNECTED(CONNECTED), UNCONNECTED(UNCONNECTED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CONNECTED, UNCONNECTED</p>
+<p>MML Default Value: CONNECTED(CONNECTED)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRU-PIM3CFGSW.html">PIM3CFGSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PIM3 Hit Configuration Control Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the RF module allows the configuration of the cell with PIM3 hit. If this switch is turned on, the configuration of the cell with PIM3 hit takes effect. If this switch is turned off, the configuration of the cell with PIM3 hit does not take effect. In the PIM3 hit scenario, the third-order intermodulation products of downlink signals of cells configured on the same antenna port of the RF module fall in the uplink frequencies of some cells. In the PIM3 hit scenario, the size of the intermodulation products is affected by the PIM3 specifications of the antenna system (including but not limited to the antenna, feeder/jumper, combiner, TMA, anti-interference filter, surge protector, and RET device). After this switch is turned on, the receiver sensitivity of the hit uplink frequency may deteriorate, and in some cases uplink services may even be unavailable. The impact is directly related to the size of the intermodulation products of the antenna system. For example, when the PIM3 is -140 dBc@2x43 dBm, the static receiver sensitivity of a single RRU channel deteriorates by 22 dB or less for GSM and by 9 dB or less for ULN. After this switch is turned on, alarms, such as ALM-26522 RF Unit RX Channel RTWP/RSSI Unbalanced, may be reported.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If switch is turned on, the configuration of the cell with PIM3 hit takes effect. If switch is turned off, the configuration of the cell with PIM3 hit does not take effect.</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_rru__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an RRU with the parameters as follows: Cabinet No.: 0, Subrack No.: 60, Slot No.: 0, Topo Position: TRUNK, RRU Chain No.: 0, RRU Position: 0, RRU type: MRRU, RF Unit Working Mode: UO, Number of RX channels: 2, Number of TX channels: 2, VSWR alarm post-processing switch: ON, VSWR alarm post-processing threshold: 30, RF Desensitivity: 0, RRU Slave CPRI Line Rate: 6.1, Interference Frequency: 0, Maintenance Mode: NORMAL, run the following command:
+ADD RRU: CN=0, SRN=60, SN=0, TP=TRUNK, RCN=0, PS=0, RT=MRRU, RS=UO, RXNUM=2, TXNUM=2, ALMPROCSW=ON, ALMPROCTHRHLD=30, RFDS=0, SCR=6.1, IFFREQ=0, MNTMODE=NORMAL;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

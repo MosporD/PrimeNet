@@ -1,0 +1,313 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="X2Interface">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="X2Interface">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>X2Interface</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="X2Interface"></a><a name="X2Interface"></a>
+
+
+<h1 class="topictitle1">X2Interface</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="X2Interface.html"><strong>X2Interface</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An X2Interface MO consists of user-configured parameters related to an X2 interface between the local eNodeB and a neighboring eNodeB. The parameters specify information about the X2 interface and the neighboring eNodeB, including the control port bearer used for the X2 interface, the operator to which the X2 interface belongs, and the ID of the neighboring eNodeB.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="eNodeBFunction.html">eNodeBFunction</a></li><li>Relation with the <strong>ENodeBSharingMode</strong> MO:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED and <strong>CtrlMode</strong> in the <strong>X2Interface</strong> MO is set to MANUAL_MODE, <strong>CnOpSharingGroupId</strong> in the <strong>X2Interface</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CnOpSharingGroup</strong> MO:<ul><li><strong>CnOpSharingGroupId</strong> in the <strong>X2Interface</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255 and <strong>CtrlMode</strong> in the <strong>X2Interface</strong> MO is set to MANUAL_MODE.</li><li>The operator corresponding to <strong>CnOperatorId</strong> in the <strong>X2Interface</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255 and <strong>CtrlMode</strong> in the <strong>X2Interface</strong> MO is set to MANUAL_MODE.</li></ul>
+</li><li>Relation with the <strong>S1Interface</strong> MO:<ul><li><strong>S1CpBearerId</strong> in an <strong>S1Interface</strong> MO must be different from <strong>X2CpBearerId</strong> in any <strong>X2Interface</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CPBEARER</strong> MO:<ul><li>If <strong>CtrlMode</strong> in the <strong>X2Interface</strong> MO is set to MANUAL_MODE, a <strong>CTRLMODE</strong> in the <strong>CPBEARER</strong> MO referenced by an <strong>X2Interface</strong> MO must set to MANUAL_MODE.</li><li>If <strong>CtrlMode</strong> in the <strong>X2Interface</strong> MO is set to MANUAL_MODE, <strong>X2CpBearerId</strong> in an <strong>X2Interface</strong> MO must have been set in the associated <strong>CPBEARER</strong> MO, and must not have been set in the SAAL type.</li></ul>
+</li><li>Relation with the <strong>CnOperator</strong> MO:<ul><li>If <strong>CtrlMode</strong> in the <strong>X2Interface</strong> MO is set to MANUAL_MODE, <strong>CnOperatorId</strong> in an <strong>X2Interface</strong> MO must have been set in the associated <strong>CnOperator</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> MO:<ul><li>The number of instances of the <strong>X2Interface</strong> MO cannot exceed 96 when the <strong>TYPE</strong> parameter in the <strong>MPT</strong> is set to LMPT.</li><li>The number of instances of the <strong>X2Interface</strong> MO cannot exceed 256 when the <strong>TYPE</strong> parameter in the <strong>MPT</strong> is set to UMPT and the <strong>BRDSPEC</strong> parameter is set to UMPTa/b.</li><li>The number of instances of the <strong>X2Interface</strong> MO cannot exceed 384 when the <strong>TYPE</strong> parameter in the <strong>MPT</strong> is set to UMPT and the <strong>BRDSPEC</strong> parameter is set to UMPTe, and other BRDSPEC parameters in all <strong>MPT</strong> MOs is set to UMPTe, UMPTa, UMPTb, or UMPTa/b.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#X2Interface__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="X2Interface__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="X2Interface__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_x2interface.html">ADD X2INTERFACE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an X2 interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_x2interface.html">DSP X2INTERFACE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of an X2 interface and the information about the peer base station. The information about the peer base station includes the peer base station ID and its PLMN ID. If the status of an X2 interface is abnormal, the execution result displays the information about the peer base station in the last normal connection with the local eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_x2upinfo.html">DSP X2UPINFO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query X2 user plane information.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_x2interface.html">MOD X2INTERFACE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify an X2 interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_x2interface.html">RMV X2INTERFACE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an X2 interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rst_x2interface.html">RST X2INTERFACE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to reset an X2 interface.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#X2Interface__tab2">Table 2</a> and <a href="#X2Interface__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="X2Interface__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="X2Interface__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/X2Interface-X2InterfaceId.html">X2Interface ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the X2 interface ID. If the X2 interface is set up based on the endpoint configuration mode, the value range is 40000 to 65535. If the X2 interface is set up based on the link configuration mode using the MAE or MML commands, the recommended value range is 0 to 39999.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/X2Interface-X2CpBearerId.html">X2 Interface CP Bearer ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the control port bearer for the X2 interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/X2Interface-CnOperatorId.html">CN Operator ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the operator that owns the X2 interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/X2Interface-TargetENodeBRelease.html">Peer Base Station Release</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the protocol release with which the peer base station connected to the local base station through the X2 interface complies. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/X2Interface-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the control mode of the X2 interface, which determines the control policies of operators and the SON functions on the X2 interface. This parameter is set by the system and cannot be modified by operators. If the X2 interface was set up by operators by using the MAE or MML commands, this parameter is set to MANUAL_MODE and operators can configure the interface. If the X2 interface was set up automatically based on the endpoint configuration mode, then: 1. This parameter is set to AUTO_MODE. 2. Operators can reset the interface and query the information about the interface. 3. Operators cannot modify or delete the interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/X2Interface-AutoCfgFlag.html">Auto Config Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the X2 interface was created automatically or manually. This parameter is set by the system and cannot be modified by operators. The system sets this parameter to AUTO_CREATED when the X2 interface was created automatically using SON and to MANUAL_CREATED when the X2 interface was created manually by using the MAE or running MML commands.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/X2Interface-CnOpSharingGroupId.html">CN Operator Sharing Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a carrier-sharing operator group that shares the X2 Interface MO. If the eNodeB works in hybrid RAN sharing mode, set this parameter to a value within the range from 0 to 5. If the eNodeB works in independent mode, RAN sharing with common carriers mode, or RAN sharing with dedicated carriers mode, retain the default value 255, which is an invalid value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/X2Interface-NeighboringBaseStationType.html">Neighboring Base Station Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the neighboring base station to which the local base station is connected through the X2 interface. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="X2Interface__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="X2Interface__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-NbrENodeBId.html">Neighboring Base Station ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of the neighboring base station to which the local base station is connected through the X2 interface. The combination of this parameter and NbrEnbPlmnId uniquely identifies the neighboring base station around the globe. If the neighboring base station is an eNodeB, this parameter specifies the eNodeB ID. If the neighboring base station is a gNodeB, this parameter specifies the gNodeB ID. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-NbrENodeBPlmnId.html">Neighbor Base Station PLMN ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the PLMN ID of the neighboring eNodeB to which the local eNodeB is connected through the X2 interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2InterfaceState.html">X2Interface state</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of the X2 interface. If the status is normal, the X2 interface has been successfully established. If the status is abnormal, the X2 interface establishment fails.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2AbnormalReason.html">X2Interface state abnormal reason</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the reason why the X2 interface is abnormal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-LastFaultOccurTime.html">Last Fault Occur Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the time when the last X2 fault occurred. When a lower-layer link fault occurred and persisted for 18 seconds, the time that is 18 seconds after the fault occurred is recorded and taken as the parameter value. When an X2 interface setup failed for three consecutive times, the time that the X2 setup failure occurs for the third time is recorded and taken as the parameter value. The time format is YEAR-MONTH-DAY HH:MM:SS. For example, 2000-1-1 10:20:05 indicates 10:20:05 on January 1, 2000.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-QueryType.html">Query Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status type of X2 interfaces to be queried. If this parameter is not specified in the DSP X2INTERFACE command, information about X2 interfaces in all states is displayed in the command output. If the X2interfaceId parameter is specified in the MML command, the QueryType parameter does not take effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UPHostIP.html">X2 User Plane Host IPv4 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPv4 address of the user-plane host of the X2 interface. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UPPeerIP.html">X2 User Plane Peer IPv4 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPv4 address of the user-plane peer of the X2 interface. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UPLinkState.html">X2 User Plane Link State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the user-plane link status of the X2 interface. The value Abnormal indicates that the user-plane link is disconnected. The value Normal indicates that the user-plane link is connected. The value Unknown indicates that the status or the IP PM delay of the link cannot be obtained. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UPLinkMaxOneWayDelay.html">X2 User Plane Link Maximum One-Way Delay</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates maximum one-way link delay of the X2 user-plane. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UPLinkTwoWayDelay.html">X2 User Plane Link Two-Way Delay</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the two-way link delay of the X2 user-plane. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-TransmitAvailableBw.html">Transmit Available Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the available bandwidth in the sending direction detected by the function of transmission congestion detection. If the TransmitCongDelay and TransmitAvailableBw parameter values are NULL and congestion detection in X2/eX2 links in non-ideal backhaul mode for bearer coordination services is enabled, the transmission congestion detection procedure fails. The failure cause can be one of the following: 1. The IPPM session that transmission congestion detection depends on is not activated. 2. The version or boards of the peer end do not support transmission congestion detection. 3. The boards of the local end do not support transmission congestion detection. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-TransmitCongDelay.html">Transmit Congestion Delay</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the single-way transmission congestion delay detected by the function of transmission congestion detection. If the TransmitCongDelay and TransmitAvailableBw parameter values are NULL and congestion detection in X2/eX2 links in non-ideal backhaul mode for bearer coordination services is enabled, the transmission congestion detection procedure fails. The failure cause can be one of the following:</p>
+<p>- The IPPM session that transmission congestion detection depends on is not activated.</p>
+<p>- The version or boards of the peer end do not support transmission congestion detection.</p>
+<p>- The boards of the local end do not support transmission congestion detection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UpHostIpv6Address.html">X2 User Plane Host IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPv6 address of the user-plane host of the X2 interface. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UpPeerIpv6Address.html">X2 User Plane Peer IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPv6 address of the user-plane peer of the X2 interface. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UsageMeasDuration.html">X2 Usage Meas Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the length of measurement duration of X2 usage from the last measurement period to the current time. For a new X2 interface set up during this period, the length of the measurement duration is from the time the X2 interface is set up to the current time. The measurement period is specified by the X2SonDeleteTimerforX2Usage parameter in the GlobalProcSwitch MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2UsageStatistics.html">X2 Usage Statistics</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the measurement value of an X2 interface during a period from the last measurement period to the current time. For an inter-eNodeB X2 interface, this parameter indicates the total number of incoming and outgoing handovers over the X2 within a measurement duration. For an EN-DC X2 interface, this parameter indicates the total number of successful additions of a gNodeB that is connected over the EN-DC X2 interface within a measurement duration. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2NsaLastPeriodMeasResult.html">X2 NSA Meas Result in Last Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the accumulated values of measurements of NSA services over the X2 interface in the last full period. The parameter value includes results of multiple measurement items in the following sequence:</p>
+<p>Measurements of eNodeB-initiated SgNB addition procedures:</p>
+<p>1. Number of times the eNodeB sends SgNB Addition Request to gNodeBs</p>
+<p>2. Number of times the eNodeB receives SgNB Addition Request Acknowledge messages from gNodeBs</p>
+<p>3. Number of times the eNodeB sends SgNB Reconfiguration Complete messages to gNodeBs</p>
+<p>Measurements of eNodeB-initiated SgNB modification procedures:</p>
+<p>4. Number of times the eNodeB sends SgNB Modification Request messages to gNodeBs</p>
+<p>5. Number of times the eNodeB receives SgNB Modification Request Acknowledge messages from gNodeBs</p>
+<p>6. Number of times the eNodeB sends SgNB Reconfiguration Complete messages to gNodeBs</p>
+<p>Measurements of gNodeB-initiated SgNB release procedures:</p>
+<p>7. Number of times the eNodeB receives SgNB Release Required messages from gNodeBs</p>
+<p>8. Number of times the eNodeB receives SgNB Release Required messages for normal releases from gNodeBs</p>
+<p>Measurements of gNodeB-initiated inter-base-station handover procedures:</p>
+<p>9. Number of times the eNodeB receives SgNB Change Required messages from gNodeBs</p>
+<p>10. Number of times the eNodeB sends SgNB Change Confirm messages to gNodeBs</p>
+<p>11. Number of times the eNodeB sends SgNB Change Refuse messages to gNodeBs</p>
+<p>Measurements of failed UE-initiated SCG procedures:</p>
+<p>12. Number of times the eNodeB receives SCGFailureInformationNR messages from UEs</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2NsaCurtPeriodMeasResult.html">X2 NSA Meas Result in Current Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the accumulated values of measurements of NSA services over the X2 interface in the current period. The parameter value includes results of multiple measurement items in the following sequence:</p>
+<p>Measurements of eNodeB-initiated SgNB addition procedures:</p>
+<p>1. Number of times the eNodeB sends SgNB Addition Request messages to gNodeBs</p>
+<p>2. Number of times the eNodeB receives SgNB Addition Request Acknowledge messages from gNodeBs</p>
+<p>3. Number of times the eNodeB sends SgNB Reconfiguration Complete messages to gNodeBs</p>
+<p>Measurements of eNodeB-initiated SgNB modification procedures:</p>
+<p>4. Number of times the eNodeB sends SgNB Modification Request messages to gNodeBs</p>
+<p>5. Number of times the eNodeB receives SgNB Modification Request Acknowledge messages from gNodeBs</p>
+<p>6. Number of times the eNodeB sends SgNB Reconfiguration Complete messages to gNodeBs</p>
+<p>Measurements of gNodeB-initiated SgNB release procedures:</p>
+<p>7. Number of times the eNodeB receives SgNB Release Required messages from gNodeBs</p>
+<p>8. Number of times the eNodeB receives SgNB Release Required messages for normal releases from gNodeBs</p>
+<p>Measurements of gNodeB-initiated inter-base-station handover procedures:</p>
+<p>9. Number of times the eNodeB receives SgNB Change Required messages from gNodeBs</p>
+<p>10. Number of times the eNodeB sends SgNB Change Confirm messages to gNodeBs</p>
+<p>11. Number of times the eNodeB sends SgNB Change Refuse messages to gNodeBs</p>
+<p>Measurements of failed UE-initiated SCG procedures:</p>
+<p>12. Number of times the eNodeB receives SCGFailureInformationNR messages from UEs</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/X2Interface-X2NsaLastMeasPeriodEndTime.html">X2 NSA Last Meas Period End Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the time when the X2 service measurement finishes in the last full measurement period. The measurement period is specified by the EnodeBAlgoExtSwitch.X2NsaCounterPeriod parameter. The time format is YEAR-MONTH-DAY HH:MM:SS. For example, 2000-1-1 10:20:05 indicates 10:20:05 on January 01, 2000.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,124 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify BCCH Configuration (MOD BCCHCFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_bcchcfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify BCCH Configuration (MOD BCCHCFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_bcchcfg"></a><a name="mod_bcchcfg"></a>
+
+
+<h1 class="topictitle1">Modify BCCH Configuration (MOD BCCHCFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_bcchcfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the BCCH configuration.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_bcchcfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>The product of ModifyPeriodCoeff in BcchCfg and DefaultPagingCycle in PCCHCfg is the actual modification period of the BCCH, which cannot exceed 1,024 radio frames.</p>
+</li><li><p>The modifications on the BCCH configuration of an active cell would result in the automatic reset of the cell.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_bcchcfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BcchCfg-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BcchCfg-ModifyPeriodCoeff.html">ModifyPeriodCoeff</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Modification period coefficient</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the modification period coefficient for the BCCH. The BCCH modification period is equal to Modification period coefficient multiplied by Default paging cycle, where the BCCH modification period and default paging cycle are measured in unit of radio frames, and the modification period coefficient is specified by this parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: MOD_PERIOD_COEFF_N2(2), MOD_PERIOD_COEFF_N4(4), MOD_PERIOD_COEFF_N8(8), MOD_PERIOD_COEFF_N16(16)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MOD_PERIOD_COEFF_N2, MOD_PERIOD_COEFF_N4, MOD_PERIOD_COEFF_N8, MOD_PERIOD_COEFF_N16</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MOD_PERIOD_COEFF_N2(2)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If the length of the default paging cycle is fixed, a larger value of this parameter results in a longer modification period and a larger number of times that UEs are required to read system information change notifications, which leads to higher reliability of acquiring such notifications. A longer modification period, however, results in a longer delay in the system information change.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/BcchCfg-ModifyPeriodCoeffForNb.html">ModifyPeriodCoeffForNb</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT Modification Period Coefficient</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the BCCH modification period coefficient of an NB-IoT cell. The BCCH modification period is equal to Modification period coefficient of an NB-IoT cell multiplied by Default paging cycle, where the BCCH modification period and default paging cycle are measured in unit of radio frames, and the modification period coefficient of an NB-IoT cell is specified by this parameter. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: MOD_PERIOD_COEFF_N16(MOD_PERIOD_COEFF_N16), MOD_PERIOD_COEFF_N32(MOD_PERIOD_COEFF_N32), MOD_PERIOD_COEFF_N64(MOD_PERIOD_COEFF_N64), MOD_PERIOD_COEFF_N128(MOD_PERIOD_COEFF_N128)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MOD_PERIOD_COEFF_N16, MOD_PERIOD_COEFF_N32, MOD_PERIOD_COEFF_N64, MOD_PERIOD_COEFF_N128</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MOD_PERIOD_COEFF_N32(MOD_PERIOD_COEFF_N32)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If the length of the default paging cycle is fixed, a larger value of this parameter results in a longer modification period and a larger number of times that UEs are required to read system information change notifications, which leads to higher reliability of acquiring such notifications. A longer modification period, however, results in a longer delay in the system information change.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_bcchcfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To modify the BCCH configuration as follows: Local cell ID: 0, Modification period coefficient: MOD_PERIOD_COEFF_N2, run the following command: 
+MOD BCCHCFG: LocalCellId=0, ModifyPeriodCoeff=MOD_PERIOD_COEFF_N2;
+Example 2: To modify the BCCH configuration as follows: Local cell ID: 0, Modification period coefficient: MOD_PERIOD_COEFF_N4, run the following command:
+MOD BCCHCFG: LocalCellId=0, ModifyPeriodCoeff=MOD_PERIOD_COEFF_N4;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,150 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellFrameOffset">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellFrameOffset">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellFrameOffset</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellFrameOffset"></a><a name="CellFrameOffset"></a>
+
+
+<h1 class="topictitle1">CellFrameOffset</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellFrameOffset.html"><strong>CellFrameOffset</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A CellFrameOffset MO consists of parameters related to cell frame offset.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>FddTddInd</strong> in the <strong>Cell</strong> MO identified by <strong>LocalCellId</strong> in a <strong>CellFrameOffset</strong> MO is set to CELL_FDD(FDD), <strong>FrameOffsetMode</strong> in the <strong>CellFrameOffset</strong> MO must be set to CustomFrameOffset.</li><li>When the following conditions are met, the <strong>FrameOffsetMode</strong> and <strong>FrameOffset</strong> parameters in a <strong>CellFrameOffset</strong> MO under a <strong>Cell</strong> MO must be set to CustomFrameOffset and 0, respectively: The <strong>CellActiveState</strong>, <strong>FddTddInd</strong>, and <strong>WorkMode</strong> parameters in the associated <strong>Cell</strong> MO are set to CELL_ACTIVE, CELL_TDD, and LAA, respectively, and the <strong>CellFrameOffset</strong> MO under this <strong>Cell</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, <strong>SECTOREQM</strong>, and <strong>RRU</strong> MOs:<ul><li>If the <strong>CellActiveState</strong>, <strong>FddTddInd</strong>, <strong>MultiRruCellFlag</strong>, and <strong>MultiRruCellMode</strong> parameters are set to CELL_ACTIVE, CELL_TDD, BOOLEAN_TRUE, and CELL_COMBINATION respectively in a <strong>Cell</strong> MO, the <strong>FreqBand</strong> parameter is not set to 34 or 39 in a <strong>Cell</strong> MO, and no <strong>CellFrameOffset</strong> MO is configured under this <strong>Cell</strong> MO, then the values of the <strong>RS</strong> parameter in <strong>RRU</strong> MOs associated with this <strong>Cell</strong> MO must be the same.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>ENodeBFrameOffset</strong> MOs:<ul><li>The <strong>TddFrameOffset</strong> parameter in an <strong>ENodeBFrameOffset</strong> MO must be set to 0 when the following conditions are met: The <strong>CellActiveState</strong>, <strong>FddTddInd</strong>, and <strong>WorkMode</strong> parameters in the associated <strong>Cell</strong> MO are set to CELL_ACTIVE, CELL_TDD, and LAA, respectively, and the <strong>CellFrameOffset</strong> MO under this <strong>Cell</strong> MO has not been configured.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If the InBandRelayReNbSwitch option of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, the <strong>CellFrameOffset</strong> MO must be configured and the <strong>FrameOffsetMode</strong> parameter in this MO must be set to CustomFrameOffset.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellFrameOffset__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellFrameOffset__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellFrameOffset__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_cellframeoffset.html">ADD CELLFRAMEOFFSET</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add frame offset configurations for a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellframeoffset.html">DSP CELLFRAMEOFFSET</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query information about frame offset that takes effect in the cell. The unit of frame offset is Ts. A Tc is equal to eight times of a Ts. If the DlEarfcn parameter value equals 4294967295, the queried frame offset is invalid.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellframeoffset.html">LST CELLFRAMEOFFSET</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list frame offset configurations in cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellframeoffset.html">MOD CELLFRAMEOFFSET</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify frame offset configurations of a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_cellframeoffset.html">RMV CELLFRAMEOFFSET</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove frame offset configurations of a cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellFrameOffset__tab2">Table 2</a> and <a href="#CellFrameOffset__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellFrameOffset__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellFrameOffset__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellFrameOffset-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of a cell. It uniquely identifies a cell within an eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellFrameOffset-FrameOffsetMode.html">Frame Offset Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frame offset configuration mode for the cell.</p>
+<p>The value CustomFrameOffset(User-defined frame offset) indicates that the frame offset is user-defined. Only this value applies to FDD cells and NB-IoT cells.</p>
+<p>The value TL_FrameOffset(T-L Dual Mode frame offset) indicates that the frame offset is automatically determined based on the subframe configuration in a TD-SCDMA + LTE TDD dual-RAT network.</p>
+<p>The value TL_FrameOffset_SA2_SSP5(T-L Dual Mode SA2+SSP5 frame offset) indicates that the frame offset is automatically determined based on uplink-downlink configuration 2 and special subframe configuration 5 in a TD-SCDMA + LTE TDD dual-RAT network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellFrameOffset-FrameOffset.html">Frame Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of the start time of a cell frame against a reference clock source.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CellFrameOffset__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CellFrameOffset__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellFrameOffset-FrameOffsetEffectValue.html">Frame Offset Effect Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the offset of the cell start frame against a reference clock source. If the parameter value is a hyphen (-), the cell has not been activated.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

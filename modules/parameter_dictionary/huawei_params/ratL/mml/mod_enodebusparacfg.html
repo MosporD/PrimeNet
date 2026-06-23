@@ -1,0 +1,322 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify eNodeB US Policy Configuration (MOD ENODEBUSPARACFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_enodebusparacfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify eNodeB US Policy Configuration (MOD ENODEBUSPARACFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_enodebusparacfg"></a><a name="mod_enodebusparacfg"></a>
+
+
+<h1 class="topictitle1">Modify eNodeB US Policy Configuration (MOD ENODEBUSPARACFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_enodebusparacfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configurations of policies applied to UEs running unlimited services in an eNodeB.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_enodebusparacfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>If whether a UE is a UE running unlimited services is determined based on the SPIDs defined by the operator, operators need to specify the SPID for the service policy applied to UEs running unlimited services.</p>
+</li><li><p>If whether a UE is a UE running unlimited services is determined based on IP address of the server dedicated to UEs running unlimited services, operators need to configure the parameters related to the server dedicated to UEs running unlimited services.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_enodebusparacfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsStrategy.html">UsStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Ue Strategy Select</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the policy based on which the eNodeB identifies UEs running unlimited services.</p>
+<p>If the UsBasedSpecificSPID option is selected, the eNodeB identifies UEs running unlimited services based on the SPIDs specified by the operator using the UsUeSpid parameter in the UsUeSpidConfig MO. This option applies only to LTE FDD and LTE TDD.</p>
+<p>If the UsBasedSpecificIPAdd option is selected, the eNodeB identifies UEs running unlimited services based on the IP address of the server dedicated to UEs running unlimited services. Operators need to set the parameters in the ServerConfig MO for this server. This option applies only to LTE FDD and LTE TDD.</p>
+<p>If the UsBasedSpecificTraceID option is selected, the eNodeB identifies that UEs are running unlimited services if an end-to-end tracing task with a dedicated trace ID starts for the UEs.</p>
+<p>If the UsBasedIMEISV option is selected, the eNodeB identifies UEs running unlimited services based on the IMEISVs. Operators need to configure parameters related to the IMEISV information for UEs running unlimited services. This option applies only to LTE TDD.</p>
+<p>If the UsBasedSpecificSpidIpAddress option is selected, the eNodeB identifies UEs running unlimited services based on both the SPIDs and server IP address. Operators need to specify the SPIDs and server IP address of UEs running unlimited services. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: UsBasedSpecificSPID(UsBasedSpecificSPID), UsBasedSpecificIPAdd(UsBasedSpecificIPAdd), UsBasedSpecificTraceID(UsBasedSpecificTraceID), UsBasedIMEISV(UsBasedIMEISV), UsBasedSpecificSpidIpAddress(UsBasedSpecificSpidIpAddress)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UsBasedSpecificSPID, UsBasedSpecificIPAdd, UsBasedSpecificTraceID, UsBasedIMEISV, UsBasedSpecificSpidIpAddress</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: UsBasedSpecificSPID</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The UsBasedSpecificSpidIpAddress option of the UsStrategy parameter in the eNodeBUSParaCfg MO is mutually exclusive with the BigPackageIdentify parameter in this MO and mutually exclusive with all of the following options of the UsStrategy parameter: UsBasedSpecificSPID, UsBasedSpecificIPAdd, UsBasedSpecificTraceID, and UsBasedIMEISV.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: If UEs are treated as US UEs (UEs running unlimited services), KPIs of the US UEs related to throughput, latency, and data rate improve. KPIs of common UEs may deteriorate because the resource priorities of the common UEs become relatively lower.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsSPIDConfig.html">UsSPIDConfig</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Configurate US SPID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SPID for UEs running unlimited services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>DisuseStatement: This parameter will be deleted in later versions. Although the configuration interface in this version supports synchronization and delivery of the setting of this parameter, the system does not use this parameter.Therefore, avoid using this parameter.Therefore, avoid using this parameter.The function that is used to be controlled this parameter is controlled by UsUeSpid parameter in the UsUeSpidConfig MO.</p>
+<p>GUI Value Range: 1~256</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~256</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsUeInactiveTimer.html">UsUeInactiveTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Ue Inactive Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the UE inactivity timer for UEs. If the eNodeB detects that such a UE has neither received nor sent data for a duration exceeding the value of this parameter, the eNodeB releases the RRC connection for the UE. If this parameter is set to 0, the UE inactivity timer is not used. If the parameter setting is changed, the change applies to UEs that newly access the network.</p>
+<p>GUI Value Range: 0~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 30</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in earlier RRC connection releases for UEs without performing services, more frequent RRC connection setup requests, and better KPIs such as the service drop rate due to more normal RRC connection releases. A larger value of this parameter results in later RRC connection releases for UEs without performing services, longer online duration in which radio resources are occupied, and worse KPIs such as the service drop rate due to fewer normal RRC connection releases.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-IPDetectInterval.html">IPDetectInterval</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US IP Detect Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the packet interval at which the eNodeB parses the IP headers of the downlink packets for UEs running unlimited services. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~3600</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 70</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in more frequent downlink packet parsing. Therefore, the eNodeB can detect UEs running unlimited services more quickly. However, a smaller value of this parameter results in a higher load of the baseband processing unit. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsUeDlPriorityFactor.html">UsUeDlPriorityFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Downlink scheduling priority factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight factor used to calculate DL scheduling priorities for UEs running unlimited services. This parameter is used to provide preferential guarantee for UEs running unlimited services. If the parameter is set to a value in the range of 1 to 999, the priority is calculated using the specified weight factor. If this parameter is set to 1000, UEs running unlimited services have the highest priority. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: This parameter is used to adjust the DL scheduling priorities for UEs running unlimited services when service assurance for UEs running unlimited services is enabled. A smaller value of this parameter results in a smaller downlink bandwidth allocated to such UEs. A larger value of this parameter results in the opposite effect.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsLPktUlschPriFactor.html">UsLPktUlschPriFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Large Packet UlSch Priority Factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight factor used to calculate the connection priorities during UL scheduling for large-packet services of UEs running unlimited services. If the parameter is set to a value in the range of 1 to 999, the priority is calculated using the specified weight factor. If this parameter is set to 1000, UEs running unlimited services have the highest priority. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in smaller uplink bandwidth to be allocated to large-packet services of UEs running unlimited services when the uplink transmission bandwidth or uplink licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsSPktUlschPriFactor.html">UsSPktUlschPriFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US Small Packet UlSch Priority Factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight factor used to calculate the connection priorities during UL scheduling for small-packet services of UEs running unlimited services. If the parameter is set to a value in the range of 1 to 999, the priority is calculated using the specified weight factor. If this parameter is set to 1000, UEs running unlimited services have the highest priority. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in less uplink bandwidth to be allocated to small-packet services of UEs running unlimited services when the uplink transport bandwidth or uplink licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsUESTMSIKeepAliveTimer.html">UsUESTMSIKeepAliveTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US UE S-TMSI Keep Alive Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the S-TMSI keep-alive timer for UEs running unlimited services. When the eNodeB detects such a UE based on the IP address of a dedicated server, the eNodeB starts the S-TMSI keep-alive timer for the UE. If the UE initiates an RRC connection setup procedure towards the eNodeB before the timer expires, the eNodeB treats the UE as an unlimited-service UE. If the UE initiates the procedure after the timer expires, the eNodeB treats the UE as a common UE. For details about S-TMSIs, see 3GPP TS 36.331. If this parameter is set to 0, the timer mechanism does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~120</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 0~120</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter indicates a shorter keep-alive timer and results in a smaller number of unlimited-service UEs on the network and higher throughput and shorter delay for common UEs.</p>
+<p>A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-BigPackageIdentify.html">BigPackageIdentify</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Big Package Identification</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to use large-packet services as criterion for identifying UEs with unlimited services. If the volume of data to be transmitted for a service in the UE buffer exceeds a specified threshold, this service is a large-packet service. If this parameter is set to ON, a UE is identified based on the buffered data volume and the number of times the UE is scheduled. If certain conditions are met, the UE is identified as a UE running unlimited services. If this parameter is set to OFF, this identification criterion does not work. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UlDlUsUserDetectPeriod.html">UlDlUsUserDetectPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL DL US User Detect Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the identification period of UEs running unlimited data services in the uplink and downlink. If this parameter is set to 0, the detection in the uplink and downlink is disabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: If UEs are identified as UEs running unlimited services (US UEs), their KPIs such as the throughput, latency, and data rate improve. The KPIs of common UEs may deteriorate because the resource priorities of the common UEs become relatively lower.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsNbUeStatusResponseTimer.html">UsNbUeStatusResponseTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US NB-IoT UE Status Response Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the RLC-layer status report response timer for NB-IoT UEs running unlimited services (US NB-IoT UEs). If you need to change the parameter value, contact Huawei technical support. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~60000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~60000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This timer affects the RLC-layer status report response. A larger value of this parameter results in a lower frequency of status reporting, decreasing the probability of frequent status report scheduling. However, this results in a higher probability that the send window size changes to 0, thereby reducing the transmission rate. A smaller value of this parameter results in a higher frequency of status reporting. This ensures a timely acknowledgment of data in the send window of the transmit end and the transmission rates. However, this increases the probability of frequent status report scheduling and repeated transmissions, thereby wasting resources.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: This timer affects the RLC-layer status report response. A larger value of this parameter results in a lower frequency of status reporting, decreasing the probability of frequent status report scheduling. However, this results in a higher probability that the send window size changes to 0, thereby reducing the transmission rate. A smaller value of this parameter results in a higher frequency of status reporting. This ensures a timely acknowledgment of data in the send window of the transmit end and the transmission rates. However, this increases the probability of frequent status report scheduling and repeated transmissions, thereby wasting resources.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-NbUsUeSchPriWeightFactor.html">NbUsUeSchPriWeightFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT US UE Scheduling Priority Weight Factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight factor of NB-IoT basic scheduling priorities for UEs running unlimited services. This parameter is used to preferentially guarantee services for UEs running unlimited services. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~31</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~31</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 6</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in relatively fewer uplink and downlink resources allocated to UEs running unlimited services. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBUSParaCfg-UsUeExitDetectionTimes.html">UsUeExitDetectionTimes</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">US UE Exit Detection Times</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of times it is detected that a UE running unlimited services (referred to as a US UE) exits a specific SPID and a specific IP address before the UE is finally determined to have exited the US state. This parameter takes effect only if the UsBasedSpecificSpidIpAddress option of the UsStrategy parameter is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~600</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a shorter time before a US UE is determined to have exited the US state and a less significant rate guarantee effect for the UE, but a smaller impact on the rates of non-US UEs. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_enodebusparacfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configurations of policies applied to UEs running unlimited services in an eNodeB, the US Ue Inactive Timer is 30s, run the following command:
+MOD ENODEBUSPARACFG: UsUeInactiveTimer=30;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

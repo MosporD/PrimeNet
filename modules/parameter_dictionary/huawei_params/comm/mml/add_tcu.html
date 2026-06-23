@@ -1,0 +1,289 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add TCU (ADD TCU)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_tcu">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add TCU (ADD TCU)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_tcu"></a><a name="add_tcu"></a>
+
+
+<h1 class="topictitle1">Add TCU (ADD TCU)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_tcu__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a temperature control unit (TCU). When the TCU is added, a TCU subrack, a TCU board, and the HtCDPa are added at the same time.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_tcu__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before adding a TCU, add a cabinet for the TCU and add a subrack for the manager of the TCU. If the TCU is installed in the BBC and is connected to a PMU, run the <a href="add_pmu.html">ADD PMU</a> command to add the PMU before adding the TCU.</p>
+</li><li><p>The communication address 27 is used by a new monitoring device XMU. Therefore, do not set the communication address to 27 when running this command.</p>
+</li><li><p>The TCU used for heat dissipation can only be configured in slot 0. The TCU used for heating can only be configured in slot 1 or 2.</p>
+</li><li><p>The manager unit of the TCU must be configured and be a BBU subrack, an RRU in slot 0, an RHUB, or a CCU.</p>
+</li><li><p>Exercise caution when setting the Temperature Control Mode parameter. Inappropriate configuration of this parameter may lead to serious results such as high noise or service interruption.</p>
+</li><li><p>For the RRUs, only the RRU in slot 0 can be connected to a monitoring device.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_tcu__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the TCU is located.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the TCU is located.</p>
+<p>GUI Value Range: 8,14</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 8,14</p>
+<p>MML Default Value: 8</p>
+<p>Recommended Value: 8</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>SRN</strong> in a <strong>TCU</strong> MO can be set to 14 only when <strong>TYPE</strong> in the <strong>CABINET</strong> MO where the <strong>TCU</strong> MO is located is set to VIRTUAL or APM300.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where the TCU is located.</p>
+<p>GUI Value Range: 0~3</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~3</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-ManagerCabinet.html">MCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Manager Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the manager. The manager of the TCU is usually a BBU, RRU or CCU.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-ManagerSubrack.html">MSRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Manager Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the manager. The manager of the TCU is usually a BBU, RRU or CCU.</p>
+<p>GUI Value Range: 0~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~254</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TYPE</strong> in the <strong>CABINET</strong> MO to which the <strong>TCU</strong> MO belongs is APM300, the manager unit for the <strong>TCU</strong> MO must be the <strong>CCU</strong>MO in which <strong>SRN</strong> is 15.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The manager unit of a <strong>TCU</strong> MO must be one of the following: 1. A <strong>SUBRACK</strong> MO with <strong>SRN</strong> smaller than or equal to 1; 2. The <strong>RRU</strong> MO with <strong>SRN</strong> ranging from 60 to 254 and <strong>SN</strong> equal to 0; 3. A <strong>CCU</strong> MO with <strong>SRN</strong> set to 15.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-ManagerPort.html">MPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Manager Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the serial port where the TCU is connected. The serial port is the port through which the TCU is connected to the manager unit.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: When the TCU is connected to the MON1 port on the UPEU/UEIU, set this parameter to 1. When the TCU is connected to the MON0 port on the UPEU/UEIU, set this parameter to 0. When the TCU is connected to the RRU, set this parameter to 0. When the TCU is connected to the CCU, set this parameter to a value within the range of 0 to 7.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>TCU</strong> MO, when <strong>MSRN</strong> is set to 15, the value of <strong>MPN</strong> must be smaller than or equal to 7. When the value of <strong>MSRN</strong> is greater than or equal to 60, the value of <strong>MPN</strong> must be equal to 0. When the value of <strong>MSRN</strong> is smaller than or equal to 1, the value of <strong>MPN</strong> must be smaller than or equal to 1.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-Addr.html">ADDR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the communication address of the TCU. The TCU communicates with the main control and transmission board by using this communication address.</p>
+<p>GUI Value Range: 1~30</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~30</p>
+<p>MML Default Value: 7</p>
+<p>Recommended Value: If the manager unit of the TCU is a CCU, no matter the TCU is configured in a BBC or not, when the TCU is used for heat dissipation, the communication address of the level-1 TCU is set to 7 and that of the level-2 is set to 6; when the TCU is used for heating, the communication address of the level-1 TCU is set to 28 and that of the level-2 is set to 29.</p>
+<p>If the manager unit of the TCU is a BBU and the TCU is not configured in a BBC, when the TCU is used for heat dissipation, the communication address of the level-1 TCU is set to 7 and that of the level-2 is set to 6; when the TCU is used for heating, the communication address of the level-1 TCU is set to 28 and that of the level-2 is set to 29. For the TCU configured in a BBC, if the communication address of the PMU connected to the BBC is 3, the communication address of the level-1 TCU connected to the BBU is set to 23 and that of the level-2 TCU is set to 24. If the communication address of the PMU connected to the BBC is 4, the communication address of the level-1 TCU connected to the BBU is set to 25 and that of level-2 TCU is set to 26.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-TempLthd.html">TLTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Temperature Alarm Lower Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower threshold of the temperature. If the cabinet air outlet temperature is lower than the value, the ALM-25655 Cabinet Air Outlet Temperature Unacceptable is reported.</p>
+<p>GUI Value Range: -40~10(metric system);-40~50(imperial system)</p>
+<p>Unit: degree Celsius(metric system);degree Fahrenheit(imperial system)</p>
+<p>Actual Value Range: -40~10(metric system);-40~50(imperial system)</p>
+<p>MML Default Value: -20(metric system);-4(imperial system)</p>
+<p>Recommended Value: When the cabinet type is OMB, the recommended value is -33 degree Celsius (-27.4 degree Fahrenheit). The cabinet type of other types should be set -20 degree Celsius (-4 degree Fahrenheit).</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-TempUthd.html">TUTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Temperature Alarm Upper Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper threshold of the temperature. If the cabinet air outlet temperature is higher than the value, the ALM-25655 Cabinet Air Outlet Temperature Unacceptable is reported.</p>
+<p>GUI Value Range: 20~80(metric system);68~176(imperial system)</p>
+<p>Unit: degree Celsius(metric system);degree Fahrenheit(imperial system)</p>
+<p>Actual Value Range: 20~80(metric system);68~176(imperial system)</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: For the TCU in the BBC, the recommended value is 50 degree Celsius (122 degree Fahrenheit). For the TCU in another cabinet, the recommended value is 68 degree Celsius (154 degree Fahrenheit).</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-SpecBoolAlmFlg.html">SBAF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Special Boolean Alarm Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to allow the reporting of a dedicated Boolean alarm. If the shield flag for a Boolean alarm is enabled, the Boolean alarm cannot be reported.</p>
+<p>GUI Value Range: WS_DISABLE(Water-Immersed Sensor Disabled), SS_DISABLE(Smog Sensor Disabled)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: WS_DISABLE, SS_DISABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Water-Immersed Sensor Disabled:ON, Smog Sensor Disabled:ON</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TCU-TempControlMode.html">TCMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Temperature Control Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode that the fan speed adjustment adopts. Mode 0 is the default mode, which achieves balance in system power consumption, noise, and temperature control. It applies to most scenarios. Inappropriate configuration of this parameter may lead to serious results such as high noise or service interruption on the RF modules due to overtemperature. You need to contact Huawei technical support before configuring this parameter. You can run the DSP TCMODE command to list the number and description of the temperature control modes supported by the base station. After configuring this parameter, you can run the DSP TCU command to check whether the temperature control mode in the command output is consistent with the configuration. If yes, the configuration is successful. If no, the configuration fails and the system adopts the default mode (mode 0). The reasons for the configuration failure and countermeasures are as follows:</p>
+<p>1. The TCU version does not support the temperature control mode configuration.</p>
+<p>2. The curve corresponding to the configured temperature control mode is incorrect and the configuration cannot take effect on the TCU. You need to contact the Huawei technical support.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_tcu__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a TCU with the parameters as follows: Cabinet No.: 0, Manager Port No.: 0, Special Boolean Alarm Flag: WS_DISABLE-1, SS_DISABLE-1, other parameters use the default values, run the following command:
+ADD TCU: CN=0, MPN=0, SBAF=WS_DISABLE-1&amp;SS_DISABLE-1;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

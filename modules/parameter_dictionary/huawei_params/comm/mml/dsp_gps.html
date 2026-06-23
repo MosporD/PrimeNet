@@ -1,0 +1,278 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display GPS (DSP GPS)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_gps">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display GPS (DSP GPS)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_gps"></a><a name="dsp_gps"></a>
+
+
+<h1 class="topictitle1">Display GPS (DSP GPS)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_gps__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the dynamic attributes of a specified GPS clock link.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_gps__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>If the status of the satellite receiver is abnormal, you can only query part of the parameters.</p>
+</li><li><p>The latitude, longitude, and altitude of the GPS antenna cannot be queried if the number of detected satellites fails to meet the requirement.</p>
+</li><li><p>You are advised to run this command to query the status of different GPS clock links at an interval of no less than three minutes. This is because running this command to query the status of different GPS clock links will cause satellite card initialization, which takes a period of time (up to three minutes).</p>
+</li><li><p>If the GPS clock link is not activated, the GPS working mode displayed in the execution result is invalid.</p>
+</li><li><p>If the type of the satellite card is NGRU (OEM4), the values of the following parameters can also be queried: GPS Position Fixed, Fixed Position, Almanac Validity, Position Solution, Fixed Position, Clock Steering, and Clock Model Validity.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]When GPS and TOD clock sources work in active/standby mode, running this command can query the status of the active clock source only. If you need to query the status of the standby clock source, switch the standby clock source to the active one and then run this command.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]If the GPS reference clock is working in standby mode, the status of the GPS reference clock will be updated 2 hours at most after the GPS reference clock is configured.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_gps__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GPS-GpsNo.html">GN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">GPS Clock No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the GPS clock link.</p>
+<p>GUI Value Range: 0~17</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~17</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When a <strong>GPS</strong> MO is configured on a BBU subrack, <strong>GN</strong> must be set to 0 or 1.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_gps__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To display the status of the GPS clock link, run the following command:
+DSP GPS:;
+The result is shown as follows:    
++++    0        2019-10-15 16:54:40
+O&amp;M    #209
+%%DSP GPS:;%%
+RETCODE = 0  Operation succeeded.
+
+Display GPS State
+-----------------
+                 GPS Clock No.  =  0
+                GPS Card State  =  Normal
+                 GPS Card Type  =  RT
+                 GPS Work Mode  =  GPS
+                   Hold Status  =  HOLDED
+         GPS Satellites Traced  =  8
+     GLONASS Satellites Traced  =  0
+         BDS Satellites Traced  =  0
+     GALILEO Satellites Traced  =  0
+Antenna Longitude(1e-6 degree)  =  120200277
+ Antenna Latitude(1e-6 degree)  =  30187777
+           Antenna Altitude(m)  =  35
+         Antenna Angle(degree)  =  NULL
+             Link Active State  =  Activated
+              Feeder Delay(ns)  =  190
+                   GPS Version  =  01.14-3002
+         Position Check Switch  =  Off
+         Position Deviation(m)  =  NULL
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_gps__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GPS Clock No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the GPS clock link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GPS Card State</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the physical status of the satellite card, which is specified by the value NOTEXIST (Inexistent), ANTENNASHORTED (Antenna Shorted), ANTENNAOPENED (Antenna Opened), SELF_CHECK_FAILURE (Self-check Failure), COMEXCEPTION (Star Card Communication Fault), NORMAL (Normal), UNKNOWN (Unknown Exception), USCUINVALID (USCU Invalid), or UNKNOWN_STAR_CARD (Unknown Star Card). The value of this parameter is inaccurate when the satellite card is being reset.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GPS Card Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the physical type of the satellite card.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GPS Work Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the working mode of the satellite card. Satellite cards are classified into dual-mode satellite cards and single-mode satellite cards. A dual-mode satellite card supports two satellite searching modes. For example, the working mode of a BDS/GPS satellite card can be BDS prioritized or GPS prioritized. In BDS prioritized mode, the satellite card preferentially processes signals from BDS satellites. In GPS prioritized mode, the satellite card preferentially processes signals from GPS satellites. In addition, some satellite cards such as the UBOLX8M do not prioritize the BDS or GPS but process signals from both BDS satellites and GPS satellites. A single-mode satellite card supports only one satellite searching mode. For example, a GPS satellite card supports only the GPS mode.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Hold Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the holding status of a satellite card.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GPS Satellites Traced</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of traced GPS satellites.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GLONASS Satellites Traced</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of traced GLONASS satellites.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>BDS Satellites Traced</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of traced BDS satellites.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GALILEO Satellites Traced</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of traced GALILEO satellites.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Antenna Longitude(1e-6 degree)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the longitude of the GPS antenna. A negative value indicates the west longitude, and a positive value indicates the east longitude.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Antenna Latitude(1e-6 degree)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the latitude of the GPS antenna. A negative value indicates the south latitude, and a positive value indicates the north latitude.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Antenna Altitude[m(ft)]</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the altitude of the GPS antenna. A negative value indicates that the GPS antenna is below the sea level, and a positive value indicates that the GPS antenna is above the sea level.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Antenna Angle(degree)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the antenna angle, which is the angle with the horizontal line. If the clock source has not been activated, the value NULL will be displayed. If the clock source has been activated, the value NULL indicates that this parameter is not supported by the hardware or the hardware is faulty.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Link Active State</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the activation status of the GPS clock link. If the link is active, the GPS clock link is the current clock source of the system.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Feeder Delay(ns)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the feeder delay of the GPS clock link. The value is NULL when the clock source is not activated.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GPS Version</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the software version and hardware version of the satellite card. NULL is displayed for the software or hardware version which does not support query. The software version and the hardware version are separated by a hyphen "-". If the connected satellite card does not support the version query or the query fails, the value is NULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>GPS Position Fixed</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the position of the GPS reference receiver is locked.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Almanac Validity</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the calendar information of the GPS reference receiver is valid.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Position Solution</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the GPS satellite positioned by the GPS reference receiver is valid.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Fixed Position</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the position of the GPS satellite is set on the GPS reference receiver.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Clock Steering</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the clock adjusting state of the GPS reference receiver, Enabled indicates that the clock adjusting state is enabled and Disabled indicates that the clock adjusting state is disabled.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Clock Model Validity</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the clock mode of the GPS reference receiver is valid.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Position Check Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the position check switch of a satellite card. If this switch is turned on, the NE records the position where a satellite card is locked as the initial position and calculates the deviation between this initial position and the current position. If the deviation is excessively large, the NE regards the output signals of the satellite card unreliable and reports ALM-26120 GPS Clock Output Unavailable. The position check is applicable only when the NE position is fixed and the satellite card in the BBU supports this check.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Position Deviation[m(ft)]</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the deviation between the current position and the initial position.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

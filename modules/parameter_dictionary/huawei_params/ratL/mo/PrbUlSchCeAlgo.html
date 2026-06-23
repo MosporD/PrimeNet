@@ -1,0 +1,186 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="PrbUlSchCeAlgo">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="PrbUlSchCeAlgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>PrbUlSchCeAlgo</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="PrbUlSchCeAlgo"></a><a name="PrbUlSchCeAlgo"></a>
+
+
+<h1 class="topictitle1">PrbUlSchCeAlgo</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="Prb.html">Prb</a>
+        +-<a href="PrbUlSchCeAlgo.html"><strong>PrbUlSchCeAlgo</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A PrbUlSchCeAlgo MO consists of coverage-level-specific parameters related to the uplink scheduling algorithm for PRB carriers of NB-IoT cells. Coverage-level-specific uplink scheduling parameters determine the uplink scheduling policies and functions for different coverage levels.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Prb.html">Prb</a></li><li>Relation with the <strong>CellAlgoExtSwitch</strong> MO:<ul><li>If the SPS_BSR_SWITCH option of the <strong>NbCellAlgoExtSwitch</strong> parameter in the <strong>CellAlgoExtSwitch</strong> MO is selected, the result of the following formula must be smaller than the value of the <strong>UlSpsInterval</strong> parameter in the <strong>PrbUlSchCeAlgo</strong> MO: 296 x Quotient of (Value of the <strong>UlInitialTransRptCount</strong> parameter in the <strong>PrbUlSchCeAlgo</strong> MO x 8)/256 + Remainder of (Value of the <strong>UlInitialTransRptCount</strong> parameter in the <strong>PrbUlSchCeAlgo</strong> MO x 8)/256.</li></ul>
+</li><li>Relation with the <strong>CellAlgoExtSwitch</strong> and <strong>PrbPdcchCeConfig</strong> MOs:<ul><li>If the SPS_BSR_SWITCH option of the <strong>NbCellAlgoExtSwitch</strong> parameter in a <strong>CellAlgoExtSwitch</strong> MO is selected, the value of the <strong>UlSpsInterval</strong> parameter in a corresponding <strong>PrbUlSchCeAlgo</strong> MO must be greater than or equal to three times the product of the value of the <strong>PdcchMaxRepetitionCnt</strong> parameter and the value of the <strong>PdcchPeriodFactor</strong> parameter in the corresponding <strong>PrbPdcchCeConfig</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellEdtConfig</strong> MOs:<ul><li>If the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, the <strong>EdtMtSchToneNum</strong> parameter in the <strong>CellEdtConfig</strong> MO under this <strong>Cell</strong> MO is not set to TONE_1, and the <strong>CoverageLevel</strong> parameter in a corresponding <strong>PrbUlSchCeAlgo</strong> MO is set to COVERAGE_LEVEL_0, then the <strong>EdtUlTransRptCount</strong> parameter in this <strong>PrbUlSchCeAlgo</strong> MO must be set to REP_1, REP_2 or REP_4.</li><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE and the <strong>EdtMtSchToneNum</strong> parameter in the <strong>CellEdtConfig</strong> MO under this <strong>Cell</strong> MO is set to TONE_1, the following requirements must be met: (1) If the <strong>EdtMsg3Mcs</strong> parameter in a <strong>PrbUlSchCeAlgo</strong> MO for the cell is set to EDT_MSG3_MCS_3, the <strong>EdtMaxTbs</strong> parameter in this MO must be set to 328_BITS, 408_BITS, or 504_BITS. (2) If the <strong>EdtMsg3Mcs</strong> parameter in a <strong>PrbUlSchCeAlgo</strong> MO for the cell is set to EDT_MSG3_MCS_4, the <strong>EdtMaxTbs</strong> parameter in this MO cannot be set to 936_BITS or 1000_BITS.</li></ul>
+</li><li>Relation with the <strong>CellEdtConfig</strong> MO:<ul><li>The parameter <strong>NumberofEdtTbsType</strong> in a <strong>CellEdtConfig</strong> MO can only be set to FOUR when the <strong>EdtMaxTbs</strong> parameter in the corresponding <strong>PrbUlSchCeAlgo</strong> exist 408_BITS.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> and <strong>PrbRachCeConfig</strong> MOs:<ul><li>The <strong>MtNprachRangeMsg3InitTone</strong> parameter in the <strong>PrbRachCeConfig</strong> MO can only be set to ONE_1TONE if the MULTITONE_SWITCH option of the <strong>NbCellAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected, the <strong>UlInitialTransRptCount</strong> parameter in the <strong>PrbUlSchCeAlgo</strong> MO is set to a value indicating a repetition count greater than or equal to 2, or the <strong>PrachRepetitionCount</strong> parameter in the <strong>PrbRachCeConfig</strong> MO is set to REP_32, REP_64, or REP_128.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#PrbUlSchCeAlgo__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="PrbUlSchCeAlgo__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="PrbUlSchCeAlgo__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_prbulschcealgo.html">LST PRBULSCHCEALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list coverage-level-specific parameters related to the uplink scheduling algorithm for PRB carriers of an NB-IoT cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_prbulschcealgo.html">MOD PRBULSCHCEALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify coverage-level-specific parameters related to the uplink scheduling algorithm for PRB carriers of an NB-IoT cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#PrbUlSchCeAlgo__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="PrbUlSchCeAlgo__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="PrbUlSchCeAlgo__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local cell ID. It uniquely identifies a cell within an eNodeB. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-PrbId.html">PRB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID that uniquely specifies a PRB in an NB-IoT cell. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-CoverageLevel.html">Coverage Level</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the coverage level of a UE. The value COVERAGE_LEVEL_0 indicates 0 dB coverage enhancement, value COVERAGE_LEVEL_1 indicates 10 dB coverage enhancement, and value COVERAGE_LEVEL_2 indicates 20 dB coverage enhancement. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-UlInitialMcs.html">Uplink Initial MCS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the initial uplink MCS index for a UE at a coverage level. For details about MCS indexes, see 3GPP TS 36.211. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-UlInitialTransRptCount.html">UL Initial Transmission Repetition Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of repeated initial transmissions in the uplink at a coverage level. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-AckNackTransRptCount.html">ACK/NACK Transmission Repetition Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of uplink repetitions of ACK/NACK responses to downlink transmissions at a coverage level. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-AckNackTransRptCountMsg4.html">Msg4 ACK/NACK Trans Repetition Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of ACK/NACK responses to MSG4 at a coverage level. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-NbLogicChSrProhibitTimer.html">NB-IoT Logical Channel SR Prohibit Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the logical channel prohibition timer for a UE. This timer starts when the corresponding UE initiates service requests, prohibiting the UE from initiating service requests until it expires. The eNodeB configures this timer for a UE through an RRCConnectionSetup message. For details, see 3GPP TS 36.331. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-NbBsrRetransmissionTimer.html">NB-IoT BSR Retransmission Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the NB-IoT buffer status report (BSR) retransmission timer. This timer is started when an NB-IoT UE sends a BSR. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-InitialMsg3Mcs.html">Initial Msg3 MCS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of the MCS used for the transmission of Msg3 from UEs at a certain coverage level. For details about MCSs, see 3GPP TS 36.213. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-UlSchDurationProportion.html">Proportion of Uplink Scheduling Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of uplink scheduling duration for a specific coverage level. This parameter is used to control how frequently uplink scheduling is performed. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-UlSpsExtInactivityTimer.html">Uplink SPS Extended Inactivity Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the extended inactivity timer used in uplink semi-persistent scheduling. After the eNodeB receives an updated BSR from a UE for which semi-persistent scheduling has been activated and the uplink semi-persistent scheduling inactivity timer (specified by UlSpsInactivityTimer in the PrbUlSchCeAlgo MO) has not expired, the eNodeB extends the semi-persistent scheduling inactivity timer for the UE. For example, if this parameter is set to 1, the actual length of the extended inactivity timer for uplink semi-persistent scheduling is 1 multiplied by the value of the UlSpsInterval parameter in the PrbUlSchCeAlgo MO. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-UlSpsInactivityTimer.html">Uplink SPS Inactivity Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the inactivity timer used for uplink semi-persistent scheduling. The eNodeB starts this timer after uplink semi-persistent scheduling is activated for a UE. When the timer expires, uplink semi-persistent scheduling is deactivated. If this parameter is set to 0, the timer length is infinite. If this parameter is set to 255, uplink semi-persistent scheduling does not take effect. The effective value range of this parameter is 2 to 160. For example, if this parameter is set to 2, the actual timer length is the result of 2 multiplied by the value of the UlSpsInterval parameter in the PrbUlSchCeAlgo MO. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-UlSpsInterval.html">Uplink SPS Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval at which uplink semi-persistent scheduling is performed. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-EdtMaxTbs.html">EDT Max TBS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum TBS that can be used for the scheduling of Msg3 for EDT initiated by UEs at a specific coverage level. This parameter is valid only for the anchor carrier. For details, see 3GPP TS 36.213. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-EdtMsg3Mcs.html">EDT Msg3 MCS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of the MCS used in the scheduling of Msg3 for EDT initiated by UEs at a specific coverage level. For details, see 3GPP TS 36.213. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PrbUlSchCeAlgo-EdtUlTransRptCount.html">EDT UL Transmission Repetition Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of repetitions of Msg3 for EDT initiated by UEs at a specific coverage level. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

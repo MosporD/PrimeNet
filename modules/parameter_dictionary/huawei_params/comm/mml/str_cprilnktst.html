@@ -1,0 +1,482 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start CPRI Link Performance Test (STR CPRILNKTST)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_cprilnktst">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start CPRI Link Performance Test (STR CPRILNKTST)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_cprilnktst"></a><a name="str_cprilnktst"></a>
+
+
+<h1 class="topictitle1">Start CPRI Link Performance Test (STR CPRILNKTST)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="str_cprilnktst__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to start the performance test on a CPRI link. After the performance test is performed on a CPRI link, the performance test results will be reported, including the valid performance test period, actual loopback type, number of errored seconds, number of severely errored seconds, number of unavailable seconds, and number of bit errors. These results are used to check the quality of the CPRI link.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_cprilnktst__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Command Restrictions:</p>
+<p>The CPRI link loopback does not support the ring topology, RHUB board, or branch chain/ring on the RHUB.</p>
+<p>The CPRI link performance test can be started only between two adjacent nodes.</p>
+<p>Only one CPRI link performance test can be performed on a chain/ring at a time.</p>
+<p>The CPRI link performance test and loopback set must be performed on the same segment of a CPRI link.</p>
+<p>Before starting the CPRI link performance test, you must block all downstream boards (including the lower-level node) that can be blocked on the CPRI link to be tested. In separate-MPT scenarios using the CPRI MUX feature, you must also block all downstream boards (including the lower-level node) that can be blocked on the CPRI link to be tested on the converged party side. </p>
+<p>In separate-MPT scenarios using the CPRI MUX feature, the CPRI link performance test for the converging chain/ring cannot be started on the converged side.</p>
+<p>If the CPRI link performance test results contain "The operation timed out", the status of links on the control and service planes of all downlink boards on the CPRI link to be tested is unknown. Only after the performance test period specified by users ends, the boards can restore to the status before the CPRI link performance test, and a new CPRI link performance test can be started.</p>
+<p>Before starting a CPRI link performance test, ensure that loopback has been set on the CPRI link and the remaining loopback time is greater than or equal to 1 minute. If RRUs are directly connected to a BBU, set the loopback in the network management system (NMS) connecting to the base station. If RRUs are connected to a BBU through other devices, such as an optical transport network (OTN) device, set loopback in the NMS connecting to these devices. If loopback is not set, the CPRI link performance test is invalid.</p>
+<p>A new CPRI link performance test can be started 10s after the <a href="str_cprilnktst.html">STR CPRILNKTST</a> command output is displayed.</p>
+<p>If the CPRI port on the specified upper-level node is blocked or a breakpoint is set on this node, a CPRI link performance test cannot be started.</p>
+<p>If an operation such as blocking the CPRI port on an upper-level node is performed and the CPRI link is disconnected after a CPRI link performance test is started, the test results may be inaccurate.</p>
+<p>Some boards do not support the command. If this command is executed on these boards, an error message will be displayed. To test the performance of a CPRI link on these boards, check the SFP- and CPRI-related alarms such as ALM-26232 BBU Optical Module Transmit/Receive Fault, ALM-26234 BBU CPRI Interface Error, and ALM-26233 BBU CPRI Optical Interface Performance Degraded.</p>
+<p>The eCPRI protocol does not support the CPRI link performance test.</p>
+</li><li><p>Impact on System:</p>
+<p>After the CPRI link performance test is started, the maintenance links of all downlink boards (including the lower-level board) on the CPRI link to be tested will be interrupted.</p>
+<p>After a CPRI link performance test starts, if links cannot be established for the associated boards or the established links cannot work at the maximum CPRI line rate, run the <a href="str_cprilbrneg.html">STR CPRILBRNEG</a> command to initiate negotiation.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="str_cprilnktst__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-UpperNodeCabinetNo.html">UCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UpperLevelNodeCabinetNo</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the upper-level node of a CPRI link.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-UpperNodeSubrackNo.html">USRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UpperLevelNodeSubrackNo</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the upper-level node of a CPRI link.</p>
+<p>GUI Value Range: 0~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-UpperNodeSlotNo.html">USN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UpperLevelNodeSlotNo</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the upper-level node of a CPRI link.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-UpperNodePortNo.html">UPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UpperLevelNodePortNo</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number of the upper-level node of a CPRI link.</p>
+<p>GUI Value Range: 0~11</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~11</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-UpperNodeSubPortNo.html">USPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UpperLevelNodeSubPortNo</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subport number of the upper-level node of a CPRI link.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-LowerNodeCabinetNo.html">LCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LowerLevelNodeCabinetNo</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the lower-level node of a CPRI link.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-LowerNodeSubrackNo.html">LSRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LowerLevelNodeSubrackNo</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the lower-level node of a CPRI link.</p>
+<p>GUI Value Range: 0~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-LowerNodeSlotNo.html">LSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LowerLevelNodeSlotNo</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the lower-level node of a CPRI link.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RRUCHAIN-TestTime.html">TP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TestPeriod</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the performance test period of a CPRI link. When the performance test period ends, the performance test of a CPRI link automatically stops.</p>
+<p>GUI Value Range: 60~450</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 60~450</p>
+<p>MML Default Value: 180</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_cprilnktst__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start a CPRI link performance test with the parameters as follows: UpperLevelNodeCabinetNo: 0, UpperLevelNodeSubrackNo: 0, UpperLevelNodeSlotNo: 3, UpperLevelNodePortNo: 0, UpperLevelNodeSubPortNo: 0, LowerLevelNodeCabinetNo: 0, LowerLevelNodeSubrackNo: 60, LowerLevelNodeSlotNo: 0, TestPeriod: 180, run the following command:
+STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;
+The result is shown as follows:
++++    0        2015-04-21 18:47:17
+O&amp;M    #665
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Operation succeeded.
+
+Session ID  =  65541
+(Number of results = 1)
+
+
+---    END
+
+
++++    0        2015-04-21 18:47:17
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Start
+ Session ID  =  65541
+
+---    END
+
+
++++    0        2015-04-21 18:47:26
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Progressing
+   Progress  =  11%
+ Session ID  =  65541
+
+---    END
+
+
++++    0        2015-04-21 18:47:36
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Progressing
+   Progress  =  23%
+ Session ID  =  65541
+
+---    END
+
+
++++    0        2015-04-21 18:47:46
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Progressing
+   Progress  =  34%
+ Session ID  =  65541
+
+---    END
+
+
++++    0        2015-04-21 18:47:56
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Progressing
+   Progress  =  46%
+ Session ID  =  65541
+
+---    END
+
+
++++    0        2015-04-21 18:48:06
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Progressing
+   Progress  =  58%
+ Session ID  =  65541
+
+---    END
+
+
++++    0        2015-04-21 18:48:16
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Progressing
+   Progress  =  69%
+ Session ID  =  65541
+
+---    END
+
+
++++    0        2015-04-21 18:48:26
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Progressing
+   Progress  =  81%
+ Session ID  =  65541
+
+---    END
+
+
++++    0        2015-04-21 18:48:33
+O&amp;M    #664
+%%STR CPRILNKTST: UCN=0, USRN=0, USN=3, UPN=0, USPN=0, LCN=0, LSRN=60, LSN=0;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  CPRI Link Performance Test
+     Status  =  Success
+ Session ID  =  65541
+
+CPRI Link Performance Test Results
+----------------------------------
+UpperLevelNodeCabinetNo  UpperLevelNodeSubrackNo  UpperLevelNodeSlotNo  UpperLevelNodePortNo  UpperLevelNodeSubPortNo  LowerLevelNodeCabinetNo  LowerLevelNodeSubrackNo  LowerLevelNodeSlotNo  ValidTestPeriod(s)  ActualLoopbackType  ErroredSecondNumber  SeverelyErroredSecondNumber  UnavailableSecondNumber  BitErrorNumber
+
+0                        0                        3                     0                     0                        0                        60                       0                     66                  Serial Loopback     0                    0                            0                        0             
+(Number of results = 1)
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="str_cprilnktst__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>UpperLevelNodeCabinetNo</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the upper-level node of a CPRI link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>UpperLevelNodeSubrackNo</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the upper-level node of a CPRI link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>UpperLevelNodeSlotNo</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the upper-level node of a CPRI link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>UpperLevelNodePortNo</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the port number of the upper-level node of a CPRI link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>UpperLevelNodeSubPortNo</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subport number of the upper-level node of a CPRI link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>LowerLevelNodeCabinetNo</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the lower-level node of a CPRI link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>LowerLevelNodeSubrackNo</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the lower-level node of a CPRI link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>LowerLevelNodeSlotNo</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the lower-level node of a CPRI link.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ValidTestPeriod(s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the valid performance test period of a CPRI link. If CPRI link loopback is in progress, set this parameter to the smaller value between the remaining CPRI link loopback time minus 10 and the CPRI link performance test period minus 10, ensuring that the CPRI link performance test can be completed before the CPRI link loopback ends. If CPRI link loopback has ended, set this parameter to the CPRI link performance test period minus 10.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ActualLoopbackType</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual loopback type during the CPRI link performance test. The value of this parameter can be Serial Loopback, Parallel Loopback, Logic Loopback, or No Loopback. The value Serial Loopback indicates that the loopback point is in the serial domain of the SERDES chip in the CPRI port on the loopback device. The value Parallel Loopback indicates that the loopback point is in the parallel domain of the SERDES chip in the CPRI port on the loopback device. The value Logic Loopback indicates that the loopback point is in the user logic implementation component (FPGA/ASIC chip) in the CPRI port on the loopback device. Loopback types vary depending on device types. The system automatically selects loopback nearest to the CPRI port on the loopback device. The serial loopback is nearest to the CPRI port, the parallel loopback is nearer to the CPRI port, and the logical loopback is furthest from the CPRI port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ErroredSecondNumber</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of errored seconds in the performance test period of a CPRI link. If bit errors occur or the port fails to properly receive or transmit data within a second, this second is an errored second.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>SeverelyErroredSecondNumber</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of severely errored seconds in the performance test period of a CPRI link. If the bit error rate is greater than the value of Severely Errored Second Threshold or the port fails to properly receive or transmit data within a second, this second is a severely errored second.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>UnavailableSecondNumber</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of unavailable seconds (UASs) in the performance test period of a CPRI link. If 10 consecutive SESs occur on a CPRI link, UASs start from the first SES. If 10 consecutive non-SESs occur over on the CPRI link, UASs stop at the first non-SES.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>BitErrorNumber</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of bit errors in the performance test period of a CPRI link.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

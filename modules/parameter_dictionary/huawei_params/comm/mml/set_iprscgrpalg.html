@@ -1,0 +1,372 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set IP Transmission Resource Group Algorithm (SET IPRSCGRPALG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_iprscgrpalg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set IP Transmission Resource Group Algorithm (SET IPRSCGRPALG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_iprscgrpalg"></a><a name="set_iprscgrpalg"></a>
+
+
+<h1 class="topictitle1">Set IP Transmission Resource Group Algorithm (SET IPRSCGRPALG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_iprscgrpalg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the algorithm of an IP transmission resource group.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_iprscgrpalg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before running this command, ensure that the corresponding IP transmission resource group has been configured.</p>
+</li><li><p>If the port type of IP path is set to LOOPINT, it is not recommended that flow control be configured for the IP transmission resource group that the IP path uses by default.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]When RXBWASW or TXBWASW is set to ON, the estimated available transport bandwidth will not be reduced if the average delay variation detected by an IP PM session is greater than the Delay Variation Down Threshold parameter and no packet loss is detected by the IP PM session; the estimated available transport bandwidth will be reduced if the average delay variation detected by an IP PM session is greater than the Delay Variation Down Threshold parameter and packet loss is detected by the IP PM session.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]Bandwidth-related parameters of an adaptive port IP transmission resource group cannot be modified, they take effect as the default values according to the board capacity. Before modifying the algorithm of an IP transmission resource group with Transmission Resource Group ID set to DEFAULTPORT(Default Port), remove the IP transmission resource group with Transmission Resource Group ID set to AUTOPORT(Auto Port), and add an IP transmission resource group with Transmission Resource Group ID set to DEFAULTPORT(Default Port).</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_iprscgrpalg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-IPRscGrpID.html">IPRSCGRPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IP transmission resource group. When you add a PPP link, an MP group, an Ethernet port, an Ethernet trunk, a tunnel, or a PPPoE link, the system automatically creates an algorithm for the IP transmission resource group with IP Transmission Resource Group ID set to DEFAULTPORT(Default Port). When you remove any of the preceding objects, the system automatically removes the algorithm for the IP transmission resource group.</p>
+<p>GUI Value Range: 0~150014</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~150014</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-TxGTSSwitch.html">TXSSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Traffic Shaping Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable traffic shaping for an IP transmission resource group. If this parameter is set to ON, traffic shaping is performed according to the TX bandwidth so that the transmit traffic would not exceed the capability of downstream routers, therefore avoiding unnecessary packet loss and congestion. If this parameter is set to OFF, traffic shaping is not performed during data transmission.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(On)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the TX rate of a transmission resource group can be kept less than or equal to the configured TX bandwidth. Therefore, congestion is avoided and QoS is ensured.</p>
+<p>If this parameter is set to OFF, the TX rate of a transmission resource group can exceed the configured TX bandwidth. In this case, packet loss is easy to occur on the transport network, affecting the QoS of services.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-TxBandwidthAdjustSwitch.html">TXBWASW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Bandwidth Adjustment Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the dynamic adjustment of the TX bandwidth of an IP transmission resource group. If this parameter is set to ON, the TX bandwidth is adjusted according to the network performance and dynamic bandwidth adjustment parameters (Packet Loss Ratio Down Threshold and Delay Variation Down Threshold). The network performance is monitored through IP PM sessions, which can be enabled at the local end or at the peer end. If this parameter is set to OFF, the TX bandwidth is not adjusted. If mapping between the transmission resource group and a NodeB IP path or an IP path for no RAT is configured, this parameter does not take effect on the IP transmission resource group even though the parameter is set to ON. This parameter does not take effect in UMTS.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: In the scenario where the bandwidth on the transport network changes dynamically:</p>
+<p>If this parameter is set to ON, less packets are lost because the TX bandwidth is adjusted dynamically.</p>
+<p>If this parameter is set to OFF, the bandwidth and TX rate is not adjusted due to packet loss on the transport network.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-RxBandwidthAdjustSwitch.html">RXBWASW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RX Bandwidth Adjustment Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the dynamic adjustment of the RX bandwidth of an IP transmission resource group. If this parameter is set to ON, the RX bandwidth is adjusted according to the network performance and dynamic bandwidth adjustment parameters (Packet Loss Ratio Down Threshold and Delay Variation Down Threshold). The network performance is monitored through IP PM sessions, which can be enabled at the local end or at the peer end. If this parameter is set to OFF, the RX bandwidth is not adjusted. This parameter does not take effect in UMTS.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: In the scenario where the bandwidth on the transport network changes dynamically:</p>
+<p>If this parameter is set to ON, fewer packets are lost because the RX bandwidth is adjusted dynamically.</p>
+<p>If this parameter is set to OFF, the bandwidth and TX rate is not adjusted due to packet loss on the transport network.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-DownSpeedPLRThreshold.html">PLRDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Packet Loss Ratio Down Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rate downsizing packet loss rate threshold for bandwidth adjustment. When RXBWASW or TXBWASW is set to ON, the estimated available transport bandwidth is reduced if the packet loss rate detected through IP Performance Monitoring (IP PM) is higher than this threshold. If the packet loss rate detected through IP PM is lower than this threshold, the estimated available transport bandwidth is increased.</p>
+<p>GUI Value Range: 0~1000</p>
+<p>Unit: per mill</p>
+<p>Actual Value Range: 0~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates a higher response sensitivity of congestion on the transport network, more timely bandwidth adjustment, but higher vulnerability of bit error or packet loss on the transport network and lower requirements for robustness.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-DownSpeedDelayThreshold.html">DDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Delay Variation Down Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rate downsizing packet loss rate threshold for bandwidth adjustment. When RXBWASW or TXBWASW is set to ON, the estimated available transport bandwidth will be reduced if the packet loss rate detected by an IP PM session is higher than this threshold; the estimated available transport bandwidth will be increased if the packet loss rate detected by an IP PM session is lower than this threshold.</p>
+<p>GUI Value Range: 0~10000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller threshold value indicates a higher response sensitivity of congestion on the transport network, more timely bandwidth adjustment, but higher vulnerability of delay variation on the transport network and lower requirements for robustness.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-TxBandwidthAdjustMin.html">TXBWAMIN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Bandwidth Adjust Minimum</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum amount of adjusted TX bandwidth. If TXBWASW is set to ON, the adjusted bandwidth should be at least greater than this minimum. This parameter does not take effect in UMTS.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: kbit/s</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1024</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: This parameter limits the scope of dynamic bandwidth adjustment. If TXBWASW is set to ON, this parameter determines the minimum amount of adjusted bandwidth and therefore reserves some bandwidth.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-RxBandwidthAdjustMin.html">RXBWAMIN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RX Bandwidth Adjust Minimum</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum amount of adjusted RX bandwidth. If RXBWASW is set to ON, the adjusted bandwidth must be at least greater than this minimum. This parameter does not take effect in UMTS.</p>
+<p>GUI Value Range: 64~100000000</p>
+<p>Unit: kbit/s</p>
+<p>Actual Value Range: 64~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1024</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: This parameter limits the scope of dynamic bandwidth adjustment. If RXBWASW is set to ON, this parameter determines the minimum amount of adjusted bandwidth and therefore reserves some bandwidth.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-BackPressureCtrlSwitch.html">TCSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Traffic Control Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the backpressure algorithm of an IP transmission resource group.</p>
+<p>The BS monitors the data buffered in the queues of each IP transmission resource group, determines whether the IP transmission resource group is congested, and transmits the backpressure signals (the ID and congestion status of the IP transmission resource group) to each flow control service.</p>
+<p>If the size of buffered data packets in any backpressure queue exceeds 75% of the queue capacity, the BS regards this IP transmission resource group as congested and transmits congestion signals.</p>
+<p>If the size of buffered data packets in each backpressure queue is less than 50% of the corresponding buffer capacity, the BS decides that the IP transmission resource group is not congested. In this situation, no congestion signal or congestion release signal is transmitted.</p>
+<p>When this parameter is set to ENABLE, both intra-mode traffic control and inter-mode traffic control are supported.</p>
+<p>The inter-mode traffic control for IP transmission resource groups applies only to separate-MPT base stations with co-transmission implemented through backplane interconnection. However, it does not apply to cascaded base stations, base stations with co-transmission implemented through panel interconnection, or base stations enabled with route load sharing.</p>
+<p>When the inter-mode traffic control function is enabled for a separate-MPT base station with co-transmission implemented through backplane interconnection, the Tunnel Type parameter must be set to DL(DL) for the tunnel of the mode providing transmission ports and must be set to UL(UL) for the tunnel of the mode providing no transmission port.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ENABLE(Enable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ENABLE, congestion of transmission resource groups can be avoided. Therefore, fairness and differentiation of non-real-time services are ensured.</p>
+<p>If this parameter is set to DISABLE, packet loss is easy to occur. In this case, fairness and differentiation of non-real-time services cannot be ensured.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-PQNumber.html">PQN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PQ Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of PQs in an IP transmission resource group. The queues in an IP transmission resource group are classified into PQs and non-PQs. The scheduling priority of any PQ is higher than that of any non-PQ. The queues numbered from 0 to the result after this parameter value minus 1 are PQs. PQ scheduling is used between PQs. A smaller PQ number indicates a higher scheduling priority. The queues numbered from this parameter value to 6 are non-PQs. WPR scheduling is used between non-PQs.</p>
+<p>GUI Value Range: 0~6</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Real-time services should be in a PQ, and non-real-time services should be in a non-PQ. Otherwise, preferential transmission of real-time service data cannot be ensured.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-CongestTimeThreshold.html">CTTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Congestion Time Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the congestion time threshold of an IP transmission resource group. When TCSW is set to ENABLE, if the buffer time of non-real-time service data in an IP transmission resource group exceeds the threshold, the IP transmission resource group is congested, and backpressure signals are transmitted.</p>
+<p>GUI Value Range: 0~500</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPRSCGRPALG</strong> MO, <strong>CCTTH</strong> must be less than <strong>CTTH</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates a higher probability of the TX rate change of the transport resource group but a shorter delay.</p>
+<p>A larger parameter value indicates a lower probability of the TX rate change of the transport resource group but a longer delay.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-DecongestThreshold.html">CCTTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Congestion Clear Time Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the congestion clear time threshold of an IP transmission resource group. When TCSW is set to ENABLE, if the buffer time of non-real-time service data in an IP transmission resource group is less than the threshold, the IP transmission resource group is not congested, and congestion clear signals are transmitted.</p>
+<p>GUI Value Range: 0~500</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 25</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPRSCGRPALG</strong> MO, <strong>CCTTH</strong> must be less than <strong>CTTH</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates a better differentiation effect for bandwidth allocation of non-real-time services. This, however, leads to a higher probability of emptying the buffer of the transmission resource group and affects the bandwidth usage.</p>
+<p>A larger parameter value indicates a worse differentiation effect for bandwidth allocation of non-real-time services. This, however, leads to a lower probability of emptying the buffer of the transmission resource group and is unlikely to affect the bandwidth usage.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-TxResvBandwidth.html">TXRSVBW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Reserved Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TX bandwidth reserved for signaling data, OM data, or real-time services. This parameter should be set to a value less than the TX bandwidth of an IP transmission resource group. It is recommended that the reserved TX bandwidth be set to a value less than or equal to 3% of the TX bandwidth of an IP transmission resource group. The UMTS currently does not support this function.</p>
+<p>GUI Value Range: 0~100000000</p>
+<p>Unit: kbit/s</p>
+<p>Actual Value Range: 0~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to an excessively great value, uplink bandwidth will be wasted, and the system capacity will decrease.</p>
+<p>If this parameter is set to an excessively small value, the actual transmission load will exceed the available uplink bandwidth. This affects the quality of admitted services and admission of non-flow control services.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-RxResvBandwidth.html">RXRSVBW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RX Reserved Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the reserved RX bandwidth, which should be set to a value less than or equal to the RX bandwidth of an IP transmission resource group. This parameter does not take effect in UMTS.</p>
+<p>GUI Value Range: 0~100000000</p>
+<p>Unit: kbit/s</p>
+<p>Actual Value Range: 0~100000000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to an excessively great value, downlink bandwidth will be wasted, and system capacity will decrease.</p>
+<p>If this parameter is set to an excessively small value, the actual transmission load will exceed the available downlink bandwidth, affecting the quality of admitted services.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPRSCGRPALG-DropPktNumThreshold.html">DROPPKTNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Drop Packet Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for the number of discarded packets. This parameter indicates the capability of the queue in an IP transmission resource group to buffer packets. A greater parameter value indicates a stronger capability. If this parameter is set to 0, the queue in an IP transmission resource group cannot buffer packets, and therefore all the delayed packets on the TX channel are discarded. The threshold for the number of discarded packets determines the maximum amount of data that can be buffered in an IP transmission resource group. The congestion time threshold of a transmission resource group determines the amount of data that is buffered when the IP transmission resource group is congested. Ensure that the maximum amount of data that can be buffered is not less than the amount of data that is buffered during congestion.</p>
+<p>GUI Value Range: 0~8192</p>
+<p>Unit: packet</p>
+<p>Actual Value Range: 0~8192</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A greater value indicates a larger capability of the queue in a transmission resource group to buffer packets.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_iprscgrpalg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the algorithm of an IP transmission resource group with the parameters as follows: IP Transmission Resource Group ID: 0, TX Traffic Shaping Switch: ON, run the following command:
+SET IPRSCGRPALG: IPRSCGRPID=0, TXSSW=ON;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

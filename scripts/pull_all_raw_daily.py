@@ -15,21 +15,23 @@ import subprocess
 import sys
 import time
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from pipeline.paths import PM_RATS, raw_path
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-TARGET_DIRS = [
-    os.path.join(PROJECT_ROOT, "raw", "daily", "huawei", "cells"),
-    os.path.join(PROJECT_ROOT, "raw", "daily", "huawei", "groups"),
-    os.path.join(PROJECT_ROOT, "raw", "daily", "nokia", "cells"),
-    os.path.join(PROJECT_ROOT, "raw", "daily", "nokia", "groups"),
-]
+TARGET_DIRS = []
+for _vendor in ("huawei", "nokia"):
+    for _domain in ("cells", "groups"):
+        for _tech in PM_RATS:
+            TARGET_DIRS.append(raw_path(_vendor, _domain, _tech, "daily"))
+        TARGET_DIRS.append(raw_path(_vendor, _domain, "all", "daily"))
 
 
 SCRIPTS = [
-    ("Huawei Daily", os.path.join(PROJECT_ROOT, "scripts", "pull_huawei_raw_daily.py")),
-    ("Nokia Daily", os.path.join(PROJECT_ROOT, "scripts", "pull_nokia_raw_daily.py")),
+    ("Huawei Daily", os.path.join(PROJECT_ROOT, "scripts", "pipeline", "pull_huawei_raw_daily.py")),
+    ("Nokia Daily", os.path.join(PROJECT_ROOT, "scripts", "pipeline", "pull_nokia_raw_daily.py")),
 ]
 
 

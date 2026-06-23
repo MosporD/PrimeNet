@@ -1,0 +1,304 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add User Plane Host (ADD USERPLANEHOST)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_userplanehost">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add User Plane Host (ADD USERPLANEHOST)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_userplanehost"></a><a name="add_userplanehost"></a>
+
+
+<h1 class="topictitle1">Add User Plane Host (ADD USERPLANEHOST)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_userplanehost__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a user-plane host.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_userplanehost__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>When security automatic establishment is enabled on a user plane host, the IPSec Auto Configure Switch is enabled for the user plane host and a security host is referenced. Therefore, before enabling this feature, ensure that the security host to be referenced has been added by using the <a href="add_securityhost.html">ADD SECURITYHOST</a> command.</p>
+</li><li><p>The local IP addresses or local IPv6 addresses configured in this MO must be mutually reachable with the IP addresses of base station controllers or core network equipment. If some IP addresses are unreachable, services setup will fail on the corresponding equipment.</p>
+</li><li><p>If the following conditions are met during setup of an IPv4 user-plane link, the system will automatically configure the ACL, ACLRULE, IPSECBIND or IPSECBINDITF, and IPSECPOLICY objects and set up an IPsec tunnel for the IPv4 user-plane link:</p>
+<p>- IPSec Auto Configure Switch is set to ENABLE for both the USERPLANEHOST and USERPLANEPEER objects in the same endpoint group.</p>
+<p>- SeGW Switch is set to ENABLE for the SECURITYHOST, SECURITYPEER, and SECURITYTEMPLATE objects.</p>
+<p>- The IKEPEER, IKEPROPOSAL, and IPSECPROPOSAL objects have been configured.</p>
+<p>If the following conditions are met during setup of an IPv4 user-plane link, the system will automatically configure the ACL, ACLRULE, IPSECPOLICY, IPSECBIND or IPSECBINDITF, and IKEPEER objects and set up an IPsec tunnel for the IPv4 user-plane link:</p>
+<p>- IPSec Auto Configure Switch is set to ENABLE for both the USERPLANEHOST and USERPLANEPEER objects in the same endpoint group.</p>
+<p>- SeGW Switch is set to DISABLE for the SECURITYHOST, SECURITYPEER, and SECURITYTEMPLATE objects.</p>
+<p>- The IKEPROPOSAL and IPSECPROPOSAL objects have been configured.</p>
+<p>If IPSec Auto Configure Switch is set to DISABLE for both the USERPLANEHOST and USERPLANEPEER objects in the same endpoint group, an IPsec tunnel can be set up by manually configuring all the preceding IPsec-related objects.</p>
+</li><li><p>User plane automatic setup does not support the internal user plane path with the type of FIXED.</p>
+</li><li><p>When the user plane is set up automatically, the base station automatically sets up an internal user plane path with the type of ANY.</p>
+</li><li><p>The scenario that meets the following conditions is not supported: the local IP address of the user plane host is configured as the IP address of the main control board; the transmission extension board provides the transmission port.</p>
+</li><li><p>System specifications: If the LMPT/UMPT/GTMUb/GTMUc/UMDU is the main control board, a maximum of 32 user plane hosts can be configured. If the WMPT is the main control board, a maximum of 4 user plane hosts can be configured.</p>
+</li><li><p>Board specifications: A maximum of 32 user plane hosts can be configured on an LMPT/UMPT/GTMUb/GTMUc/UTRPc/UTRP (subboard type: UEOC/UIEC/UQEC/UAEC)/UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UMDU/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. A maximum of 4 user plane hosts can be configured on a WMPT.</p>
+</li><li><p>The user plane host cannot reference the DEVIP or IPADDR4 MO whose Port Type is ETHCI.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The local IP address of the user plane host cannot be the IP address acquired by PPP or MP negotiation.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]Services may be interrupted when the following conditions are met: (1) The UP local IP address or local IPv6 address is of loopback type. (2) An internal UP link has been established. (3) The outgoing port changes because the route is modified.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]The scenario that meets the following conditions is not supported: the local IPv6 address of the user plane host is configured as the IPv6 address of the main control board; the transmission extension board provides the transmission port.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If the following conditions are met during setup of an IPv6 user-plane link, the system will automatically configure the TUNNELITF, ACL6, ACLRULE6, IPSECBINDITF, IPSECPOLICY, IKEPEER, INTERFACE, and IPROUTE6 objects and set up an IPsec tunnel for the IPv6 user-plane link:</p>
+<p>- IPSec Auto Configure Switch is set to ENABLE for both the USERPLANEHOST and USERPLANEPEER objects in the same endpoint group.</p>
+<p>- SeGW Switch is set to DISABLE for the SECURITYHOST, SECURITYPEER, and SECURITYTEMPLATE objects.</p>
+<p>- The IKEPROPOSAL and IPSECPROPOSAL objects have been configured.</p>
+</li><li><p>[Co-MPT,eNodeB]Local IP Address or local IPv6 address in a USERPLANEHOST object must have been configured using the <a href="add_devip.html">ADD DEVIP</a>, <a href="add_ipaddr4.html">ADD IPADDR4</a>, <a href="add_ipaddr6.html">ADD IPADDR6</a>, <a href="add_ppplnk.html">ADD PPPLNK</a>, or <a href="add_mpgrp.html">ADD MPGRP</a> command.</p>
+</li><li><p>[NodeB,eGBTS]Local IP Address in a USERPLANEHOST object must have been configured using the <a href="add_devip.html">ADD DEVIP</a>, <a href="add_ipaddr4.html">ADD IPADDR4</a>, <a href="add_ppplnk.html">ADD PPPLNK</a>, or <a href="add_mpgrp.html">ADD MPGRP</a> command.</p>
+</li><li><p>[gNodeB]Local IP Address or local IPv6 address in a USERPLANEHOST object must have been configured using the <a href="add_devip.html">ADD DEVIP</a>, <a href="add_ipaddr4.html">ADD IPADDR4</a>, <a href="add_ipaddr6.html">ADD IPADDR6</a> command.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_userplanehost__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-UserplaneHostID.html">UPHOSTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Plane Host ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the user-plane host.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-IPVersion.html">IPVERSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Version</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the version of the user-plane host IP address.</p>
+<p>GUI Value Range: IPv4(IPv4), IPv6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPv4, IPv6</p>
+<p>MML Default Value: IPv4(IPv4)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[NodeB]The local user plane IPv6 address of the USERPLANEHOST must be configured in the IPADDR6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-MulticastListenerSw.html">MULTICASTLISTENERSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Multicast Listener Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the user-plane host endpoint object is used for multicast listening. When this switch is turned on, the user-plane host endpoint object is used for multicast listening, and the corresponding interface ID needs to be specified. When this switch is turned off, the user-plane host endpoint object is not used for multicast listening and is used only for unicast services, requiring that the local IPv6 address be configured.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-ItfId.html">ITFID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Interface ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the interface enabled with multicast listening in an IPv6 network.</p>
+<p>GUI Value Range: 0~1499</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1499</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-LocIPv4.html">LOCIPV4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IPv4 Address of the user plane host.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>USERPLANEHOST</strong> MO, <strong>LOCIPV4</strong> must be a valid IP address of Class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-LocIPv6.html">LOCIPV6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IPv6 Address of the user plane host. This parameter takes effect only in LTE and NR.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-IPSecSwitch.html">IPSECSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Auto Configure Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable automatic user-plane IPsec tunnel setup based on the parameter values in the SECURITYHOST and SECURITYPEER MOs. If this parameter is set to ENABLE, an IPsec tunnel is automatically set up to encrypt transmitted data. If this parameter is set to DISABLE, no IPsec tunnel is automatically set up. If the value of this parameter is changed from ENABLE to DISABLE using the <a href="mod_userplanehost.html">MOD USERPLANEHOST</a> command, the system deletes the automatically set up IPsec tunnel.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The base station cannot access the network if this parameter is set to DISABLE and no IPSec tunnel has been set up between the user-plane host and user-plane peer for the internal user-plane paths in an IPSec-protected network.</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-SecHostID.html">SECHOSTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Security Host ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the security host ID used by the user-plane host.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-UserLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the information about a user-plane local.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/USERPLANEHOST-Flag.html">FLAG</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Master Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a user-plane host is active or standby. This parameter takes effect only for LTE and NR.</p>
+<p>Currently, only the S1/GNBCUS1/NG interface supports the standby user-plane host.</p>
+<p>GUI Value Range: MASTER(Master), SLAVE(Slave)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MASTER, SLAVE</p>
+<p>MML Default Value: MASTER(Master)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_userplanehost__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a user-plane host with the parameters as follows: User Plane Host ID: 0, IP Version: IPv4, Local IP Address: 192.168.1.1, IPSec Auto Configure Switch: DISABLE, run the following command:
+ADD USERPLANEHOST: UPHOSTID=0, IPVERSION=IPv4, LOCIPV4="192.168.1.1", IPSECSWITCH=DISABLE;
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

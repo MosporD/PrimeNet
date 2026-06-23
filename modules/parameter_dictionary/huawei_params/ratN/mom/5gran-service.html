@@ -1,0 +1,104 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="5G RAN Sharing MOM Description">
+<meta name="abstract" content="This section describes the concepts of 5G RAN sharing. It also provides the managed object model (MOM) view and describes the managed objects (MOs) related to 5G RAN sharing.">
+<meta name="description" content="This section describes the concepts of 5G RAN sharing. It also provides the managed object model (MOM) view and describes the managed objects (MOs) related to 5G RAN sharing.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../ratN/mom/gNodeBFunction-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="service">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>5G RAN Sharing MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="service"></a><a name="service"></a>
+
+
+<h1 class="topictitle1">5G RAN Sharing MOM Description</h1>
+
+
+<div><p>This section describes the concepts of 5G RAN sharing.
+It also provides the managed object model (MOM) view and describes
+the managed objects (MOs) related to 5G RAN sharing.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p>5G RAN sharing means
+that multiple operators share a 5G RAN. When any component of an operator
+is shared by multiple operators, it is termed as network sharing.
+Network sharing includes multiple sharing modes, such as access network
+sharing, core network sharing, and transmission sharing. This section
+focuses on the access network sharing with independent core network.</p>
+<p><strong>Sharing Mode</strong></p>
+<div class="p"><ul><li>RAN sharing with common carrier: One base station has multiple
+operators, one frequency has multiple cells, and each cell has multiple
+operators.</li><li>RAN sharing with dedicated carrier: One base station has multiple
+operators, one frequency has multiple cells, and one cell has only
+one operator.</li><li>Independent operator mode: One base station has only one operator.</li></ul>
+</div>
+<p><strong>Primary/Secondary Operator</strong></p>
+<p>Primary/secondary
+operator: The OperatorType parameter in the gNBOperator MO specifies
+the primary and secondary types of operators. The PLMN ID of the primary
+operator is located in the first of the cell broadcast message. According
+to 3GPP TS 38.331, the PLMN ID at the first in the list in the cell
+broadcast message is referred to as the primary PLMN. It is the base
+station ID and the PLMN ID in the cell ID.</p>
+<p><strong>Tracking Area</strong></p>
+<p>The tracking area is used by the core network to determine
+the scope of paging messages to be sent. A tracking area may contain
+one or more cells. When a gNodeB is shared by multiple operators,
+the cells of the gNodeB may also be shared by multiple operators.
+During configuration, the mapping between the cell and the tracking
+area of the operator needs to be established.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">MOM Introduction</h4><div class="p"><a href="#service__fig1">Figure 1</a> shows the MOM for 5G RAN sharing, which is a subset of the gNodeBFunction
+MOM. <div class="fignone" id="service__fig1"><a name="service__fig1"></a><a name="fig1"></a><span class="figcap"><b>Figure 1 </b>5G RAN sharing MOM</span>
+
+<br><span><img src="../image/mom/gnb-mom13.png"></span></div>
+The
+MOs related to 5G RAN SHARING are described as follows:<ul><li><a href="../mo/gNBOperator.html">gNBOperator</a>: A gNBOperator
+MO defines the operator information, including the operator name,
+mobile country code (MCC), and mobile network code (MNC). In the current
+version, each gNodeB supports only one operator.</li><li><a href="../mo/gNBTrackingArea.html">gNBTrackingArea</a>:
+A gNBTrackingArea MO defines a tracking area, which is identified
+by a tracking area code (TAC). The home gNBTrackingArea MO of an NRCell
+MO must be specified. One tracking area may contain one or more NR
+cells. </li><li><a href="../mo/NRDUCellOp.html">NRDUCellOp</a>: An NRDUCellOp
+MO is used to identify the secondary operator of an NR DU cell. In
+different operator modes, the number of NRDUCellOp MO instances that
+can be configured for each NR DU cell is different. In non-shared
+mode, a cell has no NRDUCellOp MO instance. In RAN sharing with dedicated
+carrier, only one NRDUCellOp MO instance can be configured for a secondary
+operator cell. In RAN sharing with common carrier, a maximum of five
+NRDUCellOp MO instances can be configured for each cell.</li><li><a href="../mo/gNBSharingMode.html">gNBSharingMode</a>: A
+gNBSharingMode MO consists of the parameter that indicates the sharing
+mode of the gNodeB. The gNodeB supports the following modes: independent
+operator, RAN sharing with common carrier, and RAN sharing with dedicated
+carrier.</li><li><a href="../mo/NRCellOpPolicy.html">NRCellOpPolicy</a>: An NRCellOpPolicy MO defines parameters related to the operator-specific policies of an NR cell.</li><li><a href="../mo/gNBFreqPriorityGroup.html">gNBFreqPriorityGroup</a>: A gNBFreqPriorityGroup MO defines a gNodeB frequency priority group, which is used to configure the cell reselection priority.</li><li><a href="../mo/gNBRfspConfig.html">gNBRfspConfig</a>: A gNBRfspConfig MO consists of parameters related to the RAT/Frequency Selection Priority (RFSP). It is used to configure RFSP-based inter-frequency load balancing switch.</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../ratN/mom/gNodeBFunction-mom.html" title="This section describes the functions and concepts of the gNodeBFunction. It also provides the classification of the gNodeBFunction.">gNodeBFunction MOM Description</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

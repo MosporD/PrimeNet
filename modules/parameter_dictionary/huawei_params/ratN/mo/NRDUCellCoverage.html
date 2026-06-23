@@ -1,0 +1,155 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NRDUCellCoverage">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NRDUCellCoverage">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NRDUCellCoverage</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NRDUCellCoverage"></a><a name="NRDUCellCoverage"></a>
+
+
+<h1 class="topictitle1">NRDUCellCoverage</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="NRDUCellTrp.html">NRDUCellTrp</a>
+    +-<a href="NRDUCellCoverage.html"><strong>NRDUCellCoverage</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An NRDUCellCoverage MO defines the RF equipment information about an NR DU cell. It is configured by network planning engineers based on site requirements.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NRDUCellTrp.html">NRDUCellTrp</a></li><li>Relation with the <strong>NRDUCellTrp</strong>, <strong>NRDUCell</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>When <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO is set to CELL_SUL, <strong>ANTCFGMODE</strong> in the <strong>SECTOREQM</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO must be set to ANTENNAPORT.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong>, <strong>NRDUCellTrp</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>If <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO associated with the <strong>NRDUCellCoverage</strong> MO is set to YES, <strong>DuplexMode</strong> is set to CELL_FDD, and <strong>ANTCFGMODE</strong> in the <strong>SECTOREQM</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO is set to ANTENNAPORT, the number of TX antennas and the number of RX antennas specified by <strong>TxRxMode</strong> in the corresponding <strong>NRDUCellTrp</strong> MO must be the same as the number of TX antennas and the number of RX antennas included in <strong>SECTOREQMANTENNA</strong> in the corresponding <strong>SECTOREQM</strong> MO.</li><li>If <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO associated with the <strong>NRDUCellCoverage</strong> MO is set to YES, <strong>DuplexMode</strong> is set to CELL_TDD, and <strong>ANTCFGMODE</strong> in the <strong>SECTOREQM</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO is set to ANTENNAPORT, the number of RX/TX antennas in <strong>SECTOREQMANTENNA</strong> in the <strong>SECTOREQM</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO must be 1, 2, or 4, the number of TX antennas must be equal to the number of RX antennas, and the number of RX/TX antennas must be less than or equal to that specified by <strong>TxRxMode</strong> in the <strong>NRDUCellTrp</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong> MO:<ul><li>The <strong>SECTOREQM</strong> MO corresponding to <strong>SectorEqmId</strong> in an <strong>NRDUCellCoverage</strong> MO must have been configured.</li><li>When <strong>ANTCFGMODE</strong> in the <strong>SECTOREQM</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO is set to ANTENNAPORT, the active/standby mode of the transmit antenna included in <strong>SECTOREQMANTENNA</strong> in the corresponding <strong>SECTOREQM</strong> MO must be MASTER.</li><li>When at least one <strong>NRDUCellCoverage</strong> MO is configured, at least one <strong>SECTOREQM</strong> MO must be configured.</li></ul>
+</li><li>Relation with the <strong>NRDUCellTrp</strong>, <strong>SECTOREQM</strong>, and <strong>NRDUCell</strong> MOs:<ul><li>If <strong>TxRxMode</strong> in an <strong>NRDUCellTrp</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO is set to 64T64R or 32T32R, <strong>ANTCFGMODE</strong> in the corresponding <strong>SECTOREQM</strong> MO must be set to BEAM, <strong>BEAMSHAPE</strong> must be set to SEC_120DEG, <strong>BEAMLAYERSPLIT</strong> must be set to None, and <strong>BEAMAZIMUTHOFFSET</strong> must be set to None. If <strong>TxRxMode</strong> in an <strong>NRDUCellTrp</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO is set to 8T8R and <strong>FrequencyBand</strong> in the associated <strong>NRDUCell</strong> MO is set to N257, N258, N260, or N261, <strong>ANTCFGMODE</strong> in the associated <strong>SECTOREQM</strong> MO must be set to BEAM. If <strong>TxRxMode</strong> in the <strong>NRDUCellTrp</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO is set to 8T8R, and <strong>FrequencyBand</strong> in the <strong>NRDUCell</strong> MO is not set to N257, N258, N260, or N261, <strong>ANTCFGMODE</strong> in the corresponding <strong>SECTOREQM</strong> MO must be set to ANTENNAPORT.</li><li>When <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO associated with the <strong>NRDUCellCoverage</strong> MO is set to NO and <strong>ANTCFGMODE</strong> in a <strong>SECTOREQM</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO is set to ANTENNAPORT, the number of TX antennas and the number of RX antennas specified by <strong>TxRxMode</strong> in the corresponding <strong>NRDUCellTrp</strong> MO must be the same as the number of TX antennas and the number of RX antennas included in <strong>SECTOREQMANTENNA</strong> in the corresponding <strong>SECTOREQM</strong> MO.</li><li>When <strong>FrequencyBand</strong> in the <strong>NRDUCell</strong> MO corresponding to the <strong>NRDUCellTrp</strong> MO associated with the <strong>NRDUCellCoverage</strong> MOs that reference the same sector equipment ID <strong>SectorEqmId</strong> is set to N257, N258, N260, or N261, at least one <strong>SupplementaryCellInd</strong> is set to NORMAL_CELL.</li><li>If <strong>FrequencyBand</strong> in an <strong>NRDUCell</strong> MO is not set to N257, N258, N260, or N261 and <strong>TxRxMode</strong> in the associated <strong>NRDUCellTrp</strong> MO is set to 2T2R, 4T4R, 2R, 4R, 1T1R, or 2T4R, <strong>ANTCFGMODE</strong> in the <strong>SECTOREQM</strong> MO corresponding to <strong>SectorEqmId</strong> in the <strong>NRDUCellCoverage</strong> MO must be set to ANTENNAPORT. If <strong>TxRxMode</strong> in an <strong>NRDUCellTrp</strong> MO is set to 4R, or <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is set to CELL_FDD and <strong>TxRxMode</strong> in the <strong>NRDUCellTrp</strong> MO is set to 4T4R, the RRUs corresponding to each antenna can be different (the values of ANTxCN, ANTxSRN, and ANTxSN can be different). The RRUs corresponding to the antennas of a 4T4R cell can be the same RRU or two channels of two different RRUs.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong> and <strong>RRU</strong> MOs:<ul><li><strong>RS</strong> in the <strong>RRU</strong> MO referenced by the <strong>SECTOREQM</strong> MO corresponding to <strong>SectorEqmId</strong> in the <strong>NRDUCellCoverage</strong> MO must contain the NR RAT.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong>, <strong>NRDUCellTrpMmwavBeam</strong>, <strong>SECTOREQM</strong>, <strong>NRDUCellTrp</strong>, and <strong>NRCell</strong> MOs:<ul><li>If <strong>FrequencyBand</strong> in an <strong>NRDUCell</strong> MO is set to N257, N258, N260, or N261, <strong>NRDUCellTrpMmwavBeam</strong> MO instances identified by different <strong>NrDuCellTrpId</strong> correspond to the same <strong>SectorEqmId</strong> in the <strong>NRDUCellCoverage</strong> MO, and the values of <strong>RRUCN</strong>, <strong>RRUSRN</strong>, and <strong>RRUSN</strong> in the <strong>SECTOREQM</strong> MO corresponding to <strong>SectorEqmId</strong> in the <strong>NRDUCellCoverage</strong> MO are the same, <strong>Tilt</strong> in different <strong>NRDUCellTrpMmwavBeam</strong> MO instances must be the same when the following conditions are met: 1. The <strong>NRDUCellTrpMmwavBeam</strong> MO instances are associated with the <strong>NRDUCellTrp</strong> MO instances through <strong>NrDuCellTrpId</strong>. 2. <strong>NRDUCellTrp</strong> MO instances are associated with the <strong>NRDUCell</strong> MO instances through <strong>NrDuCellId</strong>. 3. <strong>CellActiveState</strong> in the <strong>NRCell</strong> MO corresponding to <strong>CellId</strong> in the associated <strong>NRDUCell</strong> MO instances is set to CELL_ACTIVE.</li><li>If <strong>FrequencyBand</strong> in an <strong>NRDUCell</strong> MO is set to N257, N258, N260, or N261, <strong>NRDUCellTrpMmwavBeam</strong> MO instances identified by different <strong>NrDuCellTrpId</strong> correspond to the same <strong>SectorEqmId</strong> in the <strong>NRDUCellCoverage</strong> MO, and the values of <strong>RRUCN</strong>, <strong>RRUSRN</strong>, and <strong>RRUSN</strong> in the <strong>SECTOREQM</strong> MO corresponding to <strong>SectorEqmId</strong> in the <strong>NRDUCellCoverage</strong> MO are the same, <strong>CoverageScenario</strong> in different <strong>NRDUCellTrpMmwavBeam</strong> MO instances must be the same when the following conditions are met: 1. The <strong>NRDUCellTrpMmwavBeam</strong> MO instances are associated with the <strong>NRDUCellTrp</strong> MO instances through <strong>NrDuCellTrpId</strong>. 2. <strong>NRDUCellTrp</strong> MO instances are associated with the <strong>NRDUCell</strong> MO instances through <strong>NrDuCellId</strong>. 3. <strong>CellActiveState</strong> in the <strong>NRCell</strong> MO corresponding to <strong>CellId</strong> in the associated <strong>NRDUCell</strong> MO instances is set to CELL_ACTIVE.</li><li>If <strong>FrequencyBand</strong> in an <strong>NRDUCell</strong> MO is set to N257, N258, N260, or N261, and the values of <strong>SECTOREQMID</strong> in some <strong>SECTOREQM</strong> MO instances corresponding to the <strong>NRCell</strong> MO with <strong>CellActiveState</strong> being CELL_ACTIVE are the same, then the values of <strong>Azimuth</strong> in the <strong>NRDUCellTrpMmwavBeam</strong> MO instances corresponding to the cells with the same <strong>SECTOREQMID</strong> must be the same.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong>, <strong>NRDUCellTrp</strong>, <strong>NRDUCellAlgoSwitch</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>If the INTER_RRU_CHN_CALIB_SW option of <strong>ChnCalibSwitch</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO is selected, <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO must be set to YES, and the number of TX antennas and the number of RX antennas included in <strong>SECTOREQMANTENNA</strong> in the <strong>SECTOREQM</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO under the <strong>NRDUCellTrp</strong> MO corresponding to the <strong>NRDUCell</strong> MO must be 4.</li></ul>
+</li><li>Relation with the <strong>NRDUCellAlgoSwitch</strong>, <strong>NRDUCellTrp</strong>, <strong>SECTOREQM</strong>, and <strong>NRDUCell</strong> MOs:<ul><li>When the combinations of <strong>RRUCN</strong>, <strong>RRUSRN</strong>, and <strong>RRUSN</strong> in the <strong>SECTOREQM</strong> MOs corresponding to <strong>SectorEqmId</strong> in the <strong>NRDUCellCoverage</strong> MOs corresponding to different <strong>NRDUCell</strong> MO instances are the same, and <strong>LampSiteCellFlag</strong> in at least two <strong>NRDUCell</strong> MO instances is set to NO, the RF_SHUTDOWN_SW option of <strong>PowerSavingSwitch</strong> in the <strong>NRDUCellAlgoSwitch</strong> MOs corresponding to these cells must be deselected.</li></ul>
+</li><li>Relation with the <strong>NRDUCellAlgoSwitch</strong>, <strong>NRDUCell</strong>, <strong>SECTOREQM</strong>, <strong>NRDUCellTrp</strong>, and <strong>RRU</strong> MOs:<ul><li>When the RF_SHUTDOWN_SW option of <strong>PowerSavingSwitch</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO is selected, <strong>RS</strong> must be set to NO(NR_ONLY) or TN(LTE_TDD_NR) in the <strong>RRU</strong> MO corresponding to <strong>RRUCN</strong>, <strong>RRUSRN</strong>, and <strong>RRUSN</strong> in the <strong>SECTOREQM</strong> MO associated with <strong>SectorEqmId</strong> in all the <strong>NRDUCellCoverage</strong> MOs configured for the corresponding cell.</li></ul>
+</li><li>Relation with the <strong>NRDUCellTrp</strong>, <strong>SECTOREQM</strong>, and <strong>RRU</strong> MOs:<ul><li>If <strong>TxRxMode</strong> in the <strong>NRDUCellTrp</strong> MO corresponding to the <strong>NRDUCellCoverage</strong> MO is set to 64T64R, the SPEC_SUB6G_PFM_ENH_NR_TDD option of <strong>CUSTOMEDRFSPECSW</strong> in the <strong>RRU</strong> MO used by the corresponding <strong>SECTOREQM</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>NRDUCellTrp</strong> and <strong>NRDUCell</strong> MOs:<ul><li>If the <strong>NRDUCell</strong> MO associated with <strong>NrDuCellId</strong> in the <strong>NRDUCellTrp</strong> MO is configured, when <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO is set to NO, the <strong>NRDUCellTrp</strong> MO can be configured with a maximum of one associated <strong>NRDUCellCoverage</strong> MO; When <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO is set to YES, the <strong>NRDUCellTrp</strong> MO can be configured with a maximum of 32 associated <strong>NRDUCellCoverage</strong> MOs.</li><li>In an <strong>NRDUCell</strong> MO, if <strong>LampSiteCellFlag</strong> and <strong>DuplexMode</strong> are set to YES and CELL_FDD, respectively, a maximum of 16 associated <strong>NRDUCellCoverage</strong> MO instances can be configured for the <strong>NRDUCellTrp</strong> MO.</li><li>If <strong>DuplexMode</strong> in an <strong>NRDUCell</strong> MO is set to CELL_FDD or CELL_TDD, and <strong>TxRxMode</strong> in the <strong>NRDUCellTrp</strong> MO is set to 4T4R, <strong>AntennaPortMapping</strong> in the <strong>NRDUCellCoverage</strong> MO must be set to DEFAULT, 4T_0213, 4T_0231, 4T_0123, 4T_0132, 4T_0312, or 4T_0321.</li><li>If <strong>DuplexMode</strong> in an <strong>NRDUCell</strong> MO is set to CELL_TDD, and <strong>TxRxMode</strong> in the <strong>NRDUCellTrp</strong> MO is set to 8T8R, <strong>AntennaPortMapping</strong> in the <strong>NRDUCellCoverage</strong> MO must be set to DEFAULT or 8T_01234567.</li><li>If <strong>DuplexMode</strong> in an <strong>NRDUCell</strong> MO is not set to CELL_FDD or CELL_TDD, <strong>TxRxMode</strong> in the <strong>NRDUCellTrp</strong> MO is not set to 4T4R or 8T8R, or <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO is set to YES, <strong>AntennaPortMapping</strong> in the <strong>NRDUCellCoverage</strong> MO must be set to DEFAULT.</li></ul>
+</li><li>Relation with the <strong>NRCell</strong>, <strong>NRDUCell</strong>, and <strong>NRDUCellTrp</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is set to CELL_ACTIVE, an <strong>NRDUCell</strong> MO must already be configured and <strong>CellId</strong> in this <strong>NRDUCell</strong> MO must be set to the same value as <strong>CellId</strong> in the <strong>NRCell</strong> MO. In addition, the <strong>NRDUCell</strong> MO must be configured with at least one <strong>NRDUCellTrp</strong> MO and one <strong>NRDUCellCoverage</strong> MO.</li><li>If <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is CELL_ACTIVE and <strong>TrpType</strong> in the <strong>NRDUCellTrp</strong> MO corresponding to the <strong>NRDUCell</strong> MO is set to MASTER_8T8R or MASTER_4T4R, at least one <strong>NRDUCellCoverage</strong> MO must be configured for the <strong>NRDUCellTrp</strong> MO instance with <strong>TrpType</strong> set to SLAVE.</li></ul>
+</li><li>Relation with the <strong>NRCell</strong>, <strong>NRDUCellSul</strong>, <strong>NRDUCell</strong>, and <strong>NRDUCellTrp</strong> MOs:<ul><li>If the value of <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is CELL_ACTIVE, an <strong>NRDUCell</strong> MO must have been configured and <strong>CellId</strong> in this <strong>NRDUCell</strong> MO must be set to the same value as <strong>CellId</strong> in the <strong>NRCell</strong> MO. If the <strong>NRDUCell</strong> MO is configured with an <strong>NRDUCellSul</strong> MO, the <strong>NRDUCell</strong> MO corresponding to each <strong>NRDUCellSul</strong> MO must be configured with at least one <strong>NRDUCellTrp</strong> MO and each <strong>NRDUCellTrp</strong> MO must be configured with at least one <strong>NRDUCellCoverage</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong> and <strong>NRDUCellTrp</strong> MOs:<ul><li>When <strong>NrDuCellId</strong> in an <strong>NRDUCellTrp</strong> MO is set to a value configured in the associated <strong>NRDUCell</strong> MO:</li><li>If <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO is set to YES, <strong>SectorEqmId</strong> in the associated <strong>NRDUCellCoverage</strong> MOs must be set to different values.</li><li>If <strong>LampSiteCellFlag</strong> in the <strong>NRDUCell</strong> MO is set to NO, <strong>MaxTransmitPower</strong> in the corresponding <strong>NRDUCellCoverage</strong> MO must be set to 65535.</li></ul>
+</li><li>Relation with the <strong>NRDUCellTrp</strong> MO:<ul><li>If <strong>TrpType</strong> in an <strong>NRDUCellTrp</strong> MO is set to SLAVE, the values of <strong>SectorEqmId</strong> in the associated <strong>NRDUCellCoverage</strong> MOs must be different. In addition, the values must be different from those of <strong>SectorEqmId</strong> in the associated <strong>NRDUCellCoverage</strong> MOs associated with the master TRP.</li><li>When <strong>TrpType</strong> in an <strong>NRDUCellTrp</strong> MO is set to SLAVE, a maximum of 32 associated <strong>NRDUCellCoverage</strong> MOs can be configured for the <strong>NRDUCellTrp</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRDUCellTrp</strong>, <strong>NRCell</strong>, and <strong>NRDUCell</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is CELL_ACTIVE and <strong>NrDuCellNetworkingMode</strong> in the <strong>NRDUCell</strong> MO corresponding to the <strong>NRCell</strong> MO is set to HYPER_CELL or HYPER_CELL_COMBINE_MODE, at least one <strong>NRDUCellCoverage</strong> MO must be configured under each <strong>NRDUCellTrp</strong> MO in the <strong>NRDUCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRDUCellTrp</strong>, <strong>NRDUCell</strong>, and <strong>NRCell</strong> MOs:<ul><li>If <strong>DuplexMode</strong> in <strong>NRDUCell</strong> MOs corresponding to different NRDUCellTrp MOs associated with the same <strong>SectorEqmId</strong> in the <strong>NRDUCellCoverage</strong> MO is set to CELL_TDD and <strong>CellActiveState</strong> in the <strong>NRCell</strong> MO corresponding to the <strong>NRDUCell</strong> MO is set to CELL_ACTIVE, <strong>SlotAssignment</strong> and <strong>SlotStructure</strong> configurations for these <strong>NRDUCell</strong> MOs must be consistent.</li></ul>
+</li><li>Relation with the <strong>NRDUCellTrp</strong>, <strong>SECTOREQM</strong>, and <strong>NRDUCellAlgoSwitch</strong> MOs:<ul><li>A maximum of one <strong>NRDUCellAlgoSwitch</strong> MO with the LTE_NR_DYN_POWER_SHARING_SW option of <strong>DynPowerSharingSwitch</strong> selected can be configured if this MO corresponds to the <strong>NRDUCellTrp</strong> MO corresponding to <strong>NRDUCellCoverage</strong> MOs that reference the same sector equipment ID (specified by <strong>SectorEqmId</strong>).</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NRDUCellCoverage__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NRDUCellCoverage__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellCoverage__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_nrducellcoverage.html">ADD NRDUCELLCOVERAGE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an NR DU cell coverage item.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nrducellcoverage.html">LST NRDUCELLCOVERAGE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query an NR DU cell coverage item.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nrducellcoverage.html">MOD NRDUCELLCOVERAGE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify an NR DU cell coverage item.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_nrducellcoverage.html">RMV NRDUCELLCOVERAGE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an NR DU cell coverage item.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NRDUCellCoverage__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NRDUCellCoverage__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellCoverage__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellCoverage-NrDuCellTrpId.html">NR DU Cell TRP ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a TRP for an NR DU cell, which uniquely identifies the TRP for the NR DU cell within a gNodeB. It is used with the NrDuCellCoverageId parameter to uniquely identify the coverage area of the NR DU cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellCoverage-NrDuCellCoverageId.html">NR DU Cell Coverage ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a coverage area of an NR DU cell, which is used with the NrDuCellTrpId parameter to uniquely identify the coverage area of the NR DU cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellCoverage-SectorEqmId.html">Sector Equipment ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a set of sector equipment used by an NR DU cell coverage area, which uniquely identifies the set of sector equipment within a gNodeB. This parameter must be set by network planning engineers based on site requirements.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellCoverage-MaxTransmitPower.html">Max Transmit Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum transmit power of a single transmit channel for the carrier in the coverage area of an NR DU cell. This parameter applies only to low-frequency LampSite cells. If this parameter is set to a value in the range of 0 to 600, this parameter specifies the maximum transmit power of the carrier of the low-frequency LampSite RF module. If this parameter is set to 65535, the maximum transmit power of the carrier of the RF module is determined by the MaxTransmitPower parameter corresponding to the NR DU cell TRP.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellCoverage-AntennaPortMapping.html">Antenna Port Mapping</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mapping between antenna ports and RRU channels.</p>
+<p>For TDD 4T cells and FDD 4T cells:</p>
+<p>For example, value 4T_0312 indicates that ports 0, 3, 1, and 2 are mapped to RRU channels A, B, C, and D, respectively.</p>
+<p>For TDD 4T cells, the RRU channels corresponding to antenna ports 0 and 2 must be connected to a pair of physical antennas with the same polarization mode, and the RRU channels corresponding to antenna ports 1 and 3 must be connected to another pair of physical antennas with the same polarization mode.</p>
+<p>For FDD 4T cells, the RRU channels corresponding to antenna ports 0 and 1 must be connected to a pair of physical antennas with the same polarization mode, and the RRU channels corresponding to antenna ports 2 and 3 must be connected to another pair of physical antennas with the same polarization mode.</p>
+<p>For TDD 8T cells:</p>
+<p>For example, value 8T_01234567 indicates that ports 0 to 7 are mapped to RRU channels A to H, respectively.</p>
+<p>The TDD 8T RRU ports must be correctly connected to the TDD 8T antenna ports. The default value of this parameter for TDD 8T RRUs is 8T_32107654.</p>
+<p>When Huawei 8T8R RRUs are used, Huawei 8T8R antennas or antennas that comply with the Next Generation Mobile Network (NGMN) standard are recommended. If antennas from other vendors or antennas that do not comply with the NGMN standard are used, polarization sequence mismatch may occur, affecting the cell coverage.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

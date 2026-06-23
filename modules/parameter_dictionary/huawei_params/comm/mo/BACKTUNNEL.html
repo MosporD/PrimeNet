@@ -1,0 +1,203 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="BACKTUNNEL">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="BACKTUNNEL">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>BACKTUNNEL</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="BACKTUNNEL"></a><a name="BACKTUNNEL"></a>
+
+
+<h1 class="topictitle1">BACKTUNNEL</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="BACKTUNNEL.html"><strong>BACKTUNNEL</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A BACKTUNNEL MO is used to configure a backplane communication tunnel when multimode co-transmission is used.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>PACKETFILTERING</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in a <strong>PACKETFILTERING</strong> MO is set to TUNNEL, the <strong>BACKTUNNEL</strong> MO corresponding to <strong>PORTID</strong> in the <strong>PACKETFILTERING</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>PORTLR</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>PORTLR</strong> MO is set to TUNNEL, the associated <strong>BACKTUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>PT</strong> are set to IF and TUNNEL, respectively in an <strong>IPROUTE4</strong> MO, <strong>PORTID</strong> in the <strong>IPROUTE4</strong> MO must be the same as <strong>PORTID</strong> in the associated <strong>BACKTUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>RTTYPE</strong> and <strong>PT</strong> parameters under the <strong>SRCIPROUTE4</strong> MO are set to IF and TUNNEL, respectively, the <strong>PORTID</strong> parameter under the <strong>SRCIPROUTE4</strong> MO must be set to the same value as that of the <strong>PORTID</strong> parameter under the <strong>BACKTUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BACKTUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]Each <strong>BACKTUNNEL</strong> MO must have a unique combination of <strong>SCN</strong>, <strong>DCN</strong>, <strong>SSRN</strong>, <strong>DSRN</strong>, <strong>SSN</strong>, and <strong>DSN</strong>.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]All the <strong>BACKTUNNEL</strong> MOs configured for a BS can only cross two subracks.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the logical protection group where the <strong>SSN</strong> of the <strong>BACKTUNNEL</strong> MO is located, the value of <strong>SN</strong> in the <strong>HAGRP</strong> MO must be the same as the value of <strong>SSN</strong> in the <strong>BACKTUNNEL</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the logical protection group where the <strong>DSN</strong> of the <strong>BACKTUNNEL</strong> MO is located, the value of <strong>SN</strong> in the <strong>HAGRP</strong> MO must be the same as the value of <strong>DSN</strong> in the <strong>BACKTUNNEL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>IPRSCGRP</strong> MO is set to TUNNEL, the associated <strong>BACKTUNNEL</strong> MO must have been configured.</li><li>[Co-MPT, eNodeB]The sum of non-default <strong>IPRSCGRP</strong> and <strong>RSCGRP</strong> MOs must be less than or equal to 16 on a board.</li><li>[NodeB]A maximum of eight <strong>IPRSCGRP</strong> MOs whose <strong>RSCGRPNO</strong> is not set to DEFAULTPORT or AUTOPORT can be configured on a board.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to TUNNEL respectively, the associated <strong>BACKTUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>IPADDR4</strong>, <strong>LOOPBACK</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to TUNNEL, the <strong>IPADDR4</strong> MO that is in the same routing domain as the <strong>IPPATH</strong> MO must have been configured, and also <strong>INTERFACE</strong> MO must have been configured on the <strong>LOOPBACK</strong> MO, which is on the same board with the corresponding <strong>BACKTUNNEL</strong> MO the <strong>IPPATH</strong> MO bears on.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>IPADDR4</strong>, <strong>LOOPBACK</strong>, <strong>IPRSCGRP</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to ENABLE, and the <strong>PT</strong> in corresponding <strong>IPRSCGRP</strong> MO is set to TUNNEL, the <strong>IPADDR4</strong> MO that is in the same routing domain as the <strong>IPPATH</strong> MO must have been configured, and also <strong>INTERFACE</strong> MO must have been configured on the <strong>LOOPBACK</strong> MO, which is on the same board with the corresponding <strong>BACKTUNNEL</strong> MO the <strong>IPPATH</strong> MO bears on.</li></ul>
+</li><li>Relation with the <strong>IP2IPRSCGRP</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]A maximum of two <strong>IP2IPRSCGRP</strong> MOs with <strong>IPVERSION</strong> set to IPV4 and <strong>DSTIPV4</strong> located on the same network segment can be bound to the same destination network segment in the same routing domain of the same board.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]A board can be configured with a maximum of 32 <strong>IP2IPRSCGRP</strong> MOs with <strong>IPVERSION</strong> set to IPV4 on condition that the corresponding <strong>IPRSCGRP</strong> MOs are on the same board.</li><li>[Co-MPT, eNodeB]A maximum of two <strong>IP2IPRSCGRP</strong> MOs with <strong>IPVERSION</strong> set to IPV6 and <strong>DSTIPV6</strong> located on the same network segment can be bound to the same destination network segment in the same routing domain of the same board.</li><li>[Co-MPT, eNodeB]A board can be configured with a maximum of 32 <strong>IP2IPRSCGRP</strong> MOs with <strong>IPVERSION</strong> set to IPV6 on condition that the corresponding <strong>IPRSCGRP</strong> MOs are on the same board.</li><li>[gNodeB]A maximum of two <strong>IP2IPRSCGRP</strong> MOs with <strong>IPVERSION</strong> set to IPV4 and <strong>DSTIPV4</strong> located on the same network segment can be bound to the same destination network segment in the same routing domain of the same board.</li><li>[gNodeB]A maximum of two <strong>IP2IPRSCGRP</strong> MOs with <strong>IPVERSION</strong> set to IPV6 and <strong>DSTIPV6</strong> located on the same network segment can be bound to the same destination network segment in the same routing domain of the same board.</li><li>[gNodeB]A maximum of 32 <strong>IP2IPRSCGRP</strong> MOs this <strong>IPVERSION</strong> are set to IPV4.</li><li>[gNodeB]A maximum of 32 <strong>IP2IPRSCGRP</strong> MOs this <strong>IPVERSION</strong> are set to IPV6.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>BACKTUNNEL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPULFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>IPULFLOWCTRLPARA</strong> MO is set to TUNNEL, the associated <strong>BACKTUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPDLFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>IPDLFLOWCTRLPARA</strong> MO is set to TUNNEL, the associated <strong>BACKTUNNEL</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>CASCADEPORT</strong>, <strong>IPGPM</strong>, <strong>IPRSCGRP</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, NodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO or AUTO, this board cannot be configured with the <strong>IPGPM</strong> MO. That is, this board cannot be configured with the associated <strong>IPRSCGRP</strong> MO.</li><li>[Co-MPT, NodeB]On a UBBP or LCOP board, if the <strong>CASCADEPORT</strong> MO in which the <strong>PN</strong> parameter is set to 6 does not exist, the UBBP board cannot be configured with the <strong>IPGPM</strong> MO. That is, this board cannot be configured with the associated <strong>IPRSCGRP</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#BACKTUNNEL__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="BACKTUNNEL__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="BACKTUNNEL__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_backtunnel.html">ADD BACKTUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a backplane tunnel, which is used for backplane-based communication in multimode co-transmission scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_backtunnel.html">DSP BACKTUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of a backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_backtunnel.html">LST BACKTUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of backplane tunnels.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_backtunnel.html">MOD BACKTUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify a backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_backtunnel.html">RMV BACKTUNNEL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a backplane tunnel.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#BACKTUNNEL__tab2">Table 2</a> and <a href="#BACKTUNNEL__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="BACKTUNNEL__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="BACKTUNNEL__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BACKTUNNEL-PortId.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a backplane tunnel port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BACKTUNNEL-SrcCabinetNo.html">Source Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the source cabinet number of the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BACKTUNNEL-SrcSubrackNo.html">Source Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the source subrack number of the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BACKTUNNEL-SrcSlotNo.html">Source Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the source slot number of the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BACKTUNNEL-DstCabinetNo.html">Destination Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination cabinet number of the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BACKTUNNEL-DstSubrackNo.html">Destination Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination subrack number of the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BACKTUNNEL-DstSlotNo.html">Destination Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination slot number of the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BACKTUNNEL-TunnelType.html">Tunnel Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the backplane tunnel.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="BACKTUNNEL__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="BACKTUNNEL__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BACKTUNNEL-RcvByte.html">Number of RX Bytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes received by the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BACKTUNNEL-RcvPacket.html">Number of RX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets received by the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BACKTUNNEL-SendByte.html">Number of TX Bytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes transmitted by the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BACKTUNNEL-SendPacket.html">Number of TX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets transmitted by the backplane tunnel.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

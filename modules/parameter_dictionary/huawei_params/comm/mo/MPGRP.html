@@ -1,0 +1,527 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="MPGRP">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="MPGRP">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>MPGRP</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="MPGRP"></a><a name="MPGRP"></a>
+
+
+<h1 class="topictitle1">MPGRP</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="MPGRP.html"><strong>MPGRP</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The MPGRP MO is used to bind multiple PPP links together, which are used for transmitting fragmented packets to the same destination address based on the MLPPP protocol. In this way, transmission bandwidth is increased.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> in an <strong>IPRT</strong> MO are set to IF and TUNNEL, <strong>DSTIP</strong> in an <strong>IPRT</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>RTTYPE</strong> and <strong>IFT</strong> are set to IF and MPGRP, respectively in an <strong>IPRT</strong> MO, <strong>IFNO</strong> in the <strong>IPRT</strong> MO must be the same as <strong>MPGRPN</strong> in the associated <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>RTTYPE</strong> and <strong>PT</strong> in an <strong>IPROUTE4</strong> MO are set to IF and TUNNEL, <strong>DSTIP</strong> in an <strong>IPROUTE4</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>RTTYPE</strong> and <strong>PT</strong> are set to IF and MPGRP, respectively in an <strong>IPROUTE4</strong> MO, <strong>PORTID</strong> in the <strong>IPROUTE4</strong> MO must be the same as <strong>PORTID</strong> in the associated <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, the value of <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO must be the same as that of any of the following parameters in the same routing domain: <strong>IP</strong> in a <strong>DEVIP</strong> MO; <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO; <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SECURITYPEER</strong>, <strong>DEVIP</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>PEERIKEIPV4</strong> in a <strong>SECURITYPEER</strong> MO must be different from <strong>IP</strong> in a configured <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in a configured <strong>MPGRP</strong> MO, or <strong>LOCALIP</strong> in a configured <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, if <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO is referenced by <strong>LOCIPV4</strong> in the <strong>USERPLANEHOST</strong> MO, the <strong>IPSECSWITCH</strong> in the <strong>USERPLANEHOST</strong> MO cannot be set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>IPADDR4</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>IP</strong> in the <strong>IPADDR4</strong> MO must be different from <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>IPADDR4</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>IP</strong> in the <strong>IPADDR4</strong> MO must be different from <strong>PEERIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, in the same routing domain, <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO must be the same as <strong>IP</strong>, <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>IPADDR4</strong> MO, <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>USERPLANEPEER</strong> and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>PEERIPV4</strong> in a <strong>USERPLANEPEER</strong> MO must be different from <strong>LOCALIP</strong> or <strong>LOCALIP</strong> in a configured <strong>MPGRP</strong> MO and <strong>PPPLNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO must be on a different network segment from <strong>IP</strong> in an <strong>IPADDR4</strong> MO in the same routing domain on another interface.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]A maximum of seven <strong>IPADDR4</strong> MOs can be configured on a Multi-link PPP (MLPPP) group.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, and <strong>BPT</strong> in an <strong>IPPATH</strong> MO is set to MPGRP respectively, the associated <strong>MPGRP</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, <strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO is set to 0.0.0.0, the <strong>IPPATH</strong> MO must have been configured on an <strong>MPGRP</strong> MO whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> and <strong>JNRSCGRP</strong> in an <strong>IPPATH</strong> MO are set to MPGRP and DISABLE, respectively, the associated <strong>MPGRP</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO is set to 0.0.0.0, the <strong>IPPATH</strong> MO must have been configured on an <strong>MPGRP</strong> MO whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, the value of <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO must be the same as that of any of the following parameters configured in the same routing domain: <strong>IP</strong> in an <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO; <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SECURITYPEER</strong>, <strong>IPADDR4</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>PEERIKEIPV4</strong> in a <strong>SECURITYPEER</strong> MO must be set to a value different from <strong>IP</strong>, <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>IPADDR4</strong> MO, <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>INTERFACE</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>SECLOCIP</strong> is valid in an <strong>SCTPLNK</strong> MO, the <strong>IPADDR4</strong> MOs for <strong>LOCIP</strong> and <strong>SECLOCIP</strong> of this MO must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SUBIF</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]An <strong>MPGRP</strong> MO and a <strong>SUBIF</strong> MO cannot both be configured.</li></ul>
+</li><li>Relation with the <strong>VRF</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]An <strong>MPGRP</strong> MO and a <strong>VRF</strong> MO whose <strong>VRFIDX</strong> is set to 1 to 7 cannot both be configured.</li></ul>
+</li><li>Relation with the <strong>UDPSESSION</strong>, <strong>DEVIP</strong>, <strong>IFIP</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, <strong>LOCALIP</strong> in a <strong>UDPSESSION</strong> MO to be added must have been configured. That is, for the <strong>UDPSESSION</strong> MO, <strong>DEVIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board (in the same slot and cabinet), <strong>LOCALIP</strong> in the <strong>UDPSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>DEVIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, <strong>LOCALIP</strong> in a <strong>UDPSESSION</strong> MO to be added must have been configured. That is, for the <strong>UDPSESSION</strong> MO, <strong>IFIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board (in the same slot and cabinet), <strong>LOCALIP</strong> in the <strong>UDPSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>UDPSESSION</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in a <strong>UDPSESSION</strong> MO to be added must have been configured, <strong>LOCALIP</strong> in the <strong>UDPSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IPADDR4</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>UDPSESSION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>PEERIP</strong> in a <strong>UDPSESSION</strong> MO must be different from <strong>LOCALIP</strong> in a <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> whose IP protocol version is IPv4 comes from <strong>IP</strong> of a <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> of a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> of an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>LOCALIP</strong> in any <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPRESPONDER</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD and <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv4, <strong>LOCALIP</strong> in the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIP</strong> is from <strong>IP</strong> in a <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in a <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> comes from <strong>IP</strong> of an <strong>IPADDR4</strong> MO, <strong>LOCALIP</strong> of a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> of an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPRESPONDER</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv4, <strong>LOCALIP</strong> in the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIP</strong> of the <strong>TWAMPRESPONDER</strong> MO is from <strong>IP</strong> in an <strong>IPADDR4</strong> MO, <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>BFDSESSION</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, <strong>IFIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>SRCIP</strong> in a <strong>BFDSESSION</strong> MO to be added must have been configured. That is: (1) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, for the <strong>BFDSESSION</strong> MO, <strong>DEVIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO. (2) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, for the <strong>BFDSESSION</strong> MO, <strong>IFIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BFD</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>SRCIP</strong> in a <strong>BFD</strong> MO to be added must have been configured, <strong>SRCIP</strong> in the <strong>BFD</strong> MO must be the same as any of the following: <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO in the same routing domain, or <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO, or <strong>IP</strong> in the <strong>IPADDR4</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPMSESSION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO is set to NO, <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO must be different from <strong>PEERIP</strong> in the <strong>IPPMSESSION</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in a <strong>DEVIP</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If a <strong>DEVIP</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>IP</strong> in the <strong>DEVIP</strong> MO must be different from <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If a <strong>DEVIP</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>IP</strong> in the <strong>DEVIP</strong> MO must be different from <strong>PEERIP</strong> in the <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO must be on a different network segment from <strong>IP</strong> in a <strong>DEVIP</strong> MO whose <strong>BORROWIFIP</strong> is set to NO in the same routing domain on another interface.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO must be different from <strong>PEERIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>PEERIP</strong> in a <strong>PPPLNK</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO must be on a different network segment from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]Before adding an <strong>MPLNK</strong> MO, the associated <strong>MPGRP</strong> MO must have been configured. If <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>MPGRPN</strong> in an <strong>MPGRP</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>MPGRPN</strong> in an <strong>MPLNK</strong> MO, respectively, the two MOs are associated with each other.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]When removing an <strong>MPGRP</strong> MO, the system automatically removes the <strong>MPLNK</strong> MO that depends on the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>PEERIP</strong> in an <strong>OMCH</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>IP</strong> in an <strong>OMCH</strong> MO must be different from <strong>PEERIP</strong> in an <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the same routing domain, <strong>PEERIP</strong> in an <strong>MPGRP</strong> MO must be different from <strong>LOCIP</strong> and <strong>SECLOCIP</strong> in an <strong>SCTPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>WLOCALIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be different from <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be different from <strong>PEERIP</strong> in the <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be in different network segments from <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IFIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in an <strong>IFIP</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>IFIP</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>IP</strong> in the <strong>IFIP</strong> MO must be different from <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>IFIP</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>IP</strong> in the <strong>IFIP</strong> MO must be different from <strong>PEERIP</strong> in the <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO must be on a different network segment from <strong>IP</strong> in an <strong>IFIP</strong> MO in the same routing domain on another interface.</li></ul>
+</li><li>Relation with the <strong>BFDSESSION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If a <strong>BFDSESSION</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO must be different from <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BFD</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If a <strong>BFD</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFD</strong> MO must be different from <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SRCIPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If the <strong>RTTYPE</strong> and <strong>IFT</strong> parameters under the <strong>SRCIPRT</strong> MO are set to IF and MPGRP, respectively, the <strong>IFNO</strong> parameter under the <strong>SRCIPRT</strong> MO must be set to the same value as that of the <strong>MPGRPN</strong> parameter under the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If the <strong>RTTYPE</strong> and <strong>PT</strong> parameters under the <strong>SRCIPROUTE4</strong> MO are set to IF and MPGRP, respectively, the <strong>PORTID</strong> parameter under the <strong>SRCIPROUTE4</strong> MO must be set to the same value as that of the <strong>PORTID</strong> parameter under the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>OMCH</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, <strong>IFIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, and <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> MO is set to TRADITION, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> MO is set to HOSTGW, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>IFIP</strong> MO, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in an <strong>RSCGRP</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, the <strong>MPGRP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>DEVIP</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO must be the same as a <strong>DEVIP</strong> MO configured at a physical port or loopback port of the same board. If <strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO is the same as a <strong>DEVIP</strong> MO configured at a physical port, <strong>PT</strong> and <strong>PN</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>PT</strong> and <strong>PN</strong> in the <strong>DEVIP</strong> MO, respectively. Alternatively, <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>LOCALIP</strong> in the associated <strong>PPPLNK</strong> MO or <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPMSESSION</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, and <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO is set to NO, the IP address corresponding to <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must have been configured. That is, for the <strong>IPPMSESSION</strong> MO, <strong>IPADDR4</strong> MO in the same routing domain, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO; or <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>OMCH</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, and <strong>DHCPRELAYIPSW</strong> of <strong>DHCPSVRIP</strong> is set to ENABLE, <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO in the same routing domain, <strong>IP</strong> in <strong>IPADDR4</strong> MO in the same routing domain, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO in the same routing domain, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In one logical protection group, <strong>SN</strong> in an <strong>HAGRP</strong> MO must be the same as that in an <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]Each <strong>MPGRP</strong> MO must have a unique <strong>LOCALIP</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]Each <strong>MPGRP</strong> MO must have a unique combination of <strong>LOCALIP</strong> and <strong>PEERIP</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> of two <strong>MPGRP</strong> MOs must be on different network segments.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]Each <strong>MPGRP</strong> MO configured on one board must have a unique <strong>MPGRPN</strong>. That is, <strong>MPGRPN</strong> must be unique in the <strong>MPGRP</strong> MOs with an identical combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong>.</li></ul>
+</li><li>Relation with the <strong>LOCALIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in a <strong>LOCALIP</strong> MO must be different from <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in a <strong>LOCALIP</strong> MO must be different from <strong>PEERIP</strong> in an <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in a <strong>LOCALIP</strong> MO and <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO must be on different network segments.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>PPPLNK</strong>, <strong>DEVIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, before adding an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE, ensure that the <strong>MPGRP</strong> or <strong>PPPLNK</strong> MO that has the same VRF Index as the <strong>SCTPLNK</strong> MO has been configured. Alternatively, ensure that the <strong>DEVIP</strong> MO, <strong>MPGRP</strong> MO, or <strong>PPPLNK</strong> MO that meets both of the following conditions has been configured: (1) The <strong>DEVIP</strong> MO, <strong>MPGRP</strong> MO, or <strong>PPPLNK</strong> MO is in the same routing domain as the <strong>SCTPLNK</strong> MO. (2) <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO is the same as <strong>IP</strong> in the <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO, or <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO. The first and the second local IP addresses of an SCTP link must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>PPPLNK</strong>, <strong>IPADDR4</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE is configured, either of the following is true: 1. There must be the following parameters that have the same values as <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO and these IP addresses are in the same routing domain: <strong>IP</strong> in the <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO. 2. There must be either the <strong>MPGRP</strong> MO with <strong>LOCALIP</strong> set to 0.0.0.0 or the <strong>PPPLNK</strong> MO with <strong>LOCALIP</strong> set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>LR</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in an <strong>LR</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]When removing an <strong>MPGRP</strong> MO, the system automatically removes the <strong>LR</strong> MO that depends on the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PORTLR</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in an <strong>PORTLR</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>LOOPBACK</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to DISABLE, the corresponding <strong>IPADDR4</strong> MO of an <strong>IPPATH</strong> MO must have been configured on the <strong>INTERFACE</strong> MO, and <strong>VRFIDX</strong>, and <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>VRFIDX</strong>, and <strong>IP</strong> in the <strong>IPADDR4</strong> MO, respectively. Alternatively, <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>LOCALIP</strong> in the associated <strong>PPPLNK</strong> MO or <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO. Alternatively, <strong>IPADDR4</strong> for the corresponding <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be configured on the port of <strong>LOOPBACK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>LOOPBACK</strong>, <strong>INTERFACE</strong>, and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to NEW and <strong>JNIPRSCGRP</strong> is set to ENABLE, the corresponding <strong>IPADDR4</strong> MO for <strong>LOCALIP</strong> must have been configured on the port of the <strong>IPRSCGRP</strong> MO which the <strong>IPPATH</strong> MO joins in, and <strong>VRFIDX</strong>, and <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>VRFIDX</strong>, and <strong>IP</strong> in the <strong>IPADDR4</strong> MO, respectively. Alternatively, <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be the same as <strong>LOCALIP</strong> in the associated <strong>PPPLNK</strong> MO or <strong>LOCALIP</strong> in the associated <strong>MPGRP</strong> MO. Alternatively, <strong>IPADDR4</strong> for the corresponding <strong>LOCALIP</strong> in the <strong>IPPATH</strong> MO must be configured on the port of <strong>LOOPBACK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to ENABLE and <strong>LOCALIP</strong> is set to 0.0.0.0, and the corresponding <strong>PT</strong> of <strong>IPRSCGRP</strong> MO is set to MPGRP, the corresponding <strong>MPGRP</strong> MO must have been configured whose <strong>LOCALIP</strong> is set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>IPPMSESSION</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, <strong>IPADDR4</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, and <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO is set to NO, the IP address corresponding to <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must have been configured. That is, for the <strong>IPPMSESSION</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, <strong>DEVIP</strong> MO in the same routing domain, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>DEVIP</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO; or <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO. When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>IPADDR4</strong> MO in the same routing domain, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO; or <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]In the <strong>MPT</strong> MO, if the <strong>TYPE</strong> parameter is set to UMPT and the <strong>BRDSPEC</strong> parameter is set to "UMPTe" or "UMPTg" or "UMPTga" (case insensitive), the number of <strong>MPGRP</strong> MOs configured on this board must be 0.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]The <strong>MPGRP</strong> MO corresponding to <strong>INTERFACE</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PORTID</strong> to any two <strong>MPGRP</strong> MOs must be different and valid.</li></ul>
+</li><li>Relation with the <strong>IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]If <strong>PT</strong> in an <strong>IPRSCGRP</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li><li>[Co-MPT, eNodeB]A maximum of eight <strong>IPRSCGRP</strong> MOs that meet the following condition can be configured on a board: <strong>PT</strong> is set to PPP or MPGRP, and <strong>RSCGRPNO</strong> is not set to DEFAULTPORT or AUTOPORT.</li><li>[Co-MPT, eNodeB]The sum of non-default <strong>IPRSCGRP</strong> and <strong>RSCGRP</strong> MOs must be less than or equal to 16 on a board.</li><li>[NodeB]A maximum of eight <strong>IPRSCGRP</strong> MOs whose <strong>RSCGRPNO</strong> is not set to DEFAULTPORT or AUTOPORT can be configured on a board.</li></ul>
+</li><li>Relation with the <strong>DLFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>DLFLOWCTRLPARA</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ULFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>ULFLOWCTRLPARA</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>DLFLOWCTRLPARA</strong> and <strong>ULFLOWCTRLPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS]When removing an <strong>MPGRP</strong> MO, the system automatically removes the <strong>DLFLOWCTRLPARA</strong> and <strong>ULFLOWCTRLPARA</strong> MOs that depend on the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPULFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>IPULFLOWCTRLPARA</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPDLFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>PT</strong> in a <strong>IPDLFLOWCTRLPARA</strong> MO is set to MPGRP, the associated <strong>MPGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>E1T1BEAR</strong> MO:<ul><li>[Co-MPT, NodeB]<strong>MODE</strong> in the <strong>E1T1BEAR</strong> MO associated with an <strong>MPGRP</strong> MO must be set to IP.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>PPPLNK</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and the <strong>SIGIP2V4</strong> parameter in an <strong>SCTPHOST</strong> MO is valid, the <strong>IPADDR4</strong> MOs to which <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> belongs must be configured on the same subrack, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>PPPLNK</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, <strong>LOOPBACK</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>SIGIP2V6</strong> is valid in an <strong>SCTPHOST</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>DNSSRV</strong> MO:<ul><li>[Co-MPT, eNodeB]The <strong>DNSSIP4</strong> parameter in the <strong>DNSSRV</strong> MO must be different from the <strong>LOCALIP</strong> parameter in the <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>SCTPPEER</strong> and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, eNodeB]In a routing domain, <strong>SIGIP1V4</strong> in an <strong>SCTPPEER</strong> MO must be different from <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li><li>[Co-MPT, eNodeB]In a routing domain, <strong>SIGIP2V4</strong> in an <strong>SCTPPEER</strong> MO must be different from <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>GPM</strong> MO:<ul><li>[Co-MPT, NodeB]If a <strong>GPM</strong> MO and a <strong>MPGRP</strong> MO are configured on the same physical port, the <strong>MUXCP</strong> parameter must be set to DISABLE in the <strong>MPGRP</strong> MO.</li><li>[Co-MPT, NodeB]If <strong>PT</strong> and <strong>RSCGRPID</strong> in a <strong>GPM</strong> MO are set to MPGRP and DEFAULTPORT, respectively, the associated <strong>MPGRP</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPGPM</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB]If a <strong>IPGPM</strong> MO associated <strong>IPRSCGRP</strong> MO and a <strong>MPGRP</strong> MO are configured on the same physical port, the <strong>MUXCP</strong> parameter must be set to DISABLE in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DIRECTIPSECWHITELIST</strong> and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, eNodeB]When the value of <strong>MASK</strong> in a <strong>DIRECTIPSECWHITELIST</strong> MO is 255.255.255.255, the value of <strong>SECURITYPEERIPV4</strong> in the <strong>DIRECTIPSECWHITELIST</strong> MO cannot be the same as the value of <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO or the value of <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>MPGRP</strong> MOs must be less than or equal to 2 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>SCTPPEER</strong>, <strong>DEVIP</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[NodeB]In the same routing domain, <strong>SIGIP1V4</strong> in an <strong>SCTPPEER</strong> MO must be different from <strong>IP</strong>, <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>DEVIP</strong> MO, <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li><li>[NodeB]In the same routing domain, <strong>SIGIP2V4</strong> in an <strong>SCTPPEER</strong> MO must be different from <strong>IP</strong>, <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>DEVIP</strong> MO, <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>SCTPPEER</strong>, <strong>IPADDR4</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[NodeB]In the same routing domain, <strong>SIGIP1V4</strong> in an <strong>SCTPPEER</strong> MO must be different from <strong>IP</strong>, <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>IPADDR4</strong> MO, <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li><li>[NodeB]In the same routing domain, <strong>SIGIP2V4</strong> in an <strong>SCTPPEER</strong> MO must be different from <strong>IP</strong>, <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>IPADDR4</strong> MO, <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>SINGLEIPSWITCH</strong> MO:<ul><li>[NodeB]If <strong>SINGLEIPSW</strong> in a <strong>SINGLEIPSWITCH</strong> MO is set to ENABLE, <strong>GPEERIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO must be different from <strong>LOCALIP</strong> in any <strong>MPGRP</strong> MO.</li><li>[NodeB]If <strong>SINGLEIPSW</strong> in a <strong>SINGLEIPSWITCH</strong> MO is set to ENABLE, <strong>GIIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO must be different from <strong>LOCALIP</strong> in any <strong>PPPLNK</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#MPGRP__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="MPGRP__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="MPGRP__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_mpgrp.html">ADD MPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a Multi-link PPP (MLPPP) group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_mpgrp.html">DSP MPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of an MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_mpgrp.html">LST MPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_mpgrp.html">MOD MPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of the MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_mpgrp.html">RMV MPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a specified MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rst_mpgrp.html">RST MPGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to reset a specified MLPPP group and restart negotiation.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#MPGRP__tab2">Table 2</a> and <a href="#MPGRP__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="MPGRP__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="MPGRP__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet where the MLPPP group is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack where the MLPPP group is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot where the MLPPP group is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-MPGroupNo.html">Group No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-MCPPP.html">Multi-Class PPP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an MLPPP group supports the multi-class feature.</p>
+<p>If this parameter is set to ENABLE, the MLPPP group supports the Class of Service (CoS) feature and four or eight service types of different priorities.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-AuthType.html">Authentication Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the authentication type of the MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-Name.html">User Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the authentication user name of an MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-Password.html">Password</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the authentication password.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-LocalIP.html">Local IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IP address. If this parameter is set to 0.0.0.0, this IP address needs to be negotiated. If this parameter is not set to 0.0.0.0, it must be set to a valid IP address of class A, B, or C but must not be the reserved address 0.x.x.x or 127.x.x.x.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-Mask.html">Mask</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subnet mask of the local IP address. If this parameter is set to 0.0.0.0, it needs to be negotiated.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-PeerIP.html">Peer IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer IP address. When the BS is connected to a peer equipment, the peer IP address can be either user-specified or set to 0.0.0.0. If this parameter is set to 0.0.0.0, this IP address is obtained by means of negotiation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-MCHeadFormat.html">MP/MC Header Option</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MP/MC head option of the MLPPP.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-PPPMux.html">PPPMUX</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable PPP multi-frame multiplexing.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-FragSize.html">MLPPP Fragment Size</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the fragment size of an MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-MaxSFLen.html">PPP Mux Subframe Max Length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum length of the PPP MUX subframe.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-MaxMFLen.html">PPP Muxframe Max Length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum length of the PPP MUX frame.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-MuxTimeout.html">PPPMUX Combine Timeout</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the timeout duration of a PPP MUX combination. If the PPP MUX combination takes longer time than this parameter value, an alarm related to the PPP MUX combination timeout is reported.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-MCClass.html">MCPPP Class</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of classes of service.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-IPHC.html">IP Header Compression</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable IP header compression.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-ErrMuxLstFltOccurThred.html">MLPPP Packets Discard Alarm Appear Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold above which the MLPPP packet loss alarm is generated.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-ErrMuxLstFltRecoverThred.html">MLPPP Packets Discard Alarm Disappear Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold below which the MLPPP packet loss alarm is cleared.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-IPHCSUBOPT.html">IPHC SubOption</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable IPHC suboption negotiation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where an MLPPP group is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/MPGRP-PortID.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an MLPPP group, which uniquely identifies the MLPPP group. In the old model, this parameter is optional. If this parameter is not set, the default value 4294967295 is used. In the new model, this parameter is mandatory and must be unique in the system.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="MPGRP__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="MPGRP__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-MPGroupStatus.html">MLPPP Group Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of an MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-IPCPStatus.html">IPCP Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of the IPCP protocol.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-PPPMuxStatus.html">PPPMUX Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of the PPP MUX.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-LocalIPNegRlt.html">Local IP Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the local IP address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-MaskNegRlt.html">Local IP Mask Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the local IP mask.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-PeerIPNegRlt.html">Peer IP Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the peer IP address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-MCPPPNegRlt.html">Multi-Class PPP Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the multi-class PPP.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-MRUNegRlt.html">Maximum Receive Unit Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the maximum RX unit.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-MuxNegRlt.html">PPPMUX Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the PPP MUX.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-ACFCNegRlt.html">ACFC Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the address field and control field.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-PFCNegRlt.html">PFC Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the protocol field compression.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-IPHCNegRlt.html">IPHC Negotiation Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation result of the IPHC.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-RxPackets.html">Number of RX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets received.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-TxPackets.html">Number of TX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets sent.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-RxFlow.html">RX Flow</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the RX traffic.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-TxFlow.html">TX Flow</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the TX traffic.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-IPNum.html">Number of IPs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of IP addresses of an MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-IPList.html">IP Address List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the list of IP addresses of an MLPPP group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-RxBytes.html">Number of RX Bytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes received.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-RxDropPackets.html">Number of RX Drop Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of discarded packets received.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-TxBytes.html">Number of TX Bytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes transmitted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-TxDropPackets.html">Number of TX Drop Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of discarded packets transmitted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/MPGRP-DiagnoseInfo.html">Diagnosis Info</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>This parameter specifies the diagnosis information about an MLPPP group, including the start time, diagnosis result, and fault ID. When an MLPPP group is established or reset, the diagnosis is triggered automatically. The default diagnosis period is 60s and the diagnosis information is displayed in the command output.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#MPGRP__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="MPGRP__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="MPGRP__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455349.html">VS.MP.TxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets Successfully Transmitted by the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455350.html">VS.MP.TxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Bytes in the Packets Successfully Transmitted by the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455349.html">VS.MP.TxDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets That Are to Be Transmitted But Discarded by the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455349.html">VS.MP.RxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets Successfully Received by the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455350.html">VS.MP.RxBytes</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Bytes in the Packets Successfully Received by the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455349.html">VS.MP.RxDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Packets That Are Received But Discarded by the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455358.html">VS.MP.TxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum Transmit Rate of the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455358.html">VS.MP.TxMinSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Minimum Transmit Rate of the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455358.html">VS.MP.TxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average Transmit Rate of the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455358.html">VS.MP.RxMaxSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Maximum Receive Rate of the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455358.html">VS.MP.RxMinSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Minimum Receive Rate of the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455358.html">VS.MP.RxMeanSpeed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Average Receive Rate of the MP Group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460300.html">VS.MP.TxTotalBW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total transmit bandwidth of the MP group</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460300.html">VS.MP.RxTotalBW</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total receive bandwidth of the MP group</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

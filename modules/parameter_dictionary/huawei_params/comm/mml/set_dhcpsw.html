@@ -1,0 +1,127 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set OM Channel Automatic Establishment Switch (SET DHCPSW)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_dhcpsw">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set OM Channel Automatic Establishment Switch (SET DHCPSW)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_dhcpsw"></a><a name="set_dhcpsw"></a>
+
+
+<h1 class="topictitle1">Set OM Channel Automatic Establishment Switch (SET DHCPSW)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_dhcpsw__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set parameters for automatic establishment of a remote maintenance channel.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_dhcpsw__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If the remote maintenance channel between a BS and the element management system has been disconnected for over 30 minutes, the BS will not trigger the DHCP Detect function of the Automatic OMCH Establishment feature even though both the remote maintenance channel and services are interrupted. However, if Delay Establishment Switch is set to ENABLE(Enable) in this case, the BS will trigger the DHCP Detect function on Ethernet ports when the remote maintenance channel and services have been interrupted for two hours.</p>
+</li><li><p>The Delay Establishment Switch parameter applies only to scenarios where a new link needs to be reestablished when the bearer network is faulty. It has the following risks when used in other scenarios and you need to be cautious about it: </p>
+<p>1. If a base station is disconnected from the element management system due to the bearer network faults, the base station uses the new link on the bearer network to automatically establish a remote maintenance channel. In this case, the element management system needs to redeliver the configurations of the new link to the base station for recovering services. </p>
+<p>2. If a base station is disconnected from the element management system due to the bearer network faults and the base station performs automatic establishment of a remote maintenance channel, services on this base station cannot immediately recover until the automatic establishment of the remote maintenance channel is complete, even though the bearer network has recovered. </p>
+<p>3. If a base station is disconnected from the element management system due to the bearer network faults in separate-MPT co-transmission multimode base stations or cascaded base stations, services of other modes or on other cascaded base stations will be interrupted when this base station performs automatic establishment of the remote maintenance channel.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]After the VLAN scanning function of the base station is enabled, When the base station is in IPv4 networking sends a large number of DHCP broadcast packets with different VLAN IDs in the VLAN scanning process. If VLANs are not separated, broadcast storms may occur.</p>
+</li><li><p>[NodeB,eNodeB,gNodeB]If OMCH Auto-Establishment Switch is set to DISABLE and the remote maintenance channel is disconnected, the base station attempts to restore the channel based on the current transmission configurations. If the remote maintenance channel is disconnected due to modification of transmission configurations at the peer end and the services on the base station are normal or stable, the restoration may fail. Therefore, exercise caution when setting this parameter to DISABLE.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_dhcpsw__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DHCPSW-StartFlag.html">SWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">OMCH Auto-Establishment Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable DHCP detection during automatic establishment of the remote maintenance channel. If this parameter is set to DISABLE, DHCP listening is performed instead of DHCP detection.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ENABLE(Enable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DHCPSW-VlanscanSwitch.html">VLANSCANSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Vlanscan Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to turn on the base station VLAN scan function, the VLAN scanning function is refers, when the network element enters the detect detection, on the Ethernet port, carries on the IPv4 DHCP detection to the VLAN identity range to 0~4094.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DHCPSW-DelaySwitch.html">DELAYSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Delay Establishment Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the function of reestablishing the base station's remote maintenance channel after a specified period.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_dhcpsw__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the switch for the auto-establishment of the remote maintenance channel with OMCH Auto-Establishment Detect Switch set to ENABLE, Vlanscan Switch set to DISABLE and Delay Establishment Switch set to DISABLE, run the following command: 
+SET DHCPSW: SWITCH=ENABLE, VLANSCANSW=DISABLE, DELAYSW=DISABLE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

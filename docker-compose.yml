@@ -1,18 +1,56 @@
-# Optional local PostgreSQL (app defaults to SQLite; enable in .env if you use this).
-#   docker compose up -d
-#   DB_ENGINE=postgresql
-#   DATABASE_URL=postgresql://primenet:primenet@localhost:5432/primenet
+# PrimeNet production stack
+# Usage:
+#   cp .env.example .env   # edit secrets and SFTP credentials
+#   docker compose up -d --build
+#   open http://localhost:8000/dashboard
+
 services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: primenet
-      POSTGRES_PASSWORD: primenet
-      POSTGRES_DB: primenet
+  web:
+    build: .
+    image: primenet:latest
+    container_name: primenet-web
+    restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "${PRIMENET_HTTP_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      NCM_DATA_ROOT: /data
+      NCM_CONTAINER: "1"
+      NCM_BOOTSTRAP_ON_IMPORT: "0"
+      NCM_DISABLE_SCHEDULER: "1"
+      FLASK_PORT: "8000"
+      GUNICORN_WORKERS: "${GUNICORN_WORKERS:-2}"
+      GUNICORN_THREADS: "${GUNICORN_THREADS:-4}"
+      GUNICORN_TIMEOUT: "${GUNICORN_TIMEOUT:-120}"
     volumes:
-      - primenet_pgdata:/var/lib/postgresql/data
+      - primenet-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+  scheduler:
+    build: .
+    image: primenet:latest
+    container_name: primenet-scheduler
+    restart: unless-stopped
+    command: ["scheduler"]
+    env_file:
+      - .env
+    environment:
+      NCM_DATA_ROOT: /data
+      NCM_CONTAINER: "1"
+      NCM_RUN_SCHEDULER: "1"
+      NCM_DISABLE_SCHEDULER: "0"
+    volumes:
+      - primenet-data:/data
+    depends_on:
+      web:
+        condition: service_healthy
 
 volumes:
-  primenet_pgdata:
+  primenet-data:
+    driver: local

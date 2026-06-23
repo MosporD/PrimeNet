@@ -1,0 +1,111 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Remove IPv4 Route (RMV IPROUTE4)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="rmv_iproute4">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Remove IPv4 Route (RMV IPROUTE4)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="rmv_iproute4"></a><a name="rmv_iproute4"></a>
+
+
+<h1 class="topictitle1">Remove IPv4 Route (RMV IPROUTE4)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="rmv_iproute4__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to remove a static IPv4 route.</p>
+</div></div>
+
+<div class="mmlnote"><a name="rmv_iproute4__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Active/standby routes indicate routes with the same destination IP address and subnet mask but different priorities in the same routing domain.</p>
+</li><li><p>Running this command leads to interruption of services and maintenance channel depending on the static IPv4 route.</p>
+</li><li><p>This operation may interrupt the services or OM channels carried on this IPv4 route. It is recommended that you determine whether to enable the automatic configuration data rollback function depending on scenarios. For details, see the help of the <a href="cfm_cb.html">CFM CB</a> command.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB]Equal-cost routes indicate routes with the same destination IP address, subnet mask, and priority in the same routing domain.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="rmv_iproute4__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPROUTE4-RTID.html">RTIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Route Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of an IPv4 route.</p>
+<p>GUI Value Range: 0~149</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~149</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPROUTE4-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a forcible change of an IPv4 route is made. When this parameter is set to NO(No), the system checks whether the change affects upper-layer services. If the change affects upper-layer services, the forcible change will fail. When this parameter is set to YES(Yes), the system does not check whether the change affects upper-layer services. Upper-layer services include the following: active/standby OM channel (OMCH), DNS service (DNSSRV), security link (IKEPEER), certificate issuance (CA), CRL update (CRLTSK), IP clock link (IPCLKLINK), NTP (NTPC), Abis CP/Iub CP/S1 CP/X2 CP/M2 CP/ECO CP/eX2 CP/SO CP/uX2 CP/Xw CP/gNBCUX2 CP/gNBCUNg CP/gNBCUXn CP (SCTPLNK/SCTPPEER), and Abis UP/IP path of an unknown service type/Iub UP/uX2 UP/S1 UP/X2 UP/eX2 UP/Xw UP/gNBCUX2 UP/gNBCUS1 UP/gNBCUNg UP/gNBCUXn UP (IPPATH/USERPLANEPEER). This parameter is invalid when a WMPT, LMPT, GTMUb, or GTMUc serves as the main control board.</p>
+<p>Pay attention to the following when using this parameter:</p>
+<p>1. The system checks whether a forcible change of an IP route affects upper-layer services based on the configuration data instead of based on the actual running status of these services.</p>
+<p>2. If an NE is configured with an SRCIPROUTE4, PPPLNK, or MPGRP MO, the system does not check whether a forcible change of an IPv4 route affects upper-layer services.</p>
+<p>3. If Port Type is set to IPOA(IP Over ATM Interface) or AIRLNK(Air Link) for the IPv4 route to be added or removed, the system does not check whether the addition or removal affects upper-layer services.</p>
+<p>4. If Port Type is set to IPOA(IP Over ATM Interface) or AIRLNK(Air Link) for both the IPv4 routes before and after the modification, the system does not check whether the modification affects upper-layer services.</p>
+<p>5. If Port Type is set to IPOA(IP Over ATM Interface) or AIRLNK(Air Link) for an IPv4 route, the system does not check whether the IPv4 route forms a pair of equal-cost routes with another route and whether the IPv4 route is included in the network segment of another route.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="rmv_iproute4__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To remove an IPv4 Route with the parameters as follows: RTIDX:0, run the following command:
+RMV IPROUTE4: RTIDX=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

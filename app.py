@@ -1,19 +1,32 @@
-"""
-Nokia Configuration Manager - Modular Application
-Main application file with Blueprint architecture
-"""
-
 from flask import Flask, jsonify, redirect, request, url_for
 import os
 import sys
+import subprocess
+import secrets
+import threading
+from flask import g
+from urllib.parse import urlparse
+from werkzeug.serving import WSGIRequestHandler
 
 # Add current directory to Python path
 sys.path.append(os.path.dirname(__file__))
 
+# Load .env before activation_gate reads NCM_SKIP_ACTIVATION / license settings.
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"), override=True)
+except ImportError:
+    pass
+
+from core.activation_gate import install_sqlite_gate
+
+install_sqlite_gate()
+
 # Initialize Flask app
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB
-app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
+app.config['SECRET_KEY'] = (os.getenv('FLASK_SECRET_KEY') or os.getenv('SECRET_KEY') or secrets.token_hex(32))
 
 # ============================================================================
 # REGISTER BLUEPRINTS
@@ -21,24 +34,36 @@ app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
 
 # Import and register blueprints
 from routes.auth_routes import auth_bp                          # auth (shared infra)
-from network_map.routes import network_map_bp                   # module: network_map/
-from performance.routes import performance_bp                   # module: performance/
-from ne_comparison.routes import ne_comparison_bp               # module: ne_comparison/
-from excel_generator.routes import excel_generator_bp           # module: excel_generator/
-from xml_parser.routes import xml_parser_bp                     # module: xml_parser/
-from parameter_dictionary.routes import parameter_dictionary_bp # module: parameter_dictionary/
-from admin_panel.routes import admin_panel_bp                   # module: admin_panel/
-from sync.routes import sync_bp                                 # sync infra: sync/
-from config_history.routes import config_history_bp             # module: config_history/
-from network_management.routes import network_management_bp     # module: network_management/
-from reports.routes import reports_bp                           # module: reports/
-from user_profile.routes import user_profile_bp                 # module: user_profile/
-from femto_pm.routes import femto_pm_bp                         # module: femto_pm/
-from task_scheduler.routes import task_scheduler_bp             # module: task_scheduler/
-from drive_test_viewer.routes import drive_test_viewer_bp       # module: drive_test_viewer/
+from routes.activation_routes import activation_bp
+from utils.input_safety import sanitize_json, sanitize_mapping_values
+from modules.network_map.routes import network_map_bp
+from modules.performance.routes import performance_bp
+from modules.ne_comparison.routes import ne_comparison_bp
+from modules.excel_generator.routes import excel_generator_bp
+from modules.xml_parser.routes import xml_parser_bp
+from modules.cm_extractor import cm_extractor_bp
+from modules.parameter_dictionary.routes import parameter_dictionary_bp
+from modules.admin_panel.routes import admin_panel_bp
+from modules.sync.routes import sync_bp
+from modules.config_history.routes import config_history_bp
+from modules.network_management.routes import network_management_bp
+from modules.reports.routes import reports_bp
+from modules.conflict_map.routes import conflict_map_bp
+from modules.user_profile.routes import user_profile_bp
+from modules.femto_pm.routes import femto_pm_bp
+from modules.task_scheduler.routes import task_scheduler_bp
+from modules.drive_test_viewer.routes import drive_test_viewer_bp
+from modules.cell_heatmap.routes import cell_heatmap_bp
+from modules.ran_features.routes import ran_features_bp
+from modules.son_analytics.routes import son_analytics_bp
+from modules.network_health.routes import network_health_bp
+from modules.sector_health.routes import sector_health_bp
+from modules.performance_analytics import performance_analytics_bp
 
 app.register_blueprint(auth_bp)
+app.register_blueprint(activation_bp)
 app.register_blueprint(xml_parser_bp)
+app.register_blueprint(cm_extractor_bp)
 app.register_blueprint(excel_generator_bp)
 app.register_blueprint(ne_comparison_bp)
 app.register_blueprint(parameter_dictionary_bp)
@@ -49,10 +74,24 @@ app.register_blueprint(performance_bp)
 app.register_blueprint(config_history_bp)
 app.register_blueprint(network_management_bp)
 app.register_blueprint(reports_bp)
+app.register_blueprint(conflict_map_bp)
 app.register_blueprint(user_profile_bp)
 app.register_blueprint(femto_pm_bp)
 app.register_blueprint(task_scheduler_bp)
 app.register_blueprint(drive_test_viewer_bp)
+app.register_blueprint(cell_heatmap_bp)
+app.register_blueprint(ran_features_bp)
+app.register_blueprint(son_analytics_bp)
+app.register_blueprint(network_health_bp)
+app.register_blueprint(sector_health_bp)
+app.register_blueprint(performance_analytics_bp)
+
+
+def _env_true(key: str, default: bool = False) -> bool:
+    raw = (os.getenv(key) or "").strip().lower()
+    if not raw:
+        return default
+    return raw in ("1", "true", "yes", "on")
 
 # ============================================================================
 # ERROR HANDLERS
@@ -69,52 +108,234 @@ def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
 # ============================================================================
-# DATABASE INITIALIZATION
+# DATABASE INITIALIZATION (local dev / single-process only)
 # ============================================================================
 
-from database_enhanced import init_db, create_admin_user
 from database_enhanced import get_user_by_session, is_password_change_required
+from core.activation_gate import activation_status, is_activated
+from deploy.bootstrap import run_app_bootstrap_if_enabled
 
-# ============================================================================
-# DATA DB MIGRATIONS (SQLite files or PostgreSQL bootstrap)
-# ============================================================================
-from sync_config import probe_postgresql_at_startup
+_post_activation_bootstrap_done = False
 
-probe_postgresql_at_startup()
 
-try:
-    from sync.db_migration import run_migrations
+def _ensure_post_activation_bootstrap() -> None:
+    global _post_activation_bootstrap_done
+    if _post_activation_bootstrap_done or not is_activated():
+        return
+    _post_activation_bootstrap_done = True
+    run_app_bootstrap_if_enabled()
 
-    run_migrations()
-    print('[OK] Data databases migrated successfully')
-except Exception as e:
-    print(f'[WARNING] Data DB migrations: {e}')
 
-try:
-    init_db()
-    create_admin_user()
-    print('[OK] App user database initialized successfully')
-except Exception as e:
-    print(f'[WARNING] App database initialization: {e}')
+if is_activated():
+    _ensure_post_activation_bootstrap()
+else:
+    print("[INFO] Sync bootstrap deferred until operator activation")
 
-# Start SFTP sync scheduler
-# - In debug mode, Werkzeug starts a reloader parent process + a child server process.
-#   We only start the scheduler once (in the reloader parent) using the same guard
-#   we already had, but we also allow disabling it entirely for local debugging.
-import os
-if os.environ.get('NCM_DISABLE_SCHEDULER') == '1':
-    print("[INFO] Sync scheduler disabled (NCM_DISABLE_SCHEDULER=1; includes remote pull watcher)")
-elif os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
-    from sync.scheduler import start_scheduler
+
+def _start_live_logger_terminal():
+    """
+    Open a separate terminal window that tails sync_log entries (Windows dev only).
+    Disabled in containers and when NCM_DISABLE_LIVE_LOGGER_TERMINAL=1.
+    """
+    if _env_true('NCM_CONTAINER') or _env_true('NCM_DISABLE_LIVE_LOGGER_TERMINAL'):
+        return
+    if os.environ.get('NCM_DISABLE_LIVE_LOGGER_TERMINAL', '').strip().lower() in ('1', 'true', 'yes'):
+        return
+    # Start once from the reloader parent to avoid duplicate windows.
+    if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+        return
+    script = os.path.join(os.path.dirname(__file__), 'scripts', 'live_sync_logger.py')
+    if not os.path.isfile(script):
+        print(f"[WARNING] Live logger script not found: {script}")
+        return
+    cmd = f"cd '{os.path.dirname(__file__)}'; python scripts/live_sync_logger.py"
     try:
-        start_scheduler()
-        print("[OK] Sync scheduler started")
+        subprocess.Popen(
+            ['powershell', '-NoExit', '-Command', cmd],
+            creationflags=getattr(subprocess, 'CREATE_NEW_CONSOLE', 0),
+        )
+        print('[OK] Live sync logger terminal opened')
     except Exception as e:
-        print(f"[WARNING] Sync scheduler could not start: {e}")
+        print(f"[WARNING] Could not open live logger terminal: {e}")
+
+
+_start_live_logger_terminal()
+
+
+def _open_dashboard_browser():
+    """Open the dashboard in the default browser (Windows dev only)."""
+    if _env_true('NCM_CONTAINER') or _env_true('NCM_DISABLE_AUTO_BROWSER'):
+        return
+    port = int(os.getenv('FLASK_PORT', '5000'))
+    url = f'http://localhost:{port}/dashboard'
+    try:
+        subprocess.run(
+            ['powershell', '-Command', f'Start-Process {url}'],
+            check=False,
+        )
+    except Exception as e:
+        print(f'[WARNING] Could not open dashboard in browser: {e}')
 
 # ============================================================================
-# MAIN
+# HEALTH (container orchestration / load balancers)
 # ============================================================================
+
+@app.route('/health')
+@app.route('/api/health')
+def health_check():
+    act = activation_status()
+    if not act.get('activated'):
+        return jsonify({
+            'status': 'locked',
+            'service': 'primenet',
+            'activation': act,
+        }), 503
+
+    from db.runtime import connect_app, execute_query
+
+    payload = {'status': 'ok', 'service': 'primenet', 'activation': act}
+    try:
+        conn = connect_app()
+        try:
+            execute_query(conn, 'SELECT 1')
+        finally:
+            conn.close()
+        payload['database'] = 'ok'
+    except Exception as exc:
+        payload['status'] = 'degraded'
+        payload['database'] = str(exc)
+        return jsonify(payload), 503
+    return jsonify(payload), 200
+
+# ============================================================================
+# REQUEST HOOKS
+# ============================================================================
+
+@app.before_request
+def enforce_monthly_operator_activation():
+    path = request.path or '/'
+    if path.startswith('/static/') or path.startswith('/favicon'):
+        return None
+    allowed = {
+        '/activation',
+        '/api/activation/status',
+        '/api/activation/unlock',
+        '/health',
+        '/api/health',
+    }
+    if path in allowed:
+        return None
+    if is_activated():
+        _ensure_post_activation_bootstrap()
+        return None
+    status = activation_status()
+    if path.startswith('/api/'):
+        return jsonify({
+            'error': status.get('message') or 'Operator activation required',
+            'activation_required': True,
+            'activation': status,
+        }), 403
+    from flask import redirect
+    return redirect('/activation')
+
+
+@app.before_request
+def validate_and_sanitize_request_input():
+    """
+    Global request guard:
+    - Reject malformed JSON bodies.
+    - Reject oversized query/form/json input.
+    - Provide sanitized payloads via flask.g for route handlers.
+    """
+    max_query_len = 4096
+    max_json_bytes = 1_000_000
+    max_form_bytes = 1_000_000
+    if len(request.query_string or b"") > max_query_len:
+        return jsonify({'error': 'Query string too large'}), 413
+
+    try:
+        g.sanitized_args = sanitize_mapping_values(
+            list(request.args.items(multi=True)),
+            max_items=300,
+            max_key_len=128,
+            max_val_len=1024,
+        )
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
+    if request.content_type and request.content_type.startswith('application/x-www-form-urlencoded'):
+        if (request.content_length or 0) > max_form_bytes:
+            return jsonify({'error': 'Form payload too large'}), 413
+        try:
+            g.sanitized_form = sanitize_mapping_values(
+                list(request.form.items(multi=True)),
+                max_items=500,
+                max_key_len=128,
+                max_val_len=4096,
+            )
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
+    else:
+        g.sanitized_form = {}
+
+    if request.is_json:
+        if (request.content_length or 0) > max_json_bytes:
+            return jsonify({'error': 'JSON payload too large'}), 413
+        raw = request.get_data(cache=True)
+        if raw:
+            parsed = request.get_json(silent=True)
+            if parsed is None:
+                return jsonify({'error': 'Malformed JSON payload'}), 400
+            try:
+                g.sanitized_json = sanitize_json(
+                    parsed,
+                    max_depth=10,
+                    max_items=5000,
+                    max_key_len=128,
+                    max_str_len=4096,
+                )
+            except ValueError as e:
+                return jsonify({'error': str(e)}), 400
+        else:
+            g.sanitized_json = {}
+    else:
+        g.sanitized_json = {}
+
+    return None
+
+
+@app.before_request
+def enforce_csrf_origin_for_cookie_auth():
+    """
+    Basic CSRF protection for cookie-authenticated state-changing requests.
+    """
+    if request.method not in {"POST", "PUT", "PATCH", "DELETE"}:
+        return None
+    token = request.cookies.get("session_token")
+    if not token:
+        return None
+    origin = (request.headers.get("Origin") or "").strip()
+    referer = (request.headers.get("Referer") or "").strip()
+    host = (request.host_url or "").rstrip("/")
+
+    def _same_origin(url_val: str) -> bool:
+        if not url_val:
+            return False
+        try:
+            parsed = urlparse(url_val)
+            req = urlparse(host)
+            return (parsed.scheme, parsed.netloc) == (req.scheme, req.netloc)
+        except Exception:
+            return False
+
+    if origin and not _same_origin(origin):
+        return jsonify({"error": "CSRF origin check failed"}), 403
+    if not origin and referer and not _same_origin(referer):
+        return jsonify({"error": "CSRF referer check failed"}), 403
+    if not origin and not referer:
+        return jsonify({"error": "Missing CSRF origin context"}), 403
+    return None
+
 
 @app.before_request
 def enforce_password_rotation():
@@ -147,11 +368,57 @@ def enforce_password_rotation():
         }), 403
     return redirect(url_for('user_profile.profile_page', force_password_change=1))
 
+
+@app.after_request
+def set_security_headers(resp):
+    resp.headers.setdefault("X-Content-Type-Options", "nosniff")
+    resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
+    resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    resp.headers.setdefault("Permissions-Policy", "geolocation=(), microphone=(), camera=()")
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://unpkg.com; "
+        "style-src 'self' 'unsafe-inline' https://unpkg.com; "
+        "img-src 'self' data: blob: https://*.tile.openstreetmap.org https://*.tile.openstreetmap.fr https://server.arcgisonline.com; "
+        "font-src 'self' data:; "
+        "connect-src 'self'; "
+        "frame-ancestors 'self'; "
+        "base-uri 'self';"
+    )
+    resp.headers.setdefault("Content-Security-Policy", csp)
+    if _env_true("NCM_ENABLE_HSTS", False):
+        resp.headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
+    return resp
+
 if __name__ == '__main__':
+    class ConciseRequestHandler(WSGIRequestHandler):
+        """Hide query strings in access logs (e.g., massive KPI lists)."""
+        def log_request(self, code='-', size='-'):
+            req = self.requestline or ''
+            try:
+                parts = req.split(' ', 2)
+                if len(parts) == 3:
+                    method, target, version = parts
+                    safe_target = target.split('?', 1)[0]
+                    req = f'{method} {safe_target} {version}'
+            except Exception:
+                pass
+            self.log('info', '"%s" %s %s', req, code, size)
+
     print("=" * 60)
     print("PrimeNet - Network Performance & Configuration Platform")
     print("=" * 60)
     print("Starting server...")
-    print("Dashboard: http://localhost:5000/dashboard")
+    debug = _env_true("FLASK_DEBUG", False)
+    port = int(os.getenv("FLASK_PORT", "5000"))
+    print(f"Dashboard: http://localhost:{port}/dashboard")
     print("=" * 60)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Open browser once the server is listening (skip reloader parent).
+    if not debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+        threading.Timer(1.5, _open_dashboard_browser).start()
+    app.run(
+        debug=debug,
+        host=os.getenv("FLASK_HOST", "0.0.0.0"),
+        port=port,
+        request_handler=ConciseRequestHandler,
+    )

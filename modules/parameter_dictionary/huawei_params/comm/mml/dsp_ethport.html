@@ -1,0 +1,449 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display Ethernet Port Status (DSP ETHPORT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_ethport">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display Ethernet Port Status (DSP ETHPORT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_ethport"></a><a name="dsp_ethport"></a>
+
+
+<h1 class="topictitle1">Display Ethernet Port Status (DSP ETHPORT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_ethport__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the status of an Ethernet port, including the maximum transfer unit, speed, MAC address, duplex mode, physical layer status, and traffic information.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_ethport__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Number of RX Packets(packet) indicates the number of correct packets received on the Ethernet port excluding that of clock packets. Number of RX Bytes(byte) indicates the number of the correct bytes received on the Ethernet port excluding that of clock packets.</p>
+</li><li><p>TX Traffic and RX Traffic are calculated based on the MAC layer statistics.</p>
+</li><li><p>When the Local Actual Negotiation Mode parameter is set to AUTO for an Ethernet port: </p>
+<p>1. If the Local Speed Parameter is set to 1000M, the value of the Peer Speed parameter is known and the values of the Peer Actual Negotiation Mode and Peer Duplex parameters are Unknown. </p>
+<p>2. If the Local Speed Parameter is not set to 1000M and the Local Duplex parameter is set to Full Duplex, the values of the Peer Speed and Peer Actual Negotiation Mode parameters are known and the value of the Peer Duplex parameter is Full Duplex. </p>
+<p>When the Speed Parameter is set to AUTO and the Local Actual Negotiation Mode parameter is set to FORCE for an electrical port, the values of the Peer Speed and Peer Actual Negotiation Mode parameters are known and the value of the Peer Duplex parameter is Unknown.</p>
+<p>In other cases, the values of the Peer Actual Negotiation Mode, Peer Duplex, and Peer Speed parameters are Unknown.</p>
+</li><li><p>If Cabinet No., Subrack No., and Slot No. are not specified in active/standby mode, the Ethernet port information about all physical slots is displayed.</p>
+</li><li><p>If Cabinet No., Subrack No., and Slot No. are specified in active/standby mode, the Ethernet port information about only the active and standby boards can be queried. The specified slot number is the logical slot number.</p>
+</li><li><p>The value of Local Negotiation Mode is FORCE for the Ethernet port negotiated by the interconnection port.</p>
+</li><li><p>This command can only be directly queried by <a href="add_devip.html">ADD DEVIP</a> to increase the address on ETHPORT, not directly by <a href="add_ipaddr4.html">ADD IPADDR4</a>/<a href="add_ipaddr6.html">ADD IPADDR6</a> command added in INTERFACE Address on.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_ethport__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the board where the Ethernet port is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board where the Ethernet port is located.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board where the Ethernet port is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where the Ethernet port is located.</p>
+<p>GUI Value Range: ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH_COVERBOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eGBTS, eNodeB, gNodeB]In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is within the range from 0 to 5, this parameter must be set to ETH_COVERBOARD.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or ETH_COVERBOARD.</li><li>[NodeB]In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is within the range from 0 to 5, this parameter must be set to ETH_COVERBOARD.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the Ethernet port.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>ETHPORT</strong> MO, this parameter can be set to 0 to 3 if <strong>SBT</strong> is set to BASE_BOARD.</li><li>In the <strong>ETHPORT</strong> MO, this parameter can be set to a value within the range from 0 to 5 if <strong>SBT</strong> is set to ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-ClearFlag.html">CLEAR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Clear Statistic</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to delete the historical statistics. If this parameter is set to YES, the historical statistics are deleted and a new round of statistics collecting starts upon completion of the query.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_ethport__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query the status of the Ethernet port with the parameters as follows: Cabinet No.: 0, Subrack No.: 0, Slot No.: 6, Subboard Type: BASE_BOARD, Port No.: 0, Clear Statistic: NO, run the following command:  
+DSP ETHPORT: CN=0, SRN=0, SN=6, SBT=BASE_BOARD, PN=0, CLEAR=NO;
+The result is shown as follows:
++++    0        2010-07-01 22:43:32                                        
+O&amp;M    #70                                                                      
+%%DSP ETHPORT: CN=0, SRN=0, SN=6, SBT=BASE_BOARD, PN=0, CLEAR=NO;%%             
+RETCODE = 0  Operation succeeded.                                               
+                                                                                
+DSP ETHPORT Result
+------------------
+                           Cabinet No.  =  0
+                           Subrack No.  =  0
+                              Slot No.  =  6
+                         Subboard Type  =  Base Board
+                              Port No.  =  0
+                               Port ID  =  0
+                        Port Attribute  =  Copper
+                           Port Status  =  Up
+                 Physical Layer Status  =  Up
+       Maximum Transmission Unit(byte)  =  1500
+                             ARP Proxy  =  Disable
+                          Flow Control  =  Close
+                           MAC Address  =  00EA-5068-140A
+                       Loopback Status  =  No Loop
+               In Loopback Mode or Not  =  No
+                 Ethernet OAM 3AH Flag  =  Disable
+          Number of RX Packets(packet)  =  112
+              Number of RX Bytes(byte)  =  32921
+Number of RX CRC Error Packets(packet)  =  0  
+                    RX Traffic(byte/s)  =  0 
+          Number of TX Packets(packet)  =  44 
+              Number of TX Bytes(byte)  =  17204 
+                    TX Traffic(byte/s)  =  0
+                Local Negotiation Mode  =  Force
+                           Local Speed  =  100M
+                          Local Duplex  =  Full Duplex
+          Peer Actual Negotiation Mode  =  Unknown
+                            Peer Speed  =  Unknown
+                           Peer Duplex  =  Unknown
+                         Number of IPs  =  1
+                       IP Address List  =  192.168.1.1 255.255.255.0
+                              FEC Mode  =  NULL
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_ethport__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the board where the Ethernet port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the board where the Ethernet port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the board where the Ethernet port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subboard Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of sub-board on the board where the Ethernet port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of an Ethernet port, which uniquely identifies the Ethernet port. When the system automatically creates an Ethernet port, the most significant bit to the least significant bit of this parameter value indicate the cabinet number, subrack number, slot number, and port number of the Ethernet port, respectively. When Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, this parameter is optional. If this parameter is not set, the default value 4294967295 is used. When Transmission Configuration Mode in the GTRANSPARA MO is set to NEW, this parameter is mandatory and must be unique in the system. If the ETHPORT MO is not configured, the default value 4294967295 of PORTID is displayed.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port Attribute</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether an Ethernet port is an electrical port or optical port. When the system starts, the system binds an Ethernet port to an electrical port preferentially if the default value of the port attribute is AUTO. If the BS does not support cascading, the port attribute is set to AUTO. If this parameter is incorrectly set, services of a base station will be interrupted after the base station is reset.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the status of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Physical Layer Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the physical layer status of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Maximum Transmission Unit(byte)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum IPv4 packet size (including the IP header) at the Ethernet port. For the UMPTa/b, UMDU, LMPT, UCCU, and UTRPc, the value of this parameter ranges from 46 to 1800. For the WMPT, GTMUb, GTMUc, UQEC, and UEOC, the value of this parameter ranges from 46 to 1500. For the UMPTe, the value of this parameter ranges from 46 to 2000. For the UMPTg and UMPTga, the value of this parameter ranges from 46 to 9000. If this parameter is set to a value greater than the maximum allowed value, the maximum allowed value takes effect. A value greater than or equal to 776 is recommended, because broadcast packets, such as DHCP packets, may experience reception or transmission failures if the maximum transmission unit is smaller than 776. If the Ethernet port is added to an Ethernet trunk, this parameter becomes invalid. The actual maximum transmission unit depends on the value set for the Ethernet trunk.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ARP Proxy</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether to enable the ARP proxy function on the Ethernet port. If the ARP proxy function is enabled, the system serves as an ARP proxy for a loopback interface address of the base station or for an interface IP address of a lower-level base station. If this function is disabled, the system does not serve as an ARP proxy for the loopback interface IP address of the base station or for the interface IP address of a lower-level base station. To access either IP address in this case, an external device on the same subnet must be configured with a route. If the Ethernet port is added to an Ethernet trunk, this parameter becomes invalid. Whether the ARP proxy function is enabled is determined by the setting of this parameter for the Ethernet trunk.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Flow Control</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether to enable flow control on the Ethernet port. Flow control is implemented to prevent congestion. When flow control is enabled, the RX end repeatedly sends PAUSE frames to the TX end, instructing the TX end to lower the TX rate if congestion occurs on the RX end. Upon receiving PAUSE frames, the TX end stops sending data during a period of time to prevent congestion.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>MAC Address</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the MAC address (six bytes) configured for the Ethernet port. The format is XXXX-XXXX-XXXX.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Loopback Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the loopback status of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>In Loopback Mode or Not</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the Ethernet port is in the steady state of the OAM 3AH loopback response. For details, see IEEE 802.3ah.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Ethernet OAM 3AH Flag</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the Ethernet OAM 3AH is enabled.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of RX Packets(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of packets received at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of RX Bytes(byte)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of bytes received at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of RX CRC Error Packets(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of CRC error packets received at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>RX Traffic(byte/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the traffic received at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of TX Packets(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of packets transmitted at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of TX Bytes(byte)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of bytes transmitted at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>TX Traffic(byte/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the traffic transmitted at the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Negotiation Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the negotiation mode of the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Speed</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the speed mode of the Ethernet port. This parameter must be set to the same value as that of the peer port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Duplex</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the duplex mode of the Ethernet port. If an Ethernet electrical port is used, this parameter is valid when SPEED is not set to AUTO. If an Ethernet optical port is used, this parameter must be set to FULL.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer Actual Negotiation Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the negotiation mode of the NE connecting to the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer Speed</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the speed mode of the NE connecting to the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer Duplex</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the duplex mode of the NE connecting to the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Number of IPs</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of IP addresses configured for the Ethernet port.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>IP Address List</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the IP address and mask list configured for the Ethernet port.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>FEC Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the forward error correction (FEC) mode of the Ethernet port when it is a 25 Gbit/s optical port. When this parameter is set to RS-FEC, the transmit end adds error correction information to the data packet. The receive end uses the error correction information to correct the bit error generated during the transmission of the data packet, so as to improve the signal quality. When this parameter is set to NO-FEC, the FEC function is disabled and no error correction information is added to the transmitted packets.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

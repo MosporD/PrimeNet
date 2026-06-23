@@ -1,0 +1,366 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="E1T1">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="E1T1">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>E1T1</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="E1T1"></a><a name="E1T1"></a>
+
+
+<h1 class="topictitle1">E1T1</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="E1T1.html"><strong>E1T1</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO is used to set parameters for an E1/T1 port, including modifying the E1/T1 working mode and setting the frame format, line code, and clock mode.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, the <strong>E1T1</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In one logical protection group, <strong>SN</strong> in an <strong>HAGRP</strong> MO must be the same as that in an <strong>E1T1</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>SBT</strong> in a <strong>PPPLNK</strong> MO is not set to BACK_BOARD, the associated <strong>E1T1</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>E1T1</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]A maximum of eight <strong>E1T1</strong> MOs with <strong>SBT</strong> set to BACK_BOARD can be configured on a BS.</li><li>[Co-MPT, NodeB, eGBTS]The total number of cross-board <strong>TSCROSS</strong> MOs, backplane <strong>E1T1</strong> MOs, and cross-board <strong>MPLNK</strong> MOs configured on the same board cannot exceed eight.</li></ul>
+</li><li>Relation with the <strong>MPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>SBT</strong> in an <strong>MPLNK</strong> MO is set to BACK_BOARD, the associated <strong>E1T1</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>PORTSECURITY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When removing an <strong>E1T1</strong> MO whose <strong>SBT</strong> is set to BASE_BOARD or E1_COVERBOARD, the system automatically removes the <strong>PORTSECURITY</strong> MO that depends on the <strong>E1T1</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TSCROSS</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]The source and destination E1/T1 ports of a timeslot cross-connection must have the same working mode. The source E1/T1 port of a timeslot cross-connection corresponds to the <strong>E1T1</strong> MO whose <strong>PS</strong> is set to ALLPORT and whose <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SRCSN</strong>, and <strong>SRCSBT</strong> in the <strong>TSCROSS</strong> MO, respectively. The destination E1/T1 port of a timeslot cross-connection corresponds to the <strong>E1T1</strong> MO whose <strong>PS</strong> is set to ALLPORT and whose <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>DSTSN</strong>, and <strong>DSTSBT</strong> in the <strong>TSCROSS</strong> MO, respectively. The two <strong>E1T1</strong> MOs must have the same <strong>WORKMODE</strong>. If no <strong>E1T1</strong> MO with <strong>PS</strong> set to ALLPORT has been configured, <strong>WORKMODE</strong> in the <strong>E1T1</strong> MOs must be set to the default value, namely, E1_UNBA.</li><li>[Co-MPT, NodeB, eGBTS]Before adding a <strong>TSCROSS</strong> MO, ensure that the associated backplane <strong>E1T1</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>UNILNK</strong> MO:<ul><li>[Co-MPT, NodeB]When a <strong>UNILNK</strong> MO is configured for the <strong>E1T1</strong> MO whose <strong>LNCODE</strong> is set to AMI, <strong>SCRAM</strong> in the <strong>UNILNK</strong> MO must be set to ENABLE.</li><li>[Co-MPT, NodeB]If <strong>SBT</strong> in a <strong>UNILNK</strong> MO is set to BACK_BOARD, an <strong>E1T1</strong> MO that meets the following conditions must exist: <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>PN</strong> in the <strong>E1T1</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>UNILNKN</strong> in the <strong>UNILNK</strong> MO respectively.</li></ul>
+</li><li>Relation with the <strong>IMALNK</strong> and <strong>IMAGRP</strong> MOs:<ul><li>[Co-MPT, NodeB]When an <strong>IMALNK</strong> MO is configured for the <strong>E1T1</strong> MO whose <strong>LNCODE</strong> is set to AMI, <strong>SCRAM</strong> in the associated <strong>IMAGRP</strong> MO must be set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>IMALNK</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>SBT</strong> in an <strong>IMALNK</strong> MO is set to BACK_BOARD, an <strong>E1T1</strong> MO that meets the following condition must exist: <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>PN</strong> in the <strong>E1T1</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>IMALNKN</strong> in the <strong>IMALNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>FRAATM</strong> MO:<ul><li>[Co-MPT, NodeB]When an <strong>FRAATM</strong> MO is configured for the <strong>E1T1</strong> MO whose <strong>LNCODE</strong> is set to AMI, <strong>SCRAM</strong> in the <strong>FRAATM</strong> MO must be set to ENABLE.</li><li>[Co-MPT, NodeB]If <strong>SBT</strong> in an <strong>FRAATM</strong> MO is set to BACK_BOARD, an <strong>E1T1</strong> MO that meets the following conditions must have been configured: <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>PN</strong> in the <strong>E1T1</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, and <strong>PN</strong> in the <strong>FRAATM</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>SAALLNK</strong>, and <strong>IMALNK</strong> MOs:<ul><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>OMCH</strong>, and <strong>IMALNK</strong> MOs:<ul><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SAALLNK</strong> MO:<ul><li>[Co-MPT, NodeB]In a <strong>UNILNK</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>UNILNK</strong> MO.</li><li>[Co-MPT, NodeB]In an <strong>FRAATM</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>FRAATM</strong> MO.</li></ul>
+</li><li>Relation with the <strong>AAL2PATH</strong>, <strong>IMAGRP</strong>, and <strong>IMALNK</strong> MOs:<ul><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in an <strong>AAL2PATH</strong> MO is set to DISABLE, the transmit bandwidth for the <strong>AAL2PATH</strong> MO cannot exceed the transmit bandwidth for an <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>AAL2PATH</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in an <strong>AAL2PATH</strong> MO is set to DISABLE, the transmit bandwidth for the <strong>AAL2PATH</strong> MO cannot exceed the transmit bandwidth for a <strong>UNILNK</strong> MO.</li><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in an <strong>AAL2PATH</strong> MO is set to DISABLE, the transmit bandwidth for the <strong>AAL2PATH</strong> MO cannot exceed the transmit bandwidth for an <strong>FRAATM</strong> MO.</li><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in an <strong>AAL2PATH</strong> MO is set to DISABLE, the receive bandwidth for the <strong>AAL2PATH</strong> MO cannot exceed the receive bandwidth for a <strong>UNILNK</strong> MO.</li><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in an <strong>AAL2PATH</strong> MO is set to DISABLE, the receive bandwidth for the <strong>AAL2PATH</strong> MO cannot exceed the receive bandwidth for an <strong>FRAATM</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>TREELNKPVC</strong>, and <strong>IMALNK</strong> MOs:<ul><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in a <strong>TREELNKPVC</strong> MO is set to DISABLE, the transmit bandwidth for the <strong>TREELNKPVC</strong> MO cannot exceed the transmit bandwidth for an <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TREELNKPVC</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in a <strong>TREELNKPVC</strong> MO is set to DISABLE, the transmit bandwidth for the <strong>TREELNKPVC</strong> MO cannot exceed the transmit bandwidth for a <strong>UNILNK</strong> MO.</li><li>[Co-MPT, NodeB]If <strong>JNRSCGRP</strong> in a <strong>TREELNKPVC</strong> MO is set to DISABLE, the transmit bandwidth for the <strong>TREELNKPVC</strong> MO cannot exceed the transmit bandwidth for an <strong>FRAATM</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IMAGRP</strong>, <strong>RSCGRP</strong>, and <strong>IMALNK</strong> MOs:<ul><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the sum of the values of <strong>TXBW</strong> in each <strong>RSCGRP</strong> MO cannot exceed the bandwidth of the <strong>IMAGRP</strong> MO.</li><li>[Co-MPT, NodeB]In an <strong>IMAGRP</strong> MO, the sum of the values of <strong>RXBW</strong> in each <strong>RSCGRP</strong> MO cannot exceed the bandwidth of the <strong>IMAGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB]In a <strong>UNILNK</strong> MO, the sum of the values of <strong>TXBW</strong> in each <strong>RSCGRP</strong> MO cannot exceed the bandwidth for the <strong>UNILNK</strong> MO.</li><li>[Co-MPT, NodeB]In a <strong>UNILNK</strong> MO, the sum of the values of <strong>RXBW</strong> in each <strong>RSCGRP</strong> MO cannot exceed the bandwidth for the <strong>UNILNK</strong> MO.</li><li>[Co-MPT, NodeB]In an <strong>FRAATM</strong> MO, the sum of the values of <strong>TXBW</strong> in each <strong>RSCGRP</strong> MO cannot exceed the bandwidth for the <strong>FRAATM</strong> MO.</li><li>[Co-MPT, NodeB]In an <strong>FRAATM</strong> MO, the sum of the values of <strong>RXBW</strong> in each <strong>RSCGRP</strong> MO cannot exceed the bandwidth for the <strong>FRAATM</strong> MO.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB]In a <strong>UNILNK</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>UNILNK</strong> MO.</li><li>[Co-MPT, NodeB]In an <strong>FRAATM</strong> MO, the total transmit bandwidth for the <strong>SAALLNK</strong> MO with <strong>JNRSCGRP</strong> set to DISABLE and for the <strong>OMCH</strong> MO cannot exceed the transmit bandwidth for the <strong>FRAATM</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>E1T1</strong> MOs must be less than or equal to 13 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#E1T1__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="E1T1__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="E1T1__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_backe1t1.html">ADD BACKE1T1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an E1/T1 port on the backplane.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_e1t1.html">ADD E1T1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/chk_e1t1crs.html">CHK E1T1CRS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to check an E1/T1 port for crossed pair connections.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_e1t1.html">DSP E1T1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the E1/T1 port status.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_backe1t1.html">LST BACKE1T1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of an E1/T1 port configured on the backplane.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_e1t1.html">LST E1T1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the E1/T1 port configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_backe1t1.html">RMV BACKE1T1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an E1/T1 port from the backplane.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_e1t1.html">RMV E1T1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove the current configuration of an E1/T1 port and restore the default configuration of the port. That is, Work Mode is set to E1_UNBA(E1 Unbalance), Frame Format to E1_CRC4_MULTI_FRAME(E1 CRC4 Multiple Frames), Line Code to HDB3(E1 HDB3 Code), and Clock Mode to SLAVE(Slave Mode).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_e1t1.html">SET E1T1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set an E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_e1t1lop.html">SET E1T1LOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set a loopback on an E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/stp_e1t1offltst.html">STP E1T1OFFLTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to stop the E1/T1 offline performance test, summarize the E1/T1 test data, and report the data to the maintenance terminal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/stp_e1t1onltst.html">STP E1T1ONLTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to stop an E1/T1 online performance test and report the test data to the LMT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_e1t1offltst.html">STR E1T1OFFLTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start an E1/T1 offline BER test.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_e1t1onltst.html">STR E1T1ONLTST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start an E1/T1 online performance test.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#E1T1__tab2">Table 2</a> and <a href="#E1T1__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="E1T1__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="E1T1__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board where an E1/T1 port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board where an E1/T1 port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board where an E1/T1 port is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-PortNo.html">Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-PortSelect.html">Port Selection</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the range of E1/T1 ports. Note that the E1T1 MO with this parameter set to ALLPORT is actually not created on the BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-WorkMode.html">Work Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the working mode of the E1/T1 port. This parameter must be set to the same value as that at the peer end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-FrameFormat.html">Frame Format</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frame format used by the E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-LineCode.html">Line Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the line coding mode of an E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-ClockMode.html">Clock Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the clock mode of the E1/T1 port.</p>
+<p>1. If the BS extracts the line clock from the E1/T1 port, the clock mode of the E1/T1 port must be set to SLAVE. If the BS provides the line clock for the lower-level equipment through the E1/T1 port, the clock mode of the E1/T1 port must be set to MASTER. Otherwise, the line clock may fail to work properly.</p>
+<p>2. When the E1/T1 port provides an 8K clock reference for the transmission interface board, the clock mode of the E1/T1 port must be set to SLAVE.</p>
+<p>3. The clock modes of E1/T1 ports used by an inter-board MLPPP group cannot be all set to SLAVE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-DstSlotNo.html">Destination Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot housing the destination board whose backplane has an E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/E1T1-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of sub-board on the board where the E1/T1 port is located.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="E1T1__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="E1T1__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/E1T1-LinkRunningStatus.html">Link Running Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the link running status. The link running status is classified into Available, Local Loop, Remote Loop, Physical Loop, Remote Time Slot Loop, Loss of Signal, Alarm Indication Signal, Remote Alarm Indication, Loss of Frame Alignment, Loss of Multiframe Alignment, Slip, Backup, and Other Fault.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/E1T1-ExecuteLinkTestFlag.html">Link Test Execution Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether to perform the link test and the test type. The test types are classified into No Test, Offline Test, and Online Test.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/E1T1-UsedFlag.html">Used Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether the E1/T1 port is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/E1T1-LoopLeftTime.html">Loop Left Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the remaining loop time of the E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/E1T1-ActualWorkMode.html">Actual Work Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual work mode of the E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/E1T1-ActualFrameFormat.html">Actual Frame Format</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual frame format of the E1/T1 port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/E1T1-ActualLineCode.html">Actual Line Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the actual line coding mode of the E1/T1 port.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#E1T1__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="E1T1__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="E1T1__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455312.html">VS.E1T1.CodeViolate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Code Type Errors on the E1/T1 Electrical Port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455313.html">VS.E1T1.FramingError</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Base Frame Alignment Errors on the E1/T1 Electrical Port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455314.html">VS.E1T1.CrcError     </a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of CRC Errors on the E1/T1 Electrical Port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455315.html">VS.E1T1.EbitError     </a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Ebit Errors on the E1/T1 Port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455316.html">VS.E1T1.Sa6Error           </a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Sa6 Errors on the E1/T1 Port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455320.html">VS.E1T1.Multiframe         </a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of multiframe cycles at the E1/T1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455321.html">VS.E1T1.FrameAlignChanged</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Times that Frames Are Not Aligned</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455866.html">VS.E1T1.ES.TES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total Errored Seconds in the TX Direction</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455867.html">VS.E1T1.ES.TSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total Severely Errored Seconds in the TX Direction</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455868.html">VS.E1T1.ES.TUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total Unavailable Seconds in the TX Direction</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455869.html">VS.E1T1.ES.RES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total Errored Seconds in the RX Direction</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455870.html">VS.E1T1.ES.RSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total Severely Errored Seconds in the RX Direction</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542455871.html">VS.E1T1.ES.RUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Total Unavailable Seconds in the RX Direction</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

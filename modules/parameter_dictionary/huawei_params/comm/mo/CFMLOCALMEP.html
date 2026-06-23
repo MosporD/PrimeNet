@@ -1,0 +1,233 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CFMLOCALMEP">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CFMLOCALMEP">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CFMLOCALMEP</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CFMLOCALMEP"></a><a name="CFMLOCALMEP"></a>
+
+
+<h1 class="topictitle1">CFMLOCALMEP</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="CFMMD.html">CFMMD</a>
+    +-<a href="CFMMA.html">CFMMA</a>
+      +-<a href="CFMLOCALMEP.html"><strong>CFMLOCALMEP</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CFMMEP MO consists of the parameters related to the local maintenance association end point (MEP). Local MEPs and remote MEPs (RMEPs) determine the scope and boundaries of a maintenance domain (MD). The MD and MA to which MEPs belong determine the VLAN attributes and level for messages sent from the MEPs.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="CFMMA.html">CFMMA</a></li><li>Relation with the <strong>CFMLOCALMEP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Only one <strong>CFMLOCALMEP</strong> MO can be configured in a <strong>CFMMA</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the parent <strong>CFMMA</strong> MO of a <strong>CFMLOCALMEP</strong> MO is bound to a VLAN, the <strong>LEVEL</strong> value in the <strong>CFMMD</strong> MO to which the <strong>CFMLOCALMEP</strong> MO belongs must be greater than that of the <strong>CFMMD</strong> MO containing any <strong>CFMLOCALMEP</strong> MO not bound to a VLAN.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before adding a <strong>CFMLOCALMEP</strong> MO to an <strong>ETHPORT</strong> MO in an <strong>ETHTRUNK</strong> MO, ensure that <strong>LEVEL</strong> in the <strong>CFMMD</strong> MO to which the <strong>CFMLOCALMEP</strong> MO belongs is less than or equal to that in the <strong>CFMMD</strong> MO to which the <strong>CFMLOCALMEP</strong> MO configured for the <strong>ETHTRUNK</strong> MO belongs.</li></ul>
+</li><li>Relation with the <strong>CFMRMEP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Under a <strong>CFMMA</strong> MO, <strong>MEPID</strong> in the <strong>CFMLOCALMEP</strong> MO and <strong>RMEPID</strong> in the <strong>CFMRMEP</strong> MO cannot be set to the same value.</li></ul>
+</li><li>Relation with the <strong>CFMMEP</strong> and <strong>CFMRMEP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, <strong>CFMMEP</strong> MO must be configured when a <strong>CFMRMEP</strong> MO has been configured in a <strong>CFMMA</strong> MO.</li><li>When the <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>CFMLOCALMEP</strong> MO must be configured when a <strong>CFMRMEP</strong> MO has been configured in a <strong>CFMMA</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before a <strong>CFMLOCALMEP</strong> MO is configured on an <strong>ETHTRUNK</strong> MO or on an <strong>ETHPORT</strong> MO that is not added to an <strong>ETHTRUNK</strong> MO, <strong>BNDVLAN</strong> in the parent <strong>CFMMA</strong> MO of the <strong>CFMLOCALMEP</strong> MO must be set to YES.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>ETHPORT</strong> MO configured with a <strong>CFMLOCALMEP</strong> MO has joined an <strong>ETHTRUNK</strong> MO, the <strong>CFMMA</strong> MO to which the <strong>CFMLOCALMEP</strong> MO belongs cannot be associated with any VLAN.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring a <strong>CFMLOCALMEP</strong> MO on an <strong>ETHTRUNK</strong> MO, ensure that the <strong>ETHTRUNKLNK</strong> MO has been configured in the <strong>ETHTRUNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring a <strong>CFMLOCALMEP</strong> MO on an <strong>ETHTRUNK</strong> MO, ensure that the <strong>ETHTRUNK</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>CFMMA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When adding a <strong>CFMLOCALMEP</strong> MO to an <strong>ETHPORT</strong> MO that belongs to an <strong>ETHTRUNK</strong> MO, <strong>CCMINTL</strong> in the <strong>CFMMD</strong> MO containing the <strong>CFMLOCALMEP</strong> MO in the <strong>ETHTRUNK</strong> MO must be greater than <strong>CCMINTL</strong> in the <strong>CFMMD</strong> MO containing the <strong>CFMLOCALMEP</strong> MO in the <strong>ETHTRUNKLNK</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When setting the <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO to NEW and adding a <strong>CFMLOCALMEP</strong> MO to an <strong>ETHTRUNK</strong> MO that an <strong>ETHPORT</strong> MO belongs to it, <strong>CCMINTL</strong> in the <strong>CFMMD</strong> MO containing the <strong>CFMLOCALMEP</strong> MO in the <strong>ETHTRUNK</strong> MO must be greater than <strong>CCMINTL</strong> in the <strong>CFMMD</strong> MO containing the <strong>CFMLOCALMEP</strong> MO in the <strong>ETHTRUNKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PORTSECURITY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>ETHPORT</strong> MO that is associated with a <strong>CFMLOCALMEP</strong> MO must meet either of the following conditions: (1) No <strong>PORTSECURITY</strong> MO is associated with the <strong>ETHPORT</strong> MO; (2) A <strong>PORTSECURITY</strong> MO is associated with the <strong>ETHPORT</strong> MO, but <strong>SWITCH</strong> in the <strong>PORTSECURITY</strong> MO is set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>ETHDM</strong> and <strong>CFMMEP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>CFMMEP</strong> MO referenced by the <strong>ETHDM</strong> MO must have been configured.</li><li>If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>CFMLOCALMEP</strong> MO referenced by the <strong>ETHDM</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ETHLM</strong> and <strong>CFMMEP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>CFMMEP</strong> MO referenced by the <strong>ETHLM</strong> MO must have been configured.</li><li>If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>CFMLOCALMEP</strong> MO referenced by the <strong>ETHLM</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ETHLM</strong> and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and the <strong>ETHLM</strong> MO is associated with the <strong>CFMLOCALMEP</strong> MO whose <strong>PT</strong> parameter is set to ETHTRK, the <strong>ETHLM</strong> MO cannot be activated. When the <strong>ETHLM</strong> MO is associated with the <strong>CFMLOCALMEP</strong> MO whose <strong>PT</strong> parameter is set to ETH and this port has been added to the <strong>ETHTRUNK</strong> MO, the <strong>ETHLM</strong> MO cannot be activated.</li></ul>
+</li><li>Relation with the <strong>ETHPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring a <strong>CFMLOCALMEP</strong> MO on an <strong>ETHPORT</strong> MO, ensure that the <strong>ETHPORT</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>CFMLOCALMEP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>TAGGED</strong> in the <strong>INTERFACE</strong> MO associated with the <strong>CFMLOCALMEP</strong> MO must be set to ENABLE if the <strong>CFMLOCALMEP</strong> MO meets any of the following conditions: <strong>PORTID</strong> in the <strong>CFMLOCALMEP</strong> MO is equal to <strong>PORTID</strong> in the <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to ETH, and <strong>ITFTYPE</strong> is set to NORMAL. <strong>PORTID</strong> in the <strong>CFMLOCALMEP</strong> MO is equal to <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO, <strong>PORTID</strong> is equal to <strong>ETHTRKPORTID</strong>, <strong>PT</strong> is set to ETH, <strong>ITFTYPE</strong> is set to NORMAL, and <strong>PT</strong> is set to ETHTRK. <strong>PORTID</strong> in the <strong>CFMLOCALMEP</strong> MO is equal to <strong>PORTID</strong> in the <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to ETHTRK, and <strong>ITFTYPE</strong> is set to NORMAL.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CFMLOCALMEP__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CFMLOCALMEP__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CFMLOCALMEP__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_cfmlocalmep.html">ADD CFMLOCALMEP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a local maintenance association end point (MEP).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cfmlocalmep.html">DSP CFMLOCALMEP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of the local maintenance association end point (MEP).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cfmlocalmep.html">LST CFMLOCALMEP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the local maintenance association end point (MEP).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_cfmlocalmep.html">RMV CFMLOCALMEP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a local connectivity fault management (CFM) maintenance association end point (MEP).</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CFMLOCALMEP__tab2">Table 2</a> and <a href="#CFMLOCALMEP__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CFMLOCALMEP__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CFMLOCALMEP__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CFMLOCALMEP-MDName.html">MD Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the MD to which the MEP belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CFMLOCALMEP-MAName.html">MA Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the MA to which the MEP belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CFMLOCALMEP-MEPID.html">MEP ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MEP ID.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CFMLOCALMEP-PortType.html">Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port type of MEP.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CFMLOCALMEP-PortID.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the port to which the MEP belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CFMLOCALMEP-CCSwitch.html">CC Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the continuity check (CC) of the CFM.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CFMLOCALMEP__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CFMLOCALMEP__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-BindingVLAN.html">Binding VLAN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether the MA to which the MEP belongs is bound to a VLAN.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-VLANID.html">VLAN ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of a VLAN of the MA to which the MEP belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-VLANPri.html">VLAN Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the priority of a VLAN of the MA to which the MEP belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-TxCCPDU.html">Number of TX CCM PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted connectivity check (CC) packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-RxCCPDU.html">Number of RX CCM PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received connectivity check (CC) packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-TxLBPDU.html">Number of TX Loopback PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted loopback packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-RxLBPDU.html">Number of RX Loopback PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received loopback packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-TxLTPDU.html">Number of TX Link Trace PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of trace packets transmitted on a link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-RxLTPDU.html">Number of RX Link Trace PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of trace packets received on a link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-TxSuccCFMPDU.html">Number of TX Success CFM PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted CFM packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-RxSuccCFMPDU.html">Number of RX Success CFM PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received CFM packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-TxDroppedCFMPDU.html">Number of TX Dropped CFM PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of CFM packets discarded during transmission discarded.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CFMLOCALMEP-RxDroppedCFMPDU.html">Number of RX Dropped CFM PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of CFM packets discarded during reception.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

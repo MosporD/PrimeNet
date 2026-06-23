@@ -1,0 +1,356 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify PDSCH Configuration (MOD PDSCHCFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_pdschcfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify PDSCH Configuration (MOD PDSCHCFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_pdschcfg"></a><a name="mod_pdschcfg"></a>
+
+
+<h1 class="topictitle1">Modify PDSCH Configuration (MOD PDSCHCFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_pdschcfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the PDSCH configuration.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_pdschcfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If a cell is an air cell, online modifications on the PDSCH configuration will result in automatic reset of the cell.</p>
+</li><li><p>Modification of CrsPowerBoostingAmplitude will cause the cell to automatically reset. After the reset, the cell establishment may fail because the RF module does not support CRS Boosting or the RF module capability to support this function is lower than the setting of this parameter. Therefore, it is recommended that the cell's maximum capability to support this function be queried by running an MML command of DSP CELLCRSBOOSTINGCAPABILITY before this parameter is modified.</p>
+</li><li><p>After the power of a cell is changed, it takes 1 to 3 seconds for the change to take effect on the RRUs serving the cell. If the command used to change the cell power needs to be consecutively executed for a cell, it is recommended that the command be executed at an interval of 3 seconds to prevent command execution failure.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_pdschcfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-ReferenceSignalPwr.html">ReferenceSignalPwr</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reference signal power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cell reference signal power of each physical antenna (the precision of converting dBm to mW is 0.01 mW). However, the cell reference signal power delivered in SIB2 is that of each logical antenna. If the EMTC_SWITCH option of the EmtcAlgoSwitch parameter in a CellEmtcAlgo MO is selected and the value of this parameter is changed, the eNodeB will proactively release eMTC UEs that have already accessed the cell. For FDD 8T8R and 32T32R cells, this parameter indicates the cell reference signal power of each logical antenna.</p>
+<p>GUI Value Range: -600~500</p>
+<p>Unit: 0.1dBm</p>
+<p>Actual Value Range: -60~50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: (1) Coverage: If the value of ReferenceSignalPwr is too large, overshoot coverage occurs. This causes interference to other cells. If the value of ReferenceSignalPwr is too small, coverage holes appear.</p>
+<p>(2) Interference: The setting of ReferenceSignalPwr varies with the interference from neighboring cells. A large interference margin is required where the interference is strong.</p>
+<p>(3) Channel estimation: A larger value of ReferenceSignalPwr leads to higher channel estimation accuracy, a lower demodulation threshold, and higher receiver sensitivity, but it causes stronger interference to neighboring cells.</p>
+<p>(4) Capacity: A larger value of ReferenceSignalPwr brings better coverage, but a large value limits the power used for the transmission of data and hence decreases the system capacity.</p>
+<p>Set ReferenceSignalPwr appropriately to ensure a reasonable tradeoff between coverage and capacity, effective channel estimation, and appropriate interference control.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-Pb.html">Pb</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the scaling factor index of the Energy Per Resource Element (EPRE) on the PDSCH. This scaling factor is determined by the value of this parameter and the antenna port. For details, see 3GPP TS 36.213. If the EMTC_SWITCH option of the EmtcAlgoSwitch parameter in a CellEmtcAlgo MO is selected and the value of this parameter is changed, eMTC UEs that already accessed the cell will be proactively released.</p>
+<p>GUI Value Range: 0~3</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Single-antenna: 0; double-antenna: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to higher power for data on the symbols in which there are reference signals. A larger value of this parameter leads to the opposite effect.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-ReferenceSignalPwrMargin.html">ReferenceSignalPwrMargin</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reference Signal Power Margin</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cell reference signal power headroom of each physical antenna. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~60</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: 0~6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to more power headroom available for a single channel and a larger increase in the cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-TxPowerOffsetAnt0.html">TxPowerOffsetAnt0</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Offset of Ant0 to Tx Power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the TX power of physical channel 0 relative to the baseline TX power. The baseline TX power is determined by the system bandwidth, cell reference signal power, Pa, and Pb. If the TX power configurations should be the same between physical channels, set this parameter to 255. If the TX power configurations should be different between physical channels, set this parameter to a proper value based on the actual situation. This parameter applies only to FDD.</p>
+<p>GUI Value Range: -100~100,255</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: -10~10,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: When this parameter is set to 255, different TX power configurations between channels do not take effect. When this parameter is set to 0, the coverage area is not affected. When this parameter is set to a value greater than 0, the coverage area increases. When this parameter is set to a value less than 0, the coverage area shrinks.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-TxPowerOffsetAnt1.html">TxPowerOffsetAnt1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Offset of Ant1 to Tx Power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the TX power of physical channel 1 relative to the baseline TX power. The baseline TX power is determined by the system bandwidth, cell reference signal power, Pa, and Pb. If the TX power configurations should be the same between physical channels, set this parameter to 255. If the TX power configurations should be different between physical channels, set this parameter to a proper value based on the actual situation. This parameter applies only to FDD.</p>
+<p>GUI Value Range: -100~100,255</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: -10~10,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: When this parameter is set to 255, different TX power configurations between channels do not take effect. When this parameter is set to 0, the coverage area is not affected. When this parameter is set to a value greater than 0, the coverage area increases. When this parameter is set to a value less than 0, the coverage area shrinks.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-TxPowerOffsetAnt2.html">TxPowerOffsetAnt2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Offset of Ant2 to Tx Power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the TX power of physical channel 2 relative to the baseline TX power. The baseline TX power is determined by the system bandwidth, cell reference signal power, Pa, and Pb. If the TX power configurations should be the same between physical channels, set this parameter to 255. If the TX power configurations should be different between physical channels, set this parameter to a proper value based on the actual situation. This parameter applies only to FDD.</p>
+<p>GUI Value Range: -100~100,255</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: -10~10,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: When this parameter is set to 255, different TX power configurations between channels do not take effect. When this parameter is set to 0, the coverage area is not affected. When this parameter is set to a value greater than 0, the coverage area increases. When this parameter is set to a value less than 0, the coverage area shrinks.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-TxPowerOffsetAnt3.html">TxPowerOffsetAnt3</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Offset of Ant3 to Tx Power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the TX power of physical channel 3 relative to the baseline TX power. The baseline TX power is determined by the system bandwidth, cell reference signal power, Pa, and Pb. If the TX power configurations should be the same between physical channels, set this parameter to 255. If the TX power configurations should be different between physical channels, set this parameter to a proper value based on the actual situation. This parameter applies only to FDD.</p>
+<p>GUI Value Range: -100~100,255</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: -10~10,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: When this parameter is set to 255, different TX power configurations between channels do not take effect. When this parameter is set to 0, the coverage area is not affected. When this parameter is set to a value greater than 0, the coverage area increases. When this parameter is set to a value less than 0, the coverage area shrinks.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-TxChnPowerCfgSw.html">TxChnPowerCfgSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TX Channel Power Config Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable algorithms related to transmit channel power configurations.</p>
+<p>SINGLE_CA_PWR_SHARE_SW_FOR_4T: Indicates whether to enable single carrier power sharing for 4T. This option applies only to LTE FDD.</p>
+<p>GUI Value Range: SINGLE_CA_PWR_SHARE_SW_FOR_4T(SINGLE_CA_PWR_SHARE_SW_FOR_4T)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLE_CA_PWR_SHARE_SW_FOR_4T</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SINGLE_CA_PWR_SHARE_SW_FOR_4T:Off</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the LogicalPortSwapSwitch parameter in the PDSCHCfg MO is set to SWAP_MODE_1, the SINGLE_CA_PWR_SHARE_SW_FOR_4T option of the TxChnPowerCfgSw parameter in the PDSCHCfg MO must be deselected.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: SINGLE_CA_PWR_SHARE_SW_FOR_4T: If this option is selected, single carrier power sharing for 4T is enabled. In scenarios where the total power remains unchanged after a 2T cell is upgraded to a 4T cell, the reference signal power remains unchanged. This ensures that the coverage of the original 2T cell does not shrink. If this option is deselected, single carrier power sharing for 4T is disabled, which has no impact on the network performance.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-CellPowerLimit.html">CellPowerLimit</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Power Limit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum transmit power of a single channel for a cell. If this parameter is set to 0, the maximum transmit power of a single channel for the cell is not limited. If this parameter is set to a value other than 0, the maximum transmit power of a single channel for the cell is limited. In this case, the eNodeB controls the number of scheduling resources to ensure that the power of a single channel does not exceed the value of this parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~65500</p>
+<p>Unit: 0.01W</p>
+<p>Actual Value Range: 0~655</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-EmfPowerLimitSwitch.html">EmfPowerLimitSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">EMF Power Limit Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the on-demand TX power allocation under EME. If this parameter is set to ON, the maximum transmit power of a cell is limited by an EME policy. In this case, the eNodeB controls scheduling resources to ensure that the cell power does not exceed the preset limit. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-CrsPowerBoostingAmplitude.html">CrsPowerBoostingAmplitude</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CRS Power Boosting Amplitude</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the amount of increase in cell-specific reference signal (CRS) power.</p>
+<p>If this parameter is set to DB_0, the CRS power will not increase.</p>
+<p>If this parameter is set to DB_1DOT77, the CRS power will increase by 1.77 dB.</p>
+<p>If this parameter is set to DB_3, the CRS power will increase by 3 dB.</p>
+<p>This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: DB_0(0dB), DB_1DOT77(1.77dB), DB_3(3dB)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DB_0, DB_1DOT77, DB_3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the RF module power is not sufficient and the coverage of the cell needs to be improved, it is recommended that this parameter be set to DB_1DOT77(1.77dB) or DB_3(3dB).</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the CrsPowerBoostingAmplitude parameter in the PDSCHCfg MO is not set to DB_0, the PdschPowerBoostingSwitch parameter in the PDSCHCfg MO must be set to OFF.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to DB_0, network performance remains unchanged.</p>
+<p>When this parameter is set to DB_1DOT77, the CRS coverage is improved, increasing the number of admitted UEs in the cell.</p>
+<p>When this parameter is set to DB_3, the CRS coverage is further improved, resulting in a larger number of admitted UEs in the cell.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-LogicalPortSwapSwitch.html">LogicalPortSwapSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Logical Port Swap Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to change the mapping between logical antenna ports and physical channels.</p>
+<p>If this parameter is set to OFF, the mapping between logical antenna ports and physical channels, which is specified by the CrsPortMap parameter in the Cell MO, cannot be changed.</p>
+<p>If this parameter is set to SWAP_MODE_1, the physical TX channels corresponding to logical antenna ports 0 and 2 are swapped, and the physical TX channels corresponding to logical antenna ports 1 and 3 are swapped.</p>
+<p>This parameter applies only to logical cells configured with four logical CRS ports. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: OFF(OFF), SWAP_MODE_1(SWAP_MODE_1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, SWAP_MODE_1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the LogicalPortSwapSwitch parameter in the PDSCHCfg MO is set to SWAP_MODE_1, the SINGLE_CA_PWR_SHARE_SW_FOR_4T option of the TxChnPowerCfgSw parameter in the PDSCHCfg MO must be deselected.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PDSCHCfg-PdschPowerBoostingSwitch.html">PdschPowerBoostingSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDSCH Power Boosting Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable PDSCH power boosting. If this parameter is set to ON, PDSCH power boosting for TM9 UEs will be enabled. If this parameter is set to OFF, PDSCH power boosting will not be enabled. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the CrsPowerBoostingAmplitude parameter in the PDSCHCfg MO is not set to DB_0, the PdschPowerBoostingSwitch parameter in the PDSCHCfg MO must be set to OFF.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, PDSCH power is increased for TM9 UEs, which helps to increase user-perceived data rates for these UEs. However, downlink interference is generated for neighboring cells. Services fluctuate within three or four seconds after the setting of this parameter is changed.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_pdschcfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To set the PDSCH configuration information with the parameters as follows: Local cell ID: 0, Reference signal power: 160, run the following command:
+MOD PDSCHCFG: LocalCellId=0, ReferenceSignalPwr=160;
+Example 2: To set the PDSCH configuration information with the parameters as follows: Local cell ID: 0, PB: 2, run the following command:
+MOD PDSCHCFG: LocalCellId=0, Pb=2;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,343 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Download Backup Configuration File (DLD CFGFILE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dld_cfgfile">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Download Backup Configuration File (DLD CFGFILE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dld_cfgfile"></a><a name="dld_cfgfile"></a>
+
+
+<h1 class="topictitle1">Download Backup Configuration File (DLD CFGFILE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dld_cfgfile__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to download a configuration file from the FTP server to an NE.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dld_cfgfile__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before running this command, ensure that the following conditions are met:</p>
+<p>The FTP server is functioning properly.</p>
+<p>No firewall is set between the FTP server and the NE, or the firewall is disabled.</p>
+<p>The specified user name and password of the FTP server are valid, and the user has the read access to the specified directory.</p>
+</li><li><p>The file to be downloaded must exist in the specified directory on the FTP server. If no file exists, the command fails.</p>
+</li><li><p>The extension of a file to be downloaded must be .xml, .ecf, or .gz. Otherwise, execution of this command will fail.</p>
+</li><li><p>If a configuration file downloaded by using this command is not activated within 24 hours, it will be automatically deleted.</p>
+</li><li><p>Files downloaded using the <a href="dld_cfgfile.html">DLD CFGFILE</a> command and backed up using the <a href="bkp_cfgfile.html">BKP CFGFILE</a> command are saved in the same directory on an NE. An existing file will be overwritten by a new file with the same file name.</p>
+</li><li><p>Execution of this command will increase the CPU usage, and CPU overload may affect UE access. Therefore, it is recommended that you run this command when the system has a light load.</p>
+</li><li><p>When you run this command with ENCRYPTMODE set to UNENCRYPTED to download an encrypted file, the downloaded file is not decrypted. As a result, the downloaded file cannot be activated.</p>
+</li><li><p>When you run this command with ENCRYPTMODE set to PWD_ENCRYPTED to download a file that is not encrypted, the system fails to perform the decryption. As a result, the command fails.</p>
+</li><li><p>When you run this command with CF set to UNCOMPRESSED to download a compressed file, the downloaded file is not decompressed. As a result, the downloaded file cannot be activated.</p>
+</li><li><p>When you run this command with CF set to COMPRESSED to download a file that is not compressed, the system fails to perform the decompression. As a result, the command fails.</p>
+</li><li><p>If there is insufficient disk space, it is recommended that you run related remove commands or the <a href="clr_file.html">CLR FILE</a> command to delete files that are no longer in use.</p>
+</li><li><p>When the size of a file exceeds the maximum file download capability of the hardware (UMPTg/UMPTga: 100 MB; UMDU/LMPT/UMPTa/UMPTb/UMPTe: 50 MB; WMPT: 5 MB), the download will fail. Use a file compression tool such as gzip to compress the file into a .gz file and then download the file.</p>
+</li><li><p>[Co-MPT,eGBTS]If an XML configuration file is downloaded through the MAE or LMT and the file name is CFGDATA.XML, you do not need to specify FT or FN. If the file name is not CFGDATA.XML, FN cannot be the default value. Instead, the file name must be specified. After the file is downloaded, it is automatically renamed CFGDATA.XML.</p>
+</li><li><p>[NodeB]If an XML configuration file is downloaded through the MAE or LMT and the file name is NodeBCfg.xml, you do not need to specify FT or FN. If the file name is not NodeBCfg.xml, FN cannot be the default value. Instead, the file name must be specified. After the file is downloaded, it is automatically renamed NodeBCfg.xml.</p>
+</li><li><p>[eNodeB]If an XML configuration file is downloaded through the MAE or LMT and the file name is ENBCFG.XML, you do not need to specify FT or FN. If the file name is not ENBCFG.XML, FN cannot be the default value. Instead, the file name must be specified. After the file is downloaded, it is automatically renamed ENBCFG.XML.</p>
+</li><li><p>[gNodeB]If an XML configuration file is downloaded through the MAE or LMT and the file name is GNBCFG.XML, you do not need to specify FT or FN. If the file name is not GNBCFG.XML, FN cannot be the default value. Instead, the file name must be specified. After the file is downloaded, it is automatically renamed GNBCFG.XML.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dld_cfgfile__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FM-IpMode.html">MODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP mode of the FTP server.</p>
+<p>GUI Value Range: IPV4(IPv4), IPV6(IPv6)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPV4, IPV6</p>
+<p>MML Default Value: IPV4(IPv4)</p>
+<p>Recommended Value: IPV4(IPv4)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FM-ServerIp.html">IP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">FTP Server IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IP address of the FTP server.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FM-UserName.html">USR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user name for logging in to the FTP server.</p>
+<p>GUI Value Range: 1~32 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~32 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FM-PassWord.html">PWD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Password</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the password for logging in to the FTP server.</p>
+<p>GUI Value Range: 1~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FM-Path.html">DIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Directory Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the directory where the file is saved on the FTP server. If this parameter is not specified, the file will be saved to the default directory on the FTP server. Whether the directory name can include an absolute or relative path and what format the path should be in both depend on the FTP server and the operating system of the FTP server. You can refer to the directory name in the Example part.</p>
+<p>GUI Value Range: 0~230 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~230 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FM-FileName.html">FN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name.</p>
+<p>In the case of file upload, this parameter indicates the name (wildcard characters not supported) of the destination file on the target board.</p>
+<p>In the case of file download, this parameter indicates the name (wildcard characters not supported) of the file to be downloaded from the FTP server.</p>
+<p>The maximum length of the file name plus the path cannot be greater than the maximum length of file name supported by the FTP server and cannot contain more than 248 characters. (Some servers do not support a full-path file name consisting of 248 characters. For details, see the related FTP server manual.)</p>
+<p>GUI Value Range: 0~97 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~97 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFGBAK-FILETYPE.html">FT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">File Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the configuration file.</p>
+<p>GUI Value Range: XML(XML Format)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: XML</p>
+<p>MML Default Value: XML(XML Format)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFGBAK-AREAFLAG.html">AF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Area Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the location for the downloaded configuration file on the NE. Currently, the NE does not support the setting of this parameter.</p>
+<p>GUI Value Range: STANDBY(Standby), ACTIVE(Active)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: STANDBY, ACTIVE</p>
+<p>MML Default Value: STANDBY(Standby)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FM-ProgFlag.html">GA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Guage Option</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to report the progress during the data transfer. If this parameter is set to Y, the system displays the current progress in percentage, for example, 30%.</p>
+<p>GUI Value Range: Y(Send Progress), N(Not to Send Progress)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Y, N</p>
+<p>MML Default Value: Y(Send Progress)</p>
+<p>Recommended Value: Y(Send Progress)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFGBAK-ENCRYPTMODE.html">ENCRYPTMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Encrypted Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the encryption mode of a file. If this parameter is set to UNENCRYPTED, a file to be downloaded is in plaintext. Therefore, setting this parameter to UNENCRYPTED may pose security risks. If this parameter is set to PWD_ENCRYPTED for a file, the system encrypts or decrypts a file based on the entered password after the file is downloaded. Encrypting or decrypting a file needs to consume resources, which may affect ongoing services. In addition, encryption or decryption prolongs the command execution.</p>
+<p>GUI Value Range: UNENCRYPTED(UNENCRYPTED), PWD_ENCRYPTED(PWD_ENCRYPTED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNENCRYPTED, PWD_ENCRYPTED</p>
+<p>MML Default Value: UNENCRYPTED(UNENCRYPTED)</p>
+<p>Recommended Value: PWD_ENCRYPTED(PWD_ENCRYPTED)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFGBAK-FILEPWD.html">FILEPWD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">File Encryption Password</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the password used to encrypt a file.</p>
+<p>GUI Value Range: 6~32 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 6~32 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid only when ENCRYPTMODE is set to PWD_ENCRYPTED.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFGBAK-COMPRESSFLAG.html">CF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Compress Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the source file is compressed or not. If this parameter is set to COMPRESSED, the source file will be decompressed after it is downloaded. The decompression function only can be used to decompress files that are compressed on the NE.</p>
+<p>GUI Value Range: UNCOMPRESSED(Uncompressed), COMPRESSED(Compressed)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNCOMPRESSED, COMPRESSED</p>
+<p>MML Default Value: UNCOMPRESSED(Uncompressed)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CFGBAK-FOCDLD.html">FOCDLD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Forced Download Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the flag of forced configuration file download. When this parameter is set to TRUE, you can skip the MAE-Deployment integrity check for configuration files that were manually modified and download them to the base station.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: FALSE(FALSE)</p>
+<p>Recommended Value: FALSE(FALSE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dld_cfgfile__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To download the backup configuration file (IP Mode = IPV4; FTP Server IP = 192.168.60.35; User Name = admin; Password = *****; File Name = CFGDATA.XML; File Type = XML; Directory Name = default directory; Encrypted Mode = UNENCRYPTED), run the following command: 
+DLD CFGFILE: MODE=IPV4, IP="192.168.60.35", USR="admin", PWD="*****", FN="CFGDATA.XML", FT=XML, ENCRYPTMODE=UNENCRYPTED;
+
+Example 2: To download the backup configuration file (IP Mode = IPV4; FTP Server IP = 192.168.60.35; User Name = admin; Password = *****; File Name = CFGDATA.XML; File Type = XML; Directory Name = \files; Encrypted Mode = UNENCRYPTED), run the following command: 
+DLD CFGFILE: MODE=IPV4, IP="192.168.60.35", USR="admin", PWD="*****", DIR="\files", FN="CFGDATA.XML", FT=XML, ENCRYPTMODE=UNENCRYPTED;
+
+Example 3: To download the backup configuration file (IP Mode = IPV4; FTP Server IP = 192.168.60.35; User Name = admin; Password = *****; File Name = CFGDATA.XML; File Type = XML; Directory Name = ftproot/; Encrypted Mode = UNENCRYPTED), run the following command: 
+DLD CFGFILE: MODE=IPV4, IP="192.168.60.35", USR="admin", PWD="*****", DIR="ftproot/", FN="CFGDATA.XML", FT=XML, ENCRYPTMODE=UNENCRYPTED;
+
+Example 4: To download the backup configuration file (IP Mode = IPV4; FTP Server IP = 192.168.60.35; User Name = admin; Password = *****; File Name = CFGDATA.XML.ecf; File Type = XML; Directory Name = default directory; Encrypted Mode = PWD_ENCRYPTED; File Encryption Password = *****), run the following command: 
+DLD CFGFILE: MODE=IPV4, IP="192.168.60.35", USR="admin", PWD="*****", FN="CFGDATA.XML.ecf", FT=XML, ENCRYPTMODE=PWD_ENCRYPTED, FILEPWD="*****";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

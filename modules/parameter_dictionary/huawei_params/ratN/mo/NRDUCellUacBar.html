@@ -1,0 +1,128 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NRDUCellUacBar">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NRDUCellUacBar">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NRDUCellUacBar</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NRDUCellUacBar"></a><a name="NRDUCellUacBar"></a>
+
+
+<h1 class="topictitle1">NRDUCellUacBar</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="NRDUCell.html">NRDUCell</a>
+    +-<a href="NRDUCellUacBar.html"><strong>NRDUCellUacBar</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The NRDUCellUacBar MO defines access control parameters configured for different access categories.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NRDUCell.html">NRDUCell</a></li><li>Relation with the <strong>NRDUCellOp</strong> MO:<ul><li>When <strong>OperatorId</strong> in the <strong>NRDUCellUacBar</strong> MO is not set to 255, the <strong>NRDUCellOp</strong> MO with <strong>OperatorId</strong> set to the same value as <strong>OperatorId</strong> must already be configured.</li></ul>
+</li><li>Relation with the <strong>gNBUacParamGroup</strong> MO:<ul><li><strong>AccessControlParamGrpId</strong> in the <strong>NRDUCellUacBar</strong> MO must be set to the value configured in the <strong>gNBUacParamGroup</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong> MO:<ul><li><strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCellUacBar</strong> MO must be set to CELL_FDD or CELL_TDD.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> and <strong>NODE</strong> MOs:<ul><li>If <strong>TYPE</strong> in the <strong>MPT</strong> MO is not set to UMPT, the <strong>NRDUCellUacBar</strong> MO instance cannot be added.</li><li>If <strong>BRDSPEC</strong> in the <strong>MPT</strong> MO is set to UMPTe, the board type is UMPTe.</li><li>If <strong>BRDSPEC</strong> in the <strong>MPT</strong> MO is set to UMPTga, the board type is UMPTga. Otherwise, the board type is UMPTg.</li><li>If the board type is UMPTg and <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, the number of <strong>NRDUCellUacBar</strong> MO instances must be less than or equal to 72x32.</li><li>If the board type is UMPTg and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRDUCellUacBar</strong> MO instances must be less than or equal to 144x32.</li><li>If the board type is UMPTga and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRDUCellUacBar</strong> MO instances must be less than or equal to 72x32.</li><li>If the board type is UMPTga, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM2, the number of <strong>NRDUCellUacBar</strong> MO instances must be less than or equal to 36 x 32.</li><li>If the board type is UMPTga, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM, the <strong>NRDUCellUacBar</strong> MO instance cannot be added.</li><li>If the board type is UMPTe and <strong>WM</strong> in the <strong>NODE</strong> MO is set to NON-CONCURRENT, the number of <strong>NRDUCellUacBar</strong> MO instances must be less than or equal to 72x32.</li><li>If the board type is UMPTe, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM2, the number of <strong>NRDUCellUacBar</strong> MO instances must be less than or equal to 36 x 32.</li><li>If the board type is UMPTe, <strong>WM</strong> in the <strong>NODE</strong> MO is set to CONCURRENT, and <strong>WMEXTENSION</strong> is set to COMM, the <strong>NRDUCellUacBar</strong> MO instance cannot be added.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NRDUCellUacBar__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NRDUCellUacBar__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellUacBar__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_nrducelluacbar.html">ADD NRDUCELLUACBAR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add NR DU cell UAC barring configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nrducelluacbar.html">LST NRDUCELLUACBAR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list NR DU cell UAC barring configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nrducelluacbar.html">MOD NRDUCELLUACBAR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify NR DU cell UAC barring configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_nrducelluacbar.html">RMV NRDUCELLUACBAR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove NR DU cell UAC barring configuration.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NRDUCellUacBar__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NRDUCellUacBar__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellUacBar__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellUacBar-NrDuCellId.html">NR DU Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an NR DU cell, which uniquely identifies the NR DU cell within a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellUacBar-OperatorId.html">Operator ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an operator. If this parameter is set to 255, the access control policy applies to a specific operator whose policies are not configured. If this parameter is set to a value in the range from 0 to 5, the access control policy is configured for a specific operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellUacBar-AccessCategory.html">Access Category</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the access category that require access control in a cell. For details, see 3GPP TS 22.261.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellUacBar-AccessControlParamGrpId.html">Access Control Parameter Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the access control parameter group ID mapping to an access category.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

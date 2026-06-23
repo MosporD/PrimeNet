@@ -1,0 +1,353 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start Ethernet Port OAM Loopback Test (STR ETHOAMLOOPTST)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_ethoamlooptst">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start Ethernet Port OAM Loopback Test (STR ETHOAMLOOPTST)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_ethoamlooptst"></a><a name="str_ethoamlooptst"></a>
+
+
+<h1 class="topictitle1">Start Ethernet Port OAM Loopback Test (STR ETHOAMLOOPTST)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="str_ethoamlooptst__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to start an OAM loopback test on an Ethernet port.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_ethoamlooptst__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Starting a loopback interrupts services.</p>
+</li><li><p>Before starting an OAM 3AH loopback test on an Ethernet port, run the <a href="act_ethoam3ah.html">ACT ETHOAM3AH</a> or <a href="add_eth3ah.html">ADD ETH3AH</a> command to enable Ethernet OAM 3AH and set Loopback Flag to ENABLE. In addition, ensure that the local end for Ethernet OAM 3AH is in the periodic detection state.</p>
+</li><li><p>The 3AH loopback test result can be reported either periodically or non-periodically. If SW (switch used to control whether to report test results periodically) is set to ENABLE, the test result is reported every other second. If SW is set to DISABLE, the test result is reported only after the <a href="stp_ethoamlooptst.html">STP ETHOAMLOOPTST</a> command is executed. When the test ends, the result within the test period is reported regardless of whether Period Report Switch is set to ENABLE or DISABLE. The reported test result is the overall statistics.</p>
+</li><li><p>An OAM 3AH loopback test for an Ethernet port can be performed by only one user at a time. If more tests are performed on the port at the same time, the system returns failure.</p>
+</li><li><p>The OAM 3AH loopback test for Ethernet ports can be started on multiple ports on one board.</p>
+</li><li><p>After starting the OAM 3AH loopback test for Ethernet ports, you have to wait at least six seconds for negotiation before the system responds.</p>
+</li><li><p>During an OAM 3AH loopback test, do not reset the board, or set Ethernet ports or associated Ethernet trunks configured on the local end.</p>
+</li><li><p>During an OAM 3AH loopback test, if the peer Ethernet port or board is reset or the Ethernet cable is removed at the peer end, the number of packets received in the measurement period is 0. As a result, the average/maximum/minimum delay within the measurement period is NULL.</p>
+</li><li><p>[Co-MPT,eGBTS]The GTMUb board does not support periodical reporting of 3AH loopback test results.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="str_ethoamlooptst__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHOAMLOOPTST-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the board where the Ethernet OAM 3AH loopback is started.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHOAMLOOPTST-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board where the Ethernet OAM 3AH loopback is started.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHOAMLOOPTST-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board where the Ethernet OAM 3AH loopback is started.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHOAMLOOPTST-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where the Ethernet OAM 3ah loopback test is started.</p>
+<p>GUI Value Range: ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH_COVERBOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SN</strong> is within the range from 0 to 5, this parameter must be set to ETH_COVERBOARD.</li><li>If <strong>SN</strong> is set to 6 or 7, this parameter must be set to BASE_BOARD or ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHOAMLOOPTST-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the port where the Ethernet OAM 3AH loopback test is started.</p>
+<p>GUI Value Range: ETH(Ethernet Port)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH</p>
+<p>MML Default Value: ETH(Ethernet Port)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHOAMLOOPTST-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the port where the Ethernet OAM 3AH loopback test is performed.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SBT</strong> is set to BASE_BOARD, the value range of this parameter is from 0 to 3.</li><li>If <strong>SBT</strong> is set to ETH_COVERBOARD, the value range of this parameter is from 0 to 5.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHOAMLOOPTST-PeriodReportSwitch.html">SW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Period Report Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the period report switch.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHOAMLOOPTST-LoopTime.html">TM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Test Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the test time.</p>
+<p>GUI Value Range: 1~60</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 1~60</p>
+<p>MML Default Value: 1</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_ethoamlooptst__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start an Ethernet OAM 3ah loopback test with the parameters as follows: Slot No.: 6, Subboard Type: Base Board, run the following command: 
+STR ETHOAMLOOPTST: SN=6, SBT=BASE_BOARD;
+The result is shown as follows:
++++    0        2016-01-21 20:03:31
+O&amp;M    #4547
+%%STR ETHOAMLOOPTST: SN=6, SBT=BASE_BOARD;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END
+
++++    0        2016-01-21 20:04:31
+O&amp;M    #4550
+%%STR ETHOAMLOOPTST: SN=6, SBT=BASE_BOARD;%%
+RETCODE = 0  Operation succeeded.
+
+OAM 3AH LOOPBACK TEST Result
+----------------------------
+               Cabinet No.  =  0
+               Subrack No.  =  0
+                  Slot No.  =  6
+             Subboard Type  =  Base Board            
+                 Port Type  =  Ethernet Port
+                  Port No.  =  0
+               Remain Time  =  0:00'00"
+                  Duration  =  0:01'00"
+        TX Packets(packet)  =  6000
+        RX Packets(packet)  =  6000
+Average Delay(microsecond)  =  27
+    Max Delay(microsecond)  =  68
+    Min Delay(microsecond)  =  24
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="str_ethoamlooptst__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the board where the Ethernet OAM 3AH loopback is started.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the board where the Ethernet OAM 3AH loopback is started.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the board where the Ethernet OAM 3AH loopback is started.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subboard Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of sub-board on the board where the Ethernet OAM 3ah loopback test is started.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of the port where the Ethernet OAM 3AH loopback test is started.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the port where the Ethernet OAM 3AH loopback test is performed.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Remain Time</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the remaining time.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Duration</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the duration of the loopback.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>TX Packets(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the total number of packets transmitted during the loopback.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>RX Packets(packet)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the total number of packets received during the loopback.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Average Delay(microsecond)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the average delay of packets during the loopback.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Max Delay(microsecond)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum delay of packets during the loopback.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Min Delay(microsecond)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the minimum delay of packets during the loopback.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

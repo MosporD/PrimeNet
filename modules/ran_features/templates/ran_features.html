@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAN Features - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('ran_features.static', filename='ran_features.css') }}?v=3.1">
+</head>
+<body>
+    <div class="container ran-container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">← Dashboard</a>
+                    <h1>RAN Features</h1>
+                    <p>Browse Huawei &amp; Nokia RAN feature documentation</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section id="ran-vendor-gate" class="vendor-gate">
+                <h2 class="vendor-gate-title">Select Vendor</h2>
+                <p class="vendor-gate-subtitle">Choose which RAN feature library you want to open.</p>
+                <div class="vendor-buttons">
+                    <button type="button" id="ran-vendor-nokia-btn" class="vendor-btn vendor-nokia">
+                        <img src="{{ url_for('parameter_dictionary.static', filename='images/nokia_logo.png') }}?v=1" alt="Nokia logo" class="vendor-logo-img">
+                        <span class="vendor-label">Nokia</span>
+                    </button>
+                    <button type="button" id="ran-vendor-huawei-btn" class="vendor-btn vendor-huawei">
+                        <img src="{{ url_for('parameter_dictionary.static', filename='images/huawei_logo.png') }}?v=1" alt="Huawei logo" class="vendor-logo-img">
+                        <span class="vendor-label">Huawei</span>
+                    </button>
+                </div>
+            </section>
+
+            <section id="ran-huawei-content" class="ran-vendor-content" hidden>
+                <div class="ran-bar">
+                    <button type="button" id="ran-huawei-back-btn" class="ran-back-btn">← Back</button>
+                    <span class="ran-bar-title">Huawei RAN Features</span>
+                </div>
+
+                <section id="ran-tech-gate">
+                    <p class="section-description">
+                        Select a technology to browse its Huawei RAN feature documentation.
+                    </p>
+                    <div class="ran-grid">
+                        {% for t in techs %}
+                        <div class="ran-card {{ 'ran-card-disabled' if not t.available }}">
+                            <div class="ran-card-tech">{{ t.key | upper }}</div>
+                            <div class="ran-card-label">{{ t.label }}</div>
+                            {% if t.available %}
+                            <div class="ran-card-size">{{ t.size_mb }} MB</div>
+                            <button type="button" class="ran-card-btn" data-tech="{{ t.key }}" data-label="{{ t.label }}">
+                                Browse documentation
+                            </button>
+                            {% else %}
+                            <div class="ran-card-size">File not available</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <section id="ran-viewer" class="ran-viewer" hidden>
+                    <div class="ran-bar">
+                        <button type="button" id="ran-back-btn" class="ran-back-btn">← Back</button>
+                        <span id="ran-tech-title" class="ran-bar-title"></span>
+                    </div>
+                    <div class="ran-layout">
+                        <aside class="ran-sidebar">
+                            <input type="text" id="ran-search" class="ran-search" placeholder="Search features…" autocomplete="off">
+                            <div id="ran-result-count" class="ran-result-count"></div>
+                            <div id="ran-tree" class="ran-tree"></div>
+                        </aside>
+                        <iframe id="ran-frame" class="ran-frame" title="RAN feature documentation" frameborder="0"></iframe>
+                    </div>
+                </section>
+            </section>
+
+            <section id="ran-nokia-content" class="ran-vendor-content" hidden>
+                <div class="ran-bar">
+                    <button type="button" id="ran-nokia-back-btn" class="ran-back-btn">← Back</button>
+                    <span class="ran-bar-title">Nokia RAN Features</span>
+                </div>
+                <div class="ran-unavailable">
+                    <div class="ran-unavailable-icon" aria-hidden="true">&#128679;</div>
+                    <h2 class="ran-unavailable-title">Nokia integration not available</h2>
+                    <p class="ran-unavailable-text">
+                        Nokia RAN feature documentation is not integrated yet. Please select Huawei to browse the available feature library.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script src="{{ url_for('ran_features.static', filename='ran_features.js') }}?v=3.0"></script>
+</body>
+</html>

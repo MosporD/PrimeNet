@@ -1,0 +1,207 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IPGPM">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="Mode" content="UMTS">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IPGPM">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPGPM</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IPGPM"></a><a name="IPGPM"></a>
+
+
+<h1 class="topictitle1">IPGPM</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IPGPM.html"><strong>IPGPM</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO is used to set parameters related to the IPGPM detection.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>PPPLNK</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB]If a <strong>IPGPM</strong> MO associated <strong>IPRSCGRP</strong> MO and a <strong>PPPLNK</strong> MO are configured on the same physical port, the <strong>MUXCP</strong> parameter must be set to DISABLE in the <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB]If a <strong>IPGPM</strong> MO associated <strong>IPRSCGRP</strong> MO and a <strong>MPGRP</strong> MO are configured on the same physical port, the <strong>MUXCP</strong> parameter must be set to DISABLE in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPGPM</strong> MO:<ul><li>[Co-MPT, NodeB]The system supports a maximum of 20 <strong>IPGPM</strong> MOs.</li><li>[Co-MPT, NodeB]In an <strong>IPRSCGRP</strong> MO, only one <strong>IPGPM</strong> MO with <strong>DDM</strong> set to FPDT and <strong>DIR</strong> set to DOWN and only one <strong>IPGPM</strong> MO with <strong>DDM</strong> set to FPDT and <strong>DIR</strong> set to UP can be configured.</li><li>[Co-MPT, NodeB]On a loopback port, only one <strong>IPGPM</strong> MO with <strong>DDM</strong> set to FPDT and <strong>DIR</strong> set to DOWN and only one <strong>IPGPM</strong> MO with <strong>DDM</strong> set to FPDT and <strong>DIR</strong> set to UP can be configured.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>CASCADEPORT</strong>, <strong>IPRSCGRP</strong>, <strong>LOOPBACK</strong>, and <strong>BACKTUNNEL</strong> MOs:<ul><li>[Co-MPT, NodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO or AUTO, this board cannot be configured with the <strong>IPGPM</strong> MO. That is, this board cannot be configured with the associated <strong>IPRSCGRP</strong> MO.</li><li>[Co-MPT, NodeB]On a UBBP or LCOP board, if the <strong>CASCADEPORT</strong> MO in which the <strong>PN</strong> parameter is set to 6 does not exist, the UBBP board cannot be configured with the <strong>IPGPM</strong> MO. That is, this board cannot be configured with the associated <strong>IPRSCGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>CASCADEPORT</strong>, and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB]On a UBBP or LCOP board, if <strong>PN</strong> is set to 6 and <strong>PM</strong> is set to 1*40GE in the <strong>CASCADEPORT</strong> MO and <strong>PT</strong> in the <strong>IPRSCGRP</strong> MO corresponding to the <strong>IPGPM</strong> MO of the board is set to ETH, then <strong>PN</strong> in the <strong>ETHPORT</strong> MO corresponding to the <strong>IPRSCGRP</strong> MO can only be set to 0.</li><li>[Co-MPT, NodeB]On a UBBP or LCOP board, if <strong>PN</strong> is set to 6 and <strong>PM</strong> is set to 4*10GE in the <strong>CASCADEPORT</strong> MO and <strong>PT</strong> in the <strong>IPRSCGRP</strong> MO corresponding to the <strong>IPGPM</strong> MO of the board is set to ETH, then <strong>PN</strong> in the <strong>ETHPORT</strong> MO corresponding to the <strong>IPRSCGRP</strong> MO can only be set to a value in the range of 0 to 3.</li><li>[Co-MPT, NodeB]On a UBBP board, if <strong>PN</strong> is set to 6 and <strong>PM</strong> is set to 1*100GE in the <strong>CASCADEPORT</strong> MO and <strong>PT</strong> in the <strong>IPRSCGRP</strong> MO corresponding to the <strong>IPGPM</strong> MO of the board is set to ETH, then <strong>PN</strong> in the <strong>ETHPORT</strong> MO corresponding to the <strong>IPRSCGRP</strong> MO can only be set to 0.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPGPM</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>PT</strong> in a <strong>IPGPM</strong> MO is not set to OTHER, the associated <strong>IPRSCGRP</strong> MO must have been configured and not be AUTOPORT.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> MO:<ul><li>[Co-MPT, NodeB]When <strong>PT</strong> in the <strong>IPGPM</strong> MO is not set to LOOPINT and <strong>RSCGRPNO</strong> in the associated <strong>IPRSCGRP</strong> MO is not set to DEFAULTPORT, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>IPGPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li><li>[Co-MPT, NodeB]When <strong>PT</strong> in the <strong>IPGPM</strong> MO is set to LOOPINT, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>IPGPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB]When <strong>PT</strong> in the <strong>IPGPM</strong> MO is not set to LOOPINT and <strong>RSCGRPNO</strong> in the associated <strong>IPRSCGRP</strong> MO is set to DEFAULTPORT, if <strong>IPMUXSWITCH</strong> in the <strong>IPPATH</strong> MO corresponding to the <strong>IPGPM</strong> MO is set to ENABLE, <strong>TIMER</strong> in the <strong>IPPATH</strong> MO must be set to a value less than or equal to 1.</li></ul>
+</li><li>Relation with the <strong>LOOPBACK</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>PT</strong> in a <strong>IPGPM</strong> MO is not set to LOOPINT, the associated <strong>LOOPBACK</strong> MO must have been configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IPGPM__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPGPM__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IPGPM__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ipgpm.html">ADD IPGPM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add the IP general performance management (GPM) detection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipgpm.html">DSP IPGPM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the state of an IP GPM detection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ipgpm.html">LST IPGPM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of an IP GPM detection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_ipgpm.html">MOD IPGPM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify an IP GPM detection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ipgpm.html">RMV IPGPM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an IP GPM detection.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IPGPM__tab2">Table 2</a> and <a href="#IPGPM__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IPGPM__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IPGPM__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPGPM-IPGpmID.html">IP GPM Detection ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an IP GPM detection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPGPM-DetectDirection.html">Detection Direction</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the direction of an IP GPM detection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPGPM-DelayDetectMethod.html">Delay Detection Method</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the delay detection method at the bottom layer used by the IP GPM detection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPGPM-DetectObject.html">Detection Object</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the object to be detected by the IP GPM on the base station side. If the detection object is IPRSCGRP, the IP GPM detects congestion on transmission links of users in the IP transmission resource group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPGPM-PortType.html">Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the port where an IP transmission resource group detected by the IP GPM is carried.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPGPM-PortID.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the port where an IP transmission resource group detected by the IP GPM is carried.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPGPM-IPRscGrpID.html">IP Transmission Resource Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the IP transmission resource group detected by the IP GPM.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IPGPM__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IPGPM__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPGPM-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cabinet No. of the board where the IP transmission resource group detected by the IP GPM is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPGPM-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the subrack No. of the board where the IP transmission resource group detected by the IP GPM is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPGPM-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the slot No. of the board where the IP transmission resource group detected by the IP GPM is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPGPM-WorkState.html">Working State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the working state of an IP GPM detection. If the number of samples within an IP GPM detection period is 0, the working state of the IP GPM detection is "NO_MEASUREMENT". If the number of samples within an IP GPM detection period is greater than 0, the working state of the IP GPM detection is "IN_MEASUREMENT".</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#IPGPM__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPGPM__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="IPGPM__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460702.html">VS.IPGPM.CongTime</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>IPGPM-measured Congestion Duration</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,88 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Activate OM Channel Automatic Establishment Configuration (ACT DHCPCFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="act_dhcpcfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Activate OM Channel Automatic Establishment Configuration (ACT DHCPCFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="act_dhcpcfg"></a><a name="act_dhcpcfg"></a>
+
+
+<h1 class="topictitle1">Activate OM Channel Automatic Establishment Configuration (ACT DHCPCFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="act_dhcpcfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to update the user configurations of the OMCH, IP route, and IPv6 route based on the automatic OMCH establishment result after the automatic OMCH establishment detection is successful. Other transmission parameter settings take effect based on the user configurations, and the base station exits from the automatic OMCH establishment status.</p>
+</div></div>
+
+<div class="mmlnote"><a name="act_dhcpcfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>This operation may interrupt the local maintenance channel.</p>
+</li><li><p>If Effect Type is set to CHKRSLT and the NE transmits data through Ethernet ports, the NE automatically checks whether the user configurations are consistent with the automatic OMCH establishment result. If they are inconsistent, the command execution will fail. In this case, run the <a href="dsp_dhcprslt.html">DSP DHCPRSLT</a> command to query the inconsistent data and then correct it. If you are sure that the OM channel can be set up based on the current configuration, run this command with Effect Type set to FORCE_EFT.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If the OMCH settings are manually added or modified after the OMCH is automatically established, user configurations of the OMCH, IP route, and IPv6 route will not be updated based on the automatic OMCH establishment result.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB]After this command is executed, the configuration of the remote maintenance channel is refreshed automatically according to the results of automatic remote maintenance channel establishment. Before running this command, ensure that other related configurations of the remote maintenance channel are available. If the remote maintenance channel is carried on an Ethernet link or Ethernet link aggregation group, ensure that the device IP address or IPv4 address, or IPv6 address has been configured for the corresponding Ethernet port or Ethernet link aggregation group. If the remote maintenance channel is carried on a PPP link or MLPPP group, ensure that the corresponding PPP link or MLPPP group has been configured.</p>
+</li><li><p>[NodeB,eGBTS]If the OMCH settings are manually added or modified after the OMCH is automatically established, user configurations of the OMCH, IP route will not be updated based on the automatic OMCH establishment result.</p>
+</li><li><p>[gNodeB]After this command is executed, the configuration of the remote maintenance channel is refreshed automatically according to the results of automatic remote maintenance channel establishment. Before running this command, ensure that other related configurations of the remote maintenance channel are available. If the remote maintenance channel is carried on an Ethernet link or Ethernet link aggregation group, ensure that the device IP address or IPv4 address, or IPv6 address has been configured for the corresponding Ethernet port or Ethernet link aggregation group.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="act_dhcpcfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/DHCPRSLT-EFT.html">EFT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Effect Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the effective mode of online configuration activation.</p>
+<p>GUI Value Range: CHKRSLT(Check Result), FORCE_EFT(Force Effect)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CHKRSLT, FORCE_EFT</p>
+<p>MML Default Value: CHKRSLT(Check Result)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="act_dhcpcfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To activate the online configuration after the OMCH auto-establishment detection succeeds, and set Effect Type to FORCE_EFT, run the following command: 
+ACT DHCPCFG: EFT=FORCE_EFT;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

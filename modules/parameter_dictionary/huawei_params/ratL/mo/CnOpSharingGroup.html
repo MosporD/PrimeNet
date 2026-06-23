@@ -1,0 +1,147 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CnOpSharingGroup">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CnOpSharingGroup">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CnOpSharingGroup</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CnOpSharingGroup"></a><a name="CnOpSharingGroup"></a>
+
+
+<h1 class="topictitle1">CnOpSharingGroup</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="CnOpSharingGroup.html"><strong>CnOpSharingGroup</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A CnOpSharingGroup MO consists of the parameters related to a carrier-sharing operator group. A carrier-sharing operator group consists of a primary operator and a maximum of five secondary operators. An operator can belong to multiple carrier-sharing operator group. The primary operator of each carrier-sharing operator group must be unique. When an eNodeB works in hybrid RAN sharing mode, the S1Interface, X2Interface, S1, X2, and Cell MOs that associated with a CnOpSharingGroup MO provide RAN sharing services on a per carrier-sharing operator group basis..</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="eNodeBFunction.html">eNodeBFunction</a></li><li>Relation with the <strong>EutranExternalCell</strong>, <strong>eNodeBFunction</strong>, <strong>ENodeBSharingMode</strong>, and <strong>CnOperator</strong> MOs:<ul><li>If <strong>eNodeBId</strong> in an <strong>EutranExternalCell</strong> MO is set to the same value as <strong>eNodeBId</strong> in the <strong>eNodeBFunction</strong> MO and <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED, the combination of <strong>Mcc</strong> and <strong>Mnc</strong> in this <strong>EutranExternalCell</strong> MO must be different from that of <strong>Mcc</strong> and <strong>Mnc</strong> in the <strong>CnOperator</strong> MO referenced by <strong>PrimaryOperatorId</strong> in any <strong>CnOpSharingGroup</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong>, <strong>CellOp</strong>, <strong>CnOperator</strong>, <strong>CnOperatorTa</strong>, <strong>Cell</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>A <strong>CellOp</strong> MO must be configured for each <strong>EutranInterFreqNCell</strong> MO that corresponds to an intra-eNodeB inter-frequency neighboring cell. If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED, <strong>Mcc</strong> and <strong>Mnc</strong> in such an <strong>EutranInterFreqNCell</strong> MO must be set to the same values as <strong>Mcc</strong> and <strong>Mnc</strong>, respectively, in the <strong>CnOperator</strong> MO referenced by <strong>PrimaryOperatorId</strong> in the <strong>CnOpSharingGroup</strong> MO for the intra-eNodeB inter-frequency neighboring cell.</li></ul>
+</li><li>Relation with the <strong>EutranIntraFreqNCell</strong>, <strong>CellOp</strong>, <strong>CnOperator</strong>, <strong>CnOperatorTa</strong>, <strong>Cell</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>A <strong>CellOp</strong> MO must be configured for each <strong>EutranIntraFreqNCell</strong> MO that corresponds to an intra-eNodeB intra-frequency neighboring cell. If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED, <strong>Mcc</strong> and <strong>Mnc</strong> in such an <strong>EutranIntraFreqNCell</strong> MO must be set to the same values as <strong>Mcc</strong> and <strong>Mnc</strong>, respectively, in the <strong>CnOperator</strong> MO referenced by <strong>PrimaryOperatorId</strong> in the <strong>CnOpSharingGroup</strong> MO for the intra-eNodeB intra-frequency neighboring cell.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellOp</strong>, <strong>CnOperatorTa</strong>, and <strong>ENodeBSharingMode</strong> MOs:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED, <strong>CnOperatorId</strong> in the <strong>CnOperatorTa</strong> corresponding to <strong>TrackingAreaId</strong> in the <strong>CellOp</strong> MO under the <strong>Cell</strong> MO must be configured in <strong>PrimaryOperatorId</strong> or <strong>SecondaryOperatorList</strong> in the <strong>CnOpSharingGroup</strong> associated with the <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ENodeBSharingMode</strong>, <strong>Cell</strong>, <strong>CellOp</strong>, and <strong>CnOperatorTa</strong> MOs:<ul><li>If <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED and <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE, <strong>CnOperatorId</strong> in a <strong>CnOperatorTa</strong> MO associated with the <strong>CellOp</strong> MO under the <strong>Cell</strong> MO must be set to the same value as <strong>PrimaryOperatorId</strong> in the <strong>CnOpSharingGroup</strong> MO associated with the <strong>Cell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CnOperator</strong> MO:<ul><li><strong>PrimaryOperatorId</strong> in a <strong>CnOpSharingGroup</strong> MO must have been configured in the associated <strong>CnOperator</strong> MO.</li><li><strong>SecondaryOperatorId</strong> referenced by <strong>SecondaryOperatorList</strong> in a <strong>CnOpSharingGroup</strong> MO must have been configured in the associated <strong>CnOperator</strong> MO.</li></ul>
+</li><li>Relation with the <strong>S1</strong> MO:<ul><li><strong>CnOpSharingGroupId</strong> in the <strong>S1</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255.</li><li>The operator corresponding to <strong>CnOperatorId</strong> in the <strong>S1</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255.</li></ul>
+</li><li>Relation with the <strong>S1Interface</strong> MO:<ul><li><strong>CnOpSharingGroupId</strong> in the <strong>S1Interface</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255 and <strong>CtrlMode</strong> in the <strong>S1Interface</strong> MO is set to MANUAL_MODE.</li><li>The operator corresponding to <strong>CnOperatorId</strong> in the <strong>S1Interface</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255 and <strong>CtrlMode</strong> in the <strong>S1Interface</strong> MO is set to MANUAL_MODE.</li></ul>
+</li><li>Relation with the <strong>X2</strong> MO:<ul><li><strong>CnOpSharingGroupId</strong> in the <strong>X2</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255.</li><li>The operator corresponding to <strong>CnOperatorId</strong> in the <strong>X2</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255.</li></ul>
+</li><li>Relation with the <strong>X2Interface</strong> MO:<ul><li><strong>CnOpSharingGroupId</strong> in the <strong>X2Interface</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255 and <strong>CtrlMode</strong> in the <strong>X2Interface</strong> MO is set to MANUAL_MODE.</li><li>The operator corresponding to <strong>CnOperatorId</strong> in the <strong>X2Interface</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255 and <strong>CtrlMode</strong> in the <strong>X2Interface</strong> MO is set to MANUAL_MODE.</li></ul>
+</li><li>Relation with the <strong>MmeCapInfo</strong>, <strong>ENodeBSharingMode</strong>, <strong>S1</strong>, and <strong>CnOperatorTa</strong> MOs:<ul><li>If the <strong>NbCiotEpsOptCap</strong> parameter in an <strong>MmeCapInfo</strong> MO is not set to NOT_SUPPORT(NOT_SUPPORT), and the <strong>S1CfgType</strong> parameter in an <strong>MmeCapInfo</strong> MO is set to S1_CFG, and the <strong>ENodeBSharingMode</strong> parameter in the <strong>eNodeBSharingMode</strong> MO is set to HYBRID_SHARED(Hybrid RAN Sharing), then the <strong>NbIotTaFlag</strong> parameter must be set to BOOLEAN_TRUE in at least one of the <strong>CnOperatorTa</strong> MOs for primary and secondary operators in a carrier-sharing operator group associated with the <strong>CnOpSharingGroupId</strong> parameter in the <strong>S1</strong> MO associated with the <strong>MmeCapInfo</strong> MO.</li><li>The <strong>NbIotTaFlag</strong> parameter must be set to BOOLEAN_FALSE(BOOLEAN_FALSE) in at least one of the <strong>CnOperatorTa</strong> MOs for primary and secondary operators in a carrier-sharing operator group associated with the <strong>CnOpSharingGroupId</strong> parameter in the <strong>S1</strong> MO associated with the <strong>MmeCapInfo</strong> MO if all of the conditions are met: (1) The <strong>NbCiotEpsOptCap</strong> parameter in the <strong>MmeCapInfo</strong> MO is not set to NOT_SUPPORT(NOT_SUPPORT). (2) The <strong>NbLteSupportCap</strong> or <strong>MmeSupportEmtcDedEpcCap</strong> parameter in the <strong>MmeCapInfo</strong> MO is set to SUPPORT(SUPPORT). (3) The <strong>S1CfgType</strong> parameter in the <strong>MmeCapInfo</strong> MO is set to S1_CFG(S1_CFG). (4) The <strong>ENodeBSharingMode</strong> parameter in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED(Hybrid RAN Sharing).</li></ul>
+</li><li>Relation with the <strong>MmeCapInfo</strong>, <strong>ENodeBSharingMode</strong>, <strong>S1Interface</strong>, and <strong>CnOperatorTa</strong> MOs:<ul><li>If the <strong>NbCiotEpsOptCap</strong> parameter in an <strong>MmeCapInfo</strong> MO is not set to NOT_SUPPORT(NOT_SUPPORT), and the <strong>S1CfgType</strong> parameter in an <strong>MmeCapInfo</strong> MO is set to S1INTERFACE_CFG, and the <strong>ENodeBSharingMode</strong> parameter in the <strong>eNodeBSharingMode</strong> MO is set to HYBRID_SHARED(Hybrid RAN Sharing), then the <strong>NbIotTaFlag</strong> parameter must be set to BOOLEAN_TRUE in at least one of the <strong>CnOperatorTa</strong> MOs for primary and secondary operators in a carrier-sharing operator group associated with the <strong>CnOpSharingGroupId</strong> parameter in the <strong>S1Interface</strong> MO associated with the <strong>MmeCapInfo</strong> MO.</li><li>The <strong>NbIotTaFlag</strong> parameter must be set to BOOLEAN_FALSE(BOOLEAN_FALSE) in at least one of the <strong>CnOperatorTa</strong> MOs for primary and secondary operators in a carrier-sharing operator group associated with the <strong>CnOpSharingGroupId</strong> parameter in the <strong>S1Interface</strong> MO associated with the <strong>MmeCapInfo</strong> MO if all of the conditions are met: (1) The <strong>NbCiotEpsOptCap</strong> parameter in the <strong>MmeCapInfo</strong> MO is not set to NOT_SUPPORT(NOT_SUPPORT). (2) The <strong>NbLteSupportCap</strong> or <strong>MmeSupportEmtcDedEpcCap</strong> parameter in the <strong>MmeCapInfo</strong> MO is set to SUPPORT(SUPPORT). (3) The <strong>S1CfgType</strong> parameter in the <strong>MmeCapInfo</strong> MO is set to S1INTERFACE_CFG(S1INTERFACE_CFG). (4) The <strong>ENodeBSharingMode</strong> parameter in the <strong>ENodeBSharingMode</strong> MO is set to HYBRID_SHARED(Hybrid RAN Sharing).</li></ul>
+</li><li>Relation with the <strong>NG</strong> MO:<ul><li><strong>CnOpSharingGroupId</strong> in the <strong>NG</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255.</li><li>The operator corresponding to <strong>CnOperatorId</strong> in the <strong>NG</strong> MO must have been configured in the associated <strong>CnOpSharingGroup</strong> MO if <strong>CnOpSharingGroupId</strong> is not set to the invalid value 255.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CnOpSharingGroup__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CnOpSharingGroup__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CnOpSharingGroup__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_cnopsharinggroup.html">ADD CNOPSHARINGGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_secondaryop2group.html">ADD SECONDARYOP2GROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a secondary operator to a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cnopsharinggroup.html">LST CNOPSHARINGGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configurations of a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_secondaryop2group.html">LST SECONDARYOP2GROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the secondary operators in a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cnopsharinggroup.html">MOD CNOPSHARINGGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_cnopsharinggroup.html">RMV CNOPSHARINGGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_secondaryop2group.html">RMV SECONDARYOP2GROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a secondary operator from a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CnOpSharingGroup__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CnOpSharingGroup__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CnOpSharingGroup__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CnOpSharingGroup-CnOpSharingGroupId.html">CN Operator Sharing Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a carrier-sharing operator group. This parameter uniquely specifies a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CnOpSharingGroup-PrimaryOperatorId.html">Primary Operator ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the primary operator in a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CnOpSharingGroup-SecondaryOperatorList.html">Secondary Operator List</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the list of secondary operators in a carrier-sharing operator group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

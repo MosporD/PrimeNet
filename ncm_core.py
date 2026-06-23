@@ -3,9 +3,31 @@ Nokia Configuration Manager - Core Processing Logic
 Extracted from NCM_V3.py without GUI components
 """
 
+import re
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from datetime import datetime
+from typing import Any
+
+_INVALID_SHEET_TITLE_CHARS = re.compile(r'[\:\\/?*\[\]]')
+
+
+def _sanitize_sheet_title(name: str) -> str:
+    """Excel sheet titles cannot contain : \\ / ? * [ ]."""
+    cleaned = _INVALID_SHEET_TITLE_CHARS.sub('_', (name or '').strip())
+    return (cleaned or 'Sheet')[:31]
+
+
+def _unique_sheet_title(mo_class: str, used: set[str]) -> str:
+    base = _sanitize_sheet_title(mo_class)
+    title = base
+    suffix = 2
+    while title in used:
+        tail = f'_{suffix}'
+        title = f'{base[:31 - len(tail)]}{tail}'
+        suffix += 1
+    used.add(title)
+    return title
 
 try:
     import openpyxl
@@ -17,26 +39,6 @@ try:
     import pandas as pd
 except ImportError:
     raise ImportError("pandas not installed. Install with: pip install pandas")
-
-# Import MO descriptions
-try:
-    from mo_descriptions import (
-        MO_DESCRIPTIONS, MO_CATEGORIES, PARAM_DESCRIPTIONS, MO_TO_PARAMS,
-        get_mo_description, get_mo_category, get_param_description, get_mo_params,
-        EMBEDDED_CATEGORIZATION
-    )
-except ImportError:
-    # Fallback if mo_descriptions.py not found
-    MO_DESCRIPTIONS = {}
-    MO_CATEGORIES = {}
-    PARAM_DESCRIPTIONS = {}
-    MO_TO_PARAMS = {}
-    EMBEDDED_CATEGORIZATION = {}
-    def get_mo_description(mo): return "No description available"
-    def get_mo_category(mo): return "Other"
-    def get_param_description(param): return "No description available"
-    def get_mo_params(mo): return []
-
 
 def import_parameters_from_excel(excel_file):
     """
@@ -73,6 +75,316 @@ class FilterConfig:
         self.all_mos = all_mos or set()
 
 
+def discover_hierarchy_elements(hierarchy_elements: list[str], distname: str) -> None:
+    """Record MO class tokens from a distName path in first-seen depth order."""
+    for part in (distname or '').split('/'):
+        if '-' in part:
+            mo_class = part.split('-', 1)[0]
+            if mo_class != 'PLMN' and mo_class not in hierarchy_elements:
+                hierarchy_elements.append(mo_class)
+
+
+def parse_distname_hierarchy(distname: str) -> dict[str, str]:
+    """Parse distName into {MO_CLASS: instance_id} (excludes PLMN)."""
+    hierarchy: dict[str, str] = {}
+    for part in (distname or '').split('/'):
+        if '-' in part:
+            mo_class, mo_id = part.split('-', 1)
+            if mo_class != 'PLMN':
+                hierarchy[mo_class] = mo_id
+    return hierarchy
+
+
+def sort_hierarchy_columns(hierarchy_elements: list[str], hierarchy_cols: list[str]) -> list[str]:
+    """Sort hierarchy columns by depth order discovered from distNames."""
+    if not hierarchy_cols:
+        return []
+    sorted_cols: list[str] = []
+    for col in hierarchy_elements:
+        if col in hierarchy_cols:
+            sorted_cols.append(col)
+    for col in hierarchy_cols:
+        if col not in sorted_cols:
+            sorted_cols.append(col)
+    return sorted_cols
+
+
+def sort_parameter_columns(param_cols: list[str]) -> list[str]:
+    """Sort parameter columns with list markers followed by Item-* children."""
+    list_markers: set[str] = set()
+    list_details: dict[str, list[str]] = {}
+    regular_params: list[str] = []
+
+    for col in param_cols:
+        if col.startswith('Item-'):
+            parts = col.split('-', 2)
+            if len(parts) >= 2:
+                list_name = parts[1]
+                list_details.setdefault(list_name, []).append(col)
+        else:
+            has_children = any(
+                detail_col.startswith(f'Item-{col}-') for detail_col in param_cols
+            )
+            if has_children:
+                list_markers.add(col)
+            else:
+                regular_params.append(col)
+
+    result: list[str] = []
+    result.extend(sorted(regular_params))
+    for list_name in sorted(list_markers):
+        result.append(list_name)
+        result.extend(sorted(list_details.get(list_name, [])))
+    return result
+
+
+class NokiaMoSheetBuilder:
+    """
+    Build Excel sheet rows using NCM core hierarchy discovery and list integration.
+
+    Matches ``XMLToExcelConverter`` column layout: hierarchy columns first (depth
+    order), then scalar parameters, then list markers with ``Item-{list}-{param}``
+    columns. Semicolon-joins repeated list-item values.
+    """
+
+    _SKIP_PARAM_NAMES = frozenset({'PLMN'})
+    _IDENTITY_COLS = frozenset({'moId', 'DN'})
+
+    def __init__(self) -> None:
+        self.hierarchy_elements: list[str] = []
+        self.row_dicts: list[dict[str, Any]] = []
+        self.all_columns: set[str] = set()
+
+    def discover_hierarchy(self, distname: str) -> None:
+        discover_hierarchy_elements(self.hierarchy_elements, distname)
+
+    def parse_distname(self, distname: str) -> dict[str, str]:
+        return parse_distname_hierarchy(distname)
+
+    def flatten_api_parameters(self, parameters: dict[str, Any] | None) -> dict[str, str]:
+        result: dict[str, str] = {}
+        for name, value in (parameters or {}).items():
+            if name in self._SKIP_PARAM_NAMES:
+                continue
+            result.update(self._flatten_value(name, value))
+        return result
+
+    def _flatten_value(self, name: str, value: Any) -> dict[str, str]:
+        if value is None:
+            return {name: ''}
+        if isinstance(value, bool):
+            return {name: 'true' if value else 'false'}
+        if isinstance(value, (int, float)):
+            return {name: str(value)}
+        if isinstance(value, str):
+            return {name: value}
+        if isinstance(value, list):
+            return self._flatten_list(name, value)
+        if isinstance(value, dict):
+            return self._flatten_structured_value(name, value)
+        return {name: str(value)}
+
+    def _flatten_list(self, list_name: str, items: list[Any]) -> dict[str, str]:
+        if not items:
+            return {list_name: ''}
+        if all(isinstance(item, dict) for item in items):
+            result: dict[str, str] = {list_name: 'List'}
+            list_params: dict[str, list[str]] = defaultdict(list)
+            for item in items:
+                for key, val in item.items():
+                    if key in self._SKIP_PARAM_NAMES:
+                        continue
+                    for flat_key, flat_val in self._flatten_value(str(key), val).items():
+                        list_params[flat_key].append(flat_val)
+            for param_name, values in list_params.items():
+                full_key = f'Item-{list_name}-{param_name}'
+                if len(values) > 1:
+                    result[full_key] = ';'.join(values)
+                elif len(values) == 1:
+                    result[full_key] = values[0]
+            return result
+        scalar_values = [str(item) for item in items]
+        if len(scalar_values) > 1:
+            return {list_name: ';'.join(scalar_values)}
+        return {list_name: scalar_values[0]}
+
+    def _flatten_structured_value(self, name: str, value: dict[str, Any]) -> dict[str, str]:
+        items = value.get('items')
+        if isinstance(items, list):
+            return self._flatten_list(name, items)
+
+        nested_scalars: dict[str, str] = {}
+        nested_lists: dict[str, list[Any]] = {}
+        for key, val in value.items():
+            if key in self._SKIP_PARAM_NAMES:
+                continue
+            if isinstance(val, list):
+                nested_lists[str(key)] = val
+            elif isinstance(val, dict):
+                nested_scalars.update(self._flatten_structured_value(str(key), val))
+            elif val is not None:
+                nested_scalars[str(key)] = str(val)
+
+        if nested_lists:
+            result = {name: 'List'}
+            list_params: dict[str, list[str]] = defaultdict(list)
+            for list_key, list_val in nested_lists.items():
+                flat = self._flatten_list(list_key, list_val)
+                for flat_key, flat_val in flat.items():
+                    if flat_key == list_key:
+                        continue
+                    if flat_key.startswith('Item-'):
+                        list_params[flat_key.split('-', 2)[-1]].append(flat_val)
+                    else:
+                        list_params[flat_key].append(flat_val)
+            for param_name, values in list_params.items():
+                full_key = f'Item-{name}-{param_name}'
+                if len(values) > 1:
+                    result[full_key] = ';'.join(values)
+                elif len(values) == 1:
+                    result[full_key] = values[0]
+            result.update(nested_scalars)
+            return result
+
+        if nested_scalars:
+            return nested_scalars
+        return {name: str(value)}
+
+    def add_managed_object(
+        self,
+        distname: str,
+        parameters: dict[str, Any] | None = None,
+        *,
+        extra: dict[str, Any] | None = None,
+    ) -> None:
+        self.discover_hierarchy(distname)
+        row: dict[str, Any] = {}
+        row.update(self.parse_distname(distname))
+        if extra:
+            for key, val in extra.items():
+                if key in self._IDENTITY_COLS:
+                    continue
+                row[key] = val
+        row.update(self.flatten_api_parameters(parameters))
+        self.row_dicts.append(row)
+        self.all_columns.update(row.keys())
+
+    def add_flat_row(self, row_data: dict[str, Any], *, distname: str = '') -> None:
+        """Add a row that may already contain hierarchy columns and/or a DN/moId."""
+        dn = str(
+            distname
+            or row_data.get('DN')
+            or row_data.get('moId')
+            or ''
+        ).strip()
+        if dn:
+            self.discover_hierarchy(dn)
+        row: dict[str, Any] = {}
+        if dn:
+            row.update(self.parse_distname(dn))
+        for key, val in row_data.items():
+            if key in self._IDENTITY_COLS:
+                continue
+            if key in row and row[key] == val:
+                continue
+            if isinstance(val, (dict, list)):
+                row.update(self.flatten_api_parameters({str(key): val}))
+            else:
+                row[key] = '' if val is None else val
+        self.row_dicts.append(row)
+        self.all_columns.update(row.keys())
+
+    def seed_hierarchy_columns(self, columns: list[str]) -> None:
+        for col in columns:
+            if col and col not in self.hierarchy_elements and col not in self._IDENTITY_COLS:
+                self.hierarchy_elements.append(col)
+
+    def ordered_columns(self) -> tuple[list[str], int]:
+        hierarchy_cols = sort_hierarchy_columns(
+            self.hierarchy_elements,
+            [col for col in self.all_columns if col in self.hierarchy_elements],
+        )
+        param_cols = [
+            col for col in self.all_columns
+            if col not in self.hierarchy_elements and col not in self._IDENTITY_COLS
+        ]
+        param_cols_sorted = sort_parameter_columns(param_cols)
+        ordered = hierarchy_cols + param_cols_sorted
+        return ordered, len(hierarchy_cols)
+
+    def to_sheet(self) -> dict[str, Any]:
+        if not self.row_dicts:
+            return {
+                'headers': ['moId'],
+                'rows': [],
+                'hierarchy_col_count': 0,
+                'mo_count': 0,
+            }
+        ordered, hierarchy_col_count = self.ordered_columns()
+        rows = [[row.get(col, '') for col in ordered] for row in self.row_dicts]
+        return {
+            'headers': ordered,
+            'rows': rows,
+            'hierarchy_col_count': hierarchy_col_count,
+            'mo_count': len(self.row_dicts),
+        }
+
+
+def managed_objects_to_ncm_sheet(managed_objects: list[dict[str, Any]]) -> dict[str, Any]:
+    """Convert getManagedObjects payload to NCM-layout {headers, rows, hierarchy_col_count}."""
+    builder = NokiaMoSheetBuilder()
+    for mo in managed_objects or []:
+        distname = str(mo.get('moId') or mo.get('distName') or '').strip()
+        if not distname:
+            continue
+        builder.add_managed_object(distname, mo.get('parameters') or {})
+    return builder.to_sheet()
+
+
+def query_table_to_ncm_sheet(headers: list[str], rows: list[list[Any]]) -> dict[str, Any]:
+    """Convert CM query result table (DN + parameters) to NCM-layout sheet data."""
+    builder = NokiaMoSheetBuilder()
+    if not headers:
+        return builder.to_sheet()
+
+    for row in rows or []:
+        row_map = {
+            headers[idx]: row[idx] if idx < len(row) else ''
+            for idx in range(len(headers))
+        }
+        builder.add_flat_row(row_map)
+    return builder.to_sheet()
+
+
+def merge_ncm_sheet_parts(parts: list[dict[str, Any]]) -> dict[str, Any]:
+    """Merge per-site/per-chunk sheet parts preserving NCM hierarchy + list column order."""
+    builder = NokiaMoSheetBuilder()
+    for part in parts or []:
+        headers = list(part.get('headers') or [])
+        hierarchy_col_count = int(part.get('hierarchy_col_count') or 0)
+        if hierarchy_col_count and headers:
+            builder.seed_hierarchy_columns(headers[:hierarchy_col_count])
+        elif headers and headers[0] == 'DN':
+            for row in part.get('rows') or []:
+                if row:
+                    builder.discover_hierarchy(str(row[0]))
+        for row in part.get('rows') or []:
+            row_map = {
+                headers[idx]: row[idx] if idx < len(row) else ''
+                for idx in range(len(headers))
+            }
+            builder.add_flat_row(row_map)
+    return builder.to_sheet()
+
+
+def _mo_class_abbreviation(mo_class: str) -> str:
+    """RAML ``class`` may be ``FMCS`` or ``com.nokia.asrnc:FMCS`` — return ``FMCS``."""
+    token = (mo_class or '').strip()
+    if ':' in token:
+        return token.rsplit(':', 1)[-1]
+    return token
+
+
 class XMLToExcelConverter:
     """Convert Nokia XML configuration to Excel format"""
     
@@ -91,43 +403,19 @@ class XMLToExcelConverter:
     
     def discover_hierarchy(self, distname):
         """Extract hierarchy elements from distName path"""
-        parts = distname.split('/')
-        for part in parts:
-            if '-' in part:
-                mo_class = part.split('-')[0]
-                if mo_class != 'PLMN' and mo_class not in self.hierarchy_elements:
-                    self.hierarchy_elements.append(mo_class)
+        discover_hierarchy_elements(self.hierarchy_elements, distname)
     
     def parse_distname(self, distname):
         """Parse distName into hierarchy dictionary"""
-        hierarchy = {}
-        parts = distname.split('/')
-        
-        for part in parts:
-            if '-' in part:
-                mo_class, mo_id = part.split('-', 1)
-                if mo_class != 'PLMN':
-                    hierarchy[mo_class] = mo_id
-        
-        return hierarchy
+        return parse_distname_hierarchy(distname)
     
     def sort_hierarchy_columns(self, hierarchy_cols):
         """Sort hierarchy columns by depth order"""
-        if not hierarchy_cols:
-            return []
-        
-        depth_order = self.hierarchy_elements
-        sorted_cols = []
-        
-        for col in depth_order:
-            if col in hierarchy_cols:
-                sorted_cols.append(col)
-        
-        for col in hierarchy_cols:
-            if col not in sorted_cols:
-                sorted_cols.append(col)
-        
-        return sorted_cols
+        return sort_hierarchy_columns(self.hierarchy_elements, hierarchy_cols)
+    
+    def sort_parameter_columns(self, param_cols):
+        """Sort parameter columns with list markers followed by their children"""
+        return sort_parameter_columns(param_cols)
     
     def extract_parameters(self, mo_elem):
         """Extract all parameters from a managedObject element"""
@@ -231,53 +519,37 @@ class XMLToExcelConverter:
             else:
                 self._extract_nested_parameters(child, result)
     
+    def _filter_key_for_mo_class(self, mo_class):
+        """Map RAML class attribute to a filter_dict key (UI uses abbreviations like FMCS)."""
+        if not self.filter_config.filter_dict:
+            return None
+        if mo_class in self.filter_config.filter_dict:
+            return mo_class
+        abbr = _mo_class_abbreviation(mo_class)
+        if abbr in self.filter_config.filter_dict:
+            return abbr
+        return None
+
     def should_include_mo_param(self, mo_class, param_name):
-        """Check if MO/param combo should be included"""
+        """Check if MO/param combo should be included."""
         if not self.filter_config.filter_dict:
             return True
-        
-        if mo_class not in self.filter_config.filter_dict:
+
+        filter_key = self._filter_key_for_mo_class(mo_class)
+        if filter_key is None:
             return False
-        
-        return param_name in self.filter_config.filter_dict[mo_class]
+
+        allowed = self.filter_config.filter_dict[filter_key]
+        if not allowed:
+            return True
+        return param_name in allowed
     
     def should_process_mo(self, mo_class):
         """Check if this MO class matches any filter"""
         if not self.filter_config.filter_dict:
             return True
         
-        return mo_class in self.filter_config.filter_dict
-    
-    def sort_parameter_columns(self, param_cols):
-        """Sort parameter columns with list markers followed by their children"""
-        list_markers = set()
-        list_details = {}
-        regular_params = []
-        
-        for col in param_cols:
-            if col.startswith('Item-'):
-                parts = col.split('-', 2)
-                if len(parts) >= 2:
-                    list_name = parts[1]
-                    if list_name not in list_details:
-                        list_details[list_name] = []
-                    list_details[list_name].append(col)
-            else:
-                has_children = any(detail_col.startswith(f'Item-{col}-') for detail_col in param_cols)
-                if has_children:
-                    list_markers.add(col)
-                else:
-                    regular_params.append(col)
-        
-        result = []
-        result.extend(sorted(regular_params))
-        
-        for list_name in sorted(list_markers):
-            result.append(list_name)
-            if list_name in list_details:
-                result.extend(sorted(list_details[list_name]))
-        
-        return result
+        return self._filter_key_for_mo_class(mo_class) is not None
     
     def convert(self, progress_callback=None):
         """Main conversion method - returns (success, message)"""
@@ -332,8 +604,9 @@ class XMLToExcelConverter:
                     row_data.update(hierarchy)
                     row_data.update(params_dict)
                     
-                    self.data_by_mo[mo_class].append(row_data)
-                    self.all_columns_by_mo[mo_class].update(row_data.keys())
+                    mo_class_key = _mo_class_abbreviation(mo_class)
+                    self.data_by_mo[mo_class_key].append(row_data)
+                    self.all_columns_by_mo[mo_class_key].update(row_data.keys())
                     
                     elem.clear()
             
@@ -343,14 +616,15 @@ class XMLToExcelConverter:
             # Write Excel
             wb = openpyxl.Workbook()
             wb.remove(wb.active)
-            
+            used_sheet_titles: set[str] = set()
+
             for mo_class in sorted(self.data_by_mo.keys()):
                 mo_data = self.data_by_mo[mo_class]
                 
                 if not mo_data:
                     continue
                 
-                sheet_name = f"{mo_class}"[:31]
+                sheet_name = _unique_sheet_title(mo_class, used_sheet_titles)
                 ws = wb.create_sheet(title=sheet_name)
                 
                 all_cols = self.all_columns_by_mo[mo_class]
@@ -383,6 +657,19 @@ class XMLToExcelConverter:
             
             if progress_callback:
                 progress_callback(90, "Saving file...")
+
+            if not wb.sheetnames:
+                raml_classes = sorted(self.data_by_mo.keys()) or sorted(
+                    cls for cls in (self.all_columns_by_mo or {}) if cls
+                )
+                filter_keys = sorted(self.filter_config.filter_dict.keys())
+                raise ValueError(
+                    'No MO data matched the Excel filter after RAML conversion. '
+                    f'RAML classes: {raml_classes or "(none parsed)"}; '
+                    f'filter keys: {filter_keys}. '
+                    'Qualified RAML class names (e.g. com.nokia.asrnc:FMCS) must map to '
+                    'the MO abbreviation (FMCS) from your selection.'
+                )
             
             wb.save(self.output_file)
             

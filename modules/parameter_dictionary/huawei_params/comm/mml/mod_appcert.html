@@ -1,0 +1,156 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Activated Device Certificate (MOD APPCERT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_appcert">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Activated Device Certificate (MOD APPCERT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_appcert"></a><a name="mod_appcert"></a>
+
+
+<h1 class="topictitle1">Modify Activated Device Certificate (MOD APPCERT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_appcert__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the device certificate used by a base station to negotiate with the peer end about security channels. When Application Type is set to SSL, this command can be used to specify whether an RRU needs to apply for an operator-issued device certificate.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_appcert__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Running this command can only change the device certificate in the CERTMK object to the activated device certificate.</p>
+</li><li><p>Before running this command, ensure that the BS can set up a secure channel to a peer device by using this device certificate. Otherwise, the secure channel fails to be set up or the existing channel becomes disconnected.</p>
+</li><li><p>When you run this command to modify the configuration, the certificate file name must be the same as the device certificate file name in the <strong>CERTMK</strong> MO, including the file name extension. You can run the <a href="dsp_certmk.html">DSP CERTMK</a> command to query the existing certificate files and their names.</p>
+</li><li><p>When this command is used to modify the device certificate whose application type is SSL, the Web LMT may be disconnected.</p>
+</li><li><p>When a device certificate is being updated or a device certificate is being tested, this command cannot be executed to modify the device certificate. Otherwise, the device certificate may not be normally updated again or the certificate test fails.</p>
+</li><li><p>Before running this command to modify configurations, run the <a href="tst_appcert.html">TST APPCERT</a> command to test whether the certificate to be used can work for the normal IKE or SSL connection and ensure that the device certificate can be successfully used for establishing the secure channel between the network element and the peer end. Otherwise, the secure channel fails to be established or is interrupted. It is recommended that the automatic configuration rollback function be enabled before this command is executed. For details, see MML online help for <a href="cfm_cb.html">CFM CB</a>.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_appcert__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/APPCERT-ApplicationType.html">APPTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Application Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the application type of activated device certificate. The application type of a device certificate can be IKE, SSL, or DTLS. When APPTYPE is set to IKE and CERTSOURCE in the IKEPEER object is set to Appcert, the device certificate being used during IKE negotiation is the certificate configured in the APPCERT object. When APPTYPE is set to SSL, the device certificate being used is the certificate used during SSL connection, 802.1x-based, or inter-BBU interconnection authentication. When APPTYPE is set to DTLS, the device certificate being used is the certificate used during DTLS connection authentication.</p>
+<p>GUI Value Range: IKE(IKE), SSL(SSL), DTLS(DTLS)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IKE, SSL, DTLS</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a BS, there is only one activated device certificate for each application type.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/APPCERT-DeviceCertificate.html">APPCERT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certificate File Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the file name of an activated device certificate. The file name cannot include any of the following characters: backslash (\), slash (/), colon (:), asterisk (*), question mark (?), double quotation marks ("), left angle bracket (&lt;), right angle bracket (&gt;), and bar (|).</p>
+<p>GUI Value Range: 1~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]It is recommended that the value of <strong>APPCERT</strong> in an <strong>APPCERT</strong> MO be ASCII characters. A certificate file name can neither contain only space characters (including space and tab) nor contain the following characters: backslash (\), slash (/), colon (:), asterisk (*), question mark (?), double quotation marks (""), left angle bracket (&lt;), right angle bracket (&gt;), and bar (|).</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/APPCERT-RRUCertReqSwitch.html">RRUCERTREQSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Certificate Request Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether an RRU needs to apply for an operator-issued device certificate. When an operator-issued device certificate is used for SSL application type and this switch is turned on, the RRU with the eCPRI port applies for a certificate to the CA.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(Off)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>APPCERT</strong> MO, this parameter is valid only when <strong>APPTYPE</strong> is set to SSL.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/APPCERT-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether forcible changes to APPCERT objects are made. When this parameter is set to YES, forcible changes to APPCERT objects are made. When this parameter is set to NO, forcible changes to the APPCERT objects that affect associated objects are not allowed. When forcible changes are not allowed, only the local IP address is checked.</p>
+<p>The associated objects include CA, CERTREQ, and IKEPEER. This parameter is invalid when a WMPT, LMPT, GTMUb, or GTMUc serves as the main control board.</p>
+<p>Pay attention to the following when setting this parameter:</p>
+<p>1. The system checks whether forcible changes to APPCERT objects affect associated objects based on the object configuration data instead of the actual object running status.</p>
+<p>2. If an NE is configured with an SRCIPRT, SRCIPROUTE4, PPPLNK, or MPGRP object, the system will not check whether forcible changes to APPCERT objects affect associated objects.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_appcert__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify a device certificate file with the parameters as follows: Application Type: IKE, Certificate File Name: eNodeBCert.pem, run the following command:
+MOD APPCERT: APPTYPE=IKE, APPCERT="eNodeBCert.pem";
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

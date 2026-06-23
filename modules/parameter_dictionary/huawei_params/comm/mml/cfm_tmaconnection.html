@@ -1,0 +1,289 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Confirm TMA Connection (CFM TMACONNECTION)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="cfm_tmaconnection">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Confirm TMA Connection (CFM TMACONNECTION)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="cfm_tmaconnection"></a><a name="cfm_tmaconnection"></a>
+
+
+<h1 class="topictitle1">Confirm TMA Connection (CFM TMACONNECTION)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="cfm_tmaconnection__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query whether an RRU/RFU is connected to a common tower mounted amplifier (TMA). You can run this command to check whether an RRU/RFU is connected to a common TMA that does not support the AISG protocol and run the <a href="scn_ald.html">SCN ALD</a> command to check whether an RRU/RFU is connected to an intelligent TMA that supports the AISG protocol.</p>
+<p>Before performing this operation, ensure that the base station has been commissioned and its cell data has been configured and activated.</p>
+</div></div>
+
+<div class="mmlnote"><a name="cfm_tmaconnection__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>During the execution of this command, the base station attempts to turn on or off the ALD power switch of an antenna port on an RF module and set the receive channel attenuation of the RF module to 0. This changes the uplink coverage of the base station. However, the status of the ALD power switch restores after the command execution is complete. Therefore, it is recommended that you execute this command only during the base station deployment or when the traffic load of the base station is extremely light. If the common TMA is powered by another RF module or by a third-party power device instead of being powered by the connected RF module using feeders, this command cannot be used to determine whether the antenna port is connected to a common TMA.</p>
+</li><li><p>This command cannot be executed when the crossed pair detection, intermodulation interference detection, or voltage standing wave ratio (VSWR) test is in process.</p>
+</li><li><p>Do not add or remove a cell during the execution of this command. Otherwise, this command fails to be executed or the value of the CFMTMARESULT parameter in the command output is incorrect.</p>
+</li><li><p>During the execution of this command, the RF module may report ALM-26530 RF Unit ALD Current Out of Range if the RF module is not connected to a TMA. After this command is executed, this alarm will be automatically cleared.</p>
+</li><li><p>During the execution of this command, the RF module may report ALM-26541 ALD Maintenance Link Failure if the RF module has been configured with an ALD. After this command is executed, this alarm will be automatically cleared.</p>
+</li><li><p>In a dual-mode base station, this command cannot be executed simultaneously on an RF module at both sides. Otherwise, this command fails to be executed or the value of the CFMTMARESULT parameter in the command output is incorrect.</p>
+</li><li><p>If "With Normal TMA" is returned, the RRU/RFU may also be connected to an intelligent TMA.</p>
+</li><li><p>If "Without Normal TMA" is returned, you need to check whether there is no TMA or a TMA is powered by a third party.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="cfm_tmaconnection__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AntennaPort-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the RRU or RFU where the antenna port is located.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AntennaPort-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the RRU or RFU where the antenna port is located.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CN</strong> in the <strong>ANTENNAPORT</strong> MO is set to a value in the range from 0 to 15, the value of <strong>SRN</strong> can be 4, 5, or a number ranging from 60 to 254. When the value of <strong>CN</strong> in the <strong>ANTENNAPORT</strong> MO ranges from 16 to 62, the value of <strong>SRN</strong> is 4 or 5.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AntennaPort-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the RRU or RFU where the antenna port is located.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>SRN</strong> in the <strong>ANTENNAPORT</strong> MO is set to 4 or 5, the value of <strong>SN</strong> ranges from 0 to 8. When the value of <strong>SRN</strong> in an <strong>ANTENNAPORT</strong> MO ranges from 60 to 254 and <strong>RT</strong> in the <strong>RRU</strong> MO where the <strong>ANTENNAPORT</strong> MO is located is set to MPRF, the value of <strong>SN</strong> ranges from 1 to 3. When the value of <strong>SRN</strong> in an <strong>ANTENNAPORT</strong> MO is set to 60 and <strong>RT</strong> in the <strong>RRU</strong> MO where the <strong>ANTENNAPORT</strong> MO is located is not set to MPRF, <strong>SN</strong> ranges from 0 to 5. When the value of <strong>SRN</strong> in an <strong>ANTENNAPORT</strong> MO ranges from 61 to 254 and <strong>RT</strong> in the <strong>RRU</strong> MO where the <strong>ANTENNAPORT</strong> MO is located is not set to MPRF, <strong>SN</strong> must be set to 0.</li><li>[eGBTS]When <strong>SRN</strong> in the <strong>ANTENNAPORT</strong> MO is set to 4 or 5, the value of <strong>SN</strong> ranges from 0 to 8. When the value of <strong>SRN</strong> in the <strong>ANTENNAPORT</strong> MO is set to 60, <strong>SN</strong> ranges from 0 to 5. When the value of <strong>SRN</strong> in the <strong>ANTENNAPORT</strong> MO ranges from 61 to 254, <strong>SN</strong> is set 0.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AntennaPort-DeltaThreshold.html">DELTATHRESHOLD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DeltaThreshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of difference in the received total wideband power (RTWP) or received signal strength indicator (RSSI) before and after the antenna line device (ALD) power switch of an antenna port is set to on. When the difference in the RTWP or RSSI exceeds or equals this threshold, the antenna port is connected to a common tower mounted amplifier (TMA). When the difference in the RTWP or RSSI is below this threshold, the antenna port is not connected to a common TMA.</p>
+<p>GUI Value Range: 1~24</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 1~24</p>
+<p>MML Default Value: 6</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="cfm_tmaconnection__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To confirm TMA connection with the parameters as follows: DeltaThreshold: 7, run the following command:
+CFM TMACONNECTION: DELTATHRESHOLD=7;
+The result is shown as follows:
++++    eGbts        2014-08-21 13:51:11
+O&amp;M    #7790
+%%CFM TMACONNECTION: DELTATHRESHOLD=7;%%
+RETCODE = 0  Operation succeeded.
+
+Confirm TMA Connection
+----------------------
+Session ID  =  65553
+(Number of results = 1)
+
+
+---    END
+
++++    eGbts        2014-08-21 13:51:11
+O&amp;M    #7789
+%%CFM TMACONNECTION: DELTATHRESHOLD=7;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Confirm TMA
+     Status  =  Start
+ Session ID  =  65553
+
+---    END
+
++++    eGbts        2014-08-21 13:51:16
+O&amp;M    #7789
+%%CFM TMACONNECTION: DELTATHRESHOLD=7;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Confirm TMA
+     Status  =  Progressing
+   Progress  =  0%
+ Session ID  =  65553
+
+---    END
+
++++    eGbts        2014-08-21 13:51:19
+O&amp;M    #7789
+%%CFM TMACONNECTION: DELTATHRESHOLD=7;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Confirm TMA
+     Status  =  Progressing
+   Progress  =  100%
+ Session ID  =  65553
+
+---    END
+
++++    eGbts        2014-08-21 13:51:19
+O&amp;M    #7789
+%%CFM TMACONNECTION: DELTATHRESHOLD=7;%%
+RETCODE = 0  Progress report, Operation succeeded.
+
+Report Type  =  Confirm TMA
+     Status  =  Success
+ Session ID  =  65553
+
+Result
+------
+Cabinet No.  Subrack No.  Slot No.  Antenna Port No.  Confirm TMA Connection Result         ALD Actual Power Switch  ALD Current Value(mA)  ALD Current Out of Range Status  Delta of RTWP/RSSI(dB)
+
+0            65           0         R0A               With Normal TMA                       ON                       84                     No Alarm                         9                    
+0            65           0         R0B               Without normal TMA.Check the result.  ON                       267                    No Alarm                         0                    
+0            100          0         R0A               Failure                               NULL                     NULL                   NULL                             NULL                 
+0            100          0         R0B               Failure                               NULL                     NULL                   NULL                             NULL                 
+(Number of results = 4)
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="cfm_tmaconnection__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the RRU or RFU where the antenna port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the RRU or RFU where the antenna port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the RRU or RFU where the antenna port is located.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Antenna Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the antenna port on the RRU or RFU. For the RRU that works in TDD or FDD mode and has eight channels to be connected to the antenna, the service channels are ANT1 to ANT8 and the corresponding ports on the antenna are R0A to R0H. For other RRUs/RFUs, the service channels are numbered from ANT0 and the corresponding port on the antenna is R0A.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Confirm TMA Connection Result</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the confirmation result of whether an antenna port is connected to a common TMA. If the confirmation fails for an RF module, you need to run the CFM TMACONNECTION command with the ALD Actual Power Switch, ALD Current Value(mA), ALD Current Out of Range, and Delta of RTWP parameters set to NULL on this RF module to obtain the reason for the confirmation failure.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ALD Actual Power Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual status of the ALD power supply switch, which can be set to ON or OFF. ON indicates that this switch is set to on and OFF indicates that this switch is set to off.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ALD Current Value(mA)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ALD current value. Value NULL indicates that this parameter fails to be queried or the ALD Actual Power Switch is OFF.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ALD Current Out of Range Status</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the status of the ALD current of an antenna port when the ALD power switch of the antenna port is set to on. If the status is No Alarm, the ALD power switch is set to on normally and the value of the CFMTMARESULT parameter is reliable. If the status is a value other than No Alarm, the ALD power switch is not set to on, the value of the CFMTMARESULT parameter is unreliable, and you need to determine whether the antenna port is connected to a common TMA based on the onsite conditions of the base station.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Delta of RTWP/RSSI(dB)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the difference in the RTWP/RSSI before and after the ALD power switch is set to on.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

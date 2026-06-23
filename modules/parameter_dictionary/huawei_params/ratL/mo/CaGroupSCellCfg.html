@@ -1,0 +1,152 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CaGroupSCellCfg">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CaGroupSCellCfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CaGroupSCellCfg</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CaGroupSCellCfg"></a><a name="CaGroupSCellCfg"></a>
+
+
+<h1 class="topictitle1">CaGroupSCellCfg</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CaGroupSCellCfg.html"><strong>CaGroupSCellCfg</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A CaGroupSCellCfg MO consists of parameters related to a candidate secondary serving cell (SCell) for carrier aggregation (CA). Especially, if adaptive CA is used, the SCC priority, A2 offset, and A4 offset defined in an SCCFreqCfg MO take effect in SCell configuration.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>Cell</strong> MO:<ul><li>The <strong>NbCellFlag</strong> in the <strong>Cell</strong> MO corresponding to the <strong>LocalCellId</strong> in the <strong>CaGroupSCellCfg</strong> MO must be set to FALSE.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>eNodeBFunction</strong> MOs:<ul><li>If <strong>SCelleNodeBId</strong> in a <strong>CaGroupSCellCfg</strong> MO is equal to <strong>eNodeBId</strong> in the <strong>eNodeBFunction</strong> MO, the <strong>NbCellFlag</strong> in the <strong>Cell</strong> MO corresponding to the <strong>SCellLocalCellId</strong> in the <strong>CaGroupSCellCfg</strong> MO must be set to FALSE.</li></ul>
+</li><li>Relation with the <strong>CaMgtCfg</strong> MO:<ul><li>The sum of the value of <strong>SCellA4Offset</strong> parameter in the <strong>CaGroupSCellCfg</strong> MO and the value of the <strong>CarrAggrA4ThdRsrp</strong> parameter in the <strong>CaMgtCfg</strong> MO with the same <strong>LocalCellId</strong> parameter value must be greater than or equal to -140 and less than or equal to -43.</li><li>The sum of the value of <strong>SCellA2Offset</strong> parameter in the <strong>CaGroupSCellCfg</strong> MO and the value of the <strong>CarrAggrA2ThdRsrp</strong> parameter in the <strong>CaMgtCfg</strong> MO with the same <strong>LocalCellId</strong> parameter value must be greater than or equal to -140 and less than or equal to -43.</li><li>The sum of the value of <strong>SCellA4Offset</strong> parameter in the <strong>CaGroupSCellCfg</strong> MO and the value of the <strong>CarrAggrA4ThdRsrp</strong> parameter in the <strong>CaMgtCfg</strong> MO with the same <strong>LocalCellId</strong> parameter value must be greater than the sum of the value of <strong>SCellA2Offset</strong> parameter in the <strong>CaGroupSCellCfg</strong> MO and the value of the <strong>CarrAggrA2ThdRsrp</strong> parameter in the <strong>CaMgtCfg</strong> MO with the same <strong>LocalCellId</strong> parameter value.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> and <strong>GlobalProcSwitch</strong> MOs:<ul><li>If <strong>TYPE</strong> in all <strong>MPT</strong> MOs is set to LMPT, the number of <strong>CaGroupSCellCfg</strong> MOs cannot exceed 144. If there is only one <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT and only one <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT and <strong>PreferSigExtend</strong> in the <strong>GlobalProcSwitch</strong> MO is set to ON, the number of <strong>CaGroupSCellCfg</strong> MOs cannot exceed 144.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CaGroupSCellCfg__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CaGroupSCellCfg__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CaGroupSCellCfg__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_cagroupscellcfg.html">ADD CAGROUPSCELLCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add CA group SCell configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cagroupscellcfg.html">LST CAGROUPSCELLCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list CA group SCell configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cagroupscellcfg.html">MOD CAGROUPSCELLCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify CA group SCell configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_cagroupscellcfg.html">RMV CAGROUPSCELLCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to delete CA group SCell configuration.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CaGroupSCellCfg__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CaGroupSCellCfg__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CaGroupSCellCfg__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CaGroupSCellCfg-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell, which uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CaGroupSCellCfg-SCelleNodeBId.html">SCell eNodeB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the eNodeB serving the candidate SCell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CaGroupSCellCfg-SCellLocalCellId.html">SCell Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local cell ID of the candidate SCell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CaGroupSCellCfg-SCellBlindCfgFlag.html">SCell Blind Configuration Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the candidate SCell can be configured as an SCell for CA UEs in a blind manner.</p>
+<p>In CA-group-based configuration mode, this parameter takes effect if the SccBlindCfgSwitch option of the CaAlgoSwitch parameter is selected. In adaptive configuration mode, this parameter takes effect regardless of the SccBlindCfgSwitch setting.</p>
+<p>If this parameter is set to TRUE, the eNodeB can configure this candidate SCell as an SCell for CA UEs in a blind manner, without delivering A4-related measurement configurations to the CA UEs.</p>
+<p>If this parameter is set to FALSE, the eNodeB cannot configure this candidate SCell as an SCell for CA UEs in a blind manner. The eNodeB must deliver the A4 measurement configurations related to the operating frequency of the cell to CA UEs before the eNodeB can configure the cell as an SCell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CaGroupSCellCfg-SCellPriority.html">SCell Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of the cell being configured as an SCell. A larger value of this parameter indicates a higher priority level. The value 0 indicates that this cell cannot be configured as an SCell for CA UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CaGroupSCellCfg-SCellA4Offset.html">SCell A4 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to CarrAggrA4ThdRsrp in CA-group-based configuration mode. When a CA UE treats the cell specified by the LocalCellId parameter in the local eNodeB as its PCell, the UE reports event A4 pertaining to the candidate SCell specified by the SCelleNodeBId and SCellLocalCellId parameters to the eNodeB if the RSRP for the candidate SCell exceeds the sum of the CarrAggrA4ThdRsrp and SCellA4Offset parameter values. If the sum is greater than -43 dBm or less than -140 dBm, the threshold for event A4 takes the value -43 dBm or -140 dBm, respectively. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CaGroupSCellCfg-SCellA2Offset.html">SCell A2 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to CarrAggrA2ThdRsrp in CA-group-based configuration mode. When a CA UE treats the cell specified by the LocalCellId parameter in the local eNodeB as its PCell, the UE reports event A2 pertaining to the SCell specified by the SCelleNodeBId and SCellLocalCellId parameters to the eNodeB if the RSRP for the SCell falls below the sum of the CarrAggrA2ThdRsrp and SCellA2Offset parameter values. If the sum is greater than -43 dBm or less than -140 dBm, the threshold for event A2 takes the value -43 dBm or -140 dBm, respectively. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CaGroupSCellCfg-SpidGrpId.html">SPID Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an SPID group. If this parameter is set to a value ranging from 0 to 255, the candidate SCell cannot be configured as an SCell for UEs in this SPID group. If this parameter is set to 65535, this cell can be configured as an SCell for these UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

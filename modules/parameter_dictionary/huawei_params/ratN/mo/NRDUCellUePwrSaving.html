@@ -1,0 +1,118 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NRDUCellUePwrSaving">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NRDUCellUePwrSaving">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NRDUCellUePwrSaving</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NRDUCellUePwrSaving"></a><a name="NRDUCellUePwrSaving"></a>
+
+
+<h1 class="topictitle1">NRDUCellUePwrSaving</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="NRDUCell.html">NRDUCell</a>
+    +-<a href="NRDUCellUePwrSaving.html"><strong>NRDUCellUePwrSaving</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO consists of parameters related to UE power saving features such as DRX in an NR DU cell.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NRDUCell.html">NRDUCell</a></li><li>Relation with the <strong>NRDUCellPdsch</strong> MO:<ul><li>When <strong>BwpPwrSavingSw</strong> in the <strong>NRDUCellUePwrSaving</strong> MO is turned on, the options of <strong>RateMatchSwitch</strong> in the <strong>NRDUCellPdsch</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong> MO:<ul><li>When the BWP2_SWITCH option of <strong>BwpPwrSavingSw</strong> in the <strong>NRDUCellUePwrSaving</strong> MO is selected, <strong>NrDuCellNetworkingMode</strong> in the <strong>NRDUCell</strong> MO corresponding to <strong>NrDuCellId</strong> parameter in the <strong>NRDUCellUePwrSaving</strong> MO must be set to NORMAL_CELL.</li><li>When <strong>HighSpeedFlag</strong> in the <strong>NRDUCell</strong> MO is set to HIGH_SPEED, the BASIC_DRX_SW option of <strong>NrDuCellDrxAlgoSwitch</strong> in the <strong>NRDUCellUePwrSaving</strong> MO must be deselected.</li><li>The BWP2_SWITCH option of <strong>BwpPwrSavingSw</strong> in the <strong>NRDUCellUePwrSaving</strong> MO can be selected only when all the following conditions are met in the associated <strong>NRDUCell</strong> MO: <strong>DuplexMode</strong> is set to CELL_TDD, <strong>FrequencyBand</strong> is set to N38, N40, N41, N77, N78, or N79, and <strong>DlBandwidth</strong> and <strong>UlBandwidth</strong> are set to CELL_BW_60M, CELL_BW_70M, CELL_BW_80M, CELL_BW_90M, or CELL_BW_100M.</li></ul>
+</li><li>Relation with the <strong>NRDUCellAlgoSwitch</strong> and <strong>NRDUCell</strong> MOs:<ul><li>If the INIT_BWP_FULL_BW_SW option of <strong>BwpConfigPolicySwitch</strong> in an <strong>NRDUCellAlgoSwitch</strong> MO is selected and the BWP2_SWITCH option of <strong>BwpPwrSavingSw</strong> in an <strong>NRDUCellUePwrSaving</strong> MO is selected, <strong>PrachFreqStartPosition</strong> in the <strong>NRDUCell</strong> MO must be set to 65535.</li></ul>
+</li><li>Relation with the <strong>NRDUCellSrs</strong> MO:<ul><li>If the BWP2_SWITCH option of <strong>BwpPwrSavingSw</strong> in an <strong>NRDUCellUePwrSaving</strong> MO is selected, the SRS_PERIOD_ADAPT_SW option of <strong>SrsAlgoSwitch</strong> in the <strong>NRDUCellSrs</strong> MO must also be selected.</li></ul>
+</li><li>Relation with the <strong>NRDUCellUePwrSaving</strong> MO:<ul><li>If the LNR_DRX_SYNCHRONIZE_SW option of <strong>NrDuCellDrxAlgoSwitch</strong> in an <strong>NRDUCellUePwrSaving</strong> MO is selected, the BASIC_DRX_SW option of <strong>NrDuCellDrxAlgoSwitch</strong> in an <strong>NRDUCellUePwrSaving</strong> MO must be selected.</li></ul>
+</li><li>Relation with the <strong>NRDUCellPucch</strong> MO:<ul><li>If the BWP2_SWITCH option of <strong>BwpPwrSavingSw</strong> in the <strong>NRDUCellUePwrSaving</strong> MO is selected, <strong>StructureType</strong> in the associated <strong>NRDUCellPucch</strong> MO must be set to LONG_STRUCTURE.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NRDUCellUePwrSaving__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NRDUCellUePwrSaving__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellUePwrSaving__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nrducelluepwrsaving.html">LST NRDUCELLUEPWRSAVING</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list UE power-saving parameters of an NR DU cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nrducelluepwrsaving.html">MOD NRDUCELLUEPWRSAVING</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify UE power-saving parameters of an NR DU cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NRDUCellUePwrSaving__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NRDUCellUePwrSaving__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellUePwrSaving__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellUePwrSaving-NrDuCellId.html">NR DU Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an NR DU cell, which uniquely identifies the NR DU cell within a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellUePwrSaving-NrDuCellDrxAlgoSwitch.html">NR DU Cell DRX Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the DRX algorithm for an NR DU cell.</p>
+<p>BASIC_DRX_SW: Indicates whether to enable DRX for UEs in an NR DU cell.</p>
+<p>LNR_DRX_SYNCHRONIZE_SW: Indicates whether to enable DRX synchronization for EN-DC UEs in an NR DU cell. This option takes effect only if the BASIC_DRX_SW option is selected.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellUePwrSaving-BwpPwrSavingSw.html">BWP Power Saving Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow UEs in the local cell to enter the BWP2 power saving state.</p>
+<p>BWP2_SWITCH: Indicates whether the cell allows BWP2 power saving for UEs. When this option is selected, the cell allows UEs capable of this function to enter the BWP power saving state. When this option is deselected, the cell does not allow UEs to enter the BWP power saving state, even if the UEs support this function. This parameter takes effect only when NRDUCellPucch.StructureType is set to LONG_STRUCTURE. This parameter applies only to low-frequency TDD cells.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

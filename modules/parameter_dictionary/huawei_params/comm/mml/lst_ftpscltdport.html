@@ -1,0 +1,106 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="List Destination Port for FTP Client (LST FTPSCLTDPORT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="lst_ftpscltdport">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>List Destination Port for FTP Client (LST FTPSCLTDPORT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="lst_ftpscltdport"></a><a name="lst_ftpscltdport"></a>
+
+
+<h1 class="topictitle1">List Destination Port for FTP Client (LST FTPSCLTDPORT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="lst_ftpscltdport__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the list of server ports and IP addresses configured for the FTP client.</p>
+</div></div>
+
+<div class="mmlnote"><a name="lst_ftpscltdport__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>In the case of access to an FTP server whose IP address is not included in the list, control connection port 21 is used by default.</p>
+</li><li><p>0.0.0.0 is a wildcard IP address. The control connection port and data connection port range added for 0.0.0.0 will be used for all IP addresses that are not configured.</p>
+</li><li><p>FTP data connection (in PORT or PASV mode) fails to be established if the port number of the FTP server is not within the port number range and ACL Rule Automatic Setup and Deletion Switch in the PACKETFILTER MO is set to ON.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="lst_ftpscltdport__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody"><p>None.</p>
+</div></div>
+
+<div class="mmlexample"><a name="lst_ftpscltdport__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query the list of the server IP address, control connection port number, and data connection port range that are configured on the FTP client, run the following command:
+LST FTPSCLTDPORT:;
+The result is shown as follows:
++++    0        2008-05-17 12:05:39
+O&amp;M    #28
+%% LST FTPSCLTDPORT:;%%
+RETCODE = 0  Operation succeeded.
+
+FTP Server IP and Port List
+---------------------------
+FTP Server IP Address  Destination Port  Start Number of the Data Port Range  End Number of the Data Port Range
+
+10.161.209.201         345                0                                   65535
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="lst_ftpscltdport__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>FTP Server IP Address</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the IP address of the FTP server.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Destination Port</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the port of the FTP server. If no port is added to an IP address using the <a href="add_ftpscltdport.html">ADD FTPSCLTDPORT</a> command, port 21 is used for the IP address by default. If a port is added to an IP address using the ADD FTPSCLTDPORT command, the default port 21 is no longer valid for the IP address.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Start Number of the Data Port Range</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the start number of data connection ports of the FTP server. The STARTDATAPORT and ENDDATAPORT parameters specify the range of data connection ports of the FTP server when ACL Rule Automatic Setup and Deletion Switch in the PACKETFILTER MO is set to ON. If the <a href="add_ftpscltdport.html">ADD FTPSCLTDPORT</a> command is not executed to add the start number of a data port range for a new IP address, the default start port number 0 is used.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>End Number of the Data Port Range</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the end number of data connection ports of the FTP server. The STARTDATAPORT and ENDDATAPORT parameters specify the range of data connection ports of the FTP server when ACL Rule Automatic Setup and Deletion Switch in the PACKETFILTER MO is set to ON. If the <a href="add_ftpscltdport.html">ADD FTPSCLTDPORT</a> command is not executed to add the end number of a data port range for a new IP address, the default end port number 65535 is used.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

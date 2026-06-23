@@ -1,0 +1,203 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set LLDP Global Configuration Info (SET LLDPGLOBALINFO)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_lldpglobalinfo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set LLDP Global Configuration Info (SET LLDPGLOBALINFO)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_lldpglobalinfo"></a><a name="set_lldpglobalinfo"></a>
+
+
+<h1 class="topictitle1">Set LLDP Global Configuration Info (SET LLDPGLOBALINFO)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_lldpglobalinfo__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set global LLDP parameters.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_lldpglobalinfo__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>This command can be used to set global LLDP parameters. Each port enabled with the LLDP function uses the global LLDP parameter settings to process local or neighboring LLDP information. However, different ports can process LLDP information at different time points.</p>
+</li><li><p>When the value of LLDP Port Configuration Mode is changed from AUTO to MANUAL, the automatically generated LLDP ports are removed by the system.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_lldpglobalinfo__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LLDPGLOBAL-TxInterval.html">TXINTVAL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LLDPDU Tx Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval at which the local end sends LLDP packets to neighboring nodes. If the status of the local LLDP does not change, the interface module of the LLDP port sends LLDP packets to neighboring nodes at a regular interval specified by this parameter. The network topology discovery frequency can be adjusted by changing the setting of this parameter.</p>
+<p>GUI Value Range: 5~32768</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 5~32768</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 30</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>LLDPGLOBAL</strong> MO, <strong>DELAY</strong> must be less than or equal to one fourth of the value of <strong>TXINTVAL</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LLDPGLOBAL-TxHoldMultiplier.html">HOLDMULTI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LLDP Hold Multiplier</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates a multiple of the time period during which the local LLDP information is stored in neighboring nodes. The time period (time to live, TTL for short) during which the local LLDP information is stored in neighboring nodes is calculated with the following formula:</p>
+<p>TTL = Min(65535,(TXINTVAL×HOLDMULTI)+1)</p>
+<p>That is, TTL is the smaller one of 65535 and (TXINTVAL×HOLDMULTI)+1. The validity period (TTL) of storing the local LLDP information in neighboring nodes can be adjusted by changing the value of this parameter. After a neighboring node receives an LLDP packet, it updates the information aging time of the transmit end based on this validity period. If the value of TTL is 0, the receive end needs to remove the LLDP information about the transmit end immediately.</p>
+<p>GUI Value Range: 2~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 4</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LLDPGLOBAL-ReinitDelay.html">REINITDELAY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reinit Delay</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the delay in reinitializing the LLDP state machine when the interface LLDP module state is changed from RxTx or Tx to Rx or Disabled. Interface LLDP modules have four states: transmit and receive state (RxTx), transmit state (Tx), receive state (Rx), and neither transmit nor receive state (Disabled). When the interface LLDP module state changes, the interface LLDP module state machine needs to be reinitialized. When the interface LLDP module state changes from RxTx or Tx to Rx or Disabled, the system needs to wait for a period specified by this parameter before reinitializing the internal state machine. By default, the interface LLDP modules of the system are in the RxTx state and the state cannot be changed.</p>
+<p>GUI Value Range: 1~10</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LLDPGLOBAL-Delay.html">DELAY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Delay</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the delay in transmitting LLDP packets. This parameter specifies the minimum delay for an interface LLDP module to send LLDP packets to neighboring nodes after the LLDP module discovers a new neighboring node. Under normal conditions, an interface LLDP module sends LLDP packets to neighboring nodes at an interval. When the LLDP module discovers a new neighboring node, the local end enters the fast transmit mode and the system sends LLDP information to neighboring nodes at an interval specified by this parameter. The state of the local interface LLDP module becomes normal only after the local interface LLDP module has sent LLDP information to neighboring nodes for four consecutive times. If the LLDP module discovers another new neighboring node in the fast transmit mode, the system immediately sends LLDP packets to neighboring nodes and then continues sending LLDP packets at the interval specified by this parameter until this fast transmit ends.</p>
+<p>GUI Value Range: 1~8192</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~8192</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>LLDPGLOBAL</strong> MO, <strong>DELAY</strong> must be less than or equal to one fourth of the value of <strong>TXINTVAL</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LLDPGLOBAL-NotifySW.html">NOTIFYSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LLDP Notify Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to report LLDP change events to the network management system. When this switch is turned on and the network management system has subscribed to LLDP change events, the system reports LLDP change information to the network management system if the local or neighboring LLDP information changes. The purpose is to instruct the network management system to update network topology information. When the system changes from the state that the system does not need to report LLDP change events to the network management system (that is, this switch is turned off or the network management system has not subscribed to LLDP change events) to the state that the system needs to report LLDP change events (that is, this switch is turned on and the network management system has subscribed to LLDP change events), the system immediately reports all the current local and neighboring LLDP information to the network management system. The parameters set by running this command take effect for the whole base station, that is, the parameter settings control the capabilities of all LLDP ports to send LLDP change events.</p>
+<p>GUI Value Range: DISABLE(DISABLE), ENABLE(ENABLE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DISABLE(DISABLE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LLDPGLOBAL-NotifyInterval.html">NOTIFYINTERVAL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Notify Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum delay in reporting a neighboring LLDP information change notification to the element management system (EMS) by the base station when LLDP Notify Switch is set to ENABLE and the EMS subscribes the LLDP information change notification. This delay takes effect only for such neighboring LLDP information change events as adding, removing, and aging a neighboring node. If neighboring LLDP information changes frequently, this parameter can be set to a large value to reduce the frequency of sending neighboring LLDP information to the network management system and minimize network topology flapping.</p>
+<p>GUI Value Range: 5~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 5~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/LLDPGLOBAL-PortCfgMode.html">PORTCFGMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LLDP Port Configuration Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the configuration mode of all LLDP ports. When this parameter is set to MANUAL, LLDP ports must be manually configured. When this parameter is set to AUTO, LLDP ports are automatically generated by the system. When the value of this parameter is changed from AUTO to MANUAL, the automatically generated LLDP ports are removed by the system.</p>
+<p>GUI Value Range: MANUAL(Manual), AUTO(Auto)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MANUAL, AUTO</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MANUAL(Manual)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_lldpglobalinfo__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set global LLDP parameters as follows: LLDPDU Tx Interval: 5, LLDP Hold Multiplier: 2, Reinit Delay: 1, Transmission Delay: 1, LLDP Notify Switch: DISABLE, Notify Interval: 5, run the following command:
+SET LLDPGLOBALINFO: TXINTVAL=5, HOLDMULTI=2, REINITDELAY=1, DELAY=1, NOTIFYSW=DISABLE, NOTIFYINTERVAL=5;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

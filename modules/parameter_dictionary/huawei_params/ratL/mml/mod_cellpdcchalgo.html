@@ -1,0 +1,1307 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell PDCCH Algorithm Configuration (MOD CELLPDCCHALGO)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellpdcchalgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell PDCCH Algorithm Configuration (MOD CELLPDCCHALGO)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellpdcchalgo"></a><a name="mod_cellpdcchalgo"></a>
+
+
+<h1 class="topictitle1">Modify Cell PDCCH Algorithm Configuration (MOD CELLPDCCHALGO)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellpdcchalgo__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of the PDCCH resource allocation algorithm.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellpdcchalgo__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<p>Ensure that the antenna weight is valid. Otherwise, it will cause a cell activation failure during the modification of the SplitBeamPdcchSdmaSw::MASSIVE_MIMO_PDCCH_SDMA_SW option.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellpdcchalgo__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Local ID of the cell. It uniquely identifies a cell within a BS. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchPowerBoostUpperLimit.html">PdcchPowerBoostUpperLimit</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Power Boost Upper Limit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper limit for the power increase during enhanced PDCCH power control, which is determined by the PdcchPowerEnhancedSwitch parameter. When the PdcchPowerBoostUpperLimit parameter is set to NULL, the default power increase upper limit of enhanced PDCCH power control is used. When the PdcchPowerBoostUpperLimit parameter is set to another value, the parameter value is used as the upper limit for the power increase. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: NULL(NULL), 3dB(3dB), 6dB(6dB)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NULL, 3dB, 6dB</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3dB(3dB)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the PdcchPowerEnhancedSwitch parameter in the CellPdcchAlgo MO is set to OFF, the PdcchPowerBoostUpperLimit parameter in this MO cannot be set to a value other than NULL.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to NULL, the parameter setting does not have any impact.</p>
+<p>When this parameter is set to 3dB or 6dB, compared with when enhanced PDCCH power control is enabled, the eNodeB uses higher PDCCH power while ensuring proper PDCCH demodulation performance. In addition, the eNodeB selects a smaller aggregation level, further increasing the PDCCH resource allocation success rate of UEs and improving the effect of enhanced PDCCH power control.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-ComSigCongregLv.html">ComSigCongregLv</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SignalCongregateLevel</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CCE aggregation level for common control signaling. If the HOSuccRateBoostOptSwitch option of the HoSignalingOptSwitch parameter is selected, the PDCCH CCE aggregation level is changed to level 8 when an RAR message for a handover is retransmitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: CONGREG_LV4, CONGREG_LV8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CONGREG_LV4, CONGREG_LV8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: CONGREG_LV4(the CCE aggregation level 4 for common control signaling)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value results in lower PDCCH demodulation performance, but it leads to a larger number of UEs that can be scheduled and a lower probability of CCE allocation congestion for common control signaling. A larger value leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CceRatioAdjSwitch.html">CceRatioAdjSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cce Ratio Adjust Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CCE ratio adjustment switch for the PDCCH. If this parameter is set to ENHANCED_CCE_RATIO_ADJUSTMENT, the uplink-downlink CCE ratio is not dynamically adjusted in the event of uplink CCE allocation failure not caused by CCE resource insufficiency. If this parameter is set to ON, the PDCCH resource allocation algorithm dynamically adjusts the uplink-downlink CCE ratio in each TTI based on uplink and downlink CCE usages. If this parameter is set to OFF, the uplink-downlink CCE ratio is not dynamically adjusted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On), ENHANCED_CCE_RATIO_ADJUSTMENT(ENHANCED_CCE_RATIO_ADJUSTMENT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON, ENHANCED_CCE_RATIO_ADJUSTMENT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(On)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, the uplink-downlink CCE ratio cannot adapt to service requirements in case of imbalance between uplink load and downlink load, causing throughput to decrease. If this parameter is set to ON, the uplink-downlink CCE ratio dynamically adjusted in each TTI can meet uplink and downlink service requirements, helping achieve satisfactory user experience. If this parameter is set to ENHANCED_CCE_RATIO_ADJUSTMENT, the non-adjustment of uplink-downlink CCE ratio in the event of uplink CCE allocation failure not caused by CCE resource insufficiency prevents incorrect adjustment of downlink CCE resources but may affect uplink CCE resources and further affect uplink service performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-SfnPdcchDcsThd.html">SfnPdcchDcsThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SFN Pdcch DCS Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of isolation for determining whether to enable PDCCH selective transmission in adaptive SFN/SDMA scenarios. For a UE, if the ratio of the total RSRP of the RRUs providing strong signals to that of the RRUs providing weak signals is greater than or equal to this threshold, the eNodeB does not allocate power to the RRUs providing weak signals. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: 0.5dB</p>
+<p>Actual Value Range: 0~50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 40</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Indicates the threshold of isolation for deciding whether to enable PDCCH selective transmission in adaptive SFN/SDMA scenarios. A larger value of this parameter leads to more PDCCH interference among the RRUs serving the SFN cell but higher PDCCH demodulation reliability. A smaller value of this parameter leads to less PDCCH interference among the RRUs serving the SFN cell but low PDCCH demodulation reliability.</p>
+<p>A proper value of this parameter balances the PDCCH interference among the RRUs serving the SFN cell and the PDCCH demodulation reliability, and therefore improves the PDCCH coverage and capacity in the SFN cell.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-InitPdcchSymNum.html">InitPdcchSymNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Initial Symbol Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of OFDM symbols initially occupied by the PDCCH. If the switch for dynamic adjustment of the number of OFDM symbols occupied by the PDCCH is turned off, this parameter indicates the fixed number of OFDM symbols occupied by the PDCCH. For LTE TDD cells, this parameter indicates the number of OFDM symbols initially occupied by the PDCCH in the downlink subframes in which only downlink scheduling control information is transmitted. If the switch for dynamic adjustment of the number of OFDM symbols occupied by the PDCCH is turned on and the bandwidth is 1.4 MHz or 3 MHz, the PDCCH occupies 4 or 3 OFDM symbols, respectively, and this parameter is invalid. If the switch is turned on and the bandwidth is 5 MHz, 10 MHz, 15 MHz, or 20 MHz, the eNodeB adjusts the number of OFDM symbols in the range of 1, 2, and 3 when this parameter is set to the default value 1, or in the range of 2 and 3 when this parameter is set to 2 or 3. For LTE TDD cells, if the switch is turned on and the bandwidth is 5 MHz, the eNodeB adjusts the number of OFDM symbols in the range of 2 and 3 by default, and this parameter is invalid. If the EMTC_SWITCH option of the EmtcAlgoSwitch parameter in a CellEmtcAlgo MO is selected and the value of the startSymbolBR-r13 IE is changed due to modification of this parameter, eMTC UEs that already accessed the cell will be proactively released. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~4</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the PdcchSymNumSwitch parameter is set to ON or ECFIADAPTIONON, this parameter does not take effect in cells with a bandwidth of 1.4 or 3 MHz and the value 1 is recommended for cells with a bandwidth of 5 MHz or higher. If the PdcchSymNumSwitch parameter is set to OFF, the value 4 is recommended for cells with a bandwidth of 1.4 MHz and value 3 for cells with a bandwidth of higher than 1.4 MHz. For cells with a bandwidth of 1.4 MHz, the minimum recommended value of this parameter is 3. For cells with a bandwidth of 3, 5, or 10 MHz, the minimum recommended value of this parameter is 2. If this parameter is set to a value smaller than the minimum recommended values, PDCCH resources in the related cell will be insufficient, leading to UE access failures.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter increases the possibility that the cell supports dynamic adjustment on the number of OFDM symbols occupied by the PDCCH and increases the downlink throughput in unlimited CCE scenarios. However, the low PDCCH capacity may decrease the downlink throughput in limited CCE scenarios. A large value of this parameter decreases the possibility that the cell supports dynamic adjustment on the number of OFDM symbols occupied by the PDCCH. In addition, the high PDCCH capacity may decrease the downlink throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-VirtualLoadPro.html">VirtualLoadPro</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Virtual Loading Proportion</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the percentage of the number of virtually loaded PDCCH CCEs when the PDCCH power control switch is turned off, or indicates the percentage of the power of virtually loaded PDCCH CCEs when the PDCCH power control switch is turned on. This parameter is used to analyze the impact of the parameter values on PDCCH demodulation performance and provide reference to intra-frequency networking in LTE. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value results in higher interference to the PDCCH from neighboring cells. A smaller value leads to lower interference.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchInitialCceAdjustValue.html">PdcchInitialCceAdjustValue</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Initial Cce Adjustment Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PDCCH initial aggregation level adjustment. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: -10~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: -10~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0 for heavily loaded networks</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller parameter value leads to a higher PDCCH aggregation level, better coverage performance, and smaller capacity. A larger parameter value results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchSymNumSwitch.html">PdcchSymNumSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Symbol Number Adjust Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable dynamic adjustment on the number of OFDM symbols occupied by the PDCCH.</p>
+<p>If this parameter is set to OFF, the number of OFDM symbols occupied by the PDCCH is fixed.</p>
+<p>If this parameter is set to ON, the number of OFDM symbols occupied by the PDCCH is dynamically adjusted based on the required number of control channel elements (CCEs). The OFDM symbol number adjustment range can be determined by referring to the MML reference of the InitPdcchSymNum parameter.</p>
+<p>If this parameter is set to ECFIADAPTIONON, the number of OFDM symbols occupied by the PDCCH is dynamically adjusted with the aim of achieving optimal downlink throughput. The OFDM symbol number adjustment range can be determined by referring to the MML reference of the InitPdcchSymNum parameter.</p>
+<p>If this parameter is set to MM_HEAVY_LOAD_ECFI_ADAPT_ON: (1) When the control channel capacity is limited, the number of CCEs required by the massive MIMO cell in the current TTI is estimated to determine the CFI for the current TTI. (2) When the control channel capacity is not limited, the CFI for the current TTI is determined in the same way as when this parameter is set to ECFIADAPTIONON. If the EMTC_SWITCH option of the EmtcAlgoSwitch parameter in the CellEmtcAlgo MO is selected and the startSymbolBR-r13 IE value changes due to modification to this parameter, the eNodeB releases eMTC UEs in the cell.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On), ECFIADAPTIONON(Enhanced CFI Adaption On), MM_HEAVY_LOAD_ECFI_ADAPT_ON(MM_HEAVY_LOAD_ECFI_ADAPT_ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON, ECFIADAPTIONON, MM_HEAVY_LOAD_ECFI_ADAPT_ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ECFIADAPTIONON(Enhanced CFI Adaption On)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, the number of OFDM symbols occupied by the PDCCH is fixed and cannot be adaptively adjusted.</p>
+<p>If this parameter is set to ON, the number of OFDM symbols occupied by the PDCCH can be dynamically adjusted based on CCE usage, increasing downlink throughput.</p>
+<p>If this parameter is set to ECFIADAPTIONON, throughput performance is given more importance during the adjustment on the number of OFDM symbols occupied by the PDCCH, and therefore higher throughput can be achieved when frequency selective scheduling is enabled.</p>
+<p>If this parameter is set to MM_HEAVY_LOAD_ECFI_ADAPT_ON, the number of OFDM symbols occupied by the PDCCH can be quickly adjusted to adapt to CCE requirements by the massive MIMO cell in the current TTI when the control channel capacity is limited, increasing the control channel capacity and throughput of the massive MIMO cell.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CceUseRatio.html">CceUseRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CCE use ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper limit of the CCE usage within each transmission time interval (TTI). When the PdcchSymNumSwitch parameter in the CellPdcchAlgo MO is set to ON(On), the parameter setting is invalid, that is, the CCE usage cannot be limited within each TTI. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 1~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the value of this parameter is relatively small, the PDCCH has insufficient CCE resources, which will affect the access success rate of cell edge UEs (CEUs), handover success rate, CCE assignment success rate for DL scheduling, and especially that for UL scheduling. Therefore, at least 24 available CCEs are required within each TTI. The lower limits for the CCE usage within each TTI are described as follows for cells with different configurations(If the actual CCE usage within each TTI is less than the specified lower limits for the CCE usage within each TTI, access success rate of CEUs and handover success rate are affected):</p>
+<p>(1) If the cell bandwidth and the number of PDCCH symbols are 10 MHz and 1, respectively, the lower limit is 100 when the eNodeB uses either two or four physical antenna ports;</p>
+<p>(2) If the cell bandwidth and the number of PDCCH symbols are 10 MHz and 2, respectively, the lower limit is 100 when the eNodeB uses either two or four physical antenna ports;</p>
+<p>(3) If the cell bandwidth and the number of PDCCH symbols are 10 MHz and 3, respectively, the lower limit is 65 when the eNodeB uses four physical antenna ports and is 58 when the eNodeB uses two physical antenna ports;</p>
+<p>(4) If the cell bandwidth and the number of PDCCH symbols are 15 MHz and 1, respectively, the lower limit is 100 when the eNodeB uses either two or four physical antenna ports;</p>
+<p>(5) If the cell bandwidth and the number of PDCCH symbols are 15 MHz and 2, respectively, the lower limit is 80 when the eNodeB uses four physical antenna ports and is 63 when the eNodeB uses two physical antenna ports;</p>
+<p>(6) If the cell bandwidth and the number of PDCCH symbols are 15 MHz and 3, respectively, the lower limit is 44 when the eNodeB uses four physical antenna ports and is 38 when the eNodeB uses two physical antenna ports;</p>
+<p>(7) If the cell bandwidth and the number of PDCCH symbols are 20 MHz and 1, respectively, the lower limit is 100 when the eNodeB uses either two or four physical antenna ports;</p>
+<p>(8) If the cell bandwidth and the number of PDCCH symbols are 20 MHz and 2, respectively, the lower limit is 60 when the eNodeB uses four physical antenna ports and is 50 when the eNodeB uses two physical antenna ports;</p>
+<p>(9) If the cell bandwidth and the number of PDCCH symbols are 20 MHz and 3, respectively, the lower limit is 32 when the eNodeB uses four physical antenna ports and is 28 when the eNodeB uses two physical antenna ports;</p>
+<p>If multi-user MIMO (MU-MIMO) and multi-user beamforming (MUBF) are enabled, you are advised not to apply restrictions on the CCE usage within each TTI. The purpose is to ensure successful CCE assignment for paired UEs and maintain the MU-MIMO and MUBF performance.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If dynamic adjustment on the number of PDCCH OFDM symbols is disabled and this parameter is set too small, the number of available CCEs is small, resulting in low access and handover success rates and a low CCE assignment success rate for uplink and downlink scheduling per TTI for cell edge users (CEUs).</p>
+<p>If the adjustment is disabled and this parameter is set too large, CCE waste occurs when the load is low.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchAggLvlCLAdjustSwitch.html">PdcchAggLvlCLAdjustSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Aggregation Level CL Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch used to enable or disable closed-loop adjustment to the PDCCH aggregation level. If this switch is turned on, PDCCH aggregation level is adjusted based on the block error rate (BLER) of the PDCCH. If this switch is turned off, PDCCH aggregation level is not adjusted based on the BLER of the PDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(On)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is turned on, the PDCCH BLER converges on the target value and the uplink and downlink throughput increases.</p>
+<p>If this switch is turned off, the PDCCH demodulation performance deteriorates and the uplink and downlink throughput decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-DPDVirtualLoadSwitch.html">DPDVirtualLoadSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DPD Virtual Load Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable virtual loading for digital predistortion (DPD). This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: This parameter is used to optimize the method of creating a DPD model, meet the requirement for DPD dynamic performance, reduce scenario restrictions, and mitigate the interference (which is caused by shortened guard intervals) to other base stations.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-DPDVirtualLoadType.html">DPDVirtualLoadType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DPD Virtual Load Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the virtual loading type for digital predistortion (DPD). This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: AVERAGE(AVERAGE), MINUS_3DB_FIXED(MINUS_3DB_FIXED), MINUS_6DB_FIXED(MINUS_6DB_FIXED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AVERAGE, MINUS_3DB_FIXED, MINUS_6DB_FIXED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: AVERAGE(AVERAGE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: This parameter is used to provide multiple data choices for creating a DPD model and help reduce the adjacent channel power ratio (ACPR) of an RF channel.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-AggLvlSelStrageForDualCW.html">AggLvlSelStrageForDualCW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Aggregation Level Strategy for Dual Codewords</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: For FDD, this parameter indicates the PDCCH CCE aggregation level selection policy used in dual-codeword transmission scenarios. The capacity-based selection policy is the default policy. If this policy is used, a low CCE aggregation level is selected in dual-codeword transmission scenarios, allowing PDCCH resources to be allocated to more UEs. If the coverage-based selection policy is used, a high CCE aggregation level is selected in dual-codeword transmission scenarios, improving cell coverage performance. For TDD, this parameter indicates the PDCCH CCE aggregation level selection policy used in dual-codeword transmission scenarios, when the PDCCH CCE aggregation level adaptation policy is coverage-oriented. The capacity-based selection policy is the default policy. If this policy is used, a low CCE aggregation level is selected in dual-codeword transmission scenarios, allowing PDCCH resources to be allocated to more UEs. If the coverage-based selection policy is used, a high CCE aggregation level is selected in dual-codeword transmission scenarios, improving cell coverage performance. This parameter does not take effect when the PDCCH aggregation level adaptation policy is capacity-oriented. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: STRATEGYBASEDONCAPACITY(Capacity-based Selection Strategy), STRATEGYBASEDONCOVERAGE(Coverage-based Selection Strategy)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: STRATEGYBASEDONCAPACITY, STRATEGYBASEDONCOVERAGE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: STRATEGYBASEDONCAPACITY(Capacity-based Selection Strategy)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: In the scenario of dual codewords, if this parameter is set to STRATEGYBASEDONCAPACITY, the average CCE aggregation level of the PDCCH decreases, and more UEs can be supported in the PDCCH, but the PDCCH block error rate (BLER) of UEs experiencing strong interference increases. In this situation, the PDCCH BLER cannot converge on the target value even when closed-loop adjustment on the CCE aggregation level of the PDCCH is enabled. If this parameter is set to STRATEGYBASEDONCOVERAGE, the average CCE aggregation level of the PDCCH increases and the PDCCH demodulation performance improves, but fewer UEs can be supported in the PDCCH.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchCapacityImproveSwitch.html">PdcchCapacityImproveSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Capacity Improve Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable optimization on PDCCH capacity expansion. For LTE FDD networks, if this parameter is set to ON(On), (1) the initial value for closed-loop adjustment on PDCCH aggregation level applies only to SRBs; (2) if a UE fails to be allocated CCEs, the eNodeB reallocates CCEs to the UE by increasing the PDCCH power and decreasing the PDCCH aggregation level for the UE. If this parameter is set to OFF(Off), (1) the initial value for closed-loop adjustment on PDCCH aggregation level applies to both SRBs and DRBs; (2) if a UE fails to be allocated CCEs, the eNodeB does not reallocate CCEs to the UE by increasing the PDCCH power and decreasing the PDCCH aggregation level for the UE. For LTE TDD networks, if this parameter is set to ON(On), the eNodeB reallocates CCEs to a UE, if the UE fails to be allocated CCEs, by increasing the PDCCH power and decreasing the PDCCH aggregation level for the UE. If this parameter is set to OFF(Off), the eNodeB does not reallocate CCEs to a UE, if the UE fails to be allocated CCEs, by increasing the PDCCH power and decreasing the PDCCH aggregation level for the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(On)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON in an FDD network, the PDCCH aggregation level and the initial value for closed-loop adjustment on PDCCH aggregation level decrease, the PDCCH capacity increases, and therefore cell throughput also increases when CCEs are insufficient; the CCE allocation success rate increases, and therefore cell throughput also increases when CCEs are insufficient. In the case of a TDD network, the CCE allocation success rate increases, and therefore cell throughput also increases when CCEs are insufficient.</p>
+<p>When this parameter is set to OFF, the eNodeB selects a greater aggregation level, increasing the probability of CCE allocation failure. In addition, the number of UEs supported by the PDCCH (that is, PDCCH capacity) decreases when CCEs are insufficient.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchMaxCodeRate.html">PdcchMaxCodeRate</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Max Code Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum coding rate on the PDCCH. The coding rate on the PDCCH cannot exceed this parameter value. Otherwise, the PDCCH aggregation level must be increased. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 75~120</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0.75~1.2, step: 0.01</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 75</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a smaller value, the maximum coding rate on the PDCCH is smaller, and the PDCCH aggregation level will be higher. In this case, the PDCCH coverage is better, but the system capacity is smaller. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-ULDLPdcchSymNum.html">ULDLPdcchSymNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink and Downlink PDCCH Symbols Configuration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of OFDM symbols initially occupied by the PDCCH in the downlink subframe in which uplink and downlink scheduling control information is transmitted. If the PDCCH Symbol Number Adjust Switch parameter is set to OFF, this parameter indicates the fixed number of OFDM symbols occupied by the PDCCH in the downlink subframe in which uplink and downlink scheduling control information is transmitted. For downlink subframes in which both uplink and downlink scheduling control information is transmitted, if the PDCCH Symbol Number Adjust Switch parameter is set to ON, the number of OFDM symbols occupied by the PDCCH is as follows: On the bandwidth of 5 MHz, the PDCCH occupies 2 or 3 OFDM symbols. (In this case, the configuration of this parameter is invalid.) On the bandwidth of 10 MHz, 15 MHz, or 20 MHz, the PDCCH occupies 1, 2, or 3 OFDM symbols when this parameter is set to 1, and the PDCCH occupies 2 or 3 OFDM symbols when this parameter is set to 2 or 3. If the EMTC_SWITCH option of the EmtcAlgoSwitch parameter in a CellEmtcAlgo MO is selected and the value of the startSymbolBR-r13 IE is changed due to modification of this parameter, eMTC UEs that already accessed the cell will be proactively released. This parameter applies only to LTE TDD. When the PhichDuration parameter in the PHICHCfg MO is set to EXTENDED and the cell bandwidth is 1.4 MHz, this parameter must be set to 3(3) according to 3GPP specifications. Therefore, value 3(3) takes effect automatically even if this parameter is set to another value.</p>
+<p>GUI Value Range: 1(1), 2(2), 3(3)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1, 2, 3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the PDCCH Symbol Number Adjust Switch parameter is set to OFF, you are advised to set this parameter to 3.</p>
+<p>If the PDCCH Symbol Number Adjust Switch parameter is set to ON, you are advised to set this parameter to 1.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: For downlink subframes in which both uplink and downlink scheduling control information is transmitted, a small value of this parameter increases the possibility that the cell supports dynamic adjustment on the number of OFDM symbols occupied by the PDCCH, and increases the downlink throughput in CCE sufficiency scenarios. However, the low PDCCH capacity may decrease the downlink throughput in CCE insufficiency scenarios. A large value of this parameter decreases the possibility that the cell supports dynamic adjustment on the number of OFDM symbols occupied by the PDCCH. In addition, the high PDCCH capacity may decrease the downlink throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PDCCHAggLvlAdaptStrage.html">PDCCHAggLvlAdaptStrage</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">The Strategy Of PDCCH Aggregation Level Adaptation</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the adaptation strategy of the CCE aggregation level for the PDCCH. For LTE TDD cells, the coverage-based PDCCH aggregation level adaptation strategy is used by default. This strategy leads to a higher PDCCH aggregation level and better cell coverage provided by the PDCCH but fewer UEs scheduled on the PDCCH. The capacity-based PDCCH aggregation level adaptation strategy leads to a lower PDCCH aggregation level but more UEs scheduled on the PDCCH.</p>
+<p>For NB-IoT cells, the coverage-based PDCCH aggregation level adaptation strategy is used by default. This strategy slows down the adjustment of the NPDCCH aggregation level and the number of repetitions to guarantee cell-edge coverage. The capacity-based PDCCH aggregation level adaptation strategy speeds up the adjustment of the NPDCCH aggregation level and the number of repetitions based on channel quality.</p>
+<p>This parameter applies only to LTE TDD and NB-IoT.</p>
+<p>GUI Value Range: STRATEGYBASEDONCOVERAGE(Coverage-based Selection Strategy), STRATEGYBASEDONCAPACITY(Capacity-based Selection Strategy)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: STRATEGYBASEDONCOVERAGE, STRATEGYBASEDONCAPACITY</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: STRATEGYBASEDONCOVERAGE(Coverage-based Selection Strategy)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: For LTE TDD cells: If the coverage-based PDCCH aggregation level adaptation strategy is used, the PDCCH aggregation level is raised, improving the PDCCH demodulation performance but reducing the number of UEs that can be scheduled on the PDCCH. If the capacity-based PDCCH aggregation level adaptation strategy is used, the PDCCH aggregation level is decreased and more UEs can be scheduled on the PDCCH. However, some severely interfered UEs may have more PDCCH bit errors.</p>
+<p>For NB-IoT cells: If the coverage-based PDCCH aggregation level adaptation strategy is used, the NPDCCH aggregation level and the number of repetitions are raised, improving the NPDCCH demodulation performance but reducing the number of UEs that can be scheduled on the NPDCCH. If the capacity-based PDCCH aggregation level adaptation strategy is used, more UEs can be scheduled on the NPDCCH. However, some severely interfered UEs may have more NPDCCH bit errors.</p>
+<p>Applicable Mode: L-TDD, L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-HysForCfiBasedPreSch.html">HysForCfiBasedPreSch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Hysteresis for CFI increase based on PreSch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to increase the number of PDCCH symbols in case of uplink preallocation failure when PdcchSymNumSwitch is set to ECFIADAPTIONON. If this parameter is set to 0, the eNodeB does not increase the number of PDCCH symbols in case of preallocation failure. If this parameter is set to 1, the eNodeB increases the number of PDCCH symbols in case of preallocation failure. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>FDD:0, TDD:1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Setting this parameter to 1 results in a higher probability of successful control channel element (CCE) allocation during preallocation, more UEs that are selected in preallocation, a shorter delay of both uplink and downlink scheduling, but a larger increase in the downlink CFI number. As a result, the MCS index decreases in downlink scheduling and downlink throughput decreases when the downlink traffic is heavy. Setting this parameter to 0 results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-SfnPdcchSdmaThd.html">SfnPdcchSdmaThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SFN PDCCH SDMA Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of isolation for determining whether to enable PDCCH SDMA in adaptive SFN/SDMA scenarios. For a UE, if the ratio of the total RSRP of signals collaboratively received from RRUs providing strong signals to that from RRUs providing weak signals is greater than or equal to this threshold, the UE uses only the RRUs providing strong signals, and the RRUs providing weak signals serve other UEs. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: 0.5dB</p>
+<p>Actual Value Range: 0~50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 24</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Indicates the threshold of isolation for determining whether to enable PDCCH SDMA in adaptive SFN/SDMA scenarios. If this parameter is set to a large value, the PDCCH average aggregation level is low and the PDCCH spatial multiplexing percentage is also low.</p>
+<p>If this parameter is set to a small value, the PDCCH average aggregation level is high and the PDCCH spatial multiplexing percentage is also high.</p>
+<p>This parameter must be set properly to guarantee a balance between PDCCH overhead and spatial multiplexing percentage so that the PDCCH capacity can be improved in SFN cells.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-UlPdcchAllocImproveSwitch.html">UlPdcchAllocImproveSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL PDCCH Alloc Improve Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the mechanism of increasing the control channel element (CCE) resource allocation success rate in the uplink. ReserveCommonCCESwitch: Indicates whether to reserve CCE resources in the common search space for the uplink. CCE resources in the common search space are reserved for the uplink only when this switch is on. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ReserveCommonCCESwitch(ReserveCommonCCESwitch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ReserveCommonCCESwitch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ReserveCommonCCESwitch:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: ReserveCommonCCESwitch: If this switch is on, CCE resources in common search space are reserved for the uplink during CCE resource allocation, which increases the CCE allocation success rate in the uplink when the CCE resources in the uplink are insufficient. Therefore, the access success rate, network capacity for VoIP services, and uplink throughput increase, but the scheduling delay for some UEs in the downlink prolongs. If this switch is off, CCE resource allocation in the uplink is not affected.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CceMaxInitialRatio.html">CceMaxInitialRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CCE Max Initial Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum ratio of uplink to downlink initial CCEs on the PDCCH. If this parameter is set to 1_2, the maximum uplink-downlink initial CCE ratio is 1:2. If this parameter is set to a value greater than 1_2, the maximum uplink-downlink initial CCE ratio can be dynamically changed to any value ranging from 1_2 to the configured value based on the load in the uplink and downlink. If subframe configuration 2 is adopted for an LTE TDD cell, it is recommended that the SubframeSchDiffSwitch option be selected to ensure the PRB usage on subframes 3 and 8. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 1_2(1:2), 1_1(1:1), 2_1(2:1), 3_1(3:1), 4_1(4:1), 5_1(5:1), 6_1(6:1), 7_1(7:1), 8_1(8:1), 9_1(9:1), 10_1(10:1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1_2, 1_1, 2_1, 3_1, 4_1, 5_1, 6_1, 7_1, 8_1, 9_1, 10_1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Common scenarios:</p>
+<p>It is recommended that this parameter be set to 1_2.</p>
+<p>Heavy-load scenarios:</p>
+<p>For uplink-downlink subframe configuration 1, it is recommended that this parameter be set to 2_1.</p>
+<p>For uplink-downlink subframe configuration 2, it is recommended that this parameter be set to 10_1.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 1_2, the uplink service experience is poor when the uplink load is heavy and the downlink load is light.</p>
+<p>If this parameter is set to a value greater than 1_2, the uplink service experience improves but the downlink PRB usage of some subframes slightly decreases when the uplink load is heavy and the downlink load is light.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchPowerEnhancedSwitch.html">PdcchPowerEnhancedSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Power Enhanced Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable PDCCH power control enhancement and specifies the enhancement scope. If this parameter is set to ON_ALL, ON_EXPANDED_RANGE, or ON_BASIC_RANGE, the eNodeB selects an appropriate power value based on the PDCCH quality to increase the PDCCH capacity. The value ON_ALL indicates that the enhancement takes effect in all scenarios. The value ON_BASIC_RANGE indicates that the enhancement takes effect only in basic scenarios. The value ON_EXPANDED_RANGE indicates that the enhancement takes effect in more scenarios than when this parameter is set to ON_BASIC_RANGE.</p>
+<p>For FDD, this parameter can be configured in all scenarios.</p>
+<p>For TDD, this parameter applies only to massive MIMO cells where the aggregation level is selected based on capacity and cannot be set to ON_EXPANDED_RANGE or ON_BASIC_RANGE.</p>
+<p>GUI Value Range: OFF(OFF), ON_ALL(ON_ALL), ON_EXPANDED_RANGE(ON_EXPANDED_RANGE), ON_BASIC_RANGE(ON_BASIC_RANGE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON_ALL, ON_EXPANDED_RANGE, ON_BASIC_RANGE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FDD: ON_BASIC_RANGE</p>
+<p>TDD: ON_ALL</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the PdcchPowerEnhancedSwitch parameter in the CellPdcchAlgo MO is set to OFF, the PdcchPowerBoostUpperLimit parameter in this MO cannot be set to a value other than NULL.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, power control enhancement does not take effect. The eNodeB selects a high aggregation level and uses the configured transmit power value. This reduces the maximum number of UEs supported by the PDCCH, and decreases the PDCCH resource allocation success rate in case of CCE insufficiency, affecting throughput.</p>
+<p>If this parameter is set to ON_ALL, power control enhancement takes effect in all scenarios. The eNodeB selects a small aggregation level and increases the PDCCH transmit power to ensure PDCCH demodulation performance. This lifts the maximum number of UEs supported by the PDCCH, and increases the PDCCH resource allocation success rate in case of CCE insufficiency. However, negative gains may be produced.</p>
+<p>If this parameter is set to ON_EXPANDED_RANGE, power control enhancement takes effect in a relatively large scope. However, the are fewer scenarios with negative gains than when this parameter is set to ON_ALL. This parameter value is available only for LTE FDD.</p>
+<p>If this parameter is set to ON_BASIC_RANGE, power control enhancement takes effect in a small scope, but this parameter setting can minimize the scenarios with negative gains. This parameter value is available only for LTE FDD.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchBlerTarget.html">PdcchBlerTarget</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH BLER Target</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the target BLER in PDCCH link adaptation. The PDCCH BLER must converge on this target BLER. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1, step: 0.001</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: For FDD: 15. Do not change this value unless necessary. For TDD: 5; 15 if the PDCCH is heavily loaded</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower PDCCH BLER. A larger value of this parameter results in the opposite effect. A high BLER reduces uplink and downlink throughput. A low BLER increases PDCCH resource consumption, reducing the system capacity and number of UEs that can be scheduled.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-HLNetAccSigAggLvlSelEnhSw.html">HLNetAccSigAggLvlSelEnhSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HL Net Access Signal Aggregation Lvl Select Enhance Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable enhanced aggregation level selection for access signaling on high load networks. If this parameter is set to ON(On), the eNodeB accurately estimates the channel conditions when a UE accesses a high load network where PDCCH resources are insufficient, and selects a PDCCH aggregation level for the UE that better matches the UE's actual signal quality. It is recommended that this parameter be set to ON(On) and the PuschDtxSchOptSwitch option of the UlSchSwitch parameter in the CellAlgoSwitch MO be selected. If this parameter is set to OFF(Off), the eNodeB selects a high aggregation level for all access signaling to ensure the PDCCH reliability. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the selected PDCCH aggregation level better matches the actual signal quality of the UE that accesses the high load network where PDCCH resources are insufficient. This prevents PDCCH resource exhaustion and improves the PDCCH capacity and cell throughput on high load networks. However, PDCCH bit errors may increase for UEs experiencing strong interference, which increases the access delay of these UEs and may reduce the E-RAB setup success rate.</p>
+<p>If this parameter is set to OFF, the high aggregation level selected for the access signaling ensures the PDCCH reliability. However, PDCCH resources may be insufficient on high load networks, which reduces the number of scheduled UEs supported by the PDCCH and the cell throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-EpdcchAlgoSwitch.html">EpdcchAlgoSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">EPDCCH Algorithm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable algorithms related to the EPDCCH. EpdcchFunctionSwitch: Indicates whether to support EPDCCH. If this option is selected, EPDCCH is supported. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: EpdcchFunctionSwitch(EpdcchFunctionSwitch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: EpdcchFunctionSwitch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: EpdcchFunctionSwitch:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: EpdcchFunctionSwitch: If this option is selected, the eNodeB configures EPDCCH resources for newly accessed UEs when the PDCCH resources are insufficient and RB resources are not used up. In this way, both uplink and downlink RB usages increase. If this option is deselected, the eNodeB does not configure EPDCCH resources for newly accessed UEs when the PDCCH resources are insufficient and RB resources are not used up. As a result, both uplink and downlink RBs cannot be fully utilized.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CceThdtoEnableEpdcch.html">CceThdtoEnableEpdcch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CCE Usage Threshold To Enable EPDCCH</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CCE usage threshold for configuring the EPDCCH. If the CCE usage is greater than this parameter value, the eNodeB configures EPDCCH resources for newly accessed UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 80</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a CellPdcchAlgo MO, the value of CceThdtoEnableEpdcch must be larger than CceThdtoDisableEpdcch.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability of configuring the EPDCCH. As a result, RB resources cannot be fully utilized, and the network throughput decreases.</p>
+<p>A smaller value of this parameter results in a higher probability of configuring the EPDCCH, which wastes RB resources and decreases the network throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-RbThdtoEnableEpdcch.html">RbThdtoEnableEpdcch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RB Usage Threshold To Enable EPDCCH</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink RB usage threshold for configuring EPDCCH. If the downlink RB usage is less than this parameter value, the eNodeB configures EPDCCH resources for newly accessed UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 60</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a CellPdcchAlgo MO, the value of RbThdtoEnableEpdcch must be smaller than RbThdtoDisableEpdcch.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a higher probability of configuring the EPDCCH, fewer available RBs after the EPDCCH is configured, and a smaller downlink throughput gain.</p>
+<p>A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CceThdtoDisableEpdcch.html">CceThdtoDisableEpdcch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CCE Usage Threshold To Disable EPDCCH</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CCE usage threshold for disabling EPDCCH. If the CCE usage is lower than this parameter value, the eNodeB disables the EPDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 60</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a CellPdcchAlgo MO, the value of CceThdtoEnableEpdcch must be larger than CceThdtoDisableEpdcch.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower probability of configuring the EPDCCH. As a result, RB resources cannot be fully utilized, and the network throughput decreases.</p>
+<p>A larger value of this parameter results in a higher probability of configuring the EPDCCH, which wastes RB resources and decreases the network throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-EcceThdtoDisableEpdcch.html">EcceThdtoDisableEpdcch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ECCE Usage Threshold To Disable EPDCCH</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ECCE usage threshold for disabling EPDCCH. If the ECCE usage is lower than this parameter value, the eNodeB disables the EPDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower probability of disabling the EPDCCH. As a result, RB resources cannot be fully utilized, and the network throughput decreases.</p>
+<p>A larger value of this parameter results in a higher probability of disabling the EPDCCH, which wastes RB resources and decreases the network throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-RbThdtoDisableEpdcch.html">RbThdtoDisableEpdcch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RB Usage Threshold To Disable EPDCCH</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink RB usage threshold for disabling EPDCCH. If the downlink RB usage is greater than this parameter value, the eNodeB disables the EPDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 80</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a CellPdcchAlgo MO, the value of RbThdtoEnableEpdcch must be smaller than RbThdtoDisableEpdcch.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability of disabling the EPDCCH, which wastes RB resources and decreases the network throughput.</p>
+<p>A smaller value of this parameter results in a higher probability of disabling the EPDCCH. As a result, RB resources cannot be fully utilized, and the network throughput decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-HLNetAccSigAttempt.html">HLNetAccSigAttempt</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">High Load Net Access Signal Attempt</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable functions related to enhanced aggregation level selection for access signaling on high load networks. MSG5Attempt: Indicates whether to enable enhanced aggregation level selection for MSG5. If this option is selected, enhanced aggregation level selection is enabled for MSG5. If this option is deselected, enhanced aggregation level selection is disabled for MSG5. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: MSG5Attempt(MSG5Attempt)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MSG5Attempt</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the MSG5Attempt option is selected, enhanced aggregation level selection for access signaling is attempted on high load networks where PDCCH resources are insufficient, to reduce the CCE signaling overheads. The reduction can improve the PDCCH capacity in high load networks and increase the cell throughput. However, PDCCH bit errors may increase for UEs experiencing strong interference. As a result, the access delay of these UEs may increase, and the E-RAB setup success rate may decrease. If the MSG5Attempt option is deselected, a high aggregation level is selected for access signaling to ensure the PDCCH reliability. However, PDCCH resources may be insufficient on high load networks, which reduces the number of scheduled UEs supported by the PDCCH and the cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-EpdcchSfCfg.html">EpdcchSfCfg</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">EPDCCH Subframe Configuration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the enhanced physical downlink control channel (EPDCCH) is configured only on downlink subframes that carry the uplink and downlink scheduling control information or in all downlink subframes after the EPDCCH is started. This parameter takes effect only in LTE TDD cells that use uplink-downlink subframe configuration 2. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: AllDlSfCfgEpdcch(AllDlSfCfgEpdcch), UlDlGrantSfCfgEpdcch(UlDlGrantSfCfgEpdcch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AllDlSfCfgEpdcch, UlDlGrantSfCfgEpdcch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: AllDlSfCfgEpdcch(AllDlSfCfgEpdcch)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to AllDlSfCfgEpdcch, the ePDCCH is configured in all downlink subframes after the ePDCCH is enabled. This configuration mode can increase uplink or downlink PRB usage if the PRB usage is low because PDCCH resources are insufficient for carrying uplink or downlink grant.</p>
+<p>If this parameter is set to UlDlGrantSfCfgEpdcch, the ePDCCH is configured only in downlink subframes dedicated to uplink or downlink grant after the ePDCCH is enabled. This configuration mode can solve the problem that PDCCH resources are insufficient for carrying uplink grant and reduce PUCCH overhead. However, this configuration mode cannot solve the problem that PDCCH resources are insufficient for carrying downlink grant in downlink subframes dedicated to only downlink grant; as a result, the downlink PRB usage is affected.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-UlDlEcceInitialRatioAdjSw.html">UlDlEcceInitialRatioAdjSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL DL ECCE Initial Ratio Adjustment Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable adaptive adjustment of the initial ratios of the uplink and downlink enhanced control channel elements (eCCEs). If this parameter is set to ON(On), the initial ratios of uplink and downlink eCCEs can be dynamically adjusted in the range from 1 to Max(CceMaxInitialRatio, 1) based on the uplink and downlink loads. If this parameter is set to OFF(Off), the initial ratios of uplink and downlink eCCEs are fixed to be Max(CceMaxInitialRatio, 1). This parameter applies only to LTE TDD cells.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON(On), the initial ratios of uplink and downlink eCCEs are dynamically adjusted based on the uplink and downlink eCCE allocation, to meet uplink and downlink service requirements and ensure the required user experience.</p>
+<p>If this parameter is set to OFF(Off), the initial ratios of uplink and downlink eCCEs are not dynamically adjusted. In this case, the throughput may decrease if allocated eCCEs in the uplink or downlink cannot meet service requirements.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CapacityBfOpt.html">CapacityBfOpt</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BF Opt for Capacity-based PDCCH Aggregation</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to optimize the calculation of the beamforming gain for capacity-based PDCCH aggregation level adaptation. This parameter applies only to LTE TDD cells.</p>
+<p>GUI Value Range: CAPACITY_BFOPT_OFF(CAPACITY_BFOPT_OFF), CAPACITY_BFOPT_ON(CAPACITY_BFOPT_ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CAPACITY_BFOPT_OFF, CAPACITY_BFOPT_ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the PDCCH aggregation level adaptation strategy is based on capacity, it is recommended that this parameter be set to ON(On).</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON(On), the PDCCH SINR is more accurately calculated when the capacity-based PDCCH aggregation level adaptation strategy is used in beamforming mode, reducing UEs' missing detections of PDCCH for downlink scheduling.</p>
+<p>If this parameter is set to OFF(Off), UEs with a small beamforming gain are more likely to encounter PDCCH detection failures when the capacity-based PDCCH aggregation level adaptation strategy is used in beamforming mode.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CCEThdEnableFlowCtrl.html">CCEThdEnableFlowCtrl</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Flow Control Enable CCE Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the upper threshold of CCE usage. If the percentage of CCEs consumed by SRBs is larger than this threshold, the eNodeB triggers MSG3 flow control. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 65</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, the eNodeB is less likely to trigger MSG3 flow control, increasing the probability that a large proportion of CCEs are consumed by SRBs. In this case, the impact on the experience of online UEs is great. If this parameter is set to a smaller value, the eNodeB is more likely to trigger MSG3 flow control, lowering the probability that a large proportion of CCEs are consumed by SRBs. In this case, the impact on the experience of online UEs is small, but the impact on the experience of UEs accessing the network is great.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CCEThdDisableFlowCtrl.html">CCEThdDisableFlowCtrl</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Flow Control Disable CCE Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower threshold of CCE usage. If the percentage of CCEs consumed by SRBs is smaller than this threshold, the eNodeB cancels MSG3 flow control, or does not trigger MSG3 flow control. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 45</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, the eNodeB is more likely to cancel MSG3 flow control, increasing the probability that a large proportion of CCEs are consumed by SRBs. In this case, the impact on the experience of online UEs is great. If this parameter is set to a small value, the eNodeB is less likely to cancel MSG3 flow control, lowering the probability that a large proportion of CCEs are consumed by SRBs. In this case, the impact on the experience of online UEs is small, but the impact on the experience of UEs accessing the network is great.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PDCCHPwrUpperLimitOptSw.html">PDCCHPwrUpperLimitOptSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Power Upper Limit Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to raise the PDCCH power increase limit. If this parameter is set to ON(On), the eNodeB raises the PDCCH power increase limit in the subframes allocated uplink and downlink CCEs when the CceMaxInitialRatio parameter in the CellPdcchAlgo is set to a large value. If this parameter is set to OFF(Off), the eNodeB does not raise the PDCCH power increase limit in the subframes allocated uplink and downlink CCEs when the CceMaxInitialRatio parameter in the CellPdcchAlgo MO is set to a large value. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON(On), the PDCCH reliability increases in the subframes allocated uplink and downlink CCEs when the CceMaxInitialRatio parameter in the CellPdcchAlgo is set to a large value. However, the scheduling delay may increase. If this parameter is set to OFF(Off), the eNodeB does not raise the PDCCH power increase limit in the subframes allocated uplink and downlink CCEs when the CceMaxInitialRatio parameter in the CellPdcchAlgo MO is set to a large value. In this case, the PDCCH reliability decreases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchSparePowerAllocStrage.html">PdcchSparePowerAllocStrage</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Spare Power Allocation Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the spare PDCCH power allocation strategy. When this parameter is set to NONE, spare PDCCH power is not allocated. When this parameter is set to WEAKCOVERAGEUSER, spare power of the PDCCH with the current CFI is allocated to UEs with weak coverage. When this parameter is set to BIGPKTUSER, spare power of the PDCCH with the current CFI is allocated to UEs with large-packet transmission. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NONE(NONE), WEAKCOVERAGEUSER(WEAKCOVERAGEUSER), BIGPKTUSER(BIGPKTUSER)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, WEAKCOVERAGEUSER, BIGPKTUSER</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NONE(NONE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: When this parameter is set to NONE, network performance is not affected. When this parameter is set to WEAKCOVERAGEUSER, the PDCCH demodulation performance of the UEs with weak coverage improves; however, the interference to neighboring cells' PDCCH increases. When this parameter is set to BIGPKTUSER, the PDCCH demodulation performance of the UEs with large-packet transmission improves; however, the interference to neighboring cells' PDCCH increases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-VoltePdcchSinrOffset.html">VoltePdcchSinrOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Volte PDCCH SINR Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PDCCH SINR offset of voice UEs. This parameter is used to adjust the PDCCH aggregation level and PDCCH power for such UEs. If this parameter is set to 0, adjustment of the PDCCH aggregation level and PDCCH power does not take effect. It is recommended that this parameter be set to 30 for cells with few voice UEs. This helps improve the transmission reliability of the control channel occupied by voice UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~150</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If CCEs are not restricted in the uplink, set this parameter to 30 to improve the transmission reliability of the control channel occupied by voice UEs. If CCEs are restricted in the uplink, set this parameter to 0 to shorten the scheduling delay of voice UEs caused by limited control channel resources.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, the PDCCH aggregation level and the PDCCH power for voice UEs increase. In this case, PDCCH resources are wasted, but the PDCCH demodulation success rate is high. If this parameter is set to a small value, the PDCCH aggregation level and the PDCCH power for voice UEs decrease. In this case, PDCCH resources are saved, but the PDCCH demodulation success rate is low.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchDlAggLvlSlcEhnSwitch.html">PdcchDlAggLvlSlcEhnSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Enhanced PDCCH DL Agg Lev Selection</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to optimize PDCCH aggregation level selection. The PDCCH BLER caused due to no responses from the UE is used as a reference for PDCCH aggregation level selection only when this parameter is set to ON. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON, a high PDCCH aggregation level is selected if the PDCCH BLER caused due to no responses from the UE is high.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchOutLoopAdjBaseStep.html">PdcchOutLoopAdjBaseStep</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Out Loop Adjustment Baseline Step</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the baseline step used for outer-loop adjustment of the PDCCH. The selection of an appropriate step for the adjustment is dependent on this baseline step. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, DTX-based outer-loop adjustment of the PDCCH is slow. As a result, the aggregation level adjustment is slow and cannot effectively adapt to drastic channel condition changes.</p>
+<p>If this parameter is set to a large value, DTX-based outer-loop adjustment of the PDCCH is fast. As a result, the aggregation level adjustment is fast and can quickly adapt to drastic channel condition changes.</p>
+<p>It is recommended that this parameter be set to 5 if uplink interference is not severe. In the case of severe uplink interference, uplink non-DTX transmissions are incorrectly decoded as DTX in most cases. In this situation, setting this parameter to a non-default value results in excessive aggregation level adjustment, causing the capacity to decrease.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchOutLoopAdjLowerLimit.html">PdcchOutLoopAdjLowerLimit</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Out Loop Adjustment Value Lower Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: For FDD: indicates the lower limit of the adjustment amount for outer-loop adjustment of the PDCCH.</p>
+<p>For TDD: indicates the lower limit of the initial adjustment amount for outer-loop adjustment of the PDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -20~0</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: -20~0</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The value -5 is recommended for FDD.</p>
+<p>The value -2 is recommended for TDD.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a larger range for DTX-based outer-loop adjustment of the PDCCH and therefore looser restriction on aggregation level selection, ensuring normal DTX-based PDCCH aggregation level adjustment in special scenarios.</p>
+<p>A larger value of this parameter results in a smaller range for DTX-based outer-loop adjustment of the PDCCH and therefore stricter restriction on aggregation level adjustment, causing the failure to increase the aggregation level in case of a larger number of DTX transmissions in special scenarios.</p>
+<p>In the case of severe uplink interference, uplink non-DTX transmissions are incorrectly decoded as DTX in most cases. In this situation, setting this parameter to a non-default value results in excessive aggregation level adjustment, causing the capacity to decrease.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchAdjAlgoSwitch.html">PdcchAdjAlgoSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Adjust Algorithm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable optimization functions related to the PDCCH adjustment algorithm. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>CCE8PcOptSwitch: Indicates the basis of performing dynamic power control for UEs with a CCE aggregation level of 8 when the CCE aggregation level is adjusted based on capacity. If this option is selected, the PDCCH power for UEs with a CCE aggregation level of 8 is dynamically adjusted based on PDCCH quality. This option applies only to LTE TDD.</p>
+<p>AggLvl8PwrIncreaseUpperLimitSw: Indicates whether to enable power increase limiting for the PDCCH aggregation level 8. If this option is selected, the PDCCH aggregation level of downlink retransmission UEs is 8, and the number of RRC_CONNECTED UEs is greater than the value of the PdcchPwrCtrlUserNumThd parameter in the CellPdcchAlgo MO, an upper power increase limit is set for this aggregation level. If this option is deselected, no upper power increase limit is set for downlink retransmission UEs with the PDCCH aggregation level 8. This option applies only to LTE TDD.</p>
+<p>EnhCfiAdptOptSwitch: Indicates whether to enable enhanced CFI adaptation optimization for 8T8R. This option is valid only when the PdcchSymNumSwitch parameter is set to ECFIADAPTIONON. If this option is selected, CCE resources increase in 8T8R heavy-load scenarios and therefore the number of scheduled UEs also increases in these scenarios. When this option is deselected, the optimization does not take effect and the enhanced CFI adaptation function is used. This option applies only to LTE TDD.</p>
+<p>PdcchRobustnessEnhSw: Indicates whether to enable the PDCCH robustness enhancement algorithm. If this option is selected, the PDCCH robustness enhancement algorithm is enabled. If this option is deselected, the PDCCH robustness enhancement algorithm is disabled. This option applies only to LTE FDD.</p>
+<p>GUI Value Range: CCE8PcOptSwitch(CCE8PcOptSwitch), AggLvl8PwrIncreaseUpperLimitSw(AggLvl8PwrIncreaseUpperLimitSw), EnhCfiAdptOptSwitch(EnhCfiAdptOptSwitch), PdcchRobustnessEnhSw(PdcchRobustnessEnhSw)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CCE8PcOptSwitch, AggLvl8PwrIncreaseUpperLimitSw, EnhCfiAdptOptSwitch, PdcchRobustnessEnhSw</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: For TDD: If the PDCCHAggLvlAdaptStrage parameter is set to STRATEGYBASEDONCAPACITY, the recommended values are as follows: CCE8PcOptSwitch:On, AggLvl8PwrIncreaseUpperLimitSw:Off, EnhCfiAdptOptSwitch:On</p>
+<p>For FDD: PdcchRobustnessEnhSw:On</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: CCE8PcOptSwitch: If this option is selected, the cell throughput increases when the PDCCH resources are insufficient, and the user-perceived rate in weak coverage scenarios decreases. If this option is deselected, the eNodeB selects a high CCE aggregation level for UEs in weak coverage scenarios, consuming more PDCCH resources but lowering the probability of missing detection of the PDCCH in weak coverage scenarios.</p>
+<p>AggLvl8PwrIncreaseUpperLimitSw: If this option is selected and the number of RRC_CONNECTED UEs is greater than the UE quantity threshold for PDCCH power control, an upper power increase limit is set for downlink retransmission UEs with the PDCCH aggregation level 8. This improves the capacity when PDCCH CCEs are insufficient but increases the probability of missing PDCCH detection for CEUs and lowers the CEU-perceived rate.</p>
+<p>EnhCfiAdptOptSwitch: If this option is selected and enhanced CFI adaptation is being used, the CFI value increases, and therefore the number of scheduled UEs and the traffic volume in the cell also increase. If this option is deselected, network performance is not affected.</p>
+<p>PdcchRobustnessEnhSw: If this option is selected, the PDCCH allocation success rate for common messages increases and the PDCCH BLER for UEs at the cell edge decreases. However, the CFI value and the aggregation level for UEs at the cell edge may increase. If this option is deselected, the CFI value and the PDCCH aggregation level for UEs at the cell edge are relatively low, but the PDCCH allocation success rate for common messages decreases and the PDCCH BLER for UEs at the cell edge increases.</p>
+<p>Applicable Mode: L-TDD, L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-SplitBeamPdcchSdmaThd.html">SplitBeamPdcchSdmaThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Split Beam SDMA Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold of isolation for deciding whether to perform SDMA for PDCCH transmission in beam splitting scenarios. For a UE, if the ratio of the RSRP of combined beams providing strong signals to that of providing weak signals in a cell is greater than or equal to this threshold during PDCCH transmission in beam splitting scenarios, the UE uses the resources allocated to beams providing strong signals, and resources allocated to beams providing weak signals can be used by other UEs. This parameter applies only to TDD massive MIMO cells.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: 0.5dB</p>
+<p>Actual Value Range: 0~50</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 24</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, the average PDCCH aggregation level is low, but the PDCCH SDMA ratio is also low.</p>
+<p>If this parameter is set to a small value, the average PDCCH aggregation level is high, but the PDCCH SDMA ratio is also high.</p>
+<p>Set this parameter to an appropriate value so that the PDCCH resource consumption and SDMA ratio can be balanced, increasing PDCCH capacity of the cell.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-NackDtxRatioThd.html">NackDtxRatioThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NACK and DTX Ratio Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold, which is the proportion of the sum of NACKs and DTXs to the sum of ACKs, NACKs, and DTXs of uplink HARQ feedback for downlink scheduling, for stopping scheduling a UE. If the proportion of the sum of NACKs and DTXs to the sum of ACKs, NACKs, and DTXs for downlink scheduling of a UE is higher than this threshold, the eNodeB stops initial transmission and retransmission of DRBs for the UE in a certain period. If this parameter is set to 0, the eNodeB does not stop initial transmission and retransmission of DRBs for UEs based on the proportion of the sum of NACKs and DTXs to the sum of ACKs, NACKs, and DTXs. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 0, the network performance is not affected.</p>
+<p>If this parameter is set to a large value, the RBLER decreases by a small amount, and the cell throughput increases by a small amount when the PDCCH is restricted. If this parameter is set to a small value, the RBLER decreases by a large amount, and the cell throughput increases by a large amount when PDCCH capacity is restricted. However, the delay of UEs in weak coverage scenarios increases, and the user-perceived rate in weak coverage scenarios decreases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-SplitBeamPdcchSdmaSw.html">SplitBeamPdcchSdmaSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Split Beam SDMA Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to perform SDMA for PDCCH split beams.</p>
+<p>MASSIVE_MIMO_PDCCH_SDMA_SW: If this option is selected, SDMA is performed for PDCCH split beams. If this option is deselected, joint transmission is always performed for PDCCH split beams. This option applies only to LTE TDD.</p>
+<p>MASSIVE_MIMO_PDCCH_MEAS_SW: If this option is selected, PDCCH beam association measurement is performed for UEs in massive MIMO scenarios. If this option is deselected, PDCCH beam association measurement is disabled for UEs in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: MASSIVE_MIMO_PDCCH_SDMA_SW(MASSIVE_MIMO_PDCCH_SDMA_SW), MASSIVE_MIMO_PDCCH_MEAS_SW(MASSIVE_MIMO_PDCCH_MEAS_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MASSIVE_MIMO_PDCCH_SDMA_SW, MASSIVE_MIMO_PDCCH_MEAS_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MASSIVE_MIMO_PDCCH_SDMA_SW:Off</p>
+<p>MASSIVE_MIMO_PDCCH_MEAS_SW:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: MASSIVE_MIMO_PDCCH_SDMA_SW: If this option is selected, SDMA is performed for PDCCH split beams in massive MIMO scenarios, increasing PDCCH capacity. If this option is deselected, SDMA is not performed for PDCCH split beams in massive MIMO scenarios.</p>
+<p>MASSIVE_MIMO_PDCCH_MEAS_SW: This option has no impact on network performance.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchPwrCtrlUserNumThd.html">PdcchPwrCtrlUserNumThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Power Control User Num Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to perform PDCCH power optimization for heavy-load networks, and specifies the threshold of the number of UEs for triggering the optimization. If this parameter is set to 65535, PDCCH power optimization is disabled for heavy-load networks. If this parameter is set to a value ranging from 0 to 1050, PDCCH power optimization is enabled for heavy-load networks, and the eNodeB uses this threshold to determine whether to perform the optimization. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~1050,65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1050,65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that this parameter be set to 280 for heavy-load massive MIMO networks and to 150 for heavy-load non-massive MIMO networks.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter leads to strict PDCCH power control for heavy-load networks and a high DTX proportion, affecting user experience. A large value of this parameter leads to loose PDCCH power control for heavy-load networks and a low DTX proportion, improving user experience. A too large value of this parameter leads to extremely loose PDCCH power control for heavy-load networks and a too low DTX proportion, affecting user experience improvement. Set this parameter based on the number of UEs that is used as the criterion for determining heavy load.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchBfGainOffset.html">PdcchBfGainOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Beamforming Gain Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PDCCH beamforming gain offset for D-MIMO cells when the PDCCH aggregation level is selected based on coverage. If this parameter is set to -127, optimization of PDCCH beamforming gain offset is disabled. If this parameter is set to a value ranging from -10 to 10, optimization of PDCCH beamforming gain offset is enabled, and the offset is specified by this parameter. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: -127,-10~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: -127,-10~10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A large value of this parameter leads to a high PDCCH aggregation level in D-MIMO scenarios and low DTX proportion, but a high probability that uplink and downlink CCEs are restricted and allocation of these CCEs fails. A small value of this parameter leads to a low PDCCH aggregation level in D-MIMO scenarios and high DTX proportion, but a low probability of failures of uplink and downlink CCE allocation.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-VoltePdcchOptSwitch.html">VoltePdcchOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VoLTE PDCCH Optimize Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to optimize the PDCCH for VoLTE UEs.</p>
+<p>VOLTE_PDCCH_CCE_SELECT_SWITCH: Indicates whether to optimize the selection of PDCCH CCE aggregation levels. If this option is deselected, the eNodeB does not optimize selection of the PDCCH CCE aggregation levels for VoLTE UEs. If this option is selected, the eNodeB optimizes the selection of PDCCH CCE aggregation levels for VoLTE UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: VOLTE_PDCCH_CCE_SELECT_SWITCH(VOLTE_PDCCH_CCE_SELECT_SWITCH)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: VOLTE_PDCCH_CCE_SELECT_SWITCH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: VOLTE_PDCCH_CCE_SELECT_SWITCH:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: VOLTE_PDCCH_CCE_SELECT_SWITCH: If this option is deselected, control channels become less reliable for VoLTE UEs, the VoLTE packet error rate increases, and voice quality deteriorates, but cell capacity in terms of the number of UEs increases. If this option is selected, control channels become more reliable for VoLTE UEs, the VoLTE packet error rate decreases, and voice quality improves, but cell capacity in terms of the number of UEs decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-CfiAdjCceThld.html">CfiAdjCceThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CFI Adjustment CCE Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CCE threshold of enhanced CFI adaptation.</p>
+<p>This parameter is valid only when the PdcchSymNumSwitch parameter is set to ECFIADAPTIONON.</p>
+<p>This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: INF(INF), 4CCE(4CCE), 8CCE(8CCE), 12CCE(12CCE), 16CCE(16CCE), 32CCE(32CCE), 64CCE(64CCE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: INF, 4CCE, 8CCE, 12CCE, 16CCE, 32CCE, 64CCE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10 MHz or lower: 8CCE(8CCE)</p>
+<p>15 MHz: 12CCE(12CCE)</p>
+<p>20 MHz: 16CCE(16CCE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a value other than INF, the average CFI is smaller than when this parameter is set to INF and the downlink throughput increases. However, the number of CCE allocation failures increases and the uplink throughput decreases slightly.</p>
+<p>In medium- and high-load scenarios (downlink RB usage is greater than 50% and the average CFI is greater than 2), a smaller value of this parameter leads to a smaller average CFI and higher downlink throughput.</p>
+<p>In medium- and low-load scenarios, the impact of the parameter setting on performance does not vary much between the values other than INF.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-VoicePdcchOtLpAdjLowerLmt.html">VoicePdcchOtLpAdjLowerLmt</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Voice UE PDCCH Outer-Loop Adj Lower Limit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the lower limit of outer-loop adjustment to the PDCCH aggregation level and whether to enable optimized CCE aggregation level selection for PDCCH for voice and air interface acceleration UEs. For FDD, if this parameter is set to 255, the value of the PdcchOutLoopAdjLowerLimit parameter in the CellPdcchAlgo MO is used as the lower limit of outer-loop adjustment to the PDCCH aggregation level for voice and air interface acceleration UEs. In addition, optimized CCE aggregation level selection for PDCCH for air interface acceleration UEs is disabled. If this parameter is set to a value other than 255, the VoicePdcchOtLpAdjLowerLmt parameter value is used as the lower limit of outer-loop adjustment to the PDCCH aggregation level for voice and air interface acceleration UEs. In addition, optimized CCE aggregation level selection for PDCCH for air interface acceleration UEs is enabled. For TDD, if this parameter is set to 255, optimized CCE aggregation level selection for PDCCH for air interface acceleration UEs is disabled. If this parameter is set to a value other than 255, optimized CCE aggregation level selection for PDCCH for air interface acceleration UEs is enabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -20~0,255</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: -20~0,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The value -20 is recommended for the scenario where the PDCCH channel quality changes rapidly.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a value in the range of -20 to 0, the reliability of the control channel for voice and air interface acceleration UEs is high, the voice packet error rate decreases, the voice quality improves, the air interface acceleration UE performance improves, and the cell UE capacity decreases.</p>
+<p>A smaller value of this parameter results in a larger range for DTX-based outer-loop adjustment to the PDCCH aggregation level for voice and air interface acceleration UEs. When the PDCCH channel quality changes rapidly, the CCE selection is more conservative. As a result, the PDCCH DTX proportion decreases for voice and air interface acceleration UEs, the downlink voice packet loss rate improves, and capacity loss increases.</p>
+<p>A larger value of this parameter results in a smaller range for DTX-based outer-loop adjustment to the PDCCH aggregation level for voice and air interface acceleration UEs. When the PDCCH channel quality changes rapidly, the CCE selection is more aggressive. As a result, the PDCCH DTX proportion increases for voice and air interface acceleration UEs, the downlink voice packet loss rate deteriorates, and capacity loss decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchOptimizationSwitch.html">PdcchOptimizationSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable PDCCH optimization for TDD macro cells.</p>
+<p>LOW_AGG_PREFERENTIAL_SCH_SW: If this option is selected, preferential scheduling for UEs with a low aggregation level is enabled. If this option is deselected, preferential scheduling for UEs with a low aggregation level is disabled. This option applies only to LTE TDD.</p>
+<p>HEAVY_LOAD_BIG_PKT_SCH_OPT_SW: Indicates whether to enable the following two functions in heavy-load scenarios: large-packet scheduling optimization, and CCE selection optimization for cell-center UEs or UEs at a medium distance from the cell center. The two functions are enabled only if this option is selected. This option applies only to LTE TDD.</p>
+<p>SF_3_8_HARQ_SELECTIVE_SCH_SW: Indicates whether to enable selective HARQ scheduling in subframe 3 or 8. If this option is selected, selective HARQ scheduling in subframe 3 or 8 is enabled. If this option is deselected, selective HARQ scheduling in subframe 3 or 8 is disabled. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: LOW_AGG_PREFERENTIAL_SCH_SW(LOW_AGG_PREFERENTIAL_SCH_SW), HEAVY_LOAD_BIG_PKT_SCH_OPT_SW(HEAVY_LOAD_BIG_PKT_SCH_OPT_SW), SF_3_8_HARQ_SELECTIVE_SCH_SW(SF_3_8_HARQ_SELECTIVE_SCH_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LOW_AGG_PREFERENTIAL_SCH_SW, HEAVY_LOAD_BIG_PKT_SCH_OPT_SW, SF_3_8_HARQ_SELECTIVE_SCH_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: LOW_AGG_PREFERENTIAL_SCH_SW:Off, SF_3_8_HARQ_SELECTIVE_SCH_SW:Off, HEAVY_LOAD_BIG_PKT_SCH_OPT_SW:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: LOW_AGG_PREFERENTIAL_SCH_SW: If this option is selected, the average number of UEs scheduled in the downlink in a heavy-load TDD macro cell increases. If this option is deselected, the average number of UEs scheduled in the downlink in a heavy-load TDD macro cell decreases.</p>
+<p>HEAVY_LOAD_BIG_PKT_SCH_OPT_SW: If this option is selected in heavy-load scenarios, the eNodeB schedules UEs running large-packet services in the downlink, increasing the PDCCH capacity, cell traffic volume, and cell spectral efficiency. However, control channel reliability is affected for UEs, increasing the DTX proportion. If this option is selected in scenarios where a large number of UEs are running small-packet services, user-perceived data rates will decrease.</p>
+<p>SF_3_8_HARQ_SELECTIVE_SCH_SW: If this option is selected in heavy-load scenarios, the eNodeB schedules only UEs running large-packet services in subframe 3 or 8, increasing the downlink cell throughput. If this option is selected in scenarios where a large number of UEs are running small-packet services, the UE delay at the PDCP layer increases, and user-perceived data rates decreases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-SplitBeamPdcchSdmaThldOfs.html">SplitBeamPdcchSdmaThldOfs</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Split Beam PDCCH SDMA Threshold Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset to the isolation threshold for UEs with PDCCH aggregation levels of 4 and 8 when SDMA is performed for PDCCH transmission in beam splitting scenarios. The actual isolation threshold for UEs with PDCCH aggregation levels of 4 and 8 is the sum of this offset and the SplitBeamPdcchSdmaThd parameter. The value THRESHOLD_OFFSET_0 indicates that the offset is 0 dB. The value THRESHOLD_OFFSET_1 indicates that the offset is -1 dB for UEs with the PDCCH aggregation level of 4 and -2 dB for UEs with the PDCCH aggregation level of 8. The value THRESHOLD_OFFSET_2 indicates that the offset is -2 dB for UEs with the PDCCH aggregation level of 4 and -4 dB for UEs with the PDCCH aggregation level of 8. The value THRESHOLD_OFFSET_3 indicates that the offset is -3 dB for UEs with the PDCCH aggregation level of 4 and -6 dB for UEs with the PDCCH aggregation level of 8. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: THRESHOLD_OFFSET_0(THRESHOLD_OFFSET_0), THRESHOLD_OFFSET_1(THRESHOLD_OFFSET_1), THRESHOLD_OFFSET_2(THRESHOLD_OFFSET_2), THRESHOLD_OFFSET_3(THRESHOLD_OFFSET_3)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: THRESHOLD_OFFSET_0, THRESHOLD_OFFSET_1, THRESHOLD_OFFSET_2, THRESHOLD_OFFSET_3</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: THRESHOLD_OFFSET_1(THRESHOLD_OFFSET_1)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Indicates the offset to the isolation threshold for UEs with PDCCH aggregation levels of 4 and 8 when SDMA is performed for PDCCH transmission in beam splitting scenarios.</p>
+<p>A smaller value of this parameter leads to a lower average PDCCH aggregation level but also a lower proportion of PDCCHs transmitted using SDMA.</p>
+<p>A larger value of this parameter leads to a higher average PDCCH aggregation level but also a higher proportion of PDCCHs transmitted using SDMA.</p>
+<p>Set this parameter to an appropriate value so that the resource usage for the PDCCH and SDMA proportion can be balanced, increasing PDCCH capacity of the cell.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchSdmaWeightType.html">PdcchSdmaWeightType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH SDMA Weight Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight type for PDCCH SDMA in massive MIMO scenarios. If this parameter is set to PREFERENTIAL_COV_GUARANTEE, a weight type guaranteeing coverage is preferred. If this parameter is set to PREFERENTIAL_ENHANCED_SDMA, a weight type guaranteeing space division gains is preferred. This parameter value is valid only when the CoverageScenario parameter is set to SCENARIO_2(HBW 65 Degree, VBW 8 Degree) or SCENARIO_6(HBW 65 Degree, VBW 17 Degree). If this parameter is set to POWER_SHARING_AMONG_3_BEAMS, power sharing among three beams is enabled. If this parameter is set to POWER_SHARING_AMONG_4_BEAMS, power sharing among four beams is enabled. If this parameter is set to POWER_SHARING_AMONG_5_BEAMS, power sharing among five beams is enabled. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: PREFERENTIAL_COV_GUARANTEE(PREFERENTIAL_COV_GUARANTEE), PREFERENTIAL_ENHANCED_SDMA(PREFERENTIAL_ENHANCED_SDMA), POWER_SHARING_AMONG_3_BEAMS(POWER_SHARING_AMONG_3_BEAMS), POWER_SHARING_AMONG_4_BEAMS(POWER_SHARING_AMONG_4_BEAMS), POWER_SHARING_AMONG_5_BEAMS(POWER_SHARING_AMONG_5_BEAMS)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PREFERENTIAL_COV_GUARANTEE, PREFERENTIAL_ENHANCED_SDMA, POWER_SHARING_AMONG_3_BEAMS, POWER_SHARING_AMONG_4_BEAMS, POWER_SHARING_AMONG_5_BEAMS</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: POWER_SHARING_AMONG_5_BEAMS(POWER_SHARING_AMONG_5_BEAMS)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to PREFERENTIAL_COV_GUARANTEE, PDCCH capacity increases. If this parameter is set to PREFERENTIAL_ENHANCED_SDMA, coverage slightly decreases and PDCCH capacity increases significantly. If this parameter is set to POWER_SHARING_AMONG_3_BEAMS, POWER_SHARING_AMONG_4_BEAMS, or POWER_SHARING_AMONG_5_BEAMS, the PDCCH power can be shared among beams, further increasing PDCCH capacity. However, this leads to a slightly decreased coverage compared with when PDCCH split is disabled.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchPowerCheckSwitch.html">PdcchPowerCheckSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Power Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable PDCCH symbol power check. If this parameter is set to OFF, the eNodeB does not check the PDCCH symbol power. If this parameter is set to SYMBOL_0_POWER_CHECK, the eNodeB checks the power of PDCCH symbol 0 to ensure that the power of this symbol does not exceed the RRU single-channel power. If the power of this symbol exceeds the RRU single-channel power, CCE allocation fails. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), SYMBOL_0_POWER_CHECK(SYMBOL_0_POWER_CHECK)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, SYMBOL_0_POWER_CHECK</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to SYMBOL_0_POWER_CHECK, the success rate of CCE allocation for uplink and downlink scheduling in each TTI will be affected, causing the number of UEs scheduled in each TTI, the cell traffic volume, and the spectral efficiency to decrease. If this parameter is set to OFF and the PDCCH power exceeds the RRU single-channel power, the RRU may be powered off and reset.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-HarqAckFdbkModeOptThld.html">HarqAckFdbkModeOptThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HARQ-ACK Feedback Mode Optimization Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for optimizing the HARQ-ACK feedback mode. If HARQ-ACK feedback mode optimization is enabled, the PDCCH load in the cell is greater than this threshold, and the single-frame scheduling mode is used for the UEs, the HARQ-ACK feedback mode of the UEs is reconfigured to the multiplexing mode. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 60~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 60~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 60</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: The HARQ-ACK feedback mode is reconfigured for UEs based on the PDCCH load and UE services in a cell.</p>
+<p>A smaller value of this parameter results in a higher probability of reconfiguring Bundling as the HARQ-ACK feedback mode for UEs. A larger value of this parameter leads to the opposite effect. Compared with the Bundling mode, the Multiplexing mode increases the MCS index. In addition, DTX is unavailable in Multiplexing mode so that the CCE aggregation level of the PDCCH cannot be accurately determined and the PDCCH power control cannot be accurately performed. This affects the PDCCH reliability. Therefore, the handover success rate, service drop rate, ping delay, PUCCH coverage performance, and access delay may deteriorate, but the cell throughput, single-UE throughput, and user-perceived rate can be improved.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-PdcchBeamformingSwitch.html">PdcchBeamformingSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCCH Beamforming Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable PDCCH beamforming.</p>
+<p>MASSIVE_MIMO_PDCCH_BF_SW: If this option is selected, UE-specific beam weighting is performed to transmit the PDCCH data in massive MIMO scenarios. If this option is deselected, broadcast beam is performed to transmit the PDCCH data in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+<p>DisuseStatement: This parameter will be removed in later versions. In this version, the setting of this parameter is still synchronized between the MAE and the eNodeB and can be delivered to the eNodeB, but it is no longer used internally. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: MASSIVE_MIMO_PDCCH_BF_SW(MASSIVE_MIMO_PDCCH_BF_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MASSIVE_MIMO_PDCCH_BF_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MASSIVE_MIMO_PDCCH_BF_SW:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: MASSIVE_MIMO_PDCCH_BF_SW:</p>
+<p>If this option is selected, PDCCH beamforming is enabled to improve the PDCCH performance in massive MIMO scenarios. If this option is deselected, PDCCH beamforming is disabled in massive MIMO scenarios.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-AbnUePdcchOptCceUsageThld.html">AbnUePdcchOptCceUsageThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Abnormal UE PDCCH Opt CCE Usage Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the equivalent CCE usage threshold used for evaluating whether to enable the function of PDCCH optimization for defective UEs. If this parameter is set to a non-zero value, the function is enabled. If this parameter is set to 0, the function is disabled. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 30</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a smaller increase in the PDCCH capacity. A smaller value of this parameter results in a larger increase in the PDCCH capacity but lower PDCCH reliability.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellPdcchAlgo-AbnUePdcchOptCqiThld.html">AbnUePdcchOptCqiThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Abnormal UE PDCCH Opt CQI Thld</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CQI threshold of UEs used for evaluating whether to enable the function of PDCCH optimization for defective UEs. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a higher CQI requirement, a lower proportion of UEs with the function enabled, and a smaller increase in PDCCH capacity. A smaller value of this parameter results in a larger increase in the PDCCH capacity but lower PDCCH reliability.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellpdcchalgo__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of the PDCCH resource allocation algorithm with the parameters as follows: Local cell ID: 0, SignalCongregateLevel: CONGREG_LV4, Cce Ratio Adjust Switch: ON, PDCCH Initial Symbol Number: 3, PDCCH Virtual Loading Proportion: 0, PDCCH Symbol Number Adjust Switch: ON, CCE use ratio: 100, run the following command:
+MOD CELLPDCCHALGO:LocalCellId=0, ComSigCongregLv=CONGREG_LV4, CceRatioAdjSwitch=ON, InitPdcchSymNum=3, VirtualLoadPro=0, PdcchSymNumSwitch=ON, CceUseRatio=100;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

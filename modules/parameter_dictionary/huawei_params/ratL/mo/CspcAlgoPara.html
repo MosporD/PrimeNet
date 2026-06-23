@@ -1,0 +1,148 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CspcAlgoPara">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CspcAlgoPara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CspcAlgoPara</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CspcAlgoPara"></a><a name="CspcAlgoPara"></a>
+
+
+<h1 class="topictitle1">CspcAlgoPara</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="CspcAlgoPara.html"><strong>CspcAlgoPara</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CspcAlgoPara MO consists of parameters related to the coordinated scheduling and power control (CSPC) algorithm. The parameters take effect on the centralized control node in Cloud BB scenarios.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="eNodeBFunction.html">eNodeBFunction</a></li><li>Relation with the <strong>EuCoSchDLCoMPCfg</strong> MO:<ul><li>If the <strong>InterEnbDlCompSwitch</strong> parameter in the <strong>EuCoSchDLCoMPCfg</strong> MO is set to ON, the <strong>CspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be set to OFF and the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be cleared.</li></ul>
+</li><li>Relation with the <strong>CoProcRes</strong> MO:<ul><li>If the <strong>CspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO is set to ON(On), there must be at least one <strong>CoProcRes</strong> MO in which the CLUSTER_MANAGEMENT option of the <strong>WorkMode</strong> parameter is selected.</li></ul>
+</li><li>Relation with the <strong>CellDynPowerSharing</strong>, <strong>CellCspcPara</strong>, <strong>CellAlgoSwitch</strong>, <strong>Cell</strong>, and <strong>PHICHCfg</strong> MOs:<ul><li>The LTE_DYN_POWER_SHARING_SW and LTE_EXTREME_POWER_SHARING_SW options of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected only when the following conditions are met: The <strong>GLPwrShare</strong> parameter in the <strong>CellAlgoSwitch</strong> MO, the <strong>CspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO, and the <strong>CellCspcSwitch</strong> and <strong>CelleCspcSwitch</strong> parameters in the <strong>CellCspcPara</strong> MO are set to OFF, the PhichInnerLoopPcSwitch option of the <strong>DlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected, the <strong>HighSpeedFlag</strong> parameter in the <strong>Cell</strong> MO is set to LOW_SPEED, and the <strong>PhichDuration</strong> parameter in the <strong>PHICHCfg</strong> MO is not set to EXTENDED.</li></ul>
+</li><li>Relation with the <strong>CellDynPowerSharing</strong>, <strong>ENodeBAlgoSwitch</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The LTE_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected only if the <strong>DlIcicSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is set to DlIcicSwitch_OFF_ENUM, the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO is deselected, and both the BFModeUserAdptPwrSwitch and BFModeUserPwrSwitch options of the <strong>DlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are deselected.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>The switches indicated by the Sa1Sa2InterfCoordSwitch option of the <strong>AvoidInterfSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO and the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO cannot be both turned on.</li></ul>
+</li><li>Relation with the <strong>SymbolPwrSaving</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>TrigBndlSchDlAvgPrbThld</strong> parameter in the <strong>SymbolPwrSaving</strong> MO is not set to 0 for a cell and the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD for the same cell, the <strong>CspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>SymbolPwrSaving</strong>, <strong>Cell</strong>, and <strong>CellCspcPara</strong> MOs:<ul><li>If the <strong>TrigBndlSchDlAvgPrbThld</strong> parameter in the <strong>SymbolPwrSaving</strong> MO is not set to 0 for a cell and the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD for the same cell, then the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be deselected and the <strong>CellCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF for the cell.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, <strong>SectorSplitGroup</strong>, and <strong>CellCspcPara</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 8T8R, the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, and the <strong>BeamDeploymentMode</strong> parameter in the <strong>SectorSplitGroup</strong> MO is set to NOT_CFG, then the <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF and the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be deselected.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 8T8R, the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, and the <strong>BeamDeploymentMode</strong> parameter in the <strong>SectorSplitGroup</strong> MO is set to MODE_3, then the <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF and the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellDlschAlgo</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the DL_INTRA_JAMC_ALGO_SW option of the <strong>DlJointAMCAlgoSw</strong> parameter in the <strong>CellDlschAlgo</strong> MO is selected, the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be deselected.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CspcAlgoPara__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CspcAlgoPara__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CspcAlgoPara__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cspcalgopara.html">LST CSPCALGOPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list parameters related to the CSPC algorithm. This command takes effect only on the centralized control node.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cspcalgopara.html">MOD CSPCALGOPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify parameters related to the CSPC algorithm. This command takes effect only on the centralized control node.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CspcAlgoPara__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CspcAlgoPara__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CspcAlgoPara__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-CspcAlgoSwitch.html">CSPC Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable CSPC in cells under the centralized control node in Cloud BB scenarios. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-CspcRsrpMeasMode.html">CSPC RSRP Measurement Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the measurement mode of the reference signal received power (RSRP) used in CSPC. The uplink RSRP is measured based on the uplink sounding reference signal (SRS) measurement. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-CspcClusterMode.html">CSPC Cluster Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode of grouping cells into clusters for CSPC. If this parameter is set to STATIC_CONFIG, cells must be manually grouped into clusters for CSPC based on site scenarios. If this parameter is set to DYNAMIC_PARTITION_CONFIG, the centralized control node periodically groups cells into clusters for CSPC based on site scenarios. The DYNAMIC_PARTITION_CONFIG value does not take effect currently. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-CspcClusterPartPeriod.html">CSPC Cluster Partition Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval at which cells are grouped into clusters for CSPC. The interval can be configured based on site scenarios. This parameter currently does not take effect because dynamic clustering is not supported. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-CspcPowerConfigDelay.html">CSPC Power Config Delay</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval between the time that an eNodeB reports measurement information to the centralized control node and the time that the power configuration delivered by the centralized control node takes effect on the eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-CspcScheduleUeSpec.html">CSPC Schedule UE Specification</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of UEs that can be selected for CSPC. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-CspcEnableDlPrbRatioThd.html">CSPC Enable Downlink PRB Ratio Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the physical resource block (PRB) usage threshold for enabling coordinated scheduling-based power control (CSPC). CSPC is enabled when the highest PRB usage among all cells in a CSPC cluster is greater than this parameter value. To prevent CSPC from being enabled and disabled frequently in the cluster, the PRB usage threshold for disabling CSPC is lower than this parameter value. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-TddCspcAlgoSwitch.html">TDD Cspc Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable CSPC for cells under the centralized control node in Cloud BB scenarios. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CspcAlgoPara-CspcCapacityFactor.html">CSPC Capacity Factor</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the acceptable capacity loss proportion in a network with CSPC enabled. This parameter affects the gain for cell edge UEs. Set this parameter in heavily-loaded networks to adjust cell downlink throughput and the downlink throughput gain of cell edge UEs. If this parameter is set to 100, network capacity loss is not considered, and the downlink throughput gain of cell edge UEs reaches the maximum. If this parameter is set to 0, it is preferential to guarantee that capacity loss does not occur in heavily-loaded networks. However, the downlink throughput gain of cell edge UEs decreases. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

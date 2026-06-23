@@ -1,0 +1,162 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="Clock MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of clocks. It also provides the managed object model (MOM) view and describes managed objects (MOs) related to clocks.">
+<meta name="description" content="This section describes the functions and concepts of clocks. It also provides the managed object model (MOM) view and describes managed objects (MOs) related to clocks.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../comm/mom/equip-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Equip-Synchronization">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Clock MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Equip-Synchronization"></a><a name="Equip-Synchronization"></a>
+
+
+<h1 class="topictitle1">Clock MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of clocks.
+It also provides the managed object model (MOM) view and describes
+managed objects (MOs) related to clocks.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p>Roaming and handover
+services can be ensured only when clock synchronization is achieved
+among base stations in the wireless networks. The CLK defines the
+base station clock management module, involving the management of
+the system clock and external reference clocks.</p>
+<p>Seven reference
+clocks are available for a base station.</p>
+<p><strong>GPS/RGPS</strong></p>
+<div class="p">The Global Positioning System (GPS) or Remote Global Positioning
+System (RGPS) synchronization requires a GPS or RGPS receiver on each
+base station. The eNodeBs receive clock signals through the GPS or
+RGPS receivers, with the precision to microseconds. GPS and RGPS clocks
+support both frequency synchronization and time synchronization.<ul><li>A GPS receiver connects to a base station through the GPS port
+on a main processing and transmission unit on the base station.</li><li>An RGPS receiver connects to a base station through an RGPS port
+on the universal satellite card and clock unit (USCU). A base station
+synchronized with the RGPS clock must be equipped with the USCU.</li></ul>
+</div>
+<p><strong>IEEE1588 V2</strong></p>
+<p>IEEE1588 defines the Precision
+Time Protocol (PTP), which applies to standard Ethernet. High-accuracy
+frequency synchronization or time synchronization between clock servers
+and eNodeBs can be achieved. The IEEE1588 V2 clock is selected as
+the system clock of the base station by setting the ICPT parameter
+to PTP(PTP).</p>
+<p><strong>1PPS+TOD</strong></p>
+<p>A base station implements
+time synchronization by obtaining 1 pulse per second (1PPS) and time
+of day (TOD) signals. 1PPS signals are used for synchronization. TOD
+signals are used to transmit time information, and reference clock
+type and working status.</p>
+<p><strong>Clock over IP</strong></p>
+<p>Clock over
+IP is a Huawei proprietary frequency synchronization technology, which
+carries frequency synchronization packets over IP. Clock signals are
+distributed to each base station based on a server/client architecture.
+The clock over IP technology supports only frequency synchronization,
+with the frequency accuracy that is better than &plusmn;0.05 ppm.</p>
+<p><strong>BITS</strong></p>
+<p>A base station can obtain frequency synchronization
+signals by connecting to the building integrated timing supply (BITS)
+through the internal BITS clock card. After phase lock and frequency
+division, the main clock module in the base station converts the synchronization
+signals into the clock signals required for the base station. Synchronization
+with the BITS clock requires the USCUs. </p>
+<p><strong>Synchronous Ethernet</strong></p>
+<p>Synchronous Ethernet adopts the technology that recovers clock
+signals from the data bit streams in Ethernet links. The intermediate
+transport equipment in the synchronous Ethernet, such as LAN switches,
+must be capable of transparent transmission or regeneration of clock
+signals at the physical layer. </p>
+<p><strong>E1/T1 Line Clock</strong></p>
+<p>A base station can extract frequency synchronization signals from
+E1/T1 links at the physical layer. If the S1 interface transmits signals
+through E1/T1 ports, the base station can synchronize with the E1/T1
+clock.</p>
+<p><strong>INTERCLK</strong></p>
+<p>A base station can extract synchronization
+signals from IDX1 interconnection links at the physical layer. If
+BBUs are connected through IDX1 cables and the peer NE of one BBU
+provides the reference interconnection clock, the base station can
+synchronize with the reference interconnection clock.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Equip-Synchronization__fig1">Figure 1</a> shows the CLK MOM, which is a subset of the base station
+MOM.<div class="fignone" id="Equip-Synchronization__fig1"><a name="Equip-Synchronization__fig1"></a><a name="fig1"></a><span class="figcap"><b>Figure 1 </b>CLK MOM</span>
+
+<br><span><img src="../image/mom/CLK-figure3-1.png"></span></div>
+</div>
+<div class="p">The CLK MOs shown in <a href="#Equip-Synchronization__fig1">Figure 1</a> are described as
+follows:<ul><li><a href="../mo/Equipment.html">Equipment</a> defines
+the equipment root object, which manages equipment-class MOs.</li><li><a href="../mo/Tasm.html">Tasm</a>defines the system
+clock. This MO is automatically created by the system. The system
+clock can be automatically switched among available external reference
+clocks based on priorities and availability. When the Tasm MO is set,
+the following settings can be performed:<ul><li>Base station synchronization mode (time synchronization
+or frequency synchronization)</li><li>Current reference clock</li><li>IP clock algorithm parameters</li><li>The status of the system clock</li></ul>
+</li><li><a href="../mo/SyncEth.html">SyncEth</a> defines
+a synchronous Ethernet link. The synchronous Ethernet technology has
+the same basic principles as the synchronous digital hierarchy (SDH)
+and plesiochronous digital hierarchy (PDH) network clock synchronization,
+where a downstream node obtains and traces the upstream clock by recovering
+clock signals from the serial data bit streams received at the physical
+layer. </li><li><a href="../mo/GPS.html">GPS</a> defines a type of
+reference clock source. The term GPS is a collective name for all
+satellite synchronization systems, including GPS, GLONASS, and COMPASS.
+A satellite card is attached to the MPT. </li><li><a href="../mo/TOD.html">TOD</a> defines a 1PPS+TOD
+clock link. The 1PPS+TOD clock link must be configured on the USCUb.</li><li><a href="../mo/PeerClk.html">PeerClk</a> defines
+a peer reference clock link. In a multi-mode base station (BS), the
+peer reference clock is shared by multiple modes. Currently, only
+one peer reference clock link can be configured. The cabinet number,
+subrack number, and slot number are not specified when this MO is
+set.</li><li><a href="../mo/LineClk.html">LineClk</a> defines
+an E1/T1 line clock link. The E1/T1 line clock link is generally configured
+on a main control board or transmission board. The cabinet number,
+subrack number, and port number are specified for the board where
+the E1/T1 line clock link is configured. </li><li><a href="../mo/IPCLKLNK.html">IPCLKLNK</a> defines
+an IP clock link. The IP clock complies with the IEEE1588 V2 standard
+and Huawei proprietary IP clock protocol. </li><li><a href="../mo/BITS.html">BITS</a> defines a BITS
+clock link. The BITS clock link must be configured on the USCU. The <a href="../para/BITS-CabinetNo.html">CN</a>, <a href="../para/BITS-SubrackNo.html">SRN</a> and <a href="../para/BITS-SlotNo.html">SN</a>parameters in a BITS
+MO must be different from <a href="../para/GPS-CabinetNo.html">CN</a>, <a href="../para/GPS-SubrackNo.html">SRN</a> and <a href="../para/GPS-SlotNo.html">SN</a> in a GPS
+or TOD MO.</li><li><a href="../mo/InterClk.html">InterClk</a> defines
+the reference interconnection clock. The reference interconnection
+clock can be used when BBUs are connected through IDX1 cables and
+the peer NE of one BBU provides the reference interconnection clock.
+You do not need to specify the cabinet number, subrack number, or
+slot number for configuring the reference interconnection.</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../comm/mom/equip-mom.html" title="This chapter describes the MOMs related to equipment.">Equipment MOMs</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

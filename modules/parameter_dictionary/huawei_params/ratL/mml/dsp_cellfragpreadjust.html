@@ -1,0 +1,150 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display Cell Baseband Resource Fragment Pre-adjustment Information (DSP CELLFRAGPREADJUST)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_cellfragpreadjust">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display Cell Baseband Resource Fragment Pre-adjustment Information (DSP CELLFRAGPREADJUST)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_cellfragpreadjust"></a><a name="dsp_cellfragpreadjust"></a>
+
+
+<h1 class="topictitle1">Display Cell Baseband Resource Fragment Pre-adjustment Information (DSP CELLFRAGPREADJUST)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="dsp_cellfragpreadjust__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to:</p>
+<p>(1) Query the cells for which baseband resources need to be adjusted (which will cause cell reestablishment) for the establishment of a target cell if the target cell is specified. (The target cell establishment previously failed due to baseband resource fragmentation.)</p>
+<p>(2) Query the cells for which baseband resources need to be adjusted (which will cause cell reestablishment) to eliminate resource fragments on the eNodeB if no target cell is specified.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_cellfragpreadjust__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If a target cell is specified, the specified cell must be an 8T8R FDD or Static Shared Beam Mode for which the MultiRruCellFlag parameter is set to BOOLEAN_FALSE and that has failed to be established, or the specified cell must be a cell whose baseband equipment allows hybrid configuration of massive MIMO and common cells and that has failed to be established.</p>
+</li><li><p>Run this command when the environment configuration and hardware resources are stable. If the environment configuration or hardware resources are changed after this command is executed, run this command again.</p>
+</li><li><p>Resource pre-adjustment information is stored for at most 10 minutes. Run the STR CELLFRAGPREADJUST command within 10 minutes after the information is displayed.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_cellfragpreadjust__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Cell-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_cellfragpreadjust__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query cell baseband resource fragment pre-adjustment information:
+DSP CELLFRAGPREADJUST:;
+The result is shown as follows:
++++    0        2018-06-07 11:59:30
+O&amp;M   #807403532
+%%DSP CELLFRAGPREADJUST:;%%
+RETCODE = 0  Operation succeeded.
+
+
+To be continued...
+
+---    END
+
++++    0        2018-06-07 11:59:30
+O&amp;M    #807403532
+%%DSP CELLFRAGPREADJUST:;%%
+RETCODE = 0  Operation succeeded.
+
+Cell Baseband Resource Pre-adjustment Information
+------
+eNodeB ID  Local Cell ID  Sector Equipment ID  Sector Equipment Group ID  Source Baseband Processing Unit  Destination Baseband Processing Unit
+
+0          67             -                    -                          -                                0-0-1                        
+0          151            -                    -                          0-0-1                            0-0-2                        
+(Number of results = 2)
+
+
+2 reports in total
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_cellfragpreadjust__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody"><table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder"><tr><th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>eNodeB ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of the eNodeB.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Local Cell ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Sector Equipment ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of the sector equipment that serves the cell. It uniquely identifies a set of sector equipment within an eNodeB.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Sector Equipment Group ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of the sector equipment group that serves the cell. It uniquely identifies a sector equipment group within a cell.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Source Baseband Processing Unit</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet, subrack, and slot information about the source BBP of cell baseband resource adjustment.</p>
+</td>
+</tr>
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Destination Baseband Processing Unit</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet, subrack, and slot information about the target BBP of cell baseband resource adjustment.</p>
+</td>
+</tr>
+</table>
+</div></div>
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

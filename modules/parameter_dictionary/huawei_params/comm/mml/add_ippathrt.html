@@ -1,0 +1,170 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add IP Path Route (ADD IPPATHRT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ippathrt">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add IP Path Route (ADD IPPATHRT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ippathrt"></a><a name="add_ippathrt"></a>
+
+
+<h1 class="topictitle1">Add IP Path Route (ADD IPPATHRT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="add_ippathrt__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an IP path route.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ippathrt__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,eGBTS,eNodeB]IP path routes and active/standby routes cannot co-exist.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB]In IPSec networking, an IP path does not support path check if it is configured with IP path routes.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB]This command takes effect only for LTE.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB]If an IPPATHRT object has the same destination IP address as an IPRT or IPROUTE4 object but has a different next-hop IP address, the priority of the route specified by the IPPATHRT object is higher than that specified by the IPRT or IPROUTE4 object.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB]System specifications: If the LMPT/UMPT/UMDU is the main control board, a maximum of 64 IP path routes can be configured.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB]Board specifications: A maximum of 64 IP path routes can be configured on an LMPT/UMPT/UMDU.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB]An IPPATHRT object cannot coexist with the SRCIPRT or SRCIPROUTE4 object. Before adding an IPPATHRT object, delete the SRCIPRT or SRCIPROUTE4 object.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ippathrt__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATHRT-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATHRT-SrcIP.html">SRCIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IP address of an IP path route. The source IP address must be the same as the configured device IP address.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eGBTS, eNodeB]<strong>SRCIP</strong> in an <strong>IPPATHRT</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, eGBTS, eNodeB]In an <strong>IPPATHRT</strong> MO, <strong>SRCIP</strong> must be different from <strong>DSTIP</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATHRT-DstIP.html">DSTIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination IP address of an IP path route.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eGBTS, eNodeB]<strong>DSTIP</strong> in an <strong>IPPATHRT</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, eGBTS, eNodeB]In an <strong>IPPATHRT</strong> MO, <strong>SRCIP</strong> must be different from <strong>DSTIP</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATHRT-TranRscType.html">TRANRSCTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transport Resource Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of transport resource carried on an IP path route. The value HQ indicates high-quality transport resources, and the value LQ indicates low-quality transport resources.</p>
+<p>GUI Value Range: HQ(High Quality), LQ(Low Quality)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: HQ, LQ</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATHRT-NextHopIP.html">NEXTHOPIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Next Hop IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the next-hop IP address of an IP path route. The next-hop IP address and the configured device IP address must be on the same network segment, but cannot be the same.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eGBTS, eNodeB]<strong>NEXTHOPIP</strong> in an <strong>IPPATHRT</strong> MO must be a valid IP address of class A, B, or C. In addition, it cannot be set to 0.x.x.x or 127.x.x.x.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ippathrt__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an IP path route with the parameters as follows: VRF Index: 0, Source IP: 10.10.10.10, Destination IP: 172.16.21.89, Transport Resource Type: HQ, Next Hop IP: 10.10.10.1, run the following command: 
+ADD IPPATHRT: VRFIDX=0, SRCIP="10.10.10.10", DSTIP="172.16.21.89", TRANRSCTYPE=HQ, NEXTHOPIP="10.10.10.1";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

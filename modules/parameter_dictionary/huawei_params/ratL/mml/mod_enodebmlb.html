@@ -1,0 +1,160 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify eNodeB MLB Configuration (MOD ENODEBMLB)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_enodebmlb">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify eNodeB MLB Configuration (MOD ENODEBMLB)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_enodebmlb"></a><a name="mod_enodebmlb"></a>
+
+
+<h1 class="topictitle1">Modify eNodeB MLB Configuration (MOD ENODEBMLB)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_enodebmlb__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the parameter settings for eNodeB-level load balancing.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_enodebmlb__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_enodebmlb__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBMlb-InterFreqIdleMlbMode.html">InterFreqIdleMlbMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Inter Frequency Idle MLB Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode for eNodeB-level inter-frequency MLB for UEs in idle mode. ADAPTIVE_PROPORTION: Indicates whether to enable load balancing in adaptive proportions. If the ADAPTIVE_PROPORTION option of this parameter and the INTER_FREQ_IDLE_MLB_SWITCH option of the MlbAlgoSwitch parameter are selected, the eNodeB timely adjusts the proportions of UEs to be released among frequencies based on the current proportions of UEs among frequencies and the preset proportions of UEs among frequencies, ensuring that the proportions of UEs in idle mode among frequencies approaches to the preset proportions. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DisuseStatement: This parameter will be removed in later versions. In this version, the setting of this parameter is still synchronized between the MAE and the eNodeB and can be delivered to the eNodeB, but it is no longer used internally. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: ADAPTIVE_PROPORTION(ADAPTIVE_PROPORTION)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ADAPTIVE_PROPORTION</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ADAPTIVE_PROPORTION:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the ADAPTIVE_PROPORTION option of this parameter is not selected, eNodeB-level load balancing in adaptive proportions is disabled. The proportions of UEs in idle mode among frequencies may not comply with the preset proportions. If the ADAPTIVE_PROPORTION option of this parameter and the INTER_FREQ_IDLE_MLB_SWITCH option of the MlbAlgoSwitch parameter are selected, the eNodeB adjusts the proportions of UEs in idle mode among frequencies, ensuring that the proportions comply with the preset proportions.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBMlb-InterFreqIdleMlbInterval.html">InterFreqIdleMlbInterval</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Inter Frequency Idle MLB Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the measurement period of eNodeB-level inter-frequency MLB for UEs in idle mode. If the INTER_FREQ_IDLE_MLB_SWITCH option of the MlbAlgoSwitch parameter in the ENodeBAlgoSwitch MO is selected, the eNodeB collects the number of uplink synchronized UEs at a period specified by the InterFreqIdleMlbInterval parameter. At the end of a measurement period, the eNodeB updates the policy for inter-frequency MLB in proportions for UEs in idle mode based on the measurement result. If the INTER_FREQ_IDLE_MLB_SWITCH option is deselected, the eNodeB does not update the policy for inter-frequency MLB in proportions for UEs in idle mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~10080</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 0~10080</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1440</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in more timely adjustment of the proportions of UEs in idle mode among frequencies based on real-time network conditions during eNodeB-level inter-frequency MLB for UEs in idle mode. However, if this parameter value is too small, the performance of eNodeB-level inter-frequency MLB for UEs in idle mode is affected by traffic fluctuation. If this parameter is set to a larger value, the eNodeB determines the proportions based on stable traffic model. However, if this parameter value is too large, the eNodeB cannot timely adjust the proportions.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBMlb-InterFreqIdleMlbStaThd.html">InterFreqIdleMlbStaThd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Inter Frequency Idle MLB Statistic Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the sample threshold of eNodeB-level inter-frequency MLB for UEs in idle mode. This parameter specifies whether to update the load balancing policy based on the statistics of eNodeB-level inter-frequency MLB for UEs in idle mode. If the INTER_FREQ_IDLE_MLB_SWITCH option of the MlbAlgoSwitch parameter in the ENodeBAlgoSwitch MO is selected, the eNodeB periodically measures the average number of uplink synchronized UEs in each cell. If the sum of the average number of uplink synchronized UEs in all cells is greater than or equal to this parameter value, the eNodeB updates the policy of inter-frequency MLB in proportions for UEs in idle mode based on the measurement result. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~10000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability of the eNodeB adjusting the proportions in which to-be-released UEs camp on cells operating in different frequencies during eNodeB-level inter-frequency load balancing in adaptive proportions. If the parameter value is too small, the eNodeB may improperly adjust the proportions based on incredible statistic results. A larger value of this parameter results in a higher probability of the eNodeB performing proper proportion adjustments. If this parameter value is too large, there is a low probability that the eNodeB adjusts the proportions.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBMlb-DlCaLbMaxCCNum.html">DlCaLbMaxCCNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL CA LB Max Component Carrier Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of CCs aggregated for a CA UE whose load is to be transferred for load balancing in the downlink. If this parameter is set to 2CC(2CC), load of CA UEs using two CCs can be transferred for load balancing in the downlink. If this parameter is set to 3CC(3CC), load of CA UEs using two or three CCs can be transferred for load balancing in the downlink. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 3CC(3CC), 2CC(2CC)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3CC, 2CC</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3CC(3CC)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 2CC, only the load of CA UEs using two CCs can be transferred for load balancing. As a result, the average throughput cannot reach the maximum.</p>
+<p>If this parameter is set to 3CC, load of CA UEs using two CCs and three CCs can be transferred for load balancing, increasing the average cell throughput.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBMlb-CaUeMinDataVolRatio.html">CaUeMinDataVolRatio</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CA UE Minimum Data Volume Ratio</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum data volume ratio between two CCs of a CA UE whose load is to be transferred. For example, if this parameter is set to 20, the minimum ratio of the data volume on a heavily loaded CC to that on a lightly loaded CC is 1/5. If this parameter is set to 0, the minimum ratio of the data volume on a heavily loaded CC to that on a lightly loaded CC is 0/1, that is, all data on the heavily loaded CC can be transferred to the lightly loaded CC. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~99</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~99</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the average cell throughput can reach the maximum but the average throughput of CA UEs cannot reach the maximum.</p>
+<p>If this parameter is set to a large value, the average throughput of CA UEs cannot reach the maximum but the average cell throughput cannot reach the maximum.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_enodebmlb__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify eNodeB MLB configuration with the parameters as follows: Inter Frequency Idle MLB Mode: ADAPTIVE_PROPORTION-1, Inter Frequency Idle MLB Interval: 1440, Inter Frequency Idle MLB Statistic Threshold: 3, run the following command:
+MOD ENODEBMLB: InterFreqIdleMlbMode=ADAPTIVE_PROPORTION-1, InterFreqIdleMlbInterval=1440, InterFreqIdleMlbStaThd=3;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

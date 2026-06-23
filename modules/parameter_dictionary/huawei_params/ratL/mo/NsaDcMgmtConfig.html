@@ -1,0 +1,344 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NsaDcMgmtConfig">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NsaDcMgmtConfig">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NsaDcMgmtConfig</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NsaDcMgmtConfig"></a><a name="NsaDcMgmtConfig"></a>
+
+
+<h1 class="topictitle1">NsaDcMgmtConfig</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="NsaDcMgmtConfig.html"><strong>NsaDcMgmtConfig</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The NsaDcMgmtConfig MO consists of parameters related to downlink data transfer mode and uplink data transfer.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellDlschAlgo</strong> MO:<ul><li>If the <strong>McgHighLoadThreshold</strong> parameter in the <strong>CellDlschAlgo</strong> MO is set to a value other than 100, then the NSA_DC_CAPABILITY_SWITCH option of the <strong>NsaDcAlgoSwitch</strong> parameter in the <strong>NsaDcMgmtConfig</strong> MO must be selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SRSCfg</strong> MOs:<ul><li>The NSA_DC_UL_PATH_SELECTION_SW option of the <strong>NsaDcAlgoSwitch</strong> parameter in the <strong>NsaDcMgmtConfig</strong> MO can be selected only when the <strong>SrsCfgInd</strong> parameter in the <strong>SRSCfg</strong> MO is set to ON and the <strong>HighSpeedFlag</strong> parameter in the <strong>Cell</strong> MO is set to LOW_SPEED.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>ImdIntrfFreqAvoidanceType</strong> in the <strong>NsaDcMgMtConfig</strong> MO is set to PRIOR_ALLOC_NO_INTRF_RB, <strong>FddTddInd</strong> in the <strong>CELL</strong> MO must be set to CELL_FDD.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>RACHCfg</strong>, <strong>ENodeBAlgoSwitch</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD, the TDM_SWITCH option of the <strong>NsaDcAlgoSwitch</strong> parameter in the <strong>NsaDcMgmtConfig</strong> MO associated with the cell can be selected when either of the following conditions is met: 1. The <strong>PrachConfigIndexCfgInd</strong> parameter in the <strong>RACHCfg</strong> MO is set to CFG and the <strong>PrachConfigIndex</strong> parameter in the same MO is set to 0, 3, 6, 9, 13, 14, 16, 19, 22, 25, 29, 32, 35, 38, 41, 45, 48, 51, 54, or 57. 2. The <strong>PrachConfigIndexCfgInd</strong> parameter in the <strong>RACHCfg</strong> MO is set to NOT_CFG, the <strong>PrachTimeStagSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is set to OFF, and the RachAdjSwitch option of the <strong>RachAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected.</li></ul>
+</li><li>Relation with the <strong>NsaDcAlgoParam</strong> MO:<ul><li>NSA_DC_UL_PATH_SELECTION_SW in the <strong>NsaDcAlgoSwitch</strong> parameter in the <strong>NsaDcMgmtConfig</strong> MO can be set to ON only when the <strong>HoNsaBandCombSelectPolicy</strong> parameter in the <strong>NsaDcAlgoParam</strong> MO is set to LTE_SCC_NR_SCG_FIRST.</li></ul>
+</li><li>Relation with the <strong>CellDrxPara</strong> MO:<ul><li>If the LNR_DRX_SYNCHRONIZE_SW option of the <strong>NsaDcAlgoSwitch</strong> parameter in the <strong>NsaDcMgmtConfig</strong> MO is selected, the <strong>DrxAlgSwitch</strong> parameter in the <strong>CellDrxPara</strong> MO must be selected.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NsaDcMgmtConfig__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NsaDcMgmtConfig__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NsaDcMgmtConfig__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nsadcmgmtconfig.html">LST NSADCMGMTCONFIG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the LTE-NR NSA DC data split configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nsadcmgmtconfig.html">MOD NSADCMGMTCONFIG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the LTE-NR NSA DC data split configuration.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NsaDcMgmtConfig__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NsaDcMgmtConfig__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NsaDcMgmtConfig__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of a cell, which uniquely identifies the cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcAlgoSwitch.html">NSA DC Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable LTE-NR NSA DC algorithms. This parameter provides the following options:</p>
+<p>NSA_DC_CAPABILITY_SWITCH: LTE-NR NSA DC is enabled for the cell only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>INTERFERENCE_AVOID_SW: LTE supports secondary harmonic signal and cross-modulation interference signal avoidance only if this option is selected. Avoidance of interference from secondary intermodulation signals also requires that the TDM_SWITCH option of the NsaDcAlgoSwitch parameter in the NsaDcMgmtConfig MO be selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_PCC_ANCHORING_SWITCH: NSA DC PCC anchoring based on the NSA DC PCC anchoring priority (specified by the NsaPccAnchoringPriority parameter in the PccFreqCfg MO) takes effect for NSA DC UEs during initial access, incoming handovers, or incoming RRC connection reestablishment only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_BLIND_SCG_ADDITION_SWITCH: If this option is selected, blind SCG addition is enabled. If this option is deselected, this function is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_ENH_UL_POWER_CONTROL_SW: Indicates whether to enable the enhanced uplink power control function for NSA DC UEs, that is, whether to trigger the TDM function on the LTE side to increase the maximum uplink transmit power. If this option is selected, the enhanced function is enabled. If this option is deselected, the enhanced function is disabled. This option applies only to LTE FDD.</p>
+<p>TDM_SWITCH: Indicates whether to enable the time division multiplexing (TDM) function. If this option is selected, this function is enabled. If this option is deselected, this function is disabled. This option applies only to LTE FDD. For details about the TDM function, see 3GPP TS 38.306.</p>
+<p>NSA_DC_VOLUME_BASED_SCG_ADD_SW: Indicates whether to enable the traffic-volume-based SCG addition for NSA DC UEs during initial access, incoming handovers, or incoming RRC connection reestablishment. If this option is selected, SCG addition is not triggered until the traffic volume meets certain conditions. If this option is deselected, this function does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>VOLTE_NSA_DC_IF_NR_MEAS_SW: Indicates whether to enable the following functions for VoLTE UEs in NSA DC scenarios: NR SCG addition based on gap-assisted NR measurements and PCC anchoring for RRC_CONNECTED UEs based on inter-frequency measurements. If the option is selected, the eNodeB delivers gap-assisted NR measurement configurations for NR SCG addition or inter-frequency measurement configurations for PCC anchoring for RRC_CONNECTED UEs to VoLTE UEs in NSA DC scenarios. For UEs running VoLTE services in NSA DC scenarios, if this option is deselected, then the eNodeB neither delivers gap-assisted NR measurement configurations to these UEs for NR SCG addition nor delivers inter-frequency measurement configurations to these UEs for PCC anchoring for RRC_CONNECTED UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_FLEXIBLE_PCC_ANCHOR_SW: If this option is selected, flexible NSA DC PCC anchoring is enabled. PCC anchoring is performed based on the PCC anchoring priorities, loads, and uplink and downlink coverage of target frequencies. If this option is deselected, flexible NSA DC PCC anchoring is disabled. Before selecting this option, select the NSA_PCC_ANCHORING_SWITCH option of the NsaDcMgmtConfig.NsaDcAlgoSwitch parameter. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_DPS_CONTROL_SW: If this option is selected, uplink dynamic power sharing for NSA DC is enabled in a cell. If this option is deselected, uplink dynamic power sharing for NSA DC is disabled in the cell. This option applies only to LTE FDD and LTE TDD.</p>
+<p>PERIODIC_PCC_ANCHORING_SW: If this option is selected, periodic NSA DC PCC anchoring is enabled. If this option is deselected, periodic NSA DC PCC anchoring is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_STATE_PCC_ANCHORING_SW: If this option is selected, PCC anchoring can be triggered for UEs in the NSA DC state. If this option is deselected, PCC anchoring cannot be triggered for UEs in the NSA DC state. This option applies only to LTE FDD and LTE TDD.</p>
+<p>VOLUME_BASED_PERIODIC_TRIG_SW: If this option is selected, the eNodeB performs periodic NSA DC PCC anchoring or periodic SCG addition based on traffic volume. If this option is deselected, the eNodeB performs periodic NSA DC PCC anchoring or periodic SCG addition not based on traffic volume. This option applies only to LTE FDD and LTE TDD.</p>
+<p>S1_HO_DATA_FORWARDING_SW: If this option is selected, data can be forwarded through the core network during an S1-based handover for an NSA DC UE. This function takes effect only if this option is selected for both the source and target base stations. If this option is deselected, data cannot be forwarded through the core network during an S1-based handover for an NSA DC UE. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SN_TERMN_MCG_BEARER_SWITCH: The cell supports SN-terminated MCG bearers only if this option is selected. SN is short for secondary node. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_HO_ADM_STRAT_SW: Indicates whether NSA DC UEs are controlled by the MLB admission policy for target cells during handovers. If this option is selected, NSA DC UEs are controlled by the MLB admission policy for target cells during handovers. If this option is deselected, NSA DC UEs are not controlled by the MLB admission policy for target cells during handovers. This option applies only to LTE FDD and LTE TDD.</p>
+<p>IDLE_MODE_NSA_PCC_ANCHORING_SW: Indicates whether to enable NSA DC PCC anchoring for RRC_IDLE UEs. If this option is selected, NSA DC PCC anchoring for RRC_IDLE UEs is enabled. If this option is deselected, NSA DC PCC anchoring for RRC_IDLE UEs is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>VOLUME_BASED_SCG_ADD_OPT_SW: Indicates whether to enable optimization of traffic-volume-based NSA DC PCC anchoring and optimization of traffic-volume-based SCG addition. These optimization functions are enabled only if this option is selected. This option takes effect only if the INSTANT_JUDGEMENT_SW option of the NsaDcMgmtConfig.NsaDcAlgoExtSwitch parameter is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NR_COV_PCC_ANCHORING_OPT_SW: Indicates whether to enable NR-coverage-based NSA DC PCC anchoring optimization. This function takes effect only if this option is selected. This function is recommended when NR-coverage-based NSA DC PCC anchoring is deployed and LTE CA is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_PREALLOCATION_SW: Indicates whether to enable preallocation in NSA DC scenarios. Preallocation is enabled in NSA DC scenarios only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_COV_HO_ENH_SW: Indicates whether to enable enhanced coverage-based handovers for NSA DC UEs. Enhanced coverage-based handovers for NSA DC UEs are enabled only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_UL_PATH_SELECTION_SW: Indicates whether to enable NSA DC uplink path selection. Uplink paths are selected for data transmission based on factors such as load and air interface quality only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NSA_DC_COOPERATION_DPS_SW: Indicates whether to enable the cooperation-based dynamic power sharing function. Cooperation-based dynamic power sharing function in NSA DC scenarios is enabled only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>LNR_DRX_SYNCHRONIZE_SW: Indicates whether to enable DRX parameter synchronization for NSA DC UEs. If this option is selected, the function takes effect. The eNodeB sends the DrxInfo-MCG IE to the gNodeB over the X2 interface, and the gNodeB aligns the DRX sleep time on both sides as much as possible. In this way, NSA DC UEs can save power. If this option is deselected, the function does not take effect. This parameter is valid only if the DrxAlgSwitch parameter in the CellDrxPara MO is set to ON. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-DlDataMcgSplitBearerMode.html">DL Data MCG Split Bearer Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink data transfer mode of the MCG split bearers. The data transfer modes include dynamic data transfer, MeNB only, and SgNB only. In dynamic data transfer mode, data is dynamically transferred to LTE and NR NEs. In the mode of data transfer to the MeNB, data is transferred only to LTE NEs. In the mode of data transfer to the SgNB, data is transferred only to NR NEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcDefaultBearerMode.html">NSA DC Default Bearer Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of bearers set up for UEs that access the cell or are handed over to the cell in the LTE-NR NSA DC architecture. If this parameter is set to SCG_SPLIT_BEARER, SCG split bearers are set up for UEs by default. If this parameter is set to MCG_SPLIT_BEARER, MCG split bearers are set up for UEs by default. In separate-MPT co-transmission scenarios, split bearers are set up at the co-transmission port. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUeMcgUlAmbrRatio.html">NSA DC UE MCG UL AMBR Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of the uplink AMBR in the MCG for UEs in the LTE-NR NSA DC state. The proportion of the uplink AMBR in the SCG is 100% minus this parameter value. If this parameter is set to 255 (an invalid value), the proportion allocated to LTE and that allocated to NR are both 100%. This parameter cannot be set to 100 if the uplink data split policy is that uplink data is distributed dynamically or transmitted only to the SCG. This parameter cannot be set to 0 if the uplink data split policy is that uplink data is distributed dynamically or transmitted only to the MCG. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-UlDataSplitThreshold.html">UL Data Split Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for triggering uplink data transfer for UEs in the LTE-NR NSA DC state. For details, see 3GPP TS 38.323. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUeMcgUlPowerRate.html">NSA DC UE MCG UL Power Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of the proportion of the uplink MCG power of UEs in the LTE-NR NSA DC state. Indexes 1 to 16 indicate proportions 0%, 5%, 10%, 15%, 20%, 30%, 37%, 44%, 50%, 56%, 63%, 70%, 80%, 90%, 95%, and 100%, respectively. If the sum of the proportion of the uplink MCG power and the proportion of the uplink SCG power is 1, the proportion of the uplink MCG power is the proportion indicated by the configured index. If the sum is not 1, the proportion of the uplink MCG power is one minus the proportion of the uplink SCG power. For details, see 3GPP TS 38.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUeScgUlPowerRate.html">NSA DC UE SCG UL Power Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of the proportion of the uplink SCG power of UEs in the LTE-NR NSA DC state. Indexes 1 to 16 indicate proportions 0%, 5%, 10%, 15%, 20%, 30%, 37%, 44%, 50%, 56%, 63%, 70%, 80%, 90%, 95%, and 100%, respectively. If the sum of the proportion of the uplink MCG power and the proportion of the uplink SCG power is 1, the proportion of the uplink SCG power is the proportion indicated by the configured index. If the sum is not 1, the proportion of the uplink SCG power is one minus the proportion of the uplink MCG power. For details, see 3GPP TS 38.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-ScgAdditionBufferDelayThld.html">SCG Addition Buffer Delay Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the buffer delay threshold. An NR SCG can be added or PCC anchoring can be triggered for an NSA DC UE only when the data for the UE has been buffered on the eNodeB for a period of time longer than this threshold. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-ScgAdditionBufferLenThld.html">SCG Addition Buffer Length Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the buffer length threshold. An NR SCG can be added or PCC anchoring can be triggered for an NSA DC UE only when the traffic volume buffered on the eNodeB for the UE exceeds this threshold. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-ScgAdditionInterval.html">SCG Addition Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum interval at which the eNodeB attempts to add an NR SCG, add an LTE SCell before NR SCG addition, or trigger PCC anchoring for an NSA DC UE. If NR SCG or LTE SCell addition failed for an NSA DC UE, the eNodeB attempts to add an NR SCG or add an LTE SCell before NR SCG addition again at an interval, whose minimum value is specified by this parameter, when the traffic volume of the UE continuously meets the addition condition. If the PCC anchoring priority (specified by the NsaPccAnchoringPriority parameter in the PccFreqCfg MO) of the current PCC for an NSA DC UE is not the highest and the PERIODIC_PCC_ANCHORING_SW option of the NsaDcAlgoSwitch parameter in the NsaDcMgmtConfig MO is selected, the NSA DC UE periodically triggers PCC anchoring based on the setting of this parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NrDataVolumeRptCfg.html">NR Data Volume Reporting Config</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the MeNB sends event-triggered and periodic reports of the volume of data that is distributed to the NR side to the core network when an NSA DC UE uses an MCG split bearer to perform a service and whether the MeNB forwards NR data volume reports that the SgNB sends to the MeNB to the core network when an NSA DC UE uses an SCG split bearer to perform a service.</p>
+<p>Assume that an MCG split bearer is used. If this parameter is set to 0, the MeNB does not report NR data volume to the core network. If this parameter is set to 65535, the MeNB reports NR data volume only based on events. If this parameter is set to a value within the range of 60 to 36000, the MeNB reports NR data volume not only based on events but also periodically at the interval specified by this parameter.</p>
+<p>Assume that an SCG split bearer is used. If this parameter is set to 0, the MeNB does not forward SgNB-reported NR data volumes to the core network. If this parameter is set to a non-zero value, the MeNB forwards such NR data volume reports and the forwarding mode is determined based on events or at intervals, depending on the SgNB configuration. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUeMcgUlMaximumPower.html">NSA DC UE MCG Uplink Maximum Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum uplink MCG transmit power for LTE-NR NSA DC UEs. For details, see 3GPP TS 38.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUeScgUlMaximumPower.html">NSA DC UE SCG Uplink Maximum Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum uplink SCG transmit power for LTE-NR NSA DC UEs. For details, see 3GPP TS 38.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaTdmPcTrigSinrThld.html">NSA TDM Power Control Trigger SINR Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for triggering TDM uplink power control on NSA DC UEs. TDM uplink power control is triggered for an NSA DC UE only if the uplink SINR of the UE on the LTE side is less than or equal to this threshold. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-UpperLayerIndicationSwitch.html">Upper Layer Indication Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow the upperLayerIndication-r15 IE to be broadcast in SIB2.</p>
+<p>If this parameter is set to ON, the upperLayerIndication-r15 IE can be broadcast in SIB2. However, whether the upperLayerIndication-r15 IE for a PLMN can be broadcast in the E-UTRAN cell is subject to the setting of the UPPER_LYR_IND_NO_BROADCAST_SW option of the CnOperator.OperatorFunSwitch parameter. The upperLayerIndication-r15 IE for a PLMN can be broadcast in SIB2 only if this option is deselected.</p>
+<p>If this parameter is set to NR_NCELL_BASED_BROADCAST, the upperLayerIndication-r15 IE can be broadcast in SIB2 only when the E-UTRAN cell is configured with at least one neighboring NG-RAN cell. However, whether the upperLayerIndication-r15 IE for a PLMN can be broadcast in the E-UTRAN cell is subject to the setting of the UPPER_LYR_IND_NO_BROADCAST_SW option of the CnOperator.OperatorFunSwitch parameter. The upperLayerIndication-r15 IE for a PLMN can be broadcast in SIB2 only if this option is deselected.</p>
+<p>If this parameter is set to OFF, the upperLayerIndication-r15 IE cannot be broadcast in SIB2. That is, the upperLayerIndication-r15 IE for any PLMN will not be broadcast in the E-UTRAN cell, regardless of the setting of the UPPER_LYR_IND_NO_BROADCAST_SW option of the CnOperator.OperatorFunSwitch parameter.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcLteScellActBfrDelThld.html">NSA DC LTE SCell Activation Buffer Delay Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the buffer delay threshold used to evaluate LTE SCell activation in NSA DC scenarios. LTE SCells can be activated for an NSA DC UE only when the data for the UE has been buffered on the eNodeB for a period longer than this threshold. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcLteScellActBfrLenThld.html">NSA DC LTE SCell Activation Buffer Length Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the buffer length threshold used to evaluate LTE SCell activation in NSA DC scenarios. LTE SCells can be activated for an NSA DC UE only when the volume of data buffered on the eNodeB for the UE exceeds this threshold. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcPccAnchoringPolicy.html">NSA DC PCC Anchoring Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the NSA DC PCC anchoring policy. If this parameter is set to DEFAULT, NSA DC PCC anchoring adopts the default policy. If this parameter is set to BASED_ON_NR_COVERAGE, NSA DC PCC anchoring adopts the NR-coverage-based enhancement policy. In this policy, the eNodeB needs to consider NR coverage. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-VolteUeScgMgmtStrategy.html">VoLTE UE SCG Management Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SCG management policy for VoLTE UEs.</p>
+<p>If this parameter is set to VOLTE_PREFERRED, the eNodeB does not allow SCG addition for an NSA-DC-capable UE and immediately removes an existing SCG for an NSA-DC-capable UE when the NSA-DC-capable UE is performing a VoLTE service.</p>
+<p>If this parameter is set to ADAPTIVE, the eNodeB determines whether to remove an SCG for an NSA-DC-capable UE or add an SCG for an NSA-DC-capable UE without an SCG based on the uplink signal quality or voice packet loss rate when the NSA-DC-capable UE is performing a VoLTE service.</p>
+<p>If this parameter is set to VOLTE_SCG_COEXISTENCE, the eNodeB does not perform any of the following operations for an NSA-DC-capable UE performing a VoLTE service: to immediately remove an SCG, to add an SCG, and to determine whether to remove an SCG or add an SCG when no SCG is configured based on the uplink signal quality or voice packet loss rate.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-UlQualityThldForScgRelease.html">Uplink Quality Thld for SCG Release</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink SINR threshold for triggering SCG release for VoLTE UEs supporting NSA DC. If the uplink SINR of a VoLTE UE supporting NSA DC is less than or equal to this threshold, SCG release will be triggered for this UE. If no SCG has been added for this UE, SCG addition is not allowed for this UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-VoltePlrThldForScgRelease.html">VoLTE Packet Loss Rate Thld for SCG Release</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink or downlink VoLTE packet loss rate threshold for triggering SCG release for VoLTE UEs supporting NSA DC. If the uplink or downlink VoLTE packet loss rate of a VoLTE UE supporting NSA DC is greater than or equal to this threshold, SCG release will be triggered for this UE. If no SCG has been added for this UE, SCG addition is not allowed for this UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUePreUserCntThld.html">NSA DC UE Prealloc User Count Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable preallocation for NSA DC UEs and the UE number threshold for performing preallocation for NSA DC UEs. If this parameter is set to 0, the function does not take effect. If this parameter is set to a non-zero value, the function takes effect and the parameter value specifies the UE number threshold for performing preallocation for NSA DC UEs. When the number of UEs in RRC_CONNECTED mode in a cell is less than or equal to this threshold, preallocation can be performed for NSA DC UEs in the cell. When the number of UEs in RRC_CONNECTED mode in a cell exceeds this threshold, uplink preallocation will be stopped for NSA DC UEs in the cell. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-HarmonicIntrfAvoidRange.html">Harmonic Interference Avoidance Range</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency-domain range of NSA DC harmonic interference avoidance. If this parameter is set to NR_DL_COMMON_CHANNEL, the eNodeB does not schedule the corresponding uplink RBs based on the interference avoidance pattern received from the gNodeB. However, the eNodeB still schedules the RBs that may interfere the NR PDSCH. If this parameter is set to NR_DL_COMMON_AND_DATA_CHANNEL, the eNodeB does not schedule the corresponding uplink RBs based on the interference avoidance pattern received from the gNodeB. In addition, the eNodeB preferentially schedules uplink RBs that do not generate secondary harmonic interference to the NR PDSCH for data transmission. This parameter is valid only if the INTERFERENCE_AVOID_SW option of the NsaDcAlgoSwitch parameter in the NsaDcMgmtConfig MO is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-UserNumberHighLoadThld.html">User Number High Load Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE number threshold used to determine the high-load state of the cell. If the number of UEs in the cell is greater than the value of this parameter, the eNodeB does not select this cell as a target cell for NSA DC PCC anchoring. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-ImdIntrfFreqAvoidanceType.html">IMD Intrf Freq Domain Avoidance Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency-domain intermodulation interference avoidance type in NSA DC. If this parameter is set to NO_AVOIDANCE, frequency-domain avoidance is not performed. If this parameter is set to PRIOR_ALLOC_NO_INTRF_RB, the eNodeB preferentially schedules data on the non-interfering spectrum to avoid intermodulation interference. This parameter is valid only if the INTERFERENCE_AVOID_SW option of the NsaDcAlgoSwitch parameter in the NsaDcMgmtConfig MO is selected. This option applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUeLteFunActivationSw.html">NSA DC UE LTE Function Activation Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether LTE functions take effect for NSA-DC-capable UEs.</p>
+<p>FREQ_PRI_HO_SW: Indicates whether frequency-priority-based handovers take effect for NSA-DC-capable UEs. This function takes effect for NSA-DC-capable UEs only if this option is selected. This option is selected by default. This option applies only to LTE FDD and LTE TDD.</p>
+<p>MBOCS_SW: Indicates whether multi-band optimal carrier selection (MBOCS) takes effect for NSA-DC-capable UEs. This function takes effect for NSA-DC-capable UEs only if this option is selected. This option is selected by default. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SPCT_COORD_INTER_FREQ_HO_SW: Indicates whether inter-frequency handovers based on spectrum coordination take effect for NSA-DC-capable UEs when the SpectrumCoordinationSwitch option of the CellCaAlgoSwitch parameter in the CaMgtCfg MO is selected. This function takes effect for NSA-DC-capable UEs only if this option is selected. This option is selected by default. This option applies only to LTE FDD and LTE TDD.</p>
+<p>COV_BASED_DIRECTIONAL_HO_SW: Indicates whether the coverage-based directional handover function takes effect for NSA-DC-capable UEs. This function takes effect for NSA-DC-capable UEs only if this option is selected. When both VoipMeasFreqPriSwitch option of the MultiFreqPriControlSwitch parameter in the CellAlgoSwitch MO and the HO_USE_VOIP_FREQ_ALLOWED option of the QciAlgoSwitch parameter in the CellQciPara MO are selected, directional handovers for VoIP services are enabled. If the PsMeasFreqPriSwitch option of the MultiFreqPriControlSwitch parameter in the CellAlgoSwitch MO is selected, directional PS handovers are enabled. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcPccAnchorA1RsrpThld.html">NSA DC PCC Anchoring A1 RSRP Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP threshold for event A1 related to PCC anchoring for NSA-DC-capable UEs. If this parameter is set to a value other than 255, the eNodeB delivers A1 measurement configurations to UEs. If the measured RSRP values exceed this threshold, the UEs send A1 measurement reports to the eNodeB. If this parameter is set to 255, the eNodeB does not deliver A1 measurement configurations. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcLteScellConfigIntvl.html">NSA DC LTE SCell Config Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval at which service-based LTE SCell configuration is triggered for UEs that have been configured with an NR SCG. The interval at which the eNodeB attempts to configure an LTE SCell for a UE that has been configured with an NR SCG must be greater than the value of this parameter. After an LTE SCell fails to be configured for a UE configured with an NR SCG, LTE SCell configuration can be triggered again for the UE when the traffic volume of the UE continuously meets the activation conditions. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcLteScellMeasDuration.html">NSA DC LTE SCell Meas Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum duration of a single round of LTE SCell measurements for a UE for which an NR SCG has been added. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-PdcpSnOffsetSwitch.html">PDCP SN Offset Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the PDCP SN offset. If this parameter is set to OFF, PDCP SN offset does not take effect. If this parameter is set to ON, PDCP SN offset takes effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-IdleModeNsaPccAnchorPolicy.html">Idle Mode NSA DC PCC Anchoring Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy of NSA DC PCC anchoring for RRC_IDLE UEs.</p>
+<p>If this parameter is set to DEFAULT, the default policy is used for NSA DC PCC anchoring for RRC_IDLE UEs.</p>
+<p>If this parameter is set to PRIOR_TO_PLMN, an independent policy is used for NSA DC PCC anchoring for RRC_IDLE UEs though dedicated cell-reselection priorities are configured based on the serving cell's PLMN on the eNodeB.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcFastRetransTrigThld.html">NSA DC Fast Retrans Trig Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the triggering threshold for fast retransmission in downlink data split optimization in NSA DC scenarios. If the difference in the time that it takes to send out all data in the RLC buffer between both sides is greater than this threshold, fast retransmission is triggered. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-MeasGapSharingScheme.html">Measurement Gap Sharing Scheme</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates what percentage of the inter-frequency and inter-RAT measurement gap duration configured on the LTE side is used by NSA DC UEs for NR intra-frequency measurement. If this parameter is set to EQUAL_SPLITTING, the NR intra-frequency measurement gap duration is equal to the total gap duration multiplied by the proportion of NR frequencies to all frequencies to be measured. If this parameter is set to NO_SHARING, the gap duration is not shared for NR intra-frequency measurement. If this parameter is set to 25_PERCENT, 50_PERCENT, or 75_PERCENT, then 25%, 50%, or 75% of the gap duration is used for NR intra-frequency measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUlPathToLteRateCoeff.html">NSA DC UL Path Change to LTE Rate Coeff</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the rate coefficient of LTE/NR required for the NSA DC uplink path selection function to change the uplink path towards the LTE side. When the estimated LTE data rate is greater than the estimated NR data rate multiplied by the value of this parameter, the uplink path is changed towards the LTE side. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcUlPathToNrRateCoeff.html">NSA DC UL Path Change to NR Rate Coeff</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the rate coefficient of LTE/NR required for the NSA DC uplink path selection function to change the uplink path towards the NR side. When the estimated LTE data rate is less than the estimated NR data rate multiplied by the value of this parameter, the uplink path is changed towards the NR side. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcAlgoExtSwitch.html">NSA DC Algorithm Extension Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable extended LTE-NR NSA DC algorithms.</p>
+<p>SCG_ADD_PCC_ANCHOR_VOL_OPT_SW: If this option is selected, the eNodeB deducts the traffic volume of control PDUs when it evaluates the traffic volume for traffic-volume-based SCG addition or PCC anchoring. If this option is deselected, the function does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>INSTANT_JUDGEMENT_SW: Indicates whether to enable fast NSA DC traffic volume decision. If this option is selected, millisecond-level instantaneous values are used for decision of traffic-volume-based NSA DC PCC anchoring and SCG addition. If this option is deselected, second-level filtered values are used for decision of traffic-volume-based NSA DC PCC anchoring and SCG addition. This option applies only to LTE FDD and LTE TDD.</p>
+<p>PERIODIC_SCG_ADD_OPT_SW: Indicates whether to decouple periodic PCC anchoring and periodic SCG addition for NSA DC UEs. If this option is selected, the interval between the eNodeB's periodic SCG addition attempt and the last SCG addition attempt should be greater than the NsaDcMgmtConfig.ScgAdditionInterval parameter value. If this option is deselected, then both the interval between the eNodeB's periodic SCG addition attempt and the last SCG addition attempt and the interval between the eNodeB's periodic SCG addition attempt and the last PCC anchoring attempt should be greater than the NsaDcMgmtConfig.ScgAdditionInterval parameter value. This option applies only to LTE FDD and LTE TDD.</p>
+<p>INTRA_ENODEB_NSA_DC_HO_ADM_SW: Indicates whether a source cell determines whether an intra-eNodeB target cell is in the MLB high load state when intra-eNodeB NSA DC PCC anchoring is triggered. If this option is deselected for the target cell, the source cell determines whether the intra-eNodeB target cell is in the MLB high load state. If the target cell is in the MLB high load state, the handover will not be executed. If the target cell is not in the MLB high load state, the handover can be executed. If this option is selected for the target cell, the source cell does not determine whether the intra-eNodeB target cell is in the MLB high load state. In this case, handovers triggered for NSA DC PCC anchoring can be executed without considering whether the target cell is in the MLB high load status. This option applies only to LTE FDD and LTE TDD.</p>
+<p>OTHER_CG_PHR_VIRTUAL_MODE_SW: In EN-DC dynamic power sharing scenarios, if this option is deselected, the "phr-ModeOtherCG-r12" IE is set to REAL and UEs report the power of the serving cell; if this option is selected, the "phr-ModeOtherCG-r12" IE is set to VIRTUAL and UEs do not report the power of the serving cell. For details about the "phr-ModeOtherCG-r12" IE, see 3GPP TS 36.331 and 3GPP TS 36.213. This option applies only to LTE FDD and LTE TDD.</p>
+<p>A2_HO_SCG_ADD_PCC_ANCHOR_SW: Indicates whether to allow SCG addition or PCC anchoring after receiving A2 measurement reports related to coverage-based handovers of NSA DC UEs. If this option is selected, SCG addition and PCC anchoring are allowed. If this option is deselected, SCG addition and PCC anchoring are not allowed. This option applies only to LTE FDD and LTE TDD.</p>
+<p>VOLUME_BASED_PCC_ANCHORING_SW: Indicates whether to enable traffic-volume-based PCC anchoring for NSA DC UEs for which SCGs have been added. If this option is selected, whether periodic PCC anchoring for NSA DC UEs for which SCGs have been added is triggered based on the traffic volume is controlled by the NsaDcMgmtConfig.NsaDcAlgoSwitch:VOLUME_BASED_PERIODIC_TRIG_SW option, and whether the first NR-coverage-based PCC anchoring for NSA DC UEs for which SCGs have been added after incoming coverage-based handovers is triggered based on the traffic volume is controlled by the NsaDcMgmtConfig.NsaDcAlgoSwitch:VOLUME_BASED_PERIODIC_TRIG_SW and NsaDcMgmtConfig.NsaDcAlgoSwitch:NSA_DC_VOLUME_BASED_SCG_ADD_SW options. If this option is deselected, traffic volume is not checked for the first NR-coverage-based PCC anchoring after incoming coverage-based handovers and periodic PCC anchoring for NSA DC UEs for which SCGs have been added. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-NsaDcScgAdditionPolicy.html">NSA DC SCG Addition Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SCG addition policy for NSA DC UEs. If this parameter is set to HIGHEST_PRIORITY_FREQ, the eNodeB immediately triggers SCG addition when receiving a measurement report of the highest-priority NR frequency. If this parameter is set to ALL_FREQ, the eNodeB triggers SCG addition after B1 measurement reports of all NR frequencies are received or the B1 measurement report waiting timer expires. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NsaDcMgmtConfig-ScgAddPenaltyPeriodCount.html">SCG Addition Penalty Period Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of penalty periods in which SCG addition is not allowed in incoming RRC connection reestablishment scenarios. If this parameter is set to 0, the penalty mechanism does not take effect. If this parameter is set to a non-zero value, SCG addition or NR-coverage-based PCC anchoring is not allowed in a period, whose length is equal to the product of NsaDcMgmtConfig.ScgAddPenaltyPeriodCount and NsaDcMgmtConfig.ScgAdditionInterval parameter values, when RRC connection reestablishment is triggered during SCG addition or NR-coverage-based PCC anchoring. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

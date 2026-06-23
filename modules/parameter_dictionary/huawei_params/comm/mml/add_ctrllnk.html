@@ -1,0 +1,228 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Control Link (ADD CTRLLNK)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ctrllnk">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Control Link (ADD CTRLLNK)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ctrllnk"></a><a name="add_ctrllnk"></a>
+
+
+<h1 class="topictitle1">Add Control Link (ADD CTRLLNK)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_ctrllnk__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a control link. The control link is a logical concept. The physical entity of the control link is the topology between the interconnected BBUs.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ctrllnk__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before you add a control link, the local subrack or the upper-level subrack must have been configured.</p>
+</li><li><p>In this command, the local node refers to the leaf BBU and the upper-level node refers to the root BBU. In UCIU+UMPT interconnection scenarios, the root BBU is the BBU housing the UCIU. In UMPT+UMPT interconnection scenarios, if the UMPT boards are connected using an SFP electrical cable, the root BBU is the BBU connected to the cable end with a Master color-coding label; if the UMPT boards are connected using single-fiber bidirectional optical modules, the root BBU is the BBU where the optical module with a blue puller is installed in the interconnection port.</p>
+</li><li><p>In a multimode base station, this command must be executed on all modes to ensure that all control links have the same configuration.</p>
+</li><li><p>When the upper-level node is a UCIU, the value of the Upper Port No. parameter must range from 0 to 4. When the upper-level node is a UMPT, the value must be 8. When the upper-level node is a UMDU, the value must be 6.</p>
+</li><li><p>Check whether the configuration is consistent with the network plan. When a RAT is served by two interconnected BBUs, incorrect configuration of the relationship between the upper- and lower-level nodes on the control link may lead to OM channel disconnection and service interruption.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ctrllnk__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-LinkNo.html">LN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Link No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the control link at the local end.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the local node at one end of the control link.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AT</strong> is set to PEERPORT and <strong>TT</strong> is set to CHAIN, and <strong>LCN</strong> and <strong>LSRN</strong> are neither set to 255 and are not simultaneously set to the values of <strong>HCN</strong> and <strong>HSRN</strong> respectively in an <strong>RRUCHAIN</strong> MO, then there must be a <strong>CTRLLNK</strong> MO with <strong>CN</strong> equal to <strong>LCN</strong> and <strong>SRN</strong> equal to <strong>LSRN</strong> or with <strong>UPCN</strong> equal to <strong>LCN</strong> and <strong>UPSRN</strong> equal to <strong>LSRN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the local node at one end of the control link.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AT</strong> is set to PEERPORT and <strong>TT</strong> is set to CHAIN, and <strong>LCN</strong> and <strong>LSRN</strong> are neither set to 255 and are not simultaneously set to the values of <strong>HCN</strong> and <strong>HSRN</strong> respectively in an <strong>RRUCHAIN</strong> MO, then there must be a <strong>CTRLLNK</strong> MO with <strong>CN</strong> equal to <strong>LCN</strong> and <strong>SRN</strong> equal to <strong>LSRN</strong> or with <strong>UPCN</strong> equal to <strong>LCN</strong> and <strong>UPSRN</strong> equal to <strong>LSRN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the local node at one end of the control link.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-UpperCabinetNo.html">UPCN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Upper Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the upper-level node at the other end of the control link.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AT</strong> is set to PEERPORT and <strong>TT</strong> is set to CHAIN, and <strong>LCN</strong> and <strong>LSRN</strong> are neither set to 255 and are not simultaneously set to the values of <strong>HCN</strong> and <strong>HSRN</strong> respectively in an <strong>RRUCHAIN</strong> MO, then there must be a <strong>CTRLLNK</strong> MO with <strong>CN</strong> equal to <strong>LCN</strong> and <strong>SRN</strong> equal to <strong>LSRN</strong> or with <strong>UPCN</strong> equal to <strong>LCN</strong> and <strong>UPSRN</strong> equal to <strong>LSRN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-UpperSubrackNo.html">UPSRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Upper Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the upper-level node at the other end of the control link.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AT</strong> is set to PEERPORT and <strong>TT</strong> is set to CHAIN, and <strong>LCN</strong> and <strong>LSRN</strong> are neither set to 255 and are not simultaneously set to the values of <strong>HCN</strong> and <strong>HSRN</strong> respectively in an <strong>RRUCHAIN</strong> MO, then there must be a <strong>CTRLLNK</strong> MO with <strong>CN</strong> equal to <strong>LCN</strong> and <strong>SRN</strong> equal to <strong>LSRN</strong> or with <strong>UPCN</strong> equal to <strong>LCN</strong> and <strong>UPSRN</strong> equal to <strong>LSRN</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-UpperSlotNo.html">UPSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Upper Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the upper-level node at the other end of the control link.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CTRLLNK-UpperPortNo.html">UPPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Upper Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port number of the upper-level node at the other end of the control link. Values 0 to 4 indicate the ports M0 to M4 on the UCIU, Values 6 to 7 indicate the HEI ports HEI0 to HEI1 on the UMDU, and value 8 indicates the CI port on the UMPT.</p>
+<p>GUI Value Range: 0~4,6~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~4,6~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ctrllnk__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a control link with the parameters as follows: Local Link No.: 0, Local Cabinet No.: 0, Local Subrack No.: 1, Local Slot No.: 7, Upper Cabinet No.: 0, Upper Subrack No.: 0, Upper Slot No.: 5, Upper Port No.: 0, run the following command: 
+ADD CTRLLNK: LN=0, CN=0, SRN=1, SN=7, UPCN=0, UPSRN=0, UPSN=5, UPPT=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet - Operator Activation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <h1>PrimeNet</h1>
+                <p>Operator activation required</p>
+            </div>
+
+            <form id="activation-form" class="auth-form">
+                <h2>Operator unlock</h2>
+                <p class="auth-link" style="margin-bottom: 1rem;">
+                    {% if mode == 'remote' %}
+                    Enter your operator password. PrimeNet will request a license from
+                    <strong>{{ server_url }}</strong> (instance: <code>{{ instance_id }}</code>).
+                    {% else %}
+                    Enter your operator password to keep PrimeNet running for the next
+                    <strong>{{ period_days }}</strong> days
+                    {% if period_days >= 150 %}(about six months){% elif period_days >= 28 %}(about one month){% endif %}.
+                    {% endif %}
+                </p>
+
+                {% if not configured %}
+                <div class="error-message" style="display: block;">
+                    {% if mode == 'remote' %}
+                    Remote licensing is not fully configured. Set <code>NCM_LICENSE_SERVER_URL</code> and deploy
+                    <code>public.pem</code> as <code>NCM_LICENSE_PUBLIC_KEY_PATH</code>.
+                    {% else %}
+                    Activation is not configured on this server.
+                    Run <code>python scripts/set_activation_password.py</code> once, then reload this page.
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="form-group">
+                    <label for="password">Operator password</label>
+                    <input type="password" id="password" name="password" required autofocus>
+                </div>
+
+                <div id="error-message" class="error-message" style="display: none;"></div>
+
+                <button type="submit" class="btn-primary">Unlock</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('activation-form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const err = document.getElementById('error-message');
+                const password = document.getElementById('password')?.value || '';
+                err.style.display = 'none';
+                try {
+                    const res = await fetch('/api/activation/unlock', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password }),
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                        err.textContent = data.error || 'Unlock failed';
+                        err.style.display = 'block';
+                        return;
+                    }
+                    window.location.href = '/dashboard';
+                } catch {
+                    err.textContent = 'Network error. Try again.';
+                    err.style.display = 'block';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

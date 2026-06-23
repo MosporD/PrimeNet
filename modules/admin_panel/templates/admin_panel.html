@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('admin_panel.static', filename='admin_panel.css') }}?v=1.2">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">← Dashboard</a>
+                    <h1>⚙️ Admin Panel</h1>
+                    <p>User administration and system operations</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-users">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="active-users">0</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="admin-users">0</div>
+                    <div class="stat-label">Administrators</div>
+                </div>
+            </div>
+
+            <div class="admin-pages-nav" role="tablist" aria-label="Admin sections">
+                {% if can_manage_sync %}
+                <button class="admin-page-tab active" data-page="data-sync" type="button" onclick="openAdminPage('data-sync')">Data Sync</button>
+                <button class="admin-page-tab" data-page="sync-status" type="button" onclick="openAdminPage('sync-status')">Sync Status</button>
+                <button class="admin-page-tab" data-page="sync-history" type="button" onclick="openAdminPage('sync-history')">Sync History</button>
+                <button class="admin-page-tab" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
+                {% else %}
+                <button class="admin-page-tab active" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
+                {% endif %}
+            </div>
+
+            {% if can_manage_sync %}
+            <div class="admin-page-panel active" data-page="data-sync">
+                <div class="sync-section">
+                    <h2 class="section-title">Data Sync</h2>
+                    <div class="sync-actions">
+                        <button class="btn-sync nokia"  onclick="triggerSync('nokia_pm')">Sync Nokia PM</button>
+                        <button class="btn-sync huawei" onclick="triggerSync('huawei_pm')">Sync Huawei PM</button>
+                        <button class="btn-sync meta"   onclick="triggerSync('metadata')">Sync Metadata</button>
+                        <button class="btn-sync refresh" onclick="triggerSync('cells_hourly')">Refresh Cells - Hourly</button>
+                        <button class="btn-sync refresh" onclick="triggerSync('cells_daily')">Refresh Cells - Daily</button>
+                        <button class="btn-sync refresh" onclick="triggerSync('groups_hourly')">Refresh Groups - Hourly</button>
+                        <button class="btn-sync refresh" onclick="triggerSync('groups_daily')">Refresh Groups - Daily</button>
+                        <button class="btn-sync test"   onclick="testConnectivity()">Test Connectivity</button>
+                        <button class="btn-sync inspect" onclick="inspectLocal()">Inspect Column Headers</button>
+                        <button class="btn-sync inspect" onclick="loadPmLatestTimestamps()">PM — latest timestamps</button>
+                    </div>
+                    <div class="local-import-box">
+                        <h3 class="section-subtitle">Import PM From Local Path</h3>
+                        <div class="local-import-controls">
+                            <input id="pm-local-path" type="text" placeholder="C:/path/to/folder/with/pm/files">
+                            <select id="pm-local-vendor" title="Vendor filter">
+                                <option value="all">All Vendors</option>
+                                <option value="nokia">Nokia Only</option>
+                                <option value="huawei">Huawei Only</option>
+                            </select>
+                            <label class="local-import-recursive">
+                                <input id="pm-local-recursive" type="checkbox" checked>
+                                Recursive
+                            </label>
+                            <button class="btn-sync import" onclick="importPmFromPath()">Import Local PM</button>
+                        </div>
+                    </div>
+                    <div class="live-progress-box">
+                        <h3 class="section-subtitle">Live Sync Progress</h3>
+                        <div class="live-progress-grid">
+                            <div class="progress-card" id="progress-card-nokia_pm">
+                                <div class="progress-title">Nokia PM</div>
+                                <div class="progress-meta" id="progress-meta-nokia_pm">Idle</div>
+                                <div class="progress-track"><div class="progress-fill" id="progress-fill-nokia_pm"></div></div>
+                            </div>
+                            <div class="progress-card" id="progress-card-huawei_pm">
+                                <div class="progress-title">Huawei PM</div>
+                                <div class="progress-meta" id="progress-meta-huawei_pm">Idle</div>
+                                <div class="progress-track"><div class="progress-fill" id="progress-fill-huawei_pm"></div></div>
+                            </div>
+                            <div class="progress-card" id="progress-card-metadata">
+                                <div class="progress-title">Metadata</div>
+                                <div class="progress-meta" id="progress-meta-metadata">Idle</div>
+                                <div class="progress-track"><div class="progress-fill" id="progress-fill-metadata"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="sync-msg" class="sync-msg" style="display:none;"></div>
+                    <pre id="inspect-output" class="inspect-output" style="display:none;"></pre>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="sync-status">
+                <div class="sync-section">
+                    <h2 class="section-title">Last Sync per Source</h2>
+                    <table class="sync-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Technology</th>
+                                <th>Status</th>
+                                <th>Rows</th>
+                                <th>Message</th>
+                                <th>When</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sync-status-body">
+                            <tr><td colspan="6" style="text-align:center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                    <div id="sync-status-pagination" class="table-pagination"></div>
+                </div>
+            </div>
+
+            <div class="admin-page-panel" data-page="sync-history">
+                <div class="sync-section">
+                    <h2 class="section-title">Recent Sync History</h2>
+                    <h3 class="section-subtitle">Filters
+                        <input type="date" id="sync-history-day" onchange="loadSyncHistory()" title="Filter history by day">
+                        <select id="sync-history-type" onchange="loadSyncHistory()" title="Filter history by sync type">
+                            <option value="">All Types</option>
+                            <option value="cells_hourly">Cells - Hourly (manual)</option>
+                            <option value="cells_daily">Cells - Daily (manual)</option>
+                            <option value="groups_hourly">Groups - Hourly (manual)</option>
+                            <option value="groups_daily">Groups - Daily (manual)</option>
+                            <option value="raw_master_pull">Hourly Full Pipeline</option>
+                            <option value="daily_full_sync">Daily Full Pipeline</option>
+                            <option value="db_loader">DB Loader</option>
+                            <option value="metadata">Metadata</option>
+                        </select>
+                        <button class="btn-history-reload" onclick="clearSyncHistoryFilters()">Clear Filters</button>
+                        <button class="btn-history-reload" onclick="loadSyncHistory()">↻ Refresh</button>
+                    </h3>
+                    <table class="sync-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Technology</th>
+                                <th>Status</th>
+                                <th>Rows</th>
+                                <th>Message</th>
+                                <th>When</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sync-history-body">
+                            <tr><td colspan="6" style="text-align:center;">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                    <div id="sync-history-pagination" class="table-pagination"></div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="admin-page-panel {% if not can_manage_sync %}active{% endif %}" data-page="user-admin">
+                <h2 class="section-title user-admin-title">User Administration</h2>
+
+                <div id="add-user-panel" class="add-user-panel" hidden>
+                    <h3 class="section-subtitle">Add New User</h3>
+                    <form id="add-user-form" class="add-user-form" onsubmit="submitAddUser(event)">
+                        <label>
+                            Username
+                            <input type="text" id="new-user-username" required placeholder="First.Last" autocomplete="off">
+                        </label>
+                        <label>
+                            Email
+                            <input type="email" id="new-user-email" required placeholder="name@jo.zain.com" autocomplete="off">
+                        </label>
+                        <label>
+                            Full name
+                            <input type="text" id="new-user-full-name" placeholder="Optional">
+                        </label>
+                        <label>
+                            Role
+                            <select id="new-user-role">
+                                <option value="user">User</option>
+                                <option value="ran_config_user">{{ role_labels['ran_config_user'] }}</option>
+                                <option value="noc_sys">{{ role_labels['noc_sys'] }}</option>
+                                <option value="admin">{{ role_labels['admin'] }}</option>
+                            </select>
+                        </label>
+                        <label class="add-user-checkbox">
+                            <input type="checkbox" id="new-user-default-password" checked onchange="toggleCustomPasswordField()">
+                            Use default password ({{ default_user_password }})
+                        </label>
+                        <label id="new-user-password-wrap" hidden>
+                            Custom password
+                            <input type="password" id="new-user-password" minlength="8" autocomplete="new-password">
+                        </label>
+                        <div class="add-user-actions">
+                            <button type="submit" class="btn-user-primary">Create User</button>
+                            <button type="button" class="btn-user-secondary" onclick="toggleAddUserPanel(false)">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="search-section user-admin-controls">
+                    <button type="button" class="btn-user-primary" id="add-user-btn" onclick="toggleAddUserPanel()">+ Add New User</button>
+                    <input type="text" id="user-search" placeholder="Search users..." onkeyup="searchUsers()">
+                    <select id="role-filter" onchange="filterUsers()">
+                        <option value="">All Roles</option>
+                        <option value="admin">{{ role_labels['admin'] }}</option>
+                        <option value="user">User</option>
+                        <option value="ran_config_user">{{ role_labels['ran_config_user'] }}</option>
+                        <option value="noc_sys">{{ role_labels['noc_sys'] }}</option>
+                    </select>
+                    <select id="status-filter" onchange="filterUsers()">
+                        <option value="">All Status</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                    </select>
+                    <span class="user-admin-hint">Default password: <code id="default-user-password-label">{{ default_user_password }}</code></span>
+                </div>
+
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Last Activity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr><td colspan="8" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                    <div id="users-pagination" class="table-pagination"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.2"></script>
+</body>
+</html>

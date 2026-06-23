@@ -1,0 +1,293 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell CSI-RS Configuration (MOD CELLCSIRSPARACFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cellcsirsparacfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell CSI-RS Configuration (MOD CELLCSIRSPARACFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cellcsirsparacfg"></a><a name="mod_cellcsirsparacfg"></a>
+
+
+<h1 class="topictitle1">Modify Cell CSI-RS Configuration (MOD CELLCSIRSPARACFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cellcsirsparacfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to configure CSI-RS in a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cellcsirsparacfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If the CsiRsSwitch parameter value is changed while a UE is running services, the UE performance deteriorates. If a UE initiates services after the CsiRsSwitch parameter value is changed, the UE performance is not affected.</p>
+</li><li><p>Should not set the CsiRsSetJudgeTimer parameter to a value less than 5s.</p>
+</li><li><p>Should not set the CsiRsSetJudgeHysTimer parameter to a value less than 60s.</p>
+</li><li><p>Modification of CsiRsAdaptBeamCount parameter triggers CSI-RS configuration addition or removal, increasing the number of RRC connection reconfiguration times. Therefore, do not modify this parameter frequently. It is recommended that this parameter be modified only when the TM9 penetration rate changes significantly.</p>
+</li><li><p>A modification on the CsiRsPeriod parameter causes automatic resets of the cell. If LTE FDD and NR Flash Dynamic Spectrum Sharing is enabled and the NR SSB period (NRDUCell.SsbPeriod) is shorter than 20 ms, setting this parameter to a value indicating a period shorter than 20 ms will cause the NR cell to reset. Therefore, before you change the value of this parameter, check with the NR side.</p>
+</li><li><p>If a TDD cell is activated, the TM9HybridPrecodingSwitch option of the CellAlgoSwitch.EnhMIMOSwitch parameter must be deselected before setting the CellBf.PdschSplitBeamConfigIndex parameter and the CellCsiRsParaCfg.CsiRsPortNum parameter to CONFIG_INDEX4 and CSI_RS_PORT_8, respectively.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cellcsirsparacfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsSwitch.html">CsiRsSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure CSI-RSs for UEs. If this parameter is set to NOT_CFG(Not configure), the eNodeB does not configure CSI-RSs for UEs. If this parameter is set to FIXED_CFG(Fixed configure), the eNodeB configures CSI-RSs for UEs that support CSI-RSs. If this parameter is set to ADAPTIVE_CFG(ADAPTIVE_CFG), the eNodeB determines whether to configure CSI-RSs for UEs that support CSI-RSs based on the proportion of TM9 UEs. When SfnLoadBasedAdptSwitch is deselected in a TDD cell with adaptive SFN enabled, neither FIXED_CFG nor ADAPTIVE_CFG takes effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), FIXED_CFG(Fixed configure), ADAPTIVE_CFG(ADAPTIVE_CFG)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, FIXED_CFG, ADAPTIVE_CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the system by default. The default value is as follows:</p>
+<p>ADAPTIVE_CFG for the 2T FDD configuration, or NOT_CFG for other configurations.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If CsiRsSwitch in a CellCsiRsParaCfg MO is set to ADAPTIVE_CFG, the value of CsiRsConfigUserRatioTh must be greater than the value of CsiRsUnconfigUserRatioTh in this CellCsiRsParaCfg MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: The setting of this parameter determines the CSI-RS configuration mode of a cell. If this parameter is set to NOT_CFG, CSI-RSs are not transmitted in a cell, which does not affect the performance of UEs that access the cell after the parameter is set. If this parameter is set to FIXED_CFG, CSI-RSs are always transmitted in a cell, and TM9 UEs directly enter TM9 mode to obtain TM9 gains. However, CSI-RSs cause performance loss on R8 and R9 UEs. If this parameter is set to ADAPTIVE_CFG, the eNodeB adaptively determines to configure or not configure CSI-RSs based on the proportion of TM9 UEs in a cell. This reduces the negative impact of a low TM9 penetration rate on the network and increases the average cell throughput when CSI-RSs are configured. Changing the parameter value affects the performance of UEs who are running services. When the value of this parameter is changed from FIXED_CFG or ADAPTIVE_CFG to NOT_CFG, CSI-RSs are no longer configured. In this case, as stipulated in 3GPP specifications, online UEs in TM9 mode switch from closed-loop rank adaptation to open-loop rank 1 and experience significant performance deterioration. When the value of this parameter is changed from NOT_CFG to FIXED_CFG or ADAPTIVE_CFG, CSI-RS configuration does not notably affect UEs complying with 3GPP R10 or a later version, and performance loss occurs on UEs complying with 3GPP R8 or R9. You are advised not to change the value of this parameter frequently.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsPeriod.html">CsiRsPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the channel state information (CSI) reference signal (RS) measurement period. This parameter does not take effect if the FddTddInd parameter in the Cell MO is set to CELL_TDD, the TM9HybridPrecodingSwitch option of the EnhMIMOSwitch parameter in the CellAlgoSwitch MO is selected, and the CsiRsPortNum parameter in the CellCsiRsParaCfg MO is set to CSI_RS_PORT_8. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ms5(ms5), ms10(ms10), ms20(ms20), ms40(ms40), ms80(ms80)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ms5, ms10, ms20, ms40, ms80</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ms40(ms40) is recommended for LTE FDD cells.</p>
+<p>ms80(ms80) is recommended for LTE TDD cells.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a shorter measurement period, better channel tracing quality, larger overheads for measuring the CSI-RS, and a greater impact on UEs that are not configured with the CSI-RS. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsConfigUserNumTh.html">CsiRsConfigUserNumTh</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Config User Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold, which is the number of RRC_CONNECTED UEs supporting CSI-RSs, for determining a change from the CSI-RS unconfigured state to the CSI-RS configured state when adaptive CSI-RS configuration is used. The number must be equal to or larger than this threshold for determining a change from the CSI-RS unconfigured state to the CSI-RS configured state. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~1200</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~1200</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a smaller number of RRC_CONNECTED UEs supporting CSI-RS required for entering the CSI-RS configured state, and a larger increase in cell downlink throughput when the number of RRC_CONNECTED UEs supporting CSI-RS is small and the ratio of such UEs is high in the cell. However, a smaller value of this parameter also results in a higher probability of ping-pong switchover between the CSI-RS unconfigured state and the CSI-RS configured state for the cell, which increases the number of RRC connection reconfigurations and may even increase the service drop rate in the cell.</p>
+<p>A larger value of this parameter results in a larger number of RRC_CONNECTED UEs supporting CSI-RS required for entering the CSI-RS configured state, and fewer RRC connection reconfigurations and a lower service drop rate in cells where the number of RRC_CONNECTED UEs supporting CSI-RS is small and the ratio of such UEs is high. However, the cell downlink throughput may decrease.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsUnconfigUserNumTh.html">CsiRsUnconfigUserNumTh</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Unconfig User Number Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold, which is the number of RRC_CONNECTED UEs supporting CSI-RSs, for determining a change from the CSI-RS configured state to the CSI-RS unconfigured state when adaptive CSI-RS configuration is adopted. The number must be smaller than this threshold for determining a change from the CSI-RS configured state to the CSI-RS unconfigured state. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~1200</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~1200</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 200</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a smaller number of RRC_CONNECTED UEs supporting CSI-RS required for entering the CSI-RS unconfigured state, and a larger increase in cell downlink throughput when the number of RRC_CONNECTED UEs supporting CSI-RS is large and the ratio of such UEs is low in the cell. However, the number of RRC connection reconfigurations increases, and the service drop rate in the cell may even increase.</p>
+<p>A larger value of this parameter results in a larger number of RRC_CONNECTED UEs supporting CSI-RS required for entering the CSI-RS unconfigured state, and fewer RRC connection reconfigurations and a lower service drop rate in cells where the number of RRC_CONNECTED UEs supporting CSI-RS is large and the ratio of such UEs is low. However, the cell downlink throughput may decrease.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsConfigUserRatioTh.html">CsiRsConfigUserRatioTh</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Config User Ratio Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold, which is the proportion of RRC_CONNECTED UEs supporting CSI-RSs, for determining a change from the CSI-RS unconfigured state to the CSI-RS configured state when adaptive CSI-RS configuration is adopted. The proportion must be equal to or larger than this threshold for determining a change from the CSI-RS unconfigured state to the CSI-RS configured state. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 60 for adaptive SFN (ASFN) in FDD mode</p>
+<p>30 for TDD 4port CSI-RS, 50 for TDD 8port CSI-RS</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If CsiRsSwitch in a CellCsiRsParaCfg MO is set to ADAPTIVE_CFG, the value of CsiRsConfigUserRatioTh must be greater than the value of CsiRsUnconfigUserRatioTh in this CellCsiRsParaCfg MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a smaller value, a smaller percentage of RRC_CONNECTED UEs supporting CSI-RS is required for entering the CSI-RS configured state, the downlink throughput of UEs supporting CSI-RS increases, but the downlink throughput of UEs not supporting CSI-RS decreases.</p>
+<p>A larger parameter value results in the opposite effects. Modifying this parameter based on the percentage of RRC_CONNECTED UEs supporting CSI-RS helps maximize the downlink cell throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsUnconfigUserRatioTh.html">CsiRsUnconfigUserRatioTh</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Unconfig User Ratio Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold, which is the proportion of RRC_CONNECTED UEs supporting CSI-RSs, for determining a change from the CSI-RS configured state to the CSI-RS unconfigured state when adaptive CSI-RS configuration is adopted. The proportion must be equal to or smaller than this threshold for determining a change from the CSI-RS configured state to the CSI-RS unconfigured state. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 50 for adaptive SFN (ASFN) in FDD mode</p>
+<p>20 for TDD 4port CSI-RS, 40 for TDD 8port CSI-RS</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If CsiRsSwitch in a CellCsiRsParaCfg MO is set to ADAPTIVE_CFG, the value of CsiRsConfigUserRatioTh must be greater than the value of CsiRsUnconfigUserRatioTh in this CellCsiRsParaCfg MO.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a smaller value, a larger percentage of RRC_CONNECTED UEs not supporting CSI-RS are required for entering the CSI-RS unconfigured state, the downlink throughput of UEs supporting CSI-RS increases, but the downlink throughput of UEs not supporting CSI-RS decreases.</p>
+<p>A larger parameter value results in the opposite effects. Modifying this parameter based on the percentage of RRC_CONNECTED UEs supporting CSI-RS helps maximize the downlink cell throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsSetJudgeHysTimer.html">CsiRsSetJudgeHysTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Set Judge Hysteresis Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to trigger the hysteresis timer for a switch to the CSI-RS unconfigured state for UEs in the CSI-RS state when adaptive CSI-RS configuration is adopted. The timer is triggered when a UE enters the CSI-RS configured state and the decision mechanism for a switch to the CSI-RS unconfigured state is triggered after the timer expires. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter accelerates switching between the CSI-RS unconfigured state and the CSI-RS configured state, and improves noticeably the downlink throughput in cells where the proportion of CSI-RS-capable RRC_CONNECTED UEs changes quickly. However, ping-pong switching between the CSI-RS configured state and the CSI-RS unconfigured state is more likely to occur and the number of RRC reconfigurations increases. A signaling storm is more likely to occur, increasing the service drop rate. A larger value of this parameter decelerates switching between the CSI-RS unconfigured state and the CSI-RS configured state. The downlink throughput increase in cells where the proportion of CSI-RS-capable RRC_CONNECTED UEs changes quickly is less obvious.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsSetJudgeTimer.html">CsiRsSetJudgeTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Set Judge Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer for determining a switch between the CSI-RS unconfigured state and the CSI-RS configured state when adaptive CSI-RS configuration is adopted. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter accelerates switching between the CSI-RS unconfigured state and the CSI-RS configured state, and improves noticeably the downlink throughput in cells where the proportion of CSI-RS-capable RRC_CONNECTED UEs changes quickly. However, ping-pong switching between the CSI-RS configured state and the CSI-RS unconfigured state is more likely to occur and the number of RRC reconfigurations increases. A signaling storm is more likely to occur, increasing the service drop rate. A larger value of this parameter decelerates switching between the CSI-RS unconfigured state and the CSI-RS configured state. The downlink throughput increase in cells where the proportion of CSI-RS-capable RRC_CONNECTED UEs changes quickly is less obvious.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsPortNum.html">CsiRsPortNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CsiRs Port Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of CSI-RS ports. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: CSI_RS_PORT_4(CSI_RS_PORT_4), CSI_RS_PORT_8(CSI_RS_PORT_8)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CSI_RS_PORT_4, CSI_RS_PORT_8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If all antennas having more than two transmit channels and used for normal cells (including massive MIMO cells), cell combination, or SFN cells are at least 8T antennas and there are a large proportion of TM9 UEs supporting CSI-RS reception over eight antenna ports, it is recommended that this parameter be set to CSI_RS_PORT_8. Otherwise, set this parameter to CSI_RS_PORT_4.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to CSI_RS_PORT_4, the eNodeB sends CSI-RSs through four antenna ports in the cell. In this case, TM9 UEs supporting CSI-RS reception over four antenna ports achieve codebook gains, and the average cell throughput increases.</p>
+<p>If this parameter is set to CSI_RS_PORT_8, the eNodeB sends CSI-RSs through eight antenna ports in the cell. In this case, TM9 UEs supporting CSI-RS reception over eight antenna ports achieve codebook gains, and the average cell throughput increases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CellCsiRsParaCfg-CsiRsAdaptBeamCount.html">CsiRsAdaptBeamCount</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CSI-RS Adaptive Beam Count</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of CSI-RS beams during CSI-RS beam adaptation. If this parameter is set to ADAPTIVE_BEAM_DISABLED, CSI-RS beam adaptation is disabled. If this parameter is set to a value other than ADAPTIVE_BEAM_DISABLED, the number in the value indicates the maximum number of CSI-RS beams that can be configured during CSI-RS beam adaptation. For example, if this parameter is set to CSI_RS_BEAM_5, the maximum number of CSI-RS beams that can be configured during CSI-RS beam adaptation is 5. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: ADAPTIVE_BEAM_DISABLED(ADAPTIVE_BEAM_DISABLED), CSI_RS_BEAM_1(CSI_RS_BEAM_1), CSI_RS_BEAM_2(CSI_RS_BEAM_2), CSI_RS_BEAM_3(CSI_RS_BEAM_3), CSI_RS_BEAM_4(CSI_RS_BEAM_4), CSI_RS_BEAM_5(CSI_RS_BEAM_5), CSI_RS_BEAM_6(CSI_RS_BEAM_6), CSI_RS_BEAM_7(CSI_RS_BEAM_7), CSI_RS_BEAM_8(CSI_RS_BEAM_8), CSI_RS_BEAM_9(CSI_RS_BEAM_9), CSI_RS_BEAM_10(CSI_RS_BEAM_10)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ADAPTIVE_BEAM_DISABLED, CSI_RS_BEAM_1, CSI_RS_BEAM_2, CSI_RS_BEAM_3, CSI_RS_BEAM_4, CSI_RS_BEAM_5, CSI_RS_BEAM_6, CSI_RS_BEAM_7, CSI_RS_BEAM_8, CSI_RS_BEAM_9, CSI_RS_BEAM_10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The recommended value is CSI_RS_BEAM_1 if the TM9 penetration rate is lower than 10%. The recommended value is CSI_RS_BEAM_10 if the TM9 penetration rate is greater than 70%.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ADAPTIVE_BEAM_DISABLED, network performance is not affected. If this parameter is set to a value other than ADAPTIVE_BEAM_DISABLED, a larger value leads to a greater impact on UEs that cannot identify CSI-RSs, but TM9 can be used for more UEs and therefore TM9-related features can produce higher performance gains.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cellcsirsparacfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1:To modify the CSI-RS configuration in a cell with the parameters as follows: Local cell ID: 0, CSI-RS Switch: Fixed Configure, CSI-RS Period: 10ms, run the following command:
+MOD CELLCSIRSPARACFG: LocalCellId=0, CsiRsSwitch=FIXED_CFG, CsiRsPeriod=ms10;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

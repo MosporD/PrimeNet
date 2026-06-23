@@ -1,0 +1,440 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellPdcchAlgo">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellPdcchAlgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellPdcchAlgo</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellPdcchAlgo"></a><a name="CellPdcchAlgo"></a>
+
+
+<h1 class="topictitle1">CellPdcchAlgo</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellPdcchAlgo.html"><strong>CellPdcchAlgo</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellPdcchAlgo MO consists of the parameters related to the PDCCH resource allocation algorithm in a cell. These parameters are used to specify control signaling resource configuration in DL and hence must be set properly to minimize the DL control overhead and guarantee the user plane throughput.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>PHICHCfg</strong> and <strong>Cell</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>PhichDuration</strong> in the <strong>PHICHCfg</strong> MO is set to NORMAL, and <strong>PdcchSymNumSwitch</strong> in the <strong>CellPdcchAlgo</strong> MO is set to OFF, <strong>InitPdcchSymNum</strong> in the <strong>CellPdcchAlgo</strong> MO cannot be set to 1 if the cell bandwidth is 1.4 MHz.</li><li>When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>PhichDuration</strong> in the <strong>PHICHCfg</strong> MO is set to NORMAL, <strong>InitPdcchSymNum</strong> in the <strong>CellPdcchAlgo</strong> MO cannot be set to 4 if the cell bandwidth is not 1.4 MHz.</li><li>When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>PhichDuration</strong> in the <strong>PHICHCfg</strong> MO is set to EXTENDED, <strong>InitPdcchSymNum</strong> in the <strong>CellPdcchAlgo</strong> MO can be set to 3 or 4 if the cell bandwidth is 1.4 MHz.</li><li>When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>PhichDuration</strong> in the <strong>PHICHCfg</strong> MO is set to EXTENDED, <strong>InitPdcchSymNum</strong> in the <strong>CellPdcchAlgo</strong> MO must be set to 3 when the cell bandwidth is not 1.4 MHz.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If <strong>PdcchSymNumSwitch</strong> in the <strong>CellPdcchAlgo</strong> MO is not set to OFF, SuperCombCellSwitch of <strong>SfnAlgoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO must be deselected.</li><li>If SuperCombCellSwitch option of the <strong>SfnAlgoSwitch</strong> parameter is selected, the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter cannot be selected.</li><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected, the EpdcchFunctionSwitch option of <strong>EpdcchAlgoSwitch</strong> in the related <strong>CellPdcchAlgo</strong> MO must be deselected.</li><li>The SfnJtSwitch option of the <strong>SfnAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only when the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>CustomizedBandWidthCfgInd</strong> in a <strong>Cell</strong> MO is set to CFG, the EpdcchFunctionSwitch option of <strong>EpdcchAlgoSwitch</strong> in the <strong>CellPdcchAlgo</strong> MO under this <strong>Cell</strong> MO must be deselected.</li><li>If the MASSIVE_MIMO_PDCCH_MEAS_SW option of the <strong>SplitBeamPdcchSdmaSw</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is selected, the <strong>CrsPortNum</strong> parameter in the <strong>Cell</strong> MO cannot be set to CRS_PORT_1.</li><li>The MM_HEAVY_LOAD_ECFI_ADAPT_ON option of the <strong>PdcchSymNumSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO can be selected only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R.</li><li>If the <strong>DlBandWidth</strong> parameter in the <strong>Cell</strong> MO is set to CELL_BW_N50 or CELL_BW_N75 or CELL_BW_N100, the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter only can be selected.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> in the <strong>CellPdcchAlgo</strong> MO must be deselected.</li><li>For an LTE TDD cell, if the MASSIVE_MIMO_PDCCH_BF_SW option of the <strong>PdcchBeamformingSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is selected, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO must be set to 64T64R or 32T32R.</li><li>For an LTE TDD cell, the MASSIVE_MIMO_PDCCH_BF_SW option of the <strong>PdcchBeamformingSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO and the MASSIVE_MIMO_PDCCH_SDMA_SW option of the <strong>SplitBeamPdcchSdmaSw</strong> parameter in the <strong>CellPdcchAlgo</strong> MO must not be selected at the same time.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>PdcchPowerEnhancedSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO under this <strong>Cell</strong> MO must not be set to ON_EXPANDED_RANGE or ON_BASIC_RANGE.</li><li>If the MASSIVE_MIMO_PDCCH_SDMA_SW option of the <strong>SplitBeamPdcchSdmaSw</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is selected and the <strong>PdcchSdmaWeightType</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is set to POWER_SHARING_AMONG_3_BEAMS, POWER_SHARING_AMONG_4_BEAMS, or POWER_SHARING_AMONG_5_BEAMS, the <strong>CrsPortNum</strong> parameter in the <strong>Cell</strong> MO cannot be set to CRS_PORT_1.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>In a TDD cell, if the MSG5Attempt option of <strong>HLNetAccSigAttempt</strong> in the <strong>CellPdcchAlgo</strong> MO is selected, <strong>HighSpeedFlag</strong> in the corresponding <strong>Cell</strong> MO must be set to LOW_SPEED, the PuschDtxSchOptSwitch option of <strong>UlSchSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO must be selected, and <strong>PDCCHAggLvlAdaptStrage</strong> in the <strong>CellPdcchAlgo</strong> MO must be set to STRATEGYBASEDONCAPACITY.</li></ul>
+</li><li>Relation with the <strong>DdCellGroup</strong> and <strong>Cell</strong> MOs:<ul><li>The EpdcchFunctionSwitch option of <strong>EpdcchAlgoSwitch</strong> in the <strong>CellPdcchAlgo</strong> MO must be deselected when the cell corresponding to <strong>LocalCellId1</strong> or <strong>LocalCellId2</strong> in a <strong>DdCellGroup</strong> MO meets the following requirements: (1) <strong>DdBandwidth</strong> is set to BW_5DOT7M; (2) <strong>DdBandwidth</strong> is set to BW_7DOT3M; (3) <strong>DdBandwidth</strong> is set to BW_7DOT6M; (4) <strong>DdBandwidth</strong> is set to BW_8DOT6M; (5) <strong>DdBandwidth</strong> is set to BW_8DOT9M; (6) If <strong>DdBandwidth</strong> is set to BW_4M, <strong>DlBandWidth</strong> in the <strong>Cell</strong> MO is set to CELL_BW_N15; (7) If <strong>DdBandwidth</strong> is set to BW_12DOT2M, <strong>DlBandWidth</strong> in the <strong>Cell</strong> MO is set to CELL_BW_N15; (8) If <strong>DdBandwidth</strong> is set to BW_17DOT1M, <strong>DlBandWidth</strong> in the <strong>Cell</strong> MO is set to CELL_BW_N15; (9) If <strong>DdBandwidth</strong> is set to BW_27DOT6M, <strong>DlBandWidth</strong> in the <strong>Cell</strong> MO is set to CELL_BW_N50; (10) If <strong>DdBandwidth</strong> is set to BW_28DOT5M, <strong>DlBandWidth</strong> in the <strong>Cell</strong> MO is set to CELL_BW_N50; (11) If <strong>DdBandwidth</strong> is set to BW_14DOT1M, BW_18DOT7M or BW_19M, <strong>DlBandWidth</strong> in the <strong>Cell</strong> MO is set to CELL_BW_N25.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SectorSplitCell</strong> MOs:<ul><li>The MASSIVE_MIMO_PDCCH_SDMA_SW and MASSIVE_MIMO_PDCCH_MEAS_SW options option of the <strong>SplitBeamPdcchSdmaSw</strong> parameter in the <strong>CellPdcchAlgo</strong> MO can be selected only when the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is not configured.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, the <strong>PdcchSymNumSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO cannot be set to MM_HEAVY_LOAD_ECFI_ADAPT_ON.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, the HEAVY_LOAD_BIG_PKT_SCH_OPT_SW and LOW_AGG_PREFERENTIAL_SCH_SW option of the <strong>PdcchOptimizationSwitch</strong> parameter in the associated <strong>CellPdcchAlgo</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>CellPdcchAlgo</strong> MO:<ul><li>The MASSIVE_MIMO_PDCCH_MEAS_SW option of the <strong>SplitBeamPdcchSdmaSw</strong> parameter in the <strong>CellPdcchAlgo</strong> MO can be selected only if the <strong>PdcchSdmaWeightType</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is set to POWER_SHARING_AMONG_3_BEAMS, POWER_SHARING_AMONG_4_BEAMS, or POWER_SHARING_AMONG_5_BEAMS.</li></ul>
+</li><li>Relation with the <strong>SRSCfg</strong> MO:<ul><li>If the <strong>SrsCfgInd</strong> parameter in the <strong>SRSCfg</strong> MO is set to BOOLEAN_TRUE and the <strong>AnSrsSimuTrans</strong> parameter in the <strong>SRSCfg</strong> MO is set to BOOLEAN_FALSE, the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter cannot be selected.</li></ul>
+</li><li>Relation with the <strong>CellUSParaCfg</strong> and <strong>Cell</strong> MOs:<ul><li>If UsPdcchOptSwitch of <strong>UsAlgoSwitch</strong> in <strong>CellUSParaCfg</strong> is set on and <strong>FddTddInd</strong> in <strong>Cell</strong> is set to CELL_TDD, <strong>PdcchSparePowerAllocStrage</strong> in <strong>CellPdcchAlgo</strong> must be set to NONE.</li></ul>
+</li><li>Relation with the <strong>CellEmtcAlgo</strong> MO:<ul><li>If the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is selected, the PRACH_FREQ_HOPPING_SW, PUSCH_FREQ_HOPPING_SW, and MPDCCH_PDSCH_FREQ_HOPPING_SW options of the <strong>EmtcFreqHoppingSwitch</strong> parameter in the <strong>CellEmtcAlgo</strong> MO associated through LocalCellId must not be selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, and <strong>BfAnt</strong> MOs:<ul><li>When the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE(Active) and the MASSIVE_MIMO_PDCCH_SDMA_SW option of the <strong>SplitBeamPdcchSdmaSw</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is selected, the <strong>BfAnt</strong> MO associated with the <strong>WeightNO</strong> parameter in the <strong>eUCellSectorEqm</strong> MO bound to the cell must exist, and the <strong>CoverageScenario</strong> parameter in the <strong>BfAnt</strong> MO must be set to SCENARIO_2(HBW 65 Degree, VBW 8 Degree), SCENARIO_3(HBW 45 Degree, VBW 8 Degree), SCENARIO_4(HBW 25 Degree, VBW 8 Degree), SCENARIO_6(HBW 65 Degree, VBW 17 Degree), SCENARIO_7(HBW 45 Degree, VBW 17 Degree), SCENARIO_8(HBW 25 Degree, VBW 17 Degree), SCENARIO_10(HBW 65 Degree, VBW 35 Degree), SCENARIO_11(HBW 45 Degree, VBW 35 Degree), or SCENARIO_12(HBW 25 Degree, VBW 35 Degree).</li></ul>
+</li><li>Relation with the <strong>BfAnt</strong> MO:<ul><li>The <strong>PdcchSdmaWeightType</strong> parameter in a <strong>CellPdcchAlgo</strong> MO can be set to PREFERENTIAL_ENHANCED_SDMA(PREFERENTIAL_ENHANCED_SDMA) only when the <strong>CoverageScenario</strong> parameter in the <strong>BfAnt</strong> is set to SCENARIO_2(HBW 65 Degree, VBW 8 Degree) or SCENARIO_6(HBW 65 Degree, VBW 17 Degree).</li></ul>
+</li><li>Relation with the <strong>CellShortTtiAlgo</strong> MO:<ul><li>When the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is deselected, the SHORT_TTI_SW option of the <strong>SttiAlgoSwitch</strong> parameter in the <strong>CellShortTtiAlgo</strong> MO can be selected.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD and the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO under this <strong>Cell</strong> MO is set to LTE_NR_SPECTRUM_SHR, the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO under this <strong>Cell</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>eUCellSectorEqm</strong> MO:<ul><li>If the <strong>CellBeamMode</strong> parameter in an <strong>eUCellSectorEqm</strong> MO is set to MASSIVE_MIMO_Ph2, the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the associated <strong>CellPdcchAlgo</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> MO:<ul><li>When the <strong>SpectrumCloudSwitch</strong> parameter in a <strong>SpectrumCloud</strong> MO is set to GL_SPECTRUM_CONCURRENCY, UL_SPECTRUM_SHR_PH2_WITH_GSM, DC_HSDPA_BASED_UL_SPECTRUM_SHR or UL_SPECTRUM_SHARING, the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the associated <strong>CellPdcchAlgo</strong> MO must be deselected.</li><li>When the <strong>SpectrumCloudSwitch</strong> parameter in a <strong>SpectrumCloud</strong> MO is set to UL_SPECTRUM_SHARING or UL_SPECTRUM_SHR_PH2_WITH_GSM, the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the associated <strong>CellPdcchAlgo</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>RACHCfg</strong>, <strong>Cell</strong>, <strong>PUCCHCfg</strong>, <strong>SpectrumCloud</strong>, and <strong>ULZeroBufferZone</strong> MOs:<ul><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N15, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N25, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N50, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N75, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li><li>The <strong>PrachFreqOffset</strong> parameter in the <strong>RACHCfg</strong> MO must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain under the following conditions: (a) The <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is not set to UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, or DC_HSDPA_BASED_UL_SPECTRUM_SHR, the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO is deselected, or the UMTS_LTE_ZERO_BUFFER_ZONE_SW option of the <strong>ZeroBufZoneSwitch</strong> parameter in the <strong>ULZEROBUFFERZONE</strong> MO and the PucchFlexCfgSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are selected. (b) The <strong>NbCellFlag</strong>, <strong>FddTddInd</strong>, and <strong>UlBandWidth</strong> parameters in the <strong>Cell</strong> MO are set to FALSE, CELL_FDD, and CELL_BW_N100, respectively. (c) The PucchSwitch option of the <strong>PucchAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected. (d) The <strong>PrachFreqOffsetStrategy</strong> parameter in the <strong>RACHCfg</strong> MO is not set to FULLY_AUTOMATIC.</li></ul>
+</li><li>Relation with the <strong>ContigIntraBandCarr</strong> MO:<ul><li>The EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO and the CONTIG_INTRA_BAND_CARR_SW option of the <strong>ContigIntraBandCarrSw</strong> parameter in the <strong>ContigIntraBandCarr</strong> MO cannot be both selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, <strong>ENodeBAlgoSwitch</strong>, <strong>CellUSParaCfg</strong>, <strong>CellAlgoSwitch</strong>, and <strong>PDSCHCfg</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R, 32T32R, or 8T8R, the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, and the SsrdDynDlPwrSharingSwitch option of the <strong>SSRDAlgoSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected, then: 1. The <strong>UsUeDlAdaptPwrBoostThld</strong> parameter in the <strong>CellUSParaCfg</strong> MO must be set to 0; 2. The USPwrSharePaSwitch option of the <strong>UsAlgoExSwitch</strong> parameter in the <strong>CellUSParaCfg</strong> MO must be deselected; 3. The <strong>PdcchSparePowerAllocStrage</strong> parameter in the <strong>CellPdcchAlgo</strong> MO must be set to NONE; 4. The <strong>PdcchSdmaWeightType</strong> parameter in the <strong>CellPdcchAlgo</strong> MO cannot be set to POWER_SHARING_AMONG_3_BEAMS, POWER_SHARING_AMONG_4_BEAMS, or POWER_SHARING_AMONG_5_BEAMS; 5. The BfEnhChnPwrFormSwitch option of the <strong>DlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be deselected; 6. The <strong>MimoUePaAdaptSw</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be set to OFF; 7. The <strong>EmfPowerLimitSwitch</strong> parameter in the <strong>PDSCHCfg</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, <strong>SectorSplitGroup</strong>, <strong>ENodeBAlgoSwitch</strong>, <strong>CellUSParaCfg</strong>, <strong>CellAlgoSwitch</strong>, and <strong>PDSCHCfg</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 8T8R, there is a <strong>SectorSplitCell</strong> MO that corresponds to this <strong>Cell</strong> MO, the <strong>BeamDeploymentMode</strong> parameter in the <strong>SectorSplitGroup</strong> MO that includes this <strong>SectorSplitCell</strong> MO is set to MODE_3, the SsrdDynDlPwrSharingSwitch option of the <strong>SSRDAlgoSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected, then the following parameter setting requirements must be met: The <strong>UsUeDlAdaptPwrBoostThld</strong> parameter in the <strong>CellUSParaCfg</strong> MO must be set to 0, the USPwrSharePaSwitch option of the <strong>UsAlgoExSwitch</strong> parameter in the <strong>CellUSParaCfg</strong> MO must be deselected, the <strong>PdcchSparePowerAllocStrage</strong> parameter in the <strong>CellPdcchAlgo</strong> MO must be set to NONE, the MASSIVE_MIMO_PDCCH_SDMA_SW option of the <strong>SplitBeamPdcchSdmaSw</strong> parameter in the <strong>CellPdcchAlgo</strong> MO must be deselected, the BfEnhChnPwrFormSwitch option of the <strong>DlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be deselected, the <strong>MimoUePaAdaptSw</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be set to OFF, and the <strong>EmfPowerLimitSwitch</strong> parameter in the <strong>PDSCHCfg</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitGroup</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD, there is a <strong>SectorSplitCell</strong> MO that corresponds to this <strong>Cell</strong> MO, and the <strong>BeamDeploymentMode</strong> parameter in the <strong>SectorSplitGroup</strong> MO that includes this <strong>SectorSplitCell</strong> MO is set to MODE_3, then the EpdcchFunctionSwitch option of the <strong>EpdcchAlgoSwitch</strong> parameter in the associated <strong>CellPdcchAlgo</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellDynPowerSharing</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the LTE_NR_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, then the <strong>PdcchSparePowerAllocStrage</strong> parameter in the <strong>CellPdcchAlgo</strong> MO must be set to NONE and the <strong>PdcchSdmaWeightType</strong> parameter in the <strong>CellPdcchAlgo</strong> MO cannot be set to POWER_SHARING_AMONG_3_BEAMS, POWER_SHARING_AMONG_4_BEAMS, or POWER_SHARING_AMONG_5_BEAMS.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the LTE_NR_DYN_POWER_SHARING_SW option of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO is selected, then the <strong>PdcchPowerCheckSwitch</strong> parameter in the <strong>CellPdcchAlgo</strong> MO must be set to OFF.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellPdcchAlgo__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellPdcchAlgo__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellPdcchAlgo__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellpdcchalgo.html">LST CELLPDCCHALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the PDCCH resource allocation algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellpdcchalgo.html">MOD CELLPDCCHALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of the PDCCH resource allocation algorithm.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellPdcchAlgo__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellPdcchAlgo__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellPdcchAlgo__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Local ID of the cell. It uniquely identifies a cell within a BS. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchPowerBoostUpperLimit.html">PDCCH Power Boost Upper Limit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper limit for the power increase during enhanced PDCCH power control, which is determined by the PdcchPowerEnhancedSwitch parameter. When the PdcchPowerBoostUpperLimit parameter is set to NULL, the default power increase upper limit of enhanced PDCCH power control is used. When the PdcchPowerBoostUpperLimit parameter is set to another value, the parameter value is used as the upper limit for the power increase. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-ComSigCongregLv.html">SignalCongregateLevel</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CCE aggregation level for common control signaling. If the HOSuccRateBoostOptSwitch option of the HoSignalingOptSwitch parameter is selected, the PDCCH CCE aggregation level is changed to level 8 when an RAR message for a handover is retransmitted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CceRatioAdjSwitch.html">Cce Ratio Adjust Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CCE ratio adjustment switch for the PDCCH. If this parameter is set to ENHANCED_CCE_RATIO_ADJUSTMENT, the uplink-downlink CCE ratio is not dynamically adjusted in the event of uplink CCE allocation failure not caused by CCE resource insufficiency. If this parameter is set to ON, the PDCCH resource allocation algorithm dynamically adjusts the uplink-downlink CCE ratio in each TTI based on uplink and downlink CCE usages. If this parameter is set to OFF, the uplink-downlink CCE ratio is not dynamically adjusted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-SfnPdcchDcsThd.html">SFN Pdcch DCS Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of isolation for determining whether to enable PDCCH selective transmission in adaptive SFN/SDMA scenarios. For a UE, if the ratio of the total RSRP of the RRUs providing strong signals to that of the RRUs providing weak signals is greater than or equal to this threshold, the eNodeB does not allocate power to the RRUs providing weak signals. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-InitPdcchSymNum.html">PDCCH Initial Symbol Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of OFDM symbols initially occupied by the PDCCH. If the switch for dynamic adjustment of the number of OFDM symbols occupied by the PDCCH is turned off, this parameter indicates the fixed number of OFDM symbols occupied by the PDCCH. For LTE TDD cells, this parameter indicates the number of OFDM symbols initially occupied by the PDCCH in the downlink subframes in which only downlink scheduling control information is transmitted. If the switch for dynamic adjustment of the number of OFDM symbols occupied by the PDCCH is turned on and the bandwidth is 1.4 MHz or 3 MHz, the PDCCH occupies 4 or 3 OFDM symbols, respectively, and this parameter is invalid. If the switch is turned on and the bandwidth is 5 MHz, 10 MHz, 15 MHz, or 20 MHz, the eNodeB adjusts the number of OFDM symbols in the range of 1, 2, and 3 when this parameter is set to the default value 1, or in the range of 2 and 3 when this parameter is set to 2 or 3. For LTE TDD cells, if the switch is turned on and the bandwidth is 5 MHz, the eNodeB adjusts the number of OFDM symbols in the range of 2 and 3 by default, and this parameter is invalid. If the EMTC_SWITCH option of the EmtcAlgoSwitch parameter in a CellEmtcAlgo MO is selected and the value of the startSymbolBR-r13 IE is changed due to modification of this parameter, eMTC UEs that already accessed the cell will be proactively released. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-VirtualLoadPro.html">PDCCH Virtual Loading Proportion</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the percentage of the number of virtually loaded PDCCH CCEs when the PDCCH power control switch is turned off, or indicates the percentage of the power of virtually loaded PDCCH CCEs when the PDCCH power control switch is turned on. This parameter is used to analyze the impact of the parameter values on PDCCH demodulation performance and provide reference to intra-frequency networking in LTE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchInitialCceAdjustValue.html">PDCCH Initial Cce Adjustment Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PDCCH initial aggregation level adjustment. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchSymNumSwitch.html">PDCCH Symbol Number Adjust Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable dynamic adjustment on the number of OFDM symbols occupied by the PDCCH.</p>
+<p>If this parameter is set to OFF, the number of OFDM symbols occupied by the PDCCH is fixed.</p>
+<p>If this parameter is set to ON, the number of OFDM symbols occupied by the PDCCH is dynamically adjusted based on the required number of control channel elements (CCEs). The OFDM symbol number adjustment range can be determined by referring to the MML reference of the InitPdcchSymNum parameter.</p>
+<p>If this parameter is set to ECFIADAPTIONON, the number of OFDM symbols occupied by the PDCCH is dynamically adjusted with the aim of achieving optimal downlink throughput. The OFDM symbol number adjustment range can be determined by referring to the MML reference of the InitPdcchSymNum parameter.</p>
+<p>If this parameter is set to MM_HEAVY_LOAD_ECFI_ADAPT_ON: (1) When the control channel capacity is limited, the number of CCEs required by the massive MIMO cell in the current TTI is estimated to determine the CFI for the current TTI. (2) When the control channel capacity is not limited, the CFI for the current TTI is determined in the same way as when this parameter is set to ECFIADAPTIONON. If the EMTC_SWITCH option of the EmtcAlgoSwitch parameter in the CellEmtcAlgo MO is selected and the startSymbolBR-r13 IE value changes due to modification to this parameter, the eNodeB releases eMTC UEs in the cell.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CceUseRatio.html">CCE use ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper limit of the CCE usage within each transmission time interval (TTI). When the PdcchSymNumSwitch parameter in the CellPdcchAlgo MO is set to ON(On), the parameter setting is invalid, that is, the CCE usage cannot be limited within each TTI. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchAggLvlCLAdjustSwitch.html">PDCCH Aggregation Level CL Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch used to enable or disable closed-loop adjustment to the PDCCH aggregation level. If this switch is turned on, PDCCH aggregation level is adjusted based on the block error rate (BLER) of the PDCCH. If this switch is turned off, PDCCH aggregation level is not adjusted based on the BLER of the PDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-DPDVirtualLoadSwitch.html">DPD Virtual Load Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable virtual loading for digital predistortion (DPD). This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-DPDVirtualLoadType.html">DPD Virtual Load Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the virtual loading type for digital predistortion (DPD). This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-AggLvlSelStrageForDualCW.html">Aggregation Level Strategy for Dual Codewords</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For FDD, this parameter indicates the PDCCH CCE aggregation level selection policy used in dual-codeword transmission scenarios. The capacity-based selection policy is the default policy. If this policy is used, a low CCE aggregation level is selected in dual-codeword transmission scenarios, allowing PDCCH resources to be allocated to more UEs. If the coverage-based selection policy is used, a high CCE aggregation level is selected in dual-codeword transmission scenarios, improving cell coverage performance. For TDD, this parameter indicates the PDCCH CCE aggregation level selection policy used in dual-codeword transmission scenarios, when the PDCCH CCE aggregation level adaptation policy is coverage-oriented. The capacity-based selection policy is the default policy. If this policy is used, a low CCE aggregation level is selected in dual-codeword transmission scenarios, allowing PDCCH resources to be allocated to more UEs. If the coverage-based selection policy is used, a high CCE aggregation level is selected in dual-codeword transmission scenarios, improving cell coverage performance. This parameter does not take effect when the PDCCH aggregation level adaptation policy is capacity-oriented. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchCapacityImproveSwitch.html">PDCCH Capacity Improve Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable optimization on PDCCH capacity expansion. For LTE FDD networks, if this parameter is set to ON(On), (1) the initial value for closed-loop adjustment on PDCCH aggregation level applies only to SRBs; (2) if a UE fails to be allocated CCEs, the eNodeB reallocates CCEs to the UE by increasing the PDCCH power and decreasing the PDCCH aggregation level for the UE. If this parameter is set to OFF(Off), (1) the initial value for closed-loop adjustment on PDCCH aggregation level applies to both SRBs and DRBs; (2) if a UE fails to be allocated CCEs, the eNodeB does not reallocate CCEs to the UE by increasing the PDCCH power and decreasing the PDCCH aggregation level for the UE. For LTE TDD networks, if this parameter is set to ON(On), the eNodeB reallocates CCEs to a UE, if the UE fails to be allocated CCEs, by increasing the PDCCH power and decreasing the PDCCH aggregation level for the UE. If this parameter is set to OFF(Off), the eNodeB does not reallocate CCEs to a UE, if the UE fails to be allocated CCEs, by increasing the PDCCH power and decreasing the PDCCH aggregation level for the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchMaxCodeRate.html">PDCCH Max Code Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum coding rate on the PDCCH. The coding rate on the PDCCH cannot exceed this parameter value. Otherwise, the PDCCH aggregation level must be increased. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-ULDLPdcchSymNum.html">Uplink and Downlink PDCCH Symbols Configuration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of OFDM symbols initially occupied by the PDCCH in the downlink subframe in which uplink and downlink scheduling control information is transmitted. If the PDCCH Symbol Number Adjust Switch parameter is set to OFF, this parameter indicates the fixed number of OFDM symbols occupied by the PDCCH in the downlink subframe in which uplink and downlink scheduling control information is transmitted. For downlink subframes in which both uplink and downlink scheduling control information is transmitted, if the PDCCH Symbol Number Adjust Switch parameter is set to ON, the number of OFDM symbols occupied by the PDCCH is as follows: On the bandwidth of 5 MHz, the PDCCH occupies 2 or 3 OFDM symbols. (In this case, the configuration of this parameter is invalid.) On the bandwidth of 10 MHz, 15 MHz, or 20 MHz, the PDCCH occupies 1, 2, or 3 OFDM symbols when this parameter is set to 1, and the PDCCH occupies 2 or 3 OFDM symbols when this parameter is set to 2 or 3. If the EMTC_SWITCH option of the EmtcAlgoSwitch parameter in a CellEmtcAlgo MO is selected and the value of the startSymbolBR-r13 IE is changed due to modification of this parameter, eMTC UEs that already accessed the cell will be proactively released. This parameter applies only to LTE TDD. When the PhichDuration parameter in the PHICHCfg MO is set to EXTENDED and the cell bandwidth is 1.4 MHz, this parameter must be set to 3(3) according to 3GPP specifications. Therefore, value 3(3) takes effect automatically even if this parameter is set to another value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PDCCHAggLvlAdaptStrage.html">The Strategy Of PDCCH Aggregation Level Adaptation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the adaptation strategy of the CCE aggregation level for the PDCCH. For LTE TDD cells, the coverage-based PDCCH aggregation level adaptation strategy is used by default. This strategy leads to a higher PDCCH aggregation level and better cell coverage provided by the PDCCH but fewer UEs scheduled on the PDCCH. The capacity-based PDCCH aggregation level adaptation strategy leads to a lower PDCCH aggregation level but more UEs scheduled on the PDCCH.</p>
+<p>For NB-IoT cells, the coverage-based PDCCH aggregation level adaptation strategy is used by default. This strategy slows down the adjustment of the NPDCCH aggregation level and the number of repetitions to guarantee cell-edge coverage. The capacity-based PDCCH aggregation level adaptation strategy speeds up the adjustment of the NPDCCH aggregation level and the number of repetitions based on channel quality.</p>
+<p>This parameter applies only to LTE TDD and NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-HysForCfiBasedPreSch.html">Hysteresis for CFI increase based on PreSch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to increase the number of PDCCH symbols in case of uplink preallocation failure when PdcchSymNumSwitch is set to ECFIADAPTIONON. If this parameter is set to 0, the eNodeB does not increase the number of PDCCH symbols in case of preallocation failure. If this parameter is set to 1, the eNodeB increases the number of PDCCH symbols in case of preallocation failure. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-SfnPdcchSdmaThd.html">SFN PDCCH SDMA Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of isolation for determining whether to enable PDCCH SDMA in adaptive SFN/SDMA scenarios. For a UE, if the ratio of the total RSRP of signals collaboratively received from RRUs providing strong signals to that from RRUs providing weak signals is greater than or equal to this threshold, the UE uses only the RRUs providing strong signals, and the RRUs providing weak signals serve other UEs. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-UlPdcchAllocImproveSwitch.html">UL PDCCH Alloc Improve Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the mechanism of increasing the control channel element (CCE) resource allocation success rate in the uplink. ReserveCommonCCESwitch: Indicates whether to reserve CCE resources in the common search space for the uplink. CCE resources in the common search space are reserved for the uplink only when this switch is on. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CceMaxInitialRatio.html">CCE Max Initial Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum ratio of uplink to downlink initial CCEs on the PDCCH. If this parameter is set to 1_2, the maximum uplink-downlink initial CCE ratio is 1:2. If this parameter is set to a value greater than 1_2, the maximum uplink-downlink initial CCE ratio can be dynamically changed to any value ranging from 1_2 to the configured value based on the load in the uplink and downlink. If subframe configuration 2 is adopted for an LTE TDD cell, it is recommended that the SubframeSchDiffSwitch option be selected to ensure the PRB usage on subframes 3 and 8. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchPowerEnhancedSwitch.html">PDCCH Power Enhanced Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable PDCCH power control enhancement and specifies the enhancement scope. If this parameter is set to ON_ALL, ON_EXPANDED_RANGE, or ON_BASIC_RANGE, the eNodeB selects an appropriate power value based on the PDCCH quality to increase the PDCCH capacity. The value ON_ALL indicates that the enhancement takes effect in all scenarios. The value ON_BASIC_RANGE indicates that the enhancement takes effect only in basic scenarios. The value ON_EXPANDED_RANGE indicates that the enhancement takes effect in more scenarios than when this parameter is set to ON_BASIC_RANGE.</p>
+<p>For FDD, this parameter can be configured in all scenarios.</p>
+<p>For TDD, this parameter applies only to massive MIMO cells where the aggregation level is selected based on capacity and cannot be set to ON_EXPANDED_RANGE or ON_BASIC_RANGE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchBlerTarget.html">PDCCH BLER Target</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the target BLER in PDCCH link adaptation. The PDCCH BLER must converge on this target BLER. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-HLNetAccSigAggLvlSelEnhSw.html">HL Net Access Signal Aggregation Lvl Select Enhance Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable enhanced aggregation level selection for access signaling on high load networks. If this parameter is set to ON(On), the eNodeB accurately estimates the channel conditions when a UE accesses a high load network where PDCCH resources are insufficient, and selects a PDCCH aggregation level for the UE that better matches the UE's actual signal quality. It is recommended that this parameter be set to ON(On) and the PuschDtxSchOptSwitch option of the UlSchSwitch parameter in the CellAlgoSwitch MO be selected. If this parameter is set to OFF(Off), the eNodeB selects a high aggregation level for all access signaling to ensure the PDCCH reliability. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-EpdcchAlgoSwitch.html">EPDCCH Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable algorithms related to the EPDCCH. EpdcchFunctionSwitch: Indicates whether to support EPDCCH. If this option is selected, EPDCCH is supported. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CceThdtoEnableEpdcch.html">CCE Usage Threshold To Enable EPDCCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CCE usage threshold for configuring the EPDCCH. If the CCE usage is greater than this parameter value, the eNodeB configures EPDCCH resources for newly accessed UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-RbThdtoEnableEpdcch.html">RB Usage Threshold To Enable EPDCCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink RB usage threshold for configuring EPDCCH. If the downlink RB usage is less than this parameter value, the eNodeB configures EPDCCH resources for newly accessed UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CceThdtoDisableEpdcch.html">CCE Usage Threshold To Disable EPDCCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CCE usage threshold for disabling EPDCCH. If the CCE usage is lower than this parameter value, the eNodeB disables the EPDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-EcceThdtoDisableEpdcch.html">ECCE Usage Threshold To Disable EPDCCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ECCE usage threshold for disabling EPDCCH. If the ECCE usage is lower than this parameter value, the eNodeB disables the EPDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-RbThdtoDisableEpdcch.html">RB Usage Threshold To Disable EPDCCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink RB usage threshold for disabling EPDCCH. If the downlink RB usage is greater than this parameter value, the eNodeB disables the EPDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-HLNetAccSigAttempt.html">High Load Net Access Signal Attempt</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable functions related to enhanced aggregation level selection for access signaling on high load networks. MSG5Attempt: Indicates whether to enable enhanced aggregation level selection for MSG5. If this option is selected, enhanced aggregation level selection is enabled for MSG5. If this option is deselected, enhanced aggregation level selection is disabled for MSG5. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-EpdcchSfCfg.html">EPDCCH Subframe Configuration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the enhanced physical downlink control channel (EPDCCH) is configured only on downlink subframes that carry the uplink and downlink scheduling control information or in all downlink subframes after the EPDCCH is started. This parameter takes effect only in LTE TDD cells that use uplink-downlink subframe configuration 2. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-UlDlEcceInitialRatioAdjSw.html">UL DL ECCE Initial Ratio Adjustment Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable adaptive adjustment of the initial ratios of the uplink and downlink enhanced control channel elements (eCCEs). If this parameter is set to ON(On), the initial ratios of uplink and downlink eCCEs can be dynamically adjusted in the range from 1 to Max(CceMaxInitialRatio, 1) based on the uplink and downlink loads. If this parameter is set to OFF(Off), the initial ratios of uplink and downlink eCCEs are fixed to be Max(CceMaxInitialRatio, 1). This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CapacityBfOpt.html">BF Opt for Capacity-based PDCCH Aggregation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to optimize the calculation of the beamforming gain for capacity-based PDCCH aggregation level adaptation. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CCEThdEnableFlowCtrl.html">Flow Control Enable CCE Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper threshold of CCE usage. If the percentage of CCEs consumed by SRBs is larger than this threshold, the eNodeB triggers MSG3 flow control. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CCEThdDisableFlowCtrl.html">Flow Control Disable CCE Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the lower threshold of CCE usage. If the percentage of CCEs consumed by SRBs is smaller than this threshold, the eNodeB cancels MSG3 flow control, or does not trigger MSG3 flow control. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PDCCHPwrUpperLimitOptSw.html">PDCCH Power Upper Limit Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to raise the PDCCH power increase limit. If this parameter is set to ON(On), the eNodeB raises the PDCCH power increase limit in the subframes allocated uplink and downlink CCEs when the CceMaxInitialRatio parameter in the CellPdcchAlgo is set to a large value. If this parameter is set to OFF(Off), the eNodeB does not raise the PDCCH power increase limit in the subframes allocated uplink and downlink CCEs when the CceMaxInitialRatio parameter in the CellPdcchAlgo MO is set to a large value. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchSparePowerAllocStrage.html">PDCCH Spare Power Allocation Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the spare PDCCH power allocation strategy. When this parameter is set to NONE, spare PDCCH power is not allocated. When this parameter is set to WEAKCOVERAGEUSER, spare power of the PDCCH with the current CFI is allocated to UEs with weak coverage. When this parameter is set to BIGPKTUSER, spare power of the PDCCH with the current CFI is allocated to UEs with large-packet transmission. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-VoltePdcchSinrOffset.html">Volte PDCCH SINR Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PDCCH SINR offset of voice UEs. This parameter is used to adjust the PDCCH aggregation level and PDCCH power for such UEs. If this parameter is set to 0, adjustment of the PDCCH aggregation level and PDCCH power does not take effect. It is recommended that this parameter be set to 30 for cells with few voice UEs. This helps improve the transmission reliability of the control channel occupied by voice UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchDlAggLvlSlcEhnSwitch.html">Enhanced PDCCH DL Agg Lev Selection</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to optimize PDCCH aggregation level selection. The PDCCH BLER caused due to no responses from the UE is used as a reference for PDCCH aggregation level selection only when this parameter is set to ON. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchOutLoopAdjBaseStep.html">PDCCH Out Loop Adjustment Baseline Step</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the baseline step used for outer-loop adjustment of the PDCCH. The selection of an appropriate step for the adjustment is dependent on this baseline step. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchOutLoopAdjLowerLimit.html">PDCCH Out Loop Adjustment Value Lower Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>For FDD: indicates the lower limit of the adjustment amount for outer-loop adjustment of the PDCCH.</p>
+<p>For TDD: indicates the lower limit of the initial adjustment amount for outer-loop adjustment of the PDCCH. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchAdjAlgoSwitch.html">PDCCH Adjust Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable optimization functions related to the PDCCH adjustment algorithm. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>CCE8PcOptSwitch: Indicates the basis of performing dynamic power control for UEs with a CCE aggregation level of 8 when the CCE aggregation level is adjusted based on capacity. If this option is selected, the PDCCH power for UEs with a CCE aggregation level of 8 is dynamically adjusted based on PDCCH quality. This option applies only to LTE TDD.</p>
+<p>AggLvl8PwrIncreaseUpperLimitSw: Indicates whether to enable power increase limiting for the PDCCH aggregation level 8. If this option is selected, the PDCCH aggregation level of downlink retransmission UEs is 8, and the number of RRC_CONNECTED UEs is greater than the value of the PdcchPwrCtrlUserNumThd parameter in the CellPdcchAlgo MO, an upper power increase limit is set for this aggregation level. If this option is deselected, no upper power increase limit is set for downlink retransmission UEs with the PDCCH aggregation level 8. This option applies only to LTE TDD.</p>
+<p>EnhCfiAdptOptSwitch: Indicates whether to enable enhanced CFI adaptation optimization for 8T8R. This option is valid only when the PdcchSymNumSwitch parameter is set to ECFIADAPTIONON. If this option is selected, CCE resources increase in 8T8R heavy-load scenarios and therefore the number of scheduled UEs also increases in these scenarios. When this option is deselected, the optimization does not take effect and the enhanced CFI adaptation function is used. This option applies only to LTE TDD.</p>
+<p>PdcchRobustnessEnhSw: Indicates whether to enable the PDCCH robustness enhancement algorithm. If this option is selected, the PDCCH robustness enhancement algorithm is enabled. If this option is deselected, the PDCCH robustness enhancement algorithm is disabled. This option applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-SplitBeamPdcchSdmaThd.html">PDCCH Split Beam SDMA Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of isolation for deciding whether to perform SDMA for PDCCH transmission in beam splitting scenarios. For a UE, if the ratio of the RSRP of combined beams providing strong signals to that of providing weak signals in a cell is greater than or equal to this threshold during PDCCH transmission in beam splitting scenarios, the UE uses the resources allocated to beams providing strong signals, and resources allocated to beams providing weak signals can be used by other UEs. This parameter applies only to TDD massive MIMO cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-NackDtxRatioThd.html">NACK and DTX Ratio Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold, which is the proportion of the sum of NACKs and DTXs to the sum of ACKs, NACKs, and DTXs of uplink HARQ feedback for downlink scheduling, for stopping scheduling a UE. If the proportion of the sum of NACKs and DTXs to the sum of ACKs, NACKs, and DTXs for downlink scheduling of a UE is higher than this threshold, the eNodeB stops initial transmission and retransmission of DRBs for the UE in a certain period. If this parameter is set to 0, the eNodeB does not stop initial transmission and retransmission of DRBs for UEs based on the proportion of the sum of NACKs and DTXs to the sum of ACKs, NACKs, and DTXs. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-SplitBeamPdcchSdmaSw.html">PDCCH Split Beam SDMA Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to perform SDMA for PDCCH split beams.</p>
+<p>MASSIVE_MIMO_PDCCH_SDMA_SW: If this option is selected, SDMA is performed for PDCCH split beams. If this option is deselected, joint transmission is always performed for PDCCH split beams. This option applies only to LTE TDD.</p>
+<p>MASSIVE_MIMO_PDCCH_MEAS_SW: If this option is selected, PDCCH beam association measurement is performed for UEs in massive MIMO scenarios. If this option is deselected, PDCCH beam association measurement is disabled for UEs in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchPwrCtrlUserNumThd.html">PDCCH Power Control User Num Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to perform PDCCH power optimization for heavy-load networks, and specifies the threshold of the number of UEs for triggering the optimization. If this parameter is set to 65535, PDCCH power optimization is disabled for heavy-load networks. If this parameter is set to a value ranging from 0 to 1050, PDCCH power optimization is enabled for heavy-load networks, and the eNodeB uses this threshold to determine whether to perform the optimization. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchBfGainOffset.html">PDCCH Beamforming Gain Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PDCCH beamforming gain offset for D-MIMO cells when the PDCCH aggregation level is selected based on coverage. If this parameter is set to -127, optimization of PDCCH beamforming gain offset is disabled. If this parameter is set to a value ranging from -10 to 10, optimization of PDCCH beamforming gain offset is enabled, and the offset is specified by this parameter. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-VoltePdcchOptSwitch.html">VoLTE PDCCH Optimize Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to optimize the PDCCH for VoLTE UEs.</p>
+<p>VOLTE_PDCCH_CCE_SELECT_SWITCH: Indicates whether to optimize the selection of PDCCH CCE aggregation levels. If this option is deselected, the eNodeB does not optimize selection of the PDCCH CCE aggregation levels for VoLTE UEs. If this option is selected, the eNodeB optimizes the selection of PDCCH CCE aggregation levels for VoLTE UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-CfiAdjCceThld.html">CFI Adjustment CCE Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CCE threshold of enhanced CFI adaptation.</p>
+<p>This parameter is valid only when the PdcchSymNumSwitch parameter is set to ECFIADAPTIONON.</p>
+<p>This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-VoicePdcchOtLpAdjLowerLmt.html">Voice UE PDCCH Outer-Loop Adj Lower Limit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the lower limit of outer-loop adjustment to the PDCCH aggregation level and whether to enable optimized CCE aggregation level selection for PDCCH for voice and air interface acceleration UEs. For FDD, if this parameter is set to 255, the value of the PdcchOutLoopAdjLowerLimit parameter in the CellPdcchAlgo MO is used as the lower limit of outer-loop adjustment to the PDCCH aggregation level for voice and air interface acceleration UEs. In addition, optimized CCE aggregation level selection for PDCCH for air interface acceleration UEs is disabled. If this parameter is set to a value other than 255, the VoicePdcchOtLpAdjLowerLmt parameter value is used as the lower limit of outer-loop adjustment to the PDCCH aggregation level for voice and air interface acceleration UEs. In addition, optimized CCE aggregation level selection for PDCCH for air interface acceleration UEs is enabled. For TDD, if this parameter is set to 255, optimized CCE aggregation level selection for PDCCH for air interface acceleration UEs is disabled. If this parameter is set to a value other than 255, optimized CCE aggregation level selection for PDCCH for air interface acceleration UEs is enabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchOptimizationSwitch.html">PDCCH Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable PDCCH optimization for TDD macro cells.</p>
+<p>LOW_AGG_PREFERENTIAL_SCH_SW: If this option is selected, preferential scheduling for UEs with a low aggregation level is enabled. If this option is deselected, preferential scheduling for UEs with a low aggregation level is disabled. This option applies only to LTE TDD.</p>
+<p>HEAVY_LOAD_BIG_PKT_SCH_OPT_SW: Indicates whether to enable the following two functions in heavy-load scenarios: large-packet scheduling optimization, and CCE selection optimization for cell-center UEs or UEs at a medium distance from the cell center. The two functions are enabled only if this option is selected. This option applies only to LTE TDD.</p>
+<p>SF_3_8_HARQ_SELECTIVE_SCH_SW: Indicates whether to enable selective HARQ scheduling in subframe 3 or 8. If this option is selected, selective HARQ scheduling in subframe 3 or 8 is enabled. If this option is deselected, selective HARQ scheduling in subframe 3 or 8 is disabled. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-SplitBeamPdcchSdmaThldOfs.html">Split Beam PDCCH SDMA Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the isolation threshold for UEs with PDCCH aggregation levels of 4 and 8 when SDMA is performed for PDCCH transmission in beam splitting scenarios. The actual isolation threshold for UEs with PDCCH aggregation levels of 4 and 8 is the sum of this offset and the SplitBeamPdcchSdmaThd parameter. The value THRESHOLD_OFFSET_0 indicates that the offset is 0 dB. The value THRESHOLD_OFFSET_1 indicates that the offset is -1 dB for UEs with the PDCCH aggregation level of 4 and -2 dB for UEs with the PDCCH aggregation level of 8. The value THRESHOLD_OFFSET_2 indicates that the offset is -2 dB for UEs with the PDCCH aggregation level of 4 and -4 dB for UEs with the PDCCH aggregation level of 8. The value THRESHOLD_OFFSET_3 indicates that the offset is -3 dB for UEs with the PDCCH aggregation level of 4 and -6 dB for UEs with the PDCCH aggregation level of 8. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchSdmaWeightType.html">PDCCH SDMA Weight Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the weight type for PDCCH SDMA in massive MIMO scenarios. If this parameter is set to PREFERENTIAL_COV_GUARANTEE, a weight type guaranteeing coverage is preferred. If this parameter is set to PREFERENTIAL_ENHANCED_SDMA, a weight type guaranteeing space division gains is preferred. This parameter value is valid only when the CoverageScenario parameter is set to SCENARIO_2(HBW 65 Degree, VBW 8 Degree) or SCENARIO_6(HBW 65 Degree, VBW 17 Degree). If this parameter is set to POWER_SHARING_AMONG_3_BEAMS, power sharing among three beams is enabled. If this parameter is set to POWER_SHARING_AMONG_4_BEAMS, power sharing among four beams is enabled. If this parameter is set to POWER_SHARING_AMONG_5_BEAMS, power sharing among five beams is enabled. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchPowerCheckSwitch.html">PDCCH Power Check Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable PDCCH symbol power check. If this parameter is set to OFF, the eNodeB does not check the PDCCH symbol power. If this parameter is set to SYMBOL_0_POWER_CHECK, the eNodeB checks the power of PDCCH symbol 0 to ensure that the power of this symbol does not exceed the RRU single-channel power. If the power of this symbol exceeds the RRU single-channel power, CCE allocation fails. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-HarqAckFdbkModeOptThld.html">HARQ-ACK Feedback Mode Optimization Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for optimizing the HARQ-ACK feedback mode. If HARQ-ACK feedback mode optimization is enabled, the PDCCH load in the cell is greater than this threshold, and the single-frame scheduling mode is used for the UEs, the HARQ-ACK feedback mode of the UEs is reconfigured to the multiplexing mode. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-PdcchBeamformingSwitch.html">PDCCH Beamforming Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable PDCCH beamforming.</p>
+<p>MASSIVE_MIMO_PDCCH_BF_SW: If this option is selected, UE-specific beam weighting is performed to transmit the PDCCH data in massive MIMO scenarios. If this option is deselected, broadcast beam is performed to transmit the PDCCH data in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-AbnUePdcchOptCceUsageThld.html">Abnormal UE PDCCH Opt CCE Usage Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the equivalent CCE usage threshold used for evaluating whether to enable the function of PDCCH optimization for defective UEs. If this parameter is set to a non-zero value, the function is enabled. If this parameter is set to 0, the function is disabled. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellPdcchAlgo-AbnUePdcchOptCqiThld.html">Abnormal UE PDCCH Opt CQI Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CQI threshold of UEs used for evaluating whether to enable the function of PDCCH optimization for defective UEs. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

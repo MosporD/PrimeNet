@@ -1,0 +1,194 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="Transmission Maintenance and Test MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of point-to-point and end-to-end transmission maintenance and test methods. It also provides the managed object model (MOM) view and describes the managed objects (MOs) related to transmission maintenance and test.">
+<meta name="description" content="This section describes the functions and concepts of point-to-point and end-to-end transmission maintenance and test methods. It also provides the managed object model (MOM) view and describes the managed objects (MOs) related to transmission maintenance and test.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../comm/mom/trans-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Trans-Maintenance">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Transmission Maintenance and Test MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Trans-Maintenance"></a><a name="Trans-Maintenance"></a>
+
+
+<h1 class="topictitle1">Transmission Maintenance and Test MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of point-to-point
+and end-to-end transmission maintenance and test methods. It also
+provides the managed object model (MOM) view and describes the managed
+objects (MOs) related to transmission maintenance and test.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><div class="p">A base station supports
+both point-to-point and end-to-end transmission maintenance and test
+methods.<ul><li>In point-to-point mode, two NEs are directly connected. A base
+station supports the following point-to-point maintenance and test
+functions:<ul><li>Ethernet OAM (IEEE 802.3ah). OAM is short for operation, administration,
+and maintenance.</li><li>Single-hop Bidirectional Forwarding Detection (BFD) sessions of
+the maintenance type. This function is used for transmission fault
+detection between a base station and a transmission device and mainly
+applies to layer 2.</li></ul>
+</li></ul>
+<ul><li>In end-to-end mode, two NEs are connected through one or more
+NEs. A base station supports the following end-to-end maintenance
+and test functions:<ul><li>Ethernet OAM (IEEE 802.1ag and Y.1731). This function is used
+for end-to-end Ethernet maintenance and test.</li><li>Multi-hop BFD sessions of the maintenance type. This function
+is used for fault detection between the following NEs and mainly applies
+to layer 3: base station and base station; base station and serving
+gateway (S-GW); base station and remote transmission device.</li><li>Two-Way Active Measurement Protocol (TWAMP) (RFC 5357): Measurement
+packets are automatically inserted to perform an end-to-end test of
+the QoS on a transport network. This function is independent of service
+packets.</li></ul>
+</li></ul>
+</div>
+<p>For details on these functions for each RAT, see the corresponding
+feature parameter description document.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Managed Object Model</h4><div class="p"><a href="#Trans-Maintenance__fig1">Figure 1</a> shows the transport layer MOM in the old model, which is
+a subset of the base station MOM. <div class="fignone" id="Trans-Maintenance__fig1"><a name="Trans-Maintenance__fig1"></a><a name="fig1"></a><span class="figcap"><b>Figure 1 </b>Transport layer MOM in the old model</span>
+
+<br><span><img src="../image/mom/Transport-protocol-layers-figure3-1.png"></span></div>
+</div>
+<div class="p">MOs related to the maintenance and test functions
+shown in <a href="#Trans-Maintenance__fig1">Figure 1</a> are as follows: <ul><li>The MO related to Ethernet OAM (IEEE 802.3ah) is ETHOAM3AH.</li><li>MOs related to Ethernet OAM (IEEE 802.1ag and Y.1731) are CFMMEP,
+CFMMA, CFMMD, CFMRMEP, and CFMBNDIP.</li><li>MOs related to BFD sessions are IPRT and BFDSESSION.</li><li>MOs related to TWAMP are TWAMPCLIENT, TWAMPSENDER and TWAMPRESPONDER.</li></ul>
+</div>
+<div class="p"><a href="#Trans-Maintenance__fig2">Figure 2</a> shows the relationships between
+MOs related to Ethernet OAM (IEEE 802.1ag) in the old model. <div class="fignone" id="Trans-Maintenance__fig2"><a name="Trans-Maintenance__fig2"></a><a name="fig2"></a><span class="figcap"><b>Figure 2 </b>Relationships between MOs related to Ethernet OAM (IEEE 802.1ag)
+in the old model</span>
+
+<br><span><img src="../image/mom/Transport-protocol-layers-figure3-2.png"></span></div>
+A maintenance association (MA) for connectivity
+fault management (CFM), defined by the CFMMEP MO, includes a maintenance
+association endpoint (MEP) and a remote maintenance association endpoint
+(RMEP), which are defined by the CFMMEP and CFMRMEP MOs, respectively.
+Route interlock can be implemented by binding an IP address to an
+RMEP. A maintenance domain for connectivity fault management (CFMMD)
+consists of one or more MAs (CFMMA). </div>
+<div class="p"><a href="#Trans-Maintenance__fig3">Figure 3</a> shows the transport layer MOM in the new model, which is a subset
+of the base station MOM. <div class="fignone" id="Trans-Maintenance__fig3"><a name="Trans-Maintenance__fig3"></a><a name="fig3"></a><span class="figcap"><b>Figure 3 </b>Transport layer MOM in the new model</span>
+
+<br><span><img src="../image/mom/Transport-protocol-layers-figure3-3.png"></span></div>
+</div>
+<div class="p">MOs related to the maintenance and test functions
+shown in <a href="#Trans-Maintenance__fig3">Figure 3</a> are as follows: <ul><li>The MO related to Ethernet OAM (IEEE 802.3ah) is ETH3AH.</li><li>MOs related to Ethernet OAM (IEEE 802.1ag and Y.1731) are CFMLOCALMEP,
+CFMMA, CFMMD, CFMRMEP, and CFMBNDIP.</li><li>MOs related to BFD sessions are IPROUTE4 and BFD. </li><li>MOs related to TWAMP are TWAMPCLIENT, TWAMPSENDER and TWAMPRESPONDER.</li></ul>
+</div>
+<p><a href="#Trans-Maintenance__fig4">Figure 4</a> shows the relationships between
+MOs related to Ethernet OAM (IEEE 802.1ag) in the new model. </p>
+<div class="fignone" id="Trans-Maintenance__fig4"><a name="Trans-Maintenance__fig4"></a><a name="fig4"></a><span class="figcap"><b>Figure 4 </b>Relationships between MOs related to Ethernet OAM (IEEE 802.1ag)
+in the new model</span>
+
+<br><span><img src="../image/mom/Transport-protocol-layers-figure3-4.png"></span></div>
+<p>A maintenance association for connectivity fault
+management (CFMMA) includes a maintenance association endpoint (CFMLOCALMEP)
+and a remote maintenance association endpoint (CFMRMEP). Route interlock
+can be implemented by binding an IP address to an RMEP. A maintenance
+domain for connectivity fault management (CFMMD) consists of one or
+more MAs (CFMMA). </p>
+</div>
+
+<div class="section"><p><strong>MOs Related to Point-to-Point Maintenance and Test</strong></p>
+<p>MOs related to point-to-point maintenance and test are described
+as follows, including Ethernet OAM (IEEE 802.3ah) and single-hop BFD
+sessions:</p>
+<div class="p">The MOs for the data link layer are defined as follows:<ul><li><a href="../mo/ETHPORT.html">ETHPORT</a> defines an Ethernet
+port. This MO includes parameters such as the speed,
+duplex mode, port attribute, ARP proxy flag, and MTU. It also includes
+information about the loopback status and statistics of received and
+transmitted packets. The duplex mode and port attribute must be negotiated
+with the peer end.</li><li><a href="../mo/ETHOAM3AH.html">ETHOAM3AH</a>/<a href="../mo/ETH3AH.html">ETH3AH</a> is configured to support link
+monitoring, fault detection, and remote loopback as defined in IEEE
+802.3ah.</li></ul>
+</div>
+<div class="p">The MO for the network layer is defined as follows:<ul><li><a href="../mo/IPRT.html">IPRT</a>/<a href="../mo/IPROUTE4.html">IPROUTE4</a> defines a static IP route,
+which is used for data forwarding through a routing table. The IPRT/IPROUTE4
+MO does not need to be configured if BFD sessions are used for maintenance
+and test at layer 2. The IPRT/IPROUTE4 MO must be configured if BFD
+sessions are used for maintenance and test at layer 3. </li></ul>
+</div>
+<div class="p">The MOs for the transport and application layers are defined
+as follows:<ul><li><a href="../mo/BFDSESSION.html">BFDSESSION</a>/<a href="../mo/BFD.html">BFD</a> consists of parameters related to
+a BFD session, which is used to quickly detect faults on channels
+between links. Single-hop BFD sessions are used for point-to-point
+maintenance and test at layer 2.</li></ul>
+</div>
+<p><strong>MOs Related to End-to-End Maintenance and Test</strong></p>
+<p>The MOs related to end-to-end maintenance and test are described
+as follows, including Ethernet OAM (IEEE 802.1ag and Y.1731) and multi-hop
+BFD sessions:</p>
+<div class="p">The MOs for the data link layer are defined as
+follows:<ul><li><a href="../mo/ETHPORT.html">ETHPORT</a> defines an Ethernet
+port. This MO includes parameters such as the speed, duplex mode,
+port attribute, ARP proxy flag, and MTU. It also includes information
+about the loopback status and statistics of received and transmitted
+packets. The duplex mode and port attribute must be negotiated with
+the peer end.</li><li><a href="../mo/CFMMD.html">CFMMD</a> defines an MD for CFM
+on an Ethernet network. The boundary of each MD is defined by MEPs
+on ports. Each MD is identified by an MD name. A CFM MD (<a href="../mo/CFMMD.html">CFMMD</a> MO) can be composed of multiple
+MAs (<a href="../mo/CFMMA.html">CFMMA</a> MO). </li><li><a href="../mo/CFMMA.html">CFMMA</a> defines an MA, which
+is a collection of maintenance points in an MD. Each MA is identified
+by an MD name and MA name.</li><li><a href="../mo/CFMMEP.html">CFMMEP</a>/<a href="../mo/CFMLOCALMEP.html">CFMLOCALMEP</a> defines a local MEP
+and <a href="../mo/CFMRMEP.html">CFMRMEP</a> defines an RMEP.
+These MOs together define the scope and boundary of an MD. The MD
+and MA to which the local MEP belongs determine the VLAN ID and VLAN
+priority of the virtual local area network (VLAN) through which packets
+are sent.</li><li><a href="../mo/CFMBNDIP.html">CFMBNDIP</a> defines the binding
+relationship between an RMEP and an IP address. This MO helps achieve
+route interlock for the RMEP.</li></ul>
+</div>
+<div class="p">The MO for the network layer is defined as follows:<ul><li><a href="../mo/IPRT.html">IPRT</a>/<a href="../mo/IPROUTE4.html">IPROUTE4</a> defines a static IP route,
+which is used for data forwarding through a routing table. The IPRT/IPROUTE4
+MO does not need to be configured if BFD sessions are used for maintenance
+and test at layer 2. The IPRT/IPROUTE4 MO must be configured if BFD
+sessions are used for maintenance and test at layer 3. </li></ul>
+</div>
+<div class="p">The MOs for the transport and application layers are defined
+as follows:<ul><li><a href="../mo/BFDSESSION.html">BFDSESSION</a>/<a href="../mo/BFD.html">BFD</a> consists of parameters related to
+a BFD session, which is used to quickly detect faults on channels
+between links. Single-hop BFD sessions are used for point-to-point
+maintenance and test at layer 2.</li><li><a href="../mo/TWAMPCLIENT.html">TWAMPCLIENT</a> defines
+a client for establishing a TCP connection and negotiating the control
+information about a test session, such as the DSCP and UDP port number. </li><li><a href="../mo/TWAMPSENDER.html">TWAMPSENDER</a> defines
+a sender for sending measurement packets and collecting measurement
+information.</li><li><a href="../mo/TWAMPRESPONDER.html">TWAMPRESPONDER</a> defines
+a responder for responding to TWAMP negotiation packets and TWAMP
+measurement packets. </li></ul>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody">The IPv6 protocol does not involve the <a href="../mo/BFDSESSION.html">BFDSESSION</a>/<a href="../mo/BFD.html">BFD</a> MO.</div></div>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../comm/mom/trans-mom.html" title="This chapter describes the MOMs related to transmission.">Transport MOMs</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

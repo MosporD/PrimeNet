@@ -1,0 +1,703 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellUlschAlgo">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellUlschAlgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellUlschAlgo</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellUlschAlgo"></a><a name="CellUlschAlgo"></a>
+
+
+<h1 class="topictitle1">CellUlschAlgo</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellUlschAlgo.html"><strong>CellUlschAlgo</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellUlschAlgo MO consists of the parameters related to the UL scheduling algorithm for the cell. The parameters specify the scheduling policy and functions used in UL scheduling.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>PUSCHCfg</strong> MO:<ul><li>If <strong>HoppingMode</strong> in the <strong>PUSCHCfg</strong> MO is set to INTRA_AND_INTER_SUB_FRAME and <strong>UlHoppingType</strong> in the <strong>CellUlschAlgo</strong> MO is set to HOPPING_TYPE2, <strong>Nsb</strong> in the <strong>PUSCHCfg</strong> MO must be set to 1.</li><li>If <strong>HoppingMode</strong> in the <strong>PUSCHCfg</strong> MO is set to INTER_SUB_FRAME and <strong>UlHoppingType</strong> in the <strong>CellUlschAlgo</strong> MO is set to HOPPING_TYPE2_RANDOM, <strong>Nsb</strong> in the <strong>PUSCHCfg</strong> MO cannot be set to 1.</li><li>If the <strong>UlHoppingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to HOPPING_OFF and the <strong>HoppingOffset</strong> parameter in the <strong>PUSCHCfg</strong> MO is set to 0, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to a value other than MS0.</li></ul>
+</li><li>Relation with the <strong>PUSCHCfg</strong> and <strong>Cell</strong> MOs:<ul><li>Let A be the number of RB resources corresponding to the value of <strong>UlBandWidth</strong> in a <strong>Cell</strong> MO, B the even number that <strong>HoppingOffset</strong> in the <strong>PUSCHCfg</strong> MO is rounded up to, and C the difference between A and B. When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>UlHoppingType</strong> in the <strong>CellUlschAlgo</strong> MO is set to HOPPING_TYPE1, C must be greater than A modulo 2. If <strong>UlHoppingType</strong> in the <strong>CellUlschAlgo</strong> MO is set to HOPPING_TYPE2 or HOPPING_TYPE2_RANDOM, and <strong>Nsb</strong> in the <strong>PUSCHCfg</strong> MO is greater than 1, the integer value of C divide <strong>Nsb</strong> in the <strong>PUSCHCfg</strong> MO must be greater than 0. If <strong>UlBandWidth</strong> is set to CELL_BW_N6(1.4M), the number of RB resources is 6. If <strong>UlBandWidth</strong> is set to CELL_BW_N15(3M), the number of RB resources is 15. If <strong>UlBandWidth</strong> is set to CELL_BW_N25(5M), the number of RB resources is 25. If <strong>UlBandWidth</strong> is set to CELL_BW_N50(10M), the number of RB resources is 50. If <strong>UlBandWidth</strong> is set to CELL_BW_N75(15M), the number of RB resources is 75. If <strong>UlBandWidth</strong> is set to CELL_BW_N100(20M), the number of RB resources is 100.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li><strong>UlHoppingType</strong> in a <strong>CellUlschAlgo</strong> is not set to HOPPING_OFF, <strong>SfnUplinkCompSwitch</strong> in <strong>CellAlgoSwitch</strong> can only be configured to off.</li><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the UlCamcSw option is selected under the <strong>CamcSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO, the <strong>UlHoppingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO can only be set to HOPPING_OFF.</li><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the UlInterEnbCamcSw option is selected under the <strong>CamcSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO, the <strong>UlHoppingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO can only be set to HOPPING_OFF.</li><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the UL_ICS_SWITCH option under the <strong>UlIcSwitch</strong> parameter is selected, the <strong>UlHoppingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO must be set to HOPPING_OFF.</li><li>In the <strong>Cell</strong> MO, if the <strong>FddTddInd</strong> parameter is set to CELL_TDD and the UlVoIPLoadBasedSchSwitch option of the <strong>UlEnhencedVoipSchSw</strong> parameter is selected, the SpsSchSwitch option of the <strong>UlSchSwitch</strong> parameter must be selected.</li><li>The sum of UlVoipRsvRbStart in <strong>CellUlschAlgo</strong> and UlVoipRsvRbNum in <strong>CellUlschAlgo</strong> cannot be larger than 24 when the UlVoipRbRsvSwitch option of <strong>UlSchExtSwitch</strong> is selected and <strong>DlBandWidth</strong> is equal to CELL_BW_N25.</li><li>The sum of the values of UlVoipRsvRbStart in <strong>CellUlschAlgo</strong> and UlVoipRsvRbNum in <strong>CellUlschAlgo</strong> cannot be larger than 49 when the UlVoipRbRsvSwitch option <strong>UlSchExtSwitch</strong> is selected and <strong>DlBandWidth</strong> is equal to CELL_BW_N50.</li><li>The sum of the values of UlVoipRsvRbStart in <strong>CellUlschAlgo</strong> and UlVoipRsvRbNum in <strong>CellUlschAlgo</strong> cannot be larger than 74 when the UlVoipRbRsvSwitch option of <strong>UlSchExtSwitch</strong> is selected and <strong>DlBandWidth</strong> is equal to CELL_BW_N75.</li><li>The sum of the values of UlVoipRsvRbStart in <strong>CellUlschAlgo</strong> and UlVoipRsvRbNum in <strong>CellUlschAlgo</strong> cannot be larger than 99 when the UlVoipRbRsvSwitch option of <strong>UlSchExtSwitch</strong> is selected and <strong>DlBandWidth</strong> is equal to CELL_BW_N100.</li><li>If the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE and the <strong>NbUlSubcarrierSpacingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to 3dot75K or HYBRID_MODE, the UlJointReceptionSwitch option of the <strong>UplinkCompSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be deselected.</li><li>If the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE and the <strong>NbUlSubcarrierSpacingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to 3dot75K or HYBRID_MODE, the IntraBaseBandSwitch option of the <strong>SfnUplinkCompSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be deselected.</li><li>When the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to TRUE and the <strong>NbUlSubcarrierSpacingType</strong> parameter in the associated <strong>CellUlschAlgo</strong> MO is set to 3dot75K or HYBRID_MODE, the MrcIrcAdptSwitch option of the <strong>PuschIrcAlgoSwitch</strong> parameter in the associated <strong>CellAlgoSwitch</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SectorSplitCell</strong> MOs:<ul><li>The <strong>EnhancedVmimoSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to ON only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 4T4R, 8T8R, 32T32R, or 64T64R, and no <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO.</li><li>If the FddTddInd parameter in the Cell MO is set to CELL_TDD, the TxRxMode parameter in the Cell MO is set to 64T64R or 32T32R, and a SectorSplitCell MO is configured for the Cell MO, the MmUlHeavyLoadOptSwitch option of the VmimoOptAlgoSwitch parameter in the CellUlschAlgo MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>ENodeBAlgoSwitch</strong> MO:<ul><li>If the <strong>EnhancedVmimoSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to ON, the <strong>UlIcicFreqSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>The InterfHighSpeedSW option can be selected under the <strong>HighSpeedSchOptSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO only when the <strong>UlHoppingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to HOPPING_OFF.</li><li>The VmimoOptResSwitch option can be selected under the <strong>VmimoOptAlgoSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO only if the SchedulerCtrlPowerSwitch option is selected under the <strong>UlSchSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO.</li><li>If UlMultiClusterSwitch option of the <strong>UlSchExtSwitch</strong> parameter is selected, the <strong>UlHoppingType</strong> parameter in the associated <strong>CellUlschAlgo</strong> MO must be set to Hopping_OFF.</li><li>The <strong>NbUlSubcarrierSpacingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO must not be set to 3dot75K if the MULTITONE_SWITCH option of the <strong>NbCellAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected.</li><li>If the SfnUll2SelectiveRcvSwitch option of the <strong>SfnAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to a value other than MS0.</li><li>If the InBandRelayReNbSwitch or InBandRelayDeNbSwitch option of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can only be set to MS0.</li><li>If the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to a value other than MS0, the CloseLoopSpsSwitch option of the <strong>UlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be selected.</li></ul>
+</li><li>Relation with the <strong>UlCsAlgoPara</strong> MO:<ul><li>UL_COORD_RES_ALLOC_SWITCH of <strong>UlCsSw</strong> in a <strong>UlCsAlgoPara</strong> MO can be set on only if <strong>UlHoppingType</strong> in the associated <strong>CellUlschAlgo</strong> MO is set to Hopping_OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellRbReserve</strong> MOs:<ul><li>If <strong>RbRsvMode</strong> in a <strong>CellRbReserve</strong> MO under a <strong>Cell</strong> MO is set to NB_DEPLOYMENT and the value of <strong>CellActiveState</strong> in this <strong>Cell</strong> MO is CELL_ACTIVE, <strong>UlHoppingType</strong> in the <strong>CellUlschAlgo</strong> MO under this <strong>Cell</strong> MO must be set to HOPPING_OFF.</li><li>When <strong>RbRsvMode</strong> in a <strong>CellRbReserve</strong> MO is set to RB_MASKING_WITH_SRS and <strong>CellActiveState</strong> in an associated <strong>Cell</strong> MO is set to CELL_ACTIVE, <strong>UlHoppingType</strong> in a <strong>CellUlschAlgo</strong> MO under the <strong>Cell</strong> MO must be set to HOPPING_OFF.</li></ul>
+</li><li>Relation with the <strong>NCellSrsMeasPara</strong> MO:<ul><li>The NCellDmrsMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in an <strong>NCellSrsMeasPara</strong> MO can be selected only when the <strong>UlHoppingType</strong> parameter in the associated <strong>CellUlschAlgo</strong> MO is set to HOPPING_OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>The HighSpeedSdmaSwitch option of the <strong>VmimoOptAlgoSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO cannot be selected when the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_FDD or the <strong>HighSpeedFlag</strong> parameter in the <strong>Cell</strong> MO is set to LOW_SPEED(Low speed cell flag).</li><li>The <strong>HighLoadUlSchOptSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO under a <strong>Cell</strong> MO can be set to ON only if the <strong>MultiRruCellFlag</strong> and <strong>MultiRruCellMode</strong> parameters in this <strong>Cell</strong> MO are set to BOOLEAN_TRUE and MPRU_AGGREGATION, respectively.</li><li>If the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> is 8T8R or 32T32R or 64T64R, and <strong>EstimatedTcpAckPacketCount</strong> in the <strong>CellUlschAlgo</strong> is not 0, then the <strong>UlHeavyloadOptSchSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> is ON.</li><li>If the <strong>HighSpeedFlag</strong> parameter in the <strong>Cell</strong> MO is set to LOW_SPEED, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to a value other than MS0.</li><li>If the <strong>UlBandWidth</strong> parameter in the <strong>Cell</strong> MO is set to a value other than CELL_BW_N6 and CELL_BW_N15, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to a value other than MS0.</li><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can only be set to MS0.</li><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>SubframeAssignment</strong> parameter in the <strong>Cell</strong> MO is set to SA2, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to a value other than MS0.</li><li>The MmVmimoUePairingOptSw option of the <strong>VmimoOptAlgoSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be selected only if the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 32T32R or 64T64R, the <strong>EstimatedTcpAckPacketCount</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to a non-zero value, the <strong>UlHeavyloadOptSchSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to ON, and the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>HighSpdAdaptionPara</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> and <strong>HighSpeedFlag</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD and LOW_SPEED respectively, the UlRbBasedInterfAvoid option of the <strong>InterfAvoidMode</strong> parameter in the <strong>HighSpdAdaptionPara</strong> MO is selected, and the RbBasedAbsoluteAvoidInd option is deselected, the <strong>UlDelaySchStrategy</strong> parameter in the <strong>CELLULSCHALGO</strong> MO must be set to VOIP_AND_DATA_DELAYSCH.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> MO:<ul><li>When the <strong>AdaptHarqSwitch</strong> parameter in the <strong>CellUlSchAlgo</strong> MO is set to ADAPTIVE_HARQ_SW_ON or ADAPTIVE_HARQ_SW_SEMI_ON, the <strong>SpectrumCloudSwitch</strong> parameter can be set to LTE_NR_UPLINK_SPECTRUM_SHR.</li></ul>
+</li><li>Relation with the <strong>CellShortTtiAlgo</strong> MO:<ul><li>When the <strong>UlHoppingType</strong> parameter in the <strong>CellUlSchAlgo</strong> MO is set to HOPPING_OFF, the SHORT_TTI_SW option of the <strong>SttiAlgoSwitch</strong> parameter in the <strong>CellShortTtiAlgo</strong> MO can be selected.</li></ul>
+</li><li>Relation with the <strong>eUCellSectorEqm</strong> MO:<ul><li>If <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO is set to MASSIVE_MIMO_Ph2, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can only be set to MS0.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD and the <strong>SpectrumCloudSwitch</strong> parameter in the associated <strong>SpectrumCloud</strong> MO is set to LTE_NR_SPECTRUM_SHR, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the associated <strong>CellUlschAlgo</strong> MO must be set to MS0.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD and the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO under this <strong>Cell</strong> MO is set to LTE_NR_SPECTRUM_SHR, the <strong>AdaptHarqSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO under this <strong>Cell</strong> MO must be set to ADAPTIVE_HARQ_SW_ON or ADAPTIVE_HARQ_SW_SEMI_ON.</li></ul>
+</li><li>Relation with the <strong>NbCellMultiPrbConfig</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to TRUE, and the <strong>NbUlSubcarrierSpacingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to 3dot75K or HYBRID_MODE, the <strong>NbRfCarrierStrategy</strong> parameter in the <strong>NbCellMultiPrbConfig</strong> MO cannot be set to SHARE.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, and <strong>CellMMAlgo</strong> MOs:<ul><li>When the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 32T32R, and no <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, the <strong>EnhancedVmimoSwitch</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to ON only if the PUSCH_RECEIVE_ENH_SWITCH option of the <strong>MMAlgoOptSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SpectrumCloud</strong> MOs:<ul><li>When the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is set to GL_SPECTRUM_CONCURRENCY, DC_HSDPA_BASED_UL_SPECTRUM_SHR, UL_SPECTRUM_SHARING, UL_SPECTRUM_SHR_PH2_WITH_GSM, LTE_NR_UPLINK_SPECTRUM_SHR, or LTE_NR_SPECTRUM_SHR, and the <strong>FddTddInd</strong> in the <strong>Cell</strong> is set to CELL_FDD, the <strong>UlHoppingType</strong> parameter in the associated <strong>CellUlschAlgo</strong> MO must be set to HOPPING_OFF.</li></ul>
+</li><li>Relation with the <strong>CellAlgoExtSwitch</strong> MO:<ul><li>If the <strong>UlCoverageEnhancementSw</strong> parameter in the <strong>CellAlgoExtSwitch</strong> MO is set to ON, the <strong>UlHoppingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO must be set to HOPPING_OFF.</li><li>If the HARQ_ACK_WITH_SR_SWITCH or SPS_BSR_SWITCH option of the <strong>NbCellAlgoExtSwitch</strong> parameter in a <strong>CellAlgoExtSwitch</strong> MO is selected, the <strong>NbUlSubcarrierSpacingType</strong> parameter in the associated <strong>CellUlschAlgo</strong> MO must be set to 15K.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> and <strong>CellAlgoExtSwitch</strong> MOs:<ul><li>The <strong>SpaDomainPrefVmimoStrtThld</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to a value other than 255 only if both the SPACE_DOMAIN_MEAS_SW option of the <strong>MeasOptAlgoExtSw</strong> parameter in the <strong>CellAlgoExtSwitch</strong> MO and the UlVmimoSwitch option of the <strong>UlSchSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO corresponding to the <strong>Cell</strong> MO are selected.</li></ul>
+</li><li>Relation with the <strong>CellRbReserve</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>If the <strong>RbRsvMode</strong> of <strong>CellRbReserve</strong> is set to MCPTT_RB_RESERVED and the UlVoipRbRsvSwitch option of the <strong>UlSchExtSwitch</strong> parameter of <strong>CellAlgoSwitch</strong> is selected, the <strong>RbRsvStartIndex</strong> of <strong>CellRbReserve</strong> must be greater than or equal to the sum of the <strong>UlVoipRsvRbStart</strong> and the <strong>UlVoipRsvRbNum</strong>, or the <strong>UlVoipRsvRbStart</strong> of <strong>CellUlschAlgo</strong> must be greater than the <strong>RbRsvEndIndex</strong> of <strong>CellRbReserve</strong>.</li></ul>
+</li><li>Relation with the <strong>CellEmtcAlgo</strong> MO:<ul><li>If the EMTC_SWITCH option of the <strong>EmtcAlgoSwitch</strong> parameter in the <strong>CellEmtcAlgo</strong> MO is selected and the PRACH_FREQ_HOPPING_SW and PUSCH_FREQ_HOPPING_SW options of the <strong>EmtcFreqHoppingSwitch</strong> parameter in the <strong>CellEmtcAlgo</strong> MO are deselected, the <strong>IntvlOfUlSpsWithSkipping</strong> parameter in the <strong>CellUlschAlgo</strong> MO can be set to a value other than MS0.</li></ul>
+</li><li>Relation with the <strong>Prb</strong> and <strong>NbCellMultiPrbConfig</strong> MOs:<ul><li>When more than two <strong>Prb</strong> MO instances are configured under a <strong>Cell</strong> MO or if the <strong>NbRfCarrierStrategy</strong> parameter in the <strong>NbCellMultiPrbConfig</strong> MO under a <strong>Cell</strong> MO is set to SHARE, <strong>NbUlSubcarrierSpacingType</strong> in the <strong>CellUlschAlgo</strong> MO under this <strong>Cell</strong> MO cannot be set to 3dot75K or HYBRID_MODE.</li></ul>
+</li><li>Relation with the <strong>ContigIntraBandCarr</strong> MO:<ul><li>If the CONTIG_INTRA_BAND_CARR_SW option of <strong>ContigIntraBandCarrSw</strong> in the <strong>ContigIntraBandCarr</strong> MO is selected, <strong>UlHoppingType</strong> in the <strong>CellUlschAlgo</strong> MO must be set to HOPPING_OFF.</li><li>If the CONTIG_INTRA_BAND_CARR_SW option of <strong>ContigIntraBandCarrSw</strong> in the <strong>ContigIntraBandCarr</strong> MO is selected, <strong>UlHoppingType</strong> in the <strong>CellUlschAlgo</strong> MO must be set to HOPPING_OFF.</li></ul>
+</li><li>Relation with the <strong>UlInterfSuppressCfg</strong>, <strong>CellAlgoSwitch</strong>, and <strong>eUCellSectorEqm</strong> MOs:<ul><li>The <strong>UlIntrfDetectionTrigThld</strong> parameter in the <strong>UlInterfSuppressCfg</strong> MO can be set to a value other than 127 when all of the following conditions are met: The <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 1T2R, 2T2R, 2T4R, or 4T4R, the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO is set to NORMAL, the <strong>HighSpeedFlag</strong> parameter in the <strong>Cell</strong> MO is set to LOW_SPEED, the <strong>MultiRruCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to BOOLEAN_FALSE, the InBandRelayDeNbSwitch, InBandRelayReNbSwitch, and OutOfBandRelaySwitch options of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are deselected, the <strong>UlHoppingType</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to HOPPING_OFF, and the <strong>CellRadius</strong> parameter in the <strong>Cell</strong> MO is set to a value smaller than or equal to 15000 m.</li></ul>
+</li><li>Relation with the <strong>CellEdtConfig</strong> and <strong>Cell</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> parameter in the <strong>Cell</strong> MO is set to TRUE, if the <strong>NbUlSubcarrierSpacingType</strong> parameter in the associated <strong>CellUlschAlgo</strong> MO is set to 3dot75K or HYBRID_MODE, the EDT_SWITCH option of the <strong>EdtAlgoSwitch</strong> parameter in the <strong>CellEdtConfig</strong> MO cannot be selected for the cell.</li></ul>
+</li><li>Relation with the <strong>GlobalProcSwitch</strong> MO:<ul><li>If the PttVoiceOptSw option of the<strong>UlEnhencedVoipSchSw</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to ON, the <strong>LcgProfile</strong> parameter in the <strong>GlobalProcSwitch</strong> MO must be set to LCG_PROFILE_3.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellUlschAlgo__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellUlschAlgo__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellUlschAlgo__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellulschalgo.html">LST CELLULSCHALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the cell UL scheduling algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellulschalgo.html">MOD CELLULSCHALGO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of the cell UL scheduling algorithm.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellUlschAlgo__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellUlschAlgo__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellUlschAlgo__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within a BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlschStrategy.html">Uplink Scheduling Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UL scheduling policy, which determines the scheduling priority order in which UEs are arranged in UL. There are four UL scheduling strategies: MAX C/I, proportional fair (PF), round Robin (RR), and enhanced proportional fair (EPF). The MAX C/I policy schedules UEs in descending order of average signal to interference plus noise ratio (SINR). The PF policy schedules UEs in ascending order of ratio of the data rate to the average SINR. The RR policy schedules each UE in sequence, and therefore each UE has an equal opportunity to be scheduled. The EPF policy schedules UEs in ascending order of priority. In EPF, the priority of an UE is calculated based on the following factors: the data rate, average SINR, QoS-satisfying data rate for each service, and service differentiation requirements of the UE. The MAX C/I, PF, and RR policies are basic UL scheduling policies and supported by the eNodeB by default, whereas the EPF policy is intended for commercial use. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-AdaptHarqSwitch.html">adaptive HARQ switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch that is used to determine whether to enable or disable UL adaptive HARQ. If this switch is set to ADAPTIVE_HARQ_SW_OFF, UL data is retransmitted by non-adaptive synchronous HARQ. If this switch is set to ADAPTIVE_HARQ_SW_ON, UL data is retransmitted by adaptive synchronous HARQ. If this switch is set to ADAPTIVE_HARQ_SW_SEMI_ON, adaptive HARQ is triggered when a UL grant is delivered to an HARQ process that is previously suspended due to reasons such as resource collision, activation of a measurement gap, and PDCCH congestion. Setting this parameter to ADAPTIVE_HARQ_SW_ON helps reduce resource consumption due to retransmission, increase the cell throughput, and prevent retransmission conflicts. This, on the other hand, will increase signaling overhead and therefore consume more PDCCH resources. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SinrAdjustTargetIbler.html">SINR target IBLER adjustment</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the target IBLER of the SINR adjustment algorithm. A greater parameter value indicates a greater SINR adjustment value, and thus an MCS of a higher index is used. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PreAllocationBandwidthRatio.html">System Bandwidth Ratio Used By Pre-schedule user per TTI</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ratio of the maximum bandwidth resources that the uplink scheduler can allocate to preallocation UEs to the total system bandwidth. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PreAllocationMinPeriod.html">minimal period of pre-allocation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum interval between two pre-allocations. That is, the actual interval between two pre-allocations of one UE must be longer than or equal to the value of this parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PreAllocationSize.html">data size of pre-allocation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the data amount pre-allocated to each user. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlHoppingType.html">Uplink hopping type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether frequency hopping (FH) is enabled or disabled and which FH type is used.</p>
+<p>Hopping_OFF: indicates that FH is disabled.</p>
+<p>Hopping_Type1: indicates that adaptive FH is enabled and FH type 1 is used. In this scenario, UEs in the cell can determine whether to use FH based on the actual situation.</p>
+<p>Hopping_Type2: indicates that adaptive FH is enabled and FH type 2 is used. In this scenario, UEs in the cell can determine whether to use FH based on the actual situation.</p>
+<p>Hopping_Type2_RANDOM: indicates that interference-randomization-based FH is enabled and FH type 2 is used. In this scenario, all UEs in the cell use FH. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-FreeUserUlRbUsedRatio.html">Free Users Uplink RB Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the percentage of PUSCH RBs used by free UEs when both free and paying UEs are scheduled. The rest of RBs used as the PUSCH are allocated to paying UEs. When UEs have a large amount of data to be sent, the percentage of RBs allocated to free UEs and that allocated to paying UEs will reach the preset values. Changing this parameter affects the percentage of RBs allocated to free UEs and that to paying UEs. Modifying this parameter for an active cell will lead to cell reestablishment. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlSrSchDateLen.html">UL scheduling request user data length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the data amount that the uplink scheduler assigns to UEs that have sent scheduling requests. The uplink scheduler allocates resources to these UEs for them to report their buffer status and transmit some of the data.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SpsRelThd.html">Semi-persistent resource implicit release threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for the number of consecutive zero-payload packets received by the eNodeB. After receiving consecutive zero-payload packets of a number that is equal to the value of this parameter, the eNodeB performs implicit release of semi-persistent resources. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SmartPreAllocationDuration.html">Smart pre-allocation duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration of uplink smart preallocation triggered by downlink scheduling. If SmartPreAllocationSwitch is set to On and this parameter is set to 0, neither smart preallocation nor preallocation takes effect. If SmartPreAllocationSwitch is set to Off, this parameter is invalid. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlEpfCapacityFactor.html">Uplink EPF capacity factor</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the capacity factor for uplink enhanced proportional fair (EPF) scheduling. When the eNodeB schedules UEs with unsatisfied GBR, this factor affects the scheduling priorities of UEs running services with the QCI of 1, 2, 3, or 4. When the eNodeB schedules UEs running Non-GBR services, this factor affects the scheduling priorities of UEs running services with the QCI of 6, 7, 8, or 9. In this way, this factor can be used to adjust the cell capacity and fairness among UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlRbAllocationStrategy.html">Uplink Resource Block Allocation Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the strategy for allocating resource blocks (RBs) in the uplink of the cell. If this parameter is set to FS_NONFS_ADAPTIVE, this strategy adaptively switches between frequency selective scheduling and non-frequency selective scheduling. If this parameter is set to FS_INRANDOM_ADAPTIVE, this strategy adaptively switches between frequency selective scheduling and interference-randomization-based scheduling. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-DopMeasLevel.html">Doppler Measurement Level</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Doppler measurement level, which is used for selecting a Doppler measurement policy. If this parameter is set to CLASS_0, the demodulation reference signals (DMRSs) whose signal to interference plus noise ratios (SINRs) are greater than or equal to 5 dB are used in Doppler measurements. If this parameter is set to CLASS_1, the DMRSs whose SINRs are greater than or equal to -5 dB are used in Doppler measurements. This parameter does not take effect on cells established on an LBBPc. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlHarqMaxTxNum.html">Uplink HARQ Maximum Transmission Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of uplink HARQ transmissions, excluding the HARQ transmission based on TTI bundling. For details, see 3GPP TS 36.331. When a UE runs services with a QCI of 1, the smaller value between the parameter value and 5 is used as the maximum number of uplink HARQ transmissions. When the UE does not run services with a QCI of 1, the parameter value is used as the maximum number of uplink HARQ transmissions. This parameter has coupling relationships with the ENodeBAmReorderingTimer or the ENodeBUmReorderingTimer parameter. When the UlHarqMaxTxNum parameter is set to 7, it is recommended that the ENodeBAmReorderingTimer or ENodeBAUmReorderingTimer parameter be set to a value greater than or equal to 50 ms. When the UlHarqMaxTxNum parameter is set to 8, it is recommended that the ENodeBAmReorderingTimer or ENodeBAUmReorderingTimer parameter be set to a value greater than or equal to 60 ms. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SmartPreAllocDuraForSparse.html">Sparse Smart Pre-allocation Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the smart preallocation duration for sparse packets. The larger value between this parameter and the SmartPreAllocationDuration parameter is selected as the actual smart preallocation duration for sparse packets. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlSpsInterval.html">Uplink Semi-persistent Scheduling Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the semi-persistent scheduling period in the uplink. The parameter value can be 20ms, 40ms, or ADAPTIVE in LTE TDD mode. If this parameter is set to 20ms, the semi-persistent scheduling period is fixed as 20 ms. If this parameter is set to 40ms, the semi-persistent scheduling period is fixed as 40 ms. If this parameter is set to ADAPTIVE, the eNodeB adaptively selects 20ms or 40ms as the period.</p>
+<p>LTE FDD eNodeBs support a fixed interval of 20 or 40 ms. If this parameter is set to ADAPTIVE for LTE FDD eNodeBs, the actually effective value is 20ms. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SriFalseDetThdSwitch.html">Sri False Detect Threshold Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to increase the scheduling request indicator (SRI) false detection threshold for UEs in the discontinuous reception (DRX) state. If this parameter is set to ON, the threshold increases and the SRI false detection probability decreases. If this parameter is set to OFF, both the threshold and the probability remain unchanged. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-NoUlSchTtiNumAffterGap.html">No UL Scheduling TTI Number After GAP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of consecutive transmission time intervals (TTIs) within which the eNodeB does not perform uplink scheduling after a measurement gap. This parameter applies only to LTE FDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlDelaySchStrategy.html">Uplink Delay-based Scheduling Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable delay-based dynamic scheduling in the uplink. If this parameter is set to NO_DELAYSCH(No Delay Scheduling), delay-based dynamic scheduling is not enabled in the uplink. If this parameter is set to VOIP_DELAYSCH(VoIP Service Delay Scheduling), delay-based dynamic scheduling prioritization for VoIP services is enabled in the uplink and the uplink dynamic scheduling priority is adjusted based on the delay, increasing the MOS and cell VoIP capacity in heavy-load VoIP scenarios. If this parameter is set to VOIP_DELAYSCH_DIVISION, the uplink delay-based dynamic scheduling based on VoIP services is enabled to distinguish between SR-based voice and non-voice users, further increasing the MOS and cell VoIP capacity in heavy-load VoIP scenarios. VOIP_DELAYSCH_DIVISION applies only to LTE TDD. If this parameter is set to VOIP_AND_DATA_DELAYSCH, the uplink delay-based dynamic scheduling for voice and data services is enabled and the uplink dynamic scheduling priority is adjusted based on delay, increasing the MOS and cell VoIP capacity of voice services in heavy load scenarios and the data throughput. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlSchAbnUeThd.html">Uplink Schedule Abnormal Ue Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of consecutive cyclic redundancy check (CRC) errors in the uplink above which the eNodeB stops scheduling the abnormal UE. The parameter value range is from 6 to 120. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SpecificPktSizeThd.html">Specific Packet Size Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the size threshold for determining whether a packet is a special packet. This parameter can be set based on the size of special small packets, such as heartbeat packets. This parameter is used to reduce the impact of services with small packets on the calculation of performance counters related to uplink throughput. Changing this parameter value affects values of counters L.Thrp.Time.UE.UL.RmvSpecificTTI and L.Thrp.bits.UE.UL.SpecificTTI. For details about the impact, see the "Measurement Point" of the counters in eNodeB Performance Counter Reference. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SrMaskSwitch.html">SR Masking Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable scheduling request (SR) masking in logical channels for UEs complying with 3GPP Release 9 or later when the SpsSchSwitch option under the UlSchSwitch parameter is selected. If this parameter is set to ON(On), SR masking in logical channels is enabled. If this parameter is set to OFF(Off), SR masking in logical channels is disabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PuschDtxSchStrategy.html">PUSCH DTX Scheduling Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the scheduling policy for the initial PUSCH transmission that is detected as discontinuous transmission (DTX) when PuschDtxSwitch of the UlSchSwitch parameter is on. If the PuschDtxSchStrategy parameter is set to NEW_TX, initial transmission instead of retransmission is performed when the initial PUSCH transmission is detected as DTX. If the PuschDtxSchStrategy parameter is set to ADAPTIVE_RETX, adaptive retransmission is performed when the initial PUSCH transmission is detected as DTX. If the PuschDtxSchStrategy parameter is set to EN_ADAPTIVE_RETX, adaptive retransmission is performed for UEs running voice services when the initial PUSCH transmission is detected as DTX in DRX scenarios regardless of whether the UEs are in DRX sleep or active time at the retransmission. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlVoipRlcMaxSegNum.html">Max Number of UL RLC Segments for VoIP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable upper limit control on service data unit (SDU) segmentation at the radio link control (RLC) layer in the uplink for VoLTE services scheduled in non-TTI bundling mode and the maximum SDU segments at the RLC layer.</p>
+<p>If this parameter is set to 0, the upper limit control on SDU segmentation at the RLC layer is disabled in the uplink for VoLTE services scheduled in non-TTI bundling mode.</p>
+<p>If this parameter is set to a non-zero value X, upper limit control on SDU segmentation at the RLC layer is enabled and an SDU can be divided into a maximum of X segments for VoLTE services in uplink dynamic scheduling in non-TTI bundling mode.</p>
+<p>This function must be enabled if UlVoipCrosslayerOptSwitch is set on. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-InitUlSinrAdjust.html">Initial Uplink SINR Adjustment</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the initial SINR adjustment value for the SINR adjustment algorithm. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlSinrAdjustStep.html">Uplink SINR Adjust Step</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SINR adjustment step. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlSinrFilterCoef.html">Uplink SINR Filter Coefficient</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filtering coefficient for the uplink SINR. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlEnhencedVoipSchSw.html">Uplink Enhanced VoIP Schedule Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable enhanced uplink scheduling for VoLTE services.</p>
+<p>UlVoipPreAllocationSwitch: Indicates whether to perform preallocation for VoLTE UEs during talk spurts when the number of RRC_CONNECTED UEs exceeds 50 in a cell. Voice preallocation is performed only if this option is selected. This option applies only to LTE FDD.</p>
+<p>UlVoipDelaySchSwitch: Indicates whether to perform delay-based scheduling on VoLTE UEs when there are a large number of VoLTE UEs and these UEs are evenly distributed. If this option is deselected, delay-based scheduling is not performed on VoLTE UEs. If this option is selected, the scheduling priorities are calculated based on delays. This option applies only to LTE TDD.</p>
+<p>UlVoIPLoadBasedSchSwitch: Indicates whether to enable adaptive selection of scheduling modes for VoLTE UEs based on the cell load. Two scheduling modes are provided: dynamic scheduling and semi-persistent scheduling. If this option is deselected, adaptive selection of dynamic and semi-persistent scheduling cannot be performed for VoLTE UEs based on the cell load. If this option is selected, dynamic and semi-persistent scheduling can be adaptively selected for VoLTE UEs based on the cell load.</p>
+<p>UlVoipSchOptSwitch: Indicates whether to enable scheduling optimization for VoLTE UEs in the uplink. If this option is deselected, this function is disabled. If this option is selected, an uplink dynamic scheduling is triggered for VoLTE UEs adopting uplink dynamic scheduling when the scheduling interval is greater than the uplink scheduling interval threshold for VoLTE UEs. This ensures timely uplink scheduling on VoLTE UEs even when SR missing detections occur, thereby avoiding packet loss caused by the expiration of the PDCP packet discarding timer.</p>
+<p>UlVoLTEDataSizeEstSwitch: Indicates whether to enable the estimation of traffic volume dynamically scheduled for VoLTE services in the uplink. If this option is deselected, this function is disabled. If this option is selected, the eNodeB estimates the uplink traffic volume that is dynamically scheduled for VoLTE services, which shortens the VoLTE packet delay, reduces the packet loss rate, and improves the voice service quality.</p>
+<p>UlVoipServStateEnhancedSw: Indicates whether to enable enhanced determination of VoLTE service states (either in talk spurts or silent period) in the uplink. If this option is deselected, enhanced determination is disabled. If this option is selected, enhanced determination is enabled. Selecting this option shortens the determination delay on voice service states in the uplink, decreases the probability of the voice service state being falsely determined as in the silent period, decreases the voice packet loss rate caused by SR missing detections when the UlVoipSchOptSwitch option is selected, and improves the voice quality, especially the voice quality during initial accesses and handovers.</p>
+<p>UlVoipRblerControlSwitch: Indicates whether to enable retransmission optimization on uplink VoLTE services. If this option is deselected, retransmission optimization is disabled. If this option is selected, retransmission optimization is applied, and an MCS with a lower index is selected to decrease the voice packet loss rate caused by uplink HARQ retransmission failures when UEs running VoLTE services perform uplink adaptive retransmissions.</p>
+<p>UlEdgeActiveSchSwitch: Indicates whether to enable active dynamic scheduling on VoLTE UEs located on cell edges. If this option is deselected, this function is disabled. If this option is selected, the eNodeB estimates the volume of traffic to be dynamically scheduled for VoLTE services in the uplink, and actively schedules VoLTE UEs if fragmentation is required due to limited uplink power according to the estimation results. By doing so, the eNodeB reduces the packet delay and timeout-caused packet loss rate for VoLTE services, and improves voice service quality. This option applies only to LTE TDD.</p>
+<p>UlMcsRestraintAfterSpsRelSw: Indicates whether MCS restriction takes effect on uplink dynamic scheduling after uplink semi-persistent scheduling release. If this option is deselected, this function is disabled. If this option and the SpsSchSwitch option of the UlSchSwitch parameter are selected, this function is enabled, and the MCS for uplink dynamic scheduling is restricted after uplink semi-persistent scheduling release. In this way, the reliability of uplink dynamic scheduling transmission after uplink semi-persistent scheduling release can be guaranteed, and voice quality improves.</p>
+<p>SpsAndDrxOptSwitch: Indicates whether to enable optimization of cooperation between semi-persistent scheduling and DRX. If this option is deselected, power control commands for semi-persistent scheduling can be delivered during the DRX sleep time. If this option is selected, power control commands for semi-persistent scheduling can be delivered only during the DRX On Duration period, but not during the DRX sleep time.</p>
+<p>UlCallMuteRecoverSwitch: Indicates whether to enable voice mute recovery in the uplink. If this option is selected, the eNodeB performs voice activity detection (VAD) on UEs running voice services and performs intra-cell handovers or releases the RRC connections for UEs on which speech absence is detected to recreate the radio bearers.</p>
+<p>UlVoipCrosslayerOptSwitch: Indicates whether to enable cross-layer optimization for VoLTE services in the uplink. If this option is deselected, the optimization is disabled. If this option is selected, the eNodeB estimates the amount of data to be dynamically scheduled in the uplink for voice services after optimizing the PDCP SDU discarding timer, eNodeB UM receiver-end reordering timer, and maximum number of MAC-layer transmissions for uplink services of QCI 1. Based on the estimation, the eNodeB selects an optimum MCS and an optimum RB number to decrease the uplink VoLTE packet loss rate and improve voice service quality.</p>
+<p>UlVoLTEContinuousSchSw: Indicates whether to enable continuous scheduling for uplink VoLTE services. The continuous scheduling function is enabled only if this option is selected. When this function is enabled, the eNodeB continuously schedules VoLTE UEs during uplink talk spurts to reduce uplink scheduling delay, packet delay and packet jitter for VoLTE UEs and improve voice service quality.</p>
+<p>UlMixVoLTEOptSwitch: Indicates whether to enable uplink voice and data service optimization. If this option is deselected, the optimization is disabled. If this option is selected, the eNodeB allocates bandwidths suitable for scheduling voice packets for VoLTE UEs performing both data and voice services. This ensures preferential scheduling of voice service UEs and decreases the packet loss rate of QCI 1 services in heavily loaded voice service scenarios. This option applies only to LTE TDD.</p>
+<p>VoLTEPwrOptSwitch: Indicates whether to enable VoLTE power control optimization. If this option is selected, the power of cell edge VoLTE UEs is adjusted quickly. It is recommended that this option be selected only in high-speed railway scenarios.</p>
+<p>UlVoLTEDelaySchEnhancedSw: Indicates whether to enhance delay-based dynamic scheduling for VoLTE services in the uplink. If this option is deselected, the eNodeB does not enhance delay-based dynamic scheduling for VoLTE services in the uplink. If this option is selected and the UlDelaySchStrategy parameter in the CellUlschAlgo MO is set to VOIP_AND_DATA_DELAYSCH(VoIP and Data Delay Scheduling), the eNodeB enhances delay-based dynamic scheduling for VoLTE services in the uplink. This option applies only to LTE TDD.</p>
+<p>AmrVoiceFrameSmartCoverySw: Indicates whether to enable smart recovery of AMR voice frames. If this option is selected, the eNodeB recovers certain voice frames with transmission errors based on the importance of voice frames at the RLC layer. This option applies only to LTE FDD and LTE TDD.</p>
+<p>EnhancedUlVoipAmcSw: Indicates whether to enable the enhanced uplink voice-specific AMC function. If this option is selected, this function takes effect. For UEs running voice services in LTE FDD cells, the eNodeB selects an initial SINR adjustment value based on the cell-specific adjustment value and increases uplink power based on the BLER. For UEs running voice services in LTE TDD cells, the eNodeB increases uplink power based on the BLER. If this option is deselected, this function does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UlMcpttCrossLayerOptSw: Indicates whether to enable cross-layer optimization for MCPTT services in the uplink. If this option is deselected, the optimization is disabled. If this option is selected, the eNodeB estimates the amount of data to be dynamically scheduled in the uplink for MCPTT services after optimizing the uplink PDCP discarding timer and eNodeB UM receiver-end reordering timer for services of QCI 65 and QCI 66 and maximum number of uplink MAC-layer transmissions. Based on the estimation, the eNodeB selects an optimum MCS and an optimum number of RBs to decrease the uplink MCPTT packet loss rate and improve voice service quality. This option takes effect for services of QCI 65 only when the GlobalProcSwitch.LcgProfile parameter is set to LCG_PROFILE_3. This option applies only to LTE FDD and LTE TDD.</p>
+<p>VoltePdcchDtxOptSwitch: Indicates whether to enable optimization when the PDCCH is not detected by VoLTE UEs or DTX is falsely detected on the PUSCH transmitted by VoLTE UEs. The function is enabled only if this option is selected. This option applies only to LTE FDD.</p>
+<p>PttVoiceOptSw: Indicates whether to enable PTT voice optimization. If this option is selected, PTT voice optimization is enabled. If this option is deselected, PTT voice optimization is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlInBasedFssSinrThld.html">Sinr Threshold of UL FSS by Interference</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the signal to interference plus noise ratio (SINR) threshold under which interference-based frequency selective resource allocation is enabled in the uplink. This parameter takes effect only when UlInterfFssSwitch of the UlSchSwitch parameter is on. This parameter applies only to LTE FDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlCamcDlRsrpOffset.html">UL Coordinated AMC DL RSRP Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of downlink RSRP difference used to maintain the interference measurement sets of UEs in intra-eNodeB and inter-eNodeB coordinated uplink AMC algorithms. This parameter applies only to LTE TDD.</p>
+<p>The interference measurement sets of UEs are maintained based on this parameter after the downlink RSRP measurement value is received.</p>
+<p>The eNodeB selects two intra-frequency neighboring cells with large downlink RSRP differences (calculated by the RSRP of the neighboring cell minus the RSRP of the serving cell) from the CoMP set. If both large downlink RSRP differences are greater than this threshold, the neighboring cells are added to the interference measurement set.</p>
+<p>If both the UlCamcSw and UlInterEnbCamcSw options of the CamcSwitch parameter are selected, the interference measurement set must be determined based on the interference factor.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-StatisticNumThdForTtibTrig.html">Statistic Num Threshold for TTIB Trigger</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold expressed in the number of times the channel quality of a UE consistently meets conditions for entering TTI bundling. Before a UE enters TTI bundling, the eNodeB takes statistics on the channel quality of the UE at intervals of 20 ms or longer. If the number of consecutive times the channel quality of the UE consistently meets the TTI bundling entry conditions is greater than the value of this parameter, the UE enters TTI bundling. This parameter postpones the entry into TTI bundling and reduces the probability of unnecessary TTI bundling entering caused by radio signal fluctuations. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-StatisticNumThdForTtibExit.html">Statistic Num Threshold for TTIB Exit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold expressed in the number of times the channel quality of a UE consistently meets conditions for exiting TTI bundling. Before a UE exits TTI bundling, the eNodeB takes statistics on the channel quality of the UE at intervals of 20 ms or longer. If the number of consecutive times the channel quality of the UE consistently meets the TTI bundling exit conditions exceeds the value of this parameter, the UE exits TTI bundling. This parameter postpones the exit from TTI bundling and reduces the probability of unnecessary TTI bundling exit caused by radio signal fluctuations. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-HystToExitTtiBundling.html">Hysteresis to Exit TTI Bundling</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the hysteresis of the SINR threshold for exiting from TTI bundling against the SINR threshold for entering TTI bundling. This hysteresis reduces the probability of unnecessary exit from TTI bundling caused by radio signal fluctuations. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-TtiBundlingRlcMaxSegNum.html">TTIB Max Number of RLC Segments</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable upper limit control on service data unit (SDU) segmentation at the radio link control (RLC) layer in the uplink for services scheduled in transmission time interval (TTI) bundling mode and the maximum SDU segments at the RLC layer. If this parameter is set to 0, the upper limit control on SDU segmentation at the RLC layer is disabled in the uplink for services scheduled in TTI bundling mode. If this parameter is set to a non-zero value X, upper limit control on SDU segmentation at the RLC layer is enabled and an SDU can be divided into a maximum of X segments for services in uplink dynamic scheduling in TTI bundling mode. This function must be enabled if UlVoipCrosslayerOptSwitch is set on. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-TtiBundlingHarqMaxTxNum.html">TTIB Max Number of HARQ Transmissions</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of uplink hybrid automatic repeat request (HARQ) transmissions for UEs in the transmission time interval (TTI) bundling state. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-TtiBundlingTriggerStrategy.html">TTI Bundling Trigger Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy of triggering transmission time interval (TTI) bundling when TtiBundlingSwitch of the UlSchSwitch parameter is on.</p>
+<p>If this parameter is set to SERVICE_VOIP, the eNodeB triggers TTI bundling for UEs running only VoIP services in the uplink.</p>
+<p>If this parameter is set to SERVICE_MULTIAPP, the eNodeB triggers TTI bundling for all UEs running VoIP services, including UEs running only VoIP services and UEs running both VoIP services and data services in the uplink. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-DopAlgoSwitch.html">Doppler Algo Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>FastReportDopSwitch: Indicates whether to shorten the period that the baseband processing unit reports Doppler measurements to the MAC layer. If this option is selected, the Doppler measurement reporting period is shortened with the predefined reporting conditions. If this option is deselected, the Doppler measurements are reported at the predefined periods and with the predefined conditions. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-EnhancedVmimoSwitch.html">Enhanced VMIMO Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enhance uplink MU-MIMO for non-massive MIMO cells or whether to optimize pairing for uplink MU-MIMO to pair more layers of UEs in massive MIMO cells. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UeNumThdInPdcchPuschBal.html">Ue Num Threshold in PDCCH PUSCH Balance</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for the number of synchronized UEs in a cell above which the PDCCH and PUSCH resource allocation optimization mechanism is activated in large traffic volume scenarios. If this parameter is set to a value ranging from 0 to 10000 (indicating a threshold from 0 UE to 10,000 UEs), the mechanism is activated when the number of synchronized UEs in the cell is greater than or equal to this parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-DataThdInPdcchPuschBal.html">Data Threshold in PDCCH and PUSCH Balance</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the traffic volume threshold of a UE above which the UE is determined as a UE with large packets in the PDCCH and PUSCH resource allocation optimization mechanism when traffic is heavy. If this parameter is set to 0, none of the UEs is determined as a UE with large packets. If this parameter is set to a value ranging from 1 to 1000000 (indicating a threshold from 1 bit to 1,000,000 bits), a UE whose traffic to be scheduled is greater than or equal to this parameter value is determined as a UE with large packets. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-HeadOverheadForUlSch.html">Head Overhead For Uplink Scheduling</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the head overhead of data in uplink scheduling.</p>
+<p>The parameter value 0bit indicates that the data does not have head overhead.</p>
+<p>The parameter value 32bit indicates that the head overhead is 32 bits. This parameter can be set to 32bit in scenarios where RLC initial transmission is performed on a single service and the MAC layer does not send control units.</p>
+<p>The parameter value 48bit indicates that the head overhead is 48 bits. This parameter can be set to 48bit in scenarios where RLC initial transmission is performed on a single service and the MAC layer sends buffer status reports (BSRs) or power headroom reports (PHRs).</p>
+<p>The parameter value 64bit indicates that the head overhead is 64 bits. This parameter can be set to 64bit in scenarios where RLC initial transmission is performed on a single service and the MAC layer sends BSRs and PHRs.</p>
+<p>The parameter value 80bit indicates that the head overhead is 80 bits. This parameter can be set to 80bit in scenarios where RLC retransmission is performed on a single service and the MAC layer sends BSRs and PHRs.</p>
+<p>The parameter value 96bit indicates that the head overhead is 96 bits. This parameter can be set to 96bit in scenarios where RLC initial transmission is performed on multiple services and the MAC layer sends BSRs or PHRs.</p>
+<p>The parameter value 128bit indicates that the head overhead is 128 bits. This parameter can be set to 128bit in scenarios where RLC initial transmission is performed on multiple services and the MAC layer sends BSRs and PHRs.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PreAllocMinPeriodForSparse.html">Minimal Period of Sparse Pre-allocation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum interval between two preallocations for a UE with sparse packets. This is, the interval between two times that a UE with sparse packets is preallocated cannot be less than this parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PreallocationSizeForSparse.html">Data Size of Sparse Pre-allocation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the data amount preallocated to each UE with sparse packets. When this parameter is set to SAME_AS_OTHER_SERVICE, the PreAllocationSize parameter value is applicable to UEs with sparse packets. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlInterfRandomMode.html">Uplink Interference Randomization Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink interference randomization mode. For FDD: The value TWO_MODE_BASED_ON_PCI indicates that resources are allocated from the high end to the low end of the frequency range in cells with even PCI numbers and resources are allocated from the low end to the high end of the frequency range in cells with odd PCI numbers. The value THREE_MODE_BASED_ON_PCI indicates that the following three interference randomization modes are supported when the uplink RB usage is less than or equal to 60%: (1). Resources are allocated from the high end to the low end of the frequency range in cells whose value of PCI modulo 3 is 0. (2). Resources are allocated from the low end to the high end of the frequency range in cells whose value of PCI modulo 3 is 1. (3). Resources are allocated from the central frequency to the high end of the frequency range in cells whose value of PCI modulo 3 is 2. If the uplink RB usage is more than 60%, only interference randomization modes specified by the value TWO_MODE_BASED_ON_PCI are supported. When the UlRbAllocationStrategy parameter is set to FS_INRANDOM_ADAPTIVE, the UlInterfRandomMode parameter setting takes effect.</p>
+<p>For NB-IoT: The value TWO_MODE_BASED_ON_PCI indicates that uplink interference randomization is not used and the same uplink frequency-domain resource allocation policy is used in different cells. The value THREE_MODE_BASED_ON_PCI indicates that uplink interference randomization is used and uplink frequency-domain resource allocation is staggered at random between different cells.</p>
+<p>For TDD: The value TWO_MODE_BASED_ON_PCI indicates that two interference randomization modes are supported. The value THREE_MODE_BASED_ON_PCI indicates that three interference randomization modes are supported. This parameter is valid only for 20 MHz cells where the VmimoResRandomSwitch option of the VmimoOptAlgoSwitch parameter is selected and 8R uplink space-domain-preferred pairing takes effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SfnUlLoadPeriod.html">SFN Uplink Load Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period during which the uplink load of an SFN cell is measured. The isolation threshold is adjusted based on the cell load in a measurement period. High load leads to low isolation threshold, and UEs are likely to enter independent scheduling mode. Low load leads to high isolation threshold, and UEs are likely to enter joint scheduling mode.</p>
+<p>This parameter is valid only when the SfnUlSchSwitch parameter in the CellAlgoSwitch MO is set to ADAPTIVE(Adaptive scheduling). This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-MaxLayerHOVMIMO.html">Max Layer HO-VMIMO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of layers of UEs that can be paired for high-order VMIMO. This parameter applies only to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlCompenSchPeriodinSpurt.html">Min UL Compensate Scheduling Period in Spurt</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum interval of triggering uplink compensation scheduling for VoLTE UEs in talk spurts when UlVoipSchOptSwitch is selected.</p>
+<p>If this parameter is set to INTERVAL_ADAPTIVE, this minimum interval is adaptively adjusted based on the SR period.</p>
+<p>If this parameter is set to any other value, this value is the minimum interval. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlCompenSchPeriodinSilence.html">Min UL Compensate Scheduling Period in Silence</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum interval of triggering uplink compensation scheduling for VoLTE UEs in silence periods when UlVoipSchOptSwitch is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlTargetIBlerAdaptType.html">Uplink Target IBLER Adapt Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable uplink target IBLER adaptation.</p>
+<p>SinrFlunIBlerAdaptSwitch: Indicates whether to enable SINR-fluctuation-based target IBLER adaptation. When the UlIblerAdjustSwitch option of the UlSchSwitch parameter is selected, SINR-fluctuation-based target IBLER adaptation is enabled only if the SinrFlunIBlerAdaptSwitch option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SinrJumpIBlerAdaptSwitch: Indicates whether to enable SINR-jump-based target IBLER adaptation. When the UlIblerAdjustSwitch option of the UlSchSwitch parameter is selected, SINR-jump-based target IBLER adaptation is enabled only if the SinrJumpIBlerAdaptSwitch option is selected. This option applies only to LTE FDD.</p>
+<p>When the UlIblerAdjustSwitch option of the UlSchSwitch parameter is deselected, the two options of the UlIBlerTargetAdaptType parameter do not take effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-AperiodicCsiUlTxMode.html">Aperiodic CSI Uplink Transmit Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the transmission mode of aperiodic CSI in the uplink. If this parameter is set to CsiOnly and UEs have only aperiodic downlink CSI to transmit and do not have uplink service data to transmit, these UEs can be immediately scheduled on the PUSCH and only aperiodic downlink CSI is transmitted on the PUSCH. If this parameter is set to CsiWiUlService and UEs have only aperiodic downlink CSI to transmit and do not have uplink service data to transmit, within a specified period of time after aperiodic CSI transmission is triggered, these UEs cannot be immediately scheduled on the PUSCH to transmit only aperiodic downlink CSI, but the aperiodic downlink CSI and uplink service data of these UEs can be simultaneously transmitted on the PUSCH.</p>
+<p>Meanwhile, this parameter also controls the CQI update policy when the eNodeB receives CQI of 0 from UEs. If this parameter is set to CsiOnly(CsiOnly), the eNodeB determines that the CQI is unreliable when receiving CQI of 0 from a UE. If this parameter is set to CsiWiUlService(CsiWiUlService), the eNodeB determines that the CQI is reliable when receiving a CQI of 0 with the reliable indicator set to reliable. The eNodeB updates the time when the reliable CQI is received but does not use the CQI for scheduling decision. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlVoipRsvRbStart.html">Uplink VoIP Reserved RB Start</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the start position of the RBs reserved for UEs running voice services in the uplink in large-traffic scenarios. This parameter is valid only when UlVoipRbRsvSwitch is on. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlVoipRsvRbNum.html">Uplink VoIP Reserved RB Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of RBs reserved for UEs running voice services in the uplink in large-traffic scenarios. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlIBlerAdaptBigTrafficSw.html">IBLER Adapt Big Packet Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether large-packet service identification is required in IBLER adaptation. If this parameter is set to ON(On), large-packet service identification is required in IBLER adaptation. If this parameter is set to OFF(Off), large-packet service identification is not required in IBLER adaptation. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-VmimoOptAlgoSwitch.html">Vmimo Optimization Algorithm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable uplink MU-MIMO optimization functions. VmimoOptResSwitch: Indicates whether to enable uplink MU-MIMO resource optimization. This option applies only to LTE TDD. HarqVmimoSwitch: Indicates whether UEs that perform retransmission in the uplink can be paired for MU-MIMO. This option applies only to LTE TDD. PreSchVmimoSwitch: Indicates whether pre-scheduled UEs in the uplink can be paired for MU-MIMO. This option applies only to LTE TDD. VMIMOResRandomSwitch: Indicates whether to enable MU-MIMO resource randomization. This option applies only to LTE TDD. HighSpeedSdmaSwitch: Indicates whether to enable uplink spatial division in high-speed railway scenarios. This option takes effect only when subframe configuration SA2 is used. This option applies only to LTE TDD. MmUlHeavyLoadOptSwitch: Indicates whether to enable uplink heavy-load optimization in massive MIMO scenarios. This option applies only to LTE TDD. MmVmimoUePairingOptSw: Indicates whether to enable uplink MU-MIMO pairing optimization in massive MIMO scenarios. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlIcsA3Offset.html">Uplink Interference Coordination A3 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset for reporting the uplink ICS measurement event. This offset is the difference between the signal quality of a neighboring cell and that of the serving cell. A larger value indicates that a neighboring cell must have much better quality for reporting the event. A smaller value indicates that the event can be reported when a neighboring cell has a slightly better quality than the service cell. This parameter is applicable only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlMcsLowThreshold.html">Uplink MCS Low Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum MCS index when the minimum number of RBs are used due to power control. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UserSpeedUlSchPriWeight.html">User Speed Uplink Scheduling Priority Weight</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink scheduling priority weight for low-speed UEs in high-speed or ultra-high-speed cells. The actual uplink scheduling priority weight factor equals the value of this parameter multiplied by the UlschPriorityFactor parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-TarRruSelRsrpOffsetThd.html">Target RRU Select RSRP Offset Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP offset threshold for selecting the target RRU. This parameter takes effect when the SfnTarRruAdptSelSwitch option of the SfnAlgoSwitch parameter is selected.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SfnUlPairRsrpThd.html">SFN Uplink Pair RSRP Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP threshold for pairing UEs when adaptive SFN is enabled in the uplink. This parameter is valid only when SfnUlSchSwitch is set to ADAPTIVE. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-MaxUlSchRbNum.html">Max Uplink Scheduling Allocation RB Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of RBs allocated to each UE in uplink scheduling. This parameter applies only to LTE FDD. Based on the descriptions in section 6.6.3.2 in 3GPP TS 36.101, with given system bandwidth and uplink carrier frequency, changing the value of this parameter can reduce spurious emission to other frequencies in the uplink.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlSrSchDataVolAdptOptUpThd.html">UL SR Scheduling Data Vol Adapt Opt Upper Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper limit on the amount of data that can be scheduled in SR-based scheduling. This parameter, together with the UlSrSchDateLen parameter, determines the range within which this amount can be adaptively optimized. If this parameter is set to 0, adaptive optimization does not take effect. If this parameter is set to a value greater than 0 and less than the UlSrSchDateLen parameter value, this parameter takes the value of UlSrSchDateLen. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-TtiBundlingRetxStrategy.html">TTI Bundling UE Retransmission Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the retransmission strategy for UEs in TTI bundling states.</p>
+<p>RetxFssSchSwitch: Indicates whether to apply frequency selective scheduling to inter-bundle retransmissions for UEs in TTI bundling states. When this option is deselected, frequency selective scheduling does not take effect for retransmissions. When this option is selected, the eNodeB determines whether to apply frequency selective scheduling to retransmissions for UEs in TTI bundling states based on frequency selective status. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlVoLTERetransSchStrategy.html">UL Retrans Sched Strategy for VoLTE User</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink retransmission scheduling policy for VoLTE UEs.</p>
+<p>FIRST_RETRANS_EXPN_RB_SWITCH: Indicates whether to increase the number of RBs in the scheduling for initial uplink retransmission for VoLTE UEs. When this option is selected, the eNodeB increases the number to reduce the uplink retransmission delay and RBLER for VoLTE UEs and thereby to improve voice service quality. When this option is deselected, the eNodeB does not increase the number. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlExtVolteSchSw.html">Uplink Extended VoLTE Schedule Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to turn on extended scheduling switches for VoLTE services in the uplink. This parameter includes the following options.</p>
+<p>UlVolteRetransSchOptSwitch: Indicates whether to optimize retransmission scheduling for voice UEs in the uplink. If this option is deselected, retransmission scheduling is not optimized for voice UEs in the uplink. If this option is selected, the eNodeB lowers the MCS index, allocates more RBs, and boosts the transmit power for retransmission of voice UEs to increase the uplink retransmission success rate and lower the uplink packet loss rate of such UEs. This option applies only to LTE TDD.</p>
+<p>UlVolteIcsSwitch: Indicates whether to optimize UL ICS for voice UEs in the uplink. If this option is deselected, UL ICS is not optimized for voice UEs in the uplink. If this option is selected, UL ICS is optimized for voice UEs in the uplink. This option applies only to LTE TDD.</p>
+<p>UlVolteIcsPuschOptSwitch: Indicates whether to reuse PUSCH RBs for voice UEs when UL ICS is performed for such UEs. If this option is deselected, PUSCH RBs are not reused for voice UEs. If the UL_ICS_SWITCH option of the UlIcSwitch parameter is selected and both this option and the UlVolteIcsSwitch option of the UlExtVolteSchSw parameter are also selected, interference coordination is enhanced and optimized for voice UEs. This option applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlVolteDeltaSinrForNack.html">Uplink VoLTE Delta SINR for NACK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink SINR adjustment value adopted when a VoLTE UE receives an NACK for the HARQ process. This parameter affects MCS selection for VoLTE UEs in the uplink. For LTE TDD cells, when the HARQ feedback result is NACK, the MCS index is reduced. For LTE FDD cells, the MCS index is reduced by a fixed amount based on the measured SINR. If this parameter is set to 0, this function does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-NbUlHarqMaxTxCount.html">NB-IoT UL Max HARQ Transmission Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of uplink HARQ transmissions. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PrealloSystemBwCoeff.html">Preallocation System Bandwidth Coefficient</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the coefficient used to determine the system bandwidth available for preallocation. It controls the degree of reduction in the system bandwidth available for preallocation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SmartPrealloDurationCoeff.html">Smart Preallocation Duration Coefficient</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the coefficient used to determine the smart preallocation duration. It controls the degree of reduction in the smart preallocation duration. It works with the SmartPreAllocationDuration parameter, which specifies the smart preallocation duration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-HighSpeedSdmaIsolationThld.html">High Speed SDMA Isolation Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE isolation threshold for uplink space division in high-speed railway scenarios. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-EstimatedTcpAckPacketCount.html">Estimated TCP ACK Packet Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of estimated downlink TCP packets of a TCP ACK message for a TCP service. If this parameter is set to 0, optimized TCP ACK estimation is disabled. If this parameter is set to a non-zero value, the eNodeB estimates the number of downlink TCP packets of a TCP ACK message and increases the uplink scheduling priority of the UE. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-VmimoPairingStrategy.html">VMIMO Pairing Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE pairing policy for MU-MIMO in massive MIMO cells and the UE pairing policy used in the 8T8R uplink space-domain-preferred pairing algorithm. This parameter applies only to TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-VMIMOEgdeResRatio.html">UL VMIMO Edge Resource Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ratio of RBs preferentially allocated to CEUs after VMIMO interference coordination is enabled. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-MaxLayerMMVMIMO.html">Max Number of Layers for Massive MIMO VMIMO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of layers of UEs paired for MU-MIMO in the uplink in a cell with massive MIMO. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlSrSchDateLenForVoLTE.html">Uplink SR Scheduling Data Volume for VoLTE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the amount of data allocated by the uplink scheduler at a scheduling request from a voice+data VoLTE UE. This allocation improves experience of the VoLTE UE when there are concurrent voice and data services. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-AmrcDecreasingPeriod.html">AMRC Decreasing Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period during which the eNodeB determines whether to perform AMRC-based rate reduction. During this period, if the uplink QCI 1 packet loss rate and TBS meet the conditions for AMRC-based rate reduction, the eNodeB triggers AMRC-based rate reduction.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SinrThdForVoLTERateCtrl.html">SINR Threshold for VoLTE Rate Control</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SINR threshold for triggering rate adjustment for voice services. If the uplink SINR of VoLTE UEs using the AMR-WB or AMR-NB voice codec is lower than this threshold, the eNodeB lowers the rate of voice services for such UEs, reducing the number of occasions when voice service experience is poor due to continuous packet loss. If this parameter is set to -100, SINR-based rate control for voice services does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-RateCtrlCmrProcessStrategy.html">Rate Control CMR Process Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the local end performs rate adjustment when the eNodeB detects that other NEs perform rate adjustment.</p>
+<p>When this parameter is set to BASIC_STRATEGY, the local end does not perform rate adjustment when the eNodeB detects that other NEs perform rate adjustment.</p>
+<p>When this parameter is set to ADAPTIVE_STRATEGY, the local end performs rate adjustment when the eNodeB detects that other NEs perform rate adjustment. However, the target adjusted rate must be lower than or equal to the expected adjusted rate of other NEs.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-RateCtrlRspDecisionThld.html">Rate Control Response Decision Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for determining whether a UE has responded to a rate adjustment request. The threshold is expressed in a number of uplink voice packets.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-NbUlSubcarrierSpacingType.html">NB-IoT UL Subcarrier Spacing Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subcarrier spacing for the NPUSCH in the NB-IoT cell. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PreallocationUserCntThld.html">Preallocation User Count Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper limit to the number of RRC_CONNECTED UEs for which uplink preallocation takes effect. If the number of RRC_CONNECTED UEs in the cell exceeds this limit, uplink preallocation will no longer take effect in the cell. This limit does not apply to uplink preallocation for UEs that are running voice services, ping services or unlimited service, DRX UEs within On Duration, and UEs running low-latency services at the cell edge. For UEs engaged in air interface acceleration or TCP link setup acceleration, the larger value between this parameter value and 100 takes effect as the upper limit. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-HttpGetUlSchByte.html">HTTP GET UL Scheduling Byte</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of bytes in HTTP GET signaling messages scheduled in the uplink. The value 0 indicates that uplink preallocation of HTTP GET signaling messages does not take effect. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-MaxPreallocatedHttpGetCnt.html">Max Preallocated HTTP GET Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of HTTP GET signaling messages that can be pre-allocated in the uplink. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-VmimoUlPrbThld.html">VMIMO Uplink PRB Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink PRB usage threshold for triggering uplink MU-MIMO pairing. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-VolteCallSetupSchEnhTimer.html">VoLTE Call Setup Scheduling Enhancement Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the timer governing the duration of scheduling optimization for VoLTE service setup. If this parameter is set to 0, the scheduling optimization does not take effect. If this parameter is set to a non-zero value, the scheduling optimization takes effect until this timer expires. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlHeavyloadOptSchSwitch.html">Uplink Heavy Load Opt Sch Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable heavy-load scheduling optimization. If this parameter is set to ON, delayed scheduling is performed separately for VoLTE and data services in the uplink, and uplink abnormal UE penalty takes effect. If this parameter is set to OFF, heavy-load scheduling optimization does not take effect. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PrachSinrThldForCovEnh.html">PRACH SINR Thld for Coverage Enh</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the pre-equalization PRACH SINR threshold for using Msg3 coverage enhancement for UEs when coverage enhancement is enabled. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-PuschSinrThldForCovEnh.html">PUSCH SINR Thld for Coverage Enh</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the post-equalization PUSCH SINR threshold for using joint channel estimation for UEs when coverage enhancement is enabled. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-TtiBSinrThldForCovEnh.html">TTI Bundling SINR Thld for Coverage Enh</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the post-equalization SINR threshold for using TTI bundling for UEs when coverage enhancement is enabled. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-IntvlOfUlSpsWithSkipping.html">Interval of Uplink SPS with Skipping</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval of uplink SPS that allows for the SPS skipping function. If this parameter is set to MS0, uplink SPS skipping is disabled. If this parameter is set to a value other than MS0, uplink SPS skipping is enabled, and this parameter value specifies the interval of uplink SPS that allows for skipping. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-TbsForUlSpsWithSkipping.html">TBS for Uplink SPS with Skipping</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the TBS for uplink SPS that allows for the SPS skipping function. This parameter takes effect when the IntvlOfUlSpsWithSkipping parameter in the CellUlschAlgo MO is set to a value other than MS0. If this parameter is set to a large value for certain bandwidths, the function does not take effect. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-HighLoadUlSchOptThld.html">High Load UL Scheduling Optimization Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the load threshold for uplink scheduling optimization. If the uplink load is greater than the value of this parameter, the optimization is triggered to improve user experience by increasing the UE priority. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-HighLoadUlSchOptSwitch.html">High Load UL Scheduling Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to trigger uplink scheduling optimization in heavy-load scenarios. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SpaDomainPrefVmimoStrtThld.html">Space-Domain-Preferred VMIMO Start Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable uplink space-domain-preferred MU-MIMO. If this parameter is set to 255, uplink space-domain-preferred MU-MIMO does not take effect. If this parameter is set to a value other than 255 and the PUSCH PRB usage of a cell is greater than this parameter value, uplink space-domain-preferred MU-MIMO starts. If the PUSCH PRB usage of a cell is less than this threshold to some extent, uplink space-domain-preferred MU-MIMO stops. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-VmimoMLPairingCorrThld.html">VMIMO Multi-Layer Pairing Correlation Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the two-, three-, and four-layer pairing correlation thresholds for uplink space-domain-preferred MU-MIMO. The MSB to the LSB of this parameter value correspond to the correlation thresholds for two-, three-, and four-layer pairing, respectively. For example, the parameter value 755 indicates that the correlation thresholds for two-, three-, and four-layer pairing are 0.7, 0.5, and 0.5, respectively. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlPttTtiBRlcMaxSegNum.html">PTT TTIB Max Number of UL RLC Segments</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable limit control on the number of RLC-layer data segments in the uplink for PTT services scheduled in TTI-bundling mode and the maximum number of RLC-layer data segments. If this parameter is set to 0, the limit control is disabled. If this parameter is set to a non-zero value, the limit control is enabled and this value is the maximum number of RLC-layer data segments that an uplink PTT voice packet dynamically scheduled in TTI-bundling mode can be divided into. The limit control must be enabled when the UlMcpttCrosslayerOptSw option of the CellUlschAlgo.UlEnhencedVoipSchSw parameter is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlPttRlcMaxSegNum.html">PTT Max Number of UL RLC Segments</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable limit control on the number of RLC-layer data segments in the uplink for PTT services scheduled in non-TTI-bundling mode and the maximum number of RLC-layer data segments. If this parameter is set to 0, the limit control is disabled. If this parameter is set to a non-zero value, the limit control is enabled and this value is the maximum number of RLC-layer data segments that an uplink PTT voice packet dynamically scheduled in non-TTI-bundling mode can be divided into. The limit control must be enabled when the UlMcpttCrosslayerOptSw option of the CellUlschAlgo.UlEnhencedVoipSchSw parameter is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-BundledPttVoicePacketNum.html">Number of Bundled PTT Voice Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of PTT voice packets that can be bundled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlMinExpectedBitRate.html">Uplink Min Expected Bit Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the expected minimum uplink rate when equivalent Max C/I is used as the scheduling policy. If this parameter is set to 65535, equivalent Max C/I cannot be used as the scheduling policy.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-UlRateGuaranteeResRatio.html">Uplink Rate Guarantee Resource Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of resources available for uplink rate guarantee. If this parameter is set to 0, uplink rate guarantee is disabled. If this parameter is set to a value other than 0, uplink rate guarantee is enabled, and the value indicates the proportion of resources available for uplink rate guarantee. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SplUePreallocDataVolume.html">Data Volume of Special UE Preallocation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the amount of data that can be preallocated to a special UE at a time. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SplUePreallocMinInterval.html">Minimal Interval of Special UE Preallocation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum interval between two consecutive preallocations for a single special UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellUlschAlgo-SplUeSmartPreallocDuration.html">Duration of Special UE Smart Preallocation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration of uplink smart preallocation triggered by downlink scheduling for special UEs. If this parameter is set to 0, preallocation will not be performed in the uplink. This parameter is invalid when the SmartPreAllocationSwitch option of the CellAlgoSwitch.UlSchSwitch parameter is deselected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

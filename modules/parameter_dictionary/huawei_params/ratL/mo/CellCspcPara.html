@@ -1,0 +1,285 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellCspcPara">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellCspcPara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellCspcPara</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellCspcPara"></a><a name="CellCspcPara"></a>
+
+
+<h1 class="topictitle1">CellCspcPara</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellCspcPara.html"><strong>CellCspcPara</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellCspcPara MO consists of parameters related to coordinated scheduling and power control (CSPC) in an E-UTRAN cell.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellDlschAlgo</strong> MO:<ul><li>If the <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO is ON, <strong>DlschStrategy</strong> in the <strong>CellDlschAlgo</strong> MO must be set to DLSCH_PRI_TYPE_EPF.</li><li>If the <strong>CelleCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO is ON, <strong>DlschStrategy</strong> in the <strong>CellDlschAlgo</strong> MO must be set to DLSCH_PRI_TYPE_EPF.</li><li>If the <strong>IntraEnbCspcSw</strong> in the <strong>CellCspcPara</strong> MO is ON, any option under the <strong>MbsfnSfCfg</strong> parameter in the <strong>CellDlschAlgo</strong> MO cannot be selected.</li></ul>
+</li><li>Relation with the <strong>ENodeBAlgoSwitch</strong> MO:<ul><li>If the <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO is ON, <strong>DlIcicSwitch</strong> in the <strong>ENodeBAlgoSwitch</strong> MO must be set to DlIcicSwitch_OFF_ENUM.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If the <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO is ON, <strong>HighSpeedFlag</strong> in the <strong>Cell</strong> MO cannot be set to HIGH_SPEED or ULTRA_HIGH_SPEED.</li><li>When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>CellRadius</strong> in a <strong>Cell</strong> MO is set to a value greater than 100000 m, <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO under this <strong>Cell</strong> MO must be set to OFF.</li><li>If the <strong>CelleCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO is ON, <strong>HighSpeedFlag</strong> in the <strong>Cell</strong> MO cannot be set to HIGH_SPEED, ULTRA_HIGH_SPEED, or EXTRA_HIGH_SPEED.</li><li>When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if <strong>CellRadius</strong> in a <strong>Cell</strong> MO is set to a value greater than 15000m, <strong>CelleCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO under this <strong>Cell</strong> MO must be set to OFF.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> must be set OFF.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, <strong>CelleCspcSwitch</strong> in the <strong>CellCspcPara</strong> must be set OFF.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, <strong>IntraEnbCspcSw</strong> in the <strong>CellCspcPara</strong> must be set OFF.</li><li>The <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO can be set to ON only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>MultiCellShareMode</strong> parameter in the <strong>Cell</strong> MO is set to NORMAL.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If the <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO is ON, <strong>EicicSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO cannot be set to STATIC or DYNAMIC.</li><li>The DlCellCoverEnhanceAlgoSw option of <strong>CellDlCoverEnhanceSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO can be selected only if <strong>CellCspcSwitch</strong> of the <strong>CellCspcPara</strong> MO is set to OFF.</li><li>The DlCellCoverEnhanceAlgoSw option of <strong>CellDlCoverEnhanceSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO can be selected only if <strong>CelleCspcSwitch</strong> of the <strong>CellCspcPara</strong> MO is set to OFF.</li><li>If the Virtual4T4RSwitch option of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is selected, <strong>CellCspcSwitch</strong> in the related <strong>CellCspcPara</strong> MO must be set to OFF.</li><li>If the <strong>IntraEnbCspcSw</strong> of the <strong>CellCspcPara</strong> MO is set to ON, the DlCellCoverEnhanceAlgoSw option under the <strong>CellDlCoverEnhanceSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO cannot be selected.</li><li>If the <strong>IntraEnbCspcSw</strong> in the <strong>CellCspcPara</strong> MO is ON, the <strong>GLPwrShare</strong> parameter in the <strong>CellAlgoSwitch</strong> cannot be set to ON.</li><li>If the <strong>IntraEnbCspcSw</strong> in the <strong>CellCspcPara</strong> MO is ON, the GLDynSpectrumShareSwitch option of the <strong>DynSpectrumShareSwitch</strong> parameter in the associated <strong>CellAlgoSwitch</strong> MO cannot be turned on.</li><li>If the <strong>CelleCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO is ON, <strong>EicicSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO cannot be set to STATIC or DYNAMIC.</li><li>If the <strong>IntraEnbCspcSw</strong> in the <strong>CellCspcPara</strong> MO is ON, the <strong>EicicSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO cannot be set to STATIC or DYNAMIC.</li><li>The <strong>CelleCspcSwitch</strong> parameter in a <strong>CellCspcPara</strong> MO and AdptPwrMatchingAlgoSw under the <strong>CellDlCoverEnhanceSwitch</strong> parameter in the associated <strong>CellAlgoSwitch</strong> MO cannot be both set on.</li><li>The <strong>CellCspcSwitch</strong> parameter in a <strong>CellCspcPara</strong> MO and AdptPwrMatchingAlgoSw under the <strong>CellDlCoverEnhanceSwitch</strong> parameter in the associated <strong>CellAlgoSwitch</strong> MO cannot be both set on.</li><li>The Tm9JtSwitch of <strong>DlCompSwitch</strong> in a <strong>CellAlgoSwitch</strong> MO must be set off if <strong>EicicSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is set to DYNAMIC, <strong>CelleCspcSwitch</strong> in the associated <strong>CellCspcPara</strong> MO is set to ON, or Virtual4T4RSwitch of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is set on.</li><li>InBandRelayDeNbSwitch of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO and <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO cannot be both set on.</li><li>InBandRelayReNbSwitch of the <strong>RelaySwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO and <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO cannot be both set on.</li><li>The <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO can be selected only when the InterCellDmimoJTSwitch option of the <strong>DMIMOAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> and <strong>Cell</strong> MOs:<ul><li>If the Virtual4T4RSwitch option of the <strong>EmimoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected and the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF.</li><li>FDDHomNetDlCompSwitch and FDDHetNetDlCompSwitch of <strong>DlCompSwitch</strong> in a <strong>CellAlgoSwitch</strong> MO must be set off if <strong>TxRxMode</strong> in the associated <strong>Cell</strong> MO is set to 1T1R or 1T2R, <strong>EicicSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is set to DYNAMIC, <strong>CelleCspcSwitch</strong> in the associated <strong>CellCspcPara</strong> MO is set to ON, or Virtual4T4RSwitch of <strong>EmimoSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is set on.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>If the <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE and the <strong>CelleCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO is ON, <strong>DlIcicSwitch</strong> in the <strong>ENodeBAlgoSwitch</strong> MO must be set to DlIcicSwitch_OFF_ENUM.</li><li>If the <strong>CellActiveState</strong> in a <strong>Cell</strong> MO is set to CELL_ACTIVE and the <strong>IntraEnbCspcSw</strong> in the <strong>CellCspcPara</strong> MO is ON, the <strong>DlIcicSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO must be set to DlIcicSwitch_OFF_ENUM.</li></ul>
+</li><li>Relation with the <strong>CellDlpcPdschPa</strong> MO:<ul><li>Values represented by selected options of <strong>eCspcPCAdjRange</strong> in the <strong>CellCspcPara</strong> MO must be less than the value of <strong>PaPcOff</strong> in the <strong>CellDlpcPdschPa</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NCellSrsMeasPara</strong> MO:<ul><li>The NCellDmrsMeasSwitch option of the <strong>NCellMeasSwitch</strong> parameter in an <strong>NCellSrsMeasPara</strong> MO can be selected only when the <strong>CellCspcSwitch</strong> parameter in the associated <strong>CellCspcPara</strong> MO is set to OFF.</li></ul>
+</li><li>Relation with the <strong>CellDynPowerSharing</strong>, <strong>CspcAlgoPara</strong>, <strong>CellAlgoSwitch</strong>, <strong>Cell</strong>, and <strong>PHICHCfg</strong> MOs:<ul><li>The LTE_DYN_POWER_SHARING_SW and LTE_EXTREME_POWER_SHARING_SW options of the <strong>DynamicPowerSharingSwitch</strong> parameter in the <strong>CellDynPowerSharing</strong> MO can be selected only when the following conditions are met: The <strong>GLPwrShare</strong> parameter in the <strong>CellAlgoSwitch</strong> MO, the <strong>CspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO, and the <strong>CellCspcSwitch</strong> and <strong>CelleCspcSwitch</strong> parameters in the <strong>CellCspcPara</strong> MO are set to OFF, the PhichInnerLoopPcSwitch option of the <strong>DlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is deselected, the <strong>HighSpeedFlag</strong> parameter in the <strong>Cell</strong> MO is set to LOW_SPEED, and the <strong>PhichDuration</strong> parameter in the <strong>PHICHCfg</strong> MO is not set to EXTENDED.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, <strong>SectorSplitCell</strong>, and <strong>SectorSplitGroup</strong> MOs:<ul><li>The <strong>IntraEnbCspcSw</strong> parameter in the <strong>CellCspcPara</strong> MO under a <strong>Cell</strong> MO must be set to OFF when the following conditions are met: The <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE, the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO under the <strong>Cell</strong> MO is set to MASSIVE_MIMO_Ph2, and the number of <strong>SectorSplitCell</strong> MO instances under the <strong>SectorSplitGroup</strong> MO associated with the <strong>Cell</strong> MO is not greater than 2.</li></ul>
+</li><li>Relation with the <strong>CellShortTtiAlgo</strong> MO:<ul><li>The SHORT_TTI_SW option of the <strong>SttiAlgoSwitch</strong> parameter in a <strong>CellShortTtiAlgo</strong> MO can be selected only when all of the <strong>CellCspcSwitch</strong>, <strong>IntraEnbCspcSw</strong>, and <strong>CelleCspcSwitch</strong> parameters in the associated <strong>CellCspcPara</strong> MO are set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SpectrumCloud</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> in the <strong>Cell</strong> is set to CELL_FDD, and the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO is set to LTE_NR_UPLINK_SPECTRUM_SHR or LTE_NR_SPECTRUM_SHR, the <strong>CellCspcSwitch</strong> parameter in a <strong>CellCspcPara</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>eUCellSectorEqm</strong> MO:<ul><li>If the <strong>CellBeamMode</strong> parameter in an <strong>eUCellSectorEqm</strong> MO is set to MASSIVE_MIMO_Ph2, the <strong>CellCspcSwitch</strong> parameter in the associated <strong>CellCspcPara</strong> MO must be set to OFF.</li><li>If the <strong>CellBeamMode</strong> parameter in an <strong>eUCellSectorEqm</strong> MO is set to MASSIVE_MIMO_Ph2, the <strong>CelleCspcSwitch</strong> parameter in the associated <strong>CellCspcPara</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO can be set to ON only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the BFModeUserPwrSwitch, BFModeUserAdptPwrSwitch, and BfEnhChnPwrFormSwitch options of the <strong>DlPcAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO are deselected.</li><li>The <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO can be set to ON only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the InterDlCompDcsSwitch, and InterDlCompCbfSwitch options of the <strong>DlCompSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> are deselected.</li></ul>
+</li><li>Relation with the <strong>CellAlgoExtSwitch</strong> MO:<ul><li>If <strong>UlCoverageEnhancementSw</strong> in the <strong>CellAlgoExtSwitch</strong> MO is set to ON, <strong>CellCspcSwitch</strong> in the <strong>CellCspcPara</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>PDSCHCfg</strong> MOs:<ul><li>The <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO can be set to ON only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>EmfPowerLimitSwitch</strong> parameter in the <strong>PDSCHCfg</strong> MO is deselected.</li></ul>
+</li><li>Relation with the <strong>SymbolPwrSaving</strong>, <strong>CspcAlgoPara</strong>, and <strong>Cell</strong> MOs:<ul><li>If the <strong>TrigBndlSchDlAvgPrbThld</strong> parameter in the <strong>SymbolPwrSaving</strong> MO is not set to 0 for a cell and the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD for the same cell, then the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be deselected and the <strong>CellCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF for the cell.</li></ul>
+</li><li>Relation with the <strong>SymbolPwrSaving</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>TrigBndlSchDlAvgPrbThld</strong> parameter in the <strong>SymbolPwrSaving</strong> MO is not set to 0 for a cell and the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD for the cell, the <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF for the cell.</li></ul>
+</li><li>Relation with the <strong>SpectrumCloud</strong> and <strong>Cell</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the <strong>SpectrumCloudSwitch</strong> parameter in the associated <strong>SpectrumCloud</strong> MO is set to LTE_NR_SPECTRUM_SHR, the <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must not be set to ON.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, <strong>SectorSplitGroup</strong>, and <strong>CspcAlgoPara</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 8T8R, the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, and the <strong>BeamDeploymentMode</strong> parameter in the <strong>SectorSplitGroup</strong> MO is set to NOT_CFG, then the <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF and the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be deselected.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 8T8R, the <strong>SectorSplitCell</strong> MO associated with the <strong>Cell</strong> MO is configured, and the <strong>BeamDeploymentMode</strong> parameter in the <strong>SectorSplitGroup</strong> MO is set to MODE_3, then the <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF and the TddCspcMacroMicroSwitch option of the <strong>TddCspcAlgoSwitch</strong> parameter in the <strong>CspcAlgoPara</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellDlschAlgo</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the DL_INTRA_JAMC_ALGO_SW option of the <strong>DlJointAMCAlgoSw</strong> parameter in the <strong>CellDlschAlgo</strong> MO is selected, the <strong>CelleCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD and the DL_INTRA_JAMC_ALGO_SW option of the <strong>DlJointAMCAlgoSw</strong> parameter in the <strong>CellDlschAlgo</strong> MO is selected, the <strong>CellCspcSwitch</strong> parameter in the <strong>CellCspcPara</strong> MO must be set to OFF.</li></ul>
+</li><li>Relation with the <strong>CellIntelAmcConfig</strong> MO:<ul><li>When the DL_INTEL_AMC_SELECTION_SW option of the <strong>IntelligentAmcSwitch</strong> parameter in the <strong>CellIntelAmcConfig</strong> MO is selected, the <strong>CellCspcSwitch</strong> parameter in a <strong>CellCspcPara</strong> MO must not be set to ON.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellCspcPara__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellCspcPara__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellCspcPara__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellcspcstatus.html">DSP CELLCSPCSTATUS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query whether CSPC is enabled in a cell or all cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_celldlcompcocells.html">DSP CELLDLCOMPCOCELLS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the DL CoMP status of the cell and the list of cooperating cells for the cell. This command applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_celldlcompstatus.html">DSP CELLDLCOMPSTATUS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the DL CoMP state in all cells in DL CoMP scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellecspcstatus.html">DSP CELLECSPCSTATUS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query information about the coordinating neighboring cells after eCSPC is activated.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellintraenbcspcstatus.html">DSP CELLINTRAENBCSPCSTATUS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query information about the coordinating neighboring cells in intra-eNodeB CSPC. This command applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellcspcpara.html">LST CELLCSPCPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the CSPC configuration in a cell or all cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellcspcpara.html">MOD CELLCSPCPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the CSPC configuration in a cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellCspcPara__tab2">Table 2</a> and <a href="#CellCspcPara__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellCspcPara__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellCspcPara__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-eCspcPCAdjUeNumTh.html">eCSPC PC Adjustment UE Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE number threshold for power coordination to take effect. The eNodeB samples the number of activated UEs in the downlink in a cell multiple times and calculates the average number. If the average number is not 0 and greater than or equal to the threshold, power coordination takes effect. If the average number is 0 or less than the threshold, power coordination does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-CellCspcSwitch.html">Cell CSPC Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable CSPC in the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-CspcRapidRptSwitch.html">CSPC UE SRS Config Rapid Report Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to report the changed sounding reference signal (SRS) configurations of UEs with CSPC applied in the serving cell to the centralized control node immediately after the configurations are changed. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-CspcUeSrsCfgRptPeriod.html">CSPC UE SRS Config Report Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval at which the local cell reports its UE-specific SRS configurations to the centralized control node. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-UlRsrpRptPeriod.html">Uplink RSRP Measurement Report Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval at which neighboring cells report their uplink reference signal received power (RSRP) measurement results to the local cell. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-CspcCqiFilterCoeff.html">CSPC CQI Filter Coefficient</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the filtering coefficient for channel quality indicators (CQIs) in CSPC-based power optimization. This filtering makes the reported CQIs more stable. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-eCspcA3Offset.html">eCSPC A3 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the A3 offset for eCSPC. If the parameter value is increased, the probability of UEs reporting event A3 is reduced. A larger value of this parameter indicates a smaller number of cell edge users, and a smaller value of this parameter indicates a larger number of cell edge users. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-CelleCspcSwitch.html">Cell eCSPC Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable cell-level enhanced CSPC (eCSPC). eCSPC is enabled only when this parameter is set to ON. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-eCspcPCAdjRange.html">eCSPC Power Control Adjustment Range</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell power adjustment range for eCSPC. This parameter must be set to a PDSCH PA value less than the value of the PaPcOff parameter. At most two values can be selected for the eCspcPCAdjRange parameter. If one value is selected for the eCspcPCAdjRange parameter, only one-level adjustment is applicable. If two values are selected for this parameter, two-level adjustment is supported. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCspcPara-IntraEnbCspcSw.html">Intra Enodeb Cspc Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable intra-eNodeB CSPC. Intra-eNodeB CSPC is enabled only when this parameter is set to ON(On). This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CellCspcPara__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CellCspcPara__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-CellDlCompProperty.html">Cell DL CoMP Property</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the effective status of DL CoMP in a cell. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-DlCompCoCellId.html">DL CoMP Coordinate Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of a cooperating cell in DL CoMP. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-DlCompCoCellType.html">DL CoMP Coordinate Cell Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type (macro or micro) of a cooperating cell in DL CoMP. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-DlCompCoEnodebId.html">DL CoMP Coordinate eNodeB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of the eNodeB that serves a cooperating cell in DL CoMP. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-CellCspcStatus.html">Cell CSPC Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether CSPC has been enabled in the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-Remarks.html">Remarks</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the reason why CSPC is disabled in a cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-MacroOrMicroCell.html">Macro Or Micro Cell</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the Cell type is Macro Cell or Micro Cell in CSPC. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-CellDlCompStatus.html">Cell Inter-eNodeB DL CoMP Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the inter-eNodeB DL CoMP status. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-eCspcCoCellLinkDelay.html">eCspc Coordinate Cell Link Delay Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether the delay on links between the coordinating cells in eCSPC exceeds the delay threshold. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-eCspcCoCellType.html">eCspc Coordinate Cell Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type (macro or micro) of the cooperating cell in eCSPC. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-eCspcCoEnodebId.html">eCspc Coordinate eNodeB ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of the eNodeB that serves a cooperating cell in eCSPC. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-eCspcCoLocalCellId.html">eCspc Coordinate Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of the local cell that functions as a cooperating cell in eCSPC. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-eCspcDataLinkStatus.html">eCspc Data Link Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of the data link to a cooperating cell in eCSPC. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-IntraCspcCoLocalCellId.html">Intra Cspc Coordinate Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of a local coordinating cell in intra-eNodeB CSPC. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCspcPara-CellIntraEnbDlCompStatus.html">Cell Intra-eNodeB DL CoMP Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the intra-eNodeB DL CoMP status. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

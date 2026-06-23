@@ -1,0 +1,105 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set RRU Security Policy (SET RRUSECPOLICY)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_rrusecpolicy">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set RRU Security Policy (SET RRUSECPOLICY)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_rrusecpolicy"></a><a name="set_rrusecpolicy"></a>
+
+
+<h1 class="topictitle1">Set RRU Security Policy (SET RRUSECPOLICY)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_rrusecpolicy__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the RRU/AAU authentication mode configured on the BBU during Secure Sockets Layer (SSL) handshakes.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_rrusecpolicy__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>After this command is executed, the NE uses the new authentication mode during the next SSL connection setup. This operation does not affect existing connections.</p>
+</li><li><p>Before setting Authentication Mode to PEER(Verify Peer Certificate), ensure that the required certificates have been obtained. Otherwise, setting Authentication Mode to PEER(Verify Peer Certificate) may interrupt the maintenance channel.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_rrusecpolicy__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-RRUAUTHMODE.html">RRUAUTHMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Authentication Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the authentication mode of the SSL connection via the BBU eCPRI port. If this parameter is set to NONE(Verify None), the RRU can use anonymous authentication to establish a link with the BBU after the first TLS bidirectional authentication between the BBU and the RRU fails. If this parameter is set to PEER(Verify Peer Certificate), the NE must verify the certificate of the RRU eCPRI port during SSL connection setup. If the certificate verification fails, SSL the SSL connection cannot be set up. If this parameter is set to NONE(Verify None), the NE will not verify the peer certificate, so that unauthorized clients are more likely to access the NE. Please set this parameter to a proper value.</p>
+<p>GUI Value Range: NONE(Verify None), PEER(Verify Peer Certificate)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NONE, PEER</p>
+<p>MML Default Value: PEER(Verify Peer Certificate)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SSL-RRUHWCERTAUTHSW.html">RRUHWCERTAUTHSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Huawei Certificate Authentication Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether an RRU can use the Huawei certificate for mutual authentication with a BBU. If this switch is turned on, the RRU can use the Huawei certificate to establish connections with the BBU. If this switch is turned off, the RRU cannot use the Huawei certificate to establish connections with the BBU.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: ON(ON)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>RRUCERTREQSW</strong> in the <strong>APPCERT</strong> MO is set to OFF, <strong>RRUHWCERTAUTHSW</strong> in the <strong>SSL</strong> MO must be set to ON.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_rrusecpolicy__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the authentication mode to NONE, run the following command:
+SET RRUSECPOLICY: RRUAUTHMODE=NONE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

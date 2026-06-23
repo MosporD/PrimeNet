@@ -1,0 +1,749 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="RFALoCell">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="RFALoCell">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>RFALoCell</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="RFALoCell"></a><a name="RFALoCell"></a>
+
+
+<h1 class="topictitle1">RFALoCell</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="RFAFunction.html">RFAFunction</a>
+    +-<a href="RFALoCell.html"><strong>RFALoCell</strong></a>
+      +-<a href="CellRFAEqm.html">CellRFAEqm</a>[0~1]
+      +-<a href="RFACellAlgoSwitch.html">RFACellAlgoSwitch</a>[1~1]
+      +-<a href="RFACellOperator.html">RFACellOperator</a>[0~1]
+      +-<a href="RFACellRsvdPara.html">RFACellRsvdPara</a>[1~1]
+      +-<a href="RFACellSectorEqm.html">RFACellSectorEqm</a>[0~96]
+      +-<a href="RFACellSectorEqmGrp.html">RFACellSectorEqmGrp</a>[0~12]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>RFA_Function local cell</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="RFAFunction.html">RFAFunction</a></li><li><p>Possible children:</p>
+<a href="CellRFAEqm.html">CellRFAEqm</a>[0~1];<a href="RFACellAlgoSwitch.html">RFACellAlgoSwitch</a>[1~1];<a href="RFACellOperator.html">RFACellOperator</a>[0~1];<a href="RFACellRsvdPara.html">RFACellRsvdPara</a>[1~1];<a href="RFACellSectorEqm.html">RFACellSectorEqm</a>[0~96];<a href="RFACellSectorEqmGrp.html">RFACellSectorEqmGrp</a>[0~12]</li><li>Relation with the <strong>RFACellOperator</strong> MO:<ul><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, a <strong>RFACellOperator</strong> must be configured under this <strong>RFALoCell</strong>.</li></ul>
+</li><li>Relation with the <strong>CellRFAEqm</strong> MO:<ul><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, <strong>CellRFAEqm</strong> MO must be configured under this <strong>RFALoCell</strong>.</li></ul>
+</li><li>Relation with the <strong>CellRFAEqm</strong> and <strong>RFAEQM</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, <strong>RFAEqmId</strong> in a <strong>CellRFAEqm</strong> MO must have been set in the associated <strong>RFAEQM</strong>.</li><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, <strong>TxRxMode</strong>(1T1R) in a <strong>RFALoCell</strong> must be matched with the <strong>RFAEQM</strong> TXRXMODE.</li><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, <strong>TxRxMode</strong>(1T2R) in a <strong>RFALoCell</strong> must be matched with the <strong>RFAEQM</strong> TXRXMODE.</li><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, <strong>TxRxMode</strong>(2T2R) in a <strong>RFALoCell</strong> must be matched with the <strong>RFAEQM</strong> TXRXMODE.</li></ul>
+</li><li>Relation with the <strong>RFALoCell</strong> MO:<ul><li>A maximum of 120 <strong>RFALoCell</strong> MOs can be configured in system.</li></ul>
+</li><li>Relation with the <strong>RFACellSectorEqm</strong> and <strong>SECTOREQM</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, the <strong>SECTOREQM</strong> MO associated with this <strong>RFACellSectorEqm</strong> MO must be configured.</li><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, the <strong>TxRxMode</strong>(1T1R) must be matched with the <strong>SECTOREQM</strong> in <strong>RFACellSectorEqm</strong> MO under this <strong>RFALoCell</strong>.</li><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, the <strong>TxRxMode</strong>(1T2R) must be matched with the <strong>SECTOREQM</strong> in <strong>RFACellSectorEqm</strong> MO under this <strong>RFALoCell</strong>.</li><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, the <strong>TxRxMode</strong>(2T2R) must be matched with the <strong>SECTOREQM</strong> in <strong>RFACellSectorEqm</strong> MO under this <strong>RFALoCell</strong>.</li></ul>
+</li><li>Relation with the <strong>RFASectorEqmGroup</strong> MO:<ul><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, the <strong>SECTOREQM</strong> MO associated with this <strong>RFACellSectorEqmGrp</strong> MO must be configured.</li></ul>
+</li><li>Relation with the <strong>RFASectorEqmGroup</strong>, <strong>SECTOREQM</strong>, and <strong>RFACellSectorEqmGrp</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, the <strong>TxRxMode</strong>(1T1R) must be matched with the <strong>SECTOREQM</strong> of <strong>SectorEqmListRef</strong> in each <strong>RFACellSectorEqmGrp</strong> MO under this <strong>RFALoCell</strong>.</li><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, the <strong>TxRxMode</strong>(1T2R) must be matched with the <strong>SECTOREQM</strong> of <strong>SectorEqmListRef</strong> in each <strong>RFACellSectorEqmGrp</strong> MO under this <strong>RFALoCell</strong>.</li><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, the <strong>TxRxMode</strong>(2T2R) must be matched with the <strong>SECTOREQM</strong> of <strong>SectorEqmListRef</strong> in each <strong>RFACellSectorEqmGrp</strong> MO under this <strong>RFALoCell</strong>.</li></ul>
+</li><li>Relation with the <strong>RFASectorEqmGroup</strong>, <strong>RFACellSectorEqmGrp</strong>, and <strong>RFACellSectorEqm</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in a <strong>RFALoCell</strong> is ACTIVATE, in <strong>RFACellSectorEqmGrp</strong> or <strong>RFACellSectorEqm</strong> at least one <strong>SECTOREQM</strong> be configured under this <strong>RFALoCell</strong>.</li></ul>
+</li><li>Relation with the <strong>RFACellRsvdPara</strong> MO:<ul><li>When the bit 1 switch under <strong>RsvdSwPara1</strong> in <strong>RFACellRsvdPara</strong> is turned on, <strong>TxRxMode</strong> in <strong>RFALoCell</strong> must be set to 1T1R, and <strong>AccessStandard</strong> in <strong>RFALoCell</strong> must be set to GSM.</li><li>When the bit 1 switch under <strong>RsvdSwPara1</strong> in <strong>RFACellRsvdPara</strong> is turned on, <strong>LocalCellId</strong> in <strong>RFALoCell</strong> must not be set to the same value as <strong>RsvdU8Para1</strong> in <strong>RFACellRsvdPara</strong>.</li></ul>
+</li><li>Relation with the <strong>RFACellSectorEqmGrp</strong> and <strong>RFACellSectorEqm</strong> MOs:<ul><li>When the <strong>CellActiveState</strong> parameter in the <strong>RFALoCell</strong> MO is set to ACTIVATE, different sector equipment for the cell cannot be configured on the same RF module.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#RFALoCell__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="RFALoCell__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="RFALoCell__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/act_rfalocell.html">ACT RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to activate an RFA cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_rfalocell.html">ADD RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an RFA cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/blk_rfalocell.html">BLK RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to block an RFA cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dea_rfalocell.html">DEA RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to deactivate an RFA cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_rfalocell.html">DSP RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query dynamic attributes of an RFA cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_rfalocell.html">LST RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query configuration information about an RFA cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_rfalocell.html">MOD RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the information of a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_rfalocell.html">RMV RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/ubl_rfalocell.html">UBL RFALOCELL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to unblock an RFA cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#RFALoCell__tab2">Table 2</a> and <a href="#RFALoCell__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="RFALoCell__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="RFALoCell__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-LocalCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within a base station.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-CellName.html">Cell Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-AccessStandard.html">Signal Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the network standard of signals received by the MERC. If AccessStandard is set to MO(NB-IoT), all signals are sent only from NB-IoT cells. If AccessStandard is set to GM(GSM_NB-IoT), CM(CDMA_NB-IoT), or LM(LTE_FDD_NB-IoT), some signals are sent from NB-IoT cells. Set the signal source to the long CP mode for NB-IoT RF signal input. For NB-IoT input signals, the cyclic prefix length must be changed to 266.7 μs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-FreqChannel.html">Frequency Channel</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency band attribute of the RFA cell. The setting must match the signal source and comply with 3GPP specifications.</p>
+<p>Networks: GSM, frequency channel: GSM450(GSM450), GSM480(GSM480), GSM850(GSM850), P-GSM900(P-GSM900), E-GSM900(E-GSM900), R-GSM900(R-GSM900), DCS1800(DCS1800), PCS1900(PCS1900);</p>
+<p>Networks: CDMA, frequency channel: CDMA850(CDMA850), CDMA1900(CDMA1900).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-FreqL.html">Transmit Start Frequency</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink start frequency of the RFA cell. The setting must match the signal source and comply with 3GPP specifications. The downlink start frequency must be equal to or bigger than the downlink minimum frequency of the frequency band or frequency channel, and smaller than the downlink maximum frequency of the frequency band or frequency channel. If this parameter is set to 0, the setting is invalid.</p>
+<p>Networks: GSM, frequency channel: P-GSM900, transmit minimum frequency (1 kHz): 935000;</p>
+<p>Networks: GSM, frequency channel: E-GSM900, transmit minimum frequency (1 kHz): 925000;</p>
+<p>Networks: GSM, frequency channel: R-GSM900, transmit minimum frequency (1 kHz): 921000;</p>
+<p>Networks: GSM, frequency channel: DCS1800, transmit minimum frequency (1 kHz): 1805000;</p>
+<p>Networks: GSM, frequency channel: PCS1900, transmit minimum frequency (1 kHz): 1930000;</p>
+<p>Networks: GSM, frequency channel: GSM450, transmit minimum frequency (1 kHz): 460400;</p>
+<p>Networks: GSM, frequency channel: GSM480, transmit minimum frequency (1 kHz): 488800;</p>
+<p>Networks: GSM, frequency channel: GSM850, transmit minimum frequency (1 kHz): 869000;</p>
+<p>Networks: CDMA, frequency channel: CDMA850, transmit minimum frequency (1 kHz): 860000;</p>
+<p>Networks: CDMA, frequency channel: CDMA1900, transmit minimum frequency (1 kHz): 1930000;</p>
+<p>Networks: UMTS, frequency band:1: transmit minimum frequency (1 kHz): 2110000;</p>
+<p>Networks: UMTS, frequency band:2: transmit minimum frequency (1 kHz): 1930000;</p>
+<p>Networks: UMTS, frequency band:3: transmit minimum frequency (1 kHz): 1805000;</p>
+<p>Networks: UMTS, frequency band:4: transmit minimum frequency (1 kHz): 2110000;</p>
+<p>Networks: UMTS, frequency band:5: transmit minimum frequency (1 kHz): 869000;</p>
+<p>Networks: UMTS, frequency band:6: transmit minimum frequency (1 kHz): 875000;</p>
+<p>Networks: UMTS, frequency band:7: transmit minimum frequency (1 kHz): 2620000;</p>
+<p>Networks: UMTS, frequency band:8: transmit minimum frequency (1 kHz): 925000;</p>
+<p>Networks: UMTS, frequency band:9: transmit minimum frequency (1 kHz): 1844900;</p>
+<p>Networks: UMTS, frequency band:10: transmit minimum frequency (1 kHz): 2110000;</p>
+<p>Networks: UMTS, frequency band:11: transmit minimum frequency (1 kHz): 1475900;</p>
+<p>Networks: UMTS, frequency band:12: transmit minimum frequency (1 kHz): 729000;</p>
+<p>Networks: UMTS, frequency band:13: transmit minimum frequency (1 kHz): 745000;</p>
+<p>Networks: UMTS, frequency band:14: transmit minimum frequency (1 kHz): 758000;</p>
+<p>Networks: UMTS, frequency band:19: transmit minimum frequency (1 kHz): 875000;</p>
+<p>Networks: UMTS, frequency band:20: transmit minimum frequency (1 kHz): 791000;</p>
+<p>Networks: UMTS, frequency band:21: transmit minimum frequency (1 kHz): 1495900;</p>
+<p>Networks: LTE_FDD, frequency band:1: transmit minimum frequency (1 kHz): 2110000;</p>
+<p>Networks: LTE_FDD, frequency band:2: transmit minimum frequency (1 kHz): 1930000;</p>
+<p>Networks: LTE_FDD, frequency band:3: transmit minimum frequency (1 kHz): 1805000;</p>
+<p>Networks: LTE_FDD, frequency band:4: transmit minimum frequency (1 kHz): 2110000;</p>
+<p>Networks: LTE_FDD, frequency band:5: transmit minimum frequency (1 kHz): 869000;</p>
+<p>Networks: LTE_FDD, frequency band:6: transmit minimum frequency (1 kHz): 875000;</p>
+<p>Networks: LTE_FDD, frequency band:7: transmit minimum frequency (1 kHz): 2620000;</p>
+<p>Networks: LTE_FDD, frequency band:8: transmit minimum frequency (1 kHz): 925000;</p>
+<p>Networks: LTE_FDD, frequency band:9: transmit minimum frequency (1 kHz): 1844900;</p>
+<p>Networks: LTE_FDD, frequency band:10: transmit minimum frequency (1 kHz): 2110000;</p>
+<p>Networks: LTE_FDD, frequency band:11: transmit minimum frequency (1 kHz): 1475900;</p>
+<p>Networks: LTE_FDD, frequency band:12: transmit minimum frequency (1 kHz): 729000;</p>
+<p>Networks: LTE_FDD, frequency band:13: transmit minimum frequency (1 kHz): 746000;</p>
+<p>Networks: LTE_FDD, frequency band:14: transmit minimum frequency (1 kHz): 758000;</p>
+<p>Networks: LTE_FDD, frequency band:17: transmit minimum frequency (1 kHz): 734000;</p>
+<p>Networks: LTE_FDD, frequency band:18: transmit minimum frequency (1 kHz): 860000;</p>
+<p>Networks: LTE_FDD, frequency band:19: transmit minimum frequency (1 kHz): 875000;</p>
+<p>Networks: LTE_FDD, frequency band:20: transmit minimum frequency (1 kHz): 791000;</p>
+<p>Networks: LTE_FDD, frequency band:21: transmit minimum frequency (1 kHz): 1495900;</p>
+<p>Networks: LTE_FDD, frequency band:22: transmit minimum frequency (1 kHz): 3510000;</p>
+<p>Networks: LTE_FDD, frequency band:23: transmit minimum frequency (1 kHz): 2180000;</p>
+<p>Networks: LTE_FDD, frequency band:24: transmit minimum frequency (1 kHz): 1525000;</p>
+<p>Networks: LTE_FDD, frequency band:25: transmit minimum frequency (1 kHz): 1930000;</p>
+<p>Networks: LTE_FDD, frequency band:26: transmit minimum frequency (1 kHz): 859000;</p>
+<p>Networks: LTE_FDD, frequency band:27: transmit minimum frequency (1 kHz): 852000;</p>
+<p>Networks: LTE_FDD, frequency band:28: transmit minimum frequency (1 kHz): 758000;</p>
+<p>Networks: LTE_FDD, frequency band:30: transmit minimum frequency (1 kHz): 2350000;</p>
+<p>Networks: LTE_FDD, frequency band:31: transmit minimum frequency (1 kHz): 462500;</p>
+<p>Networks: LTE_FDD, frequency band:66: transmit minimum frequency (1 kHz): 2110000;</p>
+<p>Networks: LTE_TDD, frequency band:33: transmit minimum frequency (1 kHz): 1900000;</p>
+<p>Networks: LTE_TDD, frequency band:34: transmit minimum frequency (1 kHz): 2010000;</p>
+<p>Networks: LTE_TDD, frequency band:35: transmit minimum frequency (1 kHz): 1850000;</p>
+<p>Networks: LTE_TDD, frequency band:36: transmit minimum frequency (1 kHz): 1930000;</p>
+<p>Networks: LTE_TDD, frequency band:37: transmit minimum frequency (1 kHz): 1910000;</p>
+<p>Networks: LTE_TDD, frequency band:38: transmit minimum frequency (1 kHz): 2570000;</p>
+<p>Networks: LTE_TDD, frequency band:39: transmit minimum frequency (1 kHz): 1880000;</p>
+<p>Networks: LTE_TDD, frequency band:40: transmit minimum frequency (1 kHz): 2300000;</p>
+<p>Networks: LTE_TDD, frequency band:41: transmit minimum frequency (1 kHz): 2496000;</p>
+<p>Networks: LTE_TDD, frequency band:42: transmit minimum frequency (1 kHz): 3400000;</p>
+<p>Networks: LTE_TDD, frequency band:43: transmit minimum frequency (1 kHz): 3600000;</p>
+<p>Networks: LTE_TDD, frequency band:44: transmit minimum frequency (1 kHz): 703000.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-FreqH.html">Transmit End Frequency</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink end frequency of the RFA cell. The setting must match the signal source and comply with 3GPP specifications. The downlink end frequency must be equal to or smaller than the downlink maximum frequency of the frequency band or frequency channel, and bigger than the downlink minimum frequency of the frequency band or frequency channel. If this parameter is set to 0, the setting is invalid.</p>
+<p>Networks: GSM, frequency channel: P-GSM900, transmit maximum frequency (1 kHz): 960000;</p>
+<p>Networks: GSM, frequency channel: E-GSM900, transmit maximum frequency (1 kHz): 960000;</p>
+<p>Networks: GSM, frequency channel: R-GSM900, transmit maximum frequency (1 kHz): 960000;</p>
+<p>Networks: GSM, frequency channel: DCS1800, transmit maximum frequency (1 kHz): 1880000;</p>
+<p>Networks: GSM, frequency channel: PCS1900, transmit maximum frequency (1 kHz): 1990000;</p>
+<p>Networks: GSM, frequency channel: GSM450, transmit maximum frequency (1 kHz): 467600;</p>
+<p>Networks: GSM, frequency channel: GSM480, transmit maximum frequency (1 kHz): 496000;</p>
+<p>Networks: GSM, frequency channel: GSM850, transmit maximum frequency (1 kHz): 894000;</p>
+<p>Networks: CDMA, frequency channel: CDMA850, transmit maximum frequency (1 kHz): 894000;</p>
+<p>Networks: CDMA, frequency channel: CDMA1900, transmit maximum frequency (1 kHz): 1990000;</p>
+<p>Networks: UMTS, frequency band:1: transmit maximum frequency (1 kHz): 2170000;</p>
+<p>Networks: UMTS, frequency band:2: transmit maximum frequency (1 kHz): 1990000;</p>
+<p>Networks: UMTS, frequency band:3: transmit maximum frequency (1 kHz): 1880000;</p>
+<p>Networks: UMTS, frequency band:4: transmit maximum frequency (1 kHz): 2155000;</p>
+<p>Networks: UMTS, frequency band:5: transmit maximum frequency (1 kHz): 894000;</p>
+<p>Networks: UMTS, frequency band:6: transmit maximum frequency (1 kHz): 885000;</p>
+<p>Networks: UMTS, frequency band:7: transmit maximum frequency (1 kHz): 2690000;</p>
+<p>Networks: UMTS, frequency band:8: transmit maximum frequency (1 kHz): 960000;</p>
+<p>Networks: UMTS, frequency band:9: transmit maximum frequency (1 kHz): 1879900;</p>
+<p>Networks: UMTS, frequency band:10: transmit maximum frequency (1 kHz): 2170000;</p>
+<p>Networks: UMTS, frequency band:11: transmit maximum frequency (1 kHz): 1495900;</p>
+<p>Networks: UMTS, frequency band:12: transmit maximum frequency (1 kHz): 746000;</p>
+<p>Networks: UMTS, frequency band:13: transmit maximum frequency (1 kHz): 756000;</p>
+<p>Networks: UMTS, frequency band:14: transmit maximum frequency (1 kHz): 768000;</p>
+<p>Networks: UMTS, frequency band:19: transmit maximum frequency (1 kHz): 890000;</p>
+<p>Networks: UMTS, frequency band:20: transmit maximum frequency (1 kHz): 821000;</p>
+<p>Networks: UMTS, frequency band:21: transmit maximum frequency (1 kHz): 1510900;</p>
+<p>Networks: LTE_FDD, frequency band:1: transmit maximum frequency (1 kHz): 2170000;</p>
+<p>Networks: LTE_FDD, frequency band:2: transmit maximum frequency (1 kHz): 1990000;</p>
+<p>Networks: LTE_FDD, frequency band:3: transmit maximum frequency (1 kHz): 1880000;</p>
+<p>Networks: LTE_FDD, frequency band:4: transmit maximum frequency (1 kHz): 2155000;</p>
+<p>Networks: LTE_FDD, frequency band:5: transmit maximum frequency (1 kHz): 894000;</p>
+<p>Networks: LTE_FDD, frequency band:6: transmit maximum frequency (1 kHz): 885000;</p>
+<p>Networks: LTE_FDD, frequency band:7: transmit maximum frequency (1 kHz): 2690000;</p>
+<p>Networks: LTE_FDD, frequency band:8: transmit maximum frequency (1 kHz): 960000;</p>
+<p>Networks: LTE_FDD, frequency band:9: transmit maximum frequency (1 kHz): 1879900;</p>
+<p>Networks: LTE_FDD, frequency band:10: transmit maximum frequency (1 kHz): 2170000;</p>
+<p>Networks: LTE_FDD, frequency band:11: transmit maximum frequency (1 kHz): 1495900;</p>
+<p>Networks: LTE_FDD, frequency band:12: transmit maximum frequency (1 kHz): 746000;</p>
+<p>Networks: LTE_FDD, frequency band:13: transmit maximum frequency (1 kHz): 756000;</p>
+<p>Networks: LTE_FDD, frequency band:14: transmit maximum frequency (1 kHz): 768000;</p>
+<p>Networks: LTE_FDD, frequency band:17: transmit maximum frequency (1 kHz): 746000;</p>
+<p>Networks: LTE_FDD, frequency band:18: transmit maximum frequency (1 kHz): 875000;</p>
+<p>Networks: LTE_FDD, frequency band:19: transmit maximum frequency (1 kHz): 890000;</p>
+<p>Networks: LTE_FDD, frequency band:20: transmit maximum frequency (1 kHz): 821000;</p>
+<p>Networks: LTE_FDD, frequency band:21: transmit maximum frequency (1 kHz): 1510900;</p>
+<p>Networks: LTE_FDD, frequency band:22: transmit maximum frequency (1 kHz): 3590000;</p>
+<p>Networks: LTE_FDD, frequency band:23: transmit maximum frequency (1 kHz): 2200000;</p>
+<p>Networks: LTE_FDD, frequency band:24: transmit maximum frequency (1 kHz): 1559000;</p>
+<p>Networks: LTE_FDD, frequency band:25: transmit maximum frequency (1 kHz): 1995000;</p>
+<p>Networks: LTE_FDD, frequency band:26: transmit maximum frequency (1 kHz): 894000;</p>
+<p>Networks: LTE_FDD, frequency band:27: transmit maximum frequency (1 kHz): 869000;</p>
+<p>Networks: LTE_FDD, frequency band:28: transmit maximum frequency (1 kHz): 803000;</p>
+<p>Networks: LTE_FDD, frequency band:30: transmit maximum frequency (1 kHz): 2360000;</p>
+<p>Networks: LTE_FDD, frequency band:31: transmit maximum frequency (1 kHz): 467500;</p>
+<p>Networks: LTE_FDD, frequency band:66: transmit maximum frequency (1 kHz): 2200000;</p>
+<p>Networks: LTE_TDD, frequency band:33: transmit maximum frequency (1 kHz): 1920000;</p>
+<p>Networks: LTE_TDD, frequency band:34: transmit maximum frequency (1 kHz): 2025000;</p>
+<p>Networks: LTE_TDD, frequency band:35: transmit maximum frequency (1 kHz): 1910000;</p>
+<p>Networks: LTE_TDD, frequency band:36: transmit maximum frequency (1 kHz): 1990000;</p>
+<p>Networks: LTE_TDD, frequency band:37: transmit maximum frequency (1 kHz): 1930000;</p>
+<p>Networks: LTE_TDD, frequency band:38: transmit maximum frequency (1 kHz): 2620000;</p>
+<p>Networks: LTE_TDD, frequency band:39: transmit maximum frequency (1 kHz): 1920000;</p>
+<p>Networks: LTE_TDD, frequency band:40: transmit maximum frequency (1 kHz): 2400000;</p>
+<p>Networks: LTE_TDD, frequency band:41: transmit maximum frequency (1 kHz): 2690000;</p>
+<p>Networks: LTE_TDD, frequency band:42: transmit maximum frequency (1 kHz): 3600000;</p>
+<p>Networks: LTE_TDD, frequency band:43: transmit maximum frequency (1 kHz): 3800000;</p>
+<p>Networks: LTE_TDD, frequency band:44: transmit maximum frequency (1 kHz): 803000.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-FreqBand.html">Frequency Band</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency band in which the RFA cell operates. The setting must match the signal source and comply with 3GPP specifications.</p>
+<p>Networks: UMTS, frequency band: [1-14], [19-21];</p>
+<p>Networks: LTE_FDD, frequency band: [1-14], [17-28], [30-32], [66];</p>
+<p>Networks: LTE_TDD, frequency band: [33-44].</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-DlEarfcn.html">Downlink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency used by an RFA cell. The setting must match the signal source. In mixed mode operation, downlink frequencies refer to non-NB-IoT frequencies. In MO mode, downlink frequencies refer to NB-IoT frequencies. The cell frequency setting must comply with 3GPP specifications.</p>
+<p>Networks: GSM, frequency channel: GSM450: transmit start - end frequency: [259-293];</p>
+<p>Networks: GSM, frequency channel: GSM480: transmit start - end frequency: [306-340];</p>
+<p>Networks: GSM, frequency channel: GSM850: transmit start - end frequency: [128-251];</p>
+<p>Networks: GSM, frequency channel: PGSM900: transmit start - end frequency: [1-124];</p>
+<p>Networks: GSM, frequency channel: EGSM900: transmit start - end frequency: [0-124];</p>
+<p>Networks: GSM, frequency channel: EGSM900: transmit start - end frequency: [975-1023];</p>
+<p>Networks: GSM, frequency channel: RGSM900: transmit start - end frequency: [0-124];</p>
+<p>Networks: GSM, frequency channel: RGSM900: transmit start - end frequency: [955-1023]</p>
+<p>Networks: GSM, frequency channel: DCS1800: transmit start - end frequency: [512-885];</p>
+<p>Networks: GSM, frequency channel: PCS1900: transmit start - end frequency: [512-810];</p>
+<p>Networks: CDMA, frequency channel: CDMA850: transmit start - end frequency: [1-799];</p>
+<p>Networks: CDMA, frequency channel: CDMA850: transmit start - end frequency: [991-1323];</p>
+<p>Networks: CDMA, frequency channel: CDMA1900: transmit start - end frequency: [0-1199];</p>
+<p>Networks: UMTS, frequency band:1: transmit start - end frequency: [10562-10838];</p>
+<p>Networks: UMTS, frequency band:2: transmit start - end frequency: [9662-9938,412,437,462,487,512,537,562,587,612,637,662,687];</p>
+<p>Networks: UMTS, frequency band:3: transmit start - end frequency: [1162-1513];</p>
+<p>Networks: UMTS, frequency band:4: transmit start - end frequency: [1537-1738];</p>
+<p>Networks: UMTS, frequency band:5: transmit start - end frequency: [4357-4458,1007,1012,1032,1037,1062,1087];</p>
+<p>Networks: UMTS, frequency band:6: transmit start - end frequency: [4387-4413];</p>
+<p>Networks: UMTS, frequency band:7: transmit start - end frequency: [2237-2563,2587,2612,2637,2662,2687,2712,2737,2762,2787,2812,2837,2862,2887,2912];</p>
+<p>Networks: UMTS, frequency band:8: transmit start - end frequency: [2937-3088];</p>
+<p>Networks: UMTS, frequency band:9: transmit start - end frequency: [9237-9387];</p>
+<p>Networks: UMTS, frequency band:10: transmit start - end frequency: [3112-3388];</p>
+<p>Networks: UMTS, frequency band:11: transmit start - end frequency: [3712-3787];</p>
+<p>Networks: UMTS, frequency band:12: transmit start - end frequency: [3842-3903];</p>
+<p>Networks: UMTS, frequency band:13: transmit start - end frequency: [4017-4043];</p>
+<p>Networks: UMTS, frequency band:14: transmit start - end frequency: [4117-4143];</p>
+<p>Networks: UMTS, frequency band:19: transmit start - end frequency: [712-763];</p>
+<p>Networks: UMTS, frequency band:20: transmit start - end frequency: [4512-4638];</p>
+<p>Networks: UMTS, frequency band:21: transmit start - end frequency: [862-912];</p>
+<p>Networks: LTE_FDD, frequency band:1: transmit start - end frequency: [0-599];</p>
+<p>Networks: LTE_FDD, frequency band:2: transmit start - end frequency: [600 -1199];</p>
+<p>Networks: LTE_FDD, frequency band:3: transmit start - end frequency: [1200-1949];</p>
+<p>Networks: LTE_FDD, frequency band:4: transmit start - end frequency: [1950-2399];</p>
+<p>Networks: LTE_FDD, frequency band:5: transmit start - end frequency: [2400-2649];</p>
+<p>Networks: LTE_FDD, frequency band:6: transmit start - end frequency: [2650-2749];</p>
+<p>Networks: LTE_FDD, frequency band:7: transmit start - end frequency: [2750-3449];</p>
+<p>Networks: LTE_FDD, frequency band:8: transmit start - end frequency: [3450-3799];</p>
+<p>Networks: LTE_FDD, frequency band:9: transmit start - end frequency: [3800-4149];</p>
+<p>Networks: LTE_FDD, frequency band:10: transmit start - end frequency: [4150-4749];</p>
+<p>Networks: LTE_FDD, frequency band:11: transmit start - end frequency: [4750-4949];</p>
+<p>Networks: LTE_FDD, frequency band:12: transmit start - end frequency: [5010-5179];</p>
+<p>Networks: LTE_FDD, frequency band:13: transmit start - end frequency: [5180-5279];</p>
+<p>Networks: LTE_FDD, frequency band:14: transmit start - end frequency: [5280-5379];</p>
+<p>Networks: LTE_FDD, frequency band:17: transmit start - end frequency: [5730-5849];</p>
+<p>Networks: LTE_FDD, frequency band:18: transmit start - end frequency: [5850-5999];</p>
+<p>Networks: LTE_FDD, frequency band:19: transmit start - end frequency: [6000-6149];</p>
+<p>Networks: LTE_FDD, frequency band:20: transmit start - end frequency: [6150-6449];</p>
+<p>Networks: LTE_FDD, frequency band:21: transmit start - end frequency: [6450-6599];</p>
+<p>Networks: LTE_FDD, frequency band:22: transmit start - end frequency: [6600-7399];</p>
+<p>Networks: LTE_FDD, frequency band:23: transmit start - end frequency: [7500-7699];</p>
+<p>Networks: LTE_FDD, frequency band:24: transmit start - end frequency: [7700-8039];</p>
+<p>Networks: LTE_FDD, frequency band:25: transmit start - end frequency: [8040-8689];</p>
+<p>Networks: LTE_FDD, frequency band:26: transmit start - end frequency: [8690-9039];</p>
+<p>Networks: LTE_FDD, frequency band:27: transmit start - end frequency: [9040-9209];</p>
+<p>Networks: LTE_FDD, frequency band:28: transmit start - end frequency: [9210-9659];</p>
+<p>Networks: LTE_FDD, frequency band:30: transmit start - end frequency: [9770-9869];</p>
+<p>Networks: LTE_FDD, frequency band:31: transmit start - end frequency: [9870-9919];</p>
+<p>Networks: LTE_FDD, frequency band:66: transmit start - end frequency: [66436-67335];</p>
+<p>Networks: LTE_TDD, frequency band:33: transmit start - end frequency: [36000-36199];</p>
+<p>Networks: LTE_TDD, frequency band:34: transmit start - end frequency: [36200-36349];</p>
+<p>Networks: LTE_TDD, frequency band:35: transmit start - end frequency: [36350-36949];</p>
+<p>Networks: LTE_TDD, frequency band:36: transmit start - end frequency: [36950-37549];</p>
+<p>Networks: LTE_TDD, frequency band:37: transmit start - end frequency: [37550-37749];</p>
+<p>Networks: LTE_TDD, frequency band:38: transmit start - end frequency: [37750-38249];</p>
+<p>Networks: LTE_TDD, frequency band:39: transmit start - end frequency: [38250-38649];</p>
+<p>Networks: LTE_TDD, frequency band:40: transmit start - end frequency: [38650-39649];</p>
+<p>Networks: LTE_TDD, frequency band:41: transmit start - end frequency: [39650-41589];</p>
+<p>Networks: LTE_TDD, frequency band:42: transmit start - end frequency: [41590-43589];</p>
+<p>Networks: LTE_TDD, frequency band:43: transmit start - end frequency: [43590-45589];</p>
+<p>Networks: LTE_TDD, frequency band:44: transmit start - end frequency: [45590-46589];</p>
+<p>Networks: NB_IoT, frequency band:1: transmit start - end frequency: [0-599];</p>
+<p>Networks: NB_IoT, frequency band:2: transmit start - end frequency: [600 -1199];</p>
+<p>Networks: NB_IoT, frequency band:3: transmit start - end frequency: [1200-1949];</p>
+<p>Networks: NB_IoT, frequency band:5: transmit start - end frequency: [2400-2649];</p>
+<p>Networks: NB_IoT, frequency band:8: transmit start - end frequency: [3450-3799];</p>
+<p>Networks: NB_IoT, frequency band:11: transmit start - end frequency: [4750-4949];</p>
+<p>Networks: NB_IoT, frequency band:12: transmit start - end frequency: [5010-5179];</p>
+<p>Networks: NB_IoT, frequency band:13: transmit start - end frequency: [5180-5279];</p>
+<p>Networks: NB_IoT, frequency band:17: transmit start - end frequency: [5730-5849];</p>
+<p>Networks: NB_IoT, frequency band:18: transmit start - end frequency: [5850-5999];</p>
+<p>Networks: NB_IoT, frequency band:19: transmit start - end frequency: [6000-6149];</p>
+<p>Networks: NB_IoT, frequency band:20: transmit start - end frequency: [6150-6449];</p>
+<p>Networks: NB_IoT, frequency band:25: transmit start - end frequency: [8040-8689];</p>
+<p>Networks: NB_IoT, frequency band:26: transmit start - end frequency: [8690-9039];</p>
+<p>Networks: NB_IoT, frequency band:28: transmit start - end frequency: [9210-9659];</p>
+<p>Networks: NB_IoT, frequency band:31: transmit start - end frequency: [9870-9919];</p>
+<p>Networks: NB_IoT, frequency band:66: transmit start - end frequency: [66436-67335];</p>
+<p>Networks: NB_IoT, frequency band:70: transmit start - end frequency: [68336-68585].</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-BandWidth.html">Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the bandwidth. The setting of this parameter must match that of the source cell. For a GSM cell, set this parameter to OTHER with the start and end frequencies specified if a non-standard bandwidth is used and to AUTO without the need to set the start and end frequencies if a standard bandwidth is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-CellRadius.html">Cell Radius</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the radius of the RFA cell. The setting of this parameter must be less than or equal to the radius of the donor cell. The cell radius indicates the maximum latency of the RFA system, including the processing latency and air interface delay of the RFA system. For modes other than NR-TDD, the recommended cell radius is calculated as follows: 12500 (m) + Optical fiber length (m) x 1.5. When the cell radius is set to 0, the latency is automatically aligned. According to 3GPP TS 36.104 and TS 36.300, CA requires that delay differences among carriers do not exceed the upper limit. If different RFA carriers need to support CA, the corresponding RFA cells must have the same cell radius. This setting ensures that the DCU does not introduce extra delay differences.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-TxRxMode.html">Cell Transmission And Reception Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ell transmission and reception mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-MaxTxPower.html">Max Transmit Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum theoretical transmit power of a single-antenna channel in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-CellActiveState.html">Cell Active State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the activation state of a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-PilotPowerRatio.html">Pilot Power Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ratio of the unloaded power to fully loaded power of RFA cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-MercCarrierDlAtt.html">MERC Carrier Gain Adjustment</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates MERC carrier gain adjustment.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-CellManageState.html">Cell Manage State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell manage state of the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NBMode.html">NB-IoT Deployment Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the NB-IoT deployment mode. This parameter is valid only when AccessStandard is set to LM(LTE_FDD_NB-IoT) and applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NBDlEarfcn.html">NB-IoT Downlink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink EARFCN of NB-IoT. For details, see 3GPP TS 36.104. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NBUlEarfcn.html">NB-IoT Uplink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink EARFCN of NB-IoT. For details, see 3GPP TS 36.104. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NBDlFreqOffset.html">NB-IoT Downlink Frequency Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency offset of an NB-IoT downlink center frequency from an LTE FDD downlink center frequency. For details, see 3GPP TS 36.101. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NBUlFreqOffset.html">NB-IoT Uplink Frequency Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency offset of an NB-IoT uplink center frequency from an LTE FDD uplink center frequency. For details, see 3GPP TS 36.101. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NBPowerRatio.html">NB-IoT Power Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of NB-IoT carrier power to the total cell power. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NBPilotPowerRatio.html">NB-IoT Pilot Power Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ratio of the unloaded power to fully loaded power of NB-IoT carriers.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NetworkMode.html">Cell network Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the networking mode of a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-MicroRruMaxPower.html">Micro RRU Max Transmit Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum theoretical transmit power of the single-antenna channel of a low-power RRU in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-MiddleRruMaxPower.html">Middle RRU Max Transmit Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum theoretical transmit power of the single-antenna channel of a medium-power RRU in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-HighRruMaxPower.html">High RRU Max Transmit Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum theoretical transmit power of the single-antenna channel of a high-power RRU in a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-SubframeAssignment.html">Subframe assignment</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ratio of UL subframes to DL subframes in a TDD cell. For details, see 3GPP TS 36.211.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-SpecialSubframePatterns.html">Special subframe patterns</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ratio of special UL subframes to special DL subframes in a TDD cell. For details, see 3GPP TS 36.211.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-CarrierMaxInPwr.html">Carrier Max Input Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Carrier Max Input Power.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-AssociatedCellId.html">Associated Cell Id</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the associated cell of an RFA cell. It uniquely identifies a cell associated with the RFA cell within the base station.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-AssociatedCellSw.html">Associated Cell Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an RFA cell has associated RFA cells. If this parameter is set to ON, the RFA cell has associated RFA cells. If this parameter is set to OFF, the RFA cell does not have associated RFA cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-FrameOffset.html">Frame Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of the start time of a cell frame against a reference clock source.</p>
+<p>The mapping between a configured value and an actual value is as follows:</p>
+<p>If the configured value is [0,3072) Ts, the actual value is [0,3072) Ts</p>
+<p>If the configured value is [3072,12295] Ts, the actual value is [156672,165895] Ts</p>
+<p>If the configured value is (12295,153600) Ts, the actual value is (12295,153600) Ts</p>
+<p>If the configured value is [153600,156672) Ts, the actual value is [0,3072) Ts</p>
+<p>If the configured value is [156672,165895] Ts, the actual value is [156672,165895] Ts</p>
+<p>If the configured value is (165895,261120] Ts, the actual value is (12295,107520] Ts</p>
+<p>If the configured value is [275943,307200] Ts, the actual value is [275943,307200] Ts</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NRFrameOffset.html">NRFrameOffset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the delay of the start of the air interface frame of all cells under the gNodeB relative to the reference clock source.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NRSlotAssignment.html">NRSlotAssignment</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>This parameter specifies the uplink-downlink timeslot configuration. This parameter applies only to NR_TDD.</p>
+<p>4_1_DDDSU:Indicates that the ratio of the downlink timeslot to the uplink timeslot is 4 to 1,</p>
+<p>8_2_DDDDDDDSUU:Indicates that the ratio of the downlink timeslot to the uplink timeslot is 8 to 2,</p>
+<p>7_3_DDDSUDDSUU:Indicates that the ratio of the downlink timeslot to the uplink timeslot ratio is 7 to 3.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-NRSlotStructure.html">NRSlotStructure</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>This parameter specifies the timeslot structure. This parameter applies only to the NR_TDD.</p>
+<p>SS1: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is 4 to 1, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 11/1/2, and corresponding parameters are X=2.5ms, x1=3, x2=11, y2=2, and y1=1.</p>
+<p>SS2: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is 4 to 1, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 10/2/2, and corresponding parameters are X=2.5ms, x1=3, x2=10, y2=2, and y1=1.</p>
+<p>SS3: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is 4 to 1, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 9/3/2, and corresponding parameters are X=2.5ms, x1=3, x2=9, y2=2, and y1=1.</p>
+<p>SS4: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is 4 to 1, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 8/4/2, and corresponding parameters are X=2.5ms, x1=3, x2=8, y2=2, and y1=1.</p>
+<p>SS5: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is 4 to 1, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 7/5/2, and corresponding parameters are X=2.5ms, x1=3, x2=7, y2=2, and y1=1.</p>
+<p>SS6: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is 4 to 1, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 6/6/2, and corresponding parameters are X=2.5ms, x1=3, x2=6, y2=2, and y1=1.</p>
+<p>SS51: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 9/1/4, and corresponding parameters are X=5ms, x1=7, x2=9, y2=4, and y1=2.</p>
+<p>SS52: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 8/2/4, and corresponding parameters are X=5ms, x1=7, x2=8, y2=4, and y1=2.</p>
+<p>SS53: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 7/3/4, and corresponding parameters are X=5ms, x1=7, x2=7, y2=4, and y1=2.</p>
+<p>SS54: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 6/4/4, and corresponding parameters are X=5ms, x1=7, x2=6, y2=4, and y1=2.</p>
+<p>SS55: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 5/5/4, and corresponding parameters are X=5ms, x1=7, x2=5, y2=4, and y1=2.</p>
+<p>SS56: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 4/6/4, and corresponding parameters are X=5ms, x1=7, x2=4, y2=4, and y1=2.</p>
+<p>SS51: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 9/1/4, and corresponding parameters are X=5ms, x1=7, x2=9, y2=4, and y1=2.</p>
+<p>SS52: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 8/2/4, and corresponding parameters are X=5ms, x1=7, x2=8, y2=4, and y1=2.</p>
+<p>SS53: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 7/3/4, and corresponding parameters are X=5ms, x1=7, x2=7, y2=4, and y1=2.</p>
+<p>SS54: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 6/4/4, and corresponding parameters are X=5ms, x1=7, x2=6, y2=4, and y1=2.</p>
+<p>SS55: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 5/5/4, and corresponding parameters are X=5ms, x1=7, x2=5, y2=4, and y1=2.</p>
+<p>SS56: When the ratio of the low frequency downlink timeslot to the uplink timeslot is 8 to 2, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 4/6/4, and corresponding parameters are X=5ms, x1=7, x2=4, y2=4, and y1=2.</p>
+<p>SS101: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is double periods 7 to 3, the downlink symbol /GAP symbol/uplink symbol of the S timeslot in the first period is 11/1/2, and corresponding parameters are X=2.5ms, x1=3, x2=11, y2=2, and y1=1. In the second period, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 11/1/2, and corresponding parameters are Y=2.5ms,x3=2, x4=11, y4=2, and y3=2.</p>
+<p>SS102: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is double periods 7 to 3, the downlink symbol /GAP symbol/uplink symbol of the S timeslot in the first period is 10/2/2, and corresponding parameters are X=2.5ms, x1=3, x2=10, y2=2, and y1=1. In the second period, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 10/2/2, and corresponding parameters are Y=2.5ms,x3=2, x4=10, y4=2, and y3=2.</p>
+<p>SS103: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is double periods 7 to 3, the downlink symbol /GAP symbol/uplink symbol of the S timeslot in the first period is 9/3/2, and corresponding parameters are X=2.5ms, x1=3, x2=9, y2=2, and y1=1. In the second period, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 9/3/2, and corresponding parameters are Y=2.5ms,x3=2, x4=9, y4=2, and y3=2.</p>
+<p>SS104: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is double periods 7 to 3, the downlink symbol /GAP symbol/uplink symbol of the S timeslot in the first period is 8/4/2, and corresponding parameters are X=2.5ms, x1=3, x2=8, y2=2, and y1=1. In the second period, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 8/4/2, and corresponding parameters are Y=2.5ms,x3=2, x4=8, y4=2, and y3=2.</p>
+<p>SS105: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is double periods 7 to 3, the downlink symbol /GAP symbol/uplink symbol of the S timeslot in the first period is 7/5/2, and corresponding parameters are X=2.5ms, x1=3, x2=7, y2=2, and y1=1. In the second period, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 7/5/2, and corresponding parameters are Y=2.5ms,x3=2, x4=7, y4=2, and y3=2.</p>
+<p>SS106: When the ratio of the low frequency downlink timeslot to the uplink timeslot ratio is double periods 7 to 3, the downlink symbol /GAP symbol/uplink symbol of the S timeslot in the first period is 6/6/2, and corresponding parameters are X=2.5ms, x1=3, x2=6, y2=2, and y1=1. In the second period, the downlink symbol /GAP symbol/uplink symbol of the S timeslot is 6/6/2, and corresponding parameters are Y=2.5ms,x3=2, x4=6, y4=2, and y3=2.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-ULBandWidth.html">ULBandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink bandwidth of the NR cell. The value must be the same as that of the source cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-ULEarfcn.html">Uplink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink frequency of the RF access cell. The value of this parameter must be the same as that of the source cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-UlFreqL.html">Receive Start Frequency</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink start frequency of the NR RF access cell. The value must be the same as that of the source cell. The value of 4294967295 indicates an invalid value. In this case, the uplink start frequency and downlink start frequency comply with the default conversion rule of the 3GPP protocol.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RFALoCell-UlFreqH.html">Receive End Frequency</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink end frequency of the NR RF access cell. The value must be the same as that of the source cell. The value of 4294967295 indicates an invalid value. In this case, the uplink start frequency and downlink start frequency comply with the default conversion rule of the 3GPP protocol.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="RFALoCell__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="RFALoCell__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CellInstanceState.html">Cell Instance State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cell state.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CellLatestAvailState.html">Reason For Latest State Change</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the reason that causes the latest state change of the cell, which can be a cell activation success or a cell setup failure.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CellLatestSetupTime.html">Cell Latest Setup Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the latest setup time of the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CellLatestSetupType.html">Cell Latest Setup Operate Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the latest setup type of the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CellLatestRemoveTime.html">Cell Latest Remove Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the latest remove time of the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CellLatestRemoveType.html">Cell Latest Remove Operate Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the latest remove type of the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CenterFreq.html">Center Frequency</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates center frequency of a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CustomizedBWFreq.html">Customized Bandwidth Frequency Range</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the frequency range of a Customized bandwidth. The customized bandwidth is the full bandwidth occupied by the user carrier, including pass bandwidth and protection bandwidth. The pass bandwidth is the bandwidth that is used to carry the useful signal in the customized bandwidth. The protection bandwidth is reserved for the purpose of reducing the inter-carrier interference. Protection Bandwidth = Customized Bandwidth - Pass Bandwidth.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-PassBWFreq.html">Pass Bandwidth Frequency Range</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the frequency range of a pass bandwidth. The customized bandwidth is the full bandwidth occupied by the user carrier, including pass bandwidth and protection bandwidth. The pass bandwidth is the bandwidth that is used to carry the useful signal in the customized bandwidth. The protection bandwidth is reserved for the purpose of reducing the inter-carrier interference. Protection Bandwidth = Customized Bandwidth - Pass Bandwidth.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-RFAEqmInfo.html">RFA Equipment Information</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cabinet, subrack, slot, and port information of the cell RFA equipment.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-MercDlPortAdjustPower.html">Adjusted MERC Carrier Downlink Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates adjusted downlink power of carriers on the MERC port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-MercDlPortInputPower.html">MERC Carrier Downlink Input Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates downlink input power of carriers on the MERC port (manually configured maximum input power of the carrier).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-MercDlCaDigitalOutputPwr.html">MERC Carrier DL Output Power in Digital Domain</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates downlink output power of MERC carriers in the digital domain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-MercUlCaDigitalInputPwr.html">MERC Carrier UL Input Power in Digital Domain</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates uplink input power of MERC carriers in the digital domain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-MercUlPortOutputPower.html">MERC Carrier Uplink Output Power</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates uplink output power of carriers on the MERC port (Attenuation).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-RfModuleInfo.html">RF Module Information</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cabinet, subrack, and slot where the RF module serves the cell is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-TxNo.html">TX Channel No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the TX channel information about the RF unit that serves a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-RxNo.html">RX Channel No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the RX channel information about the RF unit that serves a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-Status.html">Work Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the working status of RF units used by a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-RFAEqmStatus.html">RFA Equipment Work Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the work status of the radio frequency access equipment that serves the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-UBBP_INFO.html">Information about the board for providing optical fiber connections</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the TX channel information about the RF unit that serves a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-CellRadiusTimeDelay.html">Cell Radius Target Delay</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates target delay corresponding to the cell radius.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-MaxTimeDelayCellRadius.html">Maximum Delay Equivalent Cell Radius</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates cell radius equivalent to the maximum cell delay.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-MercCarrierAutoAtt.html">MERC Carrier Auto Calibration Amount</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates MERC carrier auto calibration amount.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/RFALoCell-TimeDelayDiffValue.html">Target and Compensation Delay Difference</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates difference between the target delay corresponding to the cell radius and the delay after compensation.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,199 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IKECFG">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IKECFG">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IKECFG</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IKECFG"></a><a name="IKECFG"></a>
+
+
+<h1 class="topictitle1">IKECFG</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IKECFG.html"><strong>IKECFG</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The IKECFG MO is used to define basic IKE configuration such as the IKE local name and IKE keepalive duration.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Not involved</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>PACKETFILTERING</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to ALL, the <strong>ITFTYPE</strong> of the <strong>INTERFACE</strong> MO associated with a <strong>PACKETFILTERING</strong> MO which <strong>ACLTYPE</strong> is set to IPV4 must be set to NORMAL.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTERING</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IPSECBINDMODE</strong> in an <strong>IKECFG</strong> MO is set to ALL, <strong>PT</strong> in a <strong>PACKETFILTERING</strong> MO is set to INTERFACE, and <strong>ACLTYPE</strong> is set to IPV4, and <strong>PORTID</strong> in the <strong>PACKETFILTERING</strong> MO is set to the same value as <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO, <strong>ITFTYPE</strong> in the <strong>INTERFACE</strong> MO must be set to NORMAL.</li></ul>
+</li><li>Relation with the <strong>SECURITYHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IPSECBINDMODE</strong> in an <strong>IKECFG</strong> MO is set to ALL, at least one <strong>INTERFACE</strong> MO with <strong>ITFTYPE</strong> set to NORMAL and <strong>VRFIDX</strong> set to 0 must exist on the physical port, on which an <strong>INTERFACE</strong> MO corresponding to the <strong>IPADDR4</strong> MO referenced by the <strong>SECURITYHOST</strong> MO is located.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO must be set to SINGLE.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> and <strong>IPSECDTNL</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to ALL, the <strong>IPSECDTNL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to ALL, the <strong>ITFTYPE</strong> of the <strong>INTERFACE</strong> MO associated with an <strong>IPSECBINDITF</strong> MO with parameter <strong>CTRLMODE</strong> set to MANUAL_MODE must be set to NORMAL.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>IPSECBINDITF</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>TYPE</strong> in the <strong>MPT</strong> MO is set to LMPT and <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to ALL, a maximum of four <strong>INTERFACE</strong> MOs with <strong>ITFTYPE</strong> set to VLAN can be configured on the physical ports corresponding to the <strong>INTERFACE</strong> MOs with <strong>ITFTYPE</strong> set to NORMAL, to which all the <strong>IPSECBINDITF</strong> MOs on the same board are bound.</li><li>[Co-MPT, eNodeB]When <strong>TYPE</strong> in the <strong>MPT</strong> MO is set to LMPT and <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to SINGLE, a maximum of four <strong>IPSECBINDITF</strong> MOs that are carried on the <strong>INTERFACE</strong> MOs with <strong>ITFTYPE</strong> set to VLAN can be configured on the same board.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IKECFG__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IKECFG__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IKECFG__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ikecfg.html">DSP IKECFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the basic IKE configuration that takes effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ikecfg.html">LST IKECFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the basic IKE configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_ikecfg.html">SET IKECFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the global parameters related to the basic IKE configurations.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IKECFG__tab2">Table 2</a> and <a href="#IKECFG__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IKECFG__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IKECFG__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-LocalName.html">Local Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IKE local name.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-KeepaliveInterval.html">Interval for Sending Keepalive Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval for sending keepalive packets. When this parameter is set to 0, keepalive packets are not sent. When this parameter is not set to 0, check the timer for waiting for keepalive packets on the peer end. It is recommended that the timer length be greater than or equal to a value three times of this parameter value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-KeepaliveTimeout.html">Keepalive Timeout</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the timeout duration for waiting for the keepalive packets. If this parameter is set to 0, keepalive packets are not sent.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-NATKeepaliveTimeout.html">Interval for Sending NAT Keepalive Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval for sending network address translation (NAT) keepalive packets. This parameter is valid only when the NAT traversal function of IPsec is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-DSCP.html">DSCP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DSCP for IKE negotiation packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-IPSecSwitchBack.html">IPSec Redundancy Switch Back</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow a switchback to the master IKE peer after its negotiation recovers when the IPSec redundancy function is enabled.</p>
+<p>If this parameter is set to OFF, the base station automatically stops the negotiation with the master IKE peer (IPv4 or IPv6) when the negotiation with the master IKE peer fails and the negotiation with a slave IKE peer succeeds. In this case, the IKE negotiation failure alarm for the master IKE peer is not cleared. If the negotiation with a slave IKE peer succeeds previously but fails now, and if the negotiation with the slave IKE peer with the lowest priority still fails, the negotiation with the master IKE peer is started immediately even if this parameter is set to OFF. After the negotiation with the master IKE peer succeeds, the system immediately switches back to the master IKE peer and clears the IKE negotiation failure alarm for the master IKE peer.</p>
+<p>If this parameter is set to ON, the negotiation with the master IKE peer (IPv4 or IPv6) does not stop when the negotiation with the master IKE peer fails and services are switched to a slave IKE peer. In this case, the IKE negotiation failure alarm for the master IKE peer is cleared only when the negotiation with the master IKE peer succeeds. If the negotiation with the master IKE peer succeeds but the negotiation with a slave IKE peer fails, the system immediately switches services back to the master IKE peer. If the negotiation with a slave IKE peer succeeds, the system switches back to the master IKE peer after the specific timer expires. (The timer length is the sum of the IPSec switchback wait time and the random IPSec switchback delay.) If you run the <a href="../mml/set_ikecfg.html">SET IKECFG</a> command to forbid the switchback when the master and slave IKE peers are being switched (in the switchback wait period), the system immediately stops the negotiation of the primary channel.</p>
+<p>If this parameter is set to IPV4_ON+IPV6_OFF, the IPv4 switchback is enabled but the IPv6 switchback is disabled. This option is valid only for the UMPT/UMDU board that supports IPv6.</p>
+<p>If this parameter is set to IPV4_OFF+IPV6_ON, the IPv4 switchback is disabled but the IPv6 switchback is enabled. This option is valid only for the UMPT/UMDU board that supports IPv6.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-IPSecSwitchBackWaitTime.html">IPSec Redundancy Switch Back Wait Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration before a switchover from the slave IKE peer to the master IKE peer in the IPSec redundancy function. If the master IKE peer that has been switched over to the slave IKE peer due to failed negotiation succeeds in the negotiation again, the duration from the negotiation success to the back switchover equals the duration specified by this parameter plus a random delay generated with the IPSec Redundancy Switch Back Random Delay Time parameter specified. If the <a href="../mml/set_ikecfg.html">SET IKECFG</a> command is executed to modify the value of this parameter during a back switchover, the modified value does not take effect until the next back switchover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-IPSecSwitchBackRandomDelayTime.html">IPSec Redundancy Switch Back Random Delay Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the random delay before a switchover from the slave IKE peer to the master IKE peer in the IPSec redundancy function. When this parameter is set to N, a random delay that ranges from 0 to N is added to the duration before a back switchover. When this parameter is set to 0, no random delay is added to the duration before a back switchover. If the master IKE peer that has been switched over to the slave IKE peer due to failed negotiation succeeds in the negotiation again, the duration from the negotiation success to the back switchover equals the duration specified by the IPSec Redundancy Switch Back Wait Time parameter plus a random delay generated with this parameter specified. If the <a href="../mml/set_ikecfg.html">SET IKECFG</a> command is executed to modify the value of this parameter during a back switchover, the modified value does not take effect until the next back switchover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-IPSecSwitchOverWaitTime.html">IPSec Redundancy Switchover Wait Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration before a switchover from the master IKE peer to the slave IKE peer in the IPSec redundancy function. If a master IKE peer fails the negotiation, the slave IKE peer initiates negotiation after a period that equals the duration specified by this parameter plus a random delay generated with the IPSec Redundancy Switchover Random Delay Time parameter specified. If the <a href="../mml/set_ikecfg.html">SET IKECFG</a> command is executed to modify the value of this parameter during the slave IKE peer negotiation, the modified value does not take effect until the next switchover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-IPSecSwitchOverRandomDelayTime.html">IPSec Redundancy Switchover Random Delay Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the random delay before a switchover from the masker IKE peer to the slave IKE peer in the IPSec redundancy function. If a master IKE peer fails the negotiation, the slave IKE peer initiates negotiation after a period that equals the duration specified by the IPSec Redundancy Switchover Wait Time parameter plus a random delay generated with this parameter specified. When this parameter is set to N, a random delay that ranges from 0 to N is added to the duration before the negotiation. When this parameter is set to 0, no random delay is added to the duration before the negotiation. If the <a href="../mml/set_ikecfg.html">SET IKECFG</a> command is executed to modify the value of this parameter during the slave IKE peer negotiation, the modified value does not take effect until the next switchover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKECFG-IPSecBindMode.html">IPSec Bind Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the binding mode of an IPsec policy group, which can be global mode and single-interface mode. The two modes are mutually exclusive. In global mode, an IPsec policy group and packet filtering policies can be bound only to a normal interface, and the IPsec and packet filtering policies take effect on the normal interface and all VLAN subinterfaces in the default routing domain of the physical port to which the normal interface belongs. In single-interface mode, the IPsec policies take effect only on the interface bound to the IPsec policy group and packet filtering policies take effect only on the interface bound to the packet filtering policies. This parameter is valid only for IPv4 IPsec and packet filtering policies.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IKECFG__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IKECFG__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKECFG-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cabinet number of the IKE local board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKECFG-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the subrack number of the IKE local board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKECFG-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the slot number of the IKE local board.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

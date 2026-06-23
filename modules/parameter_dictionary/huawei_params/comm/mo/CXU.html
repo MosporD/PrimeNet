@@ -1,0 +1,934 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CXU">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CXU">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CXU</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CXU"></a><a name="CXU"></a>
+
+
+<h1 class="topictitle1">CXU</h1>
+
+<div>
+<div class="section"><pre>
+<a href="Equipment.html">EQUIPMENT</a>
+  +-<a href="CXU.html"><strong>CXU</strong></a>
+    +-<a href="CpriPort.html">CPRIPORT</a>[2~18]
+    +-<a href="SFP.html">SFP</a>[2~18]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CXU MO is used to manage the devices on the chain/ring except RF modules.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Base class:</p>
+<a href="RU.html">RU</a></li><li><p>Possible parents:</p>
+<a href="Equipment.html">EQUIPMENT</a></li><li><p>Possible children:</p>
+<a href="CpriPort.html">CPRIPORT</a>[2~18];<a href="SFP.html">SFP</a>[2~18]</li><li>Relation with the <strong>CXU</strong> and <strong>RRUCHAIN</strong> Mos:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>CXU</strong> MO is located must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>CR</strong> in an <strong>RRUCHAIN</strong> MO where an <strong>CXU</strong> MO is located cannot be set to MANUAL.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>RRUCHAIN</strong> MO, the maximum number of corresponding <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS is 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the value of <strong>CXUTYPE</strong> in a <strong>CXU</strong> MO is CGPS, the value of <strong>TT</strong> in an <strong>RRUCHAIN</strong> MO corresponding to the <strong>CXU</strong> MO must be CHAIN, or RING with <strong>BM</strong> set to COLD.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the value of <strong>CXUTYPE</strong> in a <strong>CXU</strong> MO is RPCU, the value of <strong>TT</strong> in an <strong>RRUCHAIN</strong> MO corresponding to the <strong>CXU</strong> MO must be CHAIN.</li></ul>
+</li><li>Relation with the <strong>CXU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For a base station, the maximum number of <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS is 2.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The total number of <strong>CXU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A maximum of twelve <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to RMU can be configured on a base station.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For a base station, the maximum number of <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to RPCU is 24.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an RRU chain/ring specified by an <strong>RRUCHAIN</strong> MO connects to a <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU, then the <strong>RRUCHAIN</strong> MO must meet the following conditions:</li><li>- <strong>TT</strong> is set to TRUNK_CHAIN.</li><li>- <strong>CONNCN1</strong> is set to the same value as <strong>CONNCN2</strong>.</li><li>- <strong>CONNSRN1</strong> is set to the same value as <strong>CONNSRN2</strong>.</li><li>- <strong>CONNSN1</strong> is set to the same value as <strong>CONNSN2</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If a <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU corresponds to an <strong>RRUCHAIN</strong> MO, <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO must be set to TRUNK_CHAIN.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>RRUCHAIN</strong> MO is connected to a <strong>CXU</strong> MO with <strong>AT</strong> set to PEERPORT, <strong>CS</strong> in the <strong>CXU</strong> MO cannot set to GO, GT, GL, GLFTD, GU, GUT, GUL, GULFTD, GM, GTM, GLM, GLFTDM, GUM, GUTM, GULM, or GULFTDM.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>RRUCHAIN</strong> is connected to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU and the <strong>RRU</strong> MO, <strong>RS</strong> in the <strong>RRU</strong> MO must be included in the working mode of the RMU.</li><li>[eGBTS]If <strong>TP</strong> in the <strong>RRU</strong> MO is set to BRANCH, a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must be configured in the cabinet specified by <strong>RCN</strong> in the <strong>RRU</strong> MO.</li><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, the total number of <strong>RRU</strong>, and <strong>CXU</strong> MOs in the <strong>RRUCHAIN</strong> MO must be less than or equal to seven.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When no <strong>MPT</strong> MO in which <strong>TYPE</strong> is set to UMPT is configured, the <strong>CXU</strong> MO in which <strong>CXUTYPE</strong> is set to RMU cannot be configured.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>CTRLLNK</strong>, and <strong>SUBRACK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When no <strong>MPT</strong> MO in which <strong>TYPE</strong> is set to UMPT is configured in the root BBU, the <strong>CXU</strong> MO in which <strong>CXUTYPE</strong> is set to RMU cannot be configured.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong> and <strong>RRU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRU</strong> MO in which <strong>RT</strong> is set to AIRU cannot be configured on the same trunk chain as the <strong>CXU</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>CXU</strong> MO cannot be configured on the same trunk chain as the <strong>RRU</strong> MO in which <strong>RT</strong> is set to AIRU.</li></ul>
+</li><li>Relation with the <strong>LOCATION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>LOCATIONNAME</strong> in a <strong>CXU</strong> MO is not set to NULL, the corresponding <strong>LOCATION</strong> must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>LOCATIONNAME</strong> in a <strong>CXU</strong> MO is not set to NULL, the corresponding <strong>LOCATION</strong> with <strong>LOCATIONTYPE</strong> set to BTSSITE or RFSITE must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>LOCATIONNAME</strong> in the <strong>CXU</strong> MO is not left blank, <strong>POSITIONINGMETHOD</strong> in the <strong>LOCATION</strong> MO corresponding to this character string cannot be set to POSITIONING_BY_UE.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TYPE</strong> is set to UBBP and <strong>CPRIITFTYPE</strong> is set to CPRI_QSFP in a <strong>BBP</strong> MO, the <strong>BBP</strong> MO can be associated only with the <strong>RRU</strong> MO in which <strong>RT</strong> is set to AIRU.</li></ul>
+</li><li>Relation with the <strong>CABINET</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>SN</strong> in the <strong>CXU</strong> MO is set to a value greater than 0, <strong>SRN</strong> in the <strong>CXU</strong> MO must be set to 60, and <strong>TYPE</strong> in the <strong>CABINET</strong> MO where the <strong>CXU</strong> MO is located must be set to RFC5906 or IFS5906.</li></ul>
+</li><li>Relation with the <strong>GPS</strong>, <strong>RRU</strong>, <strong>RHUB</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When a <strong>GPS</strong> MO is configured for a <strong>CXU</strong> MO in which <strong>CXUTYPE</strong> is set to CGPS, the <strong>GPS</strong> MO cannot be configured on a non-CGPS board.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>GPS</strong> MO is configured on a non-CGPS board, <strong>GPS</strong> cannot be configured for a <strong>CXU</strong> MO in which <strong>CXUTYPE</strong> is set to CGPS.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The total number of <strong>RRU</strong>, <strong>RFU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 21.</li><li>[Co-MPT, NodeB, eNodeB]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to RMU, <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU or <strong>RHUB</strong>.</li><li>[eGBTS]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong>s with <strong>CXUTYPE</strong> set to RMU.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong>, <strong>RRU</strong>, <strong>RRUCHAIN</strong>, <strong>RFU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If sector equipment antennas are distributed on multiple radio frequency units, these radio frequency units can neither be configured on different branches of trunk chains, nor be configured in hybrid networking modes including the branches of trunk chain.</li></ul>
+</li><li>Relation with the <strong>RFU</strong> and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TP</strong> in the <strong>RFU</strong> MO is set to BRANCH, the <strong>RRUCHAIN</strong> MO specified by <strong>RCN</strong> in this <strong>RFU</strong> MO must be connected to an RMU.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>RRU</strong>, <strong>RFU</strong>, <strong>AAMU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PROTOCOL</strong> is set to eCPRI and <strong>TT</strong> is set to CHAIN or LOADBALANCE in an <strong>RRUCHAIN</strong> MO, then only <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EXTRRURES</strong>, <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]Each of the following MOs must have a unique combination of cabinet number, subrack number, and slot number: <strong>EXTRRURES</strong>, <strong>RRU</strong>, <strong>AAMU</strong>, <strong>RHUB</strong> and <strong>CXU</strong>.</li></ul>
+</li><li>Relation with the <strong>CXU</strong> Mos:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU must be at the lowest level of the <strong>RRUCHAIN</strong> MO, and only the <strong>RRU</strong> or <strong>RFU</strong> MO can be configured at the upper level.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU must be at the lowest level of the <strong>RRUCHAIN</strong> MO, and only the <strong>RRU</strong> or <strong>RFU</strong> MO can be configured at the upper level.</li></ul>
+</li><li>Relation with the <strong>RHUB</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TP</strong> in the <strong>RRU</strong> MO is set to BRANCH, the <strong>RHUB</strong> MO or a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must be configured in the cabinet specified by <strong>RCN</strong> in the <strong>RRU</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>RHUB</strong> MO is located must not have <strong>RRU</strong> MO, <strong>RFU</strong> MO, <strong>AAMU</strong> MO, and <strong>CXU</strong> MO.</li><li>[gNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>RHUB</strong> MO is located must not have <strong>RRU</strong> MO, <strong>RFU</strong> MO, and <strong>CXU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>AARU</strong>, <strong>RHUB</strong>, and <strong>RRU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]Only the cabinet number and subrack number of the <strong>RRU</strong> MO with <strong>RT</strong> set to MPRF can be the same as those of the <strong>RRU</strong> MO with <strong>RT</strong> set to MPMU.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RHUB</strong>, and <strong>RRU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]Only the cabinet number and subrack number of the <strong>AARU</strong> MO can be the same as those of the <strong>AAMU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CXU</strong>, <strong>RRUCHAIN</strong> and <strong>EQUIPMENT</strong> Mos:<ul><li>[Co-MPT, eGBTS, eNodeB, gNodeB]If <strong>PROTOCOL</strong> in an <strong>EQUIPMENT</strong> MO is set to TDL_IR, a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to CGPS or <strong>CXUTYPE</strong> set to RPCU cannot be configured under an <strong>RRUCHAIN</strong> MO with <strong>PROTOCOL</strong> set to DEFAULT.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong> and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TP</strong> in the <strong>AAMU</strong> MO is set to BRANCH, a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must be configured in the cabinet specified by <strong>RCN</strong> in the <strong>AAMU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, the total number of <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs in the <strong>RRUCHAIN</strong> MO must be less than or equal to seven.</li></ul>
+</li><li>Relation with the <strong>AARU</strong> and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> is connected to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU and an <strong>AARU</strong> MO, <strong>RS</strong> in the <strong>AARU</strong> MO must be included in the working mode of the RMU.</li></ul>
+</li><li>Relation with the <strong>CPRIPORT</strong>, <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[NodeB, eGBTS, eNodeB]If <strong>ADMINISTRATIVESTATE</strong> in the <strong>CPRIPORT</strong> MO is set to BLOCKED, a <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>MDU</strong>, <strong>RHUB</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must be configured in the slot specified by <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>CPRIPORT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, <strong>RHUB</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>AAMU</strong> MOs</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU</li><li>3. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU and <strong>TP</strong> set to BRANCH.</li><li>2. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU.</li><li>3. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU and <strong>TP</strong> set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, <strong>RHUB</strong>, <strong>AAMU</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU and <strong>TP</strong> set to BRANCH.</li><li>2. <strong>AAMU</strong> MOs with <strong>TP</strong> set to BRANCH.</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU.</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU and <strong>TP</strong> set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, <strong>CXU</strong>, and <strong>RHUB</strong> Mos:<ul><li>[Co-MPT, NodeB, eNodeB]The <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU must be at the lowest level of the <strong>RRUCHAIN</strong> MO, and only the <strong>RRU</strong> or <strong>RFU</strong> MO can be configured at the upper level.</li><li>[Co-MPT, NodeB, eNodeB]The <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU must be at the lowest level of the <strong>RRUCHAIN</strong> MO, and only the <strong>RRU</strong> or <strong>RFU</strong> MO can be configured at the upper level.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]When <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in an <strong>RRUCHAIN</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>RHUB</strong> MO, respectively, the <strong>RT</strong> in the <strong>RRU</strong> MO that is configured on this <strong>RRUCHAIN</strong> MO must be set to MPMU or MPRF.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[NodeB, eNodeB]For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and <strong>AT</strong> set to a value other than PEERPORT, or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to RING or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE and <strong>AT</strong> set to a value other than PEERPORT, the following MO must have been configured:</li><li>1. A <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, <strong>MDU</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to a value other than CHAIN, a <strong>BBP</strong> MO, <strong>BRI</strong> MO, <strong>GTMU</strong> MO, <strong>RHUB</strong> MO, <strong>MDU</strong> MO, or <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> in the <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, <strong>EDC</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT]For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and <strong>AT</strong> set to a value other than PEERPORT, or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to RING or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE and <strong>AT</strong> set to a value other than PEERPORT, the following MO must have been configured:</li><li>1. A <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, <strong>MDU</strong>, <strong>EDC</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to a value other than CHAIN, a <strong>BBP</strong> MO, <strong>BRI</strong> MO, <strong>GTMU</strong> MO, <strong>RHUB</strong> MO, <strong>MDU</strong> MO, or <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> in the <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CPRIPORT</strong>, <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>RHUB</strong>, and <strong>EDC</strong> MOs:<ul><li>[Co-MPT]If <strong>ADMINISTRATIVESTATE</strong> in the <strong>CPRIPORT</strong> MO is set to BLOCKED, a <strong>BBP</strong>, <strong>BRI</strong>, <strong>GTMU</strong>, <strong>MDU</strong>, <strong>EDC</strong>, <strong>RHUB</strong>, or  <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must be configured in the slot specified by <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>CPRIPORT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[eGBTS]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>AAMU</strong> MOs</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li></ul>
+</li><li>Relation with the <strong>BBP</strong>, <strong>RHUB</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[gNodeB]For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to CHAIN and <strong>AT</strong> set to a value other than PEERPORT, or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to RING or an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE and <strong>AT</strong> set to a value other than PEERPORT, the following MO must have been configured:</li><li>1. A <strong>BBP</strong>, <strong>RHUB</strong>, <strong>MDU</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in the <strong>RRUCHAIN</strong> MO.</li><li>2. For an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to a value other than CHAIN, a <strong>BBP</strong> MO, <strong>RHUB</strong> MO, <strong>MDU</strong> MO, or <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU must have been configured. The board location is specified by <strong>TCN</strong>, <strong>TSRN</strong>, and <strong>TSN</strong> in the <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>RRU</strong>, and <strong>RFU</strong> MOs:<ul><li>[gNodeB]The total number of <strong>RRU</strong>, <strong>RFU</strong>, and <strong>CXU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 21.</li><li>[gNodeB]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to RMU, <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU or <strong>RHUB</strong>.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]When <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in an <strong>RRUCHAIN</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>RHUB</strong> MO, respectively, the <strong>RT</strong> in the <strong>RRU</strong> MO that is configured on this <strong>RRUCHAIN</strong> MO must be set to MPMU or MPRF.</li></ul>
+</li><li>Relation with the <strong>CPRIPORT</strong>, <strong>BBP</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]If <strong>ADMINISTRATIVESTATE</strong> in the <strong>CPRIPORT</strong> MO is set to BLOCKED, a <strong>BBP</strong>, <strong>MDU</strong>, <strong>RHUB</strong>, or <strong>CXU</strong> with <strong>CXUTYPE</strong> set to RMU must be configured in the slot specified by <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>CPRIPORT</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GPS</strong>, <strong>RRU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]When a <strong>GPS</strong> MO is configured for a <strong>CXU</strong> MO in which <strong>CXUTYPE</strong> is set to CGPS, the <strong>GPS</strong> MO cannot be configured on a non-CGPS board.</li><li>[gNodeB]When <strong>GPS</strong> MO is configured on a non-CGPS board, <strong>GPS</strong> cannot be configured for a <strong>CXU</strong> MO in which <strong>CXUTYPE</strong> is set to CGPS.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]If <strong>PROTOCOL</strong> is set to eCPRI and <strong>TT</strong> is set to CHAIN or LOADBALANCE in an <strong>RRUCHAIN</strong> MO, then only <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EXTRRURES</strong>, <strong>RRU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]Each of the following MOs must have a unique combination of cabinet number, subrack number, and slot number: <strong>EXTRRURES</strong>, <strong>RRU</strong>, <strong>RHUB</strong> and <strong>CXU</strong>.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, <strong>CXU</strong>, and <strong>RHUB</strong> Mos:<ul><li>[gNodeB]The <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU must be at the lowest level of the <strong>RRUCHAIN</strong> MO, and only the <strong>RRU</strong> or <strong>RFU</strong> MO can be configured at the upper level.</li><li>[gNodeB]The <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU must be at the lowest level of the <strong>RRUCHAIN</strong> MO, and only the <strong>RRU</strong> or <strong>RFU</strong> MO can be configured at the upper level.</li></ul>
+</li><li>Relation with the <strong>RHUB</strong> and <strong>RRU</strong> MOs:<ul><li>[gNodeB]Only the cabinet number and subrack number of the <strong>RRU</strong> MO with <strong>RT</strong> set to MPRF can be the same as those of the <strong>RRU</strong> MO with <strong>RT</strong> set to MPMU.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CXU__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CXU__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CXU__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_cxu.html">ADD CXU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a CXU to a specified RRU chain/ring.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cxu.html">DSP CXU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the dynamic information about a CXU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cxu.html">LST CXU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configurations of a CXU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cxu.html">MOD CXU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configurations of a CXU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_cxu.html">RMV CXU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a CXU.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CXU__tab2">Table 2</a> and <a href="#CXU__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CXU__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CXU__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet where the CXU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack where the CXU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot where the CXU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-CXUType.html">CXU Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the CXU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-RRUChainId.html">Chain/Ring No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the RRU or RFU chain/ring where the CXU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-InsertPos.html">CXU Position</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the position of the CXU on the RRU chain/ring. It is calculated from the start port one by one.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-CXUName.html">CXU Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the CXU name.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-RemoteFlag.html">Remote Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether a CXU is far away from the BBU. You can define whether a CXU is far away from the BBU as required. If you do not need to define this information, use the default value.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-Userlabel.html">User Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the user-defined CXU descriptions. You can use this parameter to record the information about the CXU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-CXUWorkStandard.html">CXU Work Standard</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the working standard of the CXU. This parameter takes effect only for the RMU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-MNTMode.html">Maintenance Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maintenance mode of a CXU. The value INSTALL indicates device creation caused by network capability expansion, device reparenting, or access of a new device to the network. The value EXPAND indicates the subrack or carrier capacity expansion of a device. The value UPGRADE indicates a device upgrade. The value TESTING indicates that an installed device is being commissioned. ExpandStatus1 to ExpandStatus10 can be used by users to define maintenance modes. The default value of this parameter is Normal.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-StartTime.html">Start Time of Status Setting</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the start time of maintenance status of the CXU. If this parameter is not specified, the start time of the maintenance status is 2000-01-01 00:00:00.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-EndTime.html">End Time of Status Setting</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the end time of the maintenance mode for the CXU. If this parameter is not specified, the maintenance mode ends at 2037-12-31 23:59:59.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-MMSetRemark.html">Maintenance Mode Setting Remark</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the remarks of maintenance status of the CXU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-AdmState.html">Administrative State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the administrative state of the CXU. The CGPS does not support the value BLOCKED(Blocked).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CXU-LocationName.html">Location Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the location information of a CXU. Set this parameter to the location name of the site. The location name of the site is configured in the Location object. This parameter must be set to the same value for RF modules serving the same sector.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CXU__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CXU__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-AccessDirection.html">Access Direction</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the access direction of the service plane.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-CurrMNTMode.html">Current Maintenance Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the current maintenance mode of the CXU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-CXUDistance.html">The length of the fiber optic cable</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the length of the fiber optic cable between the BBU and CXU. If the cable length cannot be obtained, the value NULL is displayed.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-AlarmState.html">Alarm Status(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the alarm status of the board hardware, which can be set to Normal, Warning, Minor, Major, or Critical. The alarm status of the PSU, PDB, and BDU is in the alarm status of the PMU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-OpState.html">Operational State(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the operational state of the board, which can be set to Enabled or Disabled. Enabled indicates that services can be carried on the board. Disabled indicates that no service can be carried on the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-AvailabilityStatus.html">Availability Status(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the physical status of a board, which can be Uninstalled, Starting up, Normal, Inconsistent, Unconfigured, Power off, Fault, Communication lost, In test, or the combination of multiple states. For example, if a board is not configured and fails to communicate with the main control and transmission board, the availability status of the board is "Unconfigured, Communication lost." If a board is under management of the peer end, the availability status of the board may be Starting up, Communication lost, or Fault.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-Elabel.html">Electronic Label(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the electronic label, which is a text file with a maximum of 2 KB used to record the manufacturing information about equipment such as the board, sub-board, and optical module. "BoardType" indicates the type of the board. "BarCode" indicates the bar code of the board and is the same as the code labeled on the board. "Item" indicates the BOM code. "Description" indicates the board description in English. "Manufactured" indicates the manufacturing date of the board. "VendorName" indicates the name of the vendor providing the board. "IssueNumber" indicates the board hardware version. "CLEICode" indicates the common language equipment indicator (CLEI) code of the board. "BOM" indicates the fine-grained item code of the board. "Model" indicates the model displayed on the customer interface, such as Bill of Quotation (BOQ) and paper labels.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-BoardType.html">Type(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-BoardSerial.html">Serial Number(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the bar code of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-BoardDesc.html">Description(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the description about the services and functions provided by the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-BoardManu.html">Date of Manufacture(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the manufacturing date of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-BoardVendor.html">Vendor(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the manufacturer of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-BoardIssue.html">Issue Number(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the issue number of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-RuType.html">Config Type(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of a board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-BoardTemperature.html">Board Temperature(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the temperature of a board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-HPATemperature.html">HPA Temperature(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the temperature of the power amplifier. A power amplifier is a component on an RF module. If there is no power amplifier on an RF module, this parameter value is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-DevType.html">DEVTYPE(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of the device.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-SoftVer.html">Software Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the software version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-HardVer.html">Hardware Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the hardware version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-BtrmVer.html">BootROM Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the BootROM version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CXU-GtmuWorkMode.html">WorkMode(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the working mode of the board. the value SINGLEOM indicates that the GTMU works as the main control board and provides the main control, transmission, and RF port functions. The value EVOLUTION indicates that the GTMU works as the evolved board and provides the transmission and RF port functions. NORMAL indicates that the main control and transmission board works in normal mode. TDS-EVOLUTION indicates that the main control and transmission board works in TDS evolution mode. NULL is displayed for boards other than GTMU or when the working mode cannot be queried.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#CXU__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="CXU__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="CXU__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835687.html">VS.CXU.XCI0.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835688.html">VS.CXU.XCI0.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835689.html">VS.CXU.XCI0.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835690.html">VS.CXU.XCI0.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the CXU XCI Port 0 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835691.html">VS.CXU.XCI0.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835692.html">VS.CXU.XCI0.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835693.html">VS.CXU.XCI0.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835694.html">VS.CXU.XCI0.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835695.html">VS.CXU.XCI0.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the CXU XCI Port 0 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835696.html">VS.CXU.XCI0.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835697.html">VS.CXU.XCI1.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835698.html">VS.CXU.XCI1.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835699.html">VS.CXU.XCI1.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835700.html">VS.CXU.XCI1.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the CXU XCI Port 1 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835701.html">VS.CXU.XCI1.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835702.html">VS.CXU.XCI1.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835703.html">VS.CXU.XCI1.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835704.html">VS.CXU.XCI1.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835705.html">VS.CXU.XCI1.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the CXU XCI Port 1 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835706.html">VS.CXU.XCI1.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835707.html">VS.CXU.XCI0.SUBPORT0.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the Sub-Port 0 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835708.html">VS.CXU.XCI0.SUBPORT0.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the Sub-Port 0 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835709.html">VS.CXU.XCI0.SUBPORT0.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the Sub-Port 0 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835710.html">VS.CXU.XCI0.SUBPORT0.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the Sub-Port 0 of CXU XCI Port 0 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835711.html">VS.CXU.XCI0.SUBPORT0.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the Sub-Port 0 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835712.html">VS.CXU.XCI0.SUBPORT0.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the Sub-Port 0 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835713.html">VS.CXU.XCI0.SUBPORT0.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the Sub-Port 0 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835714.html">VS.CXU.XCI0.SUBPORT0.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the Sub-Port 0 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835715.html">VS.CXU.XCI0.SUBPORT0.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the Sub-Port 0 of CXU XCI Port 0 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835716.html">VS.CXU.XCI0.SUBPORT0.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the Sub-Port 0 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835717.html">VS.CXU.XCI0.SUBPORT1.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the Sub-Port 1 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835718.html">VS.CXU.XCI0.SUBPORT1.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the Sub-Port 1 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835719.html">VS.CXU.XCI0.SUBPORT1.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the Sub-Port 1 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835720.html">VS.CXU.XCI0.SUBPORT1.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the Sub-Port 1 of CXU XCI Port 0 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835721.html">VS.CXU.XCI0.SUBPORT1.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the Sub-Port 1 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835722.html">VS.CXU.XCI0.SUBPORT1.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the Sub-Port 1 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835723.html">VS.CXU.XCI0.SUBPORT1.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the Sub-Port 1 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835724.html">VS.CXU.XCI0.SUBPORT1.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the Sub-Port 1 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835725.html">VS.CXU.XCI0.SUBPORT1.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the Sub-Port 1 of CXU XCI Port 0 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835726.html">VS.CXU.XCI0.SUBPORT1.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the Sub-Port 1 of CXU XCI Port 0</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835727.html">VS.CXU.XCI1.SUBPORT0.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the Sub-Port 0 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835728.html">VS.CXU.XCI1.SUBPORT0.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the Sub-Port 0 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835729.html">VS.CXU.XCI1.SUBPORT0.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the Sub-Port 0 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835730.html">VS.CXU.XCI1.SUBPORT0.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the Sub-Port 0 of CXU XCI Port 1 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835731.html">VS.CXU.XCI1.SUBPORT0.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the Sub-Port 0 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835732.html">VS.CXU.XCI1.SUBPORT0.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the Sub-Port 0 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835733.html">VS.CXU.XCI1.SUBPORT0.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the Sub-Port 0 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835734.html">VS.CXU.XCI1.SUBPORT0.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the Sub-Port 0 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835735.html">VS.CXU.XCI1.SUBPORT0.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the Sub-Port 0 of CXU XCI Port 1 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835736.html">VS.CXU.XCI1.SUBPORT0.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the Sub-Port 0 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835737.html">VS.CXU.XCI1.SUBPORT1.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the Sub-Port 1 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835738.html">VS.CXU.XCI1.SUBPORT1.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the Sub-Port 1 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835739.html">VS.CXU.XCI1.SUBPORT1.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the Sub-Port 1 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835740.html">VS.CXU.XCI1.SUBPORT1.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the Sub-Port 1 of CXU XCI Port 1 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835741.html">VS.CXU.XCI1.SUBPORT1.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the Sub-Port 1 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835742.html">VS.CXU.XCI1.SUBPORT1.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the Sub-Port 1 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835743.html">VS.CXU.XCI1.SUBPORT1.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the Sub-Port 1 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835744.html">VS.CXU.XCI1.SUBPORT1.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the Sub-Port 1 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835745.html">VS.CXU.XCI1.SUBPORT1.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the Sub-Port 1 of CXU XCI Port 1 are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835746.html">VS.CXU.XCI1.SUBPORT1.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the Sub-Port 1 of CXU XCI Port 1</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835747.html">VS.CXU.CPRI0.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835748.html">VS.CXU.CPRI0.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835749.html">VS.CXU.CPRI0.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835750.html">VS.CXU.CPRI0.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the CPRI0 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835751.html">VS.CXU.CPRI0.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835752.html">VS.CXU.CPRI0.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835753.html">VS.CXU.CPRI0.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835754.html">VS.CXU.CPRI0.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835755.html">VS.CXU.CPRI0.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the CPRI0 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835756.html">VS.CXU.CPRI0.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835757.html">VS.CXU.CPRI1.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835758.html">VS.CXU.CPRI1.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835759.html">VS.CXU.CPRI1.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835760.html">VS.CXU.CPRI1.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the CPRI1 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835761.html">VS.CXU.CPRI1.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835762.html">VS.CXU.CPRI1.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835763.html">VS.CXU.CPRI1.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835764.html">VS.CXU.CPRI1.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835765.html">VS.CXU.CPRI1.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the CPRI1 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835766.html">VS.CXU.CPRI1.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835768.html">VS.CXU.Avail.Dur</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>CXU Availability Duration</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835771.html">VS.CXU.CPRI9.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the CPRI9 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835772.html">VS.CXU.CPRI9.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the CPRI9 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835773.html">VS.CXU.CPRI9.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the CPRI9 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835774.html">VS.CXU.CPRI9.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the CPRI9 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835775.html">VS.CXU.CPRI9.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the CPRI9 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835776.html">VS.CXU.CPRI9.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the CPRI9 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835777.html">VS.CXU.CPRI9.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the CPRI9 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835778.html">VS.CXU.CPRI9.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the CPRI9 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835779.html">VS.CXU.CPRI9.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the CPRI9 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835780.html">VS.CXU.CPRI9.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the CPRI9 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835781.html">VS.CXU.CPRI10.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the CPRI10 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835782.html">VS.CXU.CPRI10.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the CPRI10 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835783.html">VS.CXU.CPRI10.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the CPRI10 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835784.html">VS.CXU.CPRI10.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the CPRI10 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835785.html">VS.CXU.CPRI10.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the CPRI10 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835786.html">VS.CXU.CPRI10.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the CPRI10 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835787.html">VS.CXU.CPRI10.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the CPRI10 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835788.html">VS.CXU.CPRI10.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the CPRI10 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835789.html">VS.CXU.CPRI10.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the CPRI10 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835790.html">VS.CXU.CPRI10.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the CPRI10 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835791.html">VS.CXU.CPRI11.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink ES over the CPRI11 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835792.html">VS.CXU.CPRI11.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink SES over the CPRI11 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835793.html">VS.CXU.CPRI11.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Downlink UAS over the CPRI11 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835794.html">VS.CXU.CPRI11.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when downlink measurement results of the CPRI11 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835795.html">VS.CXU.CPRI11.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of downlink bit errors over the CPRI11 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835796.html">VS.CXU.CPRI11.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink ES over the CPRI11 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835797.html">VS.CXU.CPRI11.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink SES over the CPRI11 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835798.html">VS.CXU.CPRI11.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Uplink UAS over the CPRI11 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835799.html">VS.CXU.CPRI11.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Second when uplink measurement results of the CPRI11 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835800.html">VS.CXU.CPRI11.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of uplink bit errors over the CPRI11 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835836.html">VS.EnergyCons.BTSBoard</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Power consumption of board</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

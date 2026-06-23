@@ -1,0 +1,224 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IPROUTE6">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="LTE FDD">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IPROUTE6">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPROUTE6</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IPROUTE6"></a><a name="IPROUTE6"></a>
+
+
+<h1 class="topictitle1">IPROUTE6</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IPROUTE6.html"><strong>IPROUTE6</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The IPROUTE6 is a static IPv6 route, which is used for data forwarding through a routing table.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, the <strong>IPROUTE6</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>VRF</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>CTRLMODE</strong> in an <strong>IPROUTE6</strong> MO is set to MANUAL_MODE, the <strong>VRF</strong> MO associated with an <strong>IPROUTE6</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>IPV6</strong> in an <strong>IPADDR6</strong> MO must be different from <strong>NEXTHOP</strong> in an <strong>IPROUTE6</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If the next hop address of an <strong>IPROUTE6</strong> MO is a global unicast address, an <strong>IPADDR6</strong> MO must be in the same routing domain and on the same network segment as the global unicast address but different from the global unicast address.</li></ul>
+</li><li>Relation with the <strong>IPROUTE6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>IPROUTE6</strong> MO with load sharing is not supported on a BS.</li><li>[Co-MPT, eNodeB, gNodeB]A route specified by the <strong>IPROUTE6</strong> MO with the value of <strong>RTTYPE</strong> set to NEXTHOP cannot form a pair of active and standby routes with a route specified by the <strong>IPROUTE6</strong> MO with the value of <strong>RTTYPE</strong> set to IF.</li><li>[Co-MPT, eNodeB, gNodeB]Each <strong>IPROUTE6</strong> MO must have a unique combination of <strong>VRFIDX</strong>, <strong>DSTIP</strong>, <strong>PFXLEN</strong>, <strong>RTTYPE</strong>, <strong>ITFID</strong>, and <strong>NEXTHOP</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]The number of <strong>IPROUTE6</strong> MOs with <strong>CTRLMODE</strong> set to MANUAL_MODE cannot exceed 128.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If the <strong>RTTYPE</strong> in the <strong>IPROUTE6</strong> MO is set to IF, the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO must have been configured.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>IPROUTE6</strong> MO is set to IF, <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO must be set to TUNNELITF or ETH or ETHTRK.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IPROUTE6</strong> MO, if <strong>RTTYPE</strong> and <strong>CTRLMODE</strong> are set to IF and MANUAL_MODE, respectively, <strong>VRFIDX</strong> in the <strong>IPROUTE6</strong> MO must be the same as <strong>VRFIDX</strong> in the associated <strong>INTFERFACE</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> and <strong>CTRLMODE</strong> in an <strong>IPROUTE6</strong> MO are set to IF and MANUAL_MODE, respectively, <strong>CTRLMODE</strong> in the <strong>INTERFACE</strong> MO cannot be set to AUTO_MODE.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>IPROUTE6</strong> MO is set to NEXTHOP, <strong>NEXTHOP</strong> in the <strong>IPROUTE6</strong> MO is on the same network segment as <strong>IPADDR6</strong> MO of an <strong>INTERFACE</strong> MO with PT set to ETH or ETHTRK, and <strong>CTRLMODE</strong> in the <strong>IPROUTE6</strong> MO is set to MANUAL_MODE, <strong>CTRLMODE</strong> in the <strong>INTERFACE</strong> MO cannot be set to AUTO_MODE.</li><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, two <strong>IPROUTE6</strong> MOs with <strong>RTTYPE</strong> set to IF cannot form active and stand routes if <strong>PT</strong> is set to ETH or ETHTRK in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in one <strong>IPROUTE6</strong> MO, and if <strong>PT</strong> is set to TUNNELITF in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> of the other <strong>IPROUTE6</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>IPROUTE6</strong> MO is set to IF and <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO is set to ETH, <strong>IPV6SW</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> and <strong>PMTUCFG</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>IPROUTE6</strong> MO is set to IF, <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO is set to ETH or ETHTRK, and <strong>IPV6SW</strong> in the <strong>INTERFACE</strong> MO is set to ENABLE, then <strong>MODE</strong> in the <strong>PMTUCFG</strong> MO must not be set to ACTIVE.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPv6 and <strong>BRT</strong> in the <strong>OMCH</strong> MO is set to YES, <strong>RTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. That is, the value of <strong>RTIDX</strong> in an <strong>OMCH</strong> MO is the same as the value of <strong>RTIDX</strong> in an <strong>IPROUTE6</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPv6 and <strong>BINDSECONDARYRT</strong> in the <strong>OMCH</strong> MO is set to YES, <strong>SECONDARYRTIDX</strong> in the <strong>OMCH</strong> MO must have been configured. That is, the value of <strong>SECONDARYRTIDX</strong> in an <strong>OMCH</strong> MO is the same as the value of <strong>RTIDX</strong> in an <strong>IPROUTE6</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPv6, the value of <strong>NEXTHOP</strong> in an <strong>IPROUTE6</strong> MO in the same routing domain must be different from the value of <strong>IP6</strong> in the <strong>OMCH</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in an <strong>OMCH</strong> MO is set to IPv6 and <strong>BRT</strong> in the <strong>OMCH</strong> MO is set to YES, the address specified by <strong>PEERIP6</strong> in the <strong>OMCH</strong> MO must be on the same network segment as the address specified by <strong>DSTIP</strong> in the bound active <strong>IPROUTE6</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>IPSECBINDITF</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>IPROUTE6</strong> MO is set to IF, <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO that is bound to the same <strong>IPSECBINDITF</strong> MO as the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO must be set to IPV6 or IPV4+IPV6.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, the IPv6 address specified by <strong>NEXTHOP</strong> in the <strong>IPROUTE6</strong> MO must be on the same network segment as the IPv6 address specified by <strong>IPV6</strong> in the <strong>IPADDR6</strong> MO that is configured on the <strong>INTERFACE</strong> MO with <strong>PT</strong> set to ETH or ETHTRK.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> and <strong>SECURITYTEMPLATE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>CTRLMODE</strong> in an <strong>IPROUTE6</strong> MO is set to MANUAL_MODE, <strong>RTTYPE</strong> is set to IF, and <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> is set to TUNNELITF, <strong>PREF</strong> must be greater than <strong>PREF</strong> in the <strong>SECURITYTEMPLATE</strong> MO.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in both the active and standby <strong>OMCH</strong> MOs is set to IPV6 and <strong>BRT</strong> in either <strong>OMCH</strong> MO references an <strong>IPROUTE6</strong> MO in which <strong>RTTYPE</strong> is set to IF, <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO cannot be set to ETH or ETHTRK.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>BEAR</strong> in both the active and standby <strong>OMCH</strong> MOs is set to IPV6 and <strong>BINDSECONDARYRT</strong> in either <strong>OMCH</strong> MO references an <strong>IPROUTE6</strong> MO in which <strong>RTTYPE</strong> is set to IF, <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO cannot be set to ETH or ETHTRK.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>RTTYPE</strong> is set to IF in an <strong>IPROUTE6</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>ITFID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>IPROUTE6</strong> MO with <strong>RTTYPE</strong> set to IF has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>IPROUTE6</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>IPROUTE6</strong> MOs in the same IPSec redundancy group) cannot exceed 128.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>IPROUTE6</strong> MOs is 0 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IPROUTE6__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPROUTE6__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IPROUTE6__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_iproute6.html">ADD IPROUTE6</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a static IPv6 route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_iproute6.html">DSP IPROUTE6</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the IPv6 routing table.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_iproute6.html">LST IPROUTE6</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the static IPv6 route configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_iproute6.html">MOD IPROUTE6</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the description of a static IPv6 route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_iproute6.html">RMV IPROUTE6</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a static IPv6 route.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IPROUTE6__tab2">Table 2</a> and <a href="#IPROUTE6__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IPROUTE6__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IPROUTE6__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-RTIDX.html">Route Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a static IPv6 route. The value of RTIDX in the IPROUTE6 MOs configured by users ranges from 0 to 127. The value of RTIDX in the IPROUTE6 MOs configured by the system ranges from 10000 to 19999.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-VRFIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-DstIP.html">Destination IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination IPv6 address of a static IPv6 route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-PfxLen.html">Prefix Length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the prefix length of the destination IPv6 address of a static IPv6 route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-RouteType.html">Route Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of IPv6 route. If this parameter is set to NEXTHOP, all the IP packets that meet the route direction are first forwarded to the specified next-hop IPv6 address. If this parameter is set to IF, all the IP packets that meet the route direction are first forwarded to the specified egress port.In IPv6 secure encryption and decryption scenarios, the outbound tunnel interface for incoming packets must be specified.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-NextHopIPv6.html">Next-Hop IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the next-hop IPv6 address of a static IPv6 route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-InterfaceID.html">Interface ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the IPv6 interface to which a static IPv6 route belongs. The value of ITFID in the IPROUTE6 MOs configured by users ranges from 0 to 1499. The value of ITFID in the IPROUTE6 MOs configured by the system ranges from 10000 to 19999.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-Preference.html">Preference</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of a static IPv6 route. A smaller parameter value indicates a higher priority.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-UserLabel.html">User Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the user-defined information.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPROUTE6-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object can be automatically modified or removed by the system. When this parameter is set to MANUAL_MODE, only users can perform operations on the object. When this parameter is set to AUTO_MODE, only the system can perform operations on the object.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IPROUTE6__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IPROUTE6__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPROUTE6-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cabinet number of the board to which an IPv6 route belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPROUTE6-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the subrack number of the board to which an IPv6 route belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPROUTE6-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the slot number of the board to which an IPv6 route belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPROUTE6-ActualPortType.html">Actual Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of the actual port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPROUTE6-ActualPortID.html">Actual Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of the actual port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPROUTE6-RouteProtocol.html">Route Protocol</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of the static IPv6 route. A static host route is a manually configured route with a 128-bit prefix. A static gateway route is a manually configured route with a non-128-bit prefix, with the next hop IP address on a different network segment from the egress port IP address. A dynamic host route is a dynamically learned (not manually configured) route with a 128-bit prefix. A dynamic gateway route is a dynamically learned (not manually configured) route with a non-128-bit prefix, with the next hop IP address on a different segment from the egress port IP address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPROUTE6-RouteStatus.html">Route Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the status of an IPv6 route.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

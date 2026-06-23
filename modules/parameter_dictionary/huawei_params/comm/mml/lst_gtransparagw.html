@@ -1,0 +1,207 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="List Gateway Global Transport Parameters Configuration (LST GTRANSPARAGW)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="lst_gtransparagw">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>List Gateway Global Transport Parameters Configuration (LST GTRANSPARAGW)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="lst_gtransparagw"></a><a name="lst_gtransparagw"></a>
+
+
+<h1 class="topictitle1">List Gateway Global Transport Parameters Configuration (LST GTRANSPARAGW)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="lst_gtransparagw__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to list the global transport parameters for a gateway.</p>
+</div></div>
+
+<div class="mmlnote"><a name="lst_gtransparagw__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>None.</p>
+</div></div>
+
+<div class="mmlparam"><a name="lst_gtransparagw__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody"><p>None.</p>
+</div></div>
+
+<div class="mmlexample"><a name="lst_gtransparagw__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To list the global transport parameters for a gateway, run the following command:
+LST GTRANSPARAGW:;
+The result is shown as follows:
++++    0        2016-10-29 16:52:43
+O&amp;M    #3503
+%%LST GTRANSPARAGW:;%%
+RETCODE = 0  Operation succeeded.
+
+List Gateway Global Transport Parameters Configuration
+------------------------------------------------------
+      Resource Group Scheduling Weight Switch  =  Enable
+                             Rate Config Type  =  Dual Rate
+                          Switch Back Time(s)  =  30
+                          ARP Aging Time(min)  =  20
+             IP Frame Error Rate Alarm Switch  =  Disable
+IP Frame Error Rate Occur Threshold(per mill)  =  NULL
+IP Frame Error Rate Clear Threshold(per mill)  =  NULL
+                                 Forward Mode  =  ROUTE
+                     Same Port Forward Switch  =  Enable
+                        Port Mode Auto Switch  =  Enable
+                                Priority Rule  =  DSCP
+                            IP Clock Priority  =  46
+     Physical Port Up Link OverBooking Switch  =  On
+   Physical Port Down Link OverBooking Switch  =  On
+       Physical Port Up Link Admission Switch  =  Off
+     Physical Port Down Link Admission Switch  =  Off
+                            Ethernet OAM Type  =  IEEE 802.1ag
+                               Monitor Policy  =  NULL
+                             Ping Filter Mode  =  Whitelist
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="lst_gtransparagw__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Resource Group Scheduling Weight Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the switch used to control whether to allocate bandwidths to transmission resource groups on the physical port based on their scheduling weights. When RATECFGTYPE (rate configuration type) is set to SINGLE_RATE and Physical Port Up Link OverBooking Switch or Physical Port Down Link OverBooking Switch is set to OFF, different values of this parameter lead to different bandwidth allocation methods as follows: (1) If this parameter is set to DISABLE and the sum of TX bandwidths of the associated resource groups exceeds the bandwidth of the physical port, each resource group is allocated a bandwidth that is directly proportional to its configured TX bandwidth; (2) If this parameter is set to ENABLE and the sum of TX bandwidths of the associated resource groups exceeds the bandwidth of the physical port, each resource group is allocated a bandwidth that is directly proportional to its scheduling weight. When RATECFGTYPE (rate configuration type) is set to DUAL_RATE, different values of this parameter lead to different CIR allocation methods as follows: (1) If the sum of CIRs of the associated resource groups exceeds the bandwidth of the physical port, each resource group is allocated a CIR that is directly proportional to its configured CIR; (2) If the sum of CIRs of the associated resource groups is smaller than the bandwidth of the physical port, each resource group is allocated a non-CIR that is directly proportional to its scheduling weight. In this case, the PIR of a resource group is the sum of the CIR and the non-CIR.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Rate Config Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the rate configuration mode of transmission resource groups in the BS, which can be set to SINGLE_RATE or DUAL_RATE. The dual rate configuration refers to the hybrid of the peak information rate (PIR) and committed information rate (CIR). If this parameter is set to SINGLE_RATE, the transmission resource group performs traffic shaping based on its transmit bandwidth. If this parameter is set to DUAL_RATE, the transmission resource group performs traffic shaping based on PIR and the transmission admission algorithm ensures that the non-flow-controllable traffic does not exceed CIR.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Switch Back Time(s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the period during which the active and standby routes are switched over twice. This period indicates the interval between the time single-hop BFD detects that an active route changes from DOWN to UP and the time the active route becomes available. During the switchover, if the previous standby route becomes faulty, the system waits for 10 seconds and then switches back to the active route.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>ARP Aging Time(min)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the aging time of a dynamic ARP item of the BS. This parameter does not change the ARP aging time of the local maintenance Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>IP Frame Error Rate Alarm Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the switch controlling ALM-25897 IP Excessive Frame Error Rate. When this switch is set to ENABLE, this alarm is detected and reported when the reporting conditions are met.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>IP Frame Error Rate Occur Threshold(per mill)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the generation threshold of ALM-25897 IP Excessive Frame Error Rate. If IP Frame Error Rate Alarm Switch is set to ENABLE, this alarm is reported when the number of errored IP frames exceeds this threshold within ten minutes.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>IP Frame Error Rate Clear Threshold(per mill)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the clearance threshold of ALM-25897 IP Excessive Frame Error Rate. If this alarm is reported, this alarm is cleared when the number of errored IP frames is less than this threshold within ten minutes.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Forward Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the forwarding mode flag. If this parameter is set to HOST, inter-port data routing and forwarding is disabled on the panel, and intra-port data routing and forwarding is also disabled on the panel. If this parameter is set to ROUTE, inter-port data routing and forwarding is enabled on the panel.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Same Port Forward Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether to enable intra-port data routing and forwarding on the panel. Intra-port forwarding means that after being routed and forwarded, the packets received through a port are transmitted from the same port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port Mode Auto Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether to enable the port mode (data rate and duplex mode) adaptation function for an optical Ethernet port that carries traffic through the remote maintenance channel. When this switch is enabled, the base station uses the port mode adaptation function to restore the remote maintenance channel if the inconsistent port modes between the local and peer ends cause the remote maintenance channel interruption after a base station reset.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Priority Rule</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the rule for prioritizing traffic to meet service requirements. If this parameter is set to IPPRECEDENCE, the protocol stack of the earlier version is adopted, which first converts a Type of Service (TOS) to a DSCP and then prioritizes traffic.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>IP Clock Priority</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the priority of the IP clock. If the IP clock that follows the Precision Time Protocol (PTP) is used, set this parameter to the DSCP of the PTP packets. If the IP clock that follows the Huawei proprietary protocol is used, set this parameter to the DSCP of these packets that follow the Huawei proprietary protocol.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Physical Port Up Link OverBooking Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the switch that is used to determine whether to enable UL overbooking admission control. It is used to determine the admission bandwidth of the resource group and facilitate admission control. The parameter takes effect only for LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Physical Port Down Link OverBooking Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the switch that is used to determine whether to enable DL overbooking admission control. It is used to determine the admission bandwidth of the resource group and facilitate admission control. The parameter takes effect only for LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Physical Port Up Link Admission Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the switch that is used to determine whether to apply UL admission control over a physical port. If this parameter is set to ON, UL admission control is applied to the physical port. If this parameter is set to OFF, UL admission control is not applied to the physical port. The parameter takes effect only for LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Physical Port Down Link Admission Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the switch that is used to determine whether to apply DL admission control over a physical port. If this parameter is set to ON, DL admission control is applied to the physical port. If this parameter is set to OFF, DL admission control is not applied to the physical port. The parameter takes effect only for LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Ethernet OAM Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of Ethernet OAM. The current Ethernet OAM type can be either IEEE 802.1ag or ITU-T Y.1731 ETHOAM.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Monitor Policy</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ITU-T Y.1731 monitoring policy. The monitoring policy includes the following values: PORTID_VLANID (based on PortID and VLANID), PORTID_VLANID_VLANPRI (based on PortID, VLANID, and VLAN PRI), SA_DA_VLANID (based on PortID, source MAC address, destination MAC address, and VLANID), SA_DA_VLANID_VLANPRI (based on PortID, source MAC address, destination MAC address, VLANID, and VLAN PRI), and SA_DA (based on PortID, source MAC address, and destination MAC address).</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Ping Filter Mode</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the mode of the ping filtering. When the whitelist is used, only the network segments or hosts specified by the ping filter can ping the NE. When the blacklist is used, the network segments or hosts specified by the ping filter cannot ping the NE.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

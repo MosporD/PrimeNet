@@ -1,0 +1,168 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display uX2 User Plane Information (DSP UX2UPINFO)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_ux2upinfo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display uX2 User Plane Information (DSP UX2UPINFO)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_ux2upinfo"></a><a name="dsp_ux2upinfo"></a>
+
+
+<h1 class="topictitle1">Display uX2 User Plane Information (DSP UX2UPINFO)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="dsp_ux2upinfo__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the user-plane information about the uX2 interface.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_ux2upinfo__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li>If LOCIPV4 under USERPLANEHOST is modified, the IP address displayed in the <a href="dsp_ux2upinfo.html">DSP UX2UPINFO</a> command output is incorrect.</li><li>If Static Check Switch is set to ON and no UE is running services or if Static Check Switch is set to OFF, the exceptions on user-plane links may not be accurately detected. If a user-plane link is in a status other than normal, uX2 User Plane Link State in the <a href="dsp_ux2upinfo.html">DSP UX2UPINFO</a> command output is Unknown. If Static Check Switch is set to ON and UEs are running services, the exceptions on user-plane links are accurately detected. If a user-plane link is abnormal, uX2 User Plane Link State in the <a href="dsp_ux2upinfo.html">DSP UX2UPINFO</a> command output is Abnormal. The setting of Static Check Switch can be queried by running the <a href="lst_ux2.html">LST UX2</a> command.</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_ux2upinfo__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/uX2Interface-uX2InterfaceId.html">UX2INTERFACEID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">uX2 Interface ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uX2 interface ID.</p>
+<p>GUI Value Range: 0~95</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~95</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_ux2upinfo__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">1.To query the user-plane information about all the uX2 interfaces, run the following command: 
+DSP UX2UPINFO:;
+The result is shown as follows: 
++++    0        2016-03-10 15:18:04
+O&amp;M    #537919501
+%%DSP UX2UPINFO:;%%
+RETCODE = 0  Operation succeeded.
+
+Display uX2 User Plane Information
+----------------------------------
+uX2 Interface ID  uX2 User Plane Host IP Address  uX2 User Plane Peer IP Address  uX2 User Plane Link State  uX2 UP Link Delay(0.1microsecond)  uX2 UP Link One-way Delay(0.1microsecond)
+
+5                 33.33.33.2                      33.33.33.1                      Normal                     1397                               579          
+6                 NULL                            NULL                            Unknown                    NULL                               NULL
+(Number of results = 2)
+
+
+---    END
+
+2.To query the user-plane information about the uX2 interface whose ID is 5, run the following command: 
+DSP UX2UPINFO: UX2INTERFACEID=5;
+The result is shown as follows: 
++++    0        2016-03-10 15:30:44
+O&amp;M    #537919503
+%%DSP UX2UPINFO: UX2INTERFACEID=5;%%
+RETCODE = 0  Operation succeeded.
+
+Display uX2 User Plane Information
+----------------------------------
+                         uX2 Interface ID  =  5
+           uX2 User Plane Host IP Address  =  33.33.33.2
+           uX2 User Plane Peer IP Address  =  33.33.33.1
+                uX2 User Plane Link State  =  Normal
+        uX2 UP Link Delay(0.1microsecond)  =  1397
+uX2 UP Link One-way Delay(0.1microsecond)  =  579
+(Number of results = 1)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_ux2upinfo__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>uX2 Interface ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the uX2 interface ID.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>uX2 User Plane Host IP Address</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the IP Address of the user-plane host of the uX2 interface.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>uX2 User Plane Peer IP Address</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the IP Address of the user-plane peer of the uX2 interface.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>uX2 User Plane Link State</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the user-plane link status of the uX2 interface. The value Abnormal means that the user-plane link is disconnected. The value Normal means that the user-plane link is connected. The value Unknown means that the user-plane link status information cannot be obtained.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>uX2 UP Link Delay(0.1microsecond)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the user-plane Round-Trip Time (RTT) of the uX2 interface.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>uX2 UP Link One-way Delay(0.1microsecond)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the one-way delay on the uX2 user-plane link.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,145 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="DIRECTIPSECWHITELIST">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="LTE FDD">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="DIRECTIPSECWHITELIST">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>DIRECTIPSECWHITELIST</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="DIRECTIPSECWHITELIST"></a><a name="DIRECTIPSECWHITELIST"></a>
+
+
+<h1 class="topictitle1">DIRECTIPSECWHITELIST</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="DIRECTIPSECWHITELIST.html"><strong>DIRECTIPSECWHITELIST</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A DIRECTIPSECWHITELIST MO is used to restrict the area in which direct IPsec tunnels for X2/Xn links can be automatically created between base stations. In direction connection scenarios of X2/Xn links, if direct IPsec tunnels need to be automatically established based on areas, a whitelist defined by this MO can be added to specify the area where direct IPsec tunnels can be automatically created between base stations. After a direct IPsec whitelist is specified, a base station automatically establishes a direct IPsec tunnel with only the IP addresses in the whitelist.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>DIRECTIPSECBLKLST</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]A <strong>DIRECTIPSECBLKLST</strong> MO and a <strong>DIRECTIPSECWHITELIST</strong> MO cannot both be configured.</li></ul>
+</li><li>Relation with the <strong>DIRECTIPSECBLACKLIST</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]A <strong>DIRECTIPSECBLACKLIST</strong> MO and a <strong>DIRECTIPSECWHITELIST</strong> MO cannot both be configured.</li></ul>
+</li><li>Relation with the <strong>GEPMODELPARA</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>DIRIPSECAUTODELSW</strong> in the <strong>GEPMODELPARA</strong> MO is set to ENABLE, the <strong>DIRECTIPSECWHITELIST</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DIRECTIPSECWHITELIST</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>SECURITYPEERIPV4</strong> and <strong>MASK</strong> must be different in any two <strong>DIRECTIPSECWHITELIST</strong> MOs in the same routing domain. That is, <strong>SECURITYPEERIPV4</strong> in two <strong>DIRECTIPSECWHITELIST</strong> MOs must be on different network segments.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>DIRECTIPSECWHITELIST</strong> MO is set to IPv6, <strong>SECURITYPEERIPV6</strong> in the <strong>DIRECTIPSECWHITELIST</strong> MO must be different from <strong>SECURITYPEERIPV6</strong> in any existing <strong>DIRECTIPSECWHITELIST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>IFIP</strong>, and <strong>LOCALIP</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When the value of <strong>MASK</strong> in a <strong>DIRECTIPSECWHITELIST</strong> MO is 255.255.255.255, the value of <strong>SECURITYPEERIPV4</strong> in the <strong>DIRECTIPSECWHITELIST</strong> MO cannot be the same as the value of <strong>IP</strong> in the <strong>DEVIP</strong> MO, the value of <strong>IP</strong> in the <strong>IFIP</strong> MO or the value of <strong>IP</strong> in the <strong>LOCALIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>LOCALIP</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When the value of <strong>MASK</strong> in a <strong>DIRECTIPSECWHITELIST</strong> MO is 255.255.255.255, the value of <strong>SECURITYPEERIPV4</strong> in the <strong>DIRECTIPSECWHITELIST</strong> MO cannot be the same as the value of <strong>IP</strong> in the <strong>IPADDR4</strong> MO or the value of <strong>IP</strong> in the <strong>LOCALIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, eNodeB]When the value of <strong>MASK</strong> in a <strong>DIRECTIPSECWHITELIST</strong> MO is 255.255.255.255, the value of <strong>SECURITYPEERIPV4</strong> in the <strong>DIRECTIPSECWHITELIST</strong> MO cannot be the same as the value of <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO or the value of <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#DIRECTIPSECWHITELIST__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="DIRECTIPSECWHITELIST__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="DIRECTIPSECWHITELIST__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_directipsecwhitelist.html">ADD DIRECTIPSECWHITELIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a direct IPsec whitelist.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_directipsecwhitelist.html">LST DIRECTIPSECWHITELIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list direct IPsec whitelists.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_directipsecwhitelist.html">MOD DIRECTIPSECWHITELIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify a direct IPsec whitelist.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_directipsecwhitelist.html">RMV DIRECTIPSECWHITELIST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a direct IPsec whitelist.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#DIRECTIPSECWHITELIST__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="DIRECTIPSECWHITELIST__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="DIRECTIPSECWHITELIST__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DIRECTIPSECWHITELIST-DIRECTIPSECWHITELISTID.html">ID of Whitelist for Direct IPsec Tunnel</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a direct IPsec whitelist.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DIRECTIPSECWHITELIST-IPVERSION.html">IP Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP version of a direct IPsec whitelist.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DIRECTIPSECWHITELIST-SECURITYPEERIPV4.html">Security Peer IPv4 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the security peer IP address of a direct IPsec whitelist. This address must be a valid IP address of class A, B, or C. It can also be a network segment address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DIRECTIPSECWHITELIST-MASK.html">Mask</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subnet mask of the security peer IP address of a direct IPsec whitelist. The subnet mask cannot be 0.0.0.0.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DIRECTIPSECWHITELIST-SecurityPeerIPv6.html">Security Peer IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the security peer IPv6 address of a direct IPsec whitelist. This IPv6 address must be set to a globally scoped unicast address. It can also be a network segment address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/DIRECTIPSECWHITELIST-IPv6PfxLen.html">IPv6 Address Prefix Length</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the security peer IPv6 address prefix length of a direct IPsec whitelist.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

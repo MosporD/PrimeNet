@@ -1,0 +1,128 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify eNodeB Frame Offset Configuration (MOD ENODEBFRAMEOFFSET)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_enodebframeoffset">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify eNodeB Frame Offset Configuration (MOD ENODEBFRAMEOFFSET)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_enodebframeoffset"></a><a name="mod_enodebframeoffset"></a>
+
+
+<h1 class="topictitle1">Modify eNodeB Frame Offset Configuration (MOD ENODEBFRAMEOFFSET)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_enodebframeoffset__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the offset of the start of LTE TDD cell frames against the reference time.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_enodebframeoffset__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>The frame offset configurations of all cells on the same RRU must be the same. The frame offset setting must be the same for all cells established on a single BBP, including FDD, TDD, and NB-IoT cells.</p>
+</li><li><p>If the value of the TddFrameOffset parameter in the ENodeBFrameOffset MO is changed, all activated TDD cells served by the eNodeB automatically reset. In this case, TDD CSPC or DL CoMP services automatically restart if the eNodeB is equipped with a centralized controller and TDD CSPC or DL CoMP is enabled.</p>
+<p>If the value of the FddFrameOffset parameter in the ENodeBFrameOffset MO is changed, all activated FDD cells served by the eNodeB automatically reset. In this case, FDD CSPC services automatically restart if the eNodeB is equipped with a centralized controller and FDD CSPC is enabled.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_enodebframeoffset__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ENodeBFrameOffset-TddFrameOffset.html">TddFrameOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TDD Frame Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the start time of a cell frame against a reference clock source. This offset applies to all LTE TDD cells served by an eNodeB.</p>
+<p>GUI Value Range: 0~261120,275943~307200</p>
+<p>Unit: Ts</p>
+<p>Actual Value Range: 0~261120,275943~307200</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If LTE TDD coexists with another TDD system (for example, WiMAX, TD-SCDMA, or PHS) and their spectrums are close to each other, inconsistency in uplink and downlink timeslots between systems may lead to high interference between them. This parameter is used to adjust the start time of all LTE TDD cell frames so that the uplink and downlink timeslots of LTE TDD are aligned with those of the other TDD system.</p>
+<p>Carrier aggregation (CA) in LTE TDD requires time synchronization between carriers. Therefore, all cells must be configured with the same frame offset to implement CA.</p>
+<p>Inconsistent frame offsets between carriers in FDD+TDD CA scenarios may decrease the proportion of UEs on which FDD+TDD CA takes effect.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ENodeBFrameOffset-FddFrameOffset.html">FddFrameOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">FDD Frame Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the start time of a cell frame against a reference clock source. This offset applies to all LTE FDD cells and all NB-IoT cells served by an eNodeB. This parameter applies only to LTE FDD and NB-IoT.</p>
+<p>GUI Value Range: 0~261120,275943~307200</p>
+<p>Unit: Ts</p>
+<p>Actual Value Range: 0~261120,275943~307200</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Carrier aggregation (CA) in LTE FDD requires time synchronization between carriers. Therefore, all cells must be configured with the same frame offset to implement CA.</p>
+<p>Different frame offsets between carriers in FDD+TDD CA scenarios may decrease the proportion of UEs on which FDD+TDD CA takes effect.</p>
+<p>Applicable Mode: L-FDD, L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ENodeBFrameOffset-FrameOffsetAutoCorrectSw.html">FrameOffsetAutoCorrectSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Frame Offset Auto Correct Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable automatic frame offset correction. If this option is selected and the frame offset of a cell is different from that of its neighboring cells, the eNodeB automatically changes the frame offset of this cell to that of the neighboring cells. If this option is deselected, the eNodeB cannot automatically change the frame offset of a cell. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_enodebframeoffset__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the eNodeB-level frame offsets with the parameters as follows: 
+TDD Frame Offset: 0, FDD Frame Offset: 0, 
+run the following command: 
+MOD ENODEBFRAMEOFFSET: TddFrameOffset=0, FddFrameOffset=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

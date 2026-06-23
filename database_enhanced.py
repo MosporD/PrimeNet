@@ -13,51 +13,32 @@ import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sync_config import NCMUSERS_DB as DATABASE
-from db.runtime import adapt_placeholders, connect_app, is_postgresql
+from db.runtime import adapt_app_sql, connect_app, execute_query
 
 
 def _unique_constraint_error(exc):
-    if isinstance(exc, sqlite3.IntegrityError):
-        return True
-    try:
-        import psycopg2.errors
-
-        return isinstance(exc, psycopg2.errors.UniqueViolation)
-    except Exception:
-        return False
+    return isinstance(exc, sqlite3.IntegrityError)
 
 
 def _exec(cur, sql: str, params=()):
-    return cur.execute(adapt_placeholders(sql), tuple(params) if params is not None else ())
+    return cur.execute(adapt_app_sql(sql), tuple(params) if params is not None else ())
 
 
 def _insert_return_id(conn, sql: str, params):
-    sql = adapt_placeholders(sql)
+    sql = adapt_app_sql(sql)
     params = tuple(params)
-    if is_postgresql():
-        s = sql.rstrip().rstrip(';')
-        if 'RETURNING' not in s.upper():
-            s = f'{s} RETURNING id'
-        cur = conn.cursor()
-        cur.execute(s, params)
-        row = cur.fetchone()
-        return row['id'] if row else None
     cur = conn.cursor()
     cur.execute(sql, params)
     return cur.lastrowid
 
 
 def get_db():
-    """SQLite ``ncm_users.db`` or PostgreSQL ``app`` schema (via ``DATABASE_URL``)."""
+    """SQLite ``ncm_users.db`` (``databases/admin/``)."""
     return connect_app()
 
 
 def init_db():
     """Initialize database with all tables"""
-    if is_postgresql():
-        # App + metadata + PM schemas are created by ``sync.db_migration.run_migrations``.
-        return
-
     conn = get_db()
     cursor = conn.cursor()
     
@@ -207,6 +188,23 @@ def init_db():
         )
     ''')
 
+    # Saved views (filters + state snapshots producing shareable links).
+    # `id` is a short opaque token that is safe to embed in URLs.
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS saved_views (
+            id TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            module TEXT NOT NULL,
+            name TEXT NOT NULL,
+            state TEXT NOT NULL,
+            is_public INTEGER NOT NULL DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users (id)
+        )
+    ''')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_saved_views_user_module ON saved_views(user_id, module)')
+
     # Configuration task scheduler tables
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS config_scheduler_tasks (
@@ -289,7 +287,7 @@ def create_user(username, email, password, full_name=None, department=None, role
                 username, email, password_hash, full_name, department, role, password_changed_at, force_password_change
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''',
-            (username, email, password_hash, full_name, department, role, datetime.now(), 1),
+            (username, email, password_hash, full_name, department, role, datetime.now(), True),
         )
         conn.commit()
         conn.close()
@@ -305,31 +303,45 @@ def create_user(username, email, password, full_name=None, department=None, role
         return False, str(e)
 
 def authenticate_user(username, password):
-    """Authenticate user and return user data"""
+    """Authenticate user and return user data (username match is case-insensitive)."""
+    username = (username or '').strip()
+    if not username or password is None:
+        return False, None
     conn = get_db()
     cursor = conn.cursor()
     _exec(
         cursor,
-        'SELECT * FROM users WHERE username = ? AND is_active',
+        'SELECT * FROM users WHERE LOWER(username) = LOWER(?) AND is_active',
         (username,),
     )
-    user = cursor.fetchone()
-
-    if user and verify_password(password, user['password_hash']):
-        must_change = is_password_change_required(dict(user))
-        _exec(
-            cursor,
-            'UPDATE users SET last_login = ? WHERE id = ?',
-            (datetime.now(), user['id']),
-        )
-        conn.commit()
-        conn.close()
-        out = dict(user)
-        out['must_change_password'] = must_change
-        return True, out
-
+    candidates = [dict(row) for row in cursor.fetchall()]
     conn.close()
-    return False, None
+
+    if not candidates:
+        return False, None
+
+    verified = [u for u in candidates if verify_password(password, u['password_hash'])]
+    if not verified:
+        return False, None
+
+    if len(verified) == 1:
+        user = verified[0]
+    else:
+        exact = [u for u in verified if u.get('username') == username]
+        user = exact[0] if len(exact) == 1 else verified[0]
+
+    conn = get_db()
+    cursor = conn.cursor()
+    must_change = is_password_change_required(user)
+    _exec(
+        cursor,
+        'UPDATE users SET last_login = ? WHERE id = ?',
+        (datetime.now(), user['id']),
+    )
+    conn.commit()
+    conn.close()
+    user['must_change_password'] = must_change
+    return True, user
 
 def get_all_users():
     """Get all users (for admin)"""
@@ -369,6 +381,40 @@ def update_user_status(user_id, is_active):
     conn.commit()
     conn.close()
     
+    return affected > 0
+
+
+def reset_user_password(user_id: int, new_password: str, *, force_password_change: bool = False) -> bool:
+    """Set a user's password hash (admin reset)."""
+    conn = get_db()
+    cursor = conn.cursor()
+    password_hash = hash_password(new_password)
+    _exec(
+        cursor,
+        '''
+        UPDATE users
+        SET password_hash = ?, password_changed_at = ?, force_password_change = ?
+        WHERE id = ?
+        ''',
+        (password_hash, datetime.now(), int(bool(force_password_change)), user_id),
+    )
+    affected = cursor.rowcount
+    conn.commit()
+    conn.close()
+    return affected > 0
+
+
+def set_user_force_password_change(user_id: int, required: bool) -> bool:
+    conn = get_db()
+    cursor = conn.cursor()
+    _exec(
+        cursor,
+        'UPDATE users SET force_password_change = ? WHERE id = ?',
+        (int(bool(required)), user_id),
+    )
+    affected = cursor.rowcount
+    conn.commit()
+    conn.close()
     return affected > 0
 
 # ============================================================================
@@ -518,7 +564,7 @@ def get_tasks(user_id=None, assigned_to=None, created_by=None, status=None):
 
     query += ' ORDER BY t.created_at DESC'
 
-    cursor.execute(adapt_placeholders(query), params)
+    cursor.execute(adapt_app_sql(query), params)
     tasks = cursor.fetchall()
     conn.close()
 
@@ -839,28 +885,35 @@ def check_task_permission(user, task, action='view'):
 def create_admin_user():
     """Create default admin user if no users exist"""
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('SELECT COUNT(*) as count FROM users')
-    count = cursor.fetchone()['count']
-    conn.close()
-    
-    if count == 0:
-        success, user_id = create_user(
-            username='admin',
-            email='admin@company.com',
-            password='PrimeNet@1234',
-            full_name='System Administrator',
-            department='IT',
-            role='admin'
-        )
-        return success
-    return False
+    try:
+        row = execute_query(conn, 'SELECT COUNT(*) AS n FROM users', ()).fetchone()
+        count = int(row['n'] if isinstance(row, dict) else row[0])
+    finally:
+        conn.close()
+
+    if count != 0:
+        return False
+    bootstrap_user = (os.getenv('NCM_BOOTSTRAP_ADMIN_USERNAME') or 'admin').strip()
+    bootstrap_email = (os.getenv('NCM_BOOTSTRAP_ADMIN_EMAIL') or 'admin@company.com').strip()
+    bootstrap_password = (os.getenv('NCM_BOOTSTRAP_ADMIN_PASSWORD') or '').strip()
+    if not bootstrap_password:
+        print('[WARNING] create_admin_user: NCM_BOOTSTRAP_ADMIN_PASSWORD is not set; skipping auto admin creation.')
+        return False
+    success, info = create_user(
+        username=bootstrap_user,
+        email=bootstrap_email,
+        password=bootstrap_password,
+        full_name='System Administrator',
+        department='IT',
+        role='admin',
+    )
+    if not success:
+        print(f'[WARNING] create_admin_user: could not create admin: {info}')
+    return bool(success)
 
 # Initialize database on import
 try:
-    if is_postgresql():
-        pass
-    elif not os.path.exists(DATABASE):
+    if not os.path.exists(DATABASE):
         print(f"Creating database at: {os.path.abspath(DATABASE)}")
         init_db()
         create_admin_user()

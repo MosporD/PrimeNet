@@ -1,0 +1,230 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify CN Operator (MOD CNOPERATOR)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_cnoperator">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify CN Operator (MOD CNOPERATOR)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_cnoperator"></a><a name="mod_cnoperator"></a>
+
+
+<h1 class="topictitle1">Modify CN Operator (MOD CNOPERATOR)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_cnoperator__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify an operator.</p>
+<p>The combination of the mobile country code (MCC) and mobile network code (MNC) uniquely identifies an operator. If the MCC or MNC is changed, the operator identified by the operator ID is changed. After modification, if the eNodeB is configured to work in RAN sharing with common carriers mode, RAN sharing with dedicated carriers mode, hybrid RAN sharing mode, or RAN sharing with special dedicated carriers mode but does not have the required RAN sharing license, configurations of secondary operators do not take effect. A maximum of six operators can be added for an eNodeB. If the license control item RAN Sharing by More Operators is disabled, a maximum of four operators can share the eNodeB, configurations of other operators do not take effect, and other operators cannot use the eNodeB to provide services.</p>
+<p>If the license control item RAN Sharing by More Operators is disabled and more than four operators are added for the eNodeB, the following principles apply when the eNodeB decides which four operators to take effect: The configuration of the primary operator takes effect first. The configurations of secondary operators take effect in the same sequence as they are added. After the eNodeB is restarted, the configuration of the primary operator takes effect first and the configurations of secondary operators take effect based on the operator IDs. The configuration of a secondary operator with a smaller operator ID takes effect in prior to that with a larger operator ID. As a result, the following situation is possible: The configurations of secondary operators with larger IDs (for example, 4 and 5) but earlier configuration time take effect while the configurations of secondary operators with smaller IDs (for example, 0 and 1) do not take effect. However, after the eNodeB is restarted, the configurations of secondary operators with the smaller IDs (for example, 0 and 1) take effect while the configurations of secondary operators with the larger IDs (for example, 4 and 5) do not take effect. In either case, two operators cannot provide services normally. In this case, the operators need to purchase the license control item RAN Sharing by More Operators.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_cnoperator__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If an operator is added on multiple eNodeBs managed by one NMS, the same operator ID must be configured. An operator is uniquely identified by the PLMN ID that is comprised of the MCC and MNC.</p>
+</li><li><p>After this command is executed to change the operator type, MCC, MNC or PlmnMode, run <a href="../../comm/mml/rst_app.html">RST APP</a> to reset the application referenced by the eNodeBFunction MO for the application to take effect. You can run <a href="lst_enodebfunction.html">LST ENODEBFUNCTION</a> to view the application referenced by the eNodeBFunction MO. If the application referenced by the eNodeBFunction MO is not reset within 10 minutes after the type, mobile country code (MCC), or the mobile network code (MNC) of the operator is changed by running this command, ALM-26245 Configuration Data Inconsistency will be reported.</p>
+</li><li><p>If the eNodeB works in independent mode, there can be only one operator and this operator must be the primary operator.</p>
+</li><li><p>Mobile network code is a string of two or three characters, each of which must be a digit in the range from 0 to 9.</p>
+</li><li><p>If the MOD_NCELL_CFG_SW option of the X2BasedUptNcellCfgSwitch parameter is selected for a neighboring eNodeB, after the operator is changed, the eNodeB notifies the neighboring eNodeB the changes of serving cells of the eNodeB through the X2 interfaces. The neighboring eNodeB then updates the neighbor relationship configurations. The update takes a certain amount of time. If the operator is repeatedly changed within a short period, the neighboring eNodeB cannot completely update the neighboring cell configurations. In this case, the configurations must be updated manually or by ANR. It is recommended that the interval between two changes of the operator be longer than 60 seconds.</p>
+</li><li><p>After the MCC or MNC is changed, the operator identified by the operator ID is also changed. Therefore, modify the CnOperatorTa, S1Interface, and Emc MOs that reference the operator ID.</p>
+</li><li><p>If the eNodeB works in RAN sharing with common carriers mode, RAN sharing with dedicated carriers mode, hybrid RAN sharing mode, or RAN sharing with special dedicated carriers mode, there can be only one primary operator, and other operators, if any, must be secondary operators.</p>
+</li><li><p>Mobile country code is a string of three characters, each of which must be a digit in the range of 0 to 9.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_cnoperator__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CnOperator-CnOperatorId.html">CnOperatorId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CN Operator ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the operator.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CnOperator-CnOperatorName.html">CnOperatorName</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CN Operator name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the operator.</p>
+<p>GUI Value Range: 1~32 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~32 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The value of CnOperatorName in each CnOperator MO must be unique.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CnOperator-CnOperatorType.html">CnOperatorType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CN Operator type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the operator. The operator can be the primary operator or a secondary operator. For each eNodeB, only one primary operator but more than one secondary operator can be configured.</p>
+<p>GUI Value Range: CNOPERATOR_PRIMARY(Primary Operator), CNOPERATOR_SECONDARY(Secondary Operator)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CNOPERATOR_PRIMARY, CNOPERATOR_SECONDARY</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>CnOperatorType can be set to CNOPERATOR_PRIMARY in only one CnOperator MO.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CnOperator-Mcc.html">Mcc</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mobile country code</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mobile country code (MCC) of the operator.</p>
+<p>GUI Value Range: 3 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 000~999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>Mcc in each CnOperator MO consists of digits only.</li><li>The combination of Mcc and Mnc in each CnOperator MO must be unique.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CnOperator-Mnc.html">Mnc</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mobile network code</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mobile network code (MNC) of the operator. The value of this parameter is a string of two or three decimal digits.</p>
+<p>GUI Value Range: 2~3 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 00~99,000~999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>Mnc in each CnOperator MO consists of digits only.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CnOperator-PlmnMode.html">PlmnMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PLMN Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the PLMN works in Isolated E-UTRAN Operation for Public Safety (IOPS) mode when the CnOperatorType parameter is set to CNOPERATOR_SECONDARY for the operator.</p>
+<p>Only the PLMN of a secondary operator can be configured to work in IOPS mode, and only one PLMN of an eNodeB can be configured to work in IOPS mode. When the active main control board is an LMPT board, the PlmnMode parameter cannot be set to IOPS_PLMN.</p>
+<p>GUI Value Range: NORMAL_PLMN(NORMAL_PLMN), IOPS_PLMN(IOPS_PLMN)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL_PLMN, IOPS_PLMN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The number of records where PlmnMode in the CnOperator MO is set to IOPS_PLMN must be less than or equal to one.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CnOperator-OperatorFunSwitch.html">OperatorFunSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Operator Function Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable features for the operator.</p>
+<p>CELL_TRAFFIC_TRACE_MSG_SWITCH: After a cell tracing task is started, the eNodeB can send the CellTrafficTrace message to the MME over the S1 interface only if this option is selected. For details about the mechanism of sending the CellTrafficTrace message, see 3GPP TS 32.422.</p>
+<p>DCN_SUPPORT_SWITCH: The operator supports access to the dedicated core network (DCN) and the MME-initiated Reroute NAS Request procedure only if this option is selected. For details about DCN, see 3GPP TS 36.413 and 3GPP TS 23.401.</p>
+<p>MME_STRICT_SELECTION_SWITCH: Indicates whether to enable MME selection by exact GUMMEI match for UEs of the operator. A GUMMEI is comprised of a PLMN ID, an MMEGI, and an MMEC. A UE accesses a cell with the IE Registered MME. If this option is selected, the eNodeB selects an MME, whose MMEGI and MMEC totally match those indicated by the IE. If no MME meets the exact match requirement, the eNodeB selects an MME based on priorities, topologies, and loads of MMEs and the NNSFENHANCEMENTSWITCH option does not take effect. If this option is deselected, the eNodeB selects an MME using the original algorithm.</p>
+<p>CMAS_BROADCAST_SWITCH: CMAS messages of the PLMN can be broadcast over the air interface only if this option is selected. This option takes effect only in MOCN scenarios. When CMAS is enabled, this option must be selected for at least one PLMN. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ARP_QCI_BASED_DIFF_SCH_SW: ARP- and QCI-based differentiated scheduling is enabled only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UPPER_LYR_IND_NO_BROADCAST_SW: If this option is selected, the upperLayerIndication-r15 IE of this PLMN is not included in SIB2. If this option is deselected, this IE of this PLMN is included in SIB2. This option takes effect only if the UpperLayerIndicationSwitch parameter in the NsaDcMgmtConfig MO is not set to OFF. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: CELL_TRAFFIC_TRACE_MSG_SWITCH(CELL_TRAFFIC_TRACE_MSG_SWITCH), DCN_SUPPORT_SWITCH(DCN_SUPPORT_SWITCH), MME_STRICT_SELECTION_SWITCH(MME_STRICT_SELECTION_SWITCH), CMAS_BROADCAST_SWITCH(CMAS_BROADCAST_SWITCH), ARP_QCI_BASED_DIFF_SCH_SW(ARP_QCI_BASED_DIFF_SCH_SW), UPPER_LYR_IND_NO_BROADCAST_SW(UPPER_LYR_IND_NO_BROADCAST_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CELL_TRAFFIC_TRACE_MSG_SWITCH, DCN_SUPPORT_SWITCH, MME_STRICT_SELECTION_SWITCH, CMAS_BROADCAST_SWITCH, ARP_QCI_BASED_DIFF_SCH_SW, UPPER_LYR_IND_NO_BROADCAST_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: CELL_TRAFFIC_TRACE_MSG_SWITCH:On</p>
+<p>DCN_SUPPORT_SWITCH:Off</p>
+<p>MME_STRICT_SELECTION_SWITCH:Off</p>
+<p>CMAS_BROADCAST_SWITCH:On</p>
+<p>ARP_QCI_BASED_DIFF_SCH_SW:Off</p>
+<p>UPPER_LYR_IND_NO_BROADCAST_SW:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: DCN_SUPPORT_SWITCH: If this option is selected and a UE initiates an Attach Request procedure or a cross-DCN TAU procedure, the MME may trigger a Reroute NAS Request procedure for redirection. In this case, the access delay is extended. Deselecting this option has no impact on network performance.</p>
+<p>CMAS_BROADCAST_SWITCH: Assume that this option is selected for an eNodeB in RAN sharing with common carrier or hybrid RAN sharing in MOCN scenarios, and the CBCs are independently deployed and do not work in a coordinating way. When the EPC of multiple PLMNs sends the same CMAS messages to the shared cells, air interface resources are wasted. New messages with different contents will be regarded as duplicate messages and discarded by the eNodeB or UEs. If this option is deselected, fewer air interface resources are wasted.</p>
+<p>ARP_QCI_BASED_DIFF_SCH_SW: If this option is selected, services with higher ARPs and QCI priorities have higher scheduling weights and larger throughput and services with lower ARPs and QCI priorities have lower scheduling weights and smaller throughput.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_cnoperator__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To change the value of CN Operator name to lte for the operator with CN Operator ID of 0, run the following command:
+MOD CNOPERATOR: CnOperatorId=0, CnOperatorName="lte";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

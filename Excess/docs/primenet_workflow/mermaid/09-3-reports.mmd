@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant U as User
+    participant R as modules/reports
+    participant H as metadata_helpers
+    participant DB as PM + metadata DBs
+    participant A as report_archive
+
+    U->>R: POST /api/reports/generate
+    R->>H: Query metadata + KPIs
+    H->>DB: Aggregations
+    R->>A: Store artifact
+    U->>R: GET /api/reports/download/id

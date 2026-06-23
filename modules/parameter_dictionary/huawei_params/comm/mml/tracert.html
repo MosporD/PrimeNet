@@ -1,0 +1,390 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Trace Route (TRACERT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="tracert">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Trace Route (TRACERT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="tracert"></a><a name="tracert"></a>
+
+
+<h1 class="topictitle1">Trace Route (TRACERT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="tracert__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to start route tracing. Route tracing obtains the information about the gateways on the host-to-destination route by sending test packets on the route. By running this command, you can check whether the route is reachable and locate the position where a network connection failure occurs.</p>
+</div></div>
+
+<div class="mmlnote"><a name="tracert__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>You can press Ctrl+Q or run the <a href="stp_pathchk.html">STP PATHCHK</a> command to stop running the <a href="tracert.html">TRACERT</a> command.</p>
+</li><li><p>The <a href="ping.html">PING</a>, <a href="ping6.html">PING6</a>, <a href="tracert.html">TRACERT</a>, <a href="tracert6.html">TRACERT6</a>, <a href="cfmtrace.html">CFMTRACE</a>, <a href="cfmping.html">CFMPING</a>, and <a href="udpecho.html">UDPECHO</a> commands cannot be executed simultaneously on one board.</p>
+</li><li><p>If the source IP address is not specified, it must be the configured device IP address or IPv4 address or the local IP address of the remote maintenance channel. You can run the <a href="lst_devip.html">LST DEVIP</a>, <a href="lst_ipaddr4.html">LST IPADDR4</a> and <a href="lst_omch.html">LST OMCH</a> commands to query these two types of IP addresses, respectively.</p>
+</li><li><p>If a destination IP address elicits no response during route tracing but can be pinged, check and remove redundant IP addresses on the egress port, which are on the same network segment as the planned IP address.</p>
+</li><li><p>In <a href="tracert.html">TRACERT</a> packets, "*" indicates that the detection expires, "!" indicates that the port is unreachable, "!N" indicates that the network is unreachable, "!Y" indicates that the IP address is unreachable, "!P" indicates the protocol is unavailable, "!S" indicates that the source route fails, and "!H" indicates that the host is unreachable.</p>
+</li><li><p>If the destination IP address is used to search for the outbound interface or next hop, TRACERT detection is not performed.</p>
+</li><li><p>If the base station is only configured with the source IP route, the source IP address must be specified.</p>
+</li><li><p>In backplane transmission scenarios, the next-hop IP address cannot be displayed for the backplane in the output of the <a href="tracert.html">TRACERT</a> command.</p>
+</li><li><p>When the tracert operation is continuously performed, the first UDP packets in each round of tracert have the same destination port No..</p>
+</li><li><p>In IPsec networking scenarios, if IPSec PreFragment Switch in the IKEPEER object is set to ON and DF Switch in the TRACERT object is also set to ON, the MTU of the fragment before encryption is not displayed in the TRACERT command output.</p>
+</li><li><p>When the <a href="tracert.html">TRACERT</a> command is executed, the destination IP address cannot set to the local IP address.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]If a source IP address is not specified or is 255.255.255.255, the base station searches the route closest to the destination IP address in the routing table according to the longest mask matching rule. If the masks have the same length, the base station selects the route with a higher priority and uses the most suitable IP address of the egress port corresponding to the route as the source IP address according to the longest mask matching rule. If the route tracing data flow matches the routes of both the source address and destination address, the base station may fail to select a route. It is recommended that a source IP address be specified for route tracing.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When the <a href="tracert.html">TRACERT</a> command is executed, the transmitted packets and received packets related to this command are UDP packets and ICMP packets, respectively.</p>
+</li><li><p>[NodeB,eNodeB,gNodeB]If the route corresponding to the destination IP address is a tunnel route, the source IP address must be specified.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="tracert__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the board.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-SourceIP.html">SRCIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IP address. The IP address must be a valid one of class A, B, or C. It cannot be set to 0.x.x.x or 127.x.x.x.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-DstIP.html">DSTIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination IP address. It must be a valid one of class A, B, or C and cannot be the reserved address of 0.x.x.x or 127.x.x.x. This command does not support using the IP address of the current equipment as the destination IP address.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-FirstTTL.html">TTLFST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">First TTL</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the initial TTL value of the transmitted TRACERT packet.</p>
+<p>GUI Value Range: 1~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~255</p>
+<p>MML Default Value: 1</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-MaxTTL.html">TTLMAX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximal TTL</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum TTL value of the transmitted TRACERT packet.</p>
+<p>GUI Value Range: 1~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~255</p>
+<p>MML Default Value: 30</p>
+<p>Recommended Value: 30</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-UDPPortNo.html">UDPPORT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UDP Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum No. of the destination port of the UDP packet specified by the transmitted TRACERT packet. Each time the TRACERT sends a UDP detection package, the UDP destination port No. is incremented by 1. When the UDP destination port No. reaches the maximum, it increases from 49152 again. TRACERT should not use the same port to perform the detection, for the peer end may also use this port. If TRACERT and the peer end use the same port, the peer end does not respond.</p>
+<p>GUI Value Range: 49152~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 49152~65535</p>
+<p>MML Default Value: 52889</p>
+<p>Recommended Value: 52889</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-ProbeNum.html">PRBNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Probe Packet Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the TRACERT packets transmitted to each TTL.</p>
+<p>GUI Value Range: 1~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~5</p>
+<p>MML Default Value: 3</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-Timeout.html">TIMEOUT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timeout</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the timeout duration value for waiting for the response of the TRACERT packet.</p>
+<p>GUI Value Range: 500~5000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 500~5000</p>
+<p>MML Default Value: 5000</p>
+<p>Recommended Value: 5000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-DFSwitch.html">DF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DF Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable fragmenting. When this parameter is set to ON, the detection of Path Max Transmit Unit (PMTU) can be used.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(Off)</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-DSCP.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DSCP value.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-DscpSwitch.html">PATHDSCPSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Path DSCP Display Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the DSCP value is included in the IP header of received ICMP packets. When this parameter is set to ON, the DSCP value is included.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(Off)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TRACERT-ContinueTracert.html">CONTRACERT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Continuing TRACERT</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to perform the tracert operation continuously.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="tracert__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start route tracing with the parameters as follows: Slot No.: 6, Source IP: 192.168.164.11, Destination IP: 10.141.142.22, Continuing TRACERT: ENABLE, run the following command:
+TRACERT: SN=6, SRCIP="192.168.164.11", DSTIP="10.141.142.22", CONTRACERT=ENABLE;
+The result is shown as follows:
+traceroute to  10.141.142.22(10.141.142.22) 30 hops max, 40 bytes packet 
+
+
+ 1 192.168.164.254 41 ms  8 ms  16 ms 
+
+
+ 2 192.168.15.3 2 ms  1 ms  2 ms 
+
+
+ 3 172.17.141.200 37 ms  41 ms  40 ms 
+
+
+ 4 10.141.142.22 47 ms  47 ms  46 ms 
+
+
+  User Stop
+
+
++++    0        2017-02-15 10:43:53
+O&amp;M    #3279
+%%TRACERT: SN=6, SRCIP="192.168.164.11", DSTIP="10.141.142.22", CONTRACERT=ENABLE;%%
+RETCODE = 0  Operation succeeded.
+
+
+
+
+6 reports in total
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

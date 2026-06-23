@@ -1,0 +1,33 @@
+"""Supported NE and RAT types for Huawei PM Open API (MAE 5.4)."""
+
+NE_TYPE_NAMES = (
+    'BSC6900 GSM',
+    'BSC6900 GU',
+    'BSC6900 UMTS',
+    'BSC6910 GSM',
+    'BSC6910 GU',
+    'BSC6910 UMTS',
+    'BTS3900',
+    'BTS5900',
+    'MICRO BTS3900',
+    'PICO BTS3900',
+    'eNodeB',
+    'NodeB',
+    'BTS3900 5G',
+    'BTS5900 5G',
+    'MICRO BTS5900',
+    'PICO BTS5900',
+)
+
+RAT_TYPE_NAMES = (
+    'CONTROLLER-COMM',
+    'CONTROLLER-GSM',
+    'CONTROLLER-UMTS',
+    'BASESTATION-COMM',
+    'BASESTATION-GSM',
+    'BASESTATION-UMTS',
+    'BASESTATION-LTE',
+    'BASESTATION-NR',
+)
+
+QUERY_PERIODS_MINUTES = (15, 30, 60, 1440)

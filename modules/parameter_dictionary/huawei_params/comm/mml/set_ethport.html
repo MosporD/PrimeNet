@@ -1,0 +1,487 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Ethernet Port (SET ETHPORT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_ethport">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Ethernet Port (SET ETHPORT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_ethport"></a><a name="set_ethport"></a>
+
+
+<h1 class="topictitle1">Set Ethernet Port (SET ETHPORT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_ethport__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to configure an Ethernet port. The configuration of an Ethernet port includes (but not limited to) the port rate, duplex mode, and port attribute.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_ethport__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>When a MAC loopback is performed on a port, running this command will immediately terminate this loopback.</p>
+</li><li><p>The settings of the SPEED and DUPLEX parameters must be the same between the local and peer ends. Otherwise, the negotiation may fail.</p>
+</li><li><p>If the SPEED and DUPLEX parameters are both set to AUTO, the local port automatically adjusts its data rate based on the data rate and duplex mode at the peer end so that both ends work at the highest rate and the optimal duplex mode. Generally, it takes about 5 seconds for the negotiation to complete.</p>
+</li><li><p>If an electrical module is used at the local end to connect to an electrical port at the peer end, it is recommended that PA of the peer electrical port be set to AUTO.</p>
+</li><li><p>If the local end works in AUTO mode whereas the peer end works in non-AUTO mode, the duplex mode at the local end may be negotiated and set to HALF. In this case, packet loss and intermittent link disconnection may occur if links are activated, affecting the work performance.</p>
+</li><li><p>The DUPLEX parameter at the local end must be set to AUTO to detect the configuration mode of the peer end. After the detection, the original configuration must be recovered.</p>
+</li><li><p>If the SPEED and DUPLEX parameters of an Ethernet port at the local end are both set to AUTO, and those at the peer end are set to a fixed rate and FULL, respectively, the duplex mode at the local end may be negotiated and set to HALF. If this negotiation is achieved, the local end will forcibly change it to FULL. If the local end is inactive due to modifications at the peer end, SPEED and DUPLEX of the Ethernet port at the local end are changed back to AUTO.</p>
+</li><li><p>When Port Attribute, Speed, and Duplex are all set to AUTO, you need to disable the optical port on the peer device or remove the fiber optic cable after modifying the attribute of the optical port on the peer device. Then wait about 1 minute and enable the optical port or insert the fiber optic cable again. This ensures that the automatic detection function can be triggered when the local optical port is in the inactive state.</p>
+</li><li><p>All packets sent from the backplane of a board (excluding the packets forwarded by the board) are segmented into fragments of 1500 bytes.</p>
+</li><li><p>The MTU setting of the peer equipment should not exceed the maximum allowed MTU value of the local Ethernet port.</p>
+</li><li><p>A UCCU/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9 provides six physical ports, and the last one includes four Ethernet ports. Each Ethernet port can only be set to the optical port of 10 Gbit/s and full duplex.</p>
+</li><li><p>GE electrical ports support 1000 Mbit/s only when working in auto-negotiation mode. If SPEED is set to 1000M for a GE electrical port, this port works at 1000 Mbit/s in auto-negotiation mode.</p>
+</li><li><p>Ensure that parameters settings are consistent with those at the peer end. Otherwise, the services or OM channels carried on this port may be interrupted. It is recommended that you determine whether to enable the automatic configuration data rollback function depending on scenarios. For details, see the help of the <a href="cfm_cb.html">CFM CB</a> command.</p>
+</li><li><p>If the "Fiber Speed Match" is "ENABLE" for a UMPT board, the meaning of this parameter is described as follows:</p>
+<p>The base station uses the configured data rate by default when the optical port is activated but the data rate cannot be obtained. This configuration scenario is not recommended.</p>
+</li><li><p>When an Ethernet port is an optical port, the optical modules at both ends must have the same capability. When a 10GE/25GE optical module is used at the local end, the optical module cannot be used at a reduced rate. It is recommended that the configured rate be consistent with the optical module capability.</p>
+</li><li><p>If this command is executed during the validation of the port mode after the <a href="set_portmode.html">SET PORTMODE</a> command is executed, a message indicating that configuration data fails to take effect will be displayed.</p>
+</li><li><p>An optical port which uses a 10 Gbit/s optical module only supports a data rate of 10 Gbit/s during site deployment. An optical port which uses a 25 Gbit/s optical module only supports a data rate of 25 Gbit/s during site deployment.</p>
+</li><li><p>If the transmission configuration mode is new and no ETHPORT object is configured, run the <a href="set_ethport.html">SET ETHPORT</a> command with Port ID set to a valid value.</p>
+</li><li><p>For the UMPTa/b, UMDU, LMPT, UCCU, and UTRPc, the value of this parameter ranges from 46 to 1800. For the WMPT, GTMUb, GTMUc, UQEC, and UEOC, the value of this parameter ranges from 46 to 1500. For the UMPTe, the value of this parameter ranges from 46 to 2000. For the UMPTg and UMPTga, the value of this parameter ranges from 46 to 9000. If this parameter is set to a value greater than the maximum allowed value, the maximum allowed value takes effect. A value greater than or equal to 776 is recommended, because broadcast packets, such as DHCP packets, may experience reception or transmission failures if the maximum transmission unit is smaller than 776. If the Ethernet port is added to an Ethernet trunk, this parameter becomes invalid. The actual maximum transmission unit depends on the value set for the Ethernet trunk.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]A WMPT/UMPTa/UMPTb/UMDU provides two physical ports: one optical port (port 1) and one electrical port (port 0). An LMPT provides four physical ports: two optical ports and two electrical ports. A UMPTe/UMPTg/UMPTga provides four physical ports: two optical ports (ports 1 and 3) and two electrical ports (ports 0 and 2). A UQEC provides four electrical ports. A UEOC provides two optical ports. A UTRPc provides six physical ports: two optical ports (ports 0 and 1) and four electrical ports (ports 2 to 5). A UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9 provides four physical optical ports (ports 0 to 3) if its port mode is 4*10GE; a UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9 provides one physical optical port (port 0) if its port mode is 40GE; a UBBPf1 provides one physical optical port (port 0) if its port mode is 100GE.</p>
+</li><li><p>[Co-MPT,NodeB]The rate mode and duplex mode of optical ports on a WMPT must be set to 100 Mbit/s and full duplex, respectively. The peer end must also have the same settings.</p>
+</li><li><p>[Co-MPT,eGBTS]The electrical port on a GTMUb supports negotiation only when the SPEED parameter is set to 10M or 100M.</p>
+</li><li><p>[Co-MPT,eGBTS]The SPEED and DUPLEX parameters must be set to 100M and FULL, respectively, for optical ports on a GTMUb or GTMUc. The peer end must also have the same settings.</p>
+</li><li><p>[Co-MPT,eGBTS]If the GTMUb/GTMUc is the main control board, the board provides one electrical port (port 0) and one optical port (port 1).</p>
+</li><li><p>[Co-MPT,eGBTS]The GTMUb does not support fragment reassembly of signaling packers (excluding SCTP packets) and service packets. The MTU parameter always uses the default value of 1500 bytes (which is the size of the IP packet including the IP header).</p>
+</li><li><p>[Co-MPT,NodeB]Electrical ports on a WMPT support rate negotiation for only 10 Mbit/s and 100 Mbit/s.</p>
+</li><li><p>[NodeB]It is recommended that SPEED of a UEOC, UTRPc, UCCU or UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9/UBBPf0 be set to a fixed rate. In addition, SPEED and DUPLEX of the local end must be the same as those of the peer end, respectively.</p>
+</li><li><p>[eNodeB]For Ethernet ports on an LMPT, port No. 0 consists of the electrical port No. 0 and the optical port No. 0, and port No. 1 consists of the electrical port No. 1 and the optical port No. 1. Although an Ethernet port on the LMPT can be either electrical or optical, the port can only be set to one type. That is, the same Ethernet port cannot be configured to be an electrical port and an optical port at the same time.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_ethport__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the board where the Ethernet port is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board where the Ethernet port is located.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board where the Ethernet port is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where the Ethernet port is located.</p>
+<p>GUI Value Range: ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ETH_COVERBOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eGBTS, eNodeB, gNodeB]In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is within the range from 0 to 5, this parameter must be set to ETH_COVERBOARD.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or ETH_COVERBOARD.</li><li>[NodeB]In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is within the range from 0 to 5, this parameter must be set to ETH_COVERBOARD.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the Ethernet port.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>ETHPORT</strong> MO, this parameter can be set to 0 to 3 if <strong>SBT</strong> is set to BASE_BOARD.</li><li>In the <strong>ETHPORT</strong> MO, this parameter can be set to a value within the range from 0 to 5 if <strong>SBT</strong> is set to ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-PortId.html">PORTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an Ethernet port, which uniquely identifies the Ethernet port. When the system automatically creates an Ethernet port, the most significant bit to the least significant bit of this parameter value indicate the cabinet number, subrack number, slot number, and port number of the Ethernet port, respectively. When Transmission Configuration Mode in the GTRANSPARA MO is set to OLD, this parameter is optional. If this parameter is not set, the default value 4294967295 is used. When Transmission Configuration Mode in the GTRANSPARA MO is set to NEW, this parameter is mandatory and must be unique in the system. If the ETHPORT MO is not configured, the default value 4294967295 of PORTID is displayed.</p>
+<p>GUI Value Range: 0~9999,4294967295</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~9999,4294967295</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-PortAttr.html">PA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Attribute</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether an Ethernet port is an electrical port or optical port. When the system starts, the system binds an Ethernet port to an electrical port preferentially if the default value of the port attribute is AUTO. If the BS does not support cascading, the port attribute is set to AUTO. If this parameter is incorrectly set, services of a base station will be interrupted after the base station is reset.</p>
+<p>GUI Value Range: COPPER(Copper), FIBER(Fiber), AUTO(Automatic Detection), UNCONFIG(Not Configured)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: COPPER, FIBER, AUTO, UNCONFIG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If an optical fiber is used for transmission, set this parameter to FIBER.</p>
+<p>If an electrical cable is used for transmission, set this parameter to COPPER.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When any one of the parameters <strong>PA</strong>, <strong>SPEED</strong> and <strong>DUPLEX</strong> is set to UNCONFIG, the other two must also be set to UNCONFIG.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>ETHPORT</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to COPPER, FIBER, AUTO or UNCONFIG.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SBT</strong> is set to ETH_COVERBOARD, this parameter can be set to can be set to COPPER, FIBER, AUTO or UNCONFIG.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-MTU.html">MTU</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximum Transmission Unit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum IPv4 packet size (including the IP header) at the Ethernet port. For the UMPTa/b, UMDU, LMPT, UCCU, and UTRPc, the value of this parameter ranges from 46 to 1800. For the WMPT, GTMUb, GTMUc, UQEC, and UEOC, the value of this parameter ranges from 46 to 1500. For the UMPTe, the value of this parameter ranges from 46 to 2000. For the UMPTg and UMPTga, the value of this parameter ranges from 46 to 9000. If this parameter is set to a value greater than the maximum allowed value, the maximum allowed value takes effect. A value greater than or equal to 776 is recommended, because broadcast packets, such as DHCP packets, may experience reception or transmission failures if the maximum transmission unit is smaller than 776. If the Ethernet port is added to an Ethernet trunk, this parameter becomes invalid. The actual maximum transmission unit depends on the value set for the Ethernet trunk.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IPv4 Maximum Transmission Unit parameter in the INTERFACE MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 46~9000</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 46~9000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1500</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: An excessive large parameter value leads to packet loss or excessively fragmented data packets on the transport network, resulting in a long delay and deteriorated performance. An excessive small parameter value leads to reduced available payloads for transmission, resulting in decreased transport bandwidth efficiency and deteriorated performance.</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-Speed.html">SPEED</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Speed</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the speed mode of the Ethernet port. This parameter must be set to the same value as that of the peer port. GE electrical ports of base board support 1000 Mbit/s only when working in auto-negotiation mode. When Port Attribute is set to FIBER and Speed is set to AUTO for a GE optical port, the port works at a rate of 1000 Mbit/s in auto-negotiation mode. In this case, the base station can only negotiate the duplex mode with the peer device at a fixed rate of 1000 Mbit/s. When Port Attribute is set to FIBER and Speed is set to 1000M for a GE optical port, the port works at a rate of 1000 Mbit/s in forced mode. If the Ethernet port corresponding to the optical port of the main control board is not configured, the system uses the 1000 Mbit/s auto-negotiation mode by default. If the non-default 1000 Mbit/s auto-negotiation mode is used, for example, 10 Gbit/s optical port is used, you need to run the <a href="add_ethport.html">ADD ETHPORT</a> command to set parameters such as the rate.</p>
+<p>GUI Value Range: 10M(10M), 100M(100M), 1000M(1000M), AUTO(Automatic Negotiation), 10G(10G), 25G(25G), 40G(40G), 100G(100G), UNCONFIG(Not Configured)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 10M, 100M, 1000M, AUTO, 10G, 25G, 40G, 100G, UNCONFIG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When any one of the parameters <strong>PA</strong>, <strong>SPEED</strong> and <strong>DUPLEX</strong> is set to UNCONFIG, the other two must also be set to UNCONFIG.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>ETHPORT</strong> MO, if <strong>SBT</strong> and <strong>PA</strong> are set to ETH_COVERBOARD and COPPER, respectively, this parameter can be set to 10M, 100M, 1000M, or AUTO.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is within the range from 0 to 5, <strong>SBT</strong> and <strong>PA</strong> are set to ETH_COVERBOARD and FIBER, respectively, this parameter can be set to 100M, 1000M, 10G, AUTO, 40G or 100G.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SN</strong> is set to 6 or 7, <strong>SBT</strong> and <strong>PA</strong> are set to ETH_COVERBOARD and FIBER, respectively, this parameter can be set to 100M, 1000M, or AUTO.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SBT</strong> and <strong>PA</strong> are set to ETH_COVERBOARD and AUTO, respectively, this parameter can be set to 100M, 1000M, or AUTO.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SBT</strong> and <strong>PA</strong> are set to BASE_BOARD and COPPER, respectively, this parameter can be set to 10M, 100M, or AUTO.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SBT</strong> and <strong>PA</strong> are set to BASE_BOARD and FIBER, respectively, this parameter can be set to 100M, 1000M, 10G, 25G, or AUTO.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>SBT</strong> and <strong>PA</strong> are set to BASE_BOARD and AUTO, respectively, this parameter must be set to 100M, 1000M, or AUTO.</li><li>In the <strong>ETHPORT</strong> MO, if <strong>PA</strong> is set to UNCONFIG, this parameter must be UNCONFIG.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-Duplex.html">DUPLEX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Duplex</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the duplex mode of the Ethernet port.</p>
+<p>GUI Value Range: FULL(Full Duplex), AUTO(Automatic Negotiation), UNCONFIG(Not Configured)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FULL, AUTO, UNCONFIG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When any one of the parameters <strong>PA</strong>, <strong>SPEED</strong> and <strong>DUPLEX</strong> is set to UNCONFIG, the other two must also be set to UNCONFIG.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>ETHPORT</strong> MO, if <strong>SPEED</strong> is set to AUTO, this parameter must be AUTO. </li><li>In the <strong>ETHPORT</strong> MO, if <strong>SPEED</strong> is set to 10M, 100M, 1000M, 10G, 25G, 40G or 100G, this parameter must be FULL. </li><li>In the <strong>ETHPORT</strong> MO, if <strong>PA</strong> is set to UNCONFIG, this parameter must be UNCONFIG.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-ARPProxy.html">ARPPROXY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ARP Proxy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the ARP proxy function on the Ethernet port. If the ARP proxy function is enabled, the system serves as an ARP proxy for a loopback interface address of the base station or for an interface IP address of a lower-level base station. If this function is disabled, the system does not serve as an ARP proxy for the loopback interface IP address of the base station or for the interface IP address of a lower-level base station. To access either IP address in this case, an external device on the same subnet must be configured with a route. If the Ethernet port is added to an Ethernet trunk, this parameter becomes invalid. Whether the ARP proxy function is enabled is determined by the setting of this parameter for the Ethernet trunk.</p>
+<p>This parameter is valid only when Transmission Configuration Mode in the GTRANSPARA MO is set to OLD.</p>
+<p>This parameter is invalid when Transmission Configuration Mode in the GTRANSPARA MO is set to NEW.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the ARP Proxy parameter in the INTERFACE MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]The proxy ARP function is disabled by default in the initial phase of system startup.</li><li>[eNodeB, gNodeB]The proxy ARP function is enabled by default in the initial phase of system startup.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-FlowControl.html">FC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Flow Control</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable flow control on the Ethernet port. Flow control is implemented to prevent congestion. When flow control is enabled, the RX end repeatedly sends PAUSE frames to the TX end, instructing the TX end to lower the TX rate if congestion occurs on the RX end. Upon receiving PAUSE frames, the TX end stops sending data during a period of time to prevent congestion.</p>
+<p>GUI Value Range: CLOSE(Close), OPEN(Open)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CLOSE, OPEN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OPEN(Open)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-MACOccurThreshold.html">FERAT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MAC Frame Error Rate Occur Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the generation threshold for the MAC Excessive Frame Error Rate alarm (ID: 25881). When the number of erroneous MAC frames exceeds this threshold, the MAC Excessive Frame Error Rate alarm is reported.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: per mill</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ETHPORT</strong> MO, <strong>FERAT</strong> must be greater than or equal to <strong>FERDT</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-MACRestoreThreshold.html">FERDT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MAC Frame Error Rate Clear Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the clearance threshold for the MAC Excessive Frame Error Rate alarm (ID: 25881). When the number of erroneous MAC frames falls below this threshold, the MAC Excessive Frame Error Rate alarm is cleared.</p>
+<p>GUI Value Range: 0~100</p>
+<p>Unit: per mill</p>
+<p>Actual Value Range: 0~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 8</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ETHPORT</strong> MO, <strong>FERAT</strong> must be greater than or equal to <strong>FERDT</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-RxBCastPktAlmOcrThd.html">RXBCPKTALMOCRTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rx Broadcast Pkts Alarm Occur Thd</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the generation threshold for the excessive RX broadcast packet alarm. If the average number of broadcast packets that are received on the Ethernet port keeps above the threshold for 30 seconds, an excessive RX broadcast packet alarm is reported.</p>
+<p>GUI Value Range: 50~6000</p>
+<p>Unit: packet/s</p>
+<p>Actual Value Range: 50~6000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 320</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ETHPORT</strong> MO, <strong>RXBCPKTALMOCRTHD</strong> must be greater than <strong>RXBCPKTALMCLRTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-RxBCastPktAlmClrThd.html">RXBCPKTALMCLRTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rx Broadcast Pkts Alarm Clear Thd</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the clearance threshold for the excessive RX broadcast packet alarm. If the average number of broadcast packets that are received on the Ethernet port keeps below the threshold for 30 seconds, the excessive RX broadcast packet alarm is cleared.</p>
+<p>GUI Value Range: 50~6000</p>
+<p>Unit: packet/s</p>
+<p>Actual Value Range: 50~6000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 288</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>ETHPORT</strong> MO, <strong>RXBCPKTALMOCRTHD</strong> must be greater than <strong>RXBCPKTALMCLRTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-FiberSpeedMatch.html">FIBERSPEEDMATCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Fiber Speed Match</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the method of obtaining the data rate for an optical Ethernet port. When this switch is turned on, an optical Ethernet port uses the configured rate if its rate cannot be obtained. When this switch is turned off, an optical Ethernet port obtains its rate from the Ethernet chip.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-FECMODE.html">FECMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">FEC Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the forward error correction (FEC) mode of the Ethernet port when it is a 25 Gbit/s optical port. When this parameter is set to RS-FEC, the transmit end adds error correction information to the data packet. The receive end uses the error correction information to correct the bit error generated during the transmission of the data packet, so as to improve the signal quality. When this parameter is set to NO-FEC, the FEC function is disabled and no error correction information is added to the transmitted packets.</p>
+<p>GUI Value Range: NO-FEC(NO FEC), RS-FEC(RS-FEC)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO-FEC, RS-FEC</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RS-FEC(RS-FEC)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ETHPORT-UserLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-defined information about an Ethernet port. PeerPortLocation is contained in the UserLabel field.</p>
+<p>The format of UserLabel is UserLabel="%PeerPortLocation::XXXX%ssssss", where "XXXX" indicates the value of PeerPortLocation, and "ssssss" indicates the value of UserLabel.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_ethport__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To configure an Ethernet port with the parameters as follows: Cabinet No.: 0, Subrack No.: 0, Slot No.: 6, Subboard Type: BASE_BOARD, Port No.: 0, Port Attribute: COPPER, Speed: 100M, Duplex: FULL, Fiber Speed Match: DISABLE, User Label: label, run the following command: 
+SET ETHPORT: CN=0, SRN=0, SN=6, SBT=BASE_BOARD, PN=0, PA=COPPER, SPEED=100M, DUPLEX=FULL, FIBERSPEEDMATCH=DISABLE, USERLABEL="label";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

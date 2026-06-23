@@ -1,0 +1,319 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="BFDSESSION">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="BFDSESSION">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>BFDSESSION</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="BFDSESSION"></a><a name="BFDSESSION"></a>
+
+
+<h1 class="topictitle1">BFDSESSION</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="BFDSESSION.html"><strong>BFDSESSION</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A BFDSESSION MO consists of the parameters related to a Bidirectional Forwarding Detection (BFD) session. BFD sessions are used to quickly identify faults on a channel.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>BFDSESSION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If two <strong>BFDSESSION</strong> MOs are in the same routing domain, <strong>DSTIP</strong> in one <strong>BFDSESSION</strong> MO must be different from <strong>SRCIP</strong> or <strong>DSTIP</strong> in the other <strong>BFDSESSION</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IFIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If a <strong>BFDSESSION</strong> MO and an <strong>IFIP</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO must be different from <strong>IP</strong> in the <strong>IFIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If a <strong>BFDSESSION</strong> MO and a <strong>DEVIP</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO must be different from <strong>IP</strong> in the <strong>DEVIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>LOCALIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If a <strong>BFDSESSION</strong> MO and a <strong>LOCALIP</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO must be different from <strong>IP</strong> in the <strong>LOCALIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If a <strong>BFDSESSION</strong> MO and an <strong>OMCH</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO must be different from <strong>IP</strong> in the <strong>OMCH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPSECDTNL</strong> MO, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MOs for the active and standby tunnels must be the same as <strong>LOCALIP</strong> in the <strong>IKEPEER</strong> MOs of the active and standby <strong>IPSECPOLICY</strong> MOs, respectively; <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MOs for the active and standby tunnels must be the same as <strong>REMOTEIP</strong> in the <strong>IKEPEER</strong> MOs of the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before adding an <strong>IPSECDTNL</strong> MO, ensure that the <strong>BFDSESSION</strong> MOs for the active and standby tunnels of the <strong>IPSECDTNL</strong> MO have been configured. That is, in the same routing domain the <strong>BFDSESSION</strong> MOs whose <strong>BFDSN</strong> is the same as <strong>MBFDSN</strong> and <strong>SBFDSN</strong> in the <strong>IPSECDTNL</strong> MO, respectively must have been configured.</li></ul>
+</li><li>Relation with the <strong>BFDKEYCHAIN</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>BFDAUTHSW</strong> in the <strong>BFDSESSION</strong> MO is set to ON, the <strong>BFDKEYCHAIN</strong> MO instance used by a <strong>BFDSESSION</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>BFDKEY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>BFDAUTHSW</strong> in the <strong>BFDSESSION</strong> MO is set to ON, the <strong>BFDKEY</strong> MO instance used by a <strong>BFDSESSION</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>MPGRP</strong>, <strong>PPPLNK</strong>, <strong>IFIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>SRCIP</strong> in a <strong>BFDSESSION</strong> MO to be added must have been configured. That is: (1) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, for the <strong>BFDSESSION</strong> MO, <strong>DEVIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO. (2) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, for the <strong>BFDSESSION</strong> MO, <strong>IFIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If a <strong>BFDSESSION</strong> MO and a <strong>PPPLNK</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO must be different from <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If a <strong>BFDSESSION</strong> MO and an <strong>MPGRP</strong> MO are in the same routing domain, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO must be different from <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>WLOCALIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>IP</strong> in the <strong>WLOCALIP</strong> MO must be different from <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MO in the default routing domain.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>BFDSESSION</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>BFDSESSION</strong> MOs must be less than or equal to 16 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>IFIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]<strong>SRCIP</strong> in a <strong>BFDSESSION</strong> MO to be added must have been configured. That is: (1) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, for the <strong>BFDSESSION</strong> MO and <strong>DEVIP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain. (2) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, for the <strong>BFDSESSION</strong> MO and <strong>IFIP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#BFDSESSION__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="BFDSESSION__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="BFDSESSION__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_bfdsession.html">ADD BFDSESSION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a Bidirectional Forwarding Detection (BFD) session. BFD, a protocol for fast link fault detection, provides a low-overhead and short-duration method of detecting link failures.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_bfdsession.html">DSP BFDSESSION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_bfdsession.html">LST BFDSESSION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_bfdsession.html">MOD BFDSESSION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_bfdsession.html">RMV BFDSESSION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a BFD session.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#BFDSESSION__tab2">Table 2</a> and <a href="#BFDSESSION__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="BFDSESSION__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="BFDSESSION__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet No. to which a BFD session belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack No. to which a BFD session belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot No. to which a BFD session belongs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-SessionID.html">Session ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a BFD session. The session ID plus 1 is the local discriminator of the BFD session. The local discriminator must be consistent with the configuration at the peer end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-SourceIP.html">Source IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the source IP address of a BFD session. The source IP address of a BFD session must be a device IP address of a specified board (for example, the IP address of an Ethernet port or a port that carries a PPP link or MP group) or a logical IP address (for example, the IP address of a loopback port), but cannot be set to the same value as the IP address of a remote maintenance channel or a negotiated IP address. Note that a BFD session cannot be configured as a single-hope session if its source IP address is a logical IP address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-DstIP.html">Destination IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the destination IP address of a BFD session. The destination IP address must be a valid IP address, and cannot be set to 0.0.0.0 or any existing IP addresses in the system. If Virtual Router Redundancy Protocol (VRRP) is used in the network, two BFD sessions must be configured with the destination IP addresses set to the active and standby physical IP addresses of the virtual router, respectively.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-HopType.html">Hop Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the hop type of a BFD session. The single-hop BFD session is used to perform point-to-point detection at the data link layer, and often used in layer 2 networking scenarios. The multi-hop BFD session is used to perform end-to-end connectivity checks at the transport layer, and often used in layer 3 networking scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-MinTxInterval.html">Min TX Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum interval at which a BFD session transmits control packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-MinRxInterval.html">Min RX Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum interval at which a BFD session receives control packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-DetectMultiplier.html">Detection Multiplier</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the detection multiplier of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-SessionCatalog.html">Session Catalog</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of a BFD session. If this parameter is set to MAINTENANCE, this BFD session is used only for continuity check (CC). If this parameter is set to RELIABILITY, the BFD session is used to trigger route interlock. Route interlock enables the standby route to take over once the active route becomes faulty, and therefore prevents service interruption caused by route failures.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-DSCP.html">DSCP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Differentiated Services Code Point (DSCP). The priority has a positive correlation with the value of this parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-VER.html">Protocol Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the protocol version of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-BFDAuthSwitch.html">BFD Authentication Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether a BFD session supports BFD authentication. You are advised to enable the BFD Authentication Switch.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-BFDAuthType.html">BFD Authentication Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the algorithm used during BFD authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFDSESSION-KeyChainID.html">BFD Authentication Key Chain ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a configured BFD key chain.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="BFDSESSION__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="BFDSESSION__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-ClearFlag.html">Clear Statistic</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether to delete the historical statistics. If this parameter is set to YES, the historical statistics are deleted and a new round of statistics collecting starts upon completion of the query.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-FSMState.html">Session State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the state of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-ActualMode.html">Active Detecting Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the effective detection mode through negotiation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-ActualMinTxInterval.html">Active Minimum Tx Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the effective minimum TX interval through negotiation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-ActualMinRxInterval.html">Active Minimum Rx Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the effective minimum RX interval through negotiation.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-ActualDetectTime.html">Active Detection Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the detection time when the negotiation takes effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-MyDiscreaminator.html">My Discriminator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the local discriminator of a BFD session. The value of this parameter is equal to the session number plus 1.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-YourDiscreaminator.html">Your Discriminator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the peer discriminator of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-TxPDUCount.html">Number of TX PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted packets of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-DPDUASU.html">Drop Packets of Authentication Switch Unmacth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded due to unidirectional BFD authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-DPDUATU.html">Drop Packets of Authentication Type Unmacth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded due to authentication type inconsistency during BFD authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-DPDUALU.html">Drop Packets of Authentication Length Unmacth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded due to key length inconsistency during BFD authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-DPDUAIDU.html">Drop Packets of Authentication Key ID Unmacth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded because the key indexes do not match between the two ends during BFD authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-DPDUAPSU.html">Drop Packets of Authentication Packets Sequence Unmacth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded because the sequence number is invalid in BFD authentication packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-DPDUAAHF.html">Drop Packets of Authentication Abstract or Hash Fail</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded because the BFD authentication digest check or Hash algorithm execution fails.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-RxPDUCount.html">Number of RX PDUs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received packets of a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-UptoDownCount.html">Total Number of Up to Down Sessions</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of times of up-to-down detected by a BFD session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFDSESSION-Diagnostic.html">Session Diagnosis</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the diagnostic field of a BFD session, that is, the cause of the latest failure.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

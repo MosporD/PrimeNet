@@ -1,0 +1,494 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Ping (PING)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="ping">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Ping (PING)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="ping"></a><a name="ping"></a>
+
+
+<h1 class="topictitle1">Ping (PING)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="ping__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to verify a connection or to check the quality of a connection.</p>
+</div></div>
+
+<div class="mmlnote"><a name="ping__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>The <a href="ping.html">PING</a>, <a href="ping6.html">PING6</a>, <a href="tracert.html">TRACERT</a>, <a href="tracert6.html">TRACERT6</a>, <a href="cfmtrace.html">CFMTRACE</a>, <a href="cfmping.html">CFMPING</a>, and <a href="udpecho.html">UDPECHO</a> commands cannot be executed simultaneously on one board.</p>
+</li><li><p>If CONTPING is set to ENABLE, press Ctrl+Q or run the <a href="stp_pathchk.html">STP PATHCHK</a> command to terminate the <a href="ping.html">PING</a> command.</p>
+</li><li><p>When the Appoint Interface parameter is set to YES(Yes), the Port Type parameter can be set to TUNNEL(Tunnel) only for the WMPT, UMDU and UMPT boards.</p>
+</li><li><p>In the same routing domain, if the Destination IP parameter is set to the local IP address when the <a href="ping.html">PING</a> command is executed, the source IP route meeting the following condition cannot be configured: The source IP address of this source IP route is the same as the Source IP or Destination IP parameter in the <a href="ping.html">PING</a> command.</p>
+</li><li><p>When the <a href="ping.html">PING</a> command is executed to the specified egress port, the specified egress port must be configured on the same board as the source IP address.</p>
+</li><li><p>If Next Hop IP is set to 255.255.255.255 in a <a href="ping.html">PING</a> command, the next-hop IP address is not specified during execution of the <a href="ping.html">PING</a> command.</p>
+</li><li><p>When the <a href="ping.html">PING</a> command is executed, the egress port displayed on the GUI of the first packet prevails.</p>
+</li><li><p>If the source IP address in the <a href="ping.html">PING</a> command and the egress port for transmitting a <a href="ping.html">PING</a> packets are not deployed on the same board, the <a href="ping.html">PING</a> packets is forwarded to the board providing the egress port through the backplane, and therefore the information about the port for transmitting the <a href="ping.html">PING</a> packets is not displayed.</p>
+</li><li><p>If the source IP address and destination IP address are configured on the same board in the <a href="ping.html">PING</a> command, <a href="ping.html">PING</a> packets are processed according to the board internal communication mechanism, and therefore information about the egress port for transmitting <a href="ping.html">PING</a> packets is not displayed.</p>
+</li><li><p>If the egress port is specified in the <a href="ping.html">PING</a> command, the specified egress port information is consistent with the displayed information about the external port for <a href="ping.html">PING</a> packets.</p>
+</li><li><p>The ping packet length for a successful ping depends on the maximum transmit unit size, fragment reassembly capability, maximum receive unit size, and difference in ICMP outer protocol encapsulation. The ping packet length for a successful ping varies with hardware and scenario.</p>
+</li><li><p>When the Ethernet CI port is used as the transmission port (that is, the port directly connecting the base station to an external device), packets are fragmented based on the maximum transmission unit of the Ethernet CI port. In other cases, packets are fragmented based on the maximum transmission unit of the transmission port, and you are advised not to enable the DFSwitch when running the <a href="ping.html">PING</a> command. Otherwise, the <a href="ping.html">PING</a> command may time out when the packet length exceeds the maximum transmission unit of the Ethernet CI port or tunnel.</p>
+</li><li><p>[NodeB,eNodeB,gNodeB]If the route corresponding to the destination IP address is a tunnel route, the source IP address must be specified.</p>
+</li><li><p>[NodeB,eNodeB,gNodeB]If the local IP address of a remote maintenance channel is the same as a device IP address and is used as the source IP address for a <a href="ping.html">PING</a> operation, the slot number for the <a href="ping.html">PING</a> operation must be the same as that of the board where the device IP address is configured.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If a base station uses the sub-interface networking, the enhanced <a href="ping.html">PING</a> connectivity check is not supported.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="ping__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet housing the board whose source IP address is used for the ping operation.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack housing the board whose source IP address is used in the ping operation.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding the board whose source IP address is used in the ping operation.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-LocalIP.html">SRCIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local IP address. The IP address is already configured and the LOCAL IP is not supported.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-PeerIP.html">DSTIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peer IP address. It must be a valid IP address of class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-PacketSize.html">PKTSIZE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Packet Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the size of the ping packet, neither IP header nor ICMP header is included.</p>
+<p>GUI Value Range: 20~8972</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 20~8972</p>
+<p>MML Default Value: 32</p>
+<p>Recommended Value: 32</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-CoutinuePing.html">CONTPING</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Continuing Ping</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to run the ping operation continuously.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-Timeout.html">TIMEOUT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timeout</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the timeout duration.</p>
+<p>GUI Value Range: 1~5000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1~5000</p>
+<p>MML Default Value: 3000</p>
+<p>Recommended Value: 3000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-PingNum.html">NUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Packet Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of transmitted ping packets.</p>
+<p>GUI Value Range: 1~1024</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~1024</p>
+<p>MML Default Value: 4</p>
+<p>Recommended Value: 4</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-PriRule.html">PRIRULE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority Rule</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of the ping packet.</p>
+<p>GUI Value Range: DSCP(DSCP)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DSCP</p>
+<p>MML Default Value: DSCP(DSCP)</p>
+<p>Recommended Value: DSCP(DSCP)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-DSCP.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the differentiated service priority.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-PacketInterval.html">PKTINT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Packet Interval</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval for sending a ping packet.</p>
+<p>GUI Value Range: 1000~10000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1000~10000</p>
+<p>MML Default Value: 1000</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-AppointInterface.html">APPTIF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Appoint Interface</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates to specify the egress port for a ping packet.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-NextHopIP.html">NEXTHOP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Next Hop IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the next-hop IP address of the outgoing port of ping packets.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>APPTIF</strong> is set to NO.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of subboard on which the egress port for transmitting a ping packet is located.</p>
+<p>GUI Value Range: E1_COVERBOARD(E1 Cover Board), BASE_BOARD(Base Board), BACK_BOARD(Back Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E1_COVERBOARD, BASE_BOARD, BACK_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SN</strong> is set to a value within the range of 0 to 5 and <strong>APPTIF</strong> is set to YES, this parameter can be set to E1_COVERBOARD.</li><li>If <strong>SN</strong> is set to 6 or 7 and <strong>APPTIF</strong> is set to YES, this parameter can be set to BASE_BOARD, BACK_BOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of egress port for transmitting a ping packet.</p>
+<p>GUI Value Range: PPP(PPP Link), MPGRP(Multi-link PPP Group), TUNNEL(Tunnel)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PPP, MPGRP, TUNNEL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>APPTIF</strong> and <strong>SBT</strong> are set to YES and BASE_BOARD respectively, this parameter can be set to PPP, MPGRP.</li><li>If <strong>APPTIF</strong> and <strong>SBT</strong> are set to YES and BACK_BOARD respectively, this parameter must be set to PPP or TUNNEL.</li><li>If <strong>APPTIF</strong> and <strong>SBT</strong> are set to YES and E1_COVERBOARD respectively, this parameter can be set to PPP or MPGRP.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the egress port for transmitting a ping packet.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SBT</strong> is set to BACK_BOARD and <strong>PT</strong> is set to PPP, this parameter can be set to a value within the range of 0 to 15.</li><li>If <strong>SBT</strong> is set to BACK_BOARD and <strong>PT</strong> is set to TUNNEL, this parameter can be set to a value within the range of 0 to 14.</li><li>If <strong>SBT</strong> is set to BASE_BOARD or E1_COVERBOARD and <strong>PT</strong> is set to PPP, this parameter can be set to a value within the range of 0 to 15.</li><li>If <strong>PT</strong> is set to MPGRP, this parameter can be set to a value within the range of 0 to 3.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PING-DFSwitch.html">DF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DFSwitch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a packet is segmented when its size exceeds the maximum transmission unit (MTU). When this switch is turned on, the ping packet sent by the base station cannot be fragmented for transmission. If the total length of the ping packet exceeds the maximum transmission unit allowed by the base station, this ping packet fails to be transmitted.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(Off)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="ping__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To perform PING detection with the parameters as follows: Cabinet No.: 0, Subrack No.: 0, Slot No.: 7, Source IP: 192.168.2.2, Destination IP: 192.168.2.3, Continuing Ping: DISABLE, Appoint Interface: NO:
+PING: SN=7, SRCIP="192.168.2.2", DSTIP="192.168.2.3", CONTPING=DISABLE, APPTIF=NO;
+The PING result is as follows:
+  PING 192.168.2.3: 32  data bytes
+
+
+    Reply from 192.168.2.3: bytes=32 Sequence=1 ttl=255 time=1 ms
+
+
+    Reply from 192.168.2.3: bytes=32 Sequence=2 ttl=255 time=1 ms
+
+
+    Reply from 192.168.2.3: bytes=32 Sequence=3 ttl=255 time=1 ms
+
+
+    Reply from 192.168.2.3: bytes=32 Sequence=4 ttl=255 time=1 ms
+
+
+  --- 192.168.2.3 ping statistics ---
+
+
+    4 packet(s) transmitted
+
+
+    4 packet(s) received
+
+
+   Percent 0.00 packet lost 
+
+
+    round-trip min/avg/max = 1/1/1 ms
+
+
+
+
+
+Packet(s) transmitted from port type = ETHPORT, port number = 0.
+
+
++++    0        2016-02-19 00:30:09
+O&amp;M    #726
+%%PING: SN=7, SRCIP="192.168.2.2", DSTIP="192.168.2.3", CONTPING=DISABLE, APPTIF=NO;%%
+RETCODE = 0  Operation succeeded 
+
+
+
+
+14 reports in total
+---    END
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

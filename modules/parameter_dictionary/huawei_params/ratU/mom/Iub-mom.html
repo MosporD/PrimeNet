@@ -1,0 +1,137 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="Iub MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of the Iub MOM and provides the managed object model (MOM) view and MOs related to the Iub interface.">
+<meta name="description" content="This section describes the functions and concepts of the Iub MOM and provides the managed object model (MOM) view and MOs related to the Iub interface.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../ratU/mom/NodeBFunction-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="Iub-mom">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Iub MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="Iub-mom"></a><a name="Iub-mom"></a>
+
+
+<h1 class="topictitle1">Iub MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of the
+Iub MOM and provides the managed object model (MOM) view and MOs related
+to the Iub interface. </p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p>The UMTS Iub interface
+works between a NodeB and an RNC. The interface complies with the
+protocol stacks shown in <a href="#Iub-mom__fig-1">Figure 1</a>. By data to be
+transmitted, the Iub interface can be divided into the control plane
+and user plane.</p>
+<div class="p"><div class="fignone" id="Iub-mom__fig-1"><a name="Iub-mom__fig-1"></a><a name="fig-1"></a><span class="figcap"><b>Figure 1 </b>Iub protocol stack</span>
+
+<br><span><img src="../image/mom/Iub1.png"></span></div>
+</div>
+<p>The network
+transport layer can use ATM or IP. In ATM transport mode, the physical
+layer uses E1/T1 and STM-1/OC-3 protocols. In IP transport mode, the
+physical layer uses FE/GE and E1/T1 protocols.</p>
+<ul><li>The control-plane data over the Iub interface is carried over
+SAAL in ATM transport mode and over SCTP in IP transport mode. The
+radio network layer uses NBAP. </li><li>The user-plane data over the Iub interface is carried over AAL2
+in ATM transport mode and over UDP in IP transport mode. The radio
+network layer uses FP. </li></ul>
+<p><a href="#Iub-mom__fig-2">Figure 2</a> shows the relationship between
+MOs over the Iub interface.</p>
+<div class="p"><div class="fignone" id="Iub-mom__fig-2"><a name="Iub-mom__fig-2"></a><a name="fig-2"></a><span class="figcap"><b>Figure 2 </b>Relationship between MOs over the Iub interface</span>
+
+<br><span><img src="../image/mom/Iub2.png"></span></div>
+</div>
+<p>The Iub data
+can be configured in Link or End-Point mode. In Link mode, both local
+and peer parameters, such as source and destination IP addresses,
+are manually configured. In End-Point mode, local parameters can only
+be manually configured and peer parameters can be automatically obtained
+by the NodeBFunction from signaling or manually configured. </p>
+<ul><li>The control-plane data over the Iub interface can be configured
+only in Link mode. The related MOs are SCTPLNK, IUBCP, and CPBEARER. </li><li>The user-plane data over the Iub interface can be configured in
+either Link or End-Point mode. In Link mode, the related MOs are IPPATH
+and (optional) NODEBPATH. In End-Point mode, the related MOs are IUB,
+EPGROUP, USERPLANEHOST, and USERPLANEPEER.</li></ul>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody"><div class="p"><ul><li>The user-plane data over the Iub interface can be configured in
+only one mode (Link mode or End-Point mode) at a time. The Link mode
+is recommended. </li><li>When the user-plane data over the Iub interface is configured
+in Link mode, the NODEBPATH MO is optional. For a co-MPT GSM/UMTS
+base station, if the GSM and UMTS modes use the same peer IP address
+and differentiated services code point (DSCP) but different local
+IP addresses under the IPPATH MO, the NODEBPATH MO must be configured. </li><li>When the user-plane data over the Iub interface is configured
+in End-Point mode, it is recommended that local parameters be manually
+configured and peer parameters be automatically obtained by the NodeBFunction
+from signaling. </li></ul>
+</div>
+</div></div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">MOM</h4><p><strong>Iub Control-Plane MOM</strong></p>
+<p><a href="#Iub-mom__fig-3">Figure 3</a> is a subset of the NodeB MOM and provides MOs
+related to the Iub control plane.</p>
+<div class="p"><div class="fignone" id="Iub-mom__fig-3"><a name="Iub-mom__fig-3"></a><a name="fig-3"></a><span class="figcap"><b>Figure 3 </b>MOM view for Iub control plane</span>
+
+<br><span><img src="../image/mom/Iub3.png"></span></div>
+</div>
+<ul><li><a href="../mo/ULoCell.html">IUBCP</a> defines the control
+port that carries the control-plane data over the Iub interface for
+a NodeBFunction. One IUBCP corresponds to one CPBEARER MO.</li><li><a href="../../comm/mo/CPBEARER.html">CPBEARER</a> is the
+encapsulation and abstraction of the control port bearer and is used
+to shield lower-layer protocol information from the upper-layers and
+to provide transmission bearer for the control plane at the application
+layer. One CPBEARER MO corresponds to one SCTPLNK MO. </li><li><a href="../../comm/mo/SCTPLNK.html">SCTPLNK</a> defines
+an SCTP link over the Iub interface and is used to configure SCTP-related
+parameters. </li></ul>
+<p><strong>Iub User-plane MOM</strong></p>
+<p><a href="#Iub-mom__fig-4">Figure 4</a> and <a href="#Iub-mom__fig-5">Figure 5</a> are subnets of the NodeB MOM and
+provides MOs related to the Iub user plane.</p>
+<div class="p"><div class="fignone" id="Iub-mom__fig-4"><a name="Iub-mom__fig-4"></a><a name="fig-4"></a><span class="figcap"><b>Figure 4 </b>MOM view for Iub user plane (in Link mode)</span>
+
+<br><span><img src="../image/mom/Iub4.png"></span></div>
+</div>
+<ul><li><a href="../mo/NodeBPath.html">NODEBPATH</a>, which is optional,
+defines the IPPATH MO that can be bound to the GBTSFunction. One NODEBPATH
+MO corresponds to one IPPATH MO.</li><li><a href="../../comm/mo/IPPATH.html">IPPATH</a> defines a
+path for transmitting user-plane data over the Iub interface. </li></ul>
+<div class="p"><div class="fignone" id="Iub-mom__fig-5"><a name="Iub-mom__fig-5"></a><a name="fig-5"></a><span class="figcap"><b>Figure 5 </b>MOM view for Iub user plane (in End-Point mode)</span>
+
+<br><span><img src="../image/mom/Iub5.png"></span></div>
+</div>
+<ul><li><a href="../mo/IUB.html">IUB</a> defines a set of transmission
+resources bound to the Iub interface of a NodeBFunction. One IUB MO
+corresponds to one EPGROUP MO. </li><li><a href="../../comm/mo/EPGROUP.html">EPGROUP</a> defines
+a set of transmission end point resources, including a set of control-plane
+end points, user-plane end points, or a combined set of both. The
+NodeBFunction can only use the set of user-plane end points. One EPGROUP
+MO can be configured with a maximum of 12 USERPLANEHOST MOs. </li><li><a href="../../comm/mo/USERPLANEHOST.html">USERPLANEHOST</a> defines local transmission parameters for the user-plane data. </li><li><a href="../../comm/mo/USERPLANEPEER.html">USERPLANEPEER</a> defines peer transmission parameters for the user-plane data. </li></ul>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../ratU/mom/NodeBFunction-mom.html" title="This section describes the functions and concepts of NodeBFunction and also provides the managed object model (MOM) view and MOs related to NodeBFunction.">NodeBFunction MOM Description</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

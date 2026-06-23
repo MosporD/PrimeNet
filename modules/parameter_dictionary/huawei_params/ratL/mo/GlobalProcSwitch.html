@@ -1,0 +1,819 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="GlobalProcSwitch">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="GlobalProcSwitch">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>GlobalProcSwitch</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="GlobalProcSwitch"></a><a name="GlobalProcSwitch"></a>
+
+
+<h1 class="topictitle1">GlobalProcSwitch</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="GlobalProcSwitch.html"><strong>GlobalProcSwitch</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The GlobalProcSwitch MO consists of the switch of automatic X2 setup, the method of automatic X2 setup, the scheduling request indication (SRI) adaptation switch, and the logical channel group profile.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="eNodeBFunction.html">eNodeBFunction</a></li><li>Relation with the <strong>Cell</strong> and <strong>MPT</strong> MOs:<ul><li>In <strong>MPT</strong> MO, if the num of UMPT is 1, and the number of LMPT is 1, and <strong>PreferSigExtend</strong> in a <strong>GlobalProcSwitch</strong> MO is set to ON, a maximum of 36 <strong>Cell</strong> MOs can be configured.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellEmtcAlgo</strong> MOs:<ul><li>Under the same eNodeB, when the <strong>NbCellFlag</strong> parameter in any <strong>Cell</strong> MO is set to FALSE and the EMTC_SWITCH option of the <strong>EmtcAlgoSwitch</strong> parameter in a <strong>CellEmtcAlgo</strong> MO is selected, the <strong>QciParaEffectFlag</strong> parameter in the <strong>GlobalProcSwitch</strong> MO must be set to ON.</li></ul>
+</li><li>Relation with the <strong>ANR</strong> MO:<ul><li>The SPEC_CELL_FLAG_QUERY_SW option of the <strong>SpecServiceCellQuerySw</strong> parameter in an <strong>ANR</strong> MO must be deselected when the ADD_NCELL_CFG_SW option of the <strong>X2BasedUptNcellCfgSwitch</strong> parameter in the <strong>GlobalProcSwitch</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, <strong>PreambleFmt</strong> is smaller than 4 and <strong>HighSpeedFlag</strong> is set to ULTRA_HIGH_SPEED and <strong>HighSpeedR14Switch</strong> is selected, the following requirements must be met during the setting of <strong>CellRadius</strong> and <strong>HsCellRootSequenceIndex</strong>:</li><li>1 m &lt;= <strong>CellRadius</strong> &lt;= 1199 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 24~351,356~381,386~405,408~419,422~435,438~461,466~493,498~503,506~509,512~513,516~519,522~529,532~545,548~819;</li><li>1199 m &lt; <strong>CellRadius</strong> &lt;= 1649 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 30~329,332~351,356~381,386~405,408~419,422~435,438~459,466~473,476~493,498~503,506~509,512~513,516~519,522~529,532~545,548~549,552~815;</li><li>1649 m &lt; <strong>CellRadius</strong> &lt;= 2098 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 36~329,334~349,356~381,386~393,396~405,408~419,422~435,438~445,448~459,466~473,476~493,498~503,506~509,512~513,516~519,522~529,532~545,548~549,552~809;</li><li>2098 m &lt; <strong>CellRadius</strong> &lt;= 2698 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 42~329,334~349,356~381,386~391,396~405,408~419,422~435,438~445,448~449,452~459,466~473,476~493,498~503,506~509,512~513,516~519,522~525,528~529,532~537,540~545,548~549,552~803;</li><li>2698 m &lt; <strong>CellRadius</strong> &lt;= 3598 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 52~329,334~349,356~363,368~369, 372~381,386~391,396~401,404~405,408~411,414~419,422~435,438~445,448~449,452~453,456~459,466~471,476~479,482~493,498~503,506~509,512~513,516~519,522~525,528~529,532~537,540~545,548~549,552~795;</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, <strong>PreambleFmt</strong> is smaller than 4 and <strong>HighSpeedFlag</strong> is set to ULTRA_HIGH_SPEED and <strong>HighSpeedR14Switch</strong> is selected, the following requirements must be met during the setting of <strong>CellRadius</strong> and <strong>HsCellRootSequenceIndex</strong>:</li><li>3598 m &lt; <strong>CellRadius</strong> &lt;= 4497 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 64~273,276~329,334~335,338~349,356~363,368~369,372~381,386~391,396~401,408~411,414~419,424~435,438~445,456~459,466~471,476~479,482~493,498~503,506~509,512~513,516~519,522~525,528~529,532~537,540~545,548~549,552~555,558~789;</li><li>4497 m &lt; <strong>CellRadius</strong> &lt;= 5547 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 76~273,276~279,282~307,310~327,334~335,338~343,346~349,356~363,368~369,372~381,396~399,408~411,414~419,426~435,438~445,456~459,466~471,476~479,482~493,498~503,506~509,512~513,516~519,522~525,528~529,532~537,540~545,548~549,552~555,558~777;</li><li>5547 m &lt; <strong>CellRadius</strong> &lt;= 6896 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 90~273,276~279,282~307,310~327,334~335,338~343,346~349,356~363,368~369,372~381,396~399,408~411,414~419,426~431,434~435,438~445,456~457,466~469,476~477,482~489,492~493,500~503,506~509,512~513,516~519,522~525,532~533,536~537,540~545,548~549,552~555,558~573,576~595,598~765;</li><li>6896 m &lt; <strong>CellRadius</strong> &lt;= 8695 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 116~273,276~279,282~307,310~327,338~343,348~349,356~363,368~369,372~375,378~381,396~397,408~411,414~415,418~419,428~431,438~445,466~467,476~477,482~485,488~489,492~493,502~503,506~509,512~513,516~519,522~525,532~533,536~537,540~545,548~549,552~553,558~565,568~573,576~595,598~601,604~611,614~621,624~751;</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, <strong>PreambleFmt</strong> is smaller than 4 and <strong>HighSpeedFlag</strong> is set to ULTRA_HIGH_SPEED and <strong>HighSpeedR14Switch</strong> is selected, the following requirements must be met during the setting of <strong>CellRadius</strong> and <strong>HsCellRootSequenceIndex</strong>:</li><li>8695 m &lt; <strong>CellRadius</strong> &lt;= 10794 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 136~273,276~279,282~307,310~313,316~327,338~343,348~349,356~357,360~361,374~375,378~379,396~397,408~409,428~431,438~445,466~467,476~477,484~485,492~493,502~503,506~509,512~513,516~519,522~525,532~533,536~537,542~545,552~553,558~559,562~565,568~573,576~583,586~595,598~601,604~611,614~617,620~621,624~729;</li><li>10794 m &lt; <strong>CellRadius</strong> &lt;= 13343 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 168~273,276~277,282~303,306~307,310~313,316~317,320~327,340~343,360~361,374~375,396~397,408~409,438~441,466~467,484~485,502~503,506~509,512~513,518~519,536~537,544~545,552~553,562~565,568~573,576~583,586~591,594~595,598~601,604~611,614~617,620~621,624~627,630~707;</li><li>13343 m &lt; <strong>CellRadius</strong> &lt;= 15892 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 168~169,174~177,180~181,186~187,192~193,196~197,202~273,276~277,282~291,296~303,306~307,310~313,316~317,320~327,466~467,562~565,568~573,576~581,586~591,594~595,600~601,604~611,614~617,620~621,624~627,630~659,662~663,676~683,686~687,700~701;</li><li>15892 m &lt; <strong>CellRadius</strong> &lt;= 18590 m: the value range of <strong>HsCellRootSequenceIndex</strong> is 204~205,208~221,226~229,232~239,242~245,250~255,258~259,262~265,268~269,272~273,276~277,282~287,290~291,298~301,306~307,310~313,316~317,320~321,324~327,564~565,568~569,572~573,578~581,586~591,604~611,614~617,620~621,626~627,630~639,642~643,646~649,652~653,656~659;</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>In a <strong>Cell</strong> MO, if <strong>HighSpeedFlag</strong> is set to ULTRA_HIGH_SPEED and <strong>HighSpeedR14Switch</strong> is selected, <strong>MaksIdxSwitch</strong> must be deselected.</li><li>In a <strong>Cell</strong> MO, if <strong>HighSpeedFlag</strong> is set to ULTRA_HIGH_SPEED and <strong>HighSpeedR14Switch</strong> is selected, <strong>RachAdjSwitch</strong> must be deselected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>In a <strong>Cell</strong> MO, if <strong>HighSpeedFlag</strong> is set to ULTRA_HIGH_SPEED and <strong>HighSpeedR14Switch</strong> is selected, <strong>PrachTimeStagSwitch</strong> must be deselected.</li></ul>
+</li><li>Relation with the <strong>RACHCfg</strong> and <strong>Cell</strong> MOs:<ul><li>If <strong>FddTddInd</strong> and <strong>HighSpeedFlag</strong> in a <strong>Cell</strong> MO are set to CELL_TDD and ULTRA_HIGH_SPEED, respectively, the HighSpeedR14Switch option of <strong>ProtocolCompatibilitySw</strong> in the <strong>GlobalProcSwitch</strong> MO is selected, and <strong>PrachConfigIndexCfgInd</strong> in the <strong>RACHCfg</strong> MO under this <strong>Cell</strong> MO is set to CFG, then <strong>PrachConfigIndex</strong> in the <strong>RACHCfg</strong> MO must be set as follows depending on the setting of <strong>PreambleFmt</strong> in the <strong>Cell</strong> MO: If <strong>PreambleFmt</strong> is set to 0, <strong>PrachConfigIndex</strong> must be set to 3; if <strong>PreambleFmt</strong> is set to 1, <strong>PrachConfigIndex</strong> must be set to 23; if <strong>PreambleFmt</strong> is set to 2, <strong>PrachConfigIndex</strong> must be set to 30; if <strong>PreambleFmt</strong> is set to 3, <strong>PrachConfigIndex</strong> must be set to 40.</li><li>If <strong>FddTddInd</strong> and <strong>HighSpeedFlag</strong> in a <strong>Cell</strong> MO are set to CELL_FDD and ULTRA_HIGH_SPEED, respectively, the HighSpeedR14Switch option of <strong>ProtocolCompatibilitySw</strong> in the <strong>GlobalProcSwitch</strong> MO is selected, and <strong>PrachConfigIndexCfgInd</strong> in the <strong>RACHCfg</strong> MO under this <strong>Cell</strong> MO is set to CFG, then <strong>PrachConfigIndex</strong> in the <strong>RACHCfg</strong> MO must be set as follows depending on the setting of <strong>PreambleFmt</strong> in the <strong>Cell</strong> MO: If <strong>PreambleFmt</strong> is set to 0, <strong>PrachConfigIndex</strong> must be set to 3; if <strong>PreambleFmt</strong> is set to 1, <strong>PrachConfigIndex</strong> must be set to 19; if <strong>PreambleFmt</strong> is set to 2, <strong>PrachConfigIndex</strong> must be set to 32; if <strong>PreambleFmt</strong> is set to 3, <strong>PrachConfigIndex</strong> must be set to 48.</li></ul>
+</li><li>Relation with the <strong>CaGroupSCellCfg</strong> and <strong>MPT</strong> MOs:<ul><li>If <strong>TYPE</strong> in all <strong>MPT</strong> MOs is set to LMPT, the number of <strong>CaGroupSCellCfg</strong> MOs cannot exceed 144. If there is only one <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT and only one <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT and <strong>PreferSigExtend</strong> in the <strong>GlobalProcSwitch</strong> MO is set to ON, the number of <strong>CaGroupSCellCfg</strong> MOs cannot exceed 144.</li></ul>
+</li><li>Relation with the <strong>CellQciPara</strong> and <strong>MlbQciGroup</strong> MOs:<ul><li>When the <strong>QciParaEffectFlag</strong> parameter in the <strong>GlobalProcSwitch</strong> MO is set to ON and the <strong>MlbQciGroupId</strong> parameter in the <strong>CellQciPara</strong> MO is not set to the invalid value 255, the <strong>MlbQciGroup</strong> MO referenced by the <strong>MlbQciGroupId</strong> parameter in the <strong>CellQciPara</strong> MO must be configured.</li></ul>
+</li><li>Relation with the <strong>DNSSRV</strong> MO:<ul><li>If at least one option of <strong>S1MMESonSwitch</strong> in the <strong>GlobalProcSwitch</strong> MO is selected, at least one <strong>DNSSRV</strong> MO must be configured.</li></ul>
+</li><li>Relation with the <strong>ENodeBSharingMode</strong>, <strong>S1</strong>, and <strong>EPGROUP</strong> MOs:<ul><li>If the S1_SWITCH of the para <strong>SinglePlmnHostSplitSwitch</strong> in the <strong>GlobalProcSwitch</strong> MO is set to OFF, in hybrid RAN sharing, the <strong>S1</strong> MOs of the same carrier-sharing operator group cannot reference the <strong>SCTPHOST</strong> MOs in which the value of <strong>SCTPHOSTID</strong> is different.</li><li>If the S1_SWITCH of the para <strong>SinglePlmnHostSplitSwitch</strong> in the <strong>GlobalProcSwitch</strong> MO is set to OFF, in hybrid RAN sharing, the <strong>S1</strong> MOs of tone carrier-sharing operator group cannot reference the <strong>USERPLANEHOST</strong> MOs in which the value of <strong>UPHOSTID</strong> is different.</li></ul>
+</li><li>Relation with the <strong>ENodeBSharingMode</strong>, <strong>S1</strong>, and <strong>SCTPHOST</strong> MOs:<ul><li>If the S1_SWITCH of the para <strong>SinglePlmnHostSplitSwitch</strong> in the <strong>GlobalProcSwitch</strong> MO is set to OFF, and the eNodeB works in independent mode, RAN sharing with common carriers mode, RAN sharing with dedicated carriers mode, or RAN sharing with special dedicated carriers mode, the value of the <strong>SCTPHOSTID</strong> parameter in the <strong>SCTPHOST</strong> MOs referenced by the <strong>S1</strong> MOs with the same <strong>CnOperatorId</strong> parameter value must be the same.</li></ul>
+</li><li>Relation with the <strong>S1</strong>, <strong>USERPLANEHOST</strong>, and <strong>EPGROUP</strong> MOs:<ul><li>If the S1_SWITCH of the para <strong>SinglePlmnHostSplitSwitch</strong> in the <strong>GlobalProcSwitch</strong> MO is set to OFF, and the eNodeB works in independent mode, RAN sharing with common carriers mode, RAN sharing with dedicated carriers mode, or RAN sharing with special dedicated carriers mode, the value of the <strong>UPHOSTID</strong> parameter in the <strong>USERPLANEHOST</strong> MOs referenced by the <strong>S1</strong> MOs with the same <strong>CnOperatorId</strong> parameter value must be the same.</li><li>If the S1_SWITCH option of the <strong>SinglePlmnHostSplitSwitch</strong> parameter in the <strong>GlobalProcSwitch</strong> MO is selected and the <strong>EPGROUP</strong> MOs associated with the <strong>UpEpGroupId</strong> parameter in the <strong>S1</strong> MOs of the same operator have at least one same <strong>UPHOSTID</strong> parameter value, the <strong>UpEpGroupId</strong> parameter must be set to the same value in the corresponding <strong>S1</strong> MOs.</li></ul>
+</li><li>Relation with the <strong>eX2</strong> MO:<ul><li>If <strong>ItfTypeForNonIdealModeServ</strong> in the <strong>GlobalProcSwitch</strong> MO is set to X2, no <strong>eX2</strong> MOs with <strong>BackhaulType</strong> set to NON_IDEAL can be configured.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>If <strong>EPCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to S1SIMPLE_MODE, options of <strong>S1MMESonSwitch</strong> in the <strong>GlobalProcSwitch</strong> MO cannot be selected.</li><li>If <strong>EPCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to X2SIMPLE_MODE, <strong>X2SonSetupSwitch</strong> in the <strong>GlobalProcSwitch</strong> MO must be set to ON(On).</li></ul>
+</li><li>Relation with the <strong>S1</strong> MO:<ul><li>If the S1_SWITCH checkbox under the <strong>SinglePlmnHostSplitSwitch</strong> parameter in the <strong>GlobalProcSwitch</strong> MO is ON, <strong>EpGroupCfgFlag</strong> in the <strong>S1</strong> MO must be set to CP_UP_CFG.</li></ul>
+</li><li>Relation with the <strong>S1Interface</strong> MO:<ul><li>If the S1_SWITCH checkbox under the <strong>SinglePlmnHostSplitSwitch</strong> parameter in the <strong>GlobalProcSwitch</strong> MO is ON, <strong>CtrlMode</strong> in the <strong>S1Interface</strong> MO can not be set to MANUAL_MODE.</li></ul>
+</li><li>Relation with the <strong>ENodeBAlgoSwitch</strong> MO:<ul><li>If the UeBandCombReducedR13Sw option of the <strong>CaAlgoExtSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is selected, the SupportNetReqCaComboSwitch option of the <strong>ProtocolSupportSwitch</strong> parameter in the <strong>GlobalProcSwitch</strong> MO must be selected.</li></ul>
+</li><li>Relation with the <strong>ENodeBSharingMode</strong> MO:<ul><li>Only if the para <strong>ENodeBSharingMode</strong> in the <strong>ENodeBSharingMode</strong> MO is set to SEPARATED_FREQ, the X2_SON_INTER_OP_SETUP_FBD_SW of the para <strong>InterfaceSetupPolicySw</strong> in the <strong>GlobalProcSwitch</strong> can be set ON.</li></ul>
+</li><li>Relation with the <strong>CellUlschAlgo</strong> MO:<ul><li>If the PttVoiceOptSw option of the<strong>UlEnhencedVoipSchSw</strong> parameter in the <strong>CellUlschAlgo</strong> MO is set to ON, the <strong>LcgProfile</strong> parameter in the <strong>GlobalProcSwitch</strong> MO must be set to LCG_PROFILE_3.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#GlobalProcSwitch__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="GlobalProcSwitch__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="GlobalProcSwitch__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_crsportoptdet.html">DSP CRSPORTOPTDET</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the result of CRS antenna port mapping optimization detection of the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_globalprocswitch.html">LST GLOBALPROCSWITCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the settings of parameters related to some global functions in the eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_globalprocswitch.html">MOD GLOBALPROCSWITCH</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the settings of parameters related to some global functions in the eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/stp_crsportoptdet.html">STP CRSPORTOPTDET</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to stop the CRS antenna port mapping optimization detection of the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_crsportoptdet.html">STR CRSPORTOPTDET</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start the CRS antenna port mapping optimization detection of the cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#GlobalProcSwitch__tab2">Table 2</a> and <a href="#GlobalProcSwitch__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="GlobalProcSwitch__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="GlobalProcSwitch__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonSetupSwitch.html">The Switch of X2 setup by SON</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable inter-eNodeB X2 self-setup. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonLinkSetupType.html">The method of X2 setup by SON</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the inter-eNodeB X2 self-setup method. The value X2_OVER_OSS can be set only for Huawei eNodeBs, and the value X2_OVER_S1 can be set for eNodeBs of any vendor. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-LcgProfile.html">LCG Profile</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the logical channel group configuration. Currently, four logical channel group profiles are available.</p>
+<p>If this parameter is set to LCG_PROFILE_0, the logical channel groups are assigned as follows: Logical channel group 0 is assigned to control-plane services (SRB 1, SRB 2, and QCI-5 and QCI-69 bearers) and QCI-65 services. Logical channel group 1 is assigned to VoLTE services (QCI-1 bearers) and QCI-66 services. Logical channel group 2 is assigned to other GBR services (QCI-2, QCI-3, QCI-4 and QCI-75 bearers). Logical channel group 3 is assigned to non-GBR services and QCI-79 services.</p>
+<p>If this parameter is set to LCG_PROFILE_1, the logical channel groups are assigned as follows: Logical channel group 0 is assigned to control-plane services, PTT voice services (QCI-65 and QCI-66 bearers), and VoLTE services (QCI-1 bearers). Logical channel group 1 is assigned to QCI-75 services and other GBR services (bearers of QCIs 2 to 4). Logical channel group 2 is assigned to high-priority non-GBR services and QCI-79 services. Logical channel group 3 is assigned to low-priority non-GBR services.</p>
+<p>If this parameter is set to LCG_PROFILE_2, the logical channel groups are assigned as follows: Logical channel group 0 is assigned to control-plane services and QCI-65 services. Logical channel group 1 is assigned to VoLTE services, QCI-66 services, QCI-75 services, and other GBR services (bearers of QCIs 2 to 4). Logical channel group 2 is assigned to high-priority non-GBR services and QCI-79 services. Logical channel group 3 is assigned to low-priority non-GBR services. Therefore, if this parameter is set to LCG_PROFILE_2, VoLTE services must be carried by QCI-1 bearers, PTT services must be carried by QCI-65 and QCI-66 bearers, and it is recommended that bearers of QCIs 2 to 4 be not used. TDD does not support LCG_PROFILE_2.</p>
+<p>If this parameter is set to LCG_PROFILE_3, the logical channel groups are assigned as follows: Logical channel group 0 is assigned to control-plane services (SRB 1, SRB 2, and QCI-5 and QCI-69 bearers). Logical channel group 1 is assigned to VoLTE services (QCI-1 bearers) and QCI-65 and QCI-66 services. Logical channel group 2 is assigned to other GBR services (QCI-2, QCI-3, QCI-4 and QCI-75 bearers). Logical channel group 3 is assigned to non-GBR services and QCI-79 services.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-RncPoolHoRimSwitch.html">RNC POOL HO RIM Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable or disable RAN information management (RIM) for handovers within an RNC pool. An RNC pool can be used for load balancing between RNCs. An RNC can take over a cell that was controlled by another RNC in the same pool. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UuMsgSimulSendSwitch.html">UU Message Simultaneous Sending Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB simultaneously sends Uu messages for security mode activation and reconfiguration. If this parameter is set to ON, the eNodeB simultaneously sends the Uu messages. If this parameter is set to OFF, the eNodeB sends the Uu messages one by one. If the eNodeB needs to query the UE capability information during initial access and the UeCapbEnquirySecurityEnhSwitch option of the ProtocolMsgOptSwitch parameter in the GlobalProcSwitch MO is selected, then the UuMsgSimulSendSwitch parameter does not take effect and the security mode activation, UE capability query, and reconfiguration are processed in sequence. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-TargetOpBasedX2Switch.html">X2 Auto Setup Switch Via Target Operator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the X2 interface self-setup function based on target operators. If this parameter is set to ON, the local eNodeB automatically sets up X2 interfaces with peer eNodeBs or gNodeBs of only target operators. If this parameter is set to OFF, the local eNodeB can automatically set up X2 interfaces with peer eNodeBs or gNodeBs of all operators that are not on the X2 blacklist. The X2 blacklist is configured by the X2BlackWhiteList MO. Target operators are specified by the X2AutoSetupOperator MO.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonTNLSelectMode.html">X2 Son TNL Select Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to select transport network layer (TNL) parameters based on the primary PLMN ID or selected PLMN ID contained in the SON configuration message. This parameter is used for X2 self-setup in RAN sharing scenarios. Selecting TNL parameters based on the primary PLMN ID applies only to X2 self-setup between eNodeBs provided by different vendors. For X2 self-setup between Huawei eNodeBs, selecting TNL parameters based on the selected PLMN ID is used in preference. This parameter applies only to the X2 interface between eNodeBs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UtranLoadTransChan.html">Choose UMTS Cell Load Info Trans Channel</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UMTS load transmission channel. The eNodeB sends RAN-INFORMATION-REQUEST PDUs to UTRAN cells to request multiple reports on the load status of UTRAN cells only when the parameter is set to BASED_ON_RIM. The function specified by the parameter value BASED_ON_ECO is temporarily unavailable. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-S1HoInDataFwdSwitch.html">S1 handover in data forwarding switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch used to control the data forwarding mechanism in S1-based incoming handovers.</p>
+<p>If the switch is turned off, uplink data forwarding and downlink data forwarding are separately determined. The target eNodeB can choose to send both the uplink and downlink destination addresses, not send the uplink and downlink destination addresses, or send only the uplink or downlink destination address to the source eNodeB.</p>
+<p>If the switch is turned on, uplink data forwarding and downlink data forwarding are determined together. The target eNodeB can choose to send both the uplink and downlink destination addresses, not send the uplink and downlink destination addresses, or send only the downlink destination address to the source eNodeB. The target eNodeB cannot send only the uplink destination address to the source eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InterRatLinkSetupSwitch.html">Inter RAT Link Setup Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the inter-RAT link setup switch. BTS_ENODEB_LINK_SETUP_SWITCH: Indicates whether to set up a link between a BTS and an eNodeB. This option applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonDeleteTimer.html">The Timer of X2 delete by SON</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates length of the time in which the X2 interface configuration is retained on the local and peer eNodeBs when cells served by the two eNodeBs do not have a neighbor relationship with each other. If the local eNodeB determines that no neighbor relationship is configured between cells served by the local and peer eNodeBs, the local eNodeB starts the timer defined by X2SonDeleteTimer. If no coordinated services are running over the X2 interface when the timer expires, the local eNodeB removes the X2 interface configuration. If this parameter is set to 0, the neighbor relationship-based X2 self-removal function is disabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-RimCodingPolicy.html">RIM Coding Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the eNodeB coding scheme for Global eNodeB ID IE and Reporting Cell ID IE in the RIM message. If the EPC devices that exchange RIM messages with eNodeBs are provided by Huawei and the peer devices adopt the private coding scheme, set this parameter to Private Coding. In other cases, set this parameter to Standard Coding. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-L2GUHoWithLCapSwitch.html">L2GU Handover Required With LTE Cap Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the handover request message for a handover from E-UTRAN to UTRAN or GERAN contains the UE-EUTRA-Capability information element (IE). This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-DiffOpWithSameMmecSwitch.html">Different Operator With Same MMEC Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether MMEs of different operators that share the eNodeB can be configured with the same mobility management entity code (MMEC).</p>
+<p>If this parameter is set to OFF, MMEs of different operators that share the eNodeB cannot be configured with the same MMEC. If this parameter is set to ON, MMEs of different operators that share the eNodeB can be configured with the same MMEC.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-PeerReqBasedX2DelSwitch.html">Peer Request Based X2 Delete Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the X2 automatic removal based on a request from the peer eNodeB. If this parameter is set to ON(On), this function is enabled. In this case, the local eNodeB removes the X2 interface configuration if the local eNodeB receives a RESET REQUEST message from the peer eNodeB and determines that the X2 interface is unavailable. If this parameter is set to OFF(Off), this function is disabled. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UlPdcpSduRcvStatSendSwitch.html">Receive status of UL PDCP SDUs sending switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the SN STATUS TRANSFER message contains the IE "Receive Status Of UL PDCP SDUs" during an S1- or X2-based outgoing handover.</p>
+<p>If this parameter is set to OFF, the SN STATUS TRANSFER message contains the IE "Receive Status Of UL PDCP SDUs" when the eNodeB receives out-of-order uplink PDCP packets for bearers in AM.</p>
+<p>If this parameter is set to ON, the SN STATUS TRANSFER message contains the IE "Receive Status Of UL PDCP SDUs" when the following conditions are met: (1) The source eNodeB receives out-of-order uplink PDCP packets for bearers in AM. (2) The target eNodeB returns the uplink data forwarding address. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-ProtocolMsgOptSwitch.html">Protocol Message Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to optimize protocol messages sent by the eNodeB. This parameter provides the following options:</p>
+<p>RrcSetupOptSwitch: If this option is selected, optimization of RRCConnectionSetup messages is enabled. In this case, IEs with protocol-defined default values are no longer included in the RRCConnectionSetup messages. For details about the protocol-defined default setting, see 3GPP TS 36.331. This option applies only to LTE FDD and LTE TDD.</p>
+<p>IucsRrcRecfgMcCombSwitch: If this option is selected, the eNodeB includes the radio resource configuration and measurement configuration for a UE in one RRCConnectionReconfiguration message during initial access. This option applies only to LTE FDD and LTE TDD.</p>
+<p>RcrpRrcRecfgMcCombSwitch: If this option is selected, the eNodeB includes the radio resource configuration and measurement configuration for a UE in one RRCConnectionReconfiguration message during RRC connection reestablishment. The option will not take effect on the interaction of RRC connection reestablishment and other signaling procedures. This option applies only to LTE FDD and LTE TDD.</p>
+<p>RrcRecfgMcOptSwitch: If this option is selected, the cell measurement configurations with the CIO of 0 (indicated by cellIndividualOffset) are no longer included in the measurement configurations delivered to UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>IdleCsfbRedirectOptSwitch: If this option is selected and the preferred CSFB policy is redirection, during CSFB for UEs in idle mode, the eNodeB no longer activates the security mode or performs RRC connection reconfiguration, but directly sends a redirection message. In accordance with the security requirements of 3GPP CR (R2-1714284), this option takes effect only for redirections to UTRAN cells. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UlNasBufferSwitch: If this option is selected, the eNodeB buffers uplink NAS messages sent by the UE before the UE-associated logical S1 connection is available and sends these messages after the UE-associated logical S1 connection is available. If this option is deselected, the eNodeB releases this UE after the procedures end. This option applies only to LTE FDD and LTE TDD.</p>
+<p>IratMeasCfgTransSwitch: If this option is selected, the Handover Required message that the eNodeB sends to a BSC contains the IE IRAT Measurement Configuration. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GeranAnrMcOptSwitch: This option controls whether measurement configuration optimization takes effect when ANR with GERAN is enabled. If this option is deselected, the optimization does not take effect. That is, when an eNodeB delivers measurement configuration to UEs to perform CGI reading for ANR with GERAN, the carrierFreqs IE can contain multiple GERAN frequencies. If this option is selected, the optimization takes effect, and the carrierFreqs IE contains only one GERAN frequency. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SRVCCHoBasedUeCapSwitch: If this option is selected, the eNodeB determines whether to trigger an SRVCC based only on the UE SRVCC capability information, not the SRVCCOperationPossible IE that the MME sends to the eNodeB. If this option is deselected, the eNodeB determines whether to trigger an SRVCC based on the SRVCCOperationPossible IE that the MME sends to the eNodeB. This option applies only to LTE FDD and LTE TDD.</p>
+<p>L2GPLMNChooseOptSwitch: This option specifies whether to enable target PLMN ID optimization for handovers to GERAN. If this option is selected, the eNodeB takes the NCL-defined PLMN IDs and includes them in the handover request messages or RIM request messages. If this option is deselected, the optimization is not activated. This option applies only to LTE FDD and LTE TDD.</p>
+<p>HoInRrcRecfgMcCombSwitch: If this option is selected, after a UE is handed over to a cell, the cell delivers the radio resource configuration and measurement configuration in a single RRC Connection Reconfiguration message to the UE during the resource reconfiguration procedure. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UeCapEnquiryCombSwitch: If this option is selected and a UE sends an Attach Request message to an eNodeB during initial access, the eNodeB queries capabilities of the UE immediately after the RRC connection for the UE is established. This option does not apply to subsequent UE capability query induced by the CA extended frequency band combination query. If this option is deselected and a UE sends an Attach Request message to an eNodeB during initial access, the eNodeB does not query capabilities of the UE until the MME sends a UE context setup request to the eNodeB. If the UeCapbEnquirySecurityEnhSwitch option of the ProtocolMsgOptSwitch parameter in the GlobalProcSwitch MO is selected, combined UE capability information query does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UeTraceOptSwitch: If this option is selected, the eNodeB does not handle the DEACTIVATE TRACE message sent by the MME or stop the UE tracing task in the eNodeB until the UE is released or handed over to a cell served by another eNodeB. This option applies only to LTE FDD and LTE TDD.</p>
+<p>PaDistributeMechOptSwitch: If this option is selected, the PaPcOff parameter value is taken as the PA value in the RRCConnectionSetup or RRC Connection Reestablishment message. If this option is deselected, the PA value is set to -3 dB by default. This option applies only to LTE FDD and LTE TDD.</p>
+<p>InactReSyncCompatSwitch: If this option is selected and the eNodeB determines that the UE inactivity timer expires and the resynchronization procedure is being performed, the eNodeB preferentially processes the resynchronization procedure and the timer restarts. If this option is deselected, the optimization does not take effect. That is, the UE is directly released when the UE inactivity timer expires. This option applies only to LTE FDD and LTE TDD.</p>
+<p>VolteX2HoDelayOptSwitch: If this option is selected, when receiving a VoLTE UE handover complete message, the target eNodeB for an X2-based handover starts to send uplink data with QCI of 1. If this option is deselected, the target eNodeB for an X2-based handover starts to send uplink data with QCI of 1 after receiving an MME PATH SWITCH REQUEST ACKNOWLEDGE message. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UeUtranCapEnquiryOptSwitch: If this option is selected, the following are true: If the local cell is not configured with neighboring UTRAN frequencies, UEs' UTRAN capability queries cannot be triggered. If the local cell is configured with neighboring UTRAN frequencies, the UtranFastAnrSwitch and UtranEventAnrSwitch options of the ENodeBAlgoSwitch.AnrSwitch parameter are deselected, and the local cell is configured with neighboring UTRAN cells, UEs' UTRAN capability queries cannot be triggered. If this option is deselected, this optimization does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>FreqRandomOptSwitch: If this option is selected, the eNodeB randomly selects a target frequency when there are multiple candidate frequencies with the same priority. If this option is deselected, this optimization function does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>MrMdtMeasOptSwitch: If this option is selected, measurement configurations related to MR and MDT are delivered separately. If this option is deselected, this optimization does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>CellReselectionOptSwitch: If this option is selected, when the cell reselection configuration needs to be contained in an RRC release message, the eNodeB performs as follows: - If inter-RAT cell reselection is not configured in the eNodeB, the eNodeB does not determine inter-RAT operator-dedicated cell reselection frequency priorities. - If inter-RAT cell reselection is configured in the eNodeB, the eNodeB determines inter-RAT operator-dedicated cell reselection frequency priorities. If this option is deselected, the eNodeB always determines inter-RAT operator-dedicated cell reselection frequency priorities regardless of whether inter-RAT cell reselection is configured in the eNodeB. The RAT system mentioned above does not involve NR. The operator-dedicated cell reselection frequency priorities for NR frequencies are not controlled by this option. This option applies only to LTE FDD and LTE TDD.</p>
+<p>X2GuGroupIdInfoOptSwitch: If this option is selected, the eNodeB does not include any GU Group Id dedicated to NB-IoT in the IE GU Group Id List in X2 setup request, X2 setup response, and base station configuration update messages when the MME has multiple GU Group Ids. (For details about the IE, see 3GPP TS 36.423.) If all GU Group Ids are dedicated to NB-IoT, the eNodeB can include the GU Group Ids dedicated to NB-IoT. If this option is deselected, the eNodeB can include the GU group Ids dedicated to NB-IoT in the IE Group Id List in X2 setup request, X2 setup response, and base station configuration update messages. This option applies only to LTE FDD and LTE TDD.</p>
+<p>CaBandCombQueryOptSwitch: If this option is selected, the eNodeB does not need to identify UE capability information. The eNodeB queries the CA band combination capability of a UE by including frequencies supported by the eNodeB in the UECapabilityEnquiry message delivered to the UE. If this option is deselected, the optimization does not take effect. If this option is selected, the SupportNetReqCaComboSwitch option of the ProtocolSupportSwitch parameter in the GlobalProcSwitch MO must be selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>HighPriAcsUeCellReselPriCtrlSw: If this option is selected, for a UE with the RRC connection setup request cause of HighPriorityAccess, the eNodeB delivers the dedicated cell-reselection priorities to the UE when the MME initiates to release the S1 connection and the eNodeB does not obtain the frequency capabilities of the UE. If this option is deselected, the eNodeB does not deliver the dedicated cell-reselection priorities when not obtaining the frequency capabilities of the UE. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NbMeasurementReportSwitch: If this option is selected, the eNodeB delivers NRSRP and NRSRQ measurement indications through SIB2. UEs that support measurement reporting will report measured NRSRP and NRSRQ during access. If this option is deselected, UEs will not report NRSRP or NRSRQ. For details, see 3GPP TS 36.331. This option applies only to NB-IoT.</p>
+<p>MdtMeasRptOptSwitch: If this option is selected, the maximum number of cells contained in periodic measurement reports and the triggering quantity and reporting quantity of periodic measurement reports for MDT-related intra- and inter-frequency event M1 is configured through the CellMcPara MO. If this option is deselected, MDT-related intra- and inter-frequency event M1 cannot be configured through the CellMcPara MO. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NbCqiReportSwitch: If this option is selected, the eNodeB delivers CQI measurement indications through SIB2. UEs that support measurement reporting will report measured CQIs during network access. If this option is deselected, UEs will not report CQIs. For details, see 3GPP TS 36.331. This option applies only to NB-IoT.</p>
+<p>UeCapbEnquirySecurityEnhSwitch: Indicates whether to enable security enhancement for UE capability query. If this option is selected, security enhancement for UE capability query is enabled. With this function enabled, the eNodeB can initiate a UE capability query procedure to a UE only after the Uu interface security mode is activated. If this option is deselected, security enhancement for UE capability query is disabled. If the eNodeB needs to query the UE capability information during initial access, it initiates a UE capability query procedure before the security mode is activated. If this option is selected, the UeCapEnquiryCombSwitch option of the ProtocolMsgOptSwitch parameter in the GlobalProcSwitch MO does not take effect. If the eNodeB needs to query the UE capability information during initial access, then the UuMsgSimulSendSwitch parameter in the GlobalProcSwitch MO does not take effect and the security mode activation, UE capability query, and reconfiguration procedures are processed in sequence. If the eNodeB needs to query the UE capability information during redirection-based CSFB for RRC_IDLE UEs, then the security mode activation, UE capability query, and RRC connection release procedures are processed in sequence. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UtranMeasQuanBothOptSwitch: Indicates whether to enable handovers to UTRAN based on only RSCP when UEs in compliance with 3GPP release 10 or later have compatibility issues and report only RSCP and the InterRatHoUtranB1MeasQuan parameter in the InterRatHoComm MO is set to BOTH. If this option is selected, handovers to UTRAN are triggered based on only RSCP. If this option is deselected, handovers to UTRAN are triggered based on both RSCP and Ec/No. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2ServedCellType.html">X2 served cell type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of served cells, which is contained in protocol-defined messages exchanged in X2 Setup and eNB Configuration Update procedures. If this parameter is set to ACTIVE_CELL(Active Cell), the served cells include all the activated cells. If this parameter is set to CONFIGURED_CELL(Configured Cell), the served cells include all the configured cells. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-EnbTrigMmeLoadRebalSwitch.html">eNB Triggered MME load re-balance switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable eNodeB-triggered MME load rebalancing. When this parameter is set to ON(On), the eNodeB releases the RRC connection for a UE with the cause value "loadBalancingTAUrequired" if the UE accesses the cell using an S-TMSI that is associated with an overloaded MME. This ensures that the UE can be routed to a lightly loaded MME if it initiates another access request. When this parameter is set to OFF(Off), the eNodeB sends an RRCConnectionRelease message with the cause value "other" to the UE to release its RRC connection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UeRelReSynTimes.html">Ue Release Resynchronization Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of resynchronization failures after which the UE release timer is started in scenarios where the RRC connection is released for a UE caused by resynchronization failure. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UeRelChkLostSwitch.html">Ue Release Check Lost Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to perform the radio link failure (RLF) detection for a UE when the RRC connection for the UE is released because of UE inactivity. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UeLinkAbnormalDetectSwitch.html">UE Link Abnormal Detect Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE link fault detection switch. If this switch is turned on, link fault detection is enabled for synchronized UEs. If this switch is turned off, link fault detection is not enabled for synchronized UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-S1DefaultPagingDrxSelect.html">S1 Default Paging DRX Value Select</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the value of the IE Default paging DRX contained in the S1 SETUP REQUEST and ENB CONFIGURATION UPDATE messages that the eNodeB sends over the S1 interface. For details, see 3GPP TS 36.413.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-EnhancedPhrRptCtrlSw.html">Enhanced PHR Report Control Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the RRCConnectionReconfiguration message sent from the source eNodeB to a UE contains the power headroom configuration during a handover where the eNodeB works as the target eNodeB. If this parameter is set to ON(On), the RRCConnectionReconfiguration message must contain the power headroom configuration. If this parameter is set to OFF(Off), the power headroom configuration is optional in the RRCConnectionReconfiguration message. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-EutranLoadTransSwitch.html">EUTRAN Load Transfer Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to send E-UTRAN cell load information.</p>
+<p>RimUtranSwitch: Indicates whether to send E-UTRAN cell load information through RAN information management (RIM) procedures to the UTRAN. If this option is selected, the eNodeB sends cell load information through RIM procedures to the UTRAN and notifies the UTRAN of cell load changes through RIM procedures. This option applies only to LTE FDD.</p>
+<p>EcoSwitch: Indicates whether to send cell load information to the eCoordinator. If this option is selected, the eNodeB sends load information to the eCoordinator and notifies the eCoordinator of cell load changes. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ProhibitCceLoadInfoExchangeSw: Indicates whether proprietary IEs can carry CCE load information. If this option is selected, both parties do not allow proprietary IEs to carry CCE load information during load information exchange when inter-vendor MLB is initiated. If this option is deselected, both parties allow proprietary IEs to carry CCE load information during load information exchange when inter-vendor MLB is initiated. For details, see 3GPP TS 36.331. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ProhibitTHLoadInfoExchangeSw: Indicates whether to request TNL load Ind Periodic and HW load Ind Periodic information from neighboring cells served by equipment of other vendors during load information exchange for inter-vendor load equalization. If this option is selected, TNL load Ind Periodic and HW load Ind Periodic are not requested during load information exchange for inter-vendor load equalization. If this option is deselected, TNL load Ind Periodic and HW load Ind Periodic are requested during load information exchange for inter-vendor load equalization. For details, see 3GPP TS 36.423. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-ProtocolSupportSwitch.html">Protocol Procedure Support Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB supports some protocol-defined procedures.</p>
+<p>SupportS1UeCapMatchMsg: If this option is selected, the eNodeB can process and respond to the UE RADIO CAPABILITY MATCH REQUEST message over the S1 interface. For details, see 3GPP TS 36.413. If the option is deselected, the eNodeB cannot process the UE RADIO CAPABILITY MATCH REQUEST message and responds with an error indication message. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SupportS1UELocationInfoSwitch: If this option is selected, the eNodeB reports the PCell location information about UEs in the E-RAB and UE context release messages to an MME and reports the NR PSCell location information about UEs configured with an NR SCG in some UE-level S1 messages to the MME. If this option is deselected, the eNodeB does not report the location information about UEs to the MME. PCell-related messages include UE CONTEXT RELEASE COMPLETE, E-RAB RELEASE INDICATION, and E-RAB RELEASE RESPONSE. NR-PSCell-related messages include UE CONTEXT RELEASE COMPLETE, E-RAB RELEASE INDICATION, E-RAB RELEASE RESPONSE, PATH SWITCH REQUEST, UPLINK NAS TRANSPORT, and HANDOVER NOTIFY. For details about the messages, see 3GPP TS 36.413. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SupportDrbRlcRelUecntSwitch: If this option is selected, the eNodeB proactively releases UE contexts when the maximum number of DRB RLC retransmission times is reached. If this option is deselected, the eNodeB proactively releases UE bearers when the maximum number of DRB RLC retransmission times is reached. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SupportNetReqCaComboSwitch: If this option is selected, the eNodeB queries the CA band combinations supported by a UE that supports CA band combination reporting. A maximum of 384 CA band combinations can be queried. If this option is deselected, the query procedure is disabled.</p>
+<p>X2SonProtocolDelCooSwitch: If this option is selected, the eNodeB interacts with the peer for X2 self-removal using the method defined in 3GPP Release 12 specifications. If this option is deselected, the eNodeB interacts with the peer for X2 self-removal using the method defined by Huawei. This option applies only to X2 interfaces between eNodeBs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>X2MessageWithNbCellInfoSw: If this option is selected for an eNodeB with NB-IoT cells and the TargetENodeBRelease parameter in the X2 MO is set to Release_14 or a value indicating a later version, the NB-IoT cells are included in the serving cell IE in X2 setup request, X2 self-setup request response, and eNodeB configuration update messages. If this option is deselected for such an eNodeB, the NB-IoT cells are not included in the serving cell IE in X2 setup request, X2 self-setup request response, and eNodeB configuration update messages. This option applies only to LTE FDD and NB-IoT.</p>
+<p>PwsRestartIndicationSwitch: Indicates whether to enable the public warning system (PWS) restart indication function. If this option is selected, the eNodeB sends a PWS Restart Indication message to the MME when a local cell becomes available. If this option is deselected, the eNodeB does not send the PWS Restart Indication message to the MME. This option applies only to LTE FDD and LTE TDD.</p>
+<p>OverheatingProtectionSwitch: Indicates whether to enable overheating protection. If this option is selected, the eNodeB allows UEs that support overheating protection to report the IE OverheatingAssistance-r14. After receiving this IE from a UE, the eNodeB reduces the traffic volume of the UE or reduces the number of LTE SCells for the UE to relieve UE overheating. If this option is deselected, overheating protection is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SftdMeasSwitch: Indicates whether to enable the SFTD measurement function in the eNodeB. If this option is selected, the eNodeB periodically delivers SFTD-related measurement configurations to some SFTD-capable UEs to measure the time difference between the serving LTE frequency and neighboring NR frequencies. If this option is deselected, the eNodeB does not deliver SFTD-related measurement configurations. This option applies only to LTE FDD and LTE TDD.</p>
+<p>MaxReportRsIndexSwitch: Indicates whether the eNodeB includes the maxReportRS-Index-r15 IE in LTE frequency measurement configurations in NSA DC scenarios. If this option is selected, the eNodeB includes the maxReportRS-Index-r15 IE in LTE frequency measurement configurations. If this option is deselected, the eNodeB does not include the maxReportRS-Index-r15 IE in LTE frequency measurement configurations. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NsaDcPerFr1GapSwitch: Indicates whether to configure per-FR1 measurement gaps during inter-frequency or inter-RAT measurements of UEs that support independent measurement gaps and are in the NSA DC state. If this option is selected, per-FR1 measurement gaps are configured for these UEs during inter-frequency or inter-RAT measurements. If this option is deselected, per-FR1 measurement gaps are not configured for these UEs during inter-frequency or inter-RAT measurements. For details about the configuration of independent measurement gaps in NSA networking, see 3GPP TS 37.340. This option applies only to LTE FDD and LTE TDD.</p>
+<p>Sib12WarningAreaGeoInfoSw: Indicates whether SIB12 includes the warning area geographical location information element which is introduced in 3GPP Release 15. If this option is selected, SIB12 includes the IE warningAreaCoordinatesSegment-r15. If this option is deselected, SIB12 does not include the IE warningAreaCoordinatesSegment-r15. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UeCapbEnquirySimulSwitch: Indicates whether to adopt simultaneous message transmission for security mode activation and UE capability query. If this option is selected and the UE capability needs to be queried during initial access, then parallel mode is adopted for security mode activation and UE capability query. If this option is deselected, sequence mode is adopted. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-PreferSigExtend.html">Prefer Signal Extend Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>This switch is only valid when a UMPT and an LMPT are in one BBU, with the UMPT as the main control board and the LMPT as the extended board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-MmeSelectProcSwitch.html">MME Select Procedure Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MME selection policies used when UEs access the E-UTRAN. This parameter provides the following options:</p>
+<p>MMESELECTALGOSWITCHFORGUUE: Indicates the method in which the eNodeB selects MMEs for UEs transferred from a GERAN or UTRAN to the E-UTRAN by cell reselections. If this option is deselected, the eNodeB preferentially selects an MME that stores the UE's contexts. If this option is selected, the eNodeB selects an MME based on priorities, topologies, and loads of MMEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NNSFENHANCEMENTSWITCH: Indicates whether to enable enhanced NAS node selection function (NNSF). The eNodeB behavior varies depending on the switch setting when a UE sends the Registered MME IE to the eNodeB during access to the network. If this option is deselected and the UE is an E-UTRAN user, the eNodeB selects an MME with the specified MMEGI and MMEC. If this option is deselected and the UE is transferred from a GERAN or UTRAN to the E-UTRAN by cell reselections, the eNodeB preferentially selects an MME with the specified MMEC and, if there is no such an MME, selects an MME based on priorities, topologies, and loads of MMEs. If this option is selected, the eNodeB selects an MME that meets one of the following conditions (in descending order of priority): (1) with the specified MMEGI and MMEC; (2) with the specified MMEC. If there is no such an MME, the eNodeB selects an MME based on priorities, topologies, and loads of MMEs.</p>
+<p>UE_TYPE_BASED_MME_LOAD_BAL_SW: Indicates whether the eNodeB distinguishes between NB-IoT UEs and other UEs when calculating the relative MME load. If this option is deselected, the eNodeB does not distinguish between NB-IoT UEs and other UEs and calculates the relative MME load based on the number of UEs over the S1 interface and the relative capacity. Then, the eNodeB selects an appropriate MME based on the relative load. If this option is selected, the eNodeB distinguishes between NB-IoT UEs and other UEs and calculates the relative MME load based on the numbers of UEs of the corresponding types over the S1 interface and the relative capacity. Then, the eNodeB selects an appropriate MME based on the relative load.</p>
+<p>MME_OVERLOAD_BASED_SELECT_SW: Indicates whether the eNodeB selects an MME based on the IE Traffic Load Reduction Indication in the S1AP OVERLOAD START message. If this option is deselected, the eNodeB does not consider this IE when selecting an MME for a UE. If this option is selected, the eNodeB occasionally rejects UE accesses based on the UE access cause and this IE.</p>
+<p>MME_CAPACITY_BASED_SELECT_SW: Indicates whether the eNodeB selects an MME for a UE based on capacity proportions of the MMEs. If this option is selected, the eNodeB selects an MME for a UE based on capacity proportions of the MMEs. If this option is deselected, the eNodeB selects an MME for a UE based on the relative MME load.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-S1OfflineCommitSwitch.html">S1 Offline Commit Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable offline software commissioning over the S1 interface. If all S1 links are unavailable in the initial engineering stage, setting this parameter to ON enables cells to be activated for cell signal coverage tests. It is recommended that this parameter be used only in the engineering commissioning stage.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-ProtocolCompatibilitySw.html">Protocol Compatibility Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB applies compatibility handling to the protocol-defined procedures. This parameter provides the following options:</p>
+<p>CaGapMeasPriOffSwitch: Indicates whether the eNodeB preferentially deletes the inter-frequency measurement configuration after a UE reports event A4 for configuring an SCell. When the UE supports only 2CC CA, the eNodeB preferentially sends an A4-related measurement configuration deletion message if this option is selected. If this option is deselected, the eNodeB sends the SCell configuration message to the UE before sending an A4-related measurement configuration deletion message to the UE. This option applies only to LTE FDD and LTE TDD.</p>
+<p>CaHoReqWithR9ConfigSwitch: Indicates whether the handover request message sent from the source eNodeB during a handover carries the IEs sourceOtherConfig-r9 and ue-ConfigRelease-r9. If this option is selected, the message carries these IEs. If this option is deselected, the message does not carry these IEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>AntennaFullConfigSwitch: Indicates whether the full configuration function takes effect. When a UE complying with 3GPP Release 10 initiates a handover and the handover request message contains the IE antennaInfo-r10, the setting of this option affects the IEs contained in the handover command message. If this option is selected, the handover command message contains IEs antennaInfo-r8 and fullconfig-r9. If this option is deselected, the handover command message contains only the IE antennaInfo-r10. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DrxConfigMsgSwitch: Indicates whether the eNodeB includes the DRX-Config IE in the RRC Connection Setup message. The messages contain this IE only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>MultiplexingTabSelSwitch: Indicates the type of the HARQ multiplexing table used by UEs. If this option is selected, the UEs send HARQ feedback in multiplexing mode according to HARQ-ACK Multiplexing Tables 10.1.3-2, 10.1.3-3, and 10.1.3-4 in 3GPP TS 36.213. This option applies only to LTE TDD.</p>
+<p>SCellModCaMeasRmvSwitch: Indicates whether to delete CA or DC A2 and A6 measurement configuration (A3 measurement configuration for a PSCell) of the UE before changing or deleting the SCell of the UE. If this option is selected, upon receiving an A2 or A6 measurement report (A3 measurement report for a PSCell) from a UE, the eNodeB sends an A2- and A6-related measurement configuration deletion message (A3-related measurement configuration deletion message for a PSCell) to the UE before changing or deleting the SCell of the UE. If this option is deselected, upon receiving the measurement report from a UE, the eNodeB does not send the measurement configuration deletion message to the UE before changing or deleting the SCell of the UE. This option applies only to LTE FDD and LTE TDD.</p>
+<p>HoCfgReleaseJudgeSwitch: Indicates whether the target eNodeB checks if the release version of the configuration used by the UE from the source eNodeB is later than that of the target eNodeB in an inter-eNodeB handover. When the following conditions are met: (1) The target eNodeB receives a handover request message from the source eNodeB; (2) The release version of the IE ue-ConfigRelease-r9 contained in the message is later than that of the target eNodeB or the message contains an IE that the target eNodeB does not support, the target eNodeB regards that the release version of the configuration used by the UE is later than that of the target eNodeB and includes the IE fullconfig-r9 in the HandoverCommand message if this option is selected. In the preceding scenario, the target eNodeB does not include the IE fullconfig-r9 in the HandoverCommand message if this option is deselected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ScellIndexLimitSwitch: Indicates the index value assigned to an SCell for a UE. If this option is selected, the index value assigned cannot exceed the maximum number of CCs that can be aggregated for the UE. If this option is deselected, the index value assigned can be any one in the entire SCell index value range. This option applies only to LTE FDD and LTE TDD.</p>
+<p>HoWithSccMimoModifySwitch: Indicates the method for configuring the MIMO mode of the SCell for the SCell configuration during handovers. If this option is selected, the MIMO mode of the SCell is configured based on UE status in the initial access. If this option is deselected, the MIMO mode of the SCell is configured based on UE status in the handover. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ForbidHighCapabilitySwitch: Indicates whether the eNodeB forbids capabilities beyond the UE protocol version for defective UEs that comply with 3GPP Release 10 or later. Some defective UEs may report capabilities beyond the UE protocol version. If this option is deselected, capabilities beyond the UE protocol version are allowed to take effect on the eNodeB. If this option is selected, the eNodeB ignores capabilities beyond the UE protocol version that are reported by the UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UlNasCrossHoCacheSwitch: Indicates whether an eNodeB saves an uplink NAS message in the buffer when a handover process and the message cross. When this option is selected, the eNodeB saves the uplink NAS message in the buffer and then sends it to the MME after the handover finishes. When this option is deselected, the eNodeB does not save the message in the buffer. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SCellBlindA2Switch: Indicates whether the eNodeB delivers the A2 measurement configuration for SCells to a CA UE after configuring an SCell for the UE in CA-group-based configuration mode in a blind manner. The eNodeB delivers the measurement configuration only if this option is selected. The A2 threshold is always -140 dBm, which is the minimum 3GPP-defined value. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DrxActiveStatusJudgeOptSwitch: Indicates that the eNodeB evaluates whether subframe n is in DRX active time at the n-5 subframe, whether to receive CQI/PMI/RI/PTI reports on PUCCH at subframe n, and whether to handle false PUCCH detections at subframe n for UEs complying with 3GPP Release 11 or later. If this option is deselected, for UEs complying with 3GPP Release 11 or later, the eNodeB evaluates whether subframe n is in DRX active time at the n-4 subframe. Then, the eNodeB determines whether to receive CQI/PMI/RI/PTI reports on PUCCH at subframe n. If this option is selected, for UEs complying with 3GPP Release 11 or later, the eNodeB evaluates whether subframe n is in DRX active time also at the n-5 subframe. Then, the eNodeB determines whether to receive CQI/PMI/RI/PTI reports on PUCCH at subframe n and whether to handle false PUCCH detections at subframe n. For details, see section 5.7 in 3GPP TS 36.321. This option applies only to LTE FDD and LTE TDD.</p>
+<p>MfbiMeasurementControlSwitch: Indicates the switch to control the delivery of inter-frequency measurement configurations in multi-band scenarios. If this option is selected and the carrier frequency belongs to multiple operating bands, the eNodeB delivers only one frequency in the measurement configuration. If this option is deselected, the eNodeB delivers all possible frequencies in the measurement configuration in the preceding scenario. This option applies only to LTE FDD and LTE TDD.</p>
+<p>HighSpeedR14Switch: Indicates whether to enable the 3GPP Release 14 high speed function. If the option is selected and the HighSpeedFlag parameter in the Cell MO is set to HIGH_SPEED or ULTRA_HIGH_SPEED, the eNodeB includes the 3GPP Release 14 high-speed-related IEs in the system information, handover command, and SCC configuration messages and the 3GPP Release 14 high speed function takes effect. If this option is deselected, the eNodeB does not include the IEs in these messages and the function does not take effect. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NrCapabilityParallelQuerySw: Indicates whether to enable parallel query of the NR capability. If this option is selected, the eNodeB queries both the NR and EUTRA-NR capabilities using a single UECapabilityEnquiry message during a UE capability query procedure. If this option is deselected, the eNodeB queries either the NR or EUTRA-NR capability using a single UECapabilityEnquiry message. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NsaS1ProcedureConflCompatSw: If this option is deselected, the eNodeB responds to the following messages sent from an MME with a procedure processing failure with the cause value "Interaction with other procedure" during an NSA DC procedure: E-RAB SETUP REQUEST, E-RAB MODIFY REQUEST, E-RAB RELEASE COMMAND, and UE CONTEXT MODIFICATION REQUEST. If this option is selected, the eNodeB can process these messages and respond with a success during an NSA DC procedure. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GtpuExtensionHeaderV1530Sw: Indicates whether the eNodeB complies with 3GPP TS 29.281 V15.3.0 or later in terms of the setting of the Next Extension Header Type field in the GTP-U Extension Header. If this option is selected, the eNodeB complies with 3GPP TS 29.281 V15.3.0 or later. When the extension header type is Long PDCP PDU Number, the eNodeB sets the Next Extension Header Type field to the binary number 00000011. If this option is deselected, the eNodeB does not comply with 3GPP TS 29.281 V15.3.0 or later. When the extension header type is Long PDCP PDU Number, the eNodeB sets the Next Extension Header Type field to the binary number 10000010. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NrB1MeasOptSw: Indicates whether to enable the eNodeB not to configure measurement gaps in NR B1 measurement configurations delivered to an NSA UE and whether to combine the RRC connection reconfiguration messages for the NR B1 measurement removal and SCG addition procedures for an NSA UE. If this option is selected, the eNodeB does not configure measurement gaps in NR B1 measurement configurations and combines the RRC connection reconfiguration messages for the NR B1 measurement removal and SCG addition procedures. If this option is deselected, the eNodeB configures measurement gaps in NR B1 measurement configurations and does not combine the RRC connection reconfiguration messages for the NR B1 measurement removal and SCG addition procedures. This option applies only to LTE FDD and LTE TDD.</p>
+<p>LteNrCapbParallelQuerySw: Indicates whether the eNodeB can query the E-UTRAN, NR, and EUTRAN-NR DC capabilities of an NSA-DC-capable UE through a single UE capability query message. If this option, the NrCapabilityParallelQuerySw option of the ProtocolCompatibilitySw parameter in the GlobalProcSwitch MO, and the CaBandCombQueryOptSwitch option of the ProtocolMsgOptSwitch parameter in the GlobalProcSwitch MO are all selected, the eNodeB can query these capabilities at a time through a single UE capability query message. If this option is deselected, the eNodeB cannot query these capabilities at a time through a single UE capability query message. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DrbIdIncrementalAllocSwitch: Indicates whether to enable incremental DRB ID allocation. The range of DRB IDs is 1 to 32. When the eNodeB sets up a new DRB, there are the following situations: If this option is deselected, the eNodeB searches for the smallest unused ID started from 1 and allocates it to the new DRB. If this option is selected, the eNodeB searches for the unused ID following the maximum used DRB ID and allocates it to the new DRB. For a non-NB-IoT UE, an intra-cell handover is triggered when the new DRB ID is greater than or equal to 26. After the handover, the eNodeB allocates the DRB ID started from 1 again. For an NB-IoT UE, the UE release is triggered when the eNodeB receives a new DRB setup request and the allocated DRB ID reaches the maximum value 32.</p>
+<p>HoDrbCompatibilitySwitch: Indicates whether the eNodeB is compatible with the handover request in which DRB information is contained in the "SourceRB-ConfigSN-NR-r15" IE but not in the "DRB-ToAddModList" IE. The eNodeB is compatible with such a handover request only if this option is selected. This parameter does not take effect for an LMPT board. This option applies only to LTE FDD and LTE TDD.</p>
+<p>CaScellRemovalSwitch: Indicates whether the base station removes an SCell that fails be configured for a CA UE during a dedicated bearer setup procedure for the UE. Assume that an SCell fails to be configured for a CA UE during a dedicate bearer setup procedure. If this option is selected, the base station removes the SCell that fails to be configured. If this option is deselected, the base station does not remove the SCell that fails to be configured. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NrGapFrameOffsetRoundDownSw: During gap-assisted measurements of NR frequencies, the gap offset is calculated based on the frame offset and the NR SSB offset. If this option is selected, the conversion from frame offset to radio frame is based on the round-down principle. If this option is deselected, the conversion from frame offset to radio frame is based on the round-off principle. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SctpEstType.html">X2 Sctp Establishment Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the triggering type for establishing an SCTP link for an X2 interface. If this parameter is set to BASED_TNL, the establishment can be triggered based on transport resources. When the CP bearer is subscribed to, the eNodeB initiates the establishment of an SCTP link with the peer eNodeB. If this parameter is set to BASED_X2INTERFACE, the SCTP establishment can be triggered based on the X2 interface. When the conditions for setting up an X2 interface are met, the eNodeB initiates the establishment of an SCTP link with the peer eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonDeleteSwitch.html">X2 SON Delete Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable X2 automatic removal based on X2 faults and X2 usage. This parameter includes the following options:</p>
+<p>BASED_ON_X2FAULT: If this option is selected, X2 automatic removal based on X2 faults is enabled. This parameter applies only to X2 interfaces between eNodeBs in the LTE system. This option applies only to LTE FDD and LTE TDD.</p>
+<p>BASED_ON_X2USAGE_WITH_NEGO: If this option is selected, X2 automatic removal based on X2 usage is enabled and the removal requires the negotiation between the local and peer eNodeBs. If the X2SonProtocolDelCooSwitch option is selected, as long as the peer eNodeB supports 3GPP-defined X2 automatic removal negotiation method, the BASED_ON_X2USAGE_WITH_NEGO option takes effect when the X2 interface is normal regardless of whether the peer eNodeB is a Huawei eNodeB. This parameter applies only to X2 interfaces between eNodeBs in the LTE system. This option applies only to LTE FDD and LTE TDD.</p>
+<p>BASED_ON_X2USAGE_WITHOUT_NEGO: If this option is selected, X2 automatic removal based on X2 usage is enabled and the removal does not require the negotiation between the local and peer eNodeBs. This option takes effect when the X2 interface is normal, the peer eNodeB is not a Huawei eNodeB, and the X2SonProtocolDelCooSwitch option is deselected. This parameter applies only to X2 interfaces between eNodeBs in the LTE system. This option applies only to LTE FDD and LTE TDD.</p>
+<p>BASED_ON_SPEC_DYNAMIC_SHARING: If this option is selected, X2 self-removal based on dynamic sharing of the X2 specification is enabled. When the X2 interface resources are insufficient and a new EN-DC X2 setup is triggered, this function automatically and preferentially removes a faulty inter-eNodeB X2 interface with the longest duration of the latest fault or removes an inter-eNodeB X2 interface with the lowest usage within the shared X2 interface resources to provide X2 interface resources for EN-DC X2 setup. This function takes effect on both faulty and normal inter-eNodeB X2 interfaces, but it cannot automatically remove EN-DC X2 interfaces. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonDeleteTimerforX2Fault.html">X2 SON Delete Timer for X2 Fault</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the timer for automatically removing X2 interfaces based on X2 faults. If an X2 interface is faulty throughout the period specified by this timer, the eNodeB automatically removes the X2 interface. This parameter applies only to X2 interfaces between eNodeBs in the LTE system. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonDeleteTimerforX2Usage.html">X2 SON Delete Timer for X2 Usage</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the timer for automatically removing X2 interfaces based on X2 usage or based on dynamic sharing of the X2 specification.</p>
+<p>In X2 self-removal based on X2 usage, an X2 interface is automatically removed if all of the following conditions are met: 1. The number of incoming handovers over the X2 interface within a period defined by this parameter is less than or equal to a specified threshold. 2. The number of outgoing handovers over the X2 interface within the same period is less than or equal to a specified threshold. 3. No coordinating services are running over the X2 interface.</p>
+<p>In X2 self-removal based on dynamic sharing of the X2 specification, the timer starts when the base station is powered on. This function measures the sum of the number of incoming and outgoing handovers over each inter-eNodeB X2 interface within a period whose length is the same as that of the timer. The eNodeB calculates the usage of each inter-eNodeB X2 interface based on the number and sorts the inter-eNodeB X2 interfaces based on the usage. In addition, the eNodeB measures the total number of successful additions of a gNodeB that is connected over an EN-DC X2 interface. Based on the number, the eNodeB calculates the usage of this EN-DC X2 interface.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonDeleteHoInNumThd.html">X2 SON Delete Ho In Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of incoming handovers for automatically removing an X2 interface based on X2 usage. An X2 interface is automatically removed if all of the following conditions are met:</p>
+<p>1. The number of handovers from the peer eNodeB to the local eNodeB within the period specified by the X2SonDeleteTimerforX2Usage parameter is less than or equal to the X2SonDeleteHoInNumThd value.</p>
+<p>2. The number of handovers from the local eNodeB to the peer eNodeB within the same period is less than or equal to the X2SonDeleteHoOutNumThd parameter value.</p>
+<p>3. No coordinating services are running over the X2 interface.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonDeleteHoOutNumThd.html">X2 SON Delete Ho Out Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of outgoing handovers for automatically removing an X2 interface based on X2 usage. An X2 interface is automatically removed if all of the following conditions are met:</p>
+<p>1. The number of handovers from the peer eNodeB to the local eNodeB within the period specified by the X2SonDeleteTimerforX2Usage parameter is less than or equal to the X2SonDeleteHoInNumThd value.</p>
+<p>2. The number of handovers from the local eNodeB to the peer eNodeB within the same period is less than or equal to the X2SonDeleteHoOutNumThd parameter value.</p>
+<p>3. No coordinating services are running over the X2 interface.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-VoipWithGapMode.html">VoIP With Gap Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether VoIP UEs are allowed to start periodic gap-assisted measurements, and whether VoIP UEs can stop periodic gap-assisted measurements when the VoIP UEs initiate VoIP services during gap-assisted measurements. A VoIP UE can start a periodic gap-assisted measurement during GSM and LTE buffer zone optimization or periodic inter-frequency/RAT measurements in cell tracing. If a UE has started a periodic gap-assisted measurement and then initiated a VoIP service, fast ANR, active PCI conflict detection, GSM and LTE buffer zone optimization, or periodic inter-frequency/RAT measurements in cell tracing can trigger the UE to stop the measurement.</p>
+<p>If this parameter is set to ENABLE, VoIP UEs are allowed to start periodic gap-assisted measurements for GSM and LTE buffer zone optimization and periodic inter-frequency/RAT measurement in cell tracing. The parameter setting does not affect the start of periodic gap-assisted measurements for fast ANR and active PCI conflict detection for VoIP UEs.</p>
+<p>If this parameter is set to DISABLE, VoIP UEs are prohibited to start periodic gap-assisted measurements and the UEs that have started periodic gap-assisted measurements stop these measurements after initiating VoIP services. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-IntraEnodebHoStaticSw.html">Intra-eNodeB HO Static Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to optimize the statistics collection method of counters related to the number of active UEs in intra-eNodeB handover scenarios. If this switch is on, active UEs are not counted in the source cell after the handover data transfer completes. If this switch is off, active UEs are counted in the source cell after the handover data transfer completes. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-MaxSyncUserNumPerBbi.html">Maximum Sync-User Number Per BBI</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of synchronized UEs supported by a baseband processing unit (BBP). This parameter currently applies only to LBBPd boards in eNodeBs. If the PucchPeriodicCqiOptSwitch parameter is set to OFF or at least one cell established in the LBBPd is configured with extended cyclic prefixes (CPs), the parameter value MAX_SYNC_USER_1200 takes effect irrespective of the actual parameter setting. This parameter applies only to LTE FDD and NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SetupFailureTimetoWait.html">X2 Setup Failure TimetoWait</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time to wait for sending an X2 setup request again when an X2 setup fails. When an X2 setup procedure fails, the eNodeB that accepted the X2 setup request sends an X2 Setup Failure message to the peer eNodeB. This message contains the TimetoWait IE to inform the peer eNodeB of the time to wait for sending an X2 setup request again. As defined in 3GPP TS 36.423, the peer eNodeB shall wait at least for the time indicated by the TimetoWait IE before re-initiating the X2 Setup procedure towards the same eNodeB. If this parameter is set to TIMETOWAIT_NOTCARRY, the X2 Setup Failure message does not contain the TimetoWait IE. The values TIMETOWAIT_1s, TIMETOWAIT_2s, TIMETOWAIT_5s, TIMETOWAIT_10s, TIMETOWAIT_20s, and TIMETOWAIT_60s indicate that the waiting time are 1s, 2s, 5s, 10s, 20s, and 60s, respectively. Assume that the number of X2 setup failures is N. If this parameter is set to TIMETOWAIT_Default, the TimetoWait IE takes effect as follows:</p>
+<p>1. If N &lt; 10, the waiting time is 5s.</p>
+<p>2. If 10 ≤ N &lt; 20, the waiting time is 10s.</p>
+<p>3. If 20 ≤ N &lt; 60, the waiting time is 20s.</p>
+<p>4. If N ≥ 60, the waiting time is 60s.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SetupFailureNumThd.html">X2 Setup Failure Num Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of X2 setup failures. The eNodeB that initiates the X2 setup procedure measures the number of X2 setup failures. If the number reaches this threshold within a period specified by the X2SetupFailureNumTimer parameter, the eNodeB no longer attempts to send the X2 setup request within the period. If this parameter is set to 0, the eNodeB does not measure the number of X2 setup failures and does not restrict X2 setup requests.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SetupFailureNumTimer.html">X2 Setup Failure Num Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of a period for measuring the number of X2 setup failures. If the number of X2 setup failures reaches the value of the X2SetupFailureNumThd parameter within a measurement period, the eNodeB that initiates the X2 setup no longer sends any X2 setup request within the period.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-eX2AutoDeleteSwitch.html">eX2 Auto Delete Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable eX2 automatic removal.</p>
+<p>BASED_ON_EX2FAULT(Based on EX2 Fault): eX2 automatic removal based on eX2 fault is enabled only if the option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-eX2AutoDeleteTimerforFault.html">eX2 Auto Delete Timer for eX2 Fault</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the timer for automatically removing eX2 interfaces based on eX2 fault. If an eX2 interface is faulty throughout the period specified by this timer, the eNodeB automatically removes the eX2 interface. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonDeleteMode.html">X2 SON Delete Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the X2 automatic removal mode. If this parameter is set to ALL_FREE_MODE(All free mode), all enabled X2 automatic removal functions work in free mode. In this mode, the eNodeB directly removes the X2 interfaces that are determined to be removed. If this parameter is set to HUAWEI_FREE_OTHER_CONTROLLED(HW free other controlled), some functions work in controlled mode. These functions refer to those controlled by the PeerReqBasedX2DelSwitch parameter, and BASED_ON_X2FAULT(Based on X2 Fault) and BASED_ON_X2USAGE_WITHOUT_NEGO(Based on X2 Usage Without Negotiation) of the X2SonDeleteSwitch parameter. In this mode, the X2 interfaces that need to be removed are reported to the MAE, and then the operators determine whether to remove the X2 interfaces. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonSetupNumThd.html">X2 SON Setup Num Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for triggering X2 self-setup. If the number of times an X2 interface needs to be set up between the local eNodeB and a peer eNodeB is greater than or equal to this threshold within the period specified by the X2SonSetupTimer parameter, the X2 interface self-setup is triggered on the local eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonSetupTimer.html">X2 SON Setup Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the timer for the local eNodeB measuring the number of times an X2 interface needs to be automatically set up. If the number of times an X2 interface needs to be set up between the local eNodeB and a peer eNodeB is greater than or equal to the threshold specified by the X2SonSetupNumThd parameter within a period specified by the X2SonSetupTimer parameter, the X2 interface self-setup is triggered on the local eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-SecKeyRecfgSwitch.html">Security Key Recfg after X2 Ho Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an eNodeB proactively reconfigures the access stratum (AS) security key after an X2-based handover. If this parameter is set to OFF(Off), the target eNodeB uses the AS security key received from the source eNodeB after the X2-based handover. If this parameter is set to ON(On), the target eNodeB calculates an AS security key based on the key received from the MME after the X2-based handover and delivers the RRCConnectionReconfiguration message to the UE to reconfigure the AS security key. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2BasedUptENodeBPolicy.html">Update eNB Configuration Via X2 Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB automatically updates neighboring cell configuration based on the messages received over the X2 interface. The messages include X2 SETUP REQUEST, X2 SETUP RESPONSE, and ENB CONFIGURATION UPDATE. This parameter provides the following option:</p>
+<p>FreqAddCtrl(FreqAddCtrl): This option controls whether the eNodeB adds neighboring E-UTRAN frequencies based on messages received over the X2 interface. If this option is selected, the eNodeB directly adds frequencies. If this option is deselected, the eNodeB does not add any frequencies when the PLMN in the operator information and the PLMN of the serving cell do not match.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-MMEDomNameMode.html">MME Domain Name Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the method of obtaining the domain name of an MME for S1-MME self-setup. If this parameter is set to Auto, the eNodeB constructs the domain name based on a TAI. If this parameter is set to Customized, the domain name is user-defined.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-RrcConnPunishThd.html">RRC Connection Punish Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for an RRC connection penalty. Certain UEs may repeatedly fail to access networks because of incompatibility issues. If the number of RRC connection setup requests that the eNodeB receives from a UE within the period specified by T300+FilterReptRrcConnReqTimer exceeds the threshold (a non-zero value), the eNodeB imposes a penalty on the UE, rejecting RRC connection setup requests from the UE. If this parameter is set to 0, the penalty does not take effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2BasedUptNcellCfgSwitch.html">X2-based Neighboring Cell Configuration Update Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the base station automatically updates neighboring cell configurations based on messages received over the X2 interface. The messages include X2 SETUP REQUEST, X2 SETUP RESPONSE, ENB CONFIGURATION UPDATE, EN-DC X2 SETUP REQUEST, EN-DC X2 SETUP RESPONSE, and EN-DC CONFIGURATION UPDATE. This parameter provides the following options:</p>
+<p>ADD_NCELL_CFG_SW: The base station automatically adds external cells and related configurations based on received X2 messages only if this option is selected.</p>
+<p>MOD_NCELL_CFG_SW: The base station automatically modifies neighboring cell and external cell configurations based on received X2 messages only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>DEL_NCELL_CFG_SW: The base station automatically deletes neighboring cell, blacklisted neighboring E-UTRAN cell, and external cell configurations based on received X2 messages only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ADD_FREQ_CFG_SW: If this option is selected, based on the X2 messages received by a base station, the base station automatically adds new frequencies brought by new or updated neighboring cell information to the neighboring E-UTRA frequency list of the local cell. If this option is deselected, the base station does not add new frequencies based on received X2 messages to the neighboring E-UTRA frequency list of the local cell, does not add cells on the new frequencies to the NCL of the base station, and removes neighbor relationships with cells on the new frequencies from the NRTs of the local cell.</p>
+<p>UPT_EXTERNALCELLBAND_CFG_SW: If this option is selected, the secondary frequency band configurations of cells served by the local base station can be delivered over the X2 interface and the secondary frequency band configurations of external cells can be updated for the local base station based on the configurations delivered over the X2 interfaces from other base stations. If this option is deselected, the local base station neither includes the secondary frequency band configurations in the X2 messages nor updates the secondary frequency band configurations of external cells based on received X2 messages.</p>
+<p>MOD_NR_NCELL_CFG_SW: The base station automatically modifies neighboring NR cell and external NR cell configurations based on received X2 messages only if this option is selected.</p>
+<p>DEL_NR_NCELL_CFG_SW: The base station automatically deletes neighboring NR cell and external NR cell configurations based on received X2 messages only if this option is selected.</p>
+<p>UPT_NR_EXT_CELL_NW_OPT_CFG_SW: If this option is selected, the base station automatically updates NR architecture options for external NG-RAN cells based on received X2 messages. If this option is deselected, the base station does not automatically update NR architecture options for external NG-RAN cells based on received X2 messages.</p>
+<p>UPT_NR_EXT_CELL_BAND_CFG_SW: If this option is selected in NSA scenarios, the base station updates local multi-band configuration of external NG-RAN cells based on the band list configuration delivered from the gNodeB over the X2 interface. If this option is deselected in NSA scenarios, the base station does not update the local multi-band configuration of external NG-RAN cells based on the band list configuration delivered from the gNodeB.</p>
+<p>UPT_NR_EXT_CELL_PLMN_CFG_SW: If this option is selected, the local base station can update the PLMN-specific gNodeB IDs and PLMN-specific cell identities in an NR-external-cell PLMN list of the local base station based on the information about the PLMNs and cell identities of a cell delivered from the gNodeB over the X2 interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-HoProcCtrlSwitch.html">Handover Process Control Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to control the handover process. This parameter provides the following options:</p>
+<p>HoDataSendCtrlSwitch: If this option is selected, the eNodeB sends data packets to a handover-incoming UE after sending a random access response (RAR) in a non-contention-based random access procedure. If this option is deselected, the eNodeB sends data packets to the UE after receiving an Msg3 message in the non-contention-based random access procedure. This option applies only to LTE FDD and LTE TDD.</p>
+<p>CsfbFlowFirstSwitch: Indicates the policy for handling the conflicts between handover and CSFB procedures. If this option is selected and the handover and CSFB procedures conflict, the eNodeB processes the CSFB procedure first. If this option is deselected in the preceding scenario, the eNodeB processes the handover procedure first. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GwcnIncomingHoWithoutHrlSwitch: Indicates whether the eNodeB determines whether to accept an incoming handover based on the HRL. If this option is deselected, the eNodeB directly rejects the incoming handover when not receiving the HRL from the EPC. If this option is selected, the eNodeB does not reject the incoming handover when not receiving the HRL from the EPC. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-RrcReestOptSwitch.html">RRC Reestablishment Optimize Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB supports RRC connection reestablishment in enhanced scenarios. This parameter provides the following options:</p>
+<p>PCI_CONFUSION_REEST_SWITCH: Indicates whether the eNodeB supports RRC connection reestablishment in PCI confusion scenarios. The eNodeB supports reestablishment in scenarios where PCIs of neighboring cells are the same only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>S1_HANDOVER_REEST_SWITCH: Indicates whether the eNodeB supports RRC connection reestablishment in S1-based handovers. The eNodeB supports reestablishment in S1-based handovers only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NO_CONTEXT_REEST_SWITCH: Indicates whether the eNodeB uses 3GPP specifications-compliant RRC connection reestablishment without UE context. If this option is selected, the eNodeB uses 3GPP specifications-compliant RRC connection reestablishment without UE context. If this option is deselected, the eNodeB uses common RRC connection reestablishment without UE context. This option applies only to LTE FDD and LTE TDD.</p>
+<p>SEC_CMD_REEST_SWITCH: Indicates whether the eNodeB responds to RRC connection reestablishment requests from UEs when the security mode is activated. The eNodeB responds to the requests if this option is selected and rejects the requests if this option is deselected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>WITH_X2_NO_NCELL_REEST_SWITCH: Indicates whether the eNodeB supports RRC connection reestablishment when an X2 interface is configured between the source and target eNodeBs but the source and target cells are not configured as neighboring cells of each other. This type of RRC connection reestablishment is supported only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>R15_NO_CONTEXT_REEST_SWITCH: Indicates whether the eNodeB supports 3GPP release 15-compliant RRC connection reestablishment without UE context. If this option is selected, 3GPP release 15-compliant RRC connection reestablishment without UE context is supported. If this option is deselected, 3GPP release 15-compliant RRC connection reestablishment without UE context is not supported. 3GPP release 15-compliant RRC connection reestablishment without UE context is supported in PCI confusion scenarios and is not supported when an X2 interface is configured between the source and target eNodeBs but the source and target cells are not configured as neighboring cells of each other. This option applies only to LTE FDD and LTE TDD.</p>
+<p>REEST_ENHANCED_CHECK_SWITCH: Indicates whether the eNodeB supports enhanced check during RRC connection reestablishment without UE context. If this option is selected, the source eNodeB checks the short MAC-I during RRC connection reestablishment without UE context. If this option is deselected, the source eNodeB does not check the short MAC-I during RRC connection reestablishment without UE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-S1MMESonSwitch.html">The Switch of S1-MME Configuration by SON</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable S1-MME self-configuration.</p>
+<p>S1MMESonSetupSwitch(S1MMESonSetupSwitch): S1-MME self-setup is enabled only if this option is selected.</p>
+<p>S1MMESonDeleteSwitch(S1MMESonDeleteSwitch): S1-MME self-removal is enabled only if this option is selected.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-CtrlMsgFwdType.html">Control Message Forward Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the transmission mode of control-plane messages between a main control board and a baseband processing unit (BBP). If this parameter is set to NORMAL, both the uplink and downlink control-plane messages are forwarded normally. If this parameter is set to DL_DIRECT, the downlink control-plane messages are forwarded directly. If this parameter is set to UL_DIRECT, the uplink control-plane messages are forwarded directly. If this parameter is set to DL_UL_MSG_DIRECT, both the uplink and downlink control-plane messages are forwarded directly.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-PrivateMdtUeSelSwitch.html">Private MDT UE Selection Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to use a private mechanism for management-based MDT data collection. If this parameter is set to ON, the eNodeB does not use authentication information to select UEs. If this parameter is set to OFF, the eNodeB selects UEs in accordance with 3GPP specifications. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-QciUpdParaCheckSwitch.html">QCI Upd Para Check Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to perform parameter checks when the QCI value is updated. If this parameter is set to ON, the function of checking related parameters is enabled when the QCI value is updated. If this parameter is set to OFF, this function is disabled when the QCI value is updated. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UeCompatSwitch.html">Ue Compatibility Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable compatibility optimization functions for UEs to control the differentiated handling of defective UEs.</p>
+<p>AbnormalUeHandleSwitch: Indicates whether to enable handling of defective UEs. If this option is selected, the eNodeB is allowed to take differentiated measures for defective UEs. If this option is deselected, the eNodeB is not allowed to take differentiated measures for defective UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>UltraFlashCsfbComOptSw: Indicates whether to enable the optimization of UE incompatibility risks in ultra-flash CSFB. If this option is selected, an eNodeB triggers an ultra-flash CSFB procedure based on the proprietary IE "SRVCC based eCSFB operation possible" that the MME sends to the eNodeB. If this option is deselected, the eNodeB does not trigger an ultra-flash CSFB procedure based on this IE. This option applies only to LTE FDD and LTE TDD.</p>
+<p>ForbidR8R9UeAccessB41Sw: Indicates whether to forbid 3GPP R8- or R9-compliant UEs to access frequencies ranging from 2575 MHz to 2595 MHz in band 41. If this option is selected, all 3GPP R8- or R9-compliant UEs are forbidden to access frequencies ranging from 2575 MHz to 2595 MHz in band 41. If this option is deselected, 3GPP R8- or R9-compliant UEs are allowed to access frequencies ranging from 2575 MHz to 2595 MHz in band 41. It is recommended that this option be selected when there are UEs reporting that they report band 41 but actually do not support frequencies ranging from 2575 MHz to 2595 MHz in band 41. This option applies only to LTE FDD and LTE TDD.</p>
+<p>PerExtendBitSw: Indicates whether to encode extended bit indicators for Uu messages if extended IEs specified by later 3GPP releases are not included in Uu message code. If this option is selected, extended bit indicators are not encoded. If this option is deselected, extended bit indicators are encoded. This option applies only to LTE FDD and LTE TDD.</p>
+<p>InterFddTddMeasComOptSw: Indicates whether to enable compatibility optimization on inter-duplex-mode measurements for UEs. If a UE reports the inter-duplex-mode measurement capability but actually does not support inter-duplex-mode measurements, this UE incompatibility issue may cause an increase in the service drop rate. If this option is selected, the eNodeB is not allowed to deliver inter-duplex-mode measurement configurations to such UEs. This option applies only to LTE FDD and LTE TDD.</p>
+<p>NbR13CompatSw: Indicates whether to enable error correction of 3GPP Release 13 on NB-IoT-related functions. For details about the related functions, see 3GPP TS 36.211, 36.213, 36.302, 36.331, 36.212, 36.321, 36.300, 36.302, 36.403, 36.322, and 36.323. If this option is selected, the eNodeB can interconnect with UEs complying with 3GPP Release 13 published in March 2017. If this option is deselected, the eNodeB can interconnect with only UEs complying with 3GPP Release 13 published earlier than March 2017. This option applies only to NB-IoT.</p>
+<p>HashedIdCompatSw: Indicates whether the eNodeB calculates hashed IDs for eDRX paging using the method defined in 3GPP TS 36.304 released in March 2017. When this option is selected, the eNodeB calculates hashed IDs for eDRX paging using the protocol-defined method. When this option is deselected, the eNodeB calculates hashed IDs for eDRX paging using the Huawei-proprietary method.</p>
+<p>PuschAndGapConflictOptSw: Indicates whether adaptive retransmission is used for the second retransmission when the first retransmission of PUSCH conflicts with a gap-assisted measurement and the PHICH for the first retransmission does not fall into any measurement gap. If this option is selected, adaptive retransmission is used for the second retransmission. If this option is deselected, non-adaptive retransmission is used for the second retransmission. This option applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-S1MmePrivFeatureInd.html">S1 MME Private Feature Indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable Huawei-proprietary functions related to the S1 interface. This parameter provides the following options:</p>
+<p>UeTypeRecogSwitch: Indicates whether to allow the eNodeB to obtain the IMEISV information of UEs from the MME. An eNodeB applies for the IMEISV information delivered from the MME only if this option is selected. For details about IMEISVs, see section 6.2.2 in 3GPP TS 23.003. As defined in section 9.2.3.38 in 3GPP TS 36.413 Release 12, the last 4 digits of the SNR in the IMEISV are masked by setting the corresponding bits to F. RimS1SelectOptSwitch: Indicates the operator type of the S1 interface selected by the eNodeB over which the eNodeB sends RIM requests and whether the eNodeB selects S1 interfaces of other operators to retry sending the RIM requests if the transmission of RIM requests over the selected S1 interface fails. If this option is selected, the eNodeB selects the primary operator's S1 interface and retries the transmission over S1 interfaces of other operators if the transmission of RIM requests over the primary-operator S1 interface fails. If this option is deselected, the eNodeB selects the S1 interface based on the order of PLMNs configured on the eNodeB and does not retry the transmission over S1 interfaces of other operators.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-SctpAbortSmoothSwitch.html">SCTP Link Abort Smooth Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable SCTP link abortion smooth. This parameter provides the following options:</p>
+<p>HUAWEI_S1_SCTP_ABORT_SMOOTH_SW(Huawei S1 SCTP Abort Smooth Sw): For an S1 interface that connects an eNodeB and a non-Huawei MME, if this option is selected, the eNodeB starts a smooth timer when the eNodeB receives an ABORT message from the MME. Before the timer expires, the S1 interface status does not change. After the timer expires, the S1 interface status does not change if the SCTP link is normal and changes to faulty if the SCTP link is faulty. In the preceding scenario, if this option is deselected, the S1 interface status immediately changes after the eNodeB receives an ABORT message from the MME.</p>
+<p>OTHER_S1_SCTP_ABORT_SMOOTH_SW(Other S1 SCTP Abort Smooth Sw): For an S1 interface that connects an eNodeB and a Huawei MME, if this option is selected, the eNodeB starts a smooth timer when the eNodeB receives an ABORT message from the MME. Before the timer expires, the S1 interface status does not change. After the timer expires, the S1 interface status does not change if the SCTP link is normal and changes to faulty if the SCTP link is faulty. In the preceding scenario, if this option is deselected, the S1 interface status immediately changes after the eNodeB receives an ABORT message from the MME.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-CsfbFlowOptSwitch.html">CSFB Flow Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable CSFB procedure optimization. This parameter provides the following option:</p>
+<p>UTRAN_CSFB_FREQ_CHOOSE_OPT_SW: Indicates whether to optimize target frequency selection for CSFB to UTRAN if there are several target frequencies with the same priority. The optimization is enabled only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2InitFailDelSwitch.html">X2 Init Fail Delete Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether X2 automatic removal takes effect when an initial X2 self-setup procedure fails. This function is valid only if this parameter is set to ON.</p>
+<p>If this parameter is set to ON, an eNodeB automatically removes an X2 interface when the eNodeB detects a constant fault of an SCTP link referenced by an initially self-setup X2 interface. Then, the eNodeB adds information of the local and peer eNodeBs of the X2 interface to the dynamic X2 blacklist. When operators deploy a new eNodeB or tune the network, the transport network may not be stable. It is recommended that this parameter be set to ON in this situation. When the transport network becomes stable, it is recommended that this parameter be set to OFF. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2DynBlacklistAgingTimer.html">X2 Dynamic Blacklist Aging Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the aging time of dynamic X2 blacklists that are automatically generated. When the aging time is reached, dynamic X2 blacklists automatically become invalid. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-eX2AutoSetupSwitch.html">eX2 Auto Setup Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether eX2 self-setup in ideal backhaul mode, eX2 self-setup in non-ideal backhaul mode, and eX2 self-setup in intra-physical-network-domain ideal backhaul mode take effect. This parameter provides the following options:</p>
+<p>BASED_ON_EX2_IDEAL_MODE: If this option is selected, eX2 self-setup in ideal backhaul mode takes effect. If this option is deselected, the local eNodeB does not initiate eX2 self-setup in ideal mode or respond to the eX2 self-setup request in deal backhaul mode sent from a peer eNodeB. This option applies only to LTE FDD and LTE TDD.</p>
+<p>BASED_ON_EX2_NON_IDEAL_MODE: If this option is selected, eX2 self-setup in non-ideal backhaul mode takes effect. However, if there are multiple eX2 interfaces in non-ideal backhaul mode, this function does not take effect. If this option is deselected, the local eNodeB does not initiate eX2 self-setup in non-ideal mode or respond to the eX2 self-setup request in non-deal backhaul mode sent from a peer eNodeB. This option applies only to LTE FDD and LTE TDD.</p>
+<p>EX2_INTRA_PHYNET_IDEAL: If this option is selected, eX2 self-setup in intra-physical-network-domain ideal backhaul mode takes effect. If this option is deselected, the local eNodeB does not initiate eX2 self-setup in intra-physical-network-domain ideal mode or respond to the eX2 self-setup request in intra-physical-network-domain deal backhaul mode sent from a peer eNodeB. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-eX2DynBlackListSwitch.html">eX2 Dynamic BlackList Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether dynamic eX2 blacklist in ideal backhaul or non-ideal backhaul modes takes effect. This parameter provides the following options:</p>
+<p>BASED_ON_EX2_IDEAL_MODE: If this option is selected, the function of dynamic eX2 blacklist in ideal backhaul mode takes effect. In this case, when an eX2 interface self-setup attempt fails, the eNodeB adds the eX2 interface to the dynamic eX2 blacklist. If this option is deselected, this function does not take effect and all generated dynamic eX2 blacklists are removed. This option applies only to LTE FDD and LTE TDD.</p>
+<p>BASED_ON_EX2_NON_IDEAL_MODE: If this option is selected, the functions of dynamic eX2 blacklist in non-ideal backhaul mode and eX2 automatic removal triggered by initial eX2 self-setup failures take effect. In this case, when an eX2 interface self-setup attempt fails, the eNodeB adds the eX2 interface to the dynamic eX2 blacklist. If this option is deselected, these functions do not take effect and all generated dynamic eX2 blacklists are removed. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-eX2DynBlackListAgingTimer.html">eX2 Dynamic BlackList Aging Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the aging time of dynamic eX2 blacklists. If the accumulated time of dynamic eX2 blacklists reaches the aging time, the eNodeB automatically removes the blacklists.</p>
+<p>This parameter is valid only if the BASED_ON_EX2_IDEAL_MODE or BASED_ON_EX2_NON_IDEAL_MODE option of the eX2DynBlackListSwitch parameter is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-RrcConnReqStatSwitch.html">Rrc Conn Req Stat Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable measurement to collect data related to RRC connection setup requests.</p>
+<p>RrcConnPunishStatSwitch: If this option is selected, the L.RRC.ConnReq.Msg and L.RRC.ConnReq.eMTC.Msg counters are incremented only by 1 when the RRC connection punishment function is enabled and a UE repeatedly sends an RRC connection setup request, which triggers the punishment mechanism. If this option is deselected, the L.RRC.ConnReq.Msg and L.RRC.ConnReq.eMTC.Msg counters are incremented by the actual number of times a UE repeatedly sends an RRC connection setup request. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-QciParaEffectFlag.html">QCI Parameter Effect Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the parameters UeInactiveTimerForQci, UlSynTimerForQci, UeInactivityTimerDynDrxQci, and CiotUeInactiveTimer in the QciPara MO take effect. If this parameter is set to OFF, the parameters UlSynTimer, UeInactivityTimerDynDrx, UeInactiveTimerQci1, UeInactTimerDynDrxQci1, and MTCUeInactiveTimer in the RrcConnStateTimer MO take effect. If this parameter is set to ON, the parameters UeInactiveTimerForQci, UlSynTimerForQci, UeInactivityTimerDynDrxQci, and CiotUeInactiveTimer in the QciPara MO take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-RimFirstMultiReportSwitch.html">RIM First MultiReport Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB checks the RSN in the first Multiple Report message sent from the RNC in a multiple RIM procedure. If this parameter is set to ON, the eNodeB does not check the RSN but updates the RSN. If this parameter is set to OFF, the eNodeB checks the RSN. If the RSN is verified, the eNodeB updates the RSN. Otherwise, the eNodeB discards the message. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UuMsgTimeOutRelCause.html">Uu Message Timeout Release Cause</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cause value of an S1 release when the timer specified by UuMessageWaitingTimer or UuMessageWaitingTimerQci1 expires.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-S1FaultSelfRecoverySwitch.html">S1 Fault Self-recovery Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow S1 self-recovery when an S1 interface has a fault.</p>
+<p>S1AP_MSG_ABNL_SR_SWITCH(S1 Fault Self-recovery Switch): If this option is selected, an eNodeB monitors the receiving and transmitting of S1AP messages. When the receiving and transmitting is consistently faulty, the eNodeB reestablishes the faulty S1 for self-recovery. If this option is deselected, the eNodeB does not monitor the receiving and transmitting of S1AP messages and does not reestablish the faulty S1 for self-recovery when the receiving and transmitting is consistently faulty.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-ItfTypeForNonIdealModeServ.html">Service Coord Interface in Non-ideal TX mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interface type to support coordination features in no-ideal backhaul mode. If this parameter is set to EX2(EX2), an eX2 interface is used for carrying coordinating services in non-ideal backhaul mode. If this parameter is set to X2, an X2 interface is used for carrying coordinating services in non-ideal backhaul mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-SigPoolOptPolicy.html">Signaling Pool Optimization Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the signaling optimization policy. The UMPTa/b+UBBPd signaling optimization policy takes effect only if this parameter is set to ON.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-EnhancedRRCReestProtectThd.html">Enhanced RRC Reest Protection Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the protection threshold of the number of RRC connection reestablishments initiated by the same UE in an eNodeB. UE manufacturers may have different understanding of protocols, and therefore UE compliance with protocols varies and may be different from eNodeB compliance with the same protocols. Some UEs may initiate the same RRC connection reestablishments repeatedly after a successful RRC connection reestablishment. If this parameter is set to a non-zero value, the RRC connection reestablishment protection function is enabled. If this parameter is set to 0, the RRC connection reestablishment protection function is disabled. This function normally releases a UE when the number of RRC connection reestablishment procedures initiated by the UE in an eNodeB exceeds the threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-S1DefaultPagingDrxForNb.html">S1 Default Paging DRX Value for NB-IoT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the value of the IE NB-IoT Default Paging DRX contained in the S1 SETUP REQUEST and ENB CONFIGURATION UPDATE messages that the eNodeB sends over the S1 interface. For details, see 3GPP TS 36.413. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonSecMode.html">X2 SON Security Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the security mode for X2 self-setup when the local eNodeB receives the control-plane SCTP IP address, security tunnel IP address, and user-plane GTP IP address of the peer eNodeB at the same time during an X2 self-setup. If this parameter is set to CP_UP, security tunnels will be automatically set up for both the user plane and control plane. If this parameter is set to UP, a security tunnel will be automatically set up only for the user plane. This parameter takes effect only when an IPv4 security tunnel address is received but no IPv6 security tunnel address is received. In other scenarios, for example, only an IPv6 security tunnel address is received or both IPv4 and IPv6 security tunnel addresses are received, this parameter does not take effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-ProcTypeForNonIdealServData.html">Service Coord Data Processing Type in Non-ideal Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode of processing data related to coordination-based features in non-ideal backhaul mode. If this parameter is set to HARD, data is processed by hardware. If this parameter is set to SOFT, data is processed by software.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-Ex2DeleteTimerForEx2Usage.html">eX2 Auto Delete Timer for eX2 Usage</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the timer for automatically removing eX2 interfaces based on eX2 usage. An eX2 interface is automatically removed if no services are running over the interface within the time defined by this parameter. If this parameter is set to 0, eX2 automatic removal based on eX2 usage does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-SinglePlmnHostSplitSwitch.html">Single PLMN Host Split Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to support control-plane or user-plane local host split for an operator and a specific interface. S1_SWITCH: Indicates whether the S1 interface supports local host split.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InterfaceSetupPolicySw.html">Interface Setup Policy Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interface setup policies. This parameter provides the following options:</p>
+<p>X2_SON_INTER_OP_SETUP_FBD_SW: If this option is selected, inter-operator X2 self-setup is forbidden. If this option is deselected, inter-operator X2 self-setup is allowed.</p>
+<p>LTE_NR_X2_SON_SETUP_SW: If this option is selected, X2 self-setup between LTE and NR is enabled. If this option is deselected, the local eNodeB does not send an X2 self-setup request to the gNodeB and does not respond to an X2 self-setup request sent from the peer gNodeB. This option applies only to LTE FDD and LTE TDD.</p>
+<p>X2_SON_SETUP_NO_NR_NRT_SW: Indicates whether to trigger X2 self-setup if a neighbor relationship with the cell of the target SgNB is not configured on the target MeNB during an inter-eNodeB or inter-gNodeB cell change. If this option is selected, X2 self-setup can be triggered. If this option is deselected, X2 self-setup cannot be triggered. This parameter takes effect only when the LTE_NR_X2_SON_SETUP_SW option of the GlobalProcSwitch.InterfaceSetupPolicySw parameter is selected. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InitMsgProtectThld.html">Initial Access Message Protect Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of initial access messages that the eNodeB allows to process in a second.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InitMsgRatioThldDT.html">Delay Tolerance Initial Message Ratio Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the ratio of the number of initial access messages with the cause "delayTolerantAccess-v1020" that the eNodeB is allowed to process in a second to the total number of initial access messages.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InitMsgRatioThldHighPri.html">High Priority Initial Message Ratio Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the ratio of the number of initial access messages with the cause "highPriorityAccess" that the eNodeB is allowed to process in a second to the total number of initial access messages.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InitMsgRatioThldMoData.html">MO Data Initial Message Ratio Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the ratio of the number of initial access messages with the cause "mo-Data" that the eNodeB is allowed to process in a second to the total number of initial access messages.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InitMsgRatioThldMoSig.html">MO Signaling Initial Message Ratio Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the ratio of the number of initial access messages with the cause "mo-Signalling" that the eNodeB is allowed to process in a second to the total number of initial access messages.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InactvtyTmrExpnProcStrat.html">Inactvty Tmr Expiration Processing Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the processing policy applied when there is a conflict between the expiration of the inactivity timer and signaling procedures. The signaling procedures are procedures in which the eNodeB is waiting for Uu interface response messages from UEs, and the messages include RRCConnectionReconfigurationComplete, SecurityModeComplete, RRCConnectionReestablishmentComplete, UECapabilityInformation, and CounterCheckResponse messages. If this parameter is set to DEFAULT, the eNodeB directly releases a UE and terminates the ongoing signaling procedures when the UE inactivity timer expires. If this parameter is set to ALL_SIGNALING_FLOW_FIRST, the eNodeB continues processing the ongoing signaling procedures and does not directly release the UE when the UE inactivity timer expires. If this parameter is set to ONLY_ERAB_SETUP_FLOW_FIRST, the eNodeB does not directly release the UE and continues processing a bearer setup procedure only when the UE inactivity timer expires and the bearer setup procedure is ongoing. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-HoErabConflProcessingStrat.html">HO and E-RAB Conflict Processing Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy for handling conflicts between handover-related procedures and bearer-related procedures. A handover-related procedure refers to as an X2- or S1-based handover preparation phase. A bearer-related procedure refers to as a bearer setup, modification, or deletion procedure. If this parameter is set to HO_FLOW_FIRST, the eNodeB processes the handover-related procedure first when a conflict occurs. If this parameter is set to ERAB_FLOW_FIRST, the eNodeB performs as follows when a conflict occurs: 1. If the handover is not for CSFB, or an SRVCC procedure conflicts with a QCI-1 bearer release procedure, the eNodeB processes the bearer-related procedure first. 2. If the handover is for CSFB, or an SRVCC procedure conflicts with another bearer-related procedure, the eNodeB processes the handover-related procedure first. If this parameter is set to ONLY_X2_HO_ERAB_FLOW_FIRST, the eNodeB processes the bearer-related procedure first only when an X2-based handover-related procedure and a bearer-related procedure conflict. When an S1-based handover-related procedure and a bearer-related procedure conflict, the eNodeB processes the handover-related procedure first. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InterRatPowerSharingTime.html">Inter-RAT Power Sharing Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time segments in which dynamic power sharing between UMTS and LTE takes effect. Dynamic power sharing between UMTS and LTE can be triggered in different time segments based on traffic distribution on the live network. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-NbRrcConnPunishmentThld.html">NB-IoT RRC Connection Punishment Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for an RRC connection penalty on NB-IoT UEs. Certain UEs may repeatedly fail to access the network because of compatibility issues. If this parameter is set to 0, the RRC connection penalty function is disabled. If this parameter is set to a non-zero value, the function is enabled. If the number of RRC connection setup requests that the base station receives from a UE within the RRC connection penalty period exceeds the threshold, the base station imposes a penalty on the UE, rejecting RRC connection setup requests from the UE. Alternatively, if the number of RRC connection resume requests that the base station receives from a UE within this period exceeds the threshold, the base station rejects RRC connection resume requests from the UE. The length of the RRC connection penalty period is equal to min{T300ForNb + FilterReptRrcConnReqTimer, MaxFilterTimer}. In V100R015C10 or an earlier version, the value of MaxFilterTimer is 17s. In other cases, the value of MaxFilterTimer is 35s.</p>
+<p>This parameter takes effect for NB-IoT UEs. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-EmtcRrcConnPunishmentThld.html">eMTC RRC Connection Punishment Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for an RRC connection penalty on eMTC UEs. Certain UEs may repeatedly fail to access the network because of compatibility issues. If this parameter is set to 0, the RRC connection penalty function is disabled. If this parameter is set to a non-zero value, the function is enabled. If the number of RRC connection setup requests that the eNodeB receives from a UE within the time specified by the sum of T300CE and FilterReptRrcConnReqTimer exceeds the threshold, the eNodeB imposes a penalty on the UE, rejecting RRC connection setup requests from the UE. This parameter is valid only for eMTC UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-LteRrcConnPunishmentThld.html">LTE RRC Connection Punishment Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for an RRC connection penalty on LTE UEs. Certain UEs may repeatedly fail to access the network because of compatibility issues. If this parameter is set to 0, the RRC connection penalty function is disabled. If this parameter is set to a non-zero value, the function is enabled. If the number of RRC connection setup requests that the eNodeB receives from a UE within the time specified by the sum of T300 and FilterReptRrcConnReqTimer exceeds the threshold, the eNodeB imposes a penalty on the UE, rejecting RRC connection setup requests from the UE. This parameter is valid only for LTE UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SonDeleteGnbAddCntThld.html">X2 SON Delete gNodeB Addition Count Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of SgNB additions for automatically removing X2 interfaces based on NSA X2 usage. If the measured number of successful SgNB additions corresponding to an X2 interface within a timer length is less than or equal to this threshold and no NSA UEs use the X2 interface, automatic removal of this X2 interface is triggered. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-NonIdealModeCoordServQci.html">QCI of Non-ideal Mode Coordination Service</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the QCI of coordination-based services in non-ideal backhaul scenarios. The value of this parameter must be the same on the entire network. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-InterEnodebX2SpecExcluRate.html">Inter-eNodeB X2 Spec Exclusive Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of the maximum number of X2 interfaces exclusive to inter-eNodeB X2 interfaces in X2 self-removal based on dynamic sharing of the X2 specification. The maximum number of X2 interfaces exclusive to inter-eNodeB X2 interfaces is the round-up value of the product of this parameter value and the maximum total number of X2 interfaces. If X2 self-removal based on dynamic sharing of the X2 specification is enabled and the maximum number of X2 interfaces not exclusive to inter-eNodeB X2 interfaces is insufficient for EN-DC X2 interfaces, self-setup EN-DC X2 interfaces cannot occupy the X2 interface resources exclusive to inter-eNodeB X2 interfaces.</p>
+<p>If the peer ID is not configured correctly during manual X2 setup or this parameter value is changed, then EN-DC X2 interfaces may occupy the X2 interface resources exclusive to inter-eNodeB X2 interfaces, and X2 self-removal based on dynamic sharing of the X2 specification cannot automatically remove EN-DC X2 interfaces that occupy the X2 interface resources exclusive to inter-eNodeB X2 interfaces. In this case, it is recommended that EN-DC X2 interfaces be manually removed or EN-DC X2 self-removal be enabled.</p>
+<p>This parameter is valid only when the BASED_ON_SPEC_DYNAMIC_SHARING option of the X2SonDeleteSwitch parameter in the GlobalProcSwitch MO is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-X2SpecSharingSw.html">X2 Spec Sharing Sw</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether inter-eNodeB X2 interfaces can occupy unused X2 interface resources among the shared X2 interface resources. If this parameter is set to ON, inter-eNodeB X2 interfaces can be set up using the unused X2 interface resources among the shared X2 interface resources. If this parameter is set to OFF, inter-eNodeB X2 interfaces cannot be set up using the unused X2 interface resources among the shared X2 interface resources. If an inter-eNodeB X2 interface is set up using the shared X2 interface resources, this X2 interface will not be removed immediately but be removed based on subsequent EN-DC X2 self-setup. The maximum number of X2 interfaces occupying shared X2 interface resources is equal to the maximum number of X2 interfaces minus the maximum number of X2 interfaces exclusive to inter-eNodeB X2 interfaces which is specified by the InterEnodebX2SpecExcluRate parameter in the GlobalProcSwitch MO.</p>
+<p>This parameter is valid only when the BASED_ON_SPEC_DYNAMIC_SHARING option of the X2SonDeleteSwitch parameter in the GlobalProcSwitch MO is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-LteNrPowerSharingTime.html">LTE and NR Power Sharing Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time segments in which dynamic power sharing between LTE and NR takes effect. Dynamic power sharing between LTE and NR can be enabled in different time segments based on traffic distribution on the live network. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-UeEutraCapbIeSizeThld.html">UE-EUTRA-Capability IE Size Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the size threshold of the IE "UE-EUTRA-Capability" which is used to trigger network-requested CA band combination reporting. Assume that the SupportNetReqCaComboSwitch option is selected. If this parameter is set to a non-zero value, network-requested CA band combination reporting is triggered when the size of the IE "UE-EUTRA-Capability" in UE capability information is greater than the parameter value. If this parameter is set to 0, the threshold is invalid. In this case, network-requested CA band combination reporting is triggered when the number of CA band combinations in the UE capability information reaches 128. For details about the definition of the IE "UE-EUTRA-Capability", see 3GPP TS 36.331. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GlobalProcSwitch-S1FaultCellDeactWaitTime.html">S1 Fault Cell Deactivation Waiting Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the waiting time for deactivating all cells served by an eNodeB when all its S1 interfaces fail.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="GlobalProcSwitch__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="GlobalProcSwitch__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GlobalProcSwitch-CrsAntPortOptDetResult.html">CRS Antenna Port Opt Mapping Detection Result</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the CRS antenna port mapping optimization detection result of the cell. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GlobalProcSwitch-CurrentCrsAntPortMap.html">Current CRS Antenna Port Mapping</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the current mapping between cell-specific reference signal (CRS) ports and transmit (TX) channels in an RRU. As defined in 3GPP specifications, the CrsPortNum parameter can be set to CRS_PORT_1, CRS_PORT_2, or CRS_PORT_4. The value CRS_PORT_1 indicates that one CRS port (port 0) is configured. The value CRS_PORT_2 indicates that two CRS ports (ports 0 and 1) are configured. The value CRS_PORT_4 indicates that four CRS ports (ports 0, 1, 2 and 3) are configured. In values of this parameter, mTnP indicates that the number of TX channels configured for a cell is "m" and the number of CRS ports is "n". The parameter value 4TnP_abcd indicates that reference signals transmitted over CRS ports a, b, c, and d are mapped to TX channels 1, 2, 3, and 4 in an RRU, respectively (The TX channel number here is for reference only, and the actual number is R0A to R0D, or others). The parameter value NOT_CFG indicates that the mapping between CRS ports and TX channels in an RRU is not configured, and CRS ports are mapped to TX channels in an RRU in a default manner. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GlobalProcSwitch-OptCrsAntPortMap.html">Optimal CRS Antenna Port Mapping</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the optimal mapping between cell-specific reference signal (CRS) ports and transmit (TX) channels in an RRU. As defined in 3GPP specifications, the CrsPortNum parameter can be set to CRS_PORT_1, CRS_PORT_2, or CRS_PORT_4. The value CRS_PORT_1 indicates that one CRS port (port 0) is configured. The value CRS_PORT_2 indicates that two CRS ports (ports 0 and 1) are configured. The value CRS_PORT_4 indicates that four CRS ports (ports 0, 1, 2 and 3) are configured. In values of this parameter, mTnP indicates that the number of TX channels configured for a cell is "m" and the number of CRS ports is "n". The parameter value 4TnP_abcd indicates that reference signals transmitted over CRS ports a, b, c, and d are mapped to TX channels 1, 2, 3, and 4 in an RRU, respectively (The TX channel number here is for reference only, and the actual number is R0A to R0D, or others). The parameter value NOT_CFG indicates that the mapping between CRS ports and TX channels in an RRU is not configured, and CRS ports are mapped to TX channels in an RRU in a default manner. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GlobalProcSwitch-CrsOptDetCompletionStatus.html">CRS Opt Det Completion Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the detection status of CRS optimization in the entire eNodeB. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GlobalProcSwitch-CrsOptDetectionProgress.html">CRS Optimization Detection Progress</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the execution progress of CRS optimization detection in the entire eNodeB. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

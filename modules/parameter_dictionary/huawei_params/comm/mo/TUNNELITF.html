@@ -1,0 +1,150 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="TUNNELITF">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="LTE FDD">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="TUNNELITF">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>TUNNELITF</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="TUNNELITF"></a><a name="TUNNELITF"></a>
+
+
+<h1 class="topictitle1">TUNNELITF</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="TUNNELITF.html"><strong>TUNNELITF</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This object is used to configure the tunnel interface.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>TUNNELITF</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>TUNNELITF</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>REMOTEIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be different from <strong>REMOTEIP6</strong> of any existing <strong>TUNNELITF</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]The number of <strong>TUNNELITF</strong> MOs with <strong>CTRLMODE</strong> set to MANUAL_MODE cannot exceed 128.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>LOCALIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be different from <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> in an <strong>SCTPHOST</strong> MO with <strong>IPVERSION</strong> set to IPv6 in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>LOCALIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be different from <strong>LOCIP6</strong> and <strong>SECLOCIP6</strong> in an <strong>SCTPLNK</strong> MO with <strong>IPVERSION</strong> set to IPv6 in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>LOCALIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be different from <strong>LOCIPV6</strong> in a <strong>USERPLANEHOST</strong> MO with <strong>IPVERSION</strong> set to IPv6 in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>VRF</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>VRFIDX</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be set to a configured <strong>VRF</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]The value of <strong>LOCALIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be the same as that of <strong>IPV6</strong> in an <strong>IPADDR6</strong> MO that has been configured in the same routing domain on the base station, and the <strong>IPADDR6</strong> MO must be configured on the <strong>INTERFACE</strong> MO with <strong>PT</strong> set to ETH or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>REMOTEIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be different from <strong>IPV6</strong> in an <strong>IPADDR6</strong> MO.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, <strong>REMOTEIP6</strong> in a <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE must be different from <strong>IP6</strong> in an <strong>OMCH</strong> MO with <strong>BEAR</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>INTERFACE</strong> MO is set to TUNNELITF, the <strong>TUNNELITF</strong> MO referenced by the <strong>INTERFACE</strong> MO must exist.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>PT</strong> and <strong>CTRLMODE</strong> in an <strong>INTERFACE</strong> MO are set to TUNNELITF and MANUAL_MODE, respectively, <strong>CTRLMODE</strong> in the <strong>TUNNELITF</strong> MO cannot be set to AUTO_MODE.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>PT</strong> in the <strong>INTERFACE</strong> MO is TUNNELITF, <strong>VRFIDX</strong> in the <strong>INTERFACE</strong> MO must be different from <strong>VRFIDX</strong> in the <strong>INTERFACE</strong> MO of the ETH or ETHTRK type referenced by the <strong>LOCALIP6</strong> of the <strong>TUNNELITF</strong> MO on which the <strong>INTERFACE</strong> MO of the TUNNELITF type depends.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]In the same routing domain, if <strong>SRCIP</strong> of an <strong>SRCIPROUTE6</strong> MO is the same as <strong>LOCALIP6</strong> of a <strong>TUNNELITF</strong> MO, <strong>RTTYPE</strong> of the <strong>SRCIPROUTE6</strong> MO is set to NEXTHOP.</li></ul>
+</li><li>Relation with the <strong>SECURITYPEER</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>SEGWSWITCH</strong> in a <strong>SECURITYPEER</strong> MO is set to DISABLE and <strong>IPVERSION</strong> is set to IPv6, <strong>PEERIKEIPV6</strong> must be different from <strong>REMOTEIP6</strong> in the <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#TUNNELITF__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="TUNNELITF__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="TUNNELITF__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_tunnelitf.html">ADD TUNNELITF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a tunnel interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_tunnelitf.html">LST TUNNELITF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration information of tunnel interfaces.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_tunnelitf.html">MOD TUNNELITF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify a tunnel interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_tunnelitf.html">RMV TUNNELITF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a tunnel interface.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#TUNNELITF__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="TUNNELITF__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="TUNNELITF__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNELITF-PortID.html">Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port ID of a tunnel interface. The value of PORTID in the TUNNELITF MOs configured by users ranges from 0 to 127. The value of PORTID in the TUNNELITF MOs configured by the system ranges from 10000 to 19999.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNELITF-Mode.html">Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode of the tunnel interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNELITF-VRFIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNELITF-LocalIP6.html">Local IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IPv6 address of the tunnel interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNELITF-RemoteIP6.html">Remote IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the remote IPv6 address of the tunnel interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TUNNELITF-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object can be automatically modified or removed by the system. When this parameter is set to MANUAL_MODE, only users can perform operations on the object. When this parameter is set to AUTO_MODE, only the system can perform operations on the object.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

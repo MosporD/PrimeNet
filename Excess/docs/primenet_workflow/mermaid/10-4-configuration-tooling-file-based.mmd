@@ -1,0 +1,18 @@
+flowchart TB
+    subgraph XML["XML Parser — ncm_core.XMLToExcelConverter"]
+        X1["Upload XML"] --> X2["Convert"] --> X3["Download Excel"]
+    end
+    subgraph XL["Excel Generator — ncm_core.ExcelToXMLConverter"]
+        E1["Upload Excel"] --> E2["Convert"] --> E3["Download XML"]
+    end
+    subgraph NE["NE Comparison — ncm_core.XMLComparator"]
+        N1["Upload 2 NE XMLs"] --> N2["Compare"] --> N3["Report download"]
+    end
+    subgraph CH["Config History"]
+        C1["POST upload"] --> C2["config_versions table"]
+        C2 --> C3["diff / download / delete"]
+    end
+    subgraph TS["Config Task Scheduler"]
+        T1["Create task + attachments"] --> T2["config_scheduler_* tables"]
+        T2 --> T3["status / result file downloads"]
+    end

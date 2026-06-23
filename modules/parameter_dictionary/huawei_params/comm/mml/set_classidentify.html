@@ -1,0 +1,106 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Clock Class Identify Flag (SET CLASSIDENTIFY)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_classidentify">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Clock Class Identify Flag (SET CLASSIDENTIFY)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_classidentify"></a><a name="set_classidentify"></a>
+
+
+<h1 class="topictitle1">Set Clock Class Identify Flag (SET CLASSIDENTIFY)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_classidentify__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the flag for the priority clock class of the IP clock link. If the IP clock link complies with the Precision Time Protocol (PTP) but the peer clock server does not support standardized priority clock classes, you can run this command to set the identifier for the priority clock class to OFF. This command is only valid for 1588 OC_SLAVE.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_classidentify__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If two OC_SLAVE IP clock links in compliance with IEEE 1588 V2 are configured, modification of the Priority Clock Class Identify Flag parameter takes effect for both the links.</p>
+</li><li><p>Modifications on the Priority Clock Class Identify Flag parameter are valid only when the Profile Type parameter is set to 1588V2 or 1588V2_16.1.</p>
+</li><li><p>If Priority Clock Class Identify Flag is set to ON and the clock quality level of the IP server is beyond the priority clock class range, the IP clock will become unavailable.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_classidentify__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-IpClkNo.html">LN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Link No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the IP clock link.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPCLKLNK</strong> MO, when the value of <strong>DEVTYPE</strong> is set to OC_SLAVE, the value of <strong>LN</strong> must be 0 or 1. When the value of <strong>DEVTYPE</strong> is set to OC_MASTER, the value of <strong>LN</strong> must be 2.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPCLKLNK-ClassIdentify.html">CLASSIDENTIFY</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Priority Clock Class Identify Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the BMC (Best Master Clock) algorithm is enabled or not. ON indicates that the BMC algorithm is enabled, and OFF indicates that the BMC algorithm is disabled.</p>
+<p>GUI Value Range: OFF, ON</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: ON</p>
+<p>Recommended Value: ON(ON)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_classidentify__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the flag for the priority clock class to ON, run the following command:
+SET CLASSIDENTIFY: CLASSIDENTIFY=ON;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

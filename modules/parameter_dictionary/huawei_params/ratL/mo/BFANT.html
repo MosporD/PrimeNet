@@ -1,0 +1,317 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="BfAnt">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="BFANT">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>BfAnt</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="BFANT"></a><a name="BFANT"></a>
+
+
+<h1 class="topictitle1">BfAnt</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="BFANT.html"><strong>BfAnt</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A BFANT MO defines a beamforming (BF) antenna. By adjusting the amplitude and phase of output signals at each port of a BF antenna, the eNodeB can transmit a beam of a specific width to achieve increased gains.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="eNodeBFunction.html">eNodeBFunction</a></li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>If the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE, the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and no <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, a <strong>BfAnt</strong> MO must be associated with the <strong>WeightNO</strong> parameter in the <strong>eUCellSectorEqm</strong> MO bound to the cell, and the <strong>FreqBand</strong> parameter in the <strong>Cell</strong> MO must be set to the same value as the <strong>Band</strong> parameter.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>SectorSplitCell</strong>, and <strong>eUCellSectorEqm</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, and no <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, a <strong>BfAnt</strong> MO must be associated with the <strong>WeightNO</strong> parameter in the <strong>eUCellSectorEqm</strong> MO bound to the cell, and the <strong>CoverageScenario</strong> parameter in the <strong>BfAnt</strong> MO must not be set to NONE.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellPdcchAlgo</strong>, and <strong>eUCellSectorEqm</strong> MOs:<ul><li>When the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE(Active) and the MASSIVE_MIMO_PDCCH_SDMA_SW option of the <strong>SplitBeamPdcchSdmaSw</strong> parameter in the <strong>CellPdcchAlgo</strong> MO is selected, the <strong>BfAnt</strong> MO associated with the <strong>WeightNO</strong> parameter in the <strong>eUCellSectorEqm</strong> MO bound to the cell must exist, and the <strong>CoverageScenario</strong> parameter in the <strong>BfAnt</strong> MO must be set to SCENARIO_2(HBW 65 Degree, VBW 8 Degree), SCENARIO_3(HBW 45 Degree, VBW 8 Degree), SCENARIO_4(HBW 25 Degree, VBW 8 Degree), SCENARIO_6(HBW 65 Degree, VBW 17 Degree), SCENARIO_7(HBW 45 Degree, VBW 17 Degree), SCENARIO_8(HBW 25 Degree, VBW 17 Degree), SCENARIO_10(HBW 65 Degree, VBW 35 Degree), SCENARIO_11(HBW 45 Degree, VBW 35 Degree), or SCENARIO_12(HBW 25 Degree, VBW 35 Degree).</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellMMAlgo</strong>, and <strong>eUCellSectorEqm</strong> MOs:<ul><li>When the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE(Active) and the <strong>BeamGainLimitSwitch</strong> parameter in the <strong>CellMMAlgo</strong> MO is set to ON(On), the <strong>BfAnt</strong> MO associated with the <strong>WeightNO</strong> parameter in the <strong>eUCellSectorEqm</strong> MO bound to the cell must exist, and the <strong>CoverageScenario</strong> parameter in the <strong>BfAnt</strong> MO must not be set to SCENARIO_3(HBW 45 Degree, VBW 8 Degree), SCENARIO_4(HBW 25 Degree, VBW 8 Degree), SCENARIO_8(HBW 25 Degree, VBW 17 Degree), SCENARIO_9(HBW 15 Degree, VBW 17 Degree), or SCENARIO_13(HBW 15 Degree, VBW 35 Degree).</li></ul>
+</li><li>Relation with the <strong>CellPdcchAlgo</strong> MO:<ul><li>The <strong>PdcchSdmaWeightType</strong> parameter in a <strong>CellPdcchAlgo</strong> MO can be set to PREFERENTIAL_ENHANCED_SDMA(PREFERENTIAL_ENHANCED_SDMA) only when the <strong>CoverageScenario</strong> parameter in the <strong>BfAnt</strong> is set to SCENARIO_2(HBW 65 Degree, VBW 8 Degree) or SCENARIO_6(HBW 65 Degree, VBW 17 Degree).</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#BFANT__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="BFANT__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="BFANT__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/act_bfantdb.html">ACT BFANTDB</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to activate the weight database file for a beamforming antenna. This command applies only to LTE TDD non-massive MIMO scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_bfant.html">ADD BFANT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a beamforming antenna.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_bfant.html">DSP BFANT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the dynamic information about one or all beamforming antennas.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_bfantdb.html">DSP BFANTDB</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the weight database file for a beamforming antenna. This command applies only to LTE TDD non-massive MIMO scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_bfant.html">LST BFANT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of one or all beamforming antennas.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_bfant.html">MOD BFANT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a beamforming antenna.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_bfant.html">RMV BFANT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a beamforming antenna.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#BFANT__tab2">Table 2</a> and <a href="#BFANT__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="BFANT__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="BFANT__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-DeviceNo.html">Device No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the device number of a beamforming antenna. It uniquely identifies a beamforming antenna within an eNodeB. This parameter is associated with the WeightNO parameter in the eUCellSectorEqm MO. If the WeightNO parameter in the eUCellSectorEqm MO is set to 255, the weight corresponding to the smallest DeviceNo parameter value is used. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-Manufactory.html">Manufactory</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the manufacturer of a beamforming antenna. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-CrsSplitBeamIndicator.html">CRS Split Beam Indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates a split beam for the CRS of a cell from a split. If this parameter is set to a value ranging from 0 to 7, the eNodeB uses the split beam specified by this parameter to transmit the CRS of the soft split cell. The values 0 to 7 are divided into four groups: (0, 1), (2, 3), (4, 5), and (6, 7). This parameter must be set to different values in any of these groups for two split cells in a SSRDCellGroup MO. For example, if this parameter is set to 0 for the primary cell in a SSRDCellGroup MO, this parameter must be set to 1 for the split cell in the same MO. If this parameter is set to 255, the eNodeB uses the default split beam to transmit the CRS of the soft split cell. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-VerticalBeamWidth.html">Vertical Beam Width</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the vertical beam width. This parameter only applies to LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-CabinetNo.html">Connect RRU cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the RRU to which a beamforming antenna is connected. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-SubrackNo.html">Connect RRU subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the RRU to which a beamforming antenna is connected. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-SlotNo.html">Connect RRU slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the RRU to which a beamforming antenna is connected. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-AntennaModel.html">Antenna model number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the model of a beamforming antenna. Set this parameter to RAE if the antenna weight must be queried on the RAE. The value RAE is case-insensitive, while other values are case-sensitive. In massive MIMO broadcast scenarios, this parameter must be set to MassiveAntenna. For details about this parameter setting in split-related and other scenarios, see related FPD documents. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-Tilt.html">Tilt</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the integral part of the tilt corresponding to the beamforming weighting value. This parameter is used with the TiltFractionalPart parameter, which indicates the fractional part (tenths) of the tilt. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-BeamWidth.html">Beamwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the horizontal beamwidth formed after beamforming. This parameter is not used in massive MIMO scenarios. This parameter applies only to LTE TDD networks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-Band.html">Band</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency band used by a beamforming antenna. The value 0 is a broad frequency band, indicating that the object weight is applicable to all frequency bands. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-Type.html">Antenna Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of a beamforming antenna. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-BFANTBEARING.html">BFANTBEARING</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates angle at which an antenna deflects the horizontal azimuth of the beam (weight-based deflection relative to the mechanical azimuth). In non-massive MIMO scenarios, this parameter indicates only the degree at which a smart antenna deflects. In massive MIMO scenarios, this parameter indicates the degree at which an antenna deflects. With the mechanical azimuth of the antenna as the normal line, a clockwise deflection requires a positive value and a counterclockwise deflection requires a negative value. This parameter applies only to broadcast beams, but not to traffic beams. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-CoverageScenario.html">Coverage Scenario</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the coverage scenario of a massive MIMO antenna. This parameter is used to adjust the antenna beam pattern. The values EXPANDSCENARIO_1, EXPANDSCENARIO_2, and EXPANDSCENARIO_3 indicate user-defined coverage scenarios. For 64T64R cells: The vertical beamwidth of a massive MIMO antenna is equivalent to the vertical beamwidth of a single channel, and adjusting the TILT parameter in the BfAnt MO has no effect if this parameter is set to SCENARIO_10, SCENARIO_11, SCENARIO_12, or SCENARIO_13. For 32T32R cells: The vertical beamwidth of a massive MIMO antenna is equivalent to the vertical beamwidth of a single channel, and adjusting the TILT parameter in the BfAnt MO has no effect if this parameter is set to SCENARIO_5, SCENARIO_6, SCENARIO_7, SCENARIO_8, SCENARIO_9, SCENARIO_15, or SCENARIO_17. Due to the limited vertical beamwidth of a single 32T32R channel, it is not recommended that this parameter be set to SCENARIO_10, SCENARIO_11, SCENARIO_12, or SCENARIO_13. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/BFANT-TiltFractionalPart.html">Tilt Fractional Part</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the fractional part (tenths) of the tilt corresponding to the beamforming weighting value. This parameter is used with the Tilt parameter, which indicates the integral part of the tilt. This parameter applies only to massive MIMO scenarios. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="BFANT__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="BFANT__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-PolarMode.html">Polar Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the polarization mode of a beamforming antenna. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-ElmtBfWidth.html">Element Beamform Width</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the beamwidth of the antenna element.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-AntPortNum.html">Number of Port</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of antenna ports to which a beamforming antenna is connected. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS2Amp1.html">Amplitude Offset of Physical Port 1 for CRS2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the amplitude offset at physical antenna port 1 when the BF antenna is used and cell-specific reference signals are transmitted from two ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS2Pha1.html">Phase of Physical Port 1 for CRS2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the phase offset at physical antenna port 1 when the BF antenna is used and cell-specific reference signals are transmitted from two ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS2Amp2.html">Amplitude Offset of Physical Port 2 for CRS2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the amplitude offset at physical antenna port 2 when the BF antenna is used and cell-specific reference signals are transmitted from two ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS2Pha2.html">Phase of Physical Port 2 for CRS2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the phase offset at physical antenna port 2 when the BF antenna is used and cell-specific reference signals are transmitted from two ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS2Amp3.html">Amplitude Offset of Physical Port 3 for CRS2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the amplitude offset at physical antenna port 3 when the BF antenna is used and cell-specific reference signals are transmitted from two ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS2Pha3.html">Phase of Physical Port 3 for CRS2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the phase offset at physical antenna port 3 when the BF antenna is used and cell-specific reference signals are transmitted from two ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS2Amp4.html">Amplitude Offset of Physical Port 4 for CRS2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the amplitude offset at physical antenna port 4 when the BF antenna is used and cell-specific reference signals are transmitted from two ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS2Pha4.html">Phase of Physical Port 4 for CRS2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the phase offset at physical antenna port 4 when the BF antenna is used and cell-specific reference signals are transmitted from two ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS4Amp1.html">Amplitude Offset of Physical Port 1 for CRS4</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the amplitude offset at physical antenna port 1 when the BF antenna is used and cell-specific reference signals are transmitted from four ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS4Pha1.html">Phase of Physical Port 1 for CRS4</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the phase offset at physical antenna port 1 when the BF antenna is used and cell-specific reference signals are transmitted from four ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS4Amp2.html">Amplitude Offset of Physical Port 2 for CRS4</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the amplitude offset at physical antenna port 2 when the BF antenna is used and cell-specific reference signals are transmitted from four ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRS4Pha2.html">Phase of Physical Port 2 for CRS4</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the phase offset at physical antenna port 2 when the BF antenna is used and cell-specific reference signals are transmitted from four ports. Each port may consist of multiple physical antenna ports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-ChannelNo.html">Channel No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the antenna channel information of the cell. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CRSPortNo.html">CRS Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the CRS port number. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-SNID.html">Session ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of the file transfer session.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CrsAmp.html">Amplitude Offset for CRS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the amount of amplitude adjustment for cell-specific reference signals when a beamforming antenna is used. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-CrsPha.html">Phase for CRS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the amount of phase adjustment for cell-specific reference signals when a beamforming antenna is used. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/BFANT-AntWeightInfo.html">Antenna Weight Information</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the antenna weight information of a beamforming antenna. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,151 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Binding from IPSec Policy Group to Interface (ADD IPSECBINDITF)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ipsecbinditf">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Binding from IPSec Policy Group to Interface (ADD IPSECBINDITF)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ipsecbinditf"></a><a name="add_ipsecbinditf"></a>
+
+
+<h1 class="topictitle1">Add Binding from IPSec Policy Group to Interface (ADD IPSECBINDITF)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_ipsecbinditf__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to bind an IPSec policy group to an interface. IPSec tunnels are negotiated to protect the data streams flowed through an interface only after an IPSec policy group is bound to the interface.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ipsecbinditf__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>An IPSec policy can be bound to only one port.</p>
+</li><li><p>Only one IPSec policy created by user and one IPSec policy created by the system can be bound to a port.</p>
+</li><li><p>After an IPSec policy group is bound to a port, if packets comply with ACL rules in the group and IPSec SAs are available, the packets will be encapsulated by IPSec and be routed and forwarded based on the destination IP addresses after encapsulation.</p>
+</li><li><p>Before this command is executed, if the IPSECPOLICY, IPSECPROPOSAL, ACL, IKEPEER and IKEPROPOSAL objects, which the IPSECBINDITF MO directly or indirectly depends on, do not have a bearer MO (PACKETFILTERING, IPSECBINDITF), on the board for which the IPSECBINDITF MO is configured, the IPSECPOLICY, IPSECPROPOSAL, ACL, IKEPEER and IKEPROPOSAL objects will try to take effect. If these objects fail to take effect, the IPSECBINDITF MO will also fail to take effect.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]System specifications: When a WMPT/LMPT board serves as the main control board, the base station supports a maximum of 108 IPSECBINDITF objects. When a UMPTa/UMPTb/UMDU board serves as the main control board, the base station supports a maximum of 236 IPSECBINDITF objects. When a UMPTe board serves as the main control board, the base station supports a maximum of 392 IPSECBINDITF objects. When a UMPTg/UMPTga board serves as the main control board, the base station supports a maximum of 520 IPSECBINDITF objects. When a UMPT/UMDU board serves as the main control board, a maximum of 108 IPv4 IPSECBINDITF can be manually configured for a base station, and a maximum number of 128 IPv6 IPSECBINDITF can be manually configured for a base station.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]Board specifications: An LMPT board supports a maximum of 12 IPSECBINDITF objects. A UCCU/UBBPe/UBBPei/UBBPep/UBBPem/UBBPf0/UBBPex2/LCOP/UBBPg1 board supports a maximum of 8 IPSECBINDITF objects. A UMPTa/UMPTb/UMDU board supports a maximum of 236 IPSECBINDITF objects. A UMPTe board supports a maximum of 392 IPSECBINDITF objects. A UMPTg/UMPTga board supports a maximum of 520 IPSECBINDITF objects. A UTRPc board supports a maximum of 108 IPSECBINDITF objects.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]In the IPv6 IPSec scenario, the VRF index of the matched data flow comes from the INTERFACE MO of the tunnel type referenced by the interface bound to the IPsec policy group.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ipsecbinditf__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBINDITF-IPSecBindItfID.html">IPSECBINDITFID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Bind Interface ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IPSECBINDITF object. The value of IPSECBINDITFID in the IPSECBINDITF MOs configured by users ranges from 0 to 235. The value of IPSECBINDITFID in the IPSECBINDITF MOs configured by the system ranges from 10000 to 19999.</p>
+<p>GUI Value Range: 0~235,10000~19999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~235,10000~19999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBINDITF-PolicyGroupName.html">SPGN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Policy Group Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the IPSec policy group.</p>
+<p>GUI Value Range: 1~15 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBINDITF-InterfaceID.html">ITFID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Interface ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the interface to which the IPsec policy group is bound. When IPsec Policy Group Binding Mode in the IKECFG MO is set to ALL, an IPsec policy group can be bound only to a common interface and the IPsec policies take effect on the common interface and all VLAN subinterfaces in the default routing domain of the physical port on which the common interface is located. When IPsec Policy Group Binding Mode in the IKECFG MO is set to SINGLE, the IPsec policies take effect only on the interface bound to the IPsec policy group. The interface IDs in the range of 0 to 1499 are used for user-configured interfaces, and the interface IDs in the range of 10000 to 19999 are used for system-configured interfaces.</p>
+<p>GUI Value Range: 0~1499,10000~19999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1499,10000~19999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPSECBINDITF-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether forcible changes to IPSECBINDITF objects are made. When this parameter is set to YES, forcible changes to IPSECBINDITF objects are made. When this parameter is set to NO, forcible changes to the IPSECBINDITF objects that affect associated objects are not allowed.</p>
+<p>The associated objects include CA, CERTREQ, and IKEPEER. This parameter is invalid when a WMPT or LMPT serves as the main control board.</p>
+<p>Pay attention to the following when setting this parameter:</p>
+<p>1. The system checks whether forcible changes to IPSECBINDITF objects affect associated objects based on the object configuration data instead of the actual object running status.</p>
+<p>2. If the NE is configured with an SRCIPROUTE4, PPPLNK, or MPGRP MO, the system does not check whether the modification of the local IP address affects the associated MOs of the IPSECBINDITF MO.</p>
+<p>3. If the NE is configured with an SRCIPROUTE6 MO, the system does not check whether the modification of the local IPv6 address affects the associated objects of the IPSECBINDITF MO.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ipsecbinditf__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To bind an IPSec policy group to an interface with the parameters as follows: IPSec Bind Interface ID: 2, Policy Group Name: "policy", Interface ID: 2, run the following command:
+ADD IPSECBINDITF: IPSECBINDITFID=2, SPGN="policy", ITFID=2;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,112 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="List Flood Attack Defense and Alarm Configuration (LST FLOODDEFEND)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="lst_flooddefend">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>List Flood Attack Defense and Alarm Configuration (LST FLOODDEFEND)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="lst_flooddefend"></a><a name="lst_flooddefend"></a>
+
+
+<h1 class="topictitle1">List Flood Attack Defense and Alarm Configuration (LST FLOODDEFEND)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="lst_flooddefend__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to list all configurations of flood attack defense and excessive flood packet alarms.</p>
+</div></div>
+
+<div class="mmlnote"><a name="lst_flooddefend__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>None.</p>
+</div></div>
+
+<div class="mmlparam"><a name="lst_flooddefend__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody"><p>None.</p>
+</div></div>
+
+<div class="mmlexample"><a name="lst_flooddefend__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To list the configuration of flood attack defense and excessive flood packet alarms, run the following command:
+LST FLOODDEFEND:;
+The result is shown as follows:
++++    0        2011-03-21 17:20:54
+O&amp;M    #59
+%%LST FLOODDEFEND:;%%
+RETCODE = 0  Operation succeeded.
+
+List Flood Attack Defend and Alarm Configuration
+------------------------------------------------
+Flood Type  Defend Switch  Defend Threshold(packet/s)  Alarm Switch  Alarm Threshold(packet/s)
+
+ARP         Enable         11                          Enable        11                       
+ICMP        Enable         1                           Enable        1                        
+TCP         Enable         2                           Enable        2                        
+SYN         Enable         3                           Enable        3                        
+UDP         Enable         4                           Enable        4                        
+(Number of results = 5)
+
+
+---    END
+</pre>
+</div></div>
+
+<div class="mmloutput"><a name="lst_flooddefend__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Flood Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of the flood packet. If the control bits are all 0 or both the Synchronize bit and No More Data bit are 1 in TCP packets, the packets are directly discarded and flood attack defense is not performed. SYN packets refer to packets whose Synchronize bit is 1 and Acknowledgement bit is 0. When the defenses against attacks of the SYN and TCP packets are both enabled but the SYN packet data rate does not reach the flood attack defense threshold for SYN packets, the flood attack defense threshold for TCP packets is used to trigger the defense. When the data rate of some SYN packets reaches the flood attack defense threshold for SYN packets, this threshold is used to trigger the defense against the attack of these SYN packets and the flood attack defense threshold for TCP packets is used to defend against the attack of SYN packets of which the rate does not reach the flood attack defense threshold for SYN packets.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Defend Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether to enable the protection against excessive flood packets.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Defend Threshold(packet/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the threshold for starting the protection against excessive flood packets. If the DFDSW parameter is set to ENABLE, the system discards the extra packets when the RX rate of flood packets exceeds the threshold. It is recommended that the difference between Defend Threshold and Alarm Threshold is greater than 3% of Defend Threshold.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Alarm Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether to report an alarm when the local end receives excessive flood packets from the peer end.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Alarm Threshold(packet/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the threshold for the excessive flood packet alarm. If the ALMSW parameter is set to ENABLE, the system measures the RX rate of flood packets every 10 seconds. If the measured value exceeds the threshold, an excessive flood packet alarm is reported. The alarm is cleared if the RX rate of flood packets keeps below the threshold for five consecutive minutes. It is recommended that the difference between Defend Threshold and Alarm Threshold is greater than 3% of Defend Threshold.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

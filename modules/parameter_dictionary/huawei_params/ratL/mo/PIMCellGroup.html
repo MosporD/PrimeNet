@@ -1,0 +1,177 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="PIMCellGroup">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="PIMCellGroup">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>PIMCellGroup</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="PIMCellGroup"></a><a name="PIMCellGroup"></a>
+
+
+<h1 class="topictitle1">PIMCellGroup</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="PIMCellGroup.html"><strong>PIMCellGroup</strong></a>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="PIMCellGroup.html"><strong>PIMCellGroup</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A PIMCellGroup MO consist of parameters related to a passive inter-modulation (PIM) cell group. A PIM mitigation cell group consists of two cells sharing an antenna system.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="eNodeBFunction.html">eNodeBFunction</a>;<a href="eNodeBFunction.html">eNodeBFunction</a></li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>Cell</strong>, and <strong>ENodeBAlgoSwitch</strong> MOs:<ul><li>If <strong>CellPIMInterMitigSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is set to ON and <strong>CellActiveState</strong> in the <strong>Cell</strong> MO associated with this <strong>CellAlgoSwitch</strong> MO is CELL_ACTIVE, <strong>LocalCellId</strong> in the <strong>CellAlgoSwitch</strong> MO must have been set in a <strong>PIMCellGroup</strong> MO. This constraint applies only when the PIM_ADP_CELL_SEL_SWITCH option of the <strong>PimSwitch</strong> parameter in the <strong>ENodeBAlgoSwitch</strong> MO is deselected.</li></ul>
+</li><li>Relation with the <strong>DdCellGroup</strong> MO:<ul><li>If <strong>PimMitigationMode</strong> in a <strong>PIMCellGroup</strong> MO instance is set to BASED_ON_JOINT_SCH, the local cell IDs specified by <strong>Cell1Id</strong> and <strong>Cell2Id</strong> must be different from the local cell IDs specified by <strong>LocalCellId1</strong> and <strong>LocalCellId2</strong> in a <strong>DdCellGroup</strong> instance.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>PimMitigationMode</strong> in a <strong>PIMCellGroup</strong> MO instance is set to BASED_ON_JOINT_SCH, <strong>CustomizedBandWidthCfgInd</strong> cannot be set to CFG for the cells specified by <strong>Cell1Id</strong> and <strong>Cell2Id</strong> in the <strong>PIMCellGroup</strong> MO instance.</li></ul>
+</li><li>Relation with the <strong>CellDlschAlgo</strong> MO:<ul><li>If <strong>PimMitigationMode</strong> in a <strong>PIMCellGroup</strong> MO instance is set to BASED_ON_JOINT_SCH, BreathingPilotSwitch of <strong>BreathingPilotAlgoSwitch</strong> cannot be set on in the <strong>CellDlschAlgo</strong> MO instance for either of the cells specified by <strong>Cell1Id</strong> and <strong>Cell2Id</strong> in the <strong>PIMCellGroup</strong> MO instance.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If <strong>PimMitigationMode</strong> in a <strong>PIMCellGroup</strong> MO instance is set to BASED_ON_JOINT_SCH, EmimoCpsSwitch of <strong>EmimoSwitch</strong> cannot be set on in the <strong>CellAlgoSwitch</strong> MO instance for either of the cells specified by <strong>Cell1Id</strong> and <strong>Cell2Id</strong> in the <strong>PIMCellGroup</strong> MO instance.</li></ul>
+</li><li>Relation with the <strong>ENodeBAlgoSwitch</strong> MO:<ul><li>If a <strong>PIMCellGroup</strong> MO is configured, the PIM_ADP_CELL_SEL_SWITCH option of <strong>PimSwitch</strong> in the <strong>ENodeBAlgoSwitch</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>MPT</strong> MO:<ul><li>If <strong>TYPE</strong> in an <strong>MPT</strong> MO instance is set to LMPT for an eNodeB, <strong>PimMitigationMode</strong> in a <strong>PIMCellGroup</strong> MO instance cannot be set to BASED_ON_JOINT_SCH for the eNodeB.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#PIMCellGroup__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="PIMCellGroup__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="PIMCellGroup__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_pimcellgroup.html">ADD PIMCELLGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a PIM cell group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_pimcellgroup.html">DSP PIMCELLGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration information about PIM cell group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_pimcellgroup.html">LST PIMCELLGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration information about PIM cell group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_pimcellgroup.html">RMV PIMCELLGROUP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a PIM cell group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#PIMCellGroup__tab2">Table 2</a> and <a href="#PIMCellGroup__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="PIMCellGroup__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="PIMCellGroup__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PIMCellGroup-PIMCellGroupId.html">PIM Cell Group Identity</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a passive intermodulation (PIM) cell group. It uniquely identifies a PIM cell group within an eNodeB. A PIM cell group consists of two cells sharing an antenna system. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PIMCellGroup-Cell1Id.html">Cell1 Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local identity of cell 1 in the passive intermodulation (PIM) cell group. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PIMCellGroup-Cell2Id.html">Cell2 Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local identity of cell 2 in the passive intermodulation (PIM) cell group. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PIMCellGroup-Cell1SectorEqmId.html">Cell1 Sector Equipment Identity</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the sector equipment identity of cell 1 in the passive intermodulation (PIM) cell group. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PIMCellGroup-Cell2SectorEqmId.html">Cell2 Sector Equipment Identity</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the sector equipment identity of cell 2 in the passive intermodulation (PIM) cell group. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PIMCellGroup-PimMitigationMode.html">PIM Mitigation Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PIM mitigation mode. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="PIMCellGroup__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="PIMCellGroup__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PIMCellGroup-Cell1PIMState.html">Cell1 PIM State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the passive intermodulation (PIM) configuration state of cell 1 in the PIM cell group. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PIMCellGroup-Cell2PIMState.html">Cell2 PIM State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the passive intermodulation (PIM) configuration status of cell 2 in the PIM cell set. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PIMCellGroup-Cell1PuncturedRbCount.html">Cell1 Punctured RB Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of RBs to be blocked in cell 1. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PIMCellGroup-Cell2PuncturedRbCount.html">Cell2 Punctured RB Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of RBs to be blocked in cell 2. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,328 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Timeslot Cross (ADD TSCROSS)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_tscross">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Timeslot Cross (ADD TSCROSS)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_tscross"></a><a name="add_tscross"></a>
+
+
+<h1 class="topictitle1">Add Timeslot Cross (ADD TSCROSS)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="add_tscross__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a timeslot cross connection between two E1/T1 ports.</p>
+<p>In a dual-mode BS, after an E1/T1 port on the backplane is configured on a board, a timeslot cross connection from the panel of the board to the backplane must be created so that the source board can use the E1/T1 port shared by the destination board.</p>
+<p>In a dual-mode co-site base station, a timeslot cross connection from the panel of the source board to that of the destination board must be created so that transparent transmission of E1/T1 signals is available or E1/T1 ports are shared.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_tscross__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]Only the following types of timeslot cross connections can be configured:</p>
+<p>      (1) Intra- or inter-board panel-to-panel timeslot cross connection;</p>
+<p>      (2) Intra-board panel-to-backplane timeslot cross connection;</p>
+<p>      (3) Intra-board backplane-to-panel timeslot cross connection.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The number of source timeslots must be the same as that of destination timeslots in a timeslot cross connection.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]In an intra-board panel-to-backplane timeslot cross connection, both the source timeslots and destination timeslots must be available on the ports.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]One timeslot cross connection can carry only one upper-layer link.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The source and destination E1/T1 ports of a timeslot cross connection must be mutually different.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]Ensure that the clocks used on two E1/T1 ports of one timeslot cross connections have the same frequency.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]One board has 8 internal TOP resources. One TOP resource can be used by only one E1/T1 port on the backplane, inter-board timeslot cross connection, or inter-board MLPPP group. During configuration of an inter-board timeslot cross connection (see the <a href="lst_tscross.html">LST TSCROSS</a> command), the idle internal TOP resources with the same number are occupied on the boards in the source and destination slots. During configuration of an E1/T1 port on the backplane (see the <a href="lst_backe1t1.html">LST BACKE1T1</a> command), the internal TOP resources that have the same number as the E1/T1 port number are occupied on the board. During configuration of an inter-board MP group (see the <a href="lst_mplnk.html">LST MPLNK</a> command), the idle internal TOP resources with the same number are occupied on the boards in the source and destination slots.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]System specifications: If the WMPT/UMPT/GTMUb/GTMUc is the main control board, a maximum of 16 timeslot cross connections can be configured. If the UMDU is the main control board, a maximum of 8 timeslot cross connections can be configured.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]Board specifications: A maximum of 8 timeslot cross connections can be configured on a WMPT/UMPTa/UMPTb/UMDU/GTMUb/GTMUc. A maximum of 16 timeslot cross connections can be configured on a UTRP (subboard type: UAEC/UIEC).</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_tscross__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-TSCrossNo.html">NO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TS Cross No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of a timeslot cross-connection.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses the board where timeslot cross-connections are established.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses the board where timeslot cross-connections are established.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-SourceSlotNo.html">SRCSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot that houses the board where the source ports of timeslot cross-connections are located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TSCROSS</strong> MO, if <strong>NO</strong> is within the range from 0 to 7, the value range of this parameter is from 0 to 7.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>NO</strong> is within the range from 8 to 15, the value range of this parameter is from 0 to 5.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-SrcSubboardType.html">SRCSBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where the source ports of timeslot cross-connections are located.</p>
+<p>GUI Value Range: E1_COVERBOARD(E1 Cover Board), BACK_BOARD(Back Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E1_COVERBOARD, BACK_BOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS]In the <strong>TSCROSS</strong> MO, <strong>SRCSBT</strong> and <strong>DSTSBT</strong> cannot be both set to BACK_BOARD.</li><li>[Co-MPT, NodeB, eGBTS]Inter-board timeslot cross-connection on the backplane is not supported. That is, in the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is different from <strong>DSTSN</strong>, <strong>SRCSBT</strong> and <strong>DSTSBT</strong> cannot be set to BACK_BOARD.</li><li>[Co-MPT, NodeB, eGBTS]For the <strong>TSCROSS</strong> MO configured on the panel of one board, if neither <strong>SRCSBT</strong> nor <strong>DSTSBT</strong> is set to BACK_BOARD, they must have the same value.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is within the range from 0 to 5, this parameter can be set to E1_COVERBOARD or BACK_BOARD.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or BACK_BOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-SourcePortNo.html">SRCPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the source port of a timeslot cross connection.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS]In the <strong>TSCROSS</strong> MO configured on the panel of one board, <strong>SRCPN</strong> must be different from <strong>DSTPN</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is within the range from 0 to 5 and <strong>SRCSBT</strong> is set to BACK_BOARD, the value range of this parameter is from 0 to 3.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is within the range from 0 to 5 and <strong>SRCSBT</strong> is set to E1_COVERBOARD, the value range of this parameter is from 0 to 7.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is set to 6 or 7 and <strong>SRCSBT</strong> is set to BASE_BOARD, the value range of this parameter is from 0 to 3.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is set to 6 or 7 and <strong>SRCSBT</strong> is set to BACK_BOARD, the value range of this parameter is from 0 to 7.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-SourceTimeslot.html">SRCTSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Time Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the source timeslot of a timeslot cross connection.</p>
+<p>GUI Value Range: TS1(Time Slot 1), TS2(Time Slot 2), TS3(Time Slot 3), TS4(Time Slot 4), TS5(Time Slot 5), TS6(Time Slot 6), TS7(Time Slot 7), TS8(Time Slot 8), TS9(Time Slot 9), TS10(Time Slot10), TS11(Time Slot11), TS12(Time Slot12), TS13(Time Slot13), TS14(Time Slot14), TS15(Time Slot15), TS16(Time Slot16), TS17(Time Slot17), TS18(Time Slot18), TS19(Time Slot19), TS20(Time Slot20), TS21(Time Slot21), TS22(Time Slot22), TS23(Time Slot23), TS24(Time Slot24), TS25(Time Slot25), TS26(Time Slot26), TS27(Time Slot27), TS28(Time Slot28), TS29(Time Slot29), TS30(Time Slot30), TS31(Time Slot31)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TS1, TS2, TS3, TS4, TS5, TS6, TS7, TS8, TS9, TS10, TS11, TS12, TS13, TS14, TS15, TS16, TS17, TS18, TS19, TS20, TS21, TS22, TS23, TS24, TS25, TS26, TS27, TS28, TS29, TS30, TS31</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS]The number of source timeslots must be the same as that of destination timeslots in timeslot cross-connection. That is, in the <strong>TSCROSS</strong> MO, the number of timeslots specified by <strong>SRCTSN</strong> must be the same as the number of timeslots specified by <strong>DSTTSN</strong>.</li><li>[Co-MPT, NodeB, eGBTS]In a panel-to-backplane timeslot cross-connection, the timeslot number of the source E1/T1 port must be the same as that of the destination E1/T1 port. That is, in the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is the same as <strong>DSTSN</strong> and either of <strong>SRCSBT</strong> and <strong>DSTSBT</strong> is set to BACK_BOARD, <strong>SRCTSN</strong> must be the same as <strong>DSTTSN</strong>.</li><li>[Co-MPT, NodeB, eGBTS]If <strong>WORKMODE</strong> in the <strong>E1T1</strong> MOs corresponding to <strong>SRCPN</strong> and <strong>DSTPN</strong> in a <strong>TSCROSS</strong> MO is set to T1, <strong>SRCTSN</strong> and <strong>DSTTSN</strong> only timeslots 1 to 24 can be configured, other timeslots are not used.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-DestinationSlotNo.html">DSTSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot that houses the board where the destination ports of timeslot cross-connections are located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TSCROSS</strong> MO, if <strong>NO</strong> is within the range from 0 to 7, the value range of this parameter is from 0 to 7.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>NO</strong> is within the range from 8 to 15, the value range of this parameter is from 0 to 5.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-DstSubboardType.html">DSTSBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where the destination ports of timeslot cross-connections are located.</p>
+<p>GUI Value Range: E1_COVERBOARD(E1 Cover Board), BACK_BOARD(Back Board), BASE_BOARD(Base Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E1_COVERBOARD, BACK_BOARD, BASE_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS]In the <strong>TSCROSS</strong> MO, <strong>SRCSBT</strong> and <strong>DSTSBT</strong> cannot be both set to BACK_BOARD.</li><li>[Co-MPT, NodeB, eGBTS]Inter-board timeslot cross-connection on the backplane is not supported. That is, in the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is different from <strong>DSTSN</strong>, <strong>SRCSBT</strong> and <strong>DSTSBT</strong> cannot be set to BACK_BOARD.</li><li>[Co-MPT, NodeB, eGBTS]For the <strong>TSCROSS</strong> MO configured on the panel of one board, if neither <strong>SRCSBT</strong> nor <strong>DSTSBT</strong> is set to BACK_BOARD, they must have the same value.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TSCROSS</strong> MO, if <strong>DSTSN</strong> is within the range from 0 to 5, this parameter can be set to E1_COVERBOARD or BACK_BOARD.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>DSTSN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or BACK_BOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-DestinationPortNo.html">DSTPN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the destination ports of timeslot cross-connections.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS]In the <strong>TSCROSS</strong> MO configured on the panel of one board, <strong>SRCPN</strong> must be different from <strong>DSTPN</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In the <strong>TSCROSS</strong> MO, if <strong>DSTSN</strong> is within the range from 0 to 5 and <strong>DSTSBT</strong> is set to BACK_BOARD, the value range of this parameter is from 0 to 3.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>DSTSN</strong> is within the range from 0 to 5 and <strong>DSTSBT</strong> is set to E1_COVERBOARD, the value range of this parameter is from 0 to 7.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>DSTSN</strong> is set to 6 or 7 and <strong>DSTSBT</strong> is set to BASE_BOARD, the value range of this parameter is from 0 to 3.</li><li>In the <strong>TSCROSS</strong> MO, if <strong>DSTSN</strong> is within the range from 6 to 7 and <strong>DSTSBT</strong> is set to BACK_BOARD, the value range of this parameter is from 0 to 7.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-DestinationTimeslot.html">DSTTSN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Time Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination timeslot of a timeslot cross-connection.</p>
+<p>GUI Value Range: TS1(Time Slot 1), TS2(Time Slot 2), TS3(Time Slot 3), TS4(Time Slot 4), TS5(Time Slot 5), TS6(Time Slot 6), TS7(Time Slot 7), TS8(Time Slot 8), TS9(Time Slot 9), TS10(Time Slot10), TS11(Time Slot11), TS12(Time Slot12), TS13(Time Slot13), TS14(Time Slot14), TS15(Time Slot15), TS16(Time Slot16), TS17(Time Slot17), TS18(Time Slot18), TS19(Time Slot19), TS20(Time Slot20), TS21(Time Slot21), TS22(Time Slot22), TS23(Time Slot23), TS24(Time Slot24), TS25(Time Slot25), TS26(Time Slot26), TS27(Time Slot27), TS28(Time Slot28), TS29(Time Slot29), TS30(Time Slot30), TS31(Time Slot31)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TS1, TS2, TS3, TS4, TS5, TS6, TS7, TS8, TS9, TS10, TS11, TS12, TS13, TS14, TS15, TS16, TS17, TS18, TS19, TS20, TS21, TS22, TS23, TS24, TS25, TS26, TS27, TS28, TS29, TS30, TS31</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS]The number of source timeslots must be the same as that of destination timeslots in timeslot cross-connection. That is, in the <strong>TSCROSS</strong> MO, the number of timeslots specified by <strong>SRCTSN</strong> must be the same as the number of timeslots specified by <strong>DSTTSN</strong>.</li><li>[Co-MPT, NodeB, eGBTS]In a panel-to-backplane timeslot cross-connection, the timeslot number of the source E1/T1 port must be the same as that of the destination E1/T1 port. That is, in the <strong>TSCROSS</strong> MO, if <strong>SRCSN</strong> is the same as <strong>DSTSN</strong> and either of <strong>SRCSBT</strong> and <strong>DSTSBT</strong> is set to BACK_BOARD, <strong>SRCTSN</strong> must be the same as <strong>DSTTSN</strong>.</li><li>[Co-MPT, NodeB, eGBTS]If <strong>WORKMODE</strong> in the <strong>E1T1</strong> MOs corresponding to <strong>SRCPN</strong> and <strong>DSTPN</strong> in a <strong>TSCROSS</strong> MO is set to T1, <strong>SRCTSN</strong> and <strong>DSTTSN</strong> only timeslots 1 to 24 can be configured, other timeslots are not used.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TSCROSS-Description.html">DESCRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Description</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the brief description about the timeslot cross connection.</p>
+<p>GUI Value Range: 0~67 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~67 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_tscross__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a timeslot cross-connection from one panel to another panel with the parameters as follows: TS Cross No.: 1, Source Slot No.: 7, Source Subboard Type: BASE_BOARD, Source Port No.: 3, Source Time Slot No.: TS24-1&amp;TS25-1, Destination Slot No.: 7, Destination Subboard Type: BASE_BOARD, Destination Port No.: 2, Destination Time Slot No.: TS5-1&amp;TS7-1, Description: For GSM, run the following command:
+ADD TSCROSS: NO=1, SRCSN=7, SRCSBT=BASE_BOARD, SRCPN=3, SRCTSN=TS24-1&amp;TS25-1, DSTSN=7, DSTSBT=BASE_BOARD, DSTPN=2, DSTTSN=TS5-1&amp;TS7-1, DESCRI="For GSM";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

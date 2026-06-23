@@ -1,0 +1,214 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="TWAMPCLIENT">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="TWAMPCLIENT">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>TWAMPCLIENT</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="TWAMPCLIENT"></a><a name="TWAMPCLIENT"></a>
+
+
+<h1 class="topictitle1">TWAMPCLIENT</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="TWAMPCLIENT.html"><strong>TWAMPCLIENT</strong></a>
+    +-<a href="TWAMPSENDER.html">TWAMPSENDER</a>[0~16]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>A TWAMPCLIENT MO configures a Two-way Active Measurement Protocol (TWAMP) client. In the full architecture, it establishes a TCP connection with a TWAMP responder to negotiate control information about measurement sessions, such as DSCP and UDP port numbers. In the light architecture, it is used to configure an IP link to a TWAMP responder.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li><p>Possible children:</p>
+<a href="TWAMPSENDER.html">TWAMPSENDER</a>[0~16]</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IP</strong> of any <strong>OMCH</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>PEERIPV6</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IP6</strong> of any <strong>OMCH</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IP</strong> in any <strong>DEVIP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IP</strong> in any <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPSENDER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>CLIENTID</strong> in a <strong>TWAMPSENDER</strong> MO to be added must have been configured. That is, <strong>CLIENTID</strong> in the <strong>TWAMPSENDER</strong> MO must be the same as <strong>CLIENTID</strong> in the <strong>TWAMPCLIENT</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>CLIENTID</strong> in a <strong>TWAMPCLIENT</strong> MO is the same as <strong>CLIENTID</strong> in a <strong>TWAMPSENDER</strong> MO, <strong>TWAMPARCH</strong> in the <strong>TWAMPSENDER</strong> MO must be the same as <strong>TWAMPARCH</strong> in the <strong>TWAMPCLIENT</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6 and <strong>CLIENTID</strong> of the <strong>TWAMPCLIENT</strong> MO is set to the same value as <strong>CLIENTID</strong> in a <strong>TWAMPSENDER</strong> MO, <strong>PKTSIZE</strong> of the <strong>TWAMPSENDER</strong> MO must be set to a value greater than or equal to 89.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> whose IP protocol version is IPv4 comes from <strong>IP</strong> of a <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> of a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> of an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>LOCALIP</strong> in any <strong>PPPLNK</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>LOCALIP</strong> in any <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> comes from <strong>IP</strong> of an <strong>IPADDR4</strong> MO, <strong>LOCALIP</strong> of a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> of an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>LOCALIP</strong> and <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO cannot the same as those in any other <strong>TWAMPCLIENT</strong> MO in the same routing domain simultaneously.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>LOCALIPV6</strong> and <strong>PEERIPV6</strong> in the <strong>TWAMPCLIENT</strong> MO cannot be the same as those in any other <strong>TWAMPCLIENT</strong> MO in the same routing domain simultaneously.</li><li>[NodeB]The <strong>TWAMPCLIENT</strong> MO of IPv6 cannot been configured.</li></ul>
+</li><li>Relation with the <strong>LOCALIP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IP</strong> in any <strong>LOCALIP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>WLOCALIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>PEERIP</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IP</strong> in any <strong>WLOCALIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>PEERIPV6</strong> in the <strong>TWAMPCLIENT</strong> MO must be different from <strong>IPV6</strong> in the <strong>IPADDR6</strong> MO in the same routing domain.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv6, <strong>LOCALIPV6</strong> of the <strong>TWAMPCLIENT</strong> MO must be set to <strong>IPV6</strong> of a configured <strong>IPADDR6</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> is <strong>IP</strong> of a <strong>DEVIP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>LOCALIP</strong> in the <strong>TWAMPCLIENT</strong> MO must have been configured. That is, <strong>LOCALIP</strong> is <strong>IP</strong> of an <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#TWAMPCLIENT__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="TWAMPCLIENT__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="TWAMPCLIENT__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_twampclient.html">ADD TWAMPCLIENT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_twampclient.html">DSP TWAMPCLIENT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the negotiation status of a TWAMP client. This command takes effect only when the TWAMP client works in the full architecture.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_twampclient.html">LST TWAMPCLIENT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration of a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_twampclient.html">MOD TWAMPCLIENT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_twampclient.html">RMV TWAMPCLIENT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a TWAMP client.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#TWAMPCLIENT__tab2">Table 2</a> and <a href="#TWAMPCLIENT__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="TWAMPCLIENT__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="TWAMPCLIENT__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-ClientId.html">Client Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-LocalIP.html">Local IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IPv4 address of a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-PeerIp.html">Peer IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer IPv4 address of a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-Dscp.html">DSCP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DSCP of TCP negotiation packets sent by a TWAMP client. This parameter is valid only when the TWAMP client is deployed in the full architecture.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-PeerPort.html">Peer TCP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer TCP port number of a TWAMP client. This parameter is valid only when the TWAMP client is deployed in the full architecture.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-IPVersion.html">IP Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP protocol version of a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-LocalIPv6.html">Local IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local IPv6 address of a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-PeerIpv6.html">Peer IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the peer IPv6 address of a TWAMP client.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/TWAMPCLIENT-TwampArch.html">TWAMP Architecture</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the architecture of a TWAMP client.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="TWAMPCLIENT__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="TWAMPCLIENT__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPCLIENT-NegoStatus.html">Negotiation Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation status of a TWAMP client. This parameter is valid only when the TWAMP client is deployed in the full architecture.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPCLIENT-FailReason.html">Negotiation Failure Cause</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation failure cause of a TWAMP client with a TWAMP server. This parameter is valid only when the TWAMP client is deployed in the full architecture.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPCLIENT-Mode.html">Negotiated Working Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the negotiation mode of a TWAMP client. TWAMP supports three negotiation modes: non-authentication, authentication, and encryption. Currently, only the non-authentication mode is supported. This parameter is valid only when the TWAMP client is deployed in the full architecture.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/TWAMPCLIENT-LocalPort.html">Local TCP Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the local TCP port number of a TWAMP client. This parameter is valid only when the TWAMP client is deployed in the full architecture.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

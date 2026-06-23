@@ -1,0 +1,269 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="AARU">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="AARU">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>AARU</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="AARU"></a><a name="AARU"></a>
+
+
+<h1 class="topictitle1">AARU</h1>
+
+<div>
+<div class="section"><pre>
+<a href="Equipment.html">EQUIPMENT</a>
+  +-<a href="AAS.html">AAS</a>
+    +-<a href="AARU.html"><strong>AARU</strong></a>
+      +-<a href="RxBranch.html">RXBRANCH</a>[0~8]
+      +-<a href="TxBranch.html">TXBRANCH</a>[0~8]
+      +-<a href="VAntennaPort.html">VANTENNAPORT</a>[32~32]
+      +-<a href="VRET.html">VRET</a>[1~1]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An AARU MO defines an AARU, which provides ports for sending and receiving baseband and RF signals and processes the uplink and downlink baseband signals.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="AAS.html">AAS</a></li><li><p>Possible children:</p>
+<a href="RxBranch.html">RXBRANCH</a>[0~8];<a href="TxBranch.html">TXBRANCH</a>[0~8];<a href="VAntennaPort.html">VANTENNAPORT</a>[32~32];<a href="VRET.html">VRET</a>[1~1]</li><li>Relation with the <strong>AAS</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>AAS</strong> MO corresponding to <strong>CN</strong> and <strong>SRN</strong> in the <strong>AARU</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>VRET</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>AARU</strong> MO corresponding to <strong>DEVICENO</strong>, <strong>CONNCN</strong>, <strong>CONNSRN</strong>, and <strong>CONNSN</strong> in the <strong>VRET</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>VRET</strong> MO corresponding to <strong>AARU</strong> MO must exist.</li></ul>
+</li><li>Relation with the <strong>TXBRANCH</strong> and <strong>RXBRANCH</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The number of <strong>TXBRANCH</strong> MOs related to the <strong>AARU</strong> MO must be equal to <strong>TXNUM</strong> in the <strong>AARU</strong> MO, and the number of <strong>RXBRANCH</strong> MOs related to the <strong>AARU</strong> MO must be equal to <strong>RXNUM</strong> in the <strong>AARU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RHUB</strong>, <strong>RRU</strong>, and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]Only the cabinet number and subrack number of the <strong>RRU</strong> MO with <strong>RT</strong> set to MPRF can be the same as those of the <strong>RRU</strong> MO with <strong>RT</strong> set to MPMU.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> MO with <strong>TT</strong> set to LOADBALANCE is connected to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU and an <strong>AARU</strong> MO, <strong>RS</strong> in the <strong>AARU</strong> MO cannot be set to UO and GO.</li></ul>
+</li><li>Relation with the <strong>CXU</strong> and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> is connected to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU and an <strong>AARU</strong> MO, <strong>RS</strong> in the <strong>AARU</strong> MO must be included in the working mode of the RMU.</li></ul>
+</li><li>Relation with the <strong>VANTENNAPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The number of <strong>VANTENNAPORT</strong> MOs configured on one <strong>AARU</strong> MO must be 32.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#AARU__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="AARU__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="AARU__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_aaru.html">ADD AARU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an active antenna radio unit (AARU).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_aaru.html">DSP AARU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the dynamic information about an active antenna radio unit (AARU). The information to be queried is as follows: the number of RX and TX channels, Maximum output power on the TX channel, the uplink channel gain, and other information about the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_aaru.html">LST AARU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the active antenna radio unit (AARU) configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_aaru.html">MOD AARU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the active antenna radio unit (AARU) configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_aaru.html">RMV AARU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an active antenna radio unit (AARU).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_anttest.html">STR ANTTEST</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start an antenna quality test for an active antenna-radio unit (AARU), a radio unit (RU) in the AAU that supports this test, or a radio phase calibration unit (RPCU).</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#AARU__tab2">Table 2</a> and <a href="#AARU__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="AARU__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="AARU__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet where the AARU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack where the AARU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-AARUName.html">AARU Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the AARU name.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-AdmState.html">Administrative State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the administrative state of the AARU.The administrative state of the AARU can be blocked, unblocked, or shutting down.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-FreqBandWidth.html">Frequency Min Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum effective bandwidth of the carrier.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-IfOffset.html">Intermediate Frequency Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the intermediate frequency offset of the AARU. This parameter is set during the network planning to avoid the external signal interference around the current received frequency, and accordingly improve the receiver sensitivity of the system.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-RxBranchNum.html">Number of RX channels</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of logical RX channels of the AARU. For details, see AAS Feature Parameter Description.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-TxBranchNum.html">Number of TX channels</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of logical TX channels of the AARU. For details, see AAS Feature Parameter Description.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-TxBranchSw.html">Logical Switch of TX Channel</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable TX channels on the AARU, ON indicates that TX channels are enabled and OFF indicates that TX channels are disabled. On the AARU, all TX channels must be simultaneously enabled or disabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-WorkStandard.html">AARU Work Standard</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the working standard of the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-VRETNo.html">VRET No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of a virtual antenna corresponding to the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/AARU-PowerSupplyGroupID.html">Power Supply Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a group which consists of one or multiple AARUs served by the same power supply system. This parameter must be set to the same value for AARUs served by the same power supply system. This parameter must be set to different values for AARUs served by different power supply systems.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="AARU__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="AARU__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/AARU-MaxBeamAzimuth.html">Max Beam Azimuth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the maximum horizontal azimuth supported by the virtual antenna subunit corresponding to the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/AARU-MinBeamAzimuth.html">Min Beam Azimuth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the minimum horizontal azimuth supported by the virtual antenna subunit corresponding to the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/AARU-MaxBeamWidth.html">Max Beam Width</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the maximum horizontal beamwidth supported by the virtual antenna subunit corresponding to the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/AARU-MinBeamWidth.html">Min Beam Width</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the minimum horizontal beamwidth supported by the virtual antenna subunit corresponding to the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/AARU-MaxTilt.html">Max Tilt</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the maximum tilt supported by the virtual antenna subunit corresponding to the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/AARU-MinTilt.html">Min Tilt</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the minimum tilt supported by the virtual antenna subunit corresponding to the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/AARU-MaxCarrierTiltDifference.html">Max Tilt Difference Between Carriers</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the maximum tilt difference between carriers supported by the virtual antenna subunit corresponding to the AARU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/AARU-AaruDistance.html">The length of the fiber optic cable between the BBU and RF module</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the length of the fiber optic cable between the BBU and RF module. When the RF module works in cold backup mode, the parameter indicates the length of the fiber optic cable that carries RF data. When the RF module works in hot backup or load sharing mode, there are two fiber optic cables between the BBU and RF module, and the parameter indicates the length of the shorter one. The parameter is inaccurate due to factors such as the refractive index. The longer the fiber optic cable, the smaller the error. The relationship between the length of the fiber optic cable and the error is as follows: When the length of the fiber optic cable is smaller than 600 m, the error is large and the parameter is for your reference only. When the length of the fiber optic cable ranges from 600 m to 2000 m, the error is less than 10%. When the length of the fiber optic cable ranges from 2000 m to 12000 m, the error is less than 5%. When the length of the fiber optic cable is greater than 12000 m, the error is less than 2.5%.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#AARU__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="AARU__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="AARU__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835836.html">VS.EnergyCons.BTSBoard</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Power consumption of board</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

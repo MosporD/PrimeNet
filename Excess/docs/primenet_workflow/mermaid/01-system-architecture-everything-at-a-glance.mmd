@@ -1,0 +1,67 @@
+flowchart TB
+    subgraph Clients["Clients"]
+        Browser["Web browser"]
+    end
+
+    subgraph PrimeNet["PrimeNet — Flask monolith"]
+        App["app.py"]
+        Auth["routes/auth_routes"]
+        BeforeReq["Global before_request hooks"]
+        AfterReq["Security headers / CSP"]
+        Blueprints["18 feature blueprints"]
+        Scheduler["APScheduler — modules/sync/scheduler.py"]
+        NCMCore["ncm_core.py — XML/Excel converters"]
+    end
+
+    subgraph External["External data sources"]
+        SFTP_Nokia["SFTP — Nokia PM / Groups / Neighbors"]
+        SFTP_Huawei["SFTP — Huawei PM / Groups / Neighbors"]
+        SFTP_Meta["SFTP — Metadata snapshots"]
+        SFTP_Femto["SFTP — Femto PM"]
+        LocalUpload["User uploads — XML, Excel, GPX, configs"]
+    end
+
+    subgraph Pipeline["Ingestion pipeline"]
+        Watcher["orchestrate_watcher_cycle.py"]
+        HourlyOrch["orchestrate_hourly_full.py"]
+        DailyOrch["orchestrate_daily_full.py"]
+        PullScripts["pipeline/pull/* + scripts/pipeline/*"]
+        LoadScripts["pipeline/load/* + scripts/pipeline/*"]
+        Processors["pm_processor / metadata_processor / group_processor"]
+    end
+
+    subgraph Storage["SQLite databases — databases/"]
+        AppDB["ncm_users.db — users, sessions, tasks, reports"]
+        MetaDB["metadata.db"]
+        NokiaPM["nokia_pm_cells.db"]
+        HuaweiPM["huawei_pm_cells.db"]
+        GroupsDB["nokia/huawei cell_groups.db"]
+        DailyDB["*_daily.db variants"]
+        NeighborDB["neighbor_kpis.db / huawei_neighbor_raw.db"]
+        FemtoDB["femto PM tables"]
+        SyncLog["sync_log in app DB"]
+    end
+
+    Browser --> App
+    App --> BeforeReq --> Blueprints
+    Blueprints --> AfterReq --> Browser
+    App --> Auth
+    App --> Scheduler
+
+    Scheduler --> Watcher
+    Scheduler --> HourlyOrch
+    Scheduler --> DailyOrch
+    Watcher --> PullScripts
+    HourlyOrch --> PullScripts --> LoadScripts
+    DailyOrch --> PullScripts --> LoadScripts
+    LoadScripts --> Processors
+
+    SFTP_Nokia & SFTP_Huawei & SFTP_Meta & SFTP_Femto --> PullScripts
+    PullScripts --> sync_dl["sync_downloads/ + raw/ staging"]
+    Processors --> Storage
+    LoadScripts --> Storage
+    Blueprints --> Storage
+    LocalUpload --> Blueprints
+    NCMCore --> Blueprints
+    Processors --> SyncLog
+    Scheduler --> SyncLog

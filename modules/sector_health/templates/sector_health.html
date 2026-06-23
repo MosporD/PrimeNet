@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sector Health - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('sector_health.static', filename='sector_health.css') }}?v=1.4">
+</head>
+<body class="sector-health-page">
+<div class="container">
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>📡 Sector Health</h1>
+                <p>2G / 3G / 5G sector counts; LTE pies (% of LTE sectors in view, excluding L35).</p>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section class="section sh-section">
+            <div class="sh-toolbar">
+                <label for="sh-area">Area</label>
+                <select id="sh-area"><option value="">All areas</option></select>
+                <label for="sh-rat">RAT filter</label>
+                <select id="sh-rat">
+                    <option value="">All sectors</option>
+                    <option value="2G">Has 2G</option>
+                    <option value="3G">Has 3G</option>
+                    <option value="5G">Has 5G</option>
+                    <option value="NO_2G">Missing 2G</option>
+                    <option value="NO_3G">Missing 3G</option>
+                    <option value="NO_5G">Missing 5G</option>
+                </select>
+                <label for="sh-search">Search</label>
+                <input type="search" id="sh-search" placeholder="Site, sector, area…" autocomplete="off">
+                <button type="button" class="btn-secondary small-btn" id="sh-refresh">Refresh</button>
+                <a href="/reports" class="btn-secondary small-btn sh-report-link">Sector Health report</a>
+            </div>
+
+            <div id="sh-status" class="sh-status">Loading sector coverage…</div>
+
+            <div id="sh-summary" class="sh-summary" hidden></div>
+        </section>
+    </main>
+</div>
+
+<script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
+<script src="{{ url_for('sector_health.static', filename='sector_health.js') }}?v=1.4"></script>
+<script>
+async function logout() {
+    try { await fetch('/api/logout', { method: 'POST' }); } catch (_) {}
+    window.location.href = '/login';
+}
+</script>
+</body>
+</html>

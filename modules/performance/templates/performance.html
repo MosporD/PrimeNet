@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Analytics - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.2">
+    <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
+</head>
+<body class="perf-page">
+<div class="container perf-container">
+
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="back-link">← Dashboard</a>
+                <h1>📈 Performance Analytics</h1>
+            </div>
+            <div class="header-right">
+                <span class="user-name">{{ user.username }}</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="perf-body">
+
+        <!-- ================================================================
+             LEFT: Filter Panel
+        ================================================================ -->
+        <aside id="perf-left-panel" class="filter-panel perf-filter-hw">
+            <input type="hidden" id="filter-site" value="">
+            <input type="hidden" id="filter-cell" value="">
+
+            <div class="perf-time-window-row">
+                <label class="perf-time-window-label" for="filter-data-scope">Data scope</label>
+                <select id="filter-data-scope" class="perf-time-window-select"
+                        onchange="onDataScopeChange()">
+                    <option value="hourly" selected>Hourly</option>
+                    <option value="daily">Daily</option>
+                </select>
+            </div>
+
+            <div id="cell-list-wrap" class="hw-tree-panel">
+                <div class="perf-sidebar-section perf-sidebar-cells">
+                    <button type="button" class="perf-sidebar-toggle" id="perf-toggle-cells"
+                            aria-expanded="true" aria-controls="perf-cells-body"
+                            onclick="perfSidebarToggle(this)">
+                        <span class="perf-chevron" aria-hidden="true">▼</span>
+                        <span>Objects</span>
+                    </button>
+                    <div id="perf-cells-body" class="perf-sidebar-body perf-cells-body">
+                        <div class="hw-tree-toolbar">
+                            <div class="hw-tree-toolbar-row">
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">NE type</span>
+                                    <select id="filter-tech" class="hw-real-select" onchange="onFilterTechChange()">
+                                        <option value="">All Technologies</option>
+                                        <option value="2G">2G</option>
+                                        <option value="3G">3G</option>
+                                        <option value="4G">4G</option>
+                                        <option value="5G">5G</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Vendor</span>
+                                    <select id="filter-vendor" class="hw-real-select" onchange="onVendorChange()">
+                                        <option value="">All Vendors</option>
+                                        <option value="Nokia">Nokia</option>
+                                        <option value="Huawei">Huawei</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field">
+                                    <span class="hw-field-label">Object group</span>
+                                    <select id="filter-area" class="hw-real-select" onchange="onAreaChange()">
+                                        <option value="">Whole Network</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field hw-toolbar-field--grow">
+                                    <span class="hw-field-label">Object cluster</span>
+                                    <select id="filter-cluster" class="hw-real-select" onchange="onClusterChange()">
+                                        <option value="">All Clusters</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="hw-tree-toolbar-row">
+                                <div class="hw-toolbar-field hw-toolbar-field--grow">
+                                    <span class="hw-field-label">Selection</span>
+                                    <select id="filter-selection-type" class="hw-real-select" onchange="onSelectionTypeChange()">
+                                        <option value="cell" selected>Cell</option>
+                                        <option value="group">Group</option>
+                                    </select>
+                                </div>
+                                <div class="hw-toolbar-field hw-toolbar-field--grow" id="group-picker-wrap" style="display:none;">
+                                    <span class="hw-field-label">Cell Group</span>
+                                    <select id="filter-group" class="hw-real-select">
+                                        <option value="">Select group...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="hw-tree-toolbar-row hw-tree-toolbar-row--tools">
+                                <input type="search" id="cell-search" class="hw-tree-search"
+                                       placeholder="Filter by keyword…" autocomplete="off"
+                                       oninput="filterCellChips(this.value)">
+                                <div class="hw-select-mode" role="radiogroup" aria-label="Selection mode">
+                                    <label class="hw-radio"><input type="radio" name="perf-sel-mode" value="single" checked onchange="onPerfSelectionModeChange()"> Single</label>
+                                    <label class="hw-radio"><input type="radio" name="perf-sel-mode" value="multiple" onchange="onPerfSelectionModeChange()"> Multiple</label>
+                                </div>
+                                <button type="button" class="hw-icon-btn" title="Collapse all" onclick="perfTreeCollapseAll()">−</button>
+                                <button type="button" class="hw-icon-btn" title="Expand all" onclick="perfTreeExpandAll()">+</button>
+                                <button type="button" class="hw-icon-btn hw-icon-btn-refresh" title="Refresh" onclick="refreshData()">↻</button>
+                                <a id="map-link" href="/network-map" class="hw-toolbar-map" title="Open network map">Map</a>
+                                <a id="sector-health-link" href="/sector-health" class="hw-toolbar-map" title="Sector layer coverage health">Sector Health</a>
+                                <a id="drive-test-link" href="/drive-test-viewer" class="hw-toolbar-map" title="Open drive test viewer">Drive Test</a>
+                            </div>
+                            <div class="hw-tree-meta"><span id="cell-count-badge"></span></div>
+                        </div>
+                        <div id="cell-list" class="hw-object-tree" role="tree"></div>
+                    </div>
+                </div>
+                <div id="kpi-scope-panel" class="kpi-scope-panel" aria-label="KPIs for current scope">
+                    <div class="kpi-scope-head">
+                        <button type="button" class="perf-sidebar-toggle perf-sidebar-toggle--nest" id="perf-toggle-kpis"
+                                aria-expanded="true" aria-controls="perf-kpis-body" title="Collapse or expand KPI list"
+                                onclick="perfSidebarToggle(this)">
+                            <span class="perf-chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <span class="kpi-scope-title" id="kpi-scope-title">Available KPIs</span>
+                        <span class="kpi-scope-count" id="kpi-scope-count"></span>
+                    </div>
+                    <div id="perf-kpis-body" class="perf-sidebar-body perf-kpis-body">
+                        <div class="kpi-scope-controls">
+                            <label class="kpi-scope-select-all">
+                                <input type="checkbox" id="kpi-select-all">
+                                <span>Select all KPIs</span>
+                            </label>
+                        </div>
+                        <div id="kpi-scope-list" class="kpi-scope-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="perf-query-bar" role="region" aria-label="Run query">
+                <div class="perf-bottom-mode">
+                    <button type="button" class="perf-mode-btn active" id="perf-mode-kpis" onclick="setPerfBottomMode('kpis')">KPIs</button>
+                    <button type="button" class="perf-mode-btn" id="perf-mode-reports" onclick="setPerfBottomMode('reports')">Reports</button>
+                </div>
+                <div id="perf-kpis-controls">
+                    <button type="button" class="btn-query" id="btn-perf-query" onclick="runPerformanceQuery()">Query</button>
+                </div>
+                <div id="perf-reports-controls" style="display:none;">
+                    <div class="perf-reports-row">
+                        <select id="perf-report-select" class="perf-report-select"></select>
+                        <button type="button" class="btn-query" onclick="runSelectedReport()">Run Report</button>
+                    </div>
+                    <div class="perf-reports-row">
+                        <button type="button" class="btn-query" onclick="saveCurrentReport()">Save Current as Report</button>
+                        <button type="button" class="btn-query btn-query-danger" onclick="deleteSelectedReport()">Delete Selected</button>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+        <button type="button" id="perf-left-panel-toggle" class="perf-left-panel-toggle"
+                aria-label="Collapse left panel" aria-expanded="true"
+                title="Collapse filters" onclick="togglePerfLeftPanel()">
+            ◀
+        </button>
+
+        <!-- ================================================================
+             RIGHT: Charts Area
+        ================================================================ -->
+        <main class="charts-area">
+
+            <div class="charts-header">
+                <div class="charts-header-top">
+                    <div class="charts-header-titles">
+                        <div id="charts-title" class="charts-title">Select a cell to view KPI trends</div>
+                    </div>
+                    <div class="header-actions">
+                        <button id="btn-add-charts" class="btn-query" onclick="addChartsFromLastQuery()" style="display:none;">
+                            + Add Charts
+                        </button>
+                        <button id="btn-compare-charts" class="btn-query" onclick="addCompareTabFromLastQuery()" style="display:none;"
+                                title="Overlay up to 6 selected cells on the same chart">
+                            ⇆ Compare Cells
+                        </button>
+                        <button id="btn-refresh" class="btn-refresh" onclick="refreshData()" style="display:none;">
+                            <span class="refresh-icon">↻</span> Refresh
+                        </button>
+                        <button id="btn-export" class="btn-export" onclick="exportCSV()" style="display:none;">
+                            Export CSV
+                        </button>
+                        <div id="saved-views-mount" class="saved-views-mount"></div>
+                    </div>
+                </div>
+                <div class="charts-header-bottom">
+                    <!-- View-mode toggle (visible once a vendor is selected) -->
+                    <div id="view-toggle" class="view-toggle" style="display:none;">
+                        <button id="btn-charts-view" class="view-btn active" onclick="switchViewMode('charts')">Charts</button>
+                        <button id="btn-table-view"  class="view-btn"        onclick="switchViewMode('table')">PM Database</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="perf-dod-bar" class="perf-dod-bar" style="display:none;" aria-label="Hourly chart view options">
+                <div class="perf-dod-row perf-dod-row--modes">
+                    <span class="perf-dod-label">Hourly charts</span>
+                    <div class="perf-dod-mode" role="radiogroup" aria-label="Trend or DOD ">
+                        <label class="perf-dod-radio"><input type="radio" name="perf-chart-display" value="trend" checked> Trend</label>
+                        <label class="perf-dod-radio"><input type="radio" name="perf-chart-display" value="dod"> DOD</label>
+                    </div>
+                </div>
+                <div id="perf-dod-days-wrap" class="perf-dod-days-wrap" style="display:none;">
+                    <div id="perf-dod-days" class="perf-dod-days"></div>
+                </div>
+            </div>
+
+            <div id="perf-chart-tabs-bar" class="perf-chart-tabs-bar" style="display:none;" aria-label="Chart tabs">
+                <div id="perf-chart-tabs-strip" class="perf-chart-tabs-strip" role="tablist"></div>
+            </div>
+            <div id="perf-kpi-category-tabs-bar" class="perf-kpi-category-tabs-bar" style="display:none;" aria-label="KPI category tabs">
+                <div id="perf-kpi-category-tabs-strip" class="perf-kpi-category-tabs-strip" role="tablist"></div>
+            </div>
+
+            <!-- Placeholder when no cell is selected -->
+            <div id="no-selection" class="no-selection">
+                <div class="no-selection-icon">📊</div>
+                <p>Choose vendor and technology (cells load automatically). Select cell(s), check KPIs, then click <strong>Query</strong>.</p>
+            </div>
+
+            <div id="charts-wrap" class="charts-wrap" style="display:none;">
+                <!-- Charts injected here by JS — 2 per row -->
+            </div>
+
+            <div id="loading-charts" class="loading-charts" style="display:none;">
+                <div class="loading-spinner"></div>
+                <p>Loading KPI data...</p>
+            </div>
+
+            <!-- ============================================================
+                 PM Database table view (replaces charts when toggled)
+            ============================================================ -->
+            <div id="pm-table-view" class="pm-table-view" style="display:none;">
+                <div class="hw-toolbar">
+                    <input type="text" id="hw-search" class="hw-search-input"
+                           placeholder="Search by cell name…"
+                           oninput="onHwSearch(this.value)">
+                    <span id="hw-row-count" class="hw-row-count"></span>
+                </div>
+                <div id="hw-table-container" class="hw-table-container">
+                    <p class="hw-empty-msg">Select a vendor + technology, then click <strong>PM Database</strong>.</p>
+                </div>
+                <div id="hw-pagination" class="hw-pagination"></div>
+            </div>
+
+            <div id="chart-config-modal" class="perf-modal-backdrop" style="display:none;">
+                <div class="perf-modal-card perf-modal-card-wide">
+                    <div class="perf-modal-head">
+                        <h3>Switch Object and KPI</h3>
+                        <button type="button" class="perf-modal-close" onclick="closeChartConfigModal()">&times;</button>
+                    </div>
+                    <div class="perf-config-grid">
+                        <div class="perf-config-col">
+                            <div class="perf-config-title">Select Objects</div>
+                            <div id="chart-config-objects" class="perf-config-list"></div>
+                        </div>
+                        <div class="perf-config-col">
+                            <div class="perf-config-title">Select KPIs</div>
+                            <div id="chart-config-kpis" class="perf-config-list"></div>
+                        </div>
+                    </div>
+                    <div class="perf-modal-actions">
+                        <button type="button" class="btn-query" onclick="applyChartConfigModal()">Apply</button>
+                        <button type="button" class="btn-query btn-query-danger" onclick="closeChartConfigModal()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
+<script src="{{ url_for('static', filename='js/saved_views.js') }}?v=1.0"></script>
+<script>
+    window.PERF_KPI_CATEGORY_MAP_URL = "{{ url_for('performance.get_kpi_mapping') }}";
+</script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=8.8"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('vendor'))     document.getElementById('filter-vendor').value = params.get('vendor');
+        if (params.get('technology')) document.getElementById('filter-tech').value   = params.get('technology');
+
+        await loadFilters();
+
+        if (params.get('area'))      document.getElementById('filter-area').value    = params.get('area');
+        if (params.get('cluster'))   document.getElementById('filter-cluster').value = params.get('cluster');
+        if (params.get('site_id'))   document.getElementById('filter-site').value   = params.get('site_id');
+        if (params.get('cell_id') || params.get('cell_name')) {
+            document.getElementById('filter-cell').value = params.get('cell_id') || params.get('cell_name') || '';
+        }
+
+        const deepLinkFilters = params.get('site_id') || params.get('area') || params.get('cluster')
+            || params.get('cell_id') || params.get('cell_name');
+        if (deepLinkFilters) {
+            await applyFilters();
+        } else {
+            await onVendorChange();
+        }
+
+        if (window.PrimeNetSavedViews && typeof getPerformanceState === 'function'
+            && typeof applyPerformanceState === 'function') {
+            window.PrimeNetSavedViews.attach({
+                module: 'performance',
+                mountSelector: '#saved-views-mount',
+                getState: getPerformanceState,
+                applyState: applyPerformanceState,
+            });
+        }
+    });
+</script>
+</body>
+</html>

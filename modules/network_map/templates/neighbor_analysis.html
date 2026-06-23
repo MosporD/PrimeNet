@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet - Neighbor Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.25">
+</head>
+<body class="map-page neighbor-only-page">
+    <header class="map-header">
+        <div class="header-left">
+            <button onclick="window.location.href='/dashboard'" class="btn-dashboard">← Dashboard</button>
+            <h1>🧭 Neighbor Analysis</h1>
+        </div>
+        <div class="header-right" aria-label="Sites on map and user">
+            <div class="header-sites-stat">
+                <span class="header-sites-value" id="sites-count">0</span>
+                <span class="header-sites-label">Sites</span>
+            </div>
+            <span class="user-name">{{ user.username }}</span>
+            <button onclick="logout()" class="btn-logout">Logout</button>
+        </div>
+    </header>
+
+    <div class="map-body">
+        <div class="left-panel-shell" id="left-panel-shell">
+            <button type="button" class="left-panel-tab" id="left-panel-tab"
+                    onclick="toggleMapLeftPanel()" aria-expanded="true" aria-controls="left-panel-drawer"
+                    title="Hide filters panel">
+                <span class="left-panel-tab-icon" aria-hidden="true">‹</span>
+            </button>
+            <div class="left-panel-drawer" id="left-panel-drawer">
+                <div class="left-panel">
+                    <div class="map-controls">
+                        <input type="text" id="site-search" placeholder="Search sites..." onkeyup="searchSites()">
+                        <div class="neighbor-data-picker" aria-label="Neighbor export data source">
+                            <div class="neighbor-field neighbor-field-full">
+                                <label for="vendor-filter">Neighbor export vendor (HO source)</label>
+                                <select id="vendor-filter" onchange="filterByVendor()"
+                                        aria-label="Neighbor handover export vendor">
+                                    <option value="all">All vendors</option>
+                                    <option value="Nokia">Nokia</option>
+                                    <option value="Huawei">Huawei</option>
+                                </select>
+                            </div>
+                            <div class="neighbor-field neighbor-field-full">
+                                <label for="neighbor-rat-select">Technology (RAT)</label>
+                                <select id="neighbor-rat-select" onchange="onNeighborRatChange()"
+                                        aria-label="Neighbor technology RAT">
+                                    <option value="2G-2G">2G</option>
+                                    <option value="3G-3G">3G</option>
+                                    <option value="4G-4G Intra-eNB" selected>4G — Intra-eNB</option>
+                                    <option value="4G-4G Inter-eNB">4G — Inter-eNB</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="neighbor-controls" class="neighbor-toolbar">
+                            <div class="neighbor-toolbar-grid">
+                                <div class="neighbor-field">
+                                    <label for="neighbor-min-attempts">Min attempts</label>
+                                    <input type="number" id="neighbor-min-attempts" min="0" value="10"
+                                           onchange="onNeighborFiltersChanged()">
+                                </div>
+                                <div class="neighbor-field">
+                                    <label for="neighbor-max-lines">Max lines</label>
+                                    <input type="number" id="neighbor-max-lines" min="10" max="2000" value="300"
+                                           onchange="onNeighborFiltersChanged()">
+                                </div>
+                            </div>
+                            <div class="neighbor-field neighbor-field-full">
+                                <label for="neighbor-metric-mode">Map &amp; links show</label>
+                                <select id="neighbor-metric-mode" onchange="onNeighborFiltersChanged()"
+                                        aria-label="Neighbor map metric: attempts and success rate, or failures">
+                                    <option value="attempts_sr" selected>Attempts and success rate</option>
+                                    <option value="failures">Failures (from SR)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Hidden controls kept for compatibility with shared map.js -->
+                        <input type="hidden" id="area-filter" value="all">
+                        <input type="hidden" id="cluster-filter" value="all">
+                        <input type="hidden" id="cell-code-search" value="">
+                        <input type="hidden" id="coord-lat" value="">
+                        <input type="hidden" id="coord-lng" value="">
+                        <select id="tech-specific-filter" style="display:none;"><option value="all">All</option></select>
+                        <select id="map-module-select" style="display:none;"><option value="neighbor-explorer" selected>Neighbor Explorer</option></select>
+                    </div>
+
+                    <div id="site-info-panel" style="display:none;"></div>
+                    <div id="neighbor-explorer-panel" style="display:block;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="network-map"></div>
+    </div>
+
+    <div id="kpi-modal">
+        <div id="kpi-content">
+            <span class="close-modal" onclick="closeKPIModal()">&times;</span>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.29"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMap();
+        });
+    </script>
+</body>
+</html>

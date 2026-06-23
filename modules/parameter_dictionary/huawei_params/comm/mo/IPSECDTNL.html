@@ -1,0 +1,206 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IPSECDTNL">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IPSECDTNL">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPSECDTNL</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IPSECDTNL"></a><a name="IPSECDTNL"></a>
+
+
+<h1 class="topictitle1">IPSECDTNL</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IPSECDTNL.html"><strong>IPSECDTNL</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An IPSECDTNL MO consists of the parameters related to an IPSec tunnel pair, such as the IPSec policies and BFD sessions referenced by the IPSec tunnel pair. An IPSec tunnel pair, that is, two IPSec tunnels between the BS and two security gateways (SeGWs), enhances the transmission security between the BS and the core network (CN) or between the BS and the MAE. In implementation, if an IPSec tunnel becomes faulty and the other tunnel is detected to be normal, the BS automatically switches over to the other tunnel and resumes secure transmission with the CN or MAE.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the value of <strong>MBFDSN</strong> or <strong>SBFDSN</strong> of <strong>IPSECDTNL</strong> MO cannot be greater than 95.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the value of <strong>MBFDSN</strong> or <strong>SBFDSN</strong> of <strong>IPSECDTNL</strong> MO cannot be less than 100 or greater than 195.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The active and standby <strong>IPSECPOLICY</strong> MOs in an <strong>IPSECDTNL</strong> MO must be different. That is, the combination of <strong>MSPGN</strong> and <strong>SSPGN</strong> MOs in the active <strong>IPSECPOLICY</strong> MO must different from the combination of <strong>MSPSN</strong> and <strong>SSPSN</strong> MOs in the standby <strong>IPSECPOLICY</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>ENCAPMODE</strong> in the <strong>IPSECPROPOSAL</strong> MO used by the <strong>IPSECPOLICY</strong> MO in an <strong>IPSECDTNL</strong> MO must be set to TUNNEL.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The active and standby <strong>IPSECPOLICY</strong> MOs in one <strong>IPSECDTNL</strong> MO must be different from those in other <strong>IPSECDTNL</strong> MOs.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is different from <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO, no <strong>IPSECDTNL</strong> MO can be configured.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The primary and secondary <strong>IPSECPOLICY</strong> MOs associated with an <strong>IPSECDTNL</strong> MO must have been configured. <strong>SPGN</strong> and <strong>SPSN</strong> in the primary <strong>IPSECPOLICY</strong> MO are the same as <strong>MSPGN</strong> and <strong>MSPSN</strong> in the <strong>IPSECDTNL</strong> MO, respectively; <strong>SPGN</strong> and <strong>SPSN</strong> in the secondary <strong>IPSECPOLICY</strong> MO are the same as <strong>SSPGN</strong> and <strong>SSPSN</strong> in the <strong>IPSECDTNL</strong> MO, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The active and standby <strong>IPSECPOLICY</strong> MOs in an <strong>IPSECDTNL</strong> MO must have <strong>ACLID</strong> of the same value.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The active and standby <strong>IPSECPOLICY</strong> MOs in an <strong>IPSECDTNL</strong> MO must reference different <strong>IKEPEER</strong> MOs.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>ACLID</strong> in the active and standby <strong>IPSECPOLICY</strong> MOs in an <strong>IPSECDTNL</strong> MO must be different from that in other <strong>IPSECPOLICY</strong> MOs.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>IPSECBIND</strong> MO in the active and standby <strong>IPSECPOLICY</strong> MOs of an <strong>IPSECDTNL</strong> MO must be bound to the same board. That is, the combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the two <strong>IPSECBIND</strong> MOs must be the same.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>BFDSESSION</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>IPSECDTNL</strong> MO, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MOs for the active and standby tunnels must be the same as <strong>LOCALIP</strong> in the <strong>IKEPEER</strong> MOs of the active and standby <strong>IPSECPOLICY</strong> MOs, respectively; <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MOs for the active and standby tunnels must be the same as <strong>REMOTEIP</strong> in the <strong>IKEPEER</strong> MOs of the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>BFD</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the default routing domain, in an <strong>IPSECDTNL</strong> MO, <strong>SRCIP</strong> in the <strong>BFD</strong> MOs for the active and standby tunnels must be the same as <strong>LOCALIP</strong> in the <strong>IKEPEER</strong> MOs of the active and standby <strong>IPSECPOLICY</strong> MOs, respectively; <strong>DSTIP</strong> in the <strong>BFD</strong> MOs for the active and standby tunnels must be the same as <strong>REMOTEIP</strong> in the <strong>IKEPEER</strong> MOs of the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>IPSECBIND</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, in an <strong>IPSECDTNL</strong> MO, the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to ports; the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to two different <strong>IPSECBIND</strong> MOs, and the <strong>SPGN</strong> values in the two <strong>IPSECBIND</strong> MOs are the same as the <strong>SPGN</strong> values in the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>BFDSESSION</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before adding an <strong>IPSECDTNL</strong> MO, ensure that the <strong>BFDSESSION</strong> MOs for the active and standby tunnels of the <strong>IPSECDTNL</strong> MO have been configured. That is, in the same routing domain the <strong>BFDSESSION</strong> MOs whose <strong>BFDSN</strong> is the same as <strong>MBFDSN</strong> and <strong>SBFDSN</strong> in the <strong>IPSECDTNL</strong> MO, respectively must have been configured.</li></ul>
+</li><li>Relation with the <strong>BFD</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before adding an <strong>IPSECDTNL</strong> MO, ensure that the <strong>BFD</strong> MOs for the active and standby tunnels of the <strong>IPSECDTNL</strong> MO have been configured. That is, in the same routing domain the <strong>BFD</strong> MOs whose <strong>BFDSN</strong> is the same as <strong>MBFDSN</strong> and <strong>SBFDSN</strong> in the <strong>IPSECDTNL</strong> MO, respectively must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>BFDDTCTSW</strong> parameter in the <strong>IPSECDTNL</strong> MO is set to OFF, the <strong>DPD</strong> parameter in the <strong>IKEPEER</strong> MOs referenced by the <strong>IPSECPOLICY</strong> MO for the primary IPSec tunnel and the <strong>IPSECPOLICY</strong> MO for the secondary IPSec tunnel in the <strong>IPSECDTNL</strong> MO must be set to PERIODIC.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>IPSECPOLICY</strong> MO in the corresponding <strong>IPSECDTNL</strong> MO cannot reference <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The master or slave <strong>IKEPEER</strong> MO cannot coexist with the <strong>IPSECDTNL</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The redirect <strong>IKEPEER</strong> MO cannot coexist with the <strong>IPSECDTNL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> and <strong>IKECFG</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to ALL, the <strong>IPSECDTNL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, in an <strong>IPSECDTNL</strong> MO, the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to ports; the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to two different <strong>IPSECBINDITF</strong> MOs, and the <strong>SPGN</strong> values in the two <strong>IPSECBINDITF</strong> MOs are the same as the <strong>SPGN</strong> values in the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]The <strong>IPSECBINDITF</strong> MOs in the active and standby <strong>IPSECPOLICY</strong> MOs of an <strong>IPSECDTNL</strong> MO must be configured in the same board.</li><li>[gNodeB]The <strong>IPSECBINDITF</strong> MOs in the active and standby <strong>IPSECPOLICY</strong> MOs of an <strong>IPSECDTNL</strong> MO must be configured in the same board.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IPSECDTNL__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPSECDTNL__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IPSECDTNL__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ipsecdtnl.html">ADD IPSECDTNL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an IPSec tunnel pair. An IPSec tunnel pair, that is, two IPSec tunnels between the BS and two security gateways (SeGWs), enhances the transmission security between the BS and the core network (CN) or between the BS and the MAE. When the BFD detection switch is set to on, an IPSec tunnel pair uses two BFD sessions to detect the status of the primary and secondary IPSec tunnels, respectively. One BFD session used to detect the status of the primary IPSec tunnel, and the other used to detect that of the secondary IPSec tunnel. If the BFD detection result for the IPSec tunnel in use shows that the SeGW is unreachable or the associated IPSec security associations (SAs) are abnormal, the other IPSec tunnel takes over automatically and resumes secure transmission if it is detected to be normal and the associated IPSec SAs are normal. When the BFD detection switch is set to off, an IPSec tunnel pair determines the status of the primary and secondary IPSec tunnels according to the IPSec SA status. If the SA status of an IPSec tunnel being used becomes faulty and that of the other tunnel is detected to be normal, the base station automatically switches over to the other tunnel and resumes secure transmission with the CN or MAE. IPSec SAs corresponding to all the ACL rules in the ACL referenced by an IPSec tunnel are considered normal only when these IPSec SAs are successfully negotiated. When the Narrow Down Switch parameter in the IPSECPOLICY MO is set to ON, it is considered that an ACL rule in the ACL referenced by this IPSECPOLICY MO succeeds in negotiating an IPSec SA as long as only one IPSec SA is successfully negotiated.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipsecdtnl.html">DSP IPSECDTNL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the information about an IPSec tunnel pair.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ipsecdtnl.html">LST IPSECDTNL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the information about an IPSec tunnel pair.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_ipsecdtnl.html">MOD IPSECDTNL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of an IPSec tunnel pair.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ipsecdtnl.html">RMV IPSECDTNL</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an IPSec tunnel pair.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IPSECDTNL__tab2">Table 2</a> and <a href="#IPSECDTNL__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IPSECDTNL__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IPSECDTNL__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-DualId.html">IPSec Dual Tunnel ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the IPSec tunnel pair. It uniquely identifies a pair of primary and secondary IPSec tunnels.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-MasterGroupName.html">Master Policy Group Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the primary IPSec policy group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-MasterSeqNo.html">Master IPSec Sequence No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the primary IPSec policy. The primary IPSec tunnel uses the primary IPSec policy, which is identified by this parameter and the MSPGN parameter together.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-SlaveGroupName.html">Slave Policy Group Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the secondary IPSec policy group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-SlaveSeqNo.html">Slave IPSec Sequence No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the secondary IPSec policy. The secondary IPSec tunnel uses the secondary IPSec policy, which is identified by this parameter and the SSPGN parameter together.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-BFDDetectSwitch.html">BFD Detect Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the BFD function. When this parameter is set to OFF, the NE does not enable the BFD function. When this parameter is set to ON, the NE enables the BFD function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-MasterBFDSessionID.html">Master Tunnel's BFD Session ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the BFD session referenced by the primary IPSec tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-SlaveBFDSessionID.html">Slave Tunnel's BFD Session ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the BFD session referenced by the secondary IPSec tunnel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-IPSecDualTunnelSwitchBack.html">IPSec Dual Tunnel Switch Back</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether services can be switched back to the primary tunnel from the secondary tunnel after the former recovers in IPSec dual-tunnel scenarios. When this parameter is set to OFF, the NE does not enable the IPSec dual-tunnel switch back function. When this parameter is set to ON, the NE enables the IPSec dual-tunnel switch back function. If the secondary tunnel that carries services becomes faulty and the primary tunnel is working properly, services are switched to the primary tunnel immediately regardless of the setting of this parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECDTNL-IPSecSwitchBackWaitTime.html">IPSec Switch Back Wait Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period from the time the primary tunnel recovers to the time services are switched back to the primary tunnel in the case that services have been switched to the secondary tunnel after the primary tunnel is faulty in IPSec dual-tunnel scenarios. If the user runs the <a href="../mml/mod_ipsecdtnl.html">MOD IPSECDTNL</a> command to change the value of this parameter during a back switchover, the changed value does not take effect until the next back switchover. The primary tunnel must keep working properly during the switchover. If the primary tunnel is disconnected, the time counting restarts. It is recommended that this parameter be set to a value greater than 10s to prevent ping-pong switchovers due to intermittent disconnection of the primary tunnel.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IPSECDTNL__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IPSECDTNL__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPSECDTNL-CurrentUsedTunnel.html">Current Used IPSec Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPSec policy in use. If the primary IPSec tunnel is used, the IPSec policy in use is the primary IPSec policy. If the slave IPSec tunnel is used, the IPSec policy in use is the slave IPSec policy.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPSECDTNL-SwitchTimes.html">Master or Slave Switchover Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of switchovers between the primary and secondary IPSec tunnels.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPSECDTNL-SwitchInformation.html">Master or Slave Switchover Information</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates specific information about switchovers between the primary and secondary IPSec tunnels. This parameter provides information about at most 10 switchovers.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

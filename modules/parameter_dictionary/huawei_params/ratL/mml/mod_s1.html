@@ -1,0 +1,274 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify S1 Configuration (MOD S1)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_s1">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify S1 Configuration (MOD S1)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_s1"></a><a name="mod_s1"></a>
+
+
+<h1 class="topictitle1">Modify S1 Configuration (MOD S1)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_s1__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the parameters in an S1 MO.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_s1__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>Changing the control-plane end point group ID may lead to automatic S1 link reestablishment.</p>
+</li><li><p>Changing the value of User Plane End Point Group ID for an S1 object may lead to service interruption.</p>
+</li><li><p>Changing the MME protocol release may change some functions related to the S1 interface. The MME protocol release configured on the eNodeB must be the same as the MME protocol release configured in the EPC; otherwise, the eNodeB function is affected, and the impact is subject to the protocol compliance of the MME.</p>
+</li><li><p>Before changing the CN operator ID, ensure that the corresponding operator has been added.</p>
+</li><li><p>Before changing the control-plane end point group ID, ensure that the corresponding end point group has been added.</p>
+</li><li><p>Before changing the user-plane end point group ID, ensure that the corresponding end point group has been added.</p>
+</li><li><p>IP addresses configured in the SCTPPEER MOs belonging to the EPGROUP MOs referenced by the CpEpGroupId parameter in S1 or X2 MOs cannot overlap.</p>
+</li><li><p>IP addresses configured in the USERPLANEPEER MOs belonging to the EPGROUP MOs referenced by the UpEpGroupId parameter in S1 or X2 MOs cannot overlap.</p>
+</li><li><p>When the eNodeB works in independent mode or in RAN sharing with common carriers mode, IP addresses configured in the SCTPPEER MOs belong to the EPGROUP MOs referenced by the CpEpGroupId parameter in different S1 MOs cannot overlap.</p>
+</li><li><p>IP addresses configured in the SCTPPEER MOs belonging to the EPGROUP MOs referenced by the CpEpGroupId parameter in the S1 or ECO MOs cannot overlap.</p>
+</li><li><p>IP addresses configured in the USERPLANEPEER MOs belonging to the EPGROUP MOs referenced by the UpEpGroupId parameter in the S1 or ECO MOs cannot overlap.</p>
+</li><li><p>IP addresses configured in the SCTPPEER MOs belonging to the EPGROUP MOs referenced by the CpEpGroupId parameter in S1 or EX2 MOs cannot overlap.</p>
+</li><li><p>IP addresses configured in the USERPLANEPEER MOs belonging to the EPGROUP MOs referenced by the UpEpGroupId parameter in S1 or EX2 MOs cannot overlap.</p>
+</li><li><p>The EPGROUP MO referenced by CpEpGroupId in an S1 MO and the EPGROUP MO referenced by the uX2 MO must be different.</p>
+</li><li><p>The EPGROUP MO referenced by UpEpGroupId in an S1 MO and the EPGROUP MO referenced by the IUB, ABIS, or uX2 MO must be different.</p>
+</li><li><p>IP addresses configured in the SCTPPEER MOs belonging to the EPGROUP MOs referenced by the CpEpGroupId parameter in the S1 MOs or the M2EpGroupId parameter in the M2 MOs cannot overlap.</p>
+</li><li><p>If the value of the CnOpSharingGroupId parameter in an S1 MO is not set to the invalid value 255, ensure that the associated CnOpSharingGroup MO has been added before modifying the CnOpSharingGroupId parameter in the S1 MO and the operator to which the S1 MO belongs is in the carrier-sharing operator group. In hybrid RAN sharing mode, the CnOpSharingGroup MO referenced by the S1 MO must be configured and the CnOpSharingGroupId parameter must be set to a valid value.</p>
+</li><li><p>IP addresses configured in the USERPLANEPEER MOs belonging to the EPGROUP MOs referenced by the UpEpGroupId parameter in the S1 MOs or the M1EpGroupId parameter in the M1 MOs cannot overlap.</p>
+</li><li><p>In hybrid RAN sharing mode, after this command is executed to modify the carrier-sharing operator group ID, the eNodeB automatically sets up the S1 interfaces managed by this S1 MO. In other eNodeB sharing modes, the execution of this command has no impact on the radio network.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_s1__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-S1Id.html">S1Id</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">S1 ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the S1 object ID.</p>
+<p>GUI Value Range: 0~31</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~31</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-CnOperatorId.html">CnOperatorId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CN Operator ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the operator that owns the S1 object.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-EpGroupCfgFlag.html">EpGroupCfgFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">End Point Group Config Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure the control-plane or user-plane endpoint group.</p>
+<p>GUI Value Range: CP_CFG(CP Config), UP_CFG(UP Config), CP_UP_CFG(CPUP Config)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CP_CFG, UP_CFG, CP_UP_CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-CpEpGroupId.html">CpEpGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Control Plane End Point Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the control-plane endpoint group used by the S1 object.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The CpEpGroupId value in each S1 MO must be unique.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-UpEpGroupId.html">UpEpGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Plane End Point Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the user-plane endpoint group used by the S1 object.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-MmeRelease.html">MmeRelease</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MME Release</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the compliance protocol release of the MMEs to which the eNodeB is connected through the S1 interfaces under this S1 object. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: Release_R8(Release 8), Release_R9(Release 9), Release_R10(Release 10), Release_R11(Release 11), Release_R12(Release 12), Release_R13(Release 13), Release_R14(Release 14), Release_R15(Release 15)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Release_R8, Release_R9, Release_R10, Release_R11, Release_R12, Release_R13, Release_R14, Release_R15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-UserLabel.html">UserLabel</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the description of the S1 object.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-Priority.html">Priority</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MME Selection Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of an MME to which the eNodeB is connected through the S1 interface. A large parameter value indicates a high priority. After this parameter is set for MMEs, the eNodeB can select a high-priority MME for UEs attempting to access the network.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-CnOpSharingGroupId.html">CnOpSharingGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CN Operator Sharing Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a carrier-sharing operator group that shares the S1 MO. If the eNodeB works in hybrid RAN sharing mode, set this parameter to a value within the range from 0 to 5. If the eNodeB works in independent operator mode, RAN sharing with common carriers mode, or RAN sharing with dedicated carriers mode, retain the default value 255, which is an invalid value.</p>
+<p>GUI Value Range: 0~5,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the eNodeB works in hybrid RAN sharing mode, the recommended value is ranging from 0 to 5; otherwise, set this parameter to the invalid value 255.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/S1-MdtEnable.html">MdtEnable</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MME supporting MDT or not</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the MME at the other end of the S1 interface supports Huawei-proprietary positioning procedures, which are included in minimization of drive tests (MDT). The value DISABLE(disable) indicates that the MME does not support the procedures and therefore the eNodeB cannot obtain UE location information from the MME through the procedures. The value ENABLE(enable) indicates the opposite. For an S1 interface that is automatically set up, the MdtEnable parameter value in the MmefeatureCfg MO is obtained from the MdtEnable parameter in the S1 MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_s1__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of an S1 MO with the parameters as follows: S1 ID: 0, End Point Config Flag: CP_UP_CFG, Control Plane End Point Group ID: 124, run the following command:
+MOD S1: S1Id=0, EpGroupCfgFlag=CP_CFG, CpEpGroupId=124;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

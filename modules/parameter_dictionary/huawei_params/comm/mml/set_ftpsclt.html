@@ -1,0 +1,191 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set FTP Client Parameter (SET FTPSCLT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_ftpsclt">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set FTP Client Parameter (SET FTPSCLT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_ftpsclt"></a><a name="set_ftpsclt"></a>
+
+
+<h1 class="topictitle1">Set FTP Client Parameter (SET FTPSCLT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_ftpsclt__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the configurations of the FTP client.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_ftpsclt__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The configurations using this command take effect in the next FTP operation.</p>
+</li><li><p>If the certificate fails to be authenticated, session-based FTP connections will frequently occur in the base station and certificate alarms will not be reported.</p>
+</li><li><p>Before referencing a TLS configuration policy, ensure that the TLS configuration policy exists.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_ftpsclt__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FTPCLT-EncryMode.html">ENCRYMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transport Encrypted Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the transmission encryption mode of the FTP client. If this parameter is set to Auto, the FTP client first attempts to transmit data in ciphertext. If the attempt fails, the FTP client automatically switches the encryption mode to retransmit data in plaintext. Therefore, setting this parameter to Auto may pose security risks. However, if there are faults in transmission equipment, the FTP client does not attempt to retransmit data in plaintext even if the FTP server supports encrypted transmission. In this case, the FTP connection setup fails.</p>
+<p>GUI Value Range: Auto(Auto), Plaintext(Plaintext), Encrypted(SSL Encrypted)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Auto, Plaintext, Encrypted</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Encrypted(SSL)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FTPCLT-SptStateFwl.html">SPTSTATEFWL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support State Firewall</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether FTP connections in encrypted mode can be established when there is a state firewall. In encrypted mode, if this parameter is set to Yes, the FTP client delivers a command to switch the transmission mode of the control connection channel to plaintext. In this way, the state firewall can identify and dynamically open the port required for FTP transmission; if this parameter is set to No, the FTP connection may fail to be set up due to port restrictions imposed by the state firewall. If security requirements are met, it is recommended that this parameter be set to Yes.</p>
+<p>GUI Value Range: No(No), Yes(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: No, Yes</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Yes(Yes)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid when <strong>ENCRYMODE</strong> is set to Plaintext.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FTPCLT-SslCertAuth.html">SSLCERTAUTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support SSL Certificate Authentication</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the certificate authentication mode is supported when data is transmitted in encrypted mode. This parameter takes effect only for TLS1.2 and earlier versions.</p>
+<p>GUI Value Range: No(No), Yes(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: No, Yes</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Yes(Yes)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid when <strong>ENCRYMODE</strong> is set to Plaintext.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FTPCLT-MinDhLen.html">MINDHLEN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Minimum DH length of FTPS</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum Diffie-Hellman group length on the NE side during an FTPS negotiation. When the key exchange algorithm DH is used in FTPS negotiation algorithms, if the length of the DH key sent by the FTP server is less than the value of this parameter, the FTPS negotiation fails. A longer DH key provides higher security. When this parameter is set to DH_0, DH keys of any length can be used for SSL negotiations between the FTP client and FTP servers. This parameter takes effect only for TLS1.2 and earlier versions.</p>
+<p>Disuse statement: In later versions, the values DH_0, DH_512, and DH_1024 will be removed from the value range of this parameter. In the current version, the configuration of these values can still be synchronized and delivered, and these values can take effect. Therefore, you are advised not to use the values DH_0, DH_512, and DH_1024.</p>
+<p>GUI Value Range: DH_0(Auto Diffie-Hellman), DH_512(512-bit Diffie-Hellman Group), DH_1024(1024-bit Diffie-Hellman Group), DH_2048(2048-bit Diffie-Hellman Group), DH_3072(3072-bit Diffie-Hellman Group), DH_4096(4096-bit Diffie-Hellman Group)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DH_0, DH_512, DH_1024, DH_2048, DH_3072, DH_4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DH_2048(2048-bit Diffie-Hellman Group)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid when <strong>ENCRYMODE</strong> is set to Plaintext.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FTPCLT-PolicyID.html">POLICYID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Policy ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a TLS configuration policy.</p>
+<p>GUI Value Range: 0~16</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~16</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid when <strong>ENCRYMODE</strong> is set to Plaintext.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FTPCLT-TLSSECCSSW.html">TLSSECCSSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TLS Secure Cipher Suite Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TLS security algorithm switch. When this switch is turned off, weak security algorithm suites other than authenticated encryption with associated data (AEAD) or perfect forward secrecy (PFS) are supported, which poses security risks. When this switch is turned on, the TLS does not support weak security algorithm suites other than AEAD and PFS. Instead, the TLS negotiates only security algorithm suites.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(ON)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid when <strong>ENCRYMODE</strong> is set to Plaintext.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_ftpsclt__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set the parameters of the FTP client as follows: Transport Encrypted Mode: Auto, Support State Firewall: Yes, Support SSL Certificate Authentication: Yes, Minimum DH length of FTPS: DH_2048, Policy ID: 0, TLS Secure Cipher Suite Switch: ON, run the following command:
+SET FTPSCLT: ENCRYMODE=Auto, SPTSTATEFWL=Yes, SSLCERTAUTH=Yes, MINDHLEN=DH_2048, POLICYID=0, TLSSECCSSW=ON;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

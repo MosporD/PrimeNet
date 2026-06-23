@@ -1,0 +1,581 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="EutranInterNFreq">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="EutranInterNFreq">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>EutranInterNFreq</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="EutranInterNFreq"></a><a name="EutranInterNFreq"></a>
+
+
+<h1 class="topictitle1">EutranInterNFreq</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="EutranInterNFreq.html"><strong>EutranInterNFreq</strong></a>
+        +-<a href="EutranNFreqRanShare.html">EutranNFreqRanShare</a>[0~6]
+        +-<a href="EutranNFreqSCellOp.html">EutranNFreqSCellOp</a>[0~6]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An EutranInterNFreq MO consists of the common parameters related to a neighboring E-UTRAN frequency. The parameters include the frequency priority for cell reselection and the measurement bandwidth. They are used in measurement control for reselection to inter-frequency neighboring cells. For details, see 3GPP TS 36.331.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li><p>Possible children:</p>
+<a href="EutranNFreqRanShare.html">EutranNFreqRanShare</a>[0~6];<a href="EutranNFreqSCellOp.html">EutranNFreqSCellOp</a>[0~6]</li><li>Relation with the <strong>InterFreqBlkCell</strong> MO:<ul><li><strong>DlEarfcn</strong> in an <strong>InterFreqBlkCell</strong> MO must be the same as <strong>DlEarfcn</strong> in an <strong>EutranInterNFreq</strong> MO for each cell.</li></ul>
+</li><li>Relation with the <strong>UtranNFreq</strong> MO:<ul><li>If <strong>CellReselPriorityCfgInd</strong> in <strong>EutranInterNFreq</strong> MO and <strong>UtranNFreq</strong> MO is both set to CFG, <strong>CellReselPriority</strong> cannot be set to a same value for each cell.</li><li>For a cell, the <strong>MlbFreqPriority</strong> parameter cannot be set to the same value as the <strong>MlbFreqPriority</strong> parameter</li></ul>
+</li><li>Relation with the <strong>GeranNfreqGroup</strong> MO:<ul><li>If <strong>CellReselPriorityCfgInd</strong> in <strong>EutranInterNFreq</strong> MO and <strong>GeranNfreqGroup</strong> MO is both set to CFG, <strong>CellReselPriority</strong> cannot be set to a same value for each cell.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, <strong>DlEarfcn</strong> in a <strong>Cell</strong> MO must be different from that in each associated <strong>EutranInterNFreq</strong> MO.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, <strong>MeasBandWidth</strong> in an <strong>EutranInterNFreq</strong> MO associated with this <strong>Cell</strong> MO must be set to MBW6(1.4M).</li><li>A maximum of eight <strong>EutranInterNFreq</strong> MOs can be configured for each Nb-IoT cell.</li><li>A maximum of sixteen <strong>EutranInterNFreq</strong> MOs can be configured for each cell.</li><li>If the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to FALSE, the <strong>QRxLevMin</strong> parameter in the <strong>EutranInterNFreq</strong> MOs whose <strong>LocalCellId</strong> is corresponding to this <strong>Cell</strong> MO must be set to a value in the range of -70 to -22.</li></ul>
+</li><li>Relation with the <strong>EutranExternalCell</strong>, <strong>EutranInterFreqNCell</strong>, and <strong>Cell</strong> MOs:<ul><li><strong>DlEarfcn</strong> in the <strong>EutranExternalCell</strong> MO corresponding to an inter-eNodeB <strong>EutranInterFreqNCell</strong> MO must be the same as <strong>DlEarfcn</strong> in an <strong>EutranInterNFreq</strong> MO.</li><li>In inter-eNodeB scenarios, the value of <strong>DlEarfcn</strong> in the <strong>EutranExternalCell</strong> MO associated with an <strong>EutranInterFreqNCell</strong> MO of a <strong>Cell</strong> MO must be the same as one of the values of <strong>DlEarfcn</strong> in the <strong>EutranInterNFreq</strong> MOs associated with this <strong>Cell</strong> MO and the values of <strong>DlFreqOffset</strong> and <strong>DlFreqOffset</strong> must be the same.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>Prb</strong> MOs:<ul><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE and an <strong>EutranInterNFreq</strong> MO is to be added for this <strong>Cell</strong> MO, a <strong>Prb</strong> MO whose <strong>AnchorCarrierFlag</strong> is TRUE must be added first for this <strong>Cell</strong> MO.</li><li>If the <strong>NbCellFlag</strong> in the <strong>Cell</strong> MO is set to TRUE, the <strong>DlEarfcn</strong> in the <strong>EutranInterNFreq</strong> MO for this local cell cannot be the same as the <strong>DlEarfcn</strong> in the <strong>Prb</strong> whose <strong>AnchorCarrierFlag</strong> is set to TRUE when the <strong>LteDlRbIndex</strong> is set to an invalid value, or the downlink frequency point calculated based on the <strong>DlEarfcn</strong> and <strong>DlBandWidth</strong> in the <strong>Cell</strong> MO corresponding to <strong>LteDlRbIndex</strong>.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong> and <strong>Cell</strong> MOs:<ul><li><strong>DlEarfcn</strong> in the <strong>Cell</strong> MO corresponding to an intra-eNodeB <strong>EutranInterFreqNCell</strong> MO must be the same as <strong>DlEarfcn</strong> in an <strong>EutranInterNFreq</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranInterFreqNCell</strong> and <strong>Prb</strong> MOs:<ul><li>If an intra-eNodeB inter-frequency neighboring cell is to be configured using an <strong>EutranInterFreqNCell</strong> MO for a local cell whose <strong>NbCellFlag</strong> is set to TRUE, and <strong>AnchorCarrierFlag</strong> is set to TRUE in the <strong>Prb</strong> MO for the neighboring cell, then an <strong>EutranInterNfreq</strong> MO must be configured for the local cell and the frequency and frequency offset specified by <strong>DlEarfcn</strong> and <strong>DlFreqOffset</strong> in the <strong>EutranInterNfreq</strong> MO must be the same as those specified by <strong>DlEarfcn</strong> and <strong>DlFreqOffset</strong> or calculated based on <strong>DlEarfcn</strong> and <strong>DlBandWidth</strong> in the <strong>Cell</strong> corresponding to <strong>LteDlRbIndex</strong> in the <strong>Prb</strong> MO with <strong>AnchorCarrierFlag</strong> set to TRUE for the neighboring cell.</li></ul>
+</li><li>Relation with the <strong>Cdma2000BandClass</strong> MO:<ul><li>If <strong>CellReselPriorityCfgInd</strong> in <strong>EutranInterNFreq</strong> MO is set to CFG, and if <strong>Cdma20001XrttCellReselInd</strong> in <strong>Cdma2000BandClass</strong> MO is set to CFG, <strong>Cdma20001XrttCellReselPri</strong> in <strong>Cdma2000BandClass</strong> MO cannot be set same as <strong>CellReselPriority</strong> in <strong>EutranInterNFreq</strong> MO for each cell, and if <strong>Cdma2000HrpdCellReselInd</strong> in <strong>Cdma2000BandClass</strong> MO is set to CFG, <strong>Cdma2000HrpdCellReselPri</strong> in <strong>Cdma2000BandClass</strong> MO cannot be set same as <strong>CellReselPriority</strong> in <strong>EutranInterNFreq</strong> MO for each cell.</li></ul>
+</li><li>Relation with the <strong>QCIEUTRANRELATION</strong> MO:<ul><li>Before adding an <strong>QCIEUTRANRELATION</strong>, ensure that the associated <strong>EutranInterNFreq</strong> has been configured.</li></ul>
+</li><li>Relation with the <strong>EutranInterNFreq</strong> MO:<ul><li>If downlink carrier frequencies calculated based on <strong>DlEarfcn</strong> in <strong>EutranInterNFreq</strong> MOs under a Cell MO are the same, <strong>MasterBandFlag</strong> in at most one of the <strong>EutranInterNFreq</strong> MOs can be set to TRUE.</li></ul>
+</li><li>Relation with the <strong>EutranBlkNCell</strong> and <strong>Cell</strong> MOs:<ul><li>In intra-eNodeB scenarios, the value of <strong>DlEarfcn</strong> in the <strong>Cell</strong> MO under which an <strong>EutranBlkNCell</strong> MO is configured must be the same as the value of either <strong>DlEarfcn</strong> in this <strong>Cell</strong> MO or <strong>DlEarfcn</strong> in the related <strong>EutranInterNFreq</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EutranBlkNCell</strong>, <strong>EutranExternalCell</strong>, and <strong>Cell</strong> MOs:<ul><li>In inter-eNodeB scenarios, the value of <strong>DlEarfcn</strong> in the <strong>EutranExternalCell</strong> MO associated with an <strong>EutranBlkNCell</strong> MO must be the same as the value of either <strong>DlEarfcn</strong> in the corresponding <strong>Cell</strong> MO or <strong>DlEarfcn</strong> in the <strong>EutranInterNFreq</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CellMLB</strong> MO:<ul><li>The sum of values of <strong>InterFreqMlbThd</strong> in the <strong>CellMLB</strong> MO and <strong>InterFreqMlbDlPrbOffset</strong> in the <strong>EutranInterNFreq</strong> MO must be less than or equal to 100.</li><li>The sum of values of <strong>InterFreqMlbUlThd</strong> in the <strong>CellMLB</strong> MO and <strong>InterFreqMlbUlPrbOffset</strong> in the <strong>EutranInterNFreq</strong> MO must be less than or equal to 100.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>UtranNFreq</strong> MOs:<ul><li><strong>MlbFreqUlPriority</strong> in the <strong>EutranInterNFreq</strong> MO associated with this Cell MO cannot be set to the same value as <strong>MlbFreqPriority</strong> in the <strong>UtranNFreq</strong> MO associated with this Cell MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO and <strong>MPT</strong> MO:<ul><li>A maximum of eight <strong>EutranInterNFreq</strong> MOs can be configured for a Cell MO when the eNodeB is equipped with only the LMPT.</li></ul>
+</li><li>Relation with the <strong>NrNFreq</strong> and <strong>CellReselToNr</strong> MOs:<ul><li>If <strong>CellReselPriorityCfgInd</strong> in <strong>EutranInterNFreq</strong> MO is set to CFG and a minimum of one <strong>CellReselToNr</strong> MO instances can be configured, <strong>CellReselPriority</strong> and the sum of <strong>NrFreqReselPriority</strong> and <strong>NrFreqReselSubPriority</strong> cannot be set to a same value for each cell.</li></ul>
+</li><li>Relation with the <strong>ServiceIfHoCfgGroup</strong> and <strong>ServiceIfDlEarfcnGrp</strong> MOs:<ul><li><strong>DlEarfcn</strong> must have been set in the associated <strong>EutranInterNFreq</strong> MO when the <strong>ServiceIfDlEarfcnGrp</strong> MO associated <strong>ServiceIfHoCfgGroup</strong>'s <strong>InterFreqHoState</strong> is PERMIT_HO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#EutranInterNFreq__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="EutranInterNFreq__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="EutranInterNFreq__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_eutraninternfreq.html">ADD EUTRANINTERNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a neighboring E-UTRAN frequency.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_eutraninternfreq.html">LST EUTRANINTERNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the neighboring E-UTRAN frequency.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_eutraninternfreq.html">MOD EUTRANINTERNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a neighboring E-UTRAN frequency.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_celleutraninternfreq.html">RMV CELLEUTRANINTERNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a cell-specific neighboring E-UTRA frequency and its related configurations.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_eutraninternfreq.html">RMV EUTRANINTERNFREQ</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove one or more records of neighboring E-UTRAN frequencies.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#EutranInterNFreq__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="EutranInterNFreq__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="EutranInterNFreq__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell ID of a local cell. It uniquely identifies a cell within an eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-DlEarfcn.html">Downlink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the DL EARFCN of the neighboring cell on the neighboring E-UTRAN frequency. For details, see the 3GPP TS 36.104.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-UlEarfcnCfgInd.html">Uplink EARFCN configure indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to configure the uplink E-UTRA absolute radio frequency channel number (EARFCN) for the inter-frequency neighboring cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-UlEarfcn.html">Uplink EARFCN</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink E-UTRA absolute radio frequency channel number (EARFCN) of the inter-frequency neighboring cell. If the value of this parameter is not specified, the default uplink EARFCN is used, which is calculated based on the downlink EARFCN. For details about this parameter, see 3GPP TS 36.104. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-CellReselPriorityCfgInd.html">Inter frequency cell resel priority configure indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to set the reselection priority of the neighboring E-UTRAN frequency. For details about how UEs process frequency priorities during cell reselection, see section 5.2.4.1 of 3GPP TS 36.304 (V12.4.0). This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-CellReselPriority.html">Inter frequency cell resel priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell reselection priority of the neighboring E-UTRAN frequency. The value 0 indicates the lowest priority. It is contained in SIB5. A UE determines whether to reselect to a neighboring cell on the frequency based on the value of this parameter and the absolute priority of the serving cell.</p>
+<p>If the priority specified by this parameter is higher than the priority of the serving cell, the UE starts measuring neighboring cells on the frequency. Then, if the signal quality of any neighboring cell meets requirements, the UE starts cell reselection.</p>
+<p>If the priority specified by this parameter is lower than or equal to the priority of the serving cell, the UE starts the measurements only when the signal quality of the serving cell is poor. Then, if the signal quality of any neighboring cell meets requirements, the UE starts cell reselection. Cell reselection priorities in different RATs cannot be the same. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-EutranReselTime.html">EUTRAN reselection time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the evaluation duration for a UE to determine whether to reselect the inter-frequency neighboring cell to camp on. If the signal quality in an inter-frequency neighboring cell is better than that in the serving cell for the period specified by this parameter and a UE camps on the serving cell for more than 1s, the UE attempts to reselect the inter-frequency neighboring cell to camp on. This parameter is contained in SIB5. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-SpeedDependSPCfgInd.html">Speed dependent resel parameter configuring indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to set the speed-dependent scaling parameters related to cell reselection.</p>
+<p>If this parameter is set to NOT_CFG, speed-dependent cell reselections are not supported by default. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-TReselEutranSfMedium.html">Scaling factor of treseleutran in medium mobility state</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the scaling factor applied to the cell reselection duration for medium-mobility UEs. This parameter is delivered in SIB5. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-TReselEutranSfHigh.html">Scaling factor of treseleutran in high mobility state</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the scaling factor applied to the cell reselection duration for high-mobility UEs. This parameter is delivered in SIB5. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MeasBandWidth.html">Measurement bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the measurement bandwidth of the inter-frequency neighboring cell on the frequency. The setting of this parameter depends on the bandwidth configuration of the cell. In E-UTRAN, a cell bandwidth is also expressed in units of resource blocks (RBs). Cell bandwidths 1.4 MHz, 3 MHz, 5 MHz, 10 MHz, 15 MHz, and 20 MHz correspond to 6 RBs, 15 RBs, 25 RBs, 50 RBs, 75 RBs, and 100 RBs, respectively. For details, see 3GPP TS 36.331. This parameter does not take effect for NB-IoT cells and it must be set to a fixed value of MBW6(1.4M) for NB-IoT cells. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QoffsetFreq.html">Frequency offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency-specific offset for the neighboring E-UTRAN frequency that applies to UEs in idle mode. It is contained in system information block type 5 (SIB5) and delivered to UEs in idle mode for cell reselection. For details, see 3GPP TS 36.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-ThreshXhigh.html">Inter frequency high priority threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum RX level required for a neighboring cell on the neighboring frequency to become a candidate for cell reselection if the cell reselection priority of the neighboring frequency is higher than that of the serving frequency.</p>
+<p>After measurements are started for cells on the target frequency, the UE reselects to a cell on the frequency only if the RX level of the cell is higher than the threshold specified by this parameter for a period of time. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-ThreshXlow.html">Inter frequency lower priority threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum RX level required for a neighboring cell on the frequency to become a candidate for reselection if the priority of the frequency is lower than that of the serving frequency.</p>
+<p>After measurements are started for neighboring cells on the frequency, the UE reselects to a neighboring cell on the frequency only if the RX level of the serving cell is lower than the ThrshServLow parameter value and that of the cell is higher than the value specified by this parameter for a time-to-trigger. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QRxLevMin.html">Minimum required RX level</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum receive level required for an inter-frequency E-UTRAN cell to become a candidate for cell selection. The level is included in S criteria and used in the evaluation of cell selection. During the evaluation for cell reselection, the UE performs the following calculation: Srxlev = Measured RSRP value of a cell on the neighboring frequency - Value of this parameter - Compensated power. If Srxlev for a cell is better than a threshold for a time-to-trigger, reselection to the cell is started. The value range of this parameter is -70 to -22 for LTE FDD and TDD, and -78 to -22 for LTE NB-IoT. For details, see 3GPP TS 36.304.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-PmaxCfgInd.html">PMAX configure indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to set the maximum power that the UE can apply to transmission on the neighboring E-UTRAN frequency. If the value of this parameter is not specified, the maximum power is subject to the UE capability.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-Pmax.html">PMAX</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum power that the UE can apply to transmission on the neighboring E-UTRAN frequency. It is used in cell reselection criteria to calculate the compensated power. If the value of this parameter is not specified, the maximum power is subject to the UE capability. For details, see 3GPP TS 36.304.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-NeighCellConfig.html">Neighbor Cell Configuration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the inter-frequency neighboring cell configuration of the local cell.</p>
+<p>The value BitString00 indicates that some inter-frequency neighboring cells have the same MBSFN subframe configuration as the local cell.</p>
+<p>The value BitString01 indicates that none of the inter-frequency neighboring cells is configured with MBSFN subframes.</p>
+<p>The value BitString10 indicates that the MBSFN subframe configurations of all neighboring cells are the same as or subsets of that of the local cell.</p>
+<p>The value BitString11 indicates that some inter-frequency neighboring cells have different UL-DL subframe configurations from the local TDD cell.</p>
+<p>For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-PresenceAntennaPort1.html">Presence antenna port1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether all inter-frequency neighboring cells on this frequency are configured with at least two antenna ports.</p>
+<p>Set this parameter to BOOLEAN_TRUE if all inter-frequency neighboring cells on this frequency are configured with at least two antenna ports.</p>
+<p>Set this parameter to BOOLEAN_FALSE if one inter-frequency neighboring cell on this frequency is configured with only one antenna port. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqHoEventType.html">Inter-Freq HO trigger Event Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the event to trigger coverage-based inter-frequency handovers. This parameter can be set to EventA3, EventA4, or EventA5. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-ThreshXhighQ.html">Inter frequency high priority RSRQ threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRQ-based minimum RX level required for a neighboring cell on the frequency to become a candidate for reselection if the RSRQ-based priority of the frequency is higher than that of the serving frequency.</p>
+<p>After measurements are started for neighboring cells on the neighboring E-UTRAN frequency, the UE reselects to a neighboring cell on the frequency only if the RSRQ-based RX level of the cell is higher than the value specified by this parameter for a time-to-trigger. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-ThreshXlowQ.html">Inter frequency low priority RSRQ threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRQ-based minimum RX level required for a neighboring cell on the frequency to become a candidate for reselection if the RSRQ-based priority of the frequency is lower than that of the serving frequency.</p>
+<p>After measurements are started for neighboring cells on a frequency, the UE reselects to a neighboring cell on the frequency only if the RSRQ-based RX level of the serving cell is lower than a specified threshold and that of the cell is higher than the value specified by this parameter for a time-to-trigger. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QqualMinCfgInd.html">Minimum RX signal quality configuration indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to set the minimum required RX level.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QqualMin.html">Minimum RX signal quality</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum RX level of an inter-frequency neighboring cell, which is required for it to become a candidate for cell reselection. It determines the probability of triggering cell reselection to inter-frequency neighboring cells on the frequency. The value of this parameter is contained in SIB5. For details, see 3GPP TS 36.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-ConnFreqPriority.html">Frequency Priority for Connected Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency priority based on which the eNodeB selects a target frequency for blind redirection or contains a frequency in a measurement configuration. If a blind redirection is triggered and the target neighboring cell is not specified, the eNodeB selects a target frequency based on this priority. If a measurement configuration is to be delivered, the eNodeB preferentially delivers a frequency with the highest priority. If this parameter is set to 0 for a frequency, this frequency has the lowest priority for measurements and can be selected as a measurement target; however, this frequency cannot be selected as the target frequency for a blind redirection. A larger value indicates a higher priority. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MlbTargetInd.html">Mobility Load Balancing Target Indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the neighboring E-UTRAN frequency can be a target frequency for MLB. The value ALLOWED indicates that the neighboring E-UTRAN frequency can be a target frequency for MLB. The value NOT_ALLOWED indicates that the neighboring E-UTRAN frequency cannot be a target frequency for MLB. The value ALLOWED_WITHOUT_IDLE_MLB indicates that the neighboring E-UTRAN frequency cannot be a target frequency for user-number-based MLB to transfer RRC_REL UEs. The value ALLOWED_WITHOUT_CONNECT_MLB indicates that the neighboring E-UTRAN frequency cannot be a target frequency for user-number-based MLB to transfer uplink-synchronized UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-FreqPriBasedHoMeasFlag.html">Frequency Priority Based Ho Measure Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable or disable measurement for frequency-priority-based inter-frequency handovers to neighboring frequencies. In frequency-priority-based handovers, if the eNodeB delivers frequencies to be measured based on frequency configuration, the frequencies with the FreqPriBasedHoMeasFlag parameter set to ENABLE can be measured, and the frequencies with the FreqPriBasedHoMeasFlag parameter set to DISABLE cannot be measured. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-IdleMlbUEReleaseRatio.html">Idle MLB UE Release Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the preset proportion of UEs in idle mode on the neighboring frequency. This parameter takes effect when both the INTER_FREQ_IDLE_MLB_SWITCH option of the MlbAlgoSwitch parameter and the Proportion option of the InterFreqIdleMlbMode parameter in the CellMLB MO are selected. The eNodeB transfers normally released UEs to frequencies based on the preset proportions, so that UEs in idle mode reach the expected proportion on each frequency. The sum of UE proportions among all frequencies cannot exceed 100%. UE proportion for the serving frequency = 100% - (UE proportion for frequency 1 + UE proportion for frequency 2 + … + UE proportion for frequency n). If the INTER_FREQ_IDLE_MLB_SWITCH option of the MlbAlgoSwitch parameter in the ENodeBAlgoSwitch MO is selected, the proportions are the expected UE proportions for the frequencies involved. The eNodeB adaptively adjusts the proportions of UEs in idle mode among frequencies based on UE distribution in the network, ensuring that the proportions of UEs in idle mode among frequencies approach the preset proportions.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MlbFreqPriority.html">MLB Frequency Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of the neighboring E-UTRAN frequency for MLB. The value 0 indicates the lowest priority. The eNodeB selects a high-priority frequency as the target frequency for MLB. For LTE TDD, if the eNodeB performs MLB that distinguishes between the uplink and downlink transmission directions, the parameter indicates the downlink priority of the neighboring E-UTRAN frequency for MLB. The value 0 indicates the lowest priority. The eNodeB selects a downlink high-priority frequency as the target frequency for MLB in the downlink. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-DlFreqOffset.html">Downlink Frequency Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency offset of the PRB downlink central frequency to the downlink frequency. For details, see 3GPP TS 36.101. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-UlFreqOffset.html">Uplink Frequency Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency offset of the PRB uplink central frequency to the uplink frequency. This parameter takes effect only when UlEarfcnCfgInd is set to CFG(Configure). Otherwise, the offset is calculated based on the uplink/downlink symmetric system. For details, see 3GPP TS 36.101. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QoffsetFreqConn.html">Frequency Offset for Connected Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency-specific offset for the neighboring E-UTRAN frequency that applies to UEs in connected mode. It is contained in the event A3/A4/A5 measurement configuration and delivered to UEs in connected mode. The offset affects the probability of reporting events A3, A4, and A5. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MeasFreqPriority.html">Measurement Frequency Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency measurement priority. A larger value indicates a higher priority. If the CovBasedInterfreqHoMode parameter is set to BASEDONSIGNALSTRENGTH or BASEDONFREQPRIORITY or the FixedMeasObjIDSwitch option of the MultiFreqPriControlSwitch parameter is selected, the eNodeB delivers frequencies for measurement based on the priority specified by this parameter in inter-frequency handovers except service- and service-request-based inter-frequency handovers. If this parameter is set to 0, the measurement priority of the neighboring E-UTRA frequency is the lowest and this frequency can still be delivered for measurement. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-IfHoThdRsrpOffset.html">Cov-based Inter-Freq HO Thd RSRP Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRP threshold for events A4 and A5 that trigger coverage-based inter-frequency handovers. In coverage-based handovers, the eNodeB delivers the RSRP threshold for event A4 or A5 to UEs, which is equal to the sum of the InterFreqHoA4ThdRsrp and IfHoThdRsrpOffset parameter values. If the RSRP threshold for event A4 or A5 is less than the minimum RSRP value, the minimum value is delivered instead. If the RSRP threshold for event A4 or A5 is greater than the maximum RSRP value, the maximum value is delivered instead. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-IfMlbThdRsrpOffset.html">Inter-Freq Mlb Threshold RSRP Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRP threshold related to load-based inter-frequency handovers. In load-based inter-frequency handovers, the RSRP threshold for event A4 or A5 that the eNodeB delivers is equal to the sum of the RSRP threshold for event A4 (specified by the InterFreqLoadBasedHoA4ThdRsrp parameter in the InterFreqHoGroup MO or the MmLoadSteeringA4ThldRsrp parameter in the InterFreqHoGroupMO) and this offset. If the RSRP threshold for event A4 or A5 with the offset added is less than the minimum RSRP value, the minimum value is delivered instead. If the RSRP threshold for event A4 or A5 with the offset added is greater than the maximum RSRP value, the maximum value is delivered instead. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MasterBandFlag.html">Master Band Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the EARFCN is specific to the primary frequency band. Among the EARFCNs of the same frequency, if the MasterBandFlag parameter is set to TRUE for one EARFCN and FALSE for other EARFCNs, the former EARFCN is specific to the primary frequency band while the latter EARFCNs are specific to secondary frequency bands. In this case, only the EARFCN specific to the primary frequency band is broadcast in system information block type 5 (SIB5). If the MasterBandFlag parameter is set to FALSE for all EARFCNs of the same frequency, only the smallest EARFCN is broadcast in SIB5.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqRanSharingInd.html">Inter Frequency RAN Sharing Indication</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether an intra-RAT inter-frequency neighboring cell is a shared neighboring cell. If this parameter is set to BOOLEAN_TRUE, the neighboring E-UTRAN frequency is a shared frequency, and the shared operator information must be checked on the OSS before all inter-frequency neighboring cells are added. If this parameter is set to BOOLEAN_FALSE, the neighboring E-UTRAN frequency is not a shared frequency, and the shared operator information does not need to be checked on the OSS before all inter-frequency neighboring cells are added. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqHighSpeedFlag.html">Inter-frequency Highspeed Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the inter-frequency cells on the frequency are low-speed, high-speed, ultra-high-speed, or extra-high-speed cells. This parameter indicates the handover direction when high- or low-speed handover algorithm is enabled for high-speed railway UEs. This parameter applies only to LTE FDD and LTE TDD. This parameter can be set only to LOW_SPEED(LOW_SPEED) or HIGH_SPEED(HIGH_SPEED) for LTE TDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-AnrInd.html">ANR Indication</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether information about inter-frequency neighboring cells on the neighboring E-UTRA frequency can be maintained by ANR. If this parameter is set to ALLOWED, the information can be maintained by ANR. If this parameter is set to NOT_ALLOWED, the information cannot be maintained by ANR. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-VoipPriority.html">Voip Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency priority of providing VoIP services on the intra-RAT neighboring frequency. A larger value of this parameter indicates a higher priority. During coverage-based inter-frequency handovers of UEs with voice bearers, if the VoIP directional handover function takes effect, the eNodeB selects and delivers the neighboring frequencies based on the frequency priorities when starting measurements. The eNodeB preferentially delivers the non-serving E-UTRA frequency with the highest VoIP priorities. If this parameter is set to 0, this neighboring frequency is not prioritized. If the VoipMeasFreqPriSwitch option of the CellAlgoSwitch.MultiFreqPriControlSwitch parameter is selected and the HO_USE_VOIP_FREQ_ALLOWED option of the CellQciPara.QciAlgoSwitch parameter is selected, the VoIP directional handover function takes effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-PsPriority.html">PS Service Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of a neighboring E-UTRAN frequency for carrying PS services. A large value indicates a high priority. If PsMeasFreqPriSwitch is on, the eNodeB preferentially selects the neighboring E-UTRAN frequency with the highest PS service priority for measurement during a coverage-based inter-frequency handover procedure. If PsPriority is set to 0 for a frequency, this frequency is not prioritized. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-VolteHoTargetInd.html">VoLTE HO Target Frequency Indication</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>This parameter specifies whether the neighboring E-UTRAN frequency can be a target frequency for VoLTE UEs in handovers. If this parameter is set to ALLOWED, the neighboring E-UTRAN frequency can be a target frequency for VoLTE UEs in handovers. If this parameter is set to NOT_ALLOWED, the neighboring E-UTRAN frequency cannot be a target frequency for VoLTE UEs in handovers. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-BackoffTargetInd.html">Backoff Target Indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether a neighboring E-UTRA frequency can be selected as the target frequency for backoff MLB. If this parameter is set to ALLOWED(ALLOWED), the neighboring frequency can be selected as the target frequency for backoff MLB. If this parameter is set to NOT_ALLOWED(NOT_ALLOWED), the neighboring frequency cannot be selected as the target frequency for backoff MLB. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MlbInterFreqHoEventType.html">MLB Inter-Freq Handover Event Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the event type used to trigger MLB-based inter-frequency handovers. The handovers can be triggered based on event A3, event A4, or event A5. Event A3 only applies to LTE TDD. If an inter-frequency neighboring cell and the serving cell are served by the same eNodeB, you are advised to set this parameter to EventA4(EventA4); otherwise, you are advised to set this parameter to EventA3(EventA3) or EventA5(EventA5). This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MobilityTargetInd.html">Mobility Target Indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the frequency can be selected as the target frequency for mobility.</p>
+<p>SpeedMobilityTargetInd: If both this option and the InterFreqSpeedHoSwitch option are selected, the frequency can be selected as a target frequency for speed-based inter-frequency handovers. If this option is deselected, the frequency cannot be selected as a target frequency for speed-based inter-frequency handovers. This option applies only to LTE FDD and LTE TDD.</p>
+<p>LcsMobilityTargetInd: If both this option and the InterFreqLcsHoSwitch option are selected, the frequency can be selected as a target frequency for location-based inter-frequency handovers. If this option is deselected, the frequency cannot be selected as a target frequency for location-based inter-frequency handovers. This option applies only to LTE FDD and LTE TDD.</p>
+<p>InterFreqHoCqiInd: If this option is selected, the frequency can be selected as a target frequency for CQI-based inter-frequency handovers. If this option is deselected, the frequency cannot be selected as a target frequency for CQI-based inter-frequency handovers. This option applies only to LTE FDD.</p>
+<p>AbnReestUeInterFreqHoTargetInd: If this option is selected, this frequency can be selected as a target frequency for inter-frequency handovers of UEs that experience abnormal RRC connection reestablishments. If this option is deselected, this frequency cannot be selected as a target frequency for inter-frequency handovers of these UEs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MlbInterFreqEffiRatio.html">MLB Inter-Freq Efficiency Ratio</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ratio of spectral efficiency of the local cell to that of a neighboring cell. If PRB-usage-based MLB is triggered in the local cell, the eNodeB considers the ratio of spectral efficiency of the local cell to that of a neighboring cell when determining load differences between the local and neighboring cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-SnrBasedUeSelectionMode.html">SNR Based UE Selection Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SNR-based UE selection mode during MLB. If this parameter is set to Random(Random), UEs are selected without considering the SNR. If this parameter is set to Best(Best), UEs with good SNRs are preferentially transferred. If this parameter is set to Worst(Worst), UEs with poor SNRs are preferentially transferred. This parameter takes effect only if FreqSelectStrategy is set to FAIRSTRATEGY(FairStrategy) and the UE-number-based inter-frequency MLB algorithm is operating. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-UlTrafficMlbTargetInd.html">UL Traffic MLB Target Indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the neighboring E-UTRAN frequency can be selected as a target frequency for uplink-traffic-based MLB. If this parameter is set to ALLOWED, this frequency can be selected as the target frequency. If this parameter is set to NOT_ALLOWED, this frequency cannot be selected as the target frequency. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-UlTrafficMlbPriority.html">UL Traffic MLB Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of the neighboring E-UTRAN frequency to be selected as a target frequency for uplink traffic-based MLB. The value 0 indicates the lowest priority. The eNodeB selects a high-priority frequency as the target frequency for uplink traffic-based MLB. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MlbInterFreqHoA3Offset.html">MLB Inter-Freq Handover A3 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of signal quality of a neighboring cell to that of the serving cell. This parameter is used to trigger event A3-based handovers for inter-frequency MLB. A larger value of this parameter indicates that better signal quality of the neighboring cells is required to trigger a handover for event A3-based inter-frequency MLB. For details, see 3GPP TS 36.331. This parameter applies only to TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-IfSrvHoThdRsrpOffset.html">Inter-Freq Service HO Thd RSRP Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRP threshold for triggering service-based inter-frequency handovers. In service-based inter-frequency handovers, the eNodeB delivers the RSRP threshold for event A4 or A5 to UEs, which is equal to the sum of the InterFreqLoadBasedHoA4ThdRsrp and IfSrvHoThdRsrpOffset parameter values. In service-request-based inter-frequency handovers, the eNodeB delivers the RSRP threshold for event A4 or A5 to UEs, which is equal to the sum of the SrvReqHoA4ThdRsrp and IfSrvHoThdRsrpOffset parameter values. If the RSRP threshold for event A4 or A5 is less than the minimum RSRP value, the minimum value is delivered instead. If the RSRP threshold for event A4 or A5 is greater than the maximum RSRP value, the maximum value is delivered instead. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-IfSrvHoThdRsrqOffset.html">Inter-Freq Service HO Thd RSRQ Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of the RSRQ threshold for triggering service-based inter-frequency handovers. In service-based inter-frequency handovers, the eNodeB delivers the RSRQ threshold for event A4 or A5 to UEs, which is equal to the sum of the InterFreqLoadBasedHoA4ThdRsrq and IfSrvHoThdRsrqOffset parameter values. In service-request-based inter-frequency handovers, the eNodeB delivers the RSRQ threshold for event A4 or A5 to UEs, which is equal to the sum of the SrvReqHoA4ThdRsrq and IfSrvHoThdRsrqOffset parameter values. If the RSRQ threshold for event A4 or A5 is less than the minimum RSRQ value, the minimum value is delivered instead. If the RSRQ threshold for event A4 or A5 is greater than the maximum RSRQ value, the maximum value is delivered instead. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MlbFreqUlPriority.html">MLB Frequency UL Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of a neighboring frequency in the uplink for inter-frequency MLB. The value 0 indicates the lowest priority. The eNodeB selects a high-priority frequency in the uplink preferentially as the target frequency for uplink MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqMlbDlPrbOffset.html">Inter-Freq MLB DL PRB Usage Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset relative to the downlink PRB usage threshold used to trigger load transfer to inter-frequency neighboring cells on the neighboring frequency for MLB. If the MlbTriggerMode parameter is set to PRB_ONLY or PRB_OR_UE_NUMBER and the PrbLoadCalcMethod parameter is set to PRB_USAGE, among all the neighboring cells working on the frequency, only those that have load information exchange with the local cell can be selected as target cells for downlink load transfer on condition that the downlink PRB usage of the cell is greater than the sum of the values of the InterFreqMlbThd and InterFreqMlbDlPrbOffset parameters. The neighboring cells that work on the frequency and have no load information exchange with the local cell can be selected as target cells for downlink offload only when downlink PRB usage of the cell is greater than or equal to the sum of the values of the InterFreqMlbThd, InterFreqOffloadOffset, and InterFreqMlbDlPrbOffset parameters. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqMlbUlPrbOffset.html">Inter-Freq MLB UL PRB Usage Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset relative to the uplink PRB usage threshold used to trigger load transfer to inter-frequency neighboring cells on the neighboring frequency for MLB. If the InterFreqMlbThd parameter is set to PRB_ONLY or PRB_OR_UE_NUMBER, among all the neighboring cells working on the frequency, only those that have load information exchange with the local cell can be selected as target cells for load transfer on condition that the uplink PRB usage of the cell is greater than the sum of the InterFreqMlbUlThd and the InterFreqMlbUlPrbOffset parameter values. The neighboring cells that work on the frequency and have no load information exchange with the local cell can be selected as target cells for uplink offload only when uplink PRB usage of the cell is greater than or equal to the sum of the InterFreqMlbUlThd, InterFreqOffloadOffset, and InterFreqMlbUlPrbOffset parameter values. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-NcellNumForAnr.html">Neighbouring Cell Number for ANR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum number of neighboring cells on the neighboring E-UTRAN frequency. The value 0 indicates that the minimum number of neighboring cells on the specified frequency is not restricted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MeasPerformanceDemand.html">Measurement Performance Demand</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the measurement performance demand for whether to broadcast the frequency in SIB5. If this parameter is set to NORMAL, the frequency is broadcast in interFreqCarrierFreqList without carrying the IE reducedMeasPerformance. The measurement performance of a UE is normal when the UE measures the frequency. If this parameter is set to REDUCED, the frequency is broadcast in interFreqCarrierFreqListExt carrying the IE reducedMeasPerformance. The measurement performance of a UE supporting extended frequency measurement can be reduced to measure the frequency. If this parameter is set to UNDELIVER, the frequency is not broadcast in SIB5. This parameter value applies only to LTE FDD. For details about the IE reducedMeasPerformance, see 3GPP TS 36.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-IfBackoffThdRsrpOffset.html">Inter-Freq Backoff Threshold RSRP Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRP threshold for triggering handovers for inter-frequency backoff MLB. To trigger handovers for inter-frequency backoff MLB, the eNodeB delivers the RSRP threshold for event A4 or A5 to UEs, which equals the sum of this offset and the InterFreqLoadBasedHoA4ThdRsrp parameter value in the InterFreqHoGroup MO. If the RSRP threshold for event A4 or A5 is smaller than the minimum RSRP value, the minimum value is delivered as the RSRP threshold for event A4 or A5. If the RSRP threshold for event A4 or A5 is greater than the maximum RSRP value, the maximum value is delivered as the RSRP threshold for event A4 or A5. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-IfBackoffThdRsrqOffset.html">Inter-Freq Backoff Threshold RSRQ Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRQ threshold for triggering handovers for inter-frequency backoff MLB. To trigger handovers for inter-frequency backoff MLB, the eNodeB delivers the RSRQ threshold for event A4 or A5 to UEs, which equals the sum of this offset and the InterFreqLoadBasedHoA4ThdRsrq parameter value in the InterFreqHoGroup MO. If the RSRQ threshold for event A4 or A5 is smaller than the minimum RSRQ value, the minimum value is delivered as the RSRQ threshold for event A4 or A5. If the RSRQ threshold for event A4 or A5 is greater than the maximum RSRQ value, the maximum value is delivered as the RSRQ threshold for event A4 or A5. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-VoLTEQualityIfHoTargetInd.html">VoLTE Qual Inter-Freq HO Target Indication</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the neighboring E-UTRAN frequency can be used as a target frequency for handovers due to poor voice quality. If this parameter is set to ALLOWED(ALLOWED), the neighboring E-UTRAN frequency can be used as a target frequency for handovers due to poor voice quality. If this parameter is set to NOT_ALLOWED(NOT_ALLOWED), the neighboring E-UTRAN frequency cannot be used as a target frequency for handovers due to poor voice quality. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-IdleMlbeMtcUEReleaseRatio.html">Idle eMTC UE Release Ratio for MLB</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of eMTC UEs in RRC_IDLE state transferred to different frequencies for MLB. This parameter takes effect when both the InterFreqIdleMlbSwitch option of the MlbAlgoSwitch parameter and the eMtcProportion option of the InterFreqIdleMlbMode parameter are selected. The eNodeB transfers normally released eMTC UEs to frequencies based on the preset proportions, so that RRC_IDLE eMTC UEs reach the expected proportion on each frequency. The sum of frequency-specific proportions cannot exceed 100%.</p>
+<p>Proportion on the serving frequency = 100% - (Proportion of RRC_IDLE eMTC UEs transferred to frequency 1 for MLB + Proportion of RRC_IDLE eMTC UEs transferred to frequency 2 for MLB + ... + Proportion of RRC_IDLE eMTC UEs transferred to frequency n for MLB)</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqCioAdjLimitCfgInd.html">Inter-Freq CIO Adjustment Configuration Ind</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates how to set the upper and lower limits of the inter-frequency CIO adjustment range for the cell. If this parameter is set to NOT_CFG, the CIO adjustment range for the cell in inter-frequency MRO is not configured separately. Instead, the value range is the same as that in intra-frequency MRO. For details, see the value ranges in the CellMro.CioAdjLimitCfgInd, CellMro.CioAdjUpperLimit, and CellMro.CioAdjLowerLimit parameters. If this parameter is set to MANUAL_CFG, the inter-frequency CIO for the cell can be changed by an amount within the range specified by the upper and lower limits. If this parameter is set to AUTO_CFG, then:</p>
+<p>(1) If the inter-frequency handover triggering event is event A4/A5, the upper and lower limits of the CIO adjustment range for the cell in inter-frequency MRO are calculated by using the following formulas: InterFreqCioAdjLowerLimit = -24, InterFreqCioAdjUpperLimit &lt; Thresh + 110 - Ofn + Hys.</p>
+<p>(2) If the inter-frequency handover triggering event is event A3, the upper and lower limits of the CIO adjustment range for the cell in inter-frequency MRO are calculated by using the following formulas: InterFreqCioAdjLowerLimit = Off + Ofs + Ocs - Ofn + Hys - 5, InterFreqCioAdjUpperLimit = Off + Ofs + Ocs - Ofn + Hys - 2.</p>
+<p>In the preceding formulas, Thresh is the coverage-based inter-frequency RSRP triggering threshold, Off is the offset for inter-frequency handover, Ofs and Ofn are the frequency-specific offsets for the serving frequency and neighboring frequency respectively, Ocs is the cell-specific offset for the serving cell, and Hys is the hysteresis for inter- or intra-frequency handover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqCioAdjLowerLimit.html">Inter-Freq CIO Adjustment Lower Limit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the lower limit of inter-frequency cell individual offset (CIO) adjustment range for the cell in mobility robustness optimization (MRO). This parameter takes effect only when the InterFreqCioAdjLimitCfgInd parameter is set to MANUAL_CFG.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqCioAdjUpperLimit.html">Inter-Freq CIO Adjustment Upper Limit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper limit of inter-frequency cell individual offset (CIO) adjustment range for the cell in mobility robustness optimization (MRO). This parameter takes effect only when the InterFreqCioAdjLimitCfgInd parameter is set to MANUAL_CFG.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreq4TInd.html">Inter Frequency 4T Indicator</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether a neighboring E-UTRA frequency is a 4T- or 2T-cell frequency. The values of FREQ2T and FREQ4T indicate that the corresponding frequency is a 2T- and 4T-cell frequency, respectively. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the control policy on ANR-related MOs, which can be defined by the user or be based on the automatic neighbor relation (ANR) algorithm. When this parameter is set to MANUAL_MODE, this MO can be modified or removed only by users. A failure message is displayed when a user adds an existing MO (with identical keywords). When this parameter is set to AUTO_MODE, this MO can be modified or removed by users or the ANR algorithm. The MO removal is successful even if the MO does not exist. If an MO does not exist, it can be added by both users and the ANR algorithm. If an existing MO is to be added, the MO is modified when a user performs the addition, but it cannot be added by the ANR algorithm. When this MO is automatically added by the ANR algorithm, this parameter is set to AUTO_MODE by default. When this MO is added by a user, this parameter can be set to either AUTO_MODE or MANUAL_MODE. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-MeasPriorityForFreqPriHo.html">Meas Priority for Freq-Priority-based HO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the measurement priority of the frequency for frequency-priority-based handovers. Before delivering frequencies to measure for frequency-priority-based handovers, the eNodeB selects frequencies based on the settings of this parameter. It preferentially selects high-priority frequencies. The larger the value of this parameter, the higher the priority level. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-EmtcInterFreqCellReselPri.html">eMTC Inter-Frequency Cell Resel Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cell reselection priority of the E-UTRAN frequency for eMTC UEs. The value 0 indicates the lowest priority. A eMTC UE compares the value of this parameter and the absolute priority of the serving cell to decide whether to reselect a neighboring cell on the target frequency:</p>
+<p>If the value of this parameter is greater than the absolute priority of the serving cell, the UE starts measuring neighboring cells on neighboring frequencies. Then, if the signal quality of a neighboring cell meets the requirements, the UE reselects the cell.</p>
+<p>If the value of this parameter is smaller than the absolute priority of the serving cell, the UE starts measuring neighboring cells on neighboring frequencies only when the signal quality of the serving cell is poor. Then, if the signal quality of a neighboring cell meets the requirements, the UE reselects the cell. For details, see 3GPP TS 36.331. The value 255 indicates that no priority is configured for the frequency. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-PwrOffsetForReselToInterNb.html">Power Offset for Resel to Inter Freq NB-IoT Cell</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the power offset for NB-IoT UEs with a 14 dBm power level in inter-frequency cell reselection. If this parameter is set to NULL, this parameter is not delivered in system information. In this case, the UEs regard that the power offset is 0 dB by default. For details, see 3GPP TS 36.331. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqHoA5Thd1RsrpOfs.html">Inter-Freq HO A5 Thld1 RSRP Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRP threshold 1 for event A5 related to coverage-based inter-frequency handovers. During coverage-based inter-frequency handovers, the delivered RSRP threshold for event A5 is the sum of the InterFreqHoA5Thd1Rsrp parameter and this offset. If the sum is less than -140, -140 is delivered. If the sum is greater than -43, -43 is delivered. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqHoA5Thd1RsrqOfs.html">Inter-Freq HO A5 Thld1 RSRQ Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRQ threshold 1 for event A5 related to coverage-based inter-frequency handovers. During coverage-based inter-frequency handovers, the delivered RSRQ threshold for event A5 is the sum of the InterFreqHoA5Thd1Rsrq parameter and this offset. If the sum is less than -40, -40 is delivered. If the sum is greater than -6, -6 is delivered. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqPrdcMrFreqGrpId.html">Inter-Freq Periodic MR Freq Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a frequency group for inter-frequency periodic MRs. The InterFreqPeriodicMrCtrlSw parameter in the CellUeMeasControlCfg MO controls whether to enable periodic MR reporting for neighboring frequencies in one or more frequency groups. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-InterFreqRedirectionSwitch.html">Inter-Freq Redirection Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB executes a redirection procedure to the frequency when the eNodeB determines to perform a handover to a cell on the frequency for a UE.</p>
+<p>If this option is selected, the eNodeB executes a redirection procedure in the preceding scenario.</p>
+<p>If this option is deselected, the eNodeB executes a handover procedure in the preceding scenario.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-PwrOfsForNbInterFreqRedir.html">Power Ofs for NB-IoT Inter-Freq Redirection</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the power offset of NB-IoT UEs used to trigger inter-frequency redirection. If this parameter is set to NULL, this parameter is not delivered in RRC Connection Release messages. In this case, the UEs regard that the power offset is 0 dB by default. For details, see 3GPP TS 36.331. This parameter applies only to NB-IoT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QQualMinForCeModeA.html">Min Required Quality Level for CE Mode A</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum received signal quality required by UEs in CE mode A for cell reselection to inter-frequency neighboring E-UTRAN cells. It is used as an input parameter for cell reselection criterion. If this parameter is set to 0, SIB5 does not contain the q-QualMin IE, and UEs use the default value negative infinity. In this case, only the signal level is used for UEs to select and reselect cells. For details, see 3GPP TS 36.304. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QQualMinForCeModeB.html">Min Required Quality Level for CE Mode B</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum received signal quality required by UEs in CE mode B for cell reselection to inter-frequency neighboring E-UTRAN cells. It is used as an input parameter for cell reselection criterion. If this parameter is set to 0, SIB5 does not contain the q-QualMin IE, and UEs use the default value negative infinity. In this case, only the signal level is used for UEs to select and reselect cells. For details, see 3GPP TS 36.304. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QRxLevMinForCeModeA.html">Min Required RX Level for CE Mode A</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum receive level required by UEs in CE mode A for cell reselection to inter-frequency neighboring E-UTRAN cells. It is used as an input parameter for cell reselection criterion. For details, see 3GPP TS 36.304. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-QRxLevMinForCeModeB.html">Min Required RX Level for CE Mode B</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum receive level required by UEs in CE mode B for cell reselection to inter-frequency neighboring E-UTRAN cells. It is used as an input parameter for cell reselection criterion. For details, see 3GPP TS 36.304. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-CovIfHoA5VolteThld1RsrpOfs.html">VoLTE Cov-based Inter-Freq HO A5 Thld 1 RSRP Ofs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRP threshold 1 for event A5 related to coverage-based inter-frequency handovers of VoLTE UEs. For coverage-based handovers of VoLTE UEs, the delivered RSRP threshold 1 for event A5 is the sum of the InterFreqHoA5Thd1Rsrp, InterFreqHoA5Thd1RsrpOfs, and CovIfHoA5VolteThld1RsrpOfs parameter values. If the sum is less than -140, -140 is delivered. If the sum is greater than -43, -43 is delivered. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-CovIfHoA5VolteThld2RsrpOfs.html">VoLTE Cov-based Inter-Freq HO A5 Thld 2 RSRP Ofs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the RSRP threshold 2 for event A5 related to coverage-based inter-frequency handovers of VoLTE UEs. For coverage-based handovers of VoLTE UEs, the delivered RSRP threshold 2 for event A5 is the sum of the InterFreqHoA4ThdRsrp, IfHoThdRsrpOffset, and CovIfHoA5VolteThld2RsrpOfs parameter values. If the sum is less than -140, -140 is delivered. If the sum is greater than -43, -43 is delivered. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-A3InterFHoServingRsrpOfs.html">A3-based Inter-Freq HO Serving Cell RSRP Ofs</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the serving cell's RSRP offset related to event-A3-based inter-frequency handovers. When an LTE UE reports inter-frequency event A3 and the serving cell's RSRP value is less than the sum of the values of the InterFreqHoGroup.A3InterFreqHoA2ThdRsrp and EutranInterNFreq.A3InterFHoServingRsrpOfs parameters, an A3-based inter-frequency handover will be triggered. This parameter is applicable only to coverage-based inter-frequency handovers. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-NsaCovIfHoServCellRsrpOfs.html">Cov-based IF HO Serving Cell RSRP Ofs for NSA DC</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the serving cell's RSRP offset related to coverage-based inter-frequency handovers for NSA DC UEs. When an NSA DC UE reports inter-frequency event A3 and the serving cell's RSRP value is less than the sum of the values of the InterFreqHoGroup.A3InterFreqHoA2ThdRsrp and EutranInterNFreq.NsaCovIfHoServCellRsrpOfs parameters, an A3-based inter-frequency handover will be triggered. When an NSA DC UE reports inter-frequency event A4 and the serving cell's RSRP value is less than the sum of the values of the InterFreqHoGroup.InterFreqHoA2ThdRsrp and EutranInterNFreq.NsaCovIfHoServCellRsrpOfs parameters, an A4-based inter-frequency handover will be triggered. When an NSA DC UE reports inter-frequency event A5 and the serving cell's RSRP value is less than the sum of the values of the InterFreqHoGroup.InterFreqHoA5Thd1Rsrp and EutranInterNFreq.NsaCovIfHoServCellRsrpOfs parameters, an A5-based inter-frequency handover will be triggered.</p>
+<p>This parameter is applicable only to coverage-based inter-frequency handovers. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-AggregationAttribute.html">Aggregation Attribute</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the aggregation attributes of the neighboring E-UTRAN frequency.</p>
+<p>VG_MODEL_FORBID_BUILD_FLAG: If this option is selected, virtual grid models cannot be built for the neighboring frequency. If this option is deselected, virtual grid models can be built for the neighboring frequency. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EutranInterNFreq-FreqPriHoA4ThldRsrpOffset.html">Freq-Pri-based HO A4 Thld RSRP Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency-specific offset relative to the RSRP threshold for event A4 related to frequency-priority-based inter-frequency handovers. If the offset is set to 0, the inter-frequency A4 RSRP threshold is set without distinguishing frequencies. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

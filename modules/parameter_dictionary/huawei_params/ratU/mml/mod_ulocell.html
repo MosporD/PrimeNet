@@ -1,0 +1,1758 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Local Cell (MOD ULOCELL)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_ulocell">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Local Cell (MOD ULOCELL)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_ulocell"></a><a name="mod_ulocell"></a>
+
+
+<h1 class="topictitle1">Modify Local Cell (MOD ULOCELL)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="mod_ulocell__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>The command is used to modify some of the properties of the local cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_ulocell__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li>The local cell ID and the type of the local cell cannot be modified.</li><li>Before modifying UL and DL UARFCNs of the local cell, ensure that the updated UL and DL UARFCNs are within the same frequency band.</li><li>If <strong>ULFREQ</strong> is not configured but <strong>DLFREQ</strong> is configured, the system will automatically configure <strong>ULFREQ</strong> according to the 3GPP specifications.</li><li>The <strong>ULFREQIND</strong> parameter indicates the uplink frequency indicator. This parameter cannot be set on the MML GUI. If <strong>ULFREQ</strong> is configured, <strong>ULFREQIND</strong> will be automatically set to TRUE, if <strong>ULFREQ</strong> is not configured but <strong>DLFREQ</strong> is configured, <strong>ULFREQIND</strong> will be automatically set to FALSE.</li><li>Different cells in a sector equipment must use unique UARFCNs.</li><li>The frequency of the local cell must be supported by the PA. Otherwise, the local cell is unavailable.</li><li>When the logical cell is available, services will be interrupted by the modification of radius larger than or less than 30 km. That is, when the radius exceeds 30 km, it is modified to the figure less than or equal to 30 km; when the radius is less than or equal to 30 km, it is modified to the figure larger than 30 km. Therefore, do not perform the operation when the logical cell exists.</li><li>When the parameter configuration exceeds the device capabilities, the command execution changes the operation status of the cell.</li><li>The uplink and downlink frequency spacing for the local cell should be the fixed frequency spacing specified by the protocol. The fixed frequency spacing varies with band. For details, see the fixed frequency spacing described in the ULFREQ and DLFREQ parameters. Otherwise, UEs fail to search for the network or network performance is not optimum.</li><li>For a 0.5/0.5 cell, if the coverage type is the same coverage, the ratio of the transmit power of the local cell under each sector equipment to the total cell power must be 50%. If the coverage type is the different coverage, the ratio of transmit power of the local cell under the sector equipment to the total cell power must be 100%.</li><li>During a change in the maximum transmit power of a multiple-RRU cell or Mixed-Multi-RRU cell, the changed power is less than the power of the sector equipment (except 65535), the power of the sector equipment will be changed to the maximum transmit power of the cell to ensure that power of the sector equipment of the local cell does not exceed the maximum transmit power.</li><li>Parameters associated with rules are introduced to accommodate the Automatic Congestion Handler (Phase2) feature. The mapping between parameters and rules is as follows: <strong>ICMODE</strong> and <strong>TURBOIC</strong> associate with rules 4 and 7 respectively. According to the mapping between a parameter and a rule, run the <a href="dsp_nodebruleactionpara.html">DSP NODEBRULEACTIONPARA</a> command to query the rule activation status for a cell. If the rule is activated, run the <a href="lst_nodebruleactionpara.html">LST NODEBRULEACTIONPARA</a> command to query the setting of Administrative State. If Administrative State is ENABLE, the parameter settings in the <a href="mod_ulocell.html">MOD ULOCELL</a> command will not take effect. Accordingly, the <strong>NODEBRULEACTIONPARA</strong> parameter settings take effect.</li><li>Uplink baseband equipment and downlink baseband equipment for all local cells must have the same number of cabinet where boards are located.</li><li>When <strong>LOCELLTYPE</strong> is set to NORMAL_CELL, <strong>BFMODE</strong> is set to NORMALBEAM for a 4T4R cell configured in the <strong>BEAMCELLGROUP</strong> MO: if the antenna device used by the cell is AAU5972/AAU5973e, the value range of <strong>MAXPWR</strong> is the intersection of value ranges [P1max - 15 dB, P1max + 4 dB], [P2max - 15 dB, P2max + 4 dB], [P3max - 15 dB, P3max + 4 dB], and [P4max - 15 dB, P4max + 4 dB]; if the antenna device used by the cell is AAU5973, the value range of <strong>MAXPWR</strong> is the intersection of value ranges [P1max - 13 dB, P1max + 6 dB], [P2max - 13 dB, P2max + 6 dB], [P3max - 13 dB, P3max + 6 dB], and [P4max - 13 dB, P4max + 6 dB]. Pnmax (n is the ID of the power amplifier) is the maximum output power of the power amplifier at the top of the cabinet.</li><li>When <strong>LOCELLTYPE</strong> is set to NORMAL_CELL, <strong>BFMODE</strong> is set to MASSIVEBEAM for a cell configured in the <strong>BEAMCELLGROUP</strong> MO under which <strong>BEAMCELLGROUPTYPE</strong> is MASSIVEBEAM8T8R: if the antenna device used by the cell is AAU5972/AAU5973, the value range of <strong>MAXPWR</strong> is the intersection of value ranges [P1max - 15 dB, P1max + 4 dB], [P2max - 15 dB, P2max + 4 dB], [P3max - 15 dB, P3max + 4 dB], and [P4max - 15 dB, P4max + 4 dB]; if the antenna device used by the cell is AAU5973e, the value range of <strong>MAXPWR</strong> is the intersection of value ranges [P1max - 15.2 dB, P1max + 3.8 dB], [P2max - 15.2 dB, P2max + 3.8 dB], [P3max - 15.2 dB, P3max + 3.8 dB], and [P4max - 15.2 dB, P4max + 3.8 dB]. Pnmax (n is the ID of the power amplifier) is the maximum output power of the power amplifier at the top of the cabinet.</li></ul>
+</div></div>
+
+<div class="mmlparam"><a name="mod_ulocell__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-uLoCellId.html">ULOCELLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local cell ID. The local cell ID is unique for one NodeB.</p>
+<p>GUI Value Range: 0~268435455</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~268435455</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-loCellType.html">LOCELLTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of local cell.</p>
+<p>GUI Value Range: NORMAL_CELL(NORMAL_CELL), HALFFREQ_CELL(HALFFREQ_CELL), DIST_CELL(DIST_CELL), MULTIRRU_CELL(MULTIRRU_CELL), IMB_CELL(IMB_CELL), MIXED_MULTIRRU_CELL(MIXED_MULTIRRU_CELL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL_CELL, HALFFREQ_CELL, DIST_CELL, MULTIRRU_CELL, IMB_CELL, MIXED_MULTIRRU_CELL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-coverType.html">COVERTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cover Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cover type. If two RF units of a cell cover the same zone, this parameter is set to SAMEZONE(Same Zone) and the output power of the cell is the sum of the output power of the two RF units. If the two RF units cover different zones, this parameter is set to DIFFZONE(Different Zone) and the output power of the cell is equal to the output power of each RF unit.</p>
+<p>GUI Value Range: SAMEZONE(Same Zone), DIFFZONE(Different Zone)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SAMEZONE, DIFFZONE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-radius.html">RADIUS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell Radius</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the radius of a local cell, affecting cell coverage. It is set according to the network plan. A small cell radius causes user access failure to some or all coverage under certain configuration. Generally, use the default value of the cell radius.</p>
+<p>GUI Value Range: 150~200000</p>
+<p>Unit: m</p>
+<p>Actual Value Range: 150~200000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, the value of <strong>RADIUS</strong> must be larger than or equal to that of <strong>HORAD</strong>.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>AIR</strong> is set to TRUE, the value of <strong>RADIUS</strong> cannot be greater than 35 km.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 30 km, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong>, if <strong>RMTCM</strong> is TRUE or <strong>RADIUS</strong> is greater than 30 km, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 35 km, <strong>ULSPECTRUMSHARINGSWITCH</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 35 km, and <strong>UL0BUFFERZONE</strong> is set to TRUE, <strong>UL0BUFFERZONEFILTER</strong> can not be ULADAPTIVEFILTER.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the radius specified by <strong>RADIUS</strong> is greater than 30 km, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to be TRUE, <strong>RMTCM</strong> must be FALSE and the value of <strong>RADIUS</strong> must be less than or equal to 35km.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the radius specified by <strong>RADIUS</strong> is greater than 30 km, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-handoverRadius.html">HORAD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell Inner Handover Radius</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the inner handover radius. The parameter value cannot be greater than cell radius.</p>
+<p>GUI Value Range: 0~200000</p>
+<p>Unit: m</p>
+<p>Actual Value Range: 0~200000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, the value of <strong>RADIUS</strong> must be larger than or equal to that of <strong>HORAD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulBasebandEqmId.html">ULBASEBANDEQMID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Baseband Equipment ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the uplink baseband equipment carrying baseband resources for the local cell. Uplink resources are shared by the cells in an uplink baseband equipment.</p>
+<p>GUI Value Range: 0~23</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~23</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlBasebandEqmId.html">DLBASEBANDEQMID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Baseband Equipment ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the downlink baseband equipment carrying baseband resources for the local cell. A local cell can be served by only one board in the downlink baseband equipment.</p>
+<p>GUI Value Range: 0~23</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~23</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-twoTxWay.html">TTW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Two Tx Way</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports 2T mode.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>TTW</strong> is set to TRUE, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong>, <strong>TTW</strong> and <strong>DLASYMFILTER</strong> cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong>, if <strong>TTW</strong> is TRUE, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>TTW</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>If the value of <strong>ULPOWERSHARE</strong> is set to TRUE, the value of <strong>TTW</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>TTW</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>TTW</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>TTW</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>TTW</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulFreqNo.html">ULFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Frequency Channel Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink frequencies channel number of the local cell. The downlink and uplink frequencies channel number of the local cell must stay within the same frequency band. Frequency(MHZ) = (Frequency Channel Number / 5) + Offset</p>
+<p>Band1: Common Frequencies Channel Number: [9612-9888] Offset: 0 Special Frequencies Channel Number: none Offset: 0 Fixed Tx-Rx Frequency Separation: 190 MHz</p>
+<p>Band2: Common Frequencies Channel Number: [9262-9538] Offset: 0 Special Frequencies Channel Number: (12, 37, 62, 87, 112, 137, 162, 187, 212, 237, 262, 287) Offset: 1850.1 Fixed Tx-Rx Frequency Separation: 80 MHz</p>
+<p>Band3: Common Frequencies Channel Number: [937-1288] Offset: 1525 Special Frequencies Channel Number: none Offset: 0 Fixed Tx-Rx Frequency Separation: 95 MHz</p>
+<p>Band4: Common Frequencies Channel Number: [1312-1513] Offset: 1450 Special Frequencies Channel Number: (1662, 1687, 1712, 1737, 1762, 1787, 1812, 1837, 1862) Offset: 1380.1 Fixed Tx-Rx Frequency Separation: 400 MHz</p>
+<p>Band5: Common Frequencies Channel Number: [4132-4233] Offset: 0 Special Frequencies Channel Number: (782, 787, 807, 812, 837, 862) Offset: 670.1 Fixed Tx-Rx Frequency Separation: 45 MHz</p>
+<p>Band6: Common Frequencies Channel Number: [4162-4188] Offset: 0 Special Frequencies Channel Number: (812, 837) Offset: 670.1 Fixed Tx-Rx Frequency Separation: 45 MHz</p>
+<p>Band7: Common Frequencies Channel Number: [2012-2338] Offset: 2100 Special Frequencies Channel Number: (2362, 2387, 2412, 2437, 2462, 2487, 2512, 2537, 2562, 2587, 2612, 2637, 2662, 2687) Offset: 2030.1 Fixed Tx-Rx Frequency Separation: 120 MHz</p>
+<p>Band8: Common Frequencies Channel Number: [2712-2863] Offset: 340 Special Frequencies Channel Number: none Offset: 0 Fixed Tx-Rx Frequency Separation: 45 MHz</p>
+<p>Band9: Common Frequencies Channel Number: [8762-8912] Offset: 0 Special Frequencies Channel Number: none Offset: 0 Fixed Tx-Rx Frequency Separation: 95 MHz.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO under which <strong>ULFREQIND</strong> is set to TRUE, the value of <strong>ULFREQ</strong> must be within the permissible range.</li><li>In the <strong>ULOCELL</strong> MO under which <strong>ULFREQIND</strong> is set to TRUE, the relationships between <strong>ULFREQ</strong> and <strong>DLFREQ</strong> must meet the requirements specified by protocols when special uplink and downlink frequencies are used.</li><li>In the <strong>ULOCELL</strong> MO under which <strong>ULFREQIND</strong> is set to TRUE, the relationships between <strong>ULFREQ</strong> and <strong>DLFREQ</strong> must meet the requirements specified by protocols when no special uplink and downlink frequencies are used.</li></ul>
+<p>-Others:</p>
+<ul><li>The UL and DL UARFCNs of the local cell must be in the same frequency band.</li><li>The UARFCNs of the local cell must be the same as that of the logical cell carried on it.</li><li>Different cells in a sector must use unique UARFCNs.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlFreqNo.html">DLFREQ</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Frequency Channel Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink frequencies channel number of the local cell. The downlink and uplink frequencies channel number of the local cell must stay within the same frequency band. Frequency(MHZ) = (Frequency Channel Number / 5) + Offset</p>
+<p>Band1: Common Frequencies Channel Number: [10562-10838] Offset: 0 Special Frequencies Channel Number: none Offset: 0 Fixed Tx-Rx Frequency Separation: 190 MHz</p>
+<p>Band2: Common Frequencies Channel Number: [9662-9938] Offset: 0 Special Frequencies Channel Number: (412, 437, 462, 487, 512, 537, 562, 587, 612, 637, 662, 687) Offset: 1850.1 Fixed Tx-Rx Frequency Separation: 80 MHz</p>
+<p>Band3: Common Frequencies Channel Number: [1162-1513] Offset: 1575 Special Frequencies Channel Number: none Offset: 0 Fixed Tx-Rx Frequency Separation: 95 MHz</p>
+<p>Band4: Common Frequencies Channel Number: [1537-1738] Offset: 1805 Special Frequencies Channel Number: (1887, 1912, 1937, 1962, 1987, 2012, 2037, 2062, 2087) Offset: 1735.1 Fixed Tx-Rx Frequency Separation: 400 MHz</p>
+<p>Band5: Common Frequencies Channel Number: [4357-4458] Offset: 0 Special Frequencies Channel Number: (1007, 1012, 1032, 1037, 1062, 1087) Offset: 670.1 Fixed Tx-Rx Frequency Separation: 45 MHz</p>
+<p>Band6: Common Frequencies Channel Number: [4387-4413] Offset: 0 Special Frequencies Channel Number: (1037, 1062) Offset: 670.1 Fixed Tx-Rx Frequency Separation: 45 MHz</p>
+<p>Band7: Common Frequencies Channel Number: [2237-2563] Offset: 2175 Special Frequencies Channel Number: (2587, 2612, 2637, 2662, 2687, 2712, 2737, 2762, 2787, 2812, 2837, 2862, 2887, 2912) Offset: 2105.1 Fixed Tx-Rx Frequency Separation: 120 MHz</p>
+<p>Band8: Common Frequencies Channel Number: [2937-3088] Offset: 340 Special Frequencies Channel Number: none Offset: 0 Fixed Tx-Rx Frequency Separation: 45 MHz</p>
+<p>Band9: Common Frequencies Channel Number: [9237-9387] Offset: 0 Special Frequencies Channel Number: none Offset: 0  Fixed Tx-Rx Frequency Separation: 95 MHz.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, the value of <strong>DLFREQ</strong> must be within the permissible range.</li><li>In the <strong>ULOCELL</strong> MO under which <strong>ULFREQIND</strong> is set to TRUE, the relationships between <strong>ULFREQ</strong> and <strong>DLFREQ</strong> must meet the requirements specified by protocols when special uplink and downlink frequencies are used.</li><li>In the <strong>ULOCELL</strong> MO under which <strong>ULFREQIND</strong> is set to TRUE, the relationships between <strong>ULFREQ</strong> and <strong>DLFREQ</strong> must meet the requirements specified by protocols when no special uplink and downlink frequencies are used.</li></ul>
+<p>-Others:</p>
+<ul><li>The UL and DL UARFCNs of the local cell must be in the same frequency band.</li><li>The UARFCNs of the local cell must be the same as that of the logical cell carried on it.</li><li>Different cells in a sector must use unique UARFCNs.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-maxPwr.html">MAXPWR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max Output Power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum transmit power of the local cell is the maximum output power at the antenna connector on the cabinet top.</p>
+<p>GUI Value Range: 0~500</p>
+<p>Unit: 0.1dBm</p>
+<p>Actual Value Range: 0~50, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>Assuming that the maximum output power of the power amplifier on top of the cabinet is Pnmax (n indicates the number of the power amplifier):</li><li>1. The value range of this parameter is [Pmax - 19 dB, Pmax] if any of the following conditions is met:</li><li>1) <strong>LOCELLTYPE</strong> is set to NORMAL_CELL, and <strong>VAM</strong>, <strong>INTEL2TVAM</strong> and <strong>TTW</strong> are set to FALSE.</li><li>2) <strong>LOCELLTYPE</strong> is set to NORMAL_CELL and <strong>TTW</strong> is set to TRUE, and this local cell is configured as a PSP cell.</li><li>3) <strong>LOCELLTYPE</strong> is set to HALFFREQ_CELL and <strong>COVERTYPE</strong> is set to DIFFZONE.</li><li>4) <strong>LOCELLTYPE</strong> is set to MULTIRRU_CELL and <strong>VAM</strong> is set to FALSE.</li><li>5) <strong>LOCELLTYPE</strong> is set to MIXED_MULTIRRU_CELL or IMB_CELL.</li><li>2. The value range of this parameter is the intersection between [P1max - 16 dB, P1max + 3 dB] and [P2max - 16 dB, P2max + 3 dB] if any of the following conditions is met:</li><li>1) <strong>LOCELLTYPE</strong> is set to NORMAL_CELL, and any of the parameters <strong>VAM</strong> and <strong>INTEL2TVAM</strong> is set to TRUE.</li><li>2) <strong>LOCELLTYPE</strong> is set to NORMAL_CELL and <strong>TTW</strong> is set to TRUE, and this local cell is not configured as a PSP cell.</li><li>3) <strong>LOCELLTYPE</strong> is set to HALFFREQ_CELL and <strong>COVERTYPE</strong> is set to SAMEZONE.</li><li>4) <strong>LOCELLTYPE</strong> is set to MULTIRRU_CELL and <strong>VAM</strong> is set to TRUE.</li><li>5) <strong>LOCELLTYPE</strong> is set to NORMAL_CELL, <strong>BFMODE</strong> is set to MASSIVEBEAM, and the local cell is configured in the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R.</li><li>6) <strong>LOCELLTYPE</strong> is set to NORMAL_CELL, <strong>BFMODE</strong> is set to COORDINATEDBEAM, and the local cell is configured in the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to COORDINATED2TBEAM.</li><li>3. The value range of this parameter is the intersection among [P1max - 15 dB, P1max + 4 dB], [P2max - 15 dB, P2max + 4 dB], [P3max - 15 dB, P3max + 4 dB], and [P4max - 15 dB, P4max + 4 dB] under the following condition:</li><li><strong>LOCELLTYPE</strong> is set to NORMAL_CELL, <strong>BFMODE</strong> is set to MASSIVEBEAM, and the local cell is configured in the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R.</li><li>4. The value range of this parameter is the intersection among [P1max - 13 dB, P1max + 6 dB], [P2max - 13 dB, P2max + 6 dB], [P3max - 13 dB, P3max + 6 dB], and [P4max - 13 dB, P4max + 6 dB] under the following condition:</li><li>1) <strong>LOCELLTYPE</strong> is set to NORMAL_CELL and <strong>BFMODE</strong> is set to FOURTXBEAMOPT.</li><li>2) <strong>LOCELLTYPE</strong> is set to NORMAL_CELL, <strong>BFMODE</strong> is set to NORMALBEAM, and the local cell is configured in the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to FOURTXSPLITSECTOR.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-defaultPwrLevel.html">DEFPWRLVL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Default Power Level</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the percentage of the default transmit power of the local cell to the RRU's total transmit power.</p>
+<p>GUI Value Range: 10~100</p>
+<p>Unit: %</p>
+<p>Actual Value Range: 10~100</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>If the <a href="mod_ulocellsectoreqm.html">MOD ULOCELLSECTOREQM</a> command has been used to set the transmit power of an RRU to a value beyond the power range supported by the RRU, the RRU cannot be used for this local cell.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The smaller this percentage, the lower the transmit power and the smaller the coverage.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlResMode.html">DLRESMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dl BB Resource Allocation Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink baseband resource allocation mode for the local cell. It determines the assignment scope of the DL baseband resources. The cell is assigned with baseband resources according to the selected DL baseband resource assignment mode. If the WBBPa board is not configured, any value is applicable to this parameter. Downlink resources are allocated from the WBBPb board and its compatible boards. The parameter value has no impact on the system. The default value is recommended. If 64QAM is required for the local cell, this parameter needs to be set to INEBOARD(From the WBBPb and other new boards).</p>
+<p>GUI Value Range: UNLIMITED(The range is unlimited), INHBOARD(In WBBPa or compatible boards), INEBOARD(In WBBPb,WBBPd or compatible boards)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNLIMITED, INHBOARD, INEBOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-desensitizationIntensity.html">DI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Desensitization Intensity</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the desensitization intensity, that is, the ratio of uplink noise intensity to background noise. If the desensitization intensity is set as 0, the desensitization is not applied.</p>
+<p>GUI Value Range: 0~30</p>
+<p>Unit: dB</p>
+<p>Actual Value Range: 0~30</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>When <strong>BEAMCELLGROUPTYPE</strong> in the <strong>BEAMCELLGROUP</strong> MO is set to MASSIVEBEAM4T4R, MASSIVEBEAM8T8R, or COORDINATED2TBEAM, <strong>DI</strong> must be set to the same value in the <strong>ULOCELL</strong> MOs configured in the <strong>BEAMCELLGROUP</strong> MO. Otherwise, the actual desensitization value will be different from the configured one for one of the two cells.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the desensitization function is enabled and the background noise value is also modified on the RNC side, this parameter only affects the uplink coverage. If the value of this parameter is too large, the uplink coverage severely shrinks. If the value of this parameter is too small, the uplink coverage becomes larger than the downlink coverage. In either case, the base station has mismatching uplink and downlink coverage. If the desensitization function is enabled but the background noise value is not modified on the RNC side, this parameter affects the simulated uplink load. The larger the value of this parameter, the heavier the simulated uplink load.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-highSpeedMode.html">HISPM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">High Speed Movement Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the High Speed Access feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li><strong>RMTCM</strong> and <strong>HISPM</strong> in the <strong>ULOCELL</strong> MO cannot be both set to TRUE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-speedRate.html">SPR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Speed Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rate level used for high-speed access.</p>
+<p>GUI Value Range: 250, 400, 500</p>
+<p>Unit: km/h</p>
+<p>Actual Value Range: 250, 400, 500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The higher the level, the faster the UEs are allowed to move. If UEs move faster than the rate allowed by the rate level, the access performance severely deteriorates. If UEs move at various rates, the rate level needs to allow for the highest rate.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-remoteCellMode.html">RMTCM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Remote Cell Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the Extended Cell Coverage up to 200km feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li><strong>RMTCM</strong> and <strong>HISPM</strong> in the <strong>ULOCELL</strong> MO cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, if the <strong>RMTCM</strong> is TRUE or <strong>RADIUS</strong> is greater than 35km, the <strong>ULCOMPSW</strong> and <strong>ULCOVEXPANSION</strong> must be FALSE.</li><li><strong>RMTCM</strong> and <strong>AIR</strong> in the <strong>ULOCELL</strong> MO cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 30 km, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong>, if <strong>RMTCM</strong> is TRUE or <strong>RADIUS</strong> is greater than 30 km, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 35 km, <strong>ULSPECTRUMSHARINGSWITCH</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 35 km, and <strong>UL0BUFFERZONE</strong> is set to TRUE, <strong>UL0BUFFERZONEFILTER</strong> can not be ULADAPTIVEFILTER.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the radius specified by <strong>RADIUS</strong> is greater than 30 km, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to be TRUE, <strong>RMTCM</strong> must be FALSE and the value of <strong>RADIUS</strong> must be less than or equal to 35km.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the radius specified by <strong>RADIUS</strong> is greater than 30 km, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-remoteCellGrpId.html">RMTCGRPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Remote Cell Group</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Index of Remote Cell Group.</p>
+<p>GUI Value Range: 0~4294967295</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~4294967295</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ul16Qam.html">UL16QAM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL 16QAM</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the UL 16QAM feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE, the cell supports 16QAM on the uplink. This will significantly improve the uplink peak rates for individual users.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulL2.html">ULL2PLUS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL L2 Enhanced</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether UL L2 Enhanced is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, the uplink coverage and application-layer rate will be improved.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dl64QamMimo.html">DL64QAMMIMO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL 64QAM+MIMO</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the DL 64QAM_MIMO feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, when <strong>DL64QAM</strong> is set to TRUE, <strong>DL64QAMMIMO</strong> is valid.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE, the cell supports 64QAM and MIMO on the downlink. This will significantly improve the downlink peak rates for individual users.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-hsdpaDcMimo.html">HSDPADCMIMO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DC-HSDPA+MIMO</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the DC-HSDPA+MIMO feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE, the cell supports DC-HSDPA+MIMO feature. This will significantly improve the downlink peak rates for individual users.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-hsdpaDbMimo.html">HSDPADBMIMO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DB-HSDPA+MIMO</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the DB-HSDPA+MIMO feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FALSE(FALSE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-hsdpa4cMimo.html">HSDPA4CMIMO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">4C-HSDPA+MIMO</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the 4C-HSDPA+MIMO feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FALSE(FALSE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-fdeMode.html">FDEMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">FDE</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports the Frequency Domain Equalization (FDE) feature for HSUPA services.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>FDEMODE</strong> is set to TRUE, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong>, <strong>FDEMODE</strong> and <strong>DLASYMFILTER</strong> cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong>, if <strong>FDEMODE</strong> is TRUE, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>FDEMODE</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>FDEMODE</strong> must be set to FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>FDEMODE</strong> must be FALSE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, the cell supports FDE. In multi-path environments, FDE improves the uplink peak rates for individual users and the uplink throughput of the cell if the number of users is small.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-icMode.html">ICMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IC</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports the Interference Cancellation feature for HSUPA services.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, the cell supports HSUPA EDPDCH IC, which greatly improves the uplink throughput of the cell.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-turboIC.html">TURBOIC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Turbo IC</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports Turbo IC.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The Turbo IC feature reduces the interference from the E-DCH and improves the cell throughput in case of full buffer services.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-turboICPhase2.html">TURBOICPHASE2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Turbo IC Phase2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports Turbo IC Phase2.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: This increases the number of online 2 ms TTI users and decreases the interference between users caused by the E-DCH.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-reservedCell.html">RSV</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reserved Cell</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: This parameter specifies whether to continue with cell services when the cell voltage is insufficient. If this parameter is set to FALSE, the cell with insufficient voltage will stop providing services. If this parameter is set to TRUE, the cell with insufficient voltage continues providing some services until the voltage drops to a level that can support no services. In this case, if the smooth power change function has been enabled by running the <a href="set_nodebsmthpwrsw.html">SET NODEBSMTHPWRSW</a> command, the cell gradually reduces its pilot power before services are stopped. This ensures that services are smoothly transferred to other normal carriers.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-boost.html">BOOST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BOOST</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the BOOST feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, the cell supports boosting, which makes channel estimation be accurate in high-speed scenarios and thereby improves the receive quality of uplink high-speed services.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-erach.html">ERACH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ERACH</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether Uplink Enhanced CELL_FACH is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, service setup delay and state transition delay will be reduced, and the common uplink coverage will be improved.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-erachHsdpcch.html">ERACHHSDPCCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ERACH HSDPCCH Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable E-RACH over HS-DPCCH.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, the NodeB supports feedbacks over HS-DPCCH on the E-RACH, improving the transmission efficiency on the E-FACH over the air interface. If this parameter is set to FALSE, the NodeB does not support feedbacks over HS-DPCCH on the E-RACH.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-vamFlag.html">VAM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support VAM</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local cell Support Virtual Antenna Mapping(VAM).</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>PRECDWSRSW</strong> is set to TRUE, <strong>VAM</strong> must be TRUE.</li><li>In the <strong>ULOCELL</strong>, if <strong>VAM</strong> is TRUE, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>VAM</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li></ul>
+<p>-Others:</p>
+<ul><li>The VAM cell must be configured with two TX channels.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this switch is set to TRUE, the power amplifiers on two downlink TX channels are made fully use of, increasing the maximum transmit power of the cell.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-preCdWsrSw.html">PRECDWSRSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Precoding Weight Set Restriction Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: This parameter is the control switch for precoding control indication in the local cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>PRECDWSRSW</strong> is set to TRUE, <strong>VAM</strong> must be TRUE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this switch is set to TRUE, the PCI code carried in the single-flow CQI reported from a MIMO UE can only be selected from two options, MIMO users will experience slightly decreasing single-flow performance, but the peak-to-average ratio (PAR) of the RRU will not increase. If this switch is set to FALSE, the PCI code carried in the single-flow CQI reported from a MIMO UE can only be selected from four options, but the PAR of the RRU will increase, and system performance will decrease.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-guPowerShare.html">GUPOWERSHARE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">GU Power Share Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the local cell supports GSM/UMTS power sharing. This parameter must be specified for a GSM/UMTS dual-mode base station.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the value of <strong>ULPOWERSHARE</strong> is set to TRUE, the value of <strong>GUPOWERSHARE</strong> must be FALSE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE and power sharing is enabled for GSM, the power actually used by UMTS exceeds the maximum transmit power of the cell. This improves the cell throughput, but it also causes more interference to neighboring cells and lowers their throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-nbis.html">NBIS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Narrowband Interference Suppression</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the Narrowband Interference Suppression feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>If <strong>NBISADAPTIVESW</strong> in <strong>NODEBALGPARA</strong> is set to ON and <strong>NBISADAPTIVEFORBIDSW</strong> in <strong>ULOCELL</strong> is set to OFF, <strong>NBIS</strong> is invalid.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If the logical cell exists, changing this parameter results in call drops. This parameter is only used to the narrowband interference. If the cell supports this feature, the narrowband interference signal can be effectively suppressed and network performance improves. Otherwise, network performance slightly declines after this feature is enabled.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dl64Qam.html">DL64QAM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL64QAM</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the downlink 64QAM function.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE and the Downlink 64QAM feature is authorized by the license file, the cell supports downlink 64QAM. This noticeably improves the peak downlink rate per user. When the license is insufficient, alarms will be generated.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-hsdpa4c.html">HSDPA4C</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">4C-HSDPA</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the 4C-HSDPA function of the local cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-frequencyBandWidth.html">FREQUENCYBANDWIDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Frequency Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth for a cell over the air interface.</p>
+<p>1. This parameter is optional. When this parameter is set to UNSPECIFIED, the actual cell bandwidth is configured by running the <a href="../../comm/mml/set_freqbwh.html">SET FREQBWH</a> command.</p>
+<p>2. This parameter is invalid for the WRFU, MRFU V1, MRFU V2, MRFU V2a, RRU3804, RRU3805, RRU3806, RRU3808, RRU3801C, RRU3801E, RRU3908, and AAU3902. However, on these RF units, the cell bandwidth is still configured by running the <a href="../../comm/mml/set_freqbwh.html">SET FREQBWH</a> command.</p>
+<p>GUI Value Range: UNSPECIFIED(UNSPECIFIED), 5000(5000), 4800(4800), 4600(4600), 4400(4400), 4200(4200), 4000(4000), 3800(3800)</p>
+<p>Unit: kHz</p>
+<p>Actual Value Range: UNSPECIFIED, 5000, 4800, 4600, 4400, 4200, 4000, 3800</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: UNSPECIFIED(UNSPECIFIED)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Small bandwidth may reduce KPIs.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-userLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user label of local cell.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-cellScaleInd.html">CELLSCALEIND</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Scale Indication</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell is configured as a macro cell or micro cell. It is recommended that the maximum transmit power of a cell be used as a criterion for CellScaleInd. For example, cells with their maximum transmit power of less than 10 w are configured as a micro cell. Otherwise, cells are configured as macro cells. In actual scenarios, the criterion for CellScaleInd is changed as required.</p>
+<p>GUI Value Range: MACRO(Macro Cell), MICRO(Micro Cell)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MACRO, MICRO</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MACRO(Macro Cell)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulCompSw.html">ULCOMPSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UlCoMP Algorithms Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a cell supports Uplink CoMP (Joint Reception) based on Coordinated BBU. A cell serves as a neighboring cell only after this switch is turned on.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if the <strong>RMTCM</strong> is TRUE or <strong>RADIUS</strong> is greater than 35km, the <strong>ULCOMPSW</strong> and <strong>ULCOVEXPANSION</strong> must be FALSE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If Uplink CoMP (Joint Reception) based on Coordinated BBU is enabled and ULCoMP groups are configured, uplink capacity of the system and uplink throughput of cell edge users increase.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-bMacMicRruCell.html">MULTIRRUSTATICDESSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Macro-Micro Multi-RRUs-Cell Static Desensitization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Macro-Micro Multi-RRUs-Cell Static Desensitization Switch.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The attenuation amplitude and desensitization amplitude of uplink signals need to be adjusted, which affects power control on services. As a result, calls may be dropped.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-hspaUserNumExt.html">HSPAUSERNUMEXT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">HSPA User Number Extend</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of HSPA users served in a local cell. Value ON indicates that a local cell serves more than 128 HSPA users, and value OFF indicates that a local cell serves a maximum of 128 HSPA users.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If the switch is turned on, the number of HSPA users served in a cell increases. To enable more users to be carried over HSPA, increase the number of downlink E-RGCH/HICH codewords. This decreases the PS traffic over DCH and the number of RABs and downlink HSDPA available codewords. If more users are carried over HSUPA, the RTWP will increase.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ircSw.html">IRCSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Interference Rejection Combining Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for interference rejection combining (IRC).</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If external interference and neighboring interference are colored interference (caused by one or two signal sources), turning on this switch increases the system capacity and performance.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-mfHsdpaSw.html">MFHSDPASW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MF-HSDPA Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports SFDC and DF3C.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON, the cell supports SFDC and DF3C, thereby improving HSDPA throughput of cell edge users (CEUs).</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-virtualCPC.html">VIRTUALCPC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Virtual CPC</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the virtual CPC feature is supported by the cell.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, a cell supports virtual CPC. The support improves the uplink capacity when the cell serves HSUPA 2ms TTI users and is heavily loaded in the uplink.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulCovExpansion.html">ULCOVEXPANSION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Coverage Expansion Under Interference</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a cell supports the Coverage Expansion Under Interference.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if the <strong>RMTCM</strong> is TRUE or <strong>RADIUS</strong> is greater than 35km, the <strong>ULCOMPSW</strong> and <strong>ULCOVEXPANSION</strong> must be FALSE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this switch is turned on, the Coverage Expansion Under Interference feature takes effect, improving the access success rate in the event of interference. If this switch is turned off, the Coverage Expansion Under Interference feature does not take effect.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-preciseChEst2ms.html">PRECISECHEST2MS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Precise Channel Estimation for HSUPA 2 ms UEs</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports precise channel estimation for HSUPA 2 ms UEs.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, the cell supports precise channel estimation for HSUPA 2 ms UEs. The support increases uplink cell capacity when the cell serves a larger number of HSUPA 2 ms UEs.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-interNodeBUlComp.html">INTERNODEBULCOMP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Inter-NodeB Uplink CoMP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a cell supports Inter-NodeB Uplink CoMP (Joint Reception).</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE, the uplink capacity increases with more uplink CEs consumed.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-speedBasedDemodSw.html">SPEEDBASEDDEMODSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Moving Speed-based Adaptive Demodulation Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports the Moving Speed-based Adaptive Demodulation feature.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, the cell supports moving speed-based adaptive demodulation, uplink cell capacity will improve or cell load will decrease.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-air.html">AIR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Adaptive Interference Rejection</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports the Adaptive Interference Rejection feature.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li><strong>RMTCM</strong> and <strong>AIR</strong> in the <strong>ULOCELL</strong> MO cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>AIR</strong> is set to TRUE, the value of <strong>RADIUS</strong> cannot be greater than 35 km.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>AIR</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>AIR</strong> must be FALSE.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE and the working mode of the uplink baseband equipment is set to AIR, uplink coverage in cells improves in the event of strong wideband interference.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-interNodeBHsDpcchComp.html">INTERNODEBHSDPCCHCOMP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Inter-NodeB HS-DPCCH CoMP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports the Inter-NodeB HS-DPCCH CoMP (Joint Reception) feature.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, cell edge user throughput improves after Inter-NodeB HS-DPCCH CoMP(Joint Reception) takes effect.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulSuperNbFilter.html">ULSUPERNARROWBANDFILTER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Super Narrow Band Filter</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth for the UMTS uplink super narrow band filter in GSM+UMTS 5 MHz scenarios. If this parameter is set to a value other than NOTSUPPORT, Uplink Super Narrow Band Filter takes effect. If this parameter is set to NOTSUPPORT, Uplink Super Narrow Band Filter does not take effect. The cell bandwidth is specified by the <strong>FMBWH</strong> parameter in the <a href="../../comm/mml/set_freqbwh.html">SET FREQBWH</a> command or the <strong>FREQUENCYBANDWIDTH</strong> parameter in the <a href="add_ulocell.html">ADD ULOCELL</a> and <a href="mod_ulocell.html">MOD ULOCELL</a> commands. For details, see the <strong>FMBWH</strong> and <strong>FREQUENCYBANDWIDTH</strong> configuration specifications.</p>
+<p>Indicates the UMTS bandwidth without overlapping GSM frequencies when uplink adaptive band-pass filter is enabled in GU@5 MHz scenarios. In this situation, the cell bandwidth is specified by <strong>FMBWH</strong> in the <a href="../../comm/mml/set_freqbwh.html">SET FREQBWH</a> command or <strong>FREQUENCYBANDWIDTH</strong> in the <a href="add_ulocell.html">ADD ULOCELL</a> or <a href="mod_ulocell.html">MOD ULOCELL</a> command. For details, see the <strong>FMBWH</strong> and <strong>FREQUENCYBANDWIDTH</strong> configuration descriptions.</p>
+<p>GUI Value Range: NOTSUPPORT(Not Support), 2200(2200), 2600(2600), 3000(3000), 3400(3400)</p>
+<p>Unit: kHz</p>
+<p>Actual Value Range: NOTSUPPORT, 2200, 2600, 3000, 3400</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>ULSUPERNARROWBANDFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>ULLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>ULRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>DLLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>DLRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 -<strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, <strong>UL0BUFFERZONEFILTER</strong> must be set to ULADAPTIVEFILTER when the following conditions are met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT; <strong>GU5MHZPERFOPT</strong> contains the ULADAPTIVEBPFILTER bit; <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE; <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE; or <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL. (2) <strong>UL0BUFFERZONE</strong> is set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, <strong>DLADAPTIVEBPFILTER</strong> cannot be set to FIXEDBANDWIDTH if any of the conditions is met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is not set to NOTSUPPORT. (2) <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE. (3) Values of <strong>GU5MHZPERFOPT</strong> contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT. (4) <strong>GUBUFZONECELLTYPE</strong> is not set to NOTBUFZONECELL. (5) <strong>ULSPECTRUMSHARINGSWITCH</strong> is not set to NOTSUPPORT. (6) <strong>UL0BUFFERZONE</strong> is set to TRUE. (7) <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlAdaptiveBpFilter.html">DLADAPTIVEBPFILTER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Adaptive Band-Pass Filter</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the algorithm for Downlink Adaptive Band-Pass Filter. When this parameter is set to NOTSUPPORT, the UMTS cell downlink adaptive band-pass filter is disabled. When this parameter is set to STATICBANDWIDTH, the UMTS cell downlink adaptive band-pass filter bandwidth remains unchanged. When this parameter is set to DYNAMICBANDWIDTH, the UMTS cell downlink adaptive band-pass filter bandwidth dynamically adapts to the GSM services. When this parameter is set to FIXEDBANDWIDTH, the 3.8 MHz downlink adaptive band-pass filter is used in the UMTS cell, requiring no bandwidth adjustment based on GSM services.</p>
+<p>GUI Value Range: NOTSUPPORT(Not Support), STATICBANDWIDTH(Static Bandwidth), DYNAMICBANDWIDTH(Dynamic Bandwidth), FIXEDBANDWIDTH(Fixed Bandwidth)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOTSUPPORT, STATICBANDWIDTH, DYNAMICBANDWIDTH, FIXEDBANDWIDTH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 30 km, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>FDEMODE</strong> is set to TRUE, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>TTW</strong> is set to TRUE, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>INTEL2TVAM</strong> is set to TRUE, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DLADAPTIVEBPFILTER</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DLADAPTIVEBPFILTER</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, <strong>DLADAPTIVEBPFILTER</strong> cannot be set to FIXEDBANDWIDTH if any of the conditions is met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is not set to NOTSUPPORT. (2) <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE. (3) Values of <strong>GU5MHZPERFOPT</strong> contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT. (4) <strong>GUBUFZONECELLTYPE</strong> is not set to NOTBUFZONECELL. (5) <strong>ULSPECTRUMSHARINGSWITCH</strong> is not set to NOTSUPPORT. (6) <strong>UL0BUFFERZONE</strong> is set to TRUE. (7) <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE.</li></ul>
+<p>-Others:</p>
+<ul><li>When <strong>DLADAPTIVEBPFILTER</strong> is set to FIXEDBANDWIDTH in the <strong>ULOCELL</strong> MO, 3800 is used as the value of <strong>FREQUENCYBANDWIDTH</strong>. The bandwidth value configured in the SET FREQBWH command cannot be greater than the value of <strong>FREQUENCYBANDWIDTH</strong>.</li><li>When Subrack Type is set to BBU3910C, this parameter is valid only if its value is FIXEDBANDWIDTH.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to NOTSUPPORT, Downlink Adaptive Band-Pass Filter does not take effect. When this parameter is set to STATICBANDWIDTH, the cell downlink signal bandwidth is set to a fixed value. The more GSM frequencies need to be filtered out on the NodeB, the lower the UMTS downlink throughput. When this parameter is set to DYNAMICBANDWIDTH, the cell downlink signal bandwidth changes dynamically based on the GSM service activation status. If the number of GSM frequencies filtered on the NodeB remains unchanged, a lower GSM service activation rate allows higher UMTS downlink throughput. When this parameter is set to FIXEDBANDWIDTH, the 3.8 MHz downlink signal spectrum is used in the cell, delivering stable UMTS performance that is slightly affected by GSM services.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dynamicBandwidthOpt.html">DYNAMICBANDWIDTHOPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Dynamic Bandwidth Optimization</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the algorithm of optimizing the dynamic bandwidth of the downlink adaptive band-pass filter. When this parameter is set to DBTOSBGUNOTSYN, dynamic filtering is changed to static filtering for the downlink adaptive band-pass filter with DLADAPTIVEBPFILTER set to DYNAMICBANDWIDTH when GSM and UMTS clocks are not synchronous. When this parameter is set to DBTOSDBGUNOTSYN, dynamic filtering is changed to semi-dynamic filtering for the downlink adaptive band-pass filter with DLADAPTIVEBPFILTER set to DYNAMICBANDWIDTH when GSM and UMTS clocks are not synchronous.</p>
+<p>GUI Value Range: DBTOSBGUNOTSYN(Dyn BW to Static When GU Clks Unsync), DBTOSDBGUNOTSYN(Dyn BW to Semi-dyn When GU Clks Unsync)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DBTOSBGUNOTSYN, DBTOSDBGUNOTSYN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to DBTOSBGUNOTSYN, dynamic filtering is changed to static filtering for the downlink adaptive band-pass filter with DLADAPTIVEBPFILTER set to DYNAMICBANDWIDTH when GSM and UMTS clocks are not synchronous. When this parameter is set to DBTOSDBGUNOTSYN, dynamic filtering is changed to semi-dynamic filtering for the downlink adaptive band-pass filter with DLADAPTIVEBPFILTER set to DYNAMICBANDWIDTH when GSM and UMTS clocks are not synchronous. The downlink signal spectrum width of the cell is dynamically adjusted in line with the activation status (whether services are performed in the eight timeslots) of GSM carrier-level services. There are fewer GSM filter frequencies than the static filtering, improving the UMTS downlink throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-gsmQlBasedRotDynaCtrl.html">GSMQLBASEDROTDYNACTRL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">GSM Quality Based ROT Dynamic Control</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the algorithm for UMTS Target RoT Adjustment Based on GSM Radio Quality. When the parameter is set to TRUE, UMTS Target RoT Adjustment Based on GSM Radio Quality is enabled. When the parameter is set to FALSE, UMTS Target RoT Adjustment Based on GSM Radio Quality is disabled.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>GSMQLBASEDROTDYNACTRL</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, <strong>DLADAPTIVEBPFILTER</strong> cannot be set to FIXEDBANDWIDTH if any of the conditions is met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is not set to NOTSUPPORT. (2) <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE. (3) Values of <strong>GU5MHZPERFOPT</strong> contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT. (4) <strong>GUBUFZONECELLTYPE</strong> is not set to NOTBUFZONECELL. (5) <strong>ULSPECTRUMSHARINGSWITCH</strong> is not set to NOTSUPPORT. (6) <strong>UL0BUFFERZONE</strong> is set to TRUE. (7) <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-intel2TVam.html">INTEL2TVAM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Intelligent 2T VAM</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Whether the Intelligent 2T VAM feature is supported by the cell. When this parameter is set to TRUE, the cell supports Intelligent 2T VAM. When this parameter is set to FALSE, the cell does not support Intelligent 2T VAM. Based on the quick phase adjustment capability of the baseband VAM, the Intelligent 2T VAM feature enables the NodeB to match the best phase difference for each user when they are being scheduled, improving use experience. Baseband VAM refers to virtual antenna mapping (VAM) implemented on the baseband.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>INTEL2TVAM</strong> is set to TRUE, <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong>, <strong>INTEL2TVAM</strong> and <strong>DLASYMFILTER</strong> cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong>, if <strong>INTEL2TVAM</strong> is TRUE, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>INTEL2TVAM</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>INTEL2TVAM</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>INTEL2TVAM</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>INTEL2TVAM</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>INTEL2TVAM</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE, the cell can use the Intelligent 2T VAM feature, improving user experience under light traffic.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-nbisAdaptiveForbidSw.html">NBISADAPTIVEFORBIDSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NBIS Adaptive Forbid Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to disable the adaptive NBIS function for a cell. If this parameter is set to ON, the adaptive NBIS function is disabled for the cell.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>If <strong>NBISADAPTIVESW</strong> in <strong>NODEBALGPARA</strong> is set to OFF, <strong>NBISADAPTIVEFORBIDSW</strong> is invalid.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When the NBISADAPTIVESW parameter under the NODEBALGPARA MO is set to ON, setting this parameter to ON disables adaptive NBIS function for the cell; setting this parameter to OFF makes the NodeB to decide whether to enable or disable NBIS in the early morning every day based on narrowband interference in the cell. NBIS improves network performance in cells with narrowband interference. Enabling or disabling NBIS causes service drops.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlAsymFilter.html">DLASYMFILTER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Asymmetric Bandpass Filter</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the function for downlink asymmetric band-pass filter. When this parameter is set to TRUE(TRUE), the cell supports this function. When this parameter is set to FALSE(FALSE), the cell does not support this function.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FALSE(FALSE)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong>, <strong>INTEL2TVAM</strong> and <strong>DLASYMFILTER</strong> cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong>, <strong>TTW</strong> and <strong>DLASYMFILTER</strong> cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong>, <strong>FDEMODE</strong> and <strong>DLASYMFILTER</strong> cannot be both set to TRUE.</li><li>In the <strong>ULOCELL</strong>, if <strong>DLASYMFILTER</strong> is TRUE, the sum of <strong>DLASYMLEFTBANDWIDTH</strong> and <strong>DLASYMRIGHTBANDWIDTH</strong> must be greater than or equal to 2.8 MHz and less than or equal to 4 MHz, and either <strong>DLASYMLEFTBANDWIDTH</strong> or <strong>DLASYMRIGHTBANDWIDTH</strong> must be 2.5 MHz.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>DLASYMFILTER</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>DLASYMFILTER</strong> must be set to FALSE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this switch is turned on, the downlink asymmetric band-pass filter is effective, yielding capacity gains.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlAsymFilterNFCellId.html">DLASYMFILTERNFCELLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL AsymFilter Neighbor Frequency Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: ID of the neighboring frequency cell of a cell working at the downlink asymmetric narrowband carrier. The value 4294967295 is invalid, this parameter cannot be set to the value by users.</p>
+<p>GUI Value Range: 0~268435455</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~268435455,4294967295</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlAsymLeftBandWidth.html">DLASYMLEFTBANDWIDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL AsymFilter Left Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth on the left, when the cell is working on the downlink asymmetric narrowband carrier. The left side indicates the frequencies lower than the center frequency. When DLASYMFILTER is set to TRUE(TRUE), this parameter takes effect. When this parameter is set to 2.5 MHz, more bandwidth is allotted to the lower frequencies. When this parameter is set to a value other than 2.5 MHz, more bandwidth is allotted to the higher frequencies. The bandwidth on the left and that on the right cannot be both set to 2.5 MHz.</p>
+<p>GUI Value Range: 300(300), 500(500), 700(700), 900(900), 1100(1100), 1300(1300), 1500(1500), 2500(2500)</p>
+<p>Unit: kHz</p>
+<p>Actual Value Range: 300, 500, 700, 900, 1100, 1300, 1500, 2500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong>, if <strong>DLASYMFILTER</strong> is TRUE, the sum of <strong>DLASYMLEFTBANDWIDTH</strong> and <strong>DLASYMRIGHTBANDWIDTH</strong> must be greater than or equal to 2.8 MHz and less than or equal to 4 MHz, and either <strong>DLASYMLEFTBANDWIDTH</strong> or <strong>DLASYMRIGHTBANDWIDTH</strong> must be 2.5 MHz.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A larger parameter value indicates that narrowband carriers can generate more capacity gains.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlAsymRightBandWidth.html">DLASYMRIGHTBANDWIDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL AsymFilter Right Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth on the right, when the cell is working on the downlink asymmetric narrowband carrier. The right side indicates the frequencies higher than the center frequency. When DLASYMFILTER is set to TRUE(TRUE), this parameter takes effect. When this parameter is set to 2.5 MHz, more bandwidth is allotted to the higher frequencies. When this parameter is set to a value other than 2.5 MHz, more bandwidth is allotted to the lower frequencies. The bandwidth on the left and that on the right cannot be both set to 2.5 MHz.</p>
+<p>GUI Value Range: 300(300), 500(500), 700(700), 900(900), 1100(1100), 1300(1300), 1500(1500), 2500(2500)</p>
+<p>Unit: kHz</p>
+<p>Actual Value Range: 300, 500, 700, 900, 1100, 1300, 1500, 2500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong>, if <strong>DLASYMFILTER</strong> is TRUE, the sum of <strong>DLASYMLEFTBANDWIDTH</strong> and <strong>DLASYMRIGHTBANDWIDTH</strong> must be greater than or equal to 2.8 MHz and less than or equal to 4 MHz, and either <strong>DLASYMLEFTBANDWIDTH</strong> or <strong>DLASYMRIGHTBANDWIDTH</strong> must be 2.5 MHz.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A larger parameter value indicates that narrowband carriers can generate more capacity gains.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-gu5MPerfOpt.html">GU5MHZPERFOPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">GU@5MHz Performance Optimize</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable GU@5MHz Phase 2.</p>
+<p>ULADAPTIVEBPFILTER: Indicates whether the cell supports uplink adaptive band-pass filter. When the option is selected, the cell supports uplink adaptive band-pass filter.</p>
+<p>DLADAPTIVEBPFILTERPERFEOPT: Indicates whether the cell supports downlink adaptive band-pass filter optimization. When the option is selected, the cell supports downlink adaptive band-pass filter optimization.</p>
+<p>GUI Value Range: ULADAPTIVEBPFILTER(UL Adaptive Band-Pass Filter), DLADAPTIVEBPFILTERPERFEOPT(DL Adaptive Band-Pass Filter Optimization)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ULADAPTIVEBPFILTER, DLADAPTIVEBPFILTERPERFEOPT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ULADAPTIVEBPFILTER:OFF, DLADAPTIVEBPFILTERPERFEOPT:OFF</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong>, if <strong>RMTCM</strong> is TRUE or <strong>RADIUS</strong> is greater than 30 km, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong>, if <strong>FDEMODE</strong> is TRUE, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong>, if <strong>TTW</strong> is TRUE, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong>, if <strong>INTEL2TVAM</strong> is TRUE, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong>, if <strong>VAM</strong> is TRUE, the values of <strong>GU5MHZPERFOPT</strong> cannot contain DLADAPTIVEBPFILTERPERFEOPT.</li><li>If the value of <strong>BFMODE</strong> under the <strong>ULOCELL</strong> MO is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>GU5MHZPERFOPT</strong> cannot contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT.</li><li>When ULADAPTIVEBPFILTER is selected under the <strong>GU5MHZPERFOPT</strong> parameter and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, and 60 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, neither ULADAPTIVEBPFILTER nor DLADAPTIVEBPFILTERPERFEOPT can be selected under <strong>GU5MHZPERFOPT</strong>.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHLTE</strong> is set to a value other than NOTSUPPORT, neither ULADAPTIVEBPFILTER nor DLADAPTIVEBPFILTERPERFEOPT can be selected under <strong>GU5MHZPERFOPT</strong>.</li><li>In the <strong>ULOCELL</strong> MO, <strong>UL0BUFFERZONEFILTER</strong> must be set to ULADAPTIVEFILTER when the following conditions are met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT; <strong>GU5MHZPERFOPT</strong> contains the ULADAPTIVEBPFILTER bit; <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE; <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE; or <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL. (2) <strong>UL0BUFFERZONE</strong> is set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, <strong>DLADAPTIVEBPFILTER</strong> cannot be set to FIXEDBANDWIDTH if any of the conditions is met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is not set to NOTSUPPORT. (2) <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE. (3) Values of <strong>GU5MHZPERFOPT</strong> contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT. (4) <strong>GUBUFZONECELLTYPE</strong> is not set to NOTBUFZONECELL. (5) <strong>ULSPECTRUMSHARINGSWITCH</strong> is not set to NOTSUPPORT. (6) <strong>UL0BUFFERZONE</strong> is set to TRUE. (7) <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240 and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When the ULADAPTIVEBPFILTER option is selected, the cell supports uplink adaptive band-pass filter and the baseband processing unit adaptively filters out uplink narrowband interference, such as GSM signals, to enhance the UMTS demodulation performance under narrowband interference. When this option is deselected, the cell does not support uplink adaptive band-pass filter. When the DLADAPTIVEBPFILTERPERFEOPT option is selected, the cell supports downlink adaptive band-pass filter optimization and the downlink UMTS capacity increases with downlink UMTS-to-GSM interference remaining unchanged. When this option is deselected, the cell does not support downlink adaptive band-pass filter optimization.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-guBufZoneCellType.html">GUBUFZONECELLTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">GU Bufferzone Cell Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of cells in GU Refarming or GU@5 MHz scenarios. Value NOTBUFZONECELL indicates that the cell is not in the buffer zone. Value BUFZONECELLWITHGSM indicates that the cell is a UMTS cell co-deployed with GSM cells in the buffer zone. Value BUFZONECELLWITHOUTGSM indicates that the cell is a UMTS cell not co-deployed with GSM cells in the buffer zone.</p>
+<p>GUI Value Range: NOTBUFZONECELL(Non-Buffer-Zone Cell), BUFZONECELLWITHGSM(Buffer-Zone Cell with GSM), BUFZONECELLWITHOUTGSM(Buffer-Zone Cell Without GSM)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOTBUFZONECELL, BUFZONECELLWITHGSM, BUFZONECELLWITHOUTGSM</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the value of <strong>BFMODE</strong> under the <strong>ULOCELL</strong> MO is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>GUBUFZONECELLTYPE</strong> must be NOTBUFZONECELL.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, and 60 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>GUBUFZONECELLTYPE</strong> must be NOTBUFZONECELL.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, <strong>UL0BUFFERZONEFILTER</strong> must be set to ULADAPTIVEFILTER when the following conditions are met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT; <strong>GU5MHZPERFOPT</strong> contains the ULADAPTIVEBPFILTER bit; <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE; <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE; or <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL. (2) <strong>UL0BUFFERZONE</strong> is set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, <strong>DLADAPTIVEBPFILTER</strong> cannot be set to FIXEDBANDWIDTH if any of the conditions is met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is not set to NOTSUPPORT. (2) <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE. (3) Values of <strong>GU5MHZPERFOPT</strong> contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT. (4) <strong>GUBUFZONECELLTYPE</strong> is not set to NOTBUFZONECELL. (5) <strong>ULSPECTRUMSHARINGSWITCH</strong> is not set to NOTSUPPORT. (6) <strong>UL0BUFFERZONE</strong> is set to TRUE. (7) <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240 and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to NOTBUFZONECELL, the cell is a non-buffer-zone cell, for which the interference suppression optimization algorithm specific to buffer-zone cells does not take effect. When this parameter is set to BUFZONEWITHGSM, the cell is a UMTS cell co-deployed with GSM cells in the buffer zone, the interference suppression optimization algorithm takes effect for this cell, and the NodeB supports GU synchronization through GSM cells in the same buffer zone to improve the interference suppression performance of buffer-zone cells. When this parameter is set to BUFZONEWITHOUTGSM, the cell is a UMTS cell not co-deployed with GSM cells in the buffer zone. In this situation, a high-precision external reference clock, such as GPS, must be configured for Downlink Adaptive Band-Pass Filter to take effect. Otherwise, the UMTS-to-GSM interference cannot be mitigated, and the capacity and KPIs may deteriorate in neighboring GSM cells.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-bfMode.html">BFMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Beam Forming Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the beamforming mode. Value NOTSUPPORT indicates that the cell does not support beamforming on the baseband processing unit. Value MASSIVEBEAM indicates that the cell is enabled with beamforming on the baseband processing unit and supports the UMTS Massive Beam 4T4R or UMTS Massive Beam 8T8R capability. Value NORMALBEAM indicates that the cell supports the normal beamforming capability on the baseband processing unit. Value FOURTXBEAMOPT indicates that the cell supports the UMTS 4T Beam Optimization capability. Value COORDINATEDBEAM indicates that the cell supports the 2T Coordinated Beaforming capability. If this parameter is set to NORMALBEAM, MASSIVEBEAM, or COORDINATEDBEAM, the ring topology for RF modules is not supported. With the hot-backup ring topology, the local cell is unavailable if downlink RF signal combination is used for two Massive Beam cells.</p>
+<p>GUI Value Range: NOTSUPPORT(Not Support), MASSIVEBEAM(Massive Beam), NORMALBEAM(Normal Beam), FOURTXBEAMOPT(4T Beam Optimization), COORDINATEDBEAM(Coordinated Beamforming)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOTSUPPORT, MASSIVEBEAM, NORMALBEAM, FOURTXBEAMOPT, COORDINATEDBEAM</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>VAM</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>TTW</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>INTEL2TVAM</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>ULSUPERNARROWBANDFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>DLADAPTIVEBPFILTER</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>GSMQLBASEDROTDYNACTRL</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>DLASYMFILTER</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if the value of <strong>AIR</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>If the value of <strong>ULPOWERSHARE</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li><li>If the value of <strong>BFMODE</strong> under the <strong>ULOCELL</strong> MO is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>GUBUFZONECELLTYPE</strong> must be NOTBUFZONECELL.</li><li>If the value of <strong>BFMODE</strong> under the <strong>ULOCELL</strong> MO is set to MASSIVEBEAM or NORMALBEAM, the value of <strong>GU5MHZPERFOPT</strong> cannot contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>BFMODE</strong> must be set to NOTSUPPORT, FOURTXBEAMOPT, or COORDINATEDBEAM.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulPowerShare.html">ULPOWERSHARE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UMTS and LTE Dynamic Power Sharing Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the local cell supports the UMTS and LTE Dynamic Power Sharing feature. This parameter applies to a UMTS/LTE dual-mode base station.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the value of <strong>ULPOWERSHARE</strong> is set to TRUE, the value of <strong>TTW</strong> must be FALSE.</li><li>If the value of <strong>ULPOWERSHARE</strong> is set to TRUE, the value of <strong>GUPOWERSHARE</strong> must be FALSE.</li><li>If the value of <strong>ULPOWERSHARE</strong> is set to TRUE, the value of <strong>BFMODE</strong> must be NOTSUPPORT.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE and the UMTS and LTE Dynamic Power Sharing feature is enabled on the LTE side, the maximum transmit power of UMTS and LTE cells changes dynamically based on the cell traffic. This improves the average throughput of the UMTS cell as the power receiver or negatively affects user experience of the UMTS cell as the power transmitter in the event of burst services.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-umtsAndLteSpecShareSw.html">ULSPECTRUMSHARINGSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UMTS and LTE Spectrum Sharing Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the UMTS and LTE spectrum sharing function takes effect. If this parameter is set to FIXED_BANDWIDTH_COMP_MODE, the UMTS and LTE spectrum sharing function takes effect to allow sharing of some spectrums between UMTS and LTE networks.</p>
+<p>GUI Value Range: NOTSUPPORT(Not Support), FIXED_BANDWIDTH_COMP_MODE(Fixed Bandwidth Compressed Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOTSUPPORT, FIXED_BANDWIDTH_COMP_MODE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If some spectrums used by UMTS and LTE networks overlap, it is good practice to set this parameter to FIXED_BANDWIDTH_COMP_MODE. In other cases, set this parameter to NOTSUPPORT.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 35 km, <strong>ULSPECTRUMSHARINGSWITCH</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>INTEL2TVAM</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>TTW</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>FDEMODE</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>ULLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>ULRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>DLLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>DLRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 -<strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> in the <strong>ULOCELL</strong> MO is set to FIXED_BANDWIDTH_COMP_MODE, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter is set to FIXED_BANDWIDTH_COMP_MODE and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, <strong>UL0BUFFERZONEFILTER</strong> must be set to ULADAPTIVEFILTER when the following conditions are met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT; <strong>GU5MHZPERFOPT</strong> contains the ULADAPTIVEBPFILTER bit; <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE; <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE; or <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL. (2) <strong>UL0BUFFERZONE</strong> is set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, <strong>DLADAPTIVEBPFILTER</strong> cannot be set to FIXEDBANDWIDTH if any of the conditions is met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is not set to NOTSUPPORT. (2) <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE. (3) Values of <strong>GU5MHZPERFOPT</strong> contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT. (4) <strong>GUBUFZONECELLTYPE</strong> is not set to NOTBUFZONECELL. (5) <strong>ULSPECTRUMSHARINGSWITCH</strong> is not set to NOTSUPPORT. (6) <strong>UL0BUFFERZONE</strong> is set to TRUE. (7) <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240 and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to FIXED_BANDWIDTH_COMP_MODE, UMTS and LTE networks can share some spectrum resources, improving the overall spectral efficiency.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulLeftSharedBandwidth.html">ULLEFTSHAREDBANDWIDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Left Shared Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth that is on the left of the uplink spectrum of a UMTS cell and can be shared or overlapped with another UMTS cell or an inter-RAT cell.</p>
+<p>GUI Value Range: 0~499</p>
+<p>Unit: 10kHz</p>
+<p>Actual Value Range: 0~4990, step: 10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>ULLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>ULRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE.</li><li>When ULADAPTIVEBPFILTER is selected under the <strong>GU5MHZPERFOPT</strong> parameter and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, the value of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> cannot be greater than 208.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set toFALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be greater than 0 and be less than or equal to 266.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter is set to FIXED_BANDWIDTH_COMP_MODE and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, the value of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 260.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>When <strong>UL0BUFFERZONE</strong> and <strong>UL0BUFFERZONEFILTER</strong> in the <strong>ULOCELL</strong> MO are set to TRUE and ULNARROWBANDFILTER, respectively, only values 80, 100, 120, and 140 are valid for <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong>.</li><li>When <strong>UL0BUFFERZONE</strong> and <strong>UL0BUFFERZONEFILTER</strong> in the <strong>ULOCELL</strong> MO are set to TRUE and ULNARROWBANDFILTER, respectively, <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be set to the same value.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a value other than 0, the UMTS available bandwidth is smaller than the standard bandwidth, decreasing the UMTS system capacity. The larger the parameter value, the smaller the UMTS system capacity.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulRightSharedBandwidth.html">ULRIGHTSHAREDBANDWIDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Right Shared Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth that is on the right of the uplink spectrum of a UMTS cell and can be shared or overlapped with another UMTS cell or an inter-RAT cell.</p>
+<p>GUI Value Range: 0~499</p>
+<p>Unit: 10kHz</p>
+<p>Actual Value Range: 0~4990, step: 10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>ULLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>ULRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE.</li><li>When ULADAPTIVEBPFILTER is selected under the <strong>GU5MHZPERFOPT</strong> parameter and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, the value of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> cannot be greater than 208.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set toFALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be greater than 0 and be less than or equal to 266.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter is set to FIXED_BANDWIDTH_COMP_MODE and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, the value of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 260.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>When <strong>UL0BUFFERZONE</strong> and <strong>UL0BUFFERZONEFILTER</strong> in the <strong>ULOCELL</strong> MO are set to TRUE and ULNARROWBANDFILTER, respectively, only values 80, 100, 120, and 140 are valid for <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong>.</li><li>When <strong>UL0BUFFERZONE</strong> and <strong>UL0BUFFERZONEFILTER</strong> in the <strong>ULOCELL</strong> MO are set to TRUE and ULNARROWBANDFILTER, respectively, <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be set to the same value.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a value other than 0, the UMTS available bandwidth is smaller than the standard bandwidth, decreasing the UMTS system capacity. The larger the parameter value, the smaller the UMTS system capacity.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlLeftSharedBandwidth.html">DLLEFTSHAREDBANDWIDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink Left Shared Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth that is on the left of the downlink spectrum of a UMTS cell and can be shared or overlapped with another UMTS cell or an inter-RAT cell.</p>
+<p>GUI Value Range: 0~499</p>
+<p>Unit: 10kHz</p>
+<p>Actual Value Range: 0~4990, step: 10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>DLLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>DLRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 -<strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> in the <strong>ULOCELL</strong> MO is set to FIXED_BANDWIDTH_COMP_MODE, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, and 60 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, only the values 10*N where N is 0~26 are valid for <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong>.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240 and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li></ul>
+<p>-Others:</p>
+<ul><li>If <strong>DCHSDPASHAREDWITHGSM</strong> in <strong>ULOCELL</strong> is set to a value other than NOTSUPPORT, and <strong>NONSTABANDDLFILTEROPT</strong> in <strong>ULOCELL</strong> is set to a value other than 5000, <strong>DLLEFTSHAREDBANDWIDTH</strong> is invalid.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a value other than 0, the UMTS available bandwidth is smaller than the standard bandwidth, decreasing the UMTS system capacity. The larger the parameter value, the smaller the UMTS system capacity.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dlRightSharedBandwidth.html">DLRIGHTSHAREDBANDWIDTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink Right Shared Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bandwidth that is on the right of the downlink spectrum of a UMTS cell and can be shared or overlapped with another UMTS cell or an inter-RAT cell.</p>
+<p>GUI Value Range: 0~499</p>
+<p>Unit: 10kHz</p>
+<p>Actual Value Range: 0~4990, step: 10</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>DLLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>DLRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 -<strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> in the <strong>ULOCELL</strong> MO is set to FIXED_BANDWIDTH_COMP_MODE, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, and 60 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, only the values 10*N where N is 0~26 are valid for <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong>.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240 and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li></ul>
+<p>-Others:</p>
+<ul><li>If <strong>DCHSDPASHAREDWITHGSM</strong> in <strong>ULOCELL</strong> is set to a value other than NOTSUPPORT, and <strong>NONSTABANDDLFILTEROPT</strong> in <strong>ULOCELL</strong> is set to a value other than 5000, <strong>DLRIGHTSHAREDBANDWIDTH</strong> is invalid.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to a value other than 0, the UMTS available bandwidth is smaller than the standard bandwidth, decreasing the UMTS system capacity. The larger the parameter value, the smaller the UMTS system capacity.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulZeroBufferZone.html">UL0BUFFERZONE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UMTS and LTE Zero Bufferzone</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the UMTS and LTE Zero Bufferzone feature takes effect for a UMTS cell. If this parameter is set to TRUE, no buffer zone is required between the UMTS cell and neighboring LTE cells during UMTS/LTE refarming. If this parameter is set to FALSE, this feature is not supported.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>ULLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>ULRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE.</li><li>When ULADAPTIVEBPFILTER is selected under the <strong>GU5MHZPERFOPT</strong> parameter and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, the value of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> cannot be greater than 208.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set toFALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be greater than 0 and be less than or equal to 266.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 35 km, and <strong>UL0BUFFERZONE</strong> is set to TRUE, <strong>UL0BUFFERZONEFILTER</strong> can not be ULADAPTIVEFILTER.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>FDEMODE</strong> must be set to FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>BFMODE</strong> must be set to NOTSUPPORT, FOURTXBEAMOPT, or COORDINATEDBEAM.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>DLASYMFILTER</strong> must be set to FALSE.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter is set to FIXED_BANDWIDTH_COMP_MODE and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>When <strong>UL0BUFFERZONE</strong> and <strong>UL0BUFFERZONEFILTER</strong> in the <strong>ULOCELL</strong> MO are set to TRUE and ULNARROWBANDFILTER, respectively, only values 80, 100, 120, and 140 are valid for <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong>.</li><li>When <strong>UL0BUFFERZONE</strong> and <strong>UL0BUFFERZONEFILTER</strong> in the <strong>ULOCELL</strong> MO are set to TRUE and ULNARROWBANDFILTER, respectively, <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be set to the same value.</li><li>In the <strong>ULOCELL</strong> MO, <strong>UL0BUFFERZONEFILTER</strong> must be set to ULADAPTIVEFILTER when the following conditions are met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT; <strong>GU5MHZPERFOPT</strong> contains the ULADAPTIVEBPFILTER bit; <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE; <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE; or <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL. (2) <strong>UL0BUFFERZONE</strong> is set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, <strong>DLADAPTIVEBPFILTER</strong> cannot be set to FIXEDBANDWIDTH if any of the conditions is met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is not set to NOTSUPPORT. (2) <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE. (3) Values of <strong>GU5MHZPERFOPT</strong> contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT. (4) <strong>GUBUFZONECELLTYPE</strong> is not set to NOTBUFZONECELL. (5) <strong>ULSPECTRUMSHARINGSWITCH</strong> is not set to NOTSUPPORT. (6) <strong>UL0BUFFERZONE</strong> is set to TRUE. (7) <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to TRUE, UMTS or LTE cells can be continuously deployed in the intra-frequency buffer zone to improve the spectral efficiency of the buffer zone.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulZeroBufferZoneFilter.html">UL0BUFFERZONEFILTER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UMTS and LTE Zero Bufferzone Filter</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the filter mode for UMTS and LTE Zero Bufferzone. Value ULADAPTIVEFILTER indicates that the uplink adaptive filtering is configured for the UMTS cell. Value ULNARROWBANDFILTER indicates that uplink narrowband filtering is configured for the UMTS cell.</p>
+<p>GUI Value Range: ULADAPTIVEFILTER(Uplink Adaptive Filter), ULNARROWBANDFILTER(Uplink Narrowband Filter)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ULADAPTIVEFILTER, ULNARROWBANDFILTER</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, the value of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> cannot be greater than 208.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set toFALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be greater than 0 and be less than or equal to 266.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the value of <strong>RADIUS</strong> is greater than 35 km, and <strong>UL0BUFFERZONE</strong> is set to TRUE, <strong>UL0BUFFERZONEFILTER</strong> can not be ULADAPTIVEFILTER.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>FDEMODE</strong> must be set to FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>BFMODE</strong> must be set to NOTSUPPORT, FOURTXBEAMOPT, or COORDINATEDBEAM.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, <strong>DLASYMFILTER</strong> must be set to FALSE.</li><li>When <strong>UL0BUFFERZONE</strong> and <strong>UL0BUFFERZONEFILTER</strong> in the <strong>ULOCELL</strong> MO are set to TRUE and ULNARROWBANDFILTER, respectively, only values 80, 100, 120, and 140 are valid for <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong>.</li><li>When <strong>UL0BUFFERZONE</strong> and <strong>UL0BUFFERZONEFILTER</strong> in the <strong>ULOCELL</strong> MO are set to TRUE and ULNARROWBANDFILTER, respectively, <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be set to the same value.</li><li>In the <strong>ULOCELL</strong> MO, <strong>UL0BUFFERZONEFILTER</strong> must be set to ULADAPTIVEFILTER when the following conditions are met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT; <strong>GU5MHZPERFOPT</strong> contains the ULADAPTIVEBPFILTER bit; <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE; <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE; or <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL. (2) <strong>UL0BUFFERZONE</strong> is set to TRUE.</li></ul>
+<p>-Others:</p>
+<ul><li>When Subrack Type is set to BBU3910C, this parameter is valid only if its value is ULNARROWBANDFILTER.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ULNARROWBANDFILTER, the uplink narrowband filter helps filter out LTE signals from uplink signals in the UMTS cell, thereby ensuring stable performance of the UMTS cell. When this parameter is set to ULADAPTIVEFILTER, LTE interference to the uplink signals in the UMTS cell is detected, and the position and bandwidth in which the filter works are adaptively adjusted, further improving the uplink capacity of the UMTS cell.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dcHsdpaSharedWithGsm.html">DCHSDPASHAREDWITHGSM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DC-HSDPA Shared with GSM</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports the DC-HSDPA function in the shared GSM spectrum.</p>
+<p>GUI Value Range: NOTSUPPORT(Not Support), STATICBANDWIDTH(Static Bandwidth), DYNAMICBANDWIDTHWITHGSM(GU Co-Site Dynamic Bandwidth), DYNAMICBANDWIDTHWITHOUTGSM(GU Non-Co-Site Dynamic Bandwidth)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOTSUPPORT, STATICBANDWIDTH, DYNAMICBANDWIDTHWITHGSM, DYNAMICBANDWIDTHWITHOUTGSM</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>TTW</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DLADAPTIVEBPFILTER</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, neither ULADAPTIVEBPFILTER nor DLADAPTIVEBPFILTERPERFEOPT can be selected under <strong>GU5MHZPERFOPT</strong>.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the radius specified by <strong>RADIUS</strong> is greater than 30 km, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>INTEL2TVAM</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, <strong>UU0DCHSDPA</strong> must be set to FALSE.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to NOTSUPPORT, the DC-HSDPA function of the shared GSM spectrum does not take effect. When this parameter is set to STATICBANDWIDTH, the downlink signal spectrum width of the cell remains unchanged. The more GSM frequencies that need to be filtered by the NodeB, the lower the UMTS HSDPA throughput. If this parameter is set to DYNAMICBANDWIDTHWITHGSM, the cell is identified as the dynamic filtering-supported cell that is co-sited with GSM cells and support GSM/UMTS synchronization through the GSM cells. The downlink signal spectrum width of the cell is dynamically adjusted in line with the activation status of GSM services. When the number of GSM frequencies to be filtered remains unchanged, the lower the GSM service activation rate decreases, the higher the UMTS downlink throughput. If this parameter is set to DYNAMICBANDWIDTHWITHOUTGSM, the cell is identified as not co-sited with any GSM cells. An external clock source (for example, GPS) with high precision must be added to the cell in order for Downlink Adaptive Band-Pass Filter in dynamic mode to take effect.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-nonStaBandDlFilterOpt.html">NONSTABANDDLFILTEROPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Non Standard Bandwidth DL Filter Optimize</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the downlink filter optimization function is supported in non-standard bandwidth scenarios.</p>
+<p>GUI Value Range: 5000(5000), 3800(3800)</p>
+<p>Unit: kHz</p>
+<p>Actual Value Range: 5000, 3800</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a value other than 5000, the cell supports downlink filter optimization in non-standard bandwidth scenarios, which helps further improve the UMTS downlink capacity under the same level of UMTS-to-GSM downlink interference. If this parameter is set to 5000, the cell does not support downlink filter optimization in non-standard bandwidth scenarios.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-ulSpectrumSharingPh2Switch.html">ULSPECTRUMSHARINGPHASE2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UMTS and LTE Spectrum Sharing Phase2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports the UMTS and LTE spectrum sharing phase 2 feature. When this parameter is set to TRUE, the cell supports this feature.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>ULLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>ULRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT and <strong>UL0BUFFERZONE</strong> is set to FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, assume that: x = Max. (<strong>DLLEFTSHAREDBANDWIDTH</strong> x 10, (2500 - <strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)), y = Max. (<strong>DLRIGHTSHAREDBANDWIDTH</strong> x 10, (2500 -<strong>ULSUPERNARROWBANDFILTER</strong> x 0.5)). Then the sum of x and y must be less than or equal to 3200 if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, and <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> in the <strong>ULOCELL</strong> MO is set to FIXED_BANDWIDTH_COMP_MODE, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>When ULADAPTIVEBPFILTER is selected under the <strong>GU5MHZPERFOPT</strong> parameter and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, and 60 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE, the value of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> cannot be greater than 208.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE and <strong>UL0BUFFERZONEFILTER</strong> is set to ULADAPTIVEFILTER, and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set toFALSE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be greater than 0 and be less than or equal to 266.</li><li>When the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter is set to FIXED_BANDWIDTH_COMP_MODE and <strong>UL0BUFFERZONE</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE and <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to FALSE in the <strong>ULOCELL</strong> MO, only the values 0, 20, 40, 60, 80, 100, and 120 are valid for the <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> parameters.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>TTW</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>INTEL2TVAM</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to be TRUE, <strong>RMTCM</strong> must be FALSE and the value of <strong>RADIUS</strong> must be less than or equal to 35km.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>FDEMODE</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHGSM</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>GUBUFZONECELLTYPE</strong> must be NOTBUFZONECELL.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, the value of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 260.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, only the values 10*N where N is 0~26 are valid for <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong>.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>AIR</strong> must be FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE and <strong>ULSUPERNARROWBANDFILTER</strong> is set to NOTSUPPORT, the sum of <strong>ULLEFTSHAREDBANDWIDTH</strong> and <strong>ULRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, <strong>UL0BUFFERZONEFILTER</strong> must be set to ULADAPTIVEFILTER when the following conditions are met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT; <strong>GU5MHZPERFOPT</strong> contains the ULADAPTIVEBPFILTER bit; <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE; <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE; or <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL. (2) <strong>UL0BUFFERZONE</strong> is set to TRUE.</li><li>In the <strong>ULOCELL</strong> MO, when <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE or <strong>DCHSDPASHAREDWITHLTE</strong> is set to DYNAMICBANDWIDTH, <strong>COCOVERLTECI</strong> can not be invalid.</li><li>In the <strong>ULOCELL</strong> MO, <strong>DLADAPTIVEBPFILTER</strong> cannot be set to FIXEDBANDWIDTH if any of the conditions is met: (1) <strong>ULSUPERNARROWBANDFILTER</strong> is not set to NOTSUPPORT. (2) <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE. (3) Values of <strong>GU5MHZPERFOPT</strong> contain ULADAPTIVEBPFILTER or DLADAPTIVEBPFILTERPERFEOPT. (4) <strong>GUBUFZONECELLTYPE</strong> is not set to NOTBUFZONECELL. (5) <strong>ULSPECTRUMSHARINGSWITCH</strong> is not set to NOTSUPPORT. (6) <strong>UL0BUFFERZONE</strong> is set to TRUE. (7) <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, only the values 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240 and 260 are valid for the <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> parameter.</li><li>When DLADAPTIVEBPFILTERPERFEOPT is selected under the <strong>GU5MHZPERFOPT</strong> parameter in the <strong>ULOCELL</strong> MO, and the <strong>GUBUFZONECELLTYPE</strong> parameter in the <strong>ULOCELL</strong> MO is not set to NOTBUFZONECELL, and the <strong>ULSPECTRUMSHARINGSWITCH</strong> parameter in the <strong>ULOCELL</strong> MO is set to NOTSUPPORT, and the <strong>ULSPECTRUMSHARINGPHASE2</strong> parameter in the <strong>ULOCELL</strong> MO is set to FALSE, the sum of <strong>DLLEFTSHAREDBANDWIDTH</strong> and <strong>DLRIGHTSHAREDBANDWIDTH</strong> must be less than or equal to 320.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE, whether the UMTS cell performs filtering on the UMTS and LTE shared spectrum is dynamically determined based on the service status of LTE cells. Compared with UMTS static filtering, the dynamic filtering delivers higher spectral efficiency. When this parameter is set to FALSE, this function does not take effect.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-dcHsdpaSharedWithLte.html">DCHSDPASHAREDWITHLTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DC-HSDPA Shared with LTE</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a UMTS cell supports the UMTS and LTE Spectrum Sharing Based on DC-HSDPA feature. When this parameter is set to DYNAMICBANDWIDTH, UMTS and LTE spectrum sharing is supported.</p>
+<p>GUI Value Range: NOTSUPPORT(Not Support), DYNAMICBANDWIDTH(Dynamic Bandwidth)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOTSUPPORT, DYNAMICBANDWIDTH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>TTW</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>BFMODE</strong> is set to MASSIVEBEAM or NORMALBEAM, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>GSMQLBASEDROTDYNACTRL</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSUPERNARROWBANDFILTER</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DLADAPTIVEBPFILTER</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGSWITCH</strong> is set to FIXED_BANDWIDTH_COMP_MODE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHLTE</strong> is set to a value other than NOTSUPPORT, neither ULADAPTIVEBPFILTER nor DLADAPTIVEBPFILTERPERFEOPT can be selected under <strong>GU5MHZPERFOPT</strong>.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>GUBUFZONECELLTYPE</strong> is set to a value other than NOTBUFZONECELL, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>UL0BUFFERZONE</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>RMTCM</strong> is set to TRUE or the radius specified by <strong>RADIUS</strong> is greater than 30 km, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>INTEL2TVAM</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE, <strong>DCHSDPASHAREDWITHLTE</strong> must be NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, <strong>DCHSDPASHAREDWITHLTE</strong> must be set to NOTSUPPORT.</li><li>In the <strong>ULOCELL</strong> MO, when <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE or <strong>DCHSDPASHAREDWITHLTE</strong> is set to DYNAMICBANDWIDTH, <strong>COCOVERLTECI</strong> can not be invalid.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHLTE</strong> is set to a value other than NOTSUPPORT, <strong>UU0DCHSDPA</strong> must be set to FALSE.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to DYNAMICBANDWIDTH, the downlink signal spectrum width of a cell is dynamically adjusted based on LTE services. The heavier the LTE service load, the lower the UMTS downlink throughput.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-coCoverLteCI.html">COCOVERLTECI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Co-coverage LTE Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the EUTRAN cell with the same coverage as a UMTS cell. This parameter uniquely identifies an LTE cell in a PLMN. For a macro base station, EutranCellId consists of the 20-bit eNodeBID and the 8-bit CellID (Specifically, EutranCellId = eNodeBID x 256 + CellID). For details about the parameter definition, see 3GPP TS 25.413. The value 4294967295 indicates an invalid ID.</p>
+<p>GUI Value Range: 0~268435455,4294967295</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~268435455,4294967295</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, when <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE or <strong>DCHSDPASHAREDWITHLTE</strong> is set to DYNAMICBANDWIDTH, <strong>COCOVERLTECI</strong> can not be invalid.</li></ul>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-coCoverLteSectorId.html">COCOVERLTESECTORID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Co-coverage LTE Cell Sector ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an LTE sector with the same coverage as a UMTS cell. Value 65536 indicates an invalid ID, and is used when the LTE SFN feature is disabled.</p>
+<p>GUI Value Range: 0~65536</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535,65536</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is invalid if Subrack Type is set to BBU3910C.</li><li>In the <strong>ULOCELL</strong> MO, when <strong>ULSPECTRUMSHARINGPHASE2</strong> is set to TRUE or <strong>DCHSDPASHAREDWITHLTE</strong> is set to DYNAMICBANDWIDTH, <strong>COCOVERLTESECTORID</strong> is valid.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ULoCell-uu0DcHsdpa.html">UU0DCHSDPA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UU 0 DC-HSDPA</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the cell supports the UU 0 DC-HSDPA function. If this parameter is set to FALSE or the cell is not in the HSDPA multi-carrier cell group, the UU 0 DC-HSDPA function does not take effect. When this parameter is set to TRUE and the cell is in the HSDPA multi-carrier cell group, the UU 0 DC-HSDPA function takes effect in the cell and the cell can be used only as a secondary cell for DC-HSDPA UEs.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHGSM</strong> is set to a value other than NOTSUPPORT, <strong>UU0DCHSDPA</strong> must be set to FALSE.</li><li>In the <strong>ULOCELL</strong> MO, if <strong>DCHSDPASHAREDWITHLTE</strong> is set to a value other than NOTSUPPORT, <strong>UU0DCHSDPA</strong> must be set to FALSE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TRUE for a cell and the cell is in the HSDPA multi-carrier cell group, the cell can be used only as a secondary cell for DC-HSDPA UEs.</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_ulocell__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">1.Modify the No.14601 local cell:
+MOD ULOCELL: ULOCELLID=14601, LOCELLTYPE=NORMAL_CELL, TURBOIC=TRUE, HSPAUSERNUMEXT=ON;
+
+2.Modify the No.14600 distributed local cell:
+MOD ULOCELL: ULOCELLID=14600, LOCELLTYPE=DIST_CELL, RADIUS=1000, HORAD=50;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

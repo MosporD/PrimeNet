@@ -1,0 +1,150 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NRCellInterRHoMeaGrp">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NRCellInterRHoMeaGrp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NRCellInterRHoMeaGrp</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NRCellInterRHoMeaGrp"></a><a name="NRCellInterRHoMeaGrp"></a>
+
+
+<h1 class="topictitle1">NRCellInterRHoMeaGrp</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="NRCell.html">NRCell</a>
+    +-<a href="NRCellInterRHoMeaGrp.html"><strong>NRCellInterRHoMeaGrp</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An NRCellInterRHoMeaGrp MO defines a group of measurement parameters related to inter-RAT handover. Handover measurement parameter settings can be QCI-specific to meet various requirements of services for target cells. For details, see 3GPP TS 38.331.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NRCell.html">NRCell</a></li><li>Relation with the <strong>NRCellQciBearer</strong> MO:<ul><li>If the value of <strong>NrCellId</strong> in an <strong>NRCellQciBearer</strong> MO is the same as that of <strong>NrCellId</strong> in an <strong>NRCellInterRHoMeaGrp</strong> MO, the value of <strong>InterRatHoMeasGroupId</strong> in the <strong>NRCellQciBearer</strong> MO must be set to the value configured in the <strong>NRCellInterRHoMeaGrp</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRCell</strong> MO:<ul><li>A maximum of 15 <strong>NRCellInterRHoMeaGrp</strong> MO instances can be configured for each <strong>NRCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRCellQciBearer</strong> and <strong>NRCellInterFHoMeaGrp</strong> MOs:<ul><li>For <strong>NRCellInterRHoMeaGrp</strong> and <strong>NRCellInterFHoMeaGrp</strong> MOs associated with the same <strong>NRCellQciBearer</strong> MO, the sum of <strong>CovInterFreqA2RsrpThld</strong> and <strong>InterFreqA1A2Hyst</strong> must be greater than the sum of <strong>CovHoToEutranBlindA2Thld</strong> and <strong>InterRatHoA1A2Hyst</strong>.</li></ul>
+</li><li>Relation with the <strong>gNBSharingMode</strong>, <strong>NRCellQciBearer</strong>, and <strong>gNBOperatorQciParam</strong> MOs:<ul><li>If <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to INDEPENDENT, and the QCIs in all the <strong>NRCellQciBearer</strong> MOs corresponding to an <strong>NRCell</strong> MO and those in all the <strong>gNBOperatorQciParam</strong> MOs corresponding to a <strong>gNBOperator</strong> MO are the same, the following condition must be met: <strong>InterRatHoA2RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO corresponding to <strong>InterRatHoMeasGroupId</strong> in the <strong>NRCellQciBearer</strong> MO + <strong>EutranA2B2RsrpThldOffset</strong> in the <strong>gNBOperatorQciParam</strong> MO &lt; <strong>InterRatHoA1RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO.</li><li>If <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to INDEPENDENT, and the QCIs in all the <strong>NRCellQciBearer</strong> MOs corresponding to an <strong>NRCell</strong> MO and those in the <strong>gNBOperatorQciParam</strong> MOs corresponding to a <strong>gNBOperator</strong> MO are the same, the following condition must be met: <strong>InterRatHoA2RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO corresponding to <strong>InterRatHoMeasGroupId</strong> in the <strong>NRCellQciBearer</strong> MO + <strong>EutranA2B2RsrpThldOffset</strong> in the <strong>gNBOperatorQciParam</strong> MO &gt; <strong>CovHoToEutranBlindA2Thld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO.</li></ul>
+</li><li>Relation with the <strong>gNBSharingMode</strong>, <strong>NRCell</strong>, <strong>NRCellQciBearer</strong>, <strong>gNBOperator</strong>, <strong>gNBOperatorQciParam</strong>, <strong>NRDUCell</strong>, and <strong>NRDUCellOp</strong> MOs:<ul><li>If <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to SEPARATED_FREQ or SHARED_FREQ, and the QCIs in all the <strong>NRCellQciBearer</strong> MOs corresponding to an <strong>NRCell</strong> MO and those in all the <strong>gNBOperatorQciParam</strong> MOs corresponding to the <strong>gNBOperator</strong> MO associated with the <strong>NRCell</strong> MO are the same, the following condition must be met: <strong>InterRatHoA2RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO corresponding to <strong>InterRatHoMeasGroupId</strong> in the <strong>NRCellQciBearer</strong> MO + <strong>EutranA2B2RsrpThldOffset</strong> in the <strong>gNBOperatorQciParam</strong> MO &lt; <strong>InterRatHoA1RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO. All the <strong>gNBOperator</strong> MOs corresponding to an <strong>NRCell</strong> MO are determined by the <strong>gNBOperator</strong> MOs corresponding to the <strong>NRDUCellOp</strong> MOs associated with the <strong>NRDUCell</strong> MO identified by <strong>CellId</strong>.</li><li>If <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to SEPARATED_FREQ or SHARED_FREQ, and the QCIs in all the <strong>NRCellQciBearer</strong> MOs corresponding to an <strong>NRCell</strong> MO and those in all the <strong>gNBOperatorQciParam</strong> MOs corresponding to the <strong>gNBOperator</strong> associated with the <strong>NRCell</strong> MO are the same, the following condition must be met: <strong>InterRatHoA2RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO corresponding to <strong>InterRatHoMeasGroupId</strong> in the <strong>NRCellQciBearer</strong> MO + <strong>EutranA2B2RsrpThldOffset</strong> in the <strong>gNBOperatorQciParam</strong> MO &gt; <strong>CovHoToEutranBlindA2Thld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO. All the <strong>gNBOperator</strong> MOs corresponding to an <strong>NRCell</strong> MO are determined by the <strong>gNBOperator</strong> MOs corresponding to the <strong>NRDUCellOp</strong> MOs associated with the <strong>NRDUCell</strong> MO identified by <strong>CellId</strong>.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NRCellInterRHoMeaGrp__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NRCellInterRHoMeaGrp__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NRCellInterRHoMeaGrp__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_nrcellinterrhomeagrp.html">ADD NRCELLINTERRHOMEAGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a measurement parameter group related to inter-RAT handover for an NR cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nrcellinterrhomeagrp.html">LST NRCELLINTERRHOMEAGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list one or more measurement parameter groups related to inter-RAT handover for an NR cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nrcellinterrhomeagrp.html">MOD NRCELLINTERRHOMEAGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify a measurement parameter group related to inter-RAT handover for an NR cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_nrcellinterrhomeagrp.html">RMV NRCELLINTERRHOMEAGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a measurement parameter group related to inter-RAT handover for an NR cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NRCellInterRHoMeaGrp__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NRCellInterRHoMeaGrp__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NRCellInterRHoMeaGrp__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellInterRHoMeaGrp-NrCellId.html">NR Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a cell, which uniquely identifies the cell within a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellInterRHoMeaGrp-InterRatHoMeasGroupId.html">Inter-RAT Handover Measurement Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a measurement parameter group related to inter-RAT handover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellInterRHoMeaGrp-InterRatHoA1RsrpThld.html">Inter-RAT Handover A1 RSRP Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP threshold for event A1 related to inter-RAT handover. If the measured RSRP value of the serving cell is greater than the threshold specified by this parameter throughout the corresponding time-to-trigger, UEs send event A1 reports. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellInterRHoMeaGrp-InterRatHoA2RsrpThld.html">Inter-RAT Handover A2 RSRP Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP threshold for event A2 related to inter-RAT handover. If the measured RSRP value of the serving cell is below the threshold specified by this parameter throughout the corresponding time-to-trigger, UEs send event A2 measurement reports. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellInterRHoMeaGrp-InterRatHoA1A2Hyst.html">Inter-RAT Handover A1A2 Hysteresis</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the hysteresis for event A1/A2 related to inter-RAT mobility procedures and for event A2 related to blind mobility procedures. Set this parameter to prevent the entering and leaving conditions from being frequently satisfied in the case of radio signal fluctuation. In this way, the probability of ping-pong handovers and incorrect decisions is reduced. A larger value of this parameter results in a lower probability of ping-pong handovers and incorrect decisions. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellInterRHoMeaGrp-InterRatHoA1A2TimeToTrig.html">Inter-RAT Handover A1A2 Time To Trigger</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the time-to-trigger for event A1/A2 related to inter-RAT mobility procedures and for event A2 related to blind mobility procedures. When detecting that the entering conditions for the corresponding event are fulfilled, a UE does not immediately send a measurement report. Instead, a UE sends a measurement report only when the entering conditions are fulfilled throughout the corresponding time-to-trigger. Set this parameter to reduce the probability of occasional event reports, the average number of handovers, and the number of unexpected handovers, and to prevent unnecessary handovers. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellInterRHoMeaGrp-CovHoToEutranBlindA2Thld.html">Cov HO to E-UTRAN Blind A2 RSRP Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP threshold for event A2 related to coverage-based blind handover to E-UTRAN and inter-frequency blind redirection.</p>
+<p>If the measured RSRP value of the serving cell is below the threshold specified by this parameter throughout the corresponding time-to-trigger for event A1/A2 related to inter-RAT mobility procedures, UEs send event A2 reports related to blind mobility procedures. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRCellInterRHoMeaGrp-CovHoToEutranB2RsrpThld1.html">Cov HO to E-UTRAN B2 RSRP Thld1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RSRP threshold 1 for event B2 related to coverage-based handover to E-UTRAN. If the measured RSRP value of the serving cell is below the event B2 RSRP threshold 1 throughout the corresponding time-to-trigger for event B1/B2 related to coverage-based handover to E-UTRAN and the RSRP of a neighboring E-UTRAN cell is greater than the RSRP threshold for event B1 related to coverage-based handover to E-UTRAN throughout the same time-to-trigger, UEs send event B2 measurement reports. For details, see 3GPP TS 38.331.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

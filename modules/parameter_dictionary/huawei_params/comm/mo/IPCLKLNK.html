@@ -1,0 +1,401 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IPCLKLNK">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IPCLKLNK">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPCLKLNK</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IPCLKLNK"></a><a name="IPCLKLNK"></a>
+
+
+<h1 class="topictitle1">IPCLKLNK</h1>
+
+<div>
+<div class="section"><pre>
+<a href="Equipment.html">EQUIPMENT</a>
+  +-<a href="IPCLKLNK.html"><strong>IPCLKLNK</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An IPCLKLNK MO indicates an IP clock link. The IP clock complies either with the IEEE1588 V2 standard or Huawei proprietary IP clock protocol.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Equipment.html">EQUIPMENT</a></li><li>Relation with the <strong>SYNCETH</strong> and <strong>TASM</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> is set to MANUAL and <strong>CLKSRC</strong> is set to SYNCETH+IPCLK in the <strong>TASM</strong> MO, the corresponding <strong>SYNCETH</strong> MO and <strong>IPCLKLNK</strong> MO in which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED must have been configured.</li></ul>
+</li><li>Relation with the <strong>TASM</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODE</strong> is set to MANUAL and <strong>CLKSRC</strong> is set to <strong>TASM</strong> MO, the corresponding <strong>IPCLKLNK</strong> MO in which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>CLKSYNCMODE</strong> in a <strong>TASM</strong> MO is set to HYBRID and two <strong>IPCLKLNK</strong> MOs are configured, <strong>IPSYNCMODE</strong> in the two MOs must not be both set to TIME.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When two <strong>IPCLKLNK</strong> MOs are configured, <strong>DELAYTYPE</strong> in these MOs must be set to the same value if <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to HYBRID.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to HYBRID, then in an <strong>IPCLKLNK</strong> MO, <strong>ICPT</strong> must be set to PTP, <strong>CNM</strong> must be set to UNICAST, and <strong>DEVTYPE</strong> must be set to OC_SLAVE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to HYBRID and <strong>PROFILETYPE</strong> in an <strong>IPCLKLNK</strong> MO is set to G.8265.1, <strong>IPSYNCMODE</strong> in this <strong>IPCLKLNK</strong> MO must be set to FREQ.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>AUTOCMPSTSW</strong> in an <strong>IPCLKLNK</strong> MO can be set to ON only when <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to TIME and <strong>CNM</strong> in the <strong>IPCLKLNK</strong> MO is set to L2_MULTICAST.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>DELAYTYPE</strong> in <strong>IPCLKLNK</strong> must be set to E2E, when <strong>CLKSYNCMODE</strong> in the <strong>TASM</strong> MO is set to TIME and <strong>LOOSETIME</strong> is set to ON.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> is set to OLD and <strong>MODELSELECT</strong> is set to TRADITION in the <strong>GTRANSPARA</strong> MO, the corresponding <strong>DEVIP</strong> MO must have been configured before an <strong>IPCLKLNK</strong> MO in which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED is created. The corresponding relationship is as follows: The combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO must be the same as the combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>DEVIP</strong> MO; <strong>CIP</strong> in the <strong>IPCLKLNK</strong> MO must be the same as <strong>IP</strong> in the <strong>DEVIP</strong> MO; <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO must be the same as <strong>VRFIDX</strong> in the <strong>DEVIP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> is set to OLD and <strong>MODELSELECT</strong> is set to TRADITION in the <strong>GTRANSPARA</strong> MO, the corresponding <strong>DEVIP</strong> MO must have been configured before an <strong>IPCLKLNK</strong> MO in which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED is created. In addition, <strong>PT</strong> in the <strong>DEVIP</strong> MO must be set to LOOPINT, ETH, ETHTRK, or SUBIF.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNK</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, an <strong>IPADDR4</strong> MO corresponding to the <strong>IPCLKLNK</strong> MO with <strong>ICPT</strong> set to HW_DEFINED must have been configured and the following conditions must be met:</li><li>1. The value of <strong>CIP</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>IP</strong> in the <strong>IPADDR4</strong> MO, and The value of <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>VRFIDX</strong> in the <strong>IPADDR4</strong> MO.</li><li>2. The value of <strong>ITFID</strong> in the <strong>IPADDR4</strong> MO that meets condition 1 is the same as that of <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO. In this <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to ETH, or ETHTRK.</li><li>3. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETH, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>4. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETHTRK, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHTRUNK</strong> MO.</li><li>5. The value of <strong>PORTID</strong> in the <strong>ETHTRUNK</strong> MO that meets condition 4 is the same as that of <strong>ETHTRKPORTID</strong> in an <strong>ETHTRUNKLNK</strong> MO.</li><li>6. The value of <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO that meets condition 5 is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>LOOPBACK</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNK</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, an <strong>IPADDR4</strong> MO corresponding to the <strong>IPCLKLNK</strong> MO with <strong>DEVTYPE</strong> set to OC_SLAVE must have been configured and the following conditions must be met:</li><li>1. The value of <strong>CIP</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>IP</strong> in the <strong>IPADDR4</strong> MO, and The value of <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>VRFIDX</strong> in the <strong>IPADDR4</strong> MO.</li><li>2. The value of <strong>ITFID</strong> in the <strong>IPADDR4</strong> MO that meets condition 1 is the same as that of <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO. In this <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to LOOPINT, ETH, or ETHTRK.</li><li>3. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to LOOPINT, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>LOOPBACK</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>LOOPBACK</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>4. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETH, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>5. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETHTRK, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHTRUNK</strong> MO.</li><li>6. The value of <strong>PORTID</strong> in the <strong>ETHTRUNK</strong> MO that meets condition 5 is the same as that of <strong>ETHTRKPORTID</strong> in an <strong>ETHTRUNKLNK</strong> MO.</li><li>7. The value of <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO that meets condition 6 is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EQUIPMENT</strong>, <strong>TASM</strong>, <strong>BITS</strong>, <strong>TOD</strong>, <strong>LINECLK</strong>, <strong>INTERCLK</strong>, <strong>SYNCETH</strong>, and <strong>PEERCLK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> and <strong>INTERSUBRACKCLKALIGNMODE</strong> in an <strong>EQUIPMENT</strong> MO are set to OFF and INDEPENDENT_GNSS_CLK, respectively, and if <strong>MODE</strong> in the <strong>TASM</strong> MO is set to AUTO, then only the <strong>GPS</strong> MO can be configured and other clock link MOs cannot be configured.</li></ul>
+</li><li>Relation with the <strong>TASM</strong> and <strong>GPS</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>TASM</strong> MO, if <strong>CLKSYNCMODE</strong> is set to HYBRID and <strong>IPSYNCMODE</strong> is set to TIME, the <strong>GPS</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>EQUIPMENT</strong>, <strong>APPLICATION</strong>, <strong>PEERCLK</strong>, <strong>BITS</strong>, <strong>TOD</strong>, <strong>LINECLK</strong>, <strong>INTERCLK</strong>, <strong>SYNCETH</strong>, and <strong>GPS</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SDRCONNSW</strong> is set to OFF and <strong>INTERSUBRACKCLKALIGNMODE</strong> is set to PEER_RF_CLK in an <strong>EQUIPMENT</strong> MO and if <strong>AT</strong> in the <strong>APPLICATION</strong> MO is set to NodeB, it is allowed and only a <strong>PEERCLK</strong> MO in which <strong>PNT</strong> is set to RF can be configured, other clock link management objects cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to OLD and <strong>MODELSELECT</strong> is set to HOSTGW in the <strong>GTRANSPARA</strong> MO, the corresponding <strong>DEVIP</strong> MO must have been configured before an <strong>IPCLKLNK</strong> MO in which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED is created.</li><li>The <strong>IPCLKLNK</strong> and <strong>DEVIP</strong> MOs must meet the following conditions: The combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO must be the same as the combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>DEVIP</strong> MO; <strong>CIP</strong> in the <strong>IPCLKLNK</strong> MO must be the same as <strong>IP</strong> in the <strong>DEVIP</strong> MO; <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO must be the same as <strong>VRFIDX</strong> in the <strong>DEVIP</strong> MO.</li><li>The <strong>IPCLKLNK</strong> and <strong>IFIP</strong> MOs must meet the following conditions: The combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO must be the same as the combination of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IFIP</strong> MO; <strong>CIP</strong> in the <strong>IPCLKLNK</strong> MO must be the same as <strong>IP</strong> in the <strong>IFIP</strong> MO; <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO must be the same as <strong>VRFIDX</strong> in the <strong>IFIP</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> is set to OLD and <strong>MODELSELECT</strong> is set to HOSTGW in the <strong>GTRANSPARA</strong> MO, the corresponding <strong>DEVIP</strong> MO must have been configured before an <strong>IPCLKLNK</strong> MO in which <strong>DEVTYPE</strong> is set to OC_SLAVE or <strong>ICPT</strong> is set to HW_DEFINED is created. In addition, <strong>PT</strong> in the <strong>DEVIP</strong> MO must be set to LOOPINT or <strong>PT</strong> in the <strong>IFIP</strong> MO must be set to ETH, ETHTRK, or SUBIF.</li></ul>
+</li><li>Relation with the <strong>HYBRIDCLK</strong> and <strong>SYNCETH</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In a <strong>HYBRIDCLK</strong> MO, if <strong>TCLKSRC</strong> is set to IPCLK and <strong>FCLKSRC</strong> is set to SYNCETH, the <strong>SYNCETH</strong> MO and <strong>IPCLKLNK</strong> MO with <strong>DEVTYPE</strong> set to OC_SLAVE and <strong>ICPT</strong> set to PTP must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD and <strong>DEVTYPE</strong> and <strong>IPMODE</strong> in an <strong>IPCLKLNK</strong> MO are set to OC_SLAVE and IPV6 respectively, a configured <strong>IPADDR6</strong> MO must exist.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>LOOPBACK</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNK</strong>, and <strong>ETHTRUNKLNK</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, an <strong>IPADDR6</strong> MO corresponding to the <strong>IPCLKLNK</strong> MO with <strong>DEVTYPE</strong> set to OC_SLAVE and <strong>IPMODE</strong> set to IPV6 must have been configured and the following conditions must be met:</li><li>1. The value of <strong>CIPV6</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>IPV6</strong> in the <strong>IPADDR6</strong> MO, and The value of <strong>VRFIDX</strong> in the <strong>IPCLKLNK</strong> MO is the same as that of <strong>VRFIDX</strong> in the <strong>IPADDR6</strong> MO.</li><li>2. The value of <strong>ITFID</strong> in the <strong>IPADDR6</strong> MO that meets condition 1 is the same as that of <strong>ITFID</strong> in an <strong>INTERFACE</strong> MO. In this <strong>INTERFACE</strong> MO, <strong>PT</strong> is set to LOOPINT, ETH, or ETHTRK.</li><li>3. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to LOOPINT, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>LOOPBACK</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>LOOPBACK</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>4. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETH, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li><li>5. If <strong>PT</strong> in the <strong>INTERFACE</strong> MO that meets condition 2 is set to ETHTRK, the value of <strong>PORTID</strong> in this <strong>INTERFACE</strong> MO is the same as that of <strong>PORTID</strong> in an <strong>ETHTRUNK</strong> MO.</li><li>6. The value of <strong>PORTID</strong> in the <strong>ETHTRUNK</strong> MO that meets condition 5 is the same as that of <strong>ETHTRKPORTID</strong> in an <strong>ETHTRUNKLNK</strong> MO.</li><li>7. The value of <strong>ETHPORTID</strong> in the <strong>ETHTRUNKLNK</strong> MO that meets condition 6 is the same as that of <strong>PORTID</strong> in an <strong>ETHPORT</strong> MO. In addition, the values of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in this <strong>ETHPORT</strong> MO are the same as those of <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>IPCLKLNK</strong> MO.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IPCLKLNK__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPCLKLNK__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IPCLKLNK__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ipclklink.html">ADD IPCLKLINK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an IP clock link. For a HW_DEFINED IP clock link or OC_SLAVE IP clock link compliant with IEEE 1588 V2, if the NE can properly obtain synchronization signals from the IP clock server, this link becomes available. For the OC_MASTER link, if the NE is configured with an external reference clock source for supplying reference clock signals, the external reference clock source is locked, and the clock link is set up, the NE can provide clock signals for lower-level NEs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipclklink.html">DSP IPCLKLINK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of an IP clock link. If the link number is not specified, the status of all IP clock links is displayed.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_priclass.html">DSP PRICLASS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query priority clock classes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ipclklink.html">LST IPCLKLINK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of all the IP clock links.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_priclass.html">LST PRICLASS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the settings of clock classes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ipclklink.html">RMV IPCLKLINK</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a specified IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_classidentify.html">SET CLASSIDENTIFY</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the flag for the priority clock class of the IP clock link. If the IP clock link complies with the Precision Time Protocol (PTP) but the peer clock server does not support standardized priority clock classes, you can run this command to set the identifier for the priority clock class to OFF. This command is only valid for 1588 OC_SLAVE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_priclass.html">SET PRICLASS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set priorities for the four clock classes of the IP clock link. This command is applicable only when the IEEE 1588 OC_SLAVE standard is supported. The OC_MASTER link does not support the function.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IPCLKLNK__tab2">Table 2</a> and <a href="#IPCLKLNK__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IPCLKLNK__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IPCLKLNK__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-IpClkNo.html">Link No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Type.html">Protocol Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the IP clock protocol, which can be PTP or Huawei proprietary protocol. PTP includes IEEE1588 V2, G.8265.1, 1588V2_16.1, G.8275.1 and G.8275.2. IEEE1588 V2, defined by the IEEE, supports both time synchronization and frequency synchronization. G.8265.1 supports frequency synchronization only. 1588 V2_16.1 supports both time synchronization and frequency synchronization. G.8275.1 supports time synchronization only. G.8275.2 supports time synchronization only. Huawei proprietary protocol, which is the Huawei-defined IP clock protocol, applies to the interconnection between Huawei equipment and supports frequency synchronization only.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet where the IP clock link is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack where the IP clock link is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot where the IP clock link is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-ClientIP.html">Client IPv4</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the client IPv4 address of the IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-ServerIP.html">Server IPv4</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the server IPv4 address of the IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Domain.html">Domain</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the domain to which the IP clock link belongs. The setting of this parameter must be the same as the setting of the clock server.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-IpClkDelayType.html">Delay Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the compensation mechanism for the transmission delay between the clock server and the NE. The E2E mode uses the Delay-Request-Response mechanism to measure the average delay between the primary and secondary devices. The P2P mode uses the Peer-Delay mechanism to measure the average delay between two devices.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-ClassIdentify.html">Priority Clock Class Identify Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the BMC (Best Master Clock) algorithm is enabled or not. ON indicates that the BMC algorithm is enabled, and OFF indicates that the BMC algorithm is disabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Class0.html">Priority Clock Class0</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority configured by the user for the BMC (Best Master Clock) algorithm. The information about the priority can be collected from the upper-level clock equipment. This parameter specifies the clock quality that is anticipated by the user. The upper-level clock equipment with the matching clock quality is selected as the target server. Class0 has the highest priority, and Class0 to Class3 indicate priorities in descending order.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Class1.html">Priority Clock Class1</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority configured by the user for the BMC (Best Master Clock) algorithm. The information about the priority can be collected from the upper-level clock equipment. This parameter specifies the clock quality that is anticipated by the user. The upper-level clock equipment with the matching clock quality is selected as the target server. Class0 has the highest priority, and Class0 to Class3 indicate priorities in descending order.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Class2.html">Priority Clock Class2</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority configured by the user for the BMC (Best Master Clock) algorithm. The information about the priority can be collected from the upper-level clock equipment. This parameter specifies the clock quality that is anticipated by the user. The upper-level clock equipment with the matching clock quality is selected as the target server. Class0 has the highest priority, and Class0 to Class3 indicate priorities in descending order.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Class3.html">Priority Clock Class3</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority configured by the user for the BMC (Best Master Clock) algorithm. The information about the priority can be collected from the upper-level clock equipment. This parameter specifies the clock quality that is anticipated by the user. The upper-level clock equipment with the matching clock quality is selected as the target server. Class0 has the highest priority, and Class0 to Class3 indicate priorities in descending order.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-MacMode.html">Clock Source Specified or Not</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the clock source is specified.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-ClkMac.html">Clock Source MAC Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MAC address of the clock source for the IP clock server. The MAC address must be in the format of XXXX-XXXX-XXXX.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-NetworkType.html">Clock Net Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the networking type for the IP clock. The LTE and NR currently do not support L3 Multicast function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Compensation.html">Compensation</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the compensation for asymmetry of IP clock links.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Priority.html">Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of the clock source. The value 1 indicates that the current clock source has the highest priority, and the value 4 indicates that the current clock source has the lowest priority.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-AnnounceFreq.html">Announce Freq</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency at which the clock source sends announcement packets based on its negotiation with the NE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-SyncFreq.html">Sync Freq</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency at which the clock source sends synchronization packets based on its negotiation with the NE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-MasterPriority.html">Master Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of the IP clock server. The value 0 indicates the highest priority, and the value 255 indicates the lowest priority. If two IP clock servers are required, the value of this parameter is used to identify the active and standby IP clock servers. The IP clock server with a higher priority serves as the active server and the IP clock server with a lower priority serves as the standby server.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-ProfileType.html">Profile Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of protocol supported by the IEEE 1588 V2-compliant IP clock link, which can be ITU-T G.8265.1, IEEE 1588 V2, IEEE1588V2_16.1, ITU-T G.8275.1 or ITU-T G.8275.2. ITU-T G.8265.1 is defined by the International Telecommunication Union (ITU) for frequency synchronization of an IEEE 1588 V2-compliant IP clock link with the networking type of UNICAST. An IP clock link in compliant with ITU-T G.8265.1 supports interconnection with servers from other vendors. An IP clock link in compliant with IEEE 1588 V2 supports interconnection with clock service devices from other vendors only in L2 or L3 multicast networking. IEEE1588V2_16.1 can also be used for interconnection with clock service devices from other vendors when the other vendors do not support ITU-T G.8265.1.The content of IEEE1588V2_16.1 refer to the optional section 16.1 of IEEE1588V2 protocol. ITU-T G.8275.1 is defined by the International Telecommunication Union (ITU) for time synchronization of an IEEE 1588 V2-compliant IP clock link with the networking type of L2 multicast. An IP clock link in compliant with ITU-T G.8275.1 supports interconnection with clock service devices from other vendors. ITU-T G.8275.2 is defined by the International Telecommunication Union (ITU) for time synchronization of an IEEE 1588 V2-compliant IP clock link with the networking type of L3 unicast. An IP clock link in compliant with ITU-T G.8275.2 supports interconnection with clock service devices from other vendors.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-Duration.html">Negotiate Duration</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval at which negotiations are performed between the NE and IP clock server. After the interval elapses, the NE initiates another negotiation with the IP clock server.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-IPMode.html">IP mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode of the IP address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-ClientIPV6.html">Client IPv6</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the client IPv6 address of the IP clock link. The UMTS currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-ServerIPV6.html">Server IPv6</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the server IPv6 address of the IP clock link. The UMTS currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-PreHopIPv4.html">Pre-Hop IPv4</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the pre-hop IPv4 address of an IP clock.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-PDelayReuestFreq.html">PDelay Request Freq</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency at which PDelay Request packets are sent on an IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-DevType.html">Device Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the device type of the IP clock. The value of this parameter can be OC_SLAVE or OC_MASTER. In OC_SLAVE mode, the NE serves as the clock equipment that is synchronized with the upstream clock. In OC_MASTER mode, the NE works as a master clock device to provide IP clock signals, and you need to configure an external reference clock source for supplying reference clock signals.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-DstMltMacType.html">Destination Multicast MAC Address Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the destination multicast MAC address to which an NE sends G.8275.1 clock synchronization packets. Forwardable Multicast MAC Address (FMAC) means that the destination MAC address to which the NE sends clock synchronization packets is 01-1B-19-00-00-00. Non-Forwardable Multicast MAC Address (NFMAC) means that the destination MAC address to which the NE sends clock synchronization packets is 01-80-C2-00-00-0E. The NE can handle clock synchronization packets from both FMAC and NFMAC.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-DelayFreq.html">Delay Freq</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency at which the clock source sends delay packets based on its negotiation with the NE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-IpClkSyncMode.html">IP Clock Sync Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP clock synchronization mode. This parameter is applicable only when Clock Synchronization Mode is set to HYBRID.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-ClkSrvDescription.html">Clock Server Description</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the description of the clock server at the peer end of the clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-AutoCmpStSw.html">Phase Deviation Report Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the base station reports information required for automatic compensation for IP clock link asymmetry to the transmission equipment. The bearer network automatically performs the compensation. If this parameter is set to ON, the base station reports the following information to the transmission equipment: phase offset of the 1588 clock relative to the GPS, whether the base station has the GPS, whether the GPS is available, and protocol-defined information such as the 1588 Clock ID. If this parameter is set to OFF, the base station does not report such information.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPCLKLNK-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the index of a virtual routing domain.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IPCLKLNK__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IPCLKLNK__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-CurClass.html">Current Priority Clock Class</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the current priority class of the IP clock link.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-ActiveState.html">Link Active State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>This parameter indicates whether an IP clock link is activated. If an IP clock link is activated, it works as the reference clock source. For the HW_DEFINED IP clock link or OC_SLAVE IP clock link compliant with IEEE 1588 V2, this parameter is valid. For the OC_MASTER link, this parameter is invalid.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-AvailableState.html">Link Available State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether an IP clock link is available. If the HW_DEFINED or 1588 OC_SLAVE link is shown as available, it only indicates that the link between the base station and the clock server is connected. An available IP clock link may not be normally locked. Only an available clock link can serve as the current clock source. An unavailable clock link may not be normally locked even if it is activated. For the MASTER link, if the NE is configured with an external reference clock source for supplying reference clock signals, the OC_MASTER link is available only when the external reference clock source is locked.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-DisorderPacketsNum.html">Number of Disorder Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of out-of-order packets over the IP clock link. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-DropPacketsNum.html">Number of Dropped Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets lost over the IP clock link. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-ReceivePacketsNum.html">Number of Received Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of synchronization packets received over the IP clock link. The LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-StepMode.html">Step Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the step mode, which can be One Step or Two Step.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-VlanId.html">VLAN ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the self-acquired VLAN ID of the IP clock server.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-GmClass.html">Grandmaster Quality Class</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the clock quality level of the 1588 clock server. This parameter can be displayed in the command output only for an activated IEEE 1588v2-compliant OC_SLAVE clock link in IPv4 mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-GmClkId.html">Grandmaster Clock ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of the 1588 clock server. This parameter can be displayed in the command output only for an activated IEEE 1588v2-compliant OC_SLAVE clock link in IPv4 mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-ParenPtId.html">Parent Port ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ID of the port on the upper-level clock device. This parameter can be displayed in the command output only for an activated IEEE 1588v2-compliant OC_SLAVE clock link in IPv4 mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-StepFromGm.html">Step from Grandmaster</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of clock nodes between the 1588 clock server and NE. This parameter can be displayed in the command output only for an activated IEEE 1588v2-compliant OC_SLAVE clock link in IPv4 mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IPCLKLNK-ClientClkId.html">Client Clock ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the clock ID of the base station functioning as the client (in OC_SLAVE mode).</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

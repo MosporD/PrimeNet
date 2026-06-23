@@ -1,0 +1,416 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify UE Timer Configuration (MOD RRCCONNSTATETIMER)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_rrcconnstatetimer">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify UE Timer Configuration (MOD RRCCONNSTATETIMER)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_rrcconnstatetimer"></a><a name="mod_rrcconnstatetimer"></a>
+
+
+<h1 class="topictitle1">Modify UE Timer Configuration (MOD RRCCONNSTATETIMER)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_rrcconnstatetimer__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the parameters related to the timers of RRC connection control.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_rrcconnstatetimer__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_rrcconnstatetimer__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-T302.html">T302</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timer302</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer T302.</p>
+<p>T302 specifies the time during which a UE whose RRC connection request is rejected has to wait before the UE can initiate a request again.</p>
+<p>This timer starts when the UE receives an RRCConnectionReject message and stops when the UE enters the RRC_CONNECTED mode or performs cell reselection. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~16</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~16</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 16</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the eNodeB rejects access of the UE again for the same reason. If this parameter is set to a large value, the UE cannot access the network for a long period of time, which affects user experience.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-T320ForLoadBalance.html">T320ForLoadBalance</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timer320 for load balance</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer contained in the RRC connection release message when an RRC connection release procedure is triggered for MLB. This timer specifies the length of a period during which cell-reselection priorities contained in the RRC connection release message retain valid. After the timer expires, the cell-reselection priorities contained in the RRC connection release message become invalid.</p>
+<p>This timer starts when the UE receives an RRC connection release message containing the T320 timer and stops when the UE enters RRC_CONNECTED mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: min5(5), min10(10), min20(20), min30(30), min60(60), min120(120), min180(180)</p>
+<p>Unit: min</p>
+<p>Actual Value Range: min5, min10, min20, min30, min60, min120, min180</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: min10(10)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: After the T320 timer expires, the cell-reselection parameters contained in the RRC connection release message become invalid, and the cell-reselection parameters contained in the system information take effect. As the cell-reselection priorities contained in the system information are optional, frequency prioritization can be better guaranteed during cell reselection if the cell-reselection priorities contained in the RRC connection release message are used. If the value of this parameter is too large, cell-reselection parameters cannot be updated in time at the UE when cell-reselection parameter values change.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-T304ForEutran.html">T304ForEutran</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timer304 for EUTRAN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer T304 for intra-RAT handover. If the UE does not complete the handover before this timer expires, the UE reverts to the associated configuration and initiates an RRC connection reestablishment procedure. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ms50(50), ms100(100), ms150(150), ms200(200), ms500(500), ms1000(1000), ms2000(2000)</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: ms50, ms100, ms150, ms200, ms500, ms1000, ms2000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ms500(500)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the UE does not complete an intra-RAT handover before this timer expires, the UE reverts to the associated configuration and initiates an RRC connection reestablishment procedure.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-T304ForGeran.html">T304ForGeran</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timer304 for GERAN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer T304 for inter-RAT handover to GERAN. If the UE does not complete the handover before this timer expires, the UE reverts to the associated configuration and initiates an RRC connection re-establishment procedure. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: ms100(100), ms200(200), ms500(500), ms1000(1000), ms2000(2000), ms4000(4000), ms8000(8000)</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: ms100, ms200, ms500, ms1000, ms2000, ms4000, ms8000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ms8000(8000)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If the UE does not complete an inter-RAT handover to GERAN before this timer expires, the UE reverts to the associated configuration and initiates an RRC connection re-establishment procedure.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-T320ForOther.html">T320ForOther</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timer320 for other</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer contained in the RRC connection release message when an RRC connection release procedure is triggered for reasons other than MLB. This timer specifies the length of a period during which cell-reselection priorities contained in the RRC connection release message retain valid. After the timer expires, the cell-reselection priorities contained in the RRC connection release message become invalid. This parameter is invalid for UEs to be redirected and reselected based on the SPID-specific frequency priorities.</p>
+<p>This timer starts when the UE receives an RRC connection release message containing the T320 timer and stops when the UE enters RRC_CONNECTED mode. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: min5(5), min10(10), min20(20), min30(30), min60(60), min120(120), min180(180)</p>
+<p>Unit: min</p>
+<p>Actual Value Range: min5, min10, min20, min30, min60, min120, min180</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: min120(120)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: After the T320 timer expires, the cell-reselection parameters contained in the RRC connection release message become invalid, and the cell-reselection parameters contained in the system information take effect. As the cell-reselection priorities contained in the system information are optional, frequency prioritization can be better guaranteed during cell reselection if the cell-reselection priorities contained in the RRC connection release message are used. If the value of this parameter is too large, cell-reselection parameters cannot be updated in time at the UE when cell-reselection parameter values change.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-NBUeInactiveTimer.html">NBUeInactiveTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT Ue inactive timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the UE inactivity timer for NB-IoT UEs. If the eNodeB detects that an NB-IoT UE has neither received nor sent data for a duration exceeding the value of this parameter, the eNodeB releases the RRC connection for the NB-IoT UE. This parameter takes effect only for UEs that will access the network after the parameter is set. This parameter applies only to NB-IoT.</p>
+<p>DisuseStatement: This parameter is replaced by the TimerDuration parameter in the UeTimerConfig MO with the TimerType parameter set to NB_CL0_UE_INACTIVITY_TIMER, NB_CL1_UE_INACTIVITY_TIMER, or NB_CL2_UE_INACTIVITY_TIMER and will be deleted in later versions. (Although the configuration interface in this version supports delivery of the setting of this parameter, the system no longer uses this parameter.) Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 1~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DeployMode is set to STAND_ALONE or GUARD_BAND: 20</p>
+<p>DeployMode is set to IN_BAND: 30</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in earlier RRC connection releases for UEs without performing services, more frequent RRC connection setup requests, and better KPIs such as the service drop rate due to more normal RRC connection releases. A larger value of this parameter results in later RRC connection releases for UEs without performing services, longer online duration in which radio resources are occupied, and worse KPIs such as the service drop rate due to fewer normal RRC connection releases.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-FilterReptRrcConnReqTimer.html">FilterReptRrcConnReqTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Filter Repeated RRCConnReq Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer for the eNodeB to filter repeated RRC Connection Request messages. For LTE FDD and LTE TDD, the actually used timer length is the sum of the length of T300 timer and the value of the FilterReptRrcConnReqTimer parameter. For NB-IoT, the actually used timer length is equal to min{T300 + FilterReptRrcConnReqTimer, MaxFilterTimer}. In V100R015C10 or an earlier version, the value of MaxFilterTimer is 17s. In other cases, the value of MaxFilterTimer is 35s.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 15</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: After the eNodeB receives the first RRC Connection Request message, if the eNodeB receives more RRC Connection Request messages within the length of T300 plus FilterReptRrcConnReqTimer, the eNodeB considers that these messages are sent for one RRC connection request and the L.RRC.ConnReq.Att counter increases only by one.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-UlSynTimerDynDrx.html">UlSynTimerDynDrx</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Sync Timer Dynamic DRX</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the timer used to govern the period in which the eNodeB maintains uplink synchronization for a DRX UE when dynamic DRX is enabled. After this timer expires, the eNodeB does not send Timing Advance Command to the UE. You are advised to set this parameter to a value less than the value of UeInactivityTimerDynDrxQci in the QciPara MO. In power saving mode, you are advised to set this parameter significantly different to the value of the UeInactivityTimerDynDrxQci parameter in the QciPara MO, for example a gap of 10 seconds, to avoid power consumption increase due to the increase of signaling. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 5~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 5~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid only when the DynDrxSwitch option of the DynDrxSwitch parameter in the CellAlgoSwitch MO is selected.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability that UEs enter the out-of-synchronization state when they should not and, therefore, a larger number of random access procedures triggered for maintaining uplink synchronization and more occupied resources for random access.</p>
+<p>A larger value of this parameter results in fewer prompt changes of UE status from uplink-synchronized to out-of-synchronization, more power consumption of UEs, and more occupied PUCCH and SRS resources.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-RrcConnRelTimer.html">RrcConnRelTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRC Connection Release Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time that the eNodeB waits for a response message after sending an RRC Connection Release message to a UE.</p>
+<p>GUI Value Range: 450~10000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 450~10000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 450</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to a longer time that the eNodeB sends the RRC connection release message and a lower probability that UEs fail to receive the RRC connection release message. As a result, the numbers of RRC connection reestablishment requests and reestablishment rejections decrease, which in turn increases the reestablishment success rate. However, more radio interface resources are required, which causes a higher probability that the throughput decreases. A smaller value of this parameter leads to a higher probability that UEs fail to receive the RRC connection release message. As a result, the numbers of RRC connection reestablishment requests and reestablishment rejections increase, which in turn decreases the reestablishment success rate.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-DRXRrcConnRelTimerOffset.html">DRXRrcConnRelTimerOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRC Connection Release Offset Timer in DRX</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the value of the RRC connection release timer that actually takes effect for UEs in the DRX state relative to the RrcConnRelTimer parameter value in the RrcConnStateTimer MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~9000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~9000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5120</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter increases the release waiting time of the eNodeB, decreases the total number of normal releases, and reduces the number of times that RRC connection reestablishment requests are rejected. More resources are occupied if the waiting time prolongs. The service drop rate increases, the RRC connection reestablishment success rate decreases, and throughput drops when the number of UEs in a cell reaches the upper limit. A smaller value of this parameter results in a higher probability that UEs fail to receive the RRC Connection Release message and more RRC connection reestablishments.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-SRLTERrcConnRelTimerOffset.html">SRLTERrcConnRelTimerOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRC Connection Release Offset Timer For SRLTE</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the value of the RRC connection release timer that actually takes effect for SRLTE UEs relative to the RrcConnRelTimer parameter value in the RrcConnStateTimer MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~20000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~20000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 6000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter increases the release waiting time of the eNodeB, reduces the total number of normal releases, and reduces the number of times that RRC connection reestablishment requests are rejected. More resources are occupied if the waiting time prolongs. The service drop rate increases, the RRC connection reestablishment success rate decreases, and throughput drops when the number of UEs in a cell reaches the upper limit. A smaller value of this parameter results in a higher probability that UEs fail to receive the RRC Connection Release message and more RRC connection reestablishments.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-ExtendedWaitTime.html">ExtendedWaitTime</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Extended Wait Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the waiting time for a UE to send an RRCConnectionRequest message again in either of the following conditions:</p>
+<p>1. After the previous RRC connection setup request with the cause value delayTolerantAccess initiated by the UE was rejected when the MME is overloaded</p>
+<p>2. After the RRC connection was released for the cause delayTolerantAccess.</p>
+<p>In NB-IoT, this parameter is used when the MME is overloaded and flow control is implemented by the eNodeB.</p>
+<p>GUI Value Range: 1~1800</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~1800</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 40</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a small value, the eNodeB rejects UE access for the same reason. If this parameter is set to a large value, UEs cannot access the cell for a long time, affecting user experience.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-PowerPrefIndicationTimer.html">PowerPrefIndicationTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Power Preference Indication Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the waiting time for a UE reporting UEAssistanceInformation after the UE reports Power Preference Indication with the value normal. The duration ranges from 0 to 600 seconds. This option applies only to LTE FDD.</p>
+<p>GUI Value Range: s0(0), s0dot5(0.5), s1(1), s2(2), s5(5), s10(10), s20(20), s30(30), s60(60), s90(90), s120(120), s300(300), s600(600)</p>
+<p>Unit: s</p>
+<p>Actual Value Range: s0, s0dot5, s1, s2, s5, s10, s20, s30, s60, s90, s120, s300, s600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: s600(600)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher frequency at which the UE reports UEAssistanceInformation, increasing the signaling overhead. If this parameter is set to a large value, the eNodeB cannot adjust the parameter settings for the UE based on the UE status, affecting UE power consumption.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-ReptRrcReestProtectTimer.html">ReptRrcReestProtectTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Repeated RRC Reest Protection Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the protection timer of repeated RRC connection reestablishments. If this parameter is set to a non-zero value and the interval between RRC connection reestablishment requests repeatedly initiated by a UE is less than this parameter value, the repeated requests and successful reestablishments are not counted. If this parameter is set to 0, this function does not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If the function of RRC connection reestablishment protection is used, you are advised to set this parameter to 20.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower probability that the interval between RRC connection reestablishment requests initiated by the same UE is less than the parameter value, a larger number of RRC connection reestablishments counted, and a larger RRC connection reestablishment success rate. A larger value of this parameter results in the opposite effects. If this parameter is set to 0, the preceding impacts do not exist.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-OutOfSyncRelTimerOffset.html">OutOfSyncRelTimerOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRC Release Timer Offset for Out-of-Sync UE</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the value of the RRC connection release timer that actually takes effect for out-of-synchronization UEs relative to the RrcConnRelTimer parameter value in the RrcConnStateTimer MO.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2550</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value results in a longer release waiting time of the eNodeB, reduces the total number of normal releases, and reduces the number of times that RRC connection setup requests are rejected. More resources are occupied if the waiting time prolongs. The service drop rate increases, the RRC connection reestablishment success rate decreases, and throughput drops when the number of UEs in a cell reaches the upper limit of UE specification. If the parameter is set to a smaller value, the probability that UEs fail to receive the RRC Connection Release message increases and the number of RRC connection reestablishments increases.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-BwPreferenceIndTimer.html">BwPreferenceIndTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bandwidth Preference Indication Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the timer during which UEs are prohibited from reporting the bw-Preference-r14 IE to the eNodeB. For details, see 3GPP TS 36.331. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: S0(0), S0dot5(0.5), S1(1), S2(2), S5(5), S10(10), S20(20), S30(30), S60(60), S90(90), S120(120), S300(300), S600(600)</p>
+<p>Unit: s</p>
+<p>Actual Value Range: S0, S0dot5, S1, S2, S5, S10, S20, S30, S60, S90, S120, S300, S600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: S5(5)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a lower probability of CE mode switchovers. However, fewer signaling messages are used for CE mode switchovers. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-VoiceUeReleaseDelayTimer.html">VoiceUeReleaseDelayTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Voice UE Release Delay Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the delay release timer for a voice UE. The eNodeB checks whether the UE sends and receives data. After QCI-1 bearers are released, the UE context cannot be released until the timer expires. If this parameter is set to 0, the timer does not take effect. If this parameter is set to a value other than 0, the UE context cannot be released until the timer expires after the QCI-1 bearers are released. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 60</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in an earlier release for a UE without performing services after QCI-1 bearers are released, more frequent RRC connection setup requests initiated by the UE, and better KPIs such as a lower service drop rate due to more normal RRC connection releases. A larger value of this parameter results in a later release for a UE without performing services after QCI-1 bearers are released, a longer UE online duration in which radio resources are occupied, and worse KPIs such as a higher service drop rate due to fewer normal RRC connection releases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RrcConnStateTimer-EmtcRrcConnRelTimerOffset.html">EmtcRrcConnRelTimerOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eMTC RRC Connection Release Timer Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset of the eMTC RRC connection release timer that takes effect relative to the value of the RrcConnRelTimer parameter in the RrcConnStateTimer MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~60000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0~60000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a longer eNodeB release waiting time, reduces the total number of normal releases, and reduces the number of times RRC connection reestablishment requests are rejected. More resources are occupied if the waiting time prolongs. The probability that the performance indicators related to service drops, RRC connection reestablishment, and throughput deteriorate increases when the number of UEs in a cell approaches the upper limit. If the parameter is set to a smaller value, the probability that UEs fail to receive the RRC connection release message increases and the number of RRC connection reestablishments increases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_rrcconnstatetimer__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To change the value of Timer302 to 4, run the following command:
+MOD RRCCONNSTATETIMER: T302=4;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

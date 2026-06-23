@@ -1,0 +1,85 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify eNodeB Sharing Mode (MOD ENODEBSHARINGMODE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_enodebsharingmode">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify eNodeB Sharing Mode (MOD ENODEBSHARINGMODE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_enodebsharingmode"></a><a name="mod_enodebsharingmode"></a>
+
+
+<h1 class="topictitle1">Modify eNodeB Sharing Mode (MOD ENODEBSHARINGMODE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_enodebsharingmode__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to change the eNodeB sharing mode.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_enodebsharingmode__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If the eNodeB works in independent mode, only one operator can be added to the eNodeB. This operator must be the primary operator.</p>
+</li><li><p>After this command is executed, run <a href="../../comm/mml/rst_app.html">RST APP</a> to reset the application referenced by the eNodeBFunction MO for the application to take effect. You can run <a href="lst_enodebfunction.html">LST ENODEBFUNCTION</a> to view the application referenced by the eNodeBFunction MO. If the application referenced by the eNodeBFunction MO is not reset within 10 minutes after the eNodeB sharing mode is changed by running this command, ALM-26245 Configuration Data Inconsistency will be reported.</p>
+</li><li><p>When the ENodeBSharingMode parameter is changed to HYBRID_SHARED, the CnOpSharingGroupId parameter in the associated S1Interface, X2Interface, S1, X2, Cell MOs must be set to a valid value. In different RAN sharing modes, the maximum number of operators that can be added and the restrictions for the relationship between the configurations of these MOs and operators are different. When the eNodeB sharing mode is changed to hybrid RAN sharing from others, the configurations of multiple MOs need to be modified at the same time. You are advised to use MAE to perform the configuration modification in batches. When using the MML command to change the eNodeB sharing mode to hybrid RAN sharing, you are advised to remove these MOs and then set the ENodeBSharingMode to HYBRID_SHARED. After this, re-add the MOs as required.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_enodebsharingmode__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ENodeBSharingMode-ENodeBSharingMode.html">ENodeBSharingMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eNodeB sharing mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the eNodeB sharing mode, which can be independent operator mode, RAN sharing with common carrier, RAN sharing with dedicated carrier, hybrid RAN sharing, or RAN sharing with special dedicated carrier.</p>
+<p>GUI Value Range: INDEPENDENT(Independent Operator Mode), SHARED_FREQ(Shared Frequency Sharing Mode), SEPARATED_FREQ(Separate Frequency Sharing Mode), HYBRID_SHARED(Hybrid RAN Sharing), SEPARATED_FREQ_SPEC(Special Separate Frequency Sharing Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: INDEPENDENT, SHARED_FREQ, SEPARATED_FREQ, HYBRID_SHARED, SEPARATED_FREQ_SPEC</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_enodebsharingmode__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To change the value of eNodeB sharing mode to INDEPENDENT, run the following command:
+MOD ENODEBSHARINGMODE: ENodeBSharingMode=INDEPENDENT;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,323 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="FMU">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="RFA">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="FMU">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>FMU</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="FMU"></a><a name="FMU"></a>
+
+
+<h1 class="topictitle1">FMU</h1>
+
+<div>
+<div class="section"><pre>
+<a href="Equipment.html">EQUIPMENT</a>
+  +-<a href="Cabinet.html">CABINET</a>
+    +-<a href="Subrack.html">SUBRACK</a>
+      +-<a href="FMU.html"><strong>FMU</strong></a>
+        +-<a href="AlmPort.html">ALMPORT</a>[0~4]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The fan monitoring unit (FMU) MO is used to dissipate heat from a cabinet. Currently, there are two types of FMU: indoor FMU and outdoor FMU.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Base class:</p>
+<a href="RU.html">RU</a></li><li><p>Possible parents:</p>
+<a href="Subrack.html">SUBRACK</a></li><li><p>Possible children:</p>
+<a href="AlmPort.html">ALMPORT</a>[0~4]</li><li>Relation with the subrack that houses the <strong>FMU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]A subrack must be configured together with an <strong>FMU</strong> MO to house the <strong>FMU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SUBRACK</strong>, <strong>RRU</strong>, and <strong>CCU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The MO corresponding to <strong>MCN</strong> and <strong>MSRN</strong> in the <strong>FMU</strong> MO must have been configured and be one of the following types: 1. <strong>SUBRACK</strong> MO with <strong>SRN</strong> set to 0 or 1; 2. <strong>RRU</strong> MO with <strong>SN</strong> set to 0; 3. <strong>CCU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>CABINET</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>FMU</strong> MO with <strong>SRN</strong> set to 12 cannot be configured in/for a <strong>CABINET</strong> MO when <strong>TYPE</strong> in the <strong>CABINET</strong> MO is set to one of the following values: RFC, BTS3900, BTS3900AL, BTS5900, RFC5906, IFS5906.</li></ul>
+</li><li>Relation with the <strong>SUBRACK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>FMU</strong> MOs configured on one <strong>SUBRACK</strong> MO must be greater than or equal to 0 and smaller than or equal to 1.</li></ul>
+</li><li>Relation with the <strong>ALMPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>ALMPORT</strong> MOs configured on one <strong>FMU</strong> MO must be greater than or equal to 0 and smaller than or equal to 4.</li></ul>
+</li><li>Relation with the <strong>TCU</strong>, <strong>PMU</strong>, <strong>EMU</strong>, <strong>FMU</strong>, <strong>CCU</strong>, <strong>MEB</strong> and <strong>GDU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]It is not allowed in the following cases: 1. The combination of <strong>MCN</strong>, <strong>MSRN</strong>, <strong>MPN</strong>, and <strong>ADDR</strong> in the <strong>FMU</strong> MO is same as the combination of those in other <strong>FMU</strong> MOs; 2. The combination of <strong>MCN</strong>, <strong>MSRN</strong>, <strong>MPN</strong>, and <strong>ADDR</strong> in the <strong>FMU</strong> MO is same as the combination of those in the <strong>PMU</strong> MOs; 3. The combination of <strong>MCN</strong>, <strong>MSRN</strong>, <strong>MPN</strong>, and <strong>ADDR</strong> in the <strong>FMU</strong> MO is same as the combination of those in the <strong>TCU</strong> MOs; 4. The combination of <strong>MCN</strong>, <strong>MSRN</strong>, <strong>MPN</strong>, and <strong>ADDR</strong> in the <strong>FMU</strong> MO is same as the combination of those in the <strong>EMU</strong> MOs; 5.The combination of <strong>MCN</strong>, <strong>MSRN</strong>, and <strong>MPN</strong> in the <strong>FMU</strong> MO is same as the combination of those in the <strong>CCU</strong> MOs, and <strong>ADDR</strong> in the <strong>FMU</strong> MO is equal to 21; 6. The combination of <strong>MCN</strong>, <strong>MSRN</strong>, and <strong>MPN</strong> in the <strong>FMU</strong> MO is same as the combination of those in the <strong>MEB</strong> MOs, and <strong>ADDR</strong> in the <strong>FMU</strong> MO is equal to 10; 7. The combination of <strong>MCN</strong>, <strong>MSRN</strong>, <strong>MPN</strong>, and <strong>ADDR</strong> in the <strong>FMU</strong> MO is same as the combination of those in the <strong>GDU</strong> MOs.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRU</strong> MO specified by <strong>MCN</strong> and <strong>MSRN</strong> in the <strong>FMU</strong> MO cannot be configured as the MRIU.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#FMU__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="FMU__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="FMU__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_fmu.html">ADD FMU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a fan monitoring unit (FMU). When the FMU is added, an FMU subrack and an FMU board are added at the same time.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/clr_fmualm.html">CLR FMUALM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to clear a fan monitoring unit (FMU) smoke alarm. When an FMU smoke alarm is reported, you must clear the fault that triggers the alarm, and then run this command to clear the alarm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_fmu.html">DSP FMU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the dynamic information about a fan monitoring unit (FMU).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_fmu.html">LST FMU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of a fan monitoring unit (FMU).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_fmu.html">MOD FMU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of a fan monitoring unit (FMU).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_fmu.html">RMV FMU</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a fan monitoring unit (FMU). When the FMU is removed, an FMU subrack and an FMU board are removed at the same time.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#FMU__tab2">Table 2</a> and <a href="#FMU__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="FMU__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="FMU__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet where the FMU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack where the FMU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot where the FMU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-ManagerCabinet.html">Manager Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the manager. The manager of the FMU is usually a BBU, RRU or CCU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-ManagerSubrack.html">Manager Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the manager. The manager of the FMU is usually a BBU, RRU or CCU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-ManagerPort.html">Manager Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the serial port where the FMU is connected. The serial port is the port through which the FMU is connected to the manager unit.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-Addr.html">Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the communication address of the FMU. The manager establishes communication with the FMU through the communication address.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-SpecBoolAlmFlg.html">Special Boolean Alarm Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to allow the reporting of a dedicated Boolean alarm. If the shield flag for a Boolean alarm is enabled, the Boolean alarm cannot be reported.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-SmartTempControl.html">Smart Temperature Control</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch of smart temperature control. When the smart temperature control is enabled, the rotation speed of the fan is adjusted by the FMU according to the temperature control parameters delivered by the BBU. When the smart temperature control is disabled, the rotation speed of the fan is adjusted by the FMU automatically according to the temperature.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-TempControlMode.html">Temperature Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode that the fan speed adjustment adopts. Mode 0 is the default mode, which achieves balance in system power consumption, noise, and temperature control. It applies to most scenarios. Mode 9 is the synchronization mode, which brings low noise but poor temperature control. Inappropriate configuration of this parameter may lead to serious results such as high noise or service interruption on the RF modules due to overtemperature. You need to contact Huawei technical support before configuring this parameter. You can run the DSP TCMODE command to list the number and description of the temperature control modes supported by the base station. After configuring this parameter, you can run the DSP FMU command to query whether the temperature control mode in the command output is consistent with the configuration. If yes, the configuration is successful. If no, the configuration fails and the system adopts the default mode (mode 0). The reasons for the configuration failure and countermeasures are as follows:</p>
+<p>1. The FMU version does not support the temperature control mode configuration.</p>
+<p>2. The curve corresponding to the configured temperature control mode is incorrect and the configuration cannot take effect on the FMU. You need to contact the Huawei technical support.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-TEMPERATUREALMDETENHSW.html">Temperature Alarm Detection Enh Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the alarm detection enhancement function for the temperature exception of the air exhaust vent and air intake vent of an FMU. If this switch is turned on, the alarm threshold of the temperature difference between the air exhaust vent and air intake vent and the upper limit of the temperature alarm for the air intake vent can be configured. The system detects alarms based on the configured thresholds.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-TEMPERATUREDELTAALMTHLD.html">Temperature Delta Alarm Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the alarm threshold of the temperature difference between the air exhaust vent and air intake vent. When the temperature difference between the air exhaust vent and air intake vent is higher than this threshold, ALM-25655 Cabinet Air Outlet Temperature Unacceptable is reported.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/FMU-INLETTEMPERATUREALMTHLD.html">Inlet Temperature Alarm Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the upper limit of the temperature alarm for the air intake vent. When the temperature of the air intake vent is higher than this threshold, ALM-25656 Cabinet Air Inlet Temperature Unacceptable is reported.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="FMU__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="FMU__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-SpeedRate.html">Fan Speed Rate</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the ratio of the current rotation speed of the fan to its maximum rotation speed.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-TempOut.html">Temperature at Fan Air Outlet</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the temperature at the air outlet of the FMU.Value NULL indicates that this parameter is not supported by the hardware or the hardware is faulty.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-TempIn.html">Temperature at Fan Air Inlet</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the temperature at the air inlet of the FMU.Value NULL indicates that this parameter is not supported by the hardware or the hardware is faulty.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-AverageSpeed.html">Fan Average Speed</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the average rotation speed of the fan per minute.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-AlarmState.html">Alarm Status(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the alarm status of the board hardware, which can be set to Normal, Warning, Minor, Major, or Critical. The alarm status of the PSU, PDB, and BDU is in the alarm status of the PMU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-OpState.html">Operational State(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the operational state of the board, which can be set to Enabled or Disabled. Enabled indicates that services can be carried on the board. Disabled indicates that no service can be carried on the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-AvailabilityStatus.html">Availability Status(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the physical status of a board, which can be Uninstalled, Starting up, Normal, Inconsistent, Unconfigured, Power off, Fault, Communication lost, In test, or the combination of multiple states. For example, if a board is not configured and fails to communicate with the main control and transmission board, the availability status of the board is "Unconfigured, Communication lost." If a board is under management of the peer end, the availability status of the board may be Starting up, Communication lost, or Fault.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-Elabel.html">Electronic Label(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the electronic label, which is a text file with a maximum of 2 KB used to record the manufacturing information about equipment such as the board, sub-board, and optical module. "BoardType" indicates the type of the board. "BarCode" indicates the bar code of the board and is the same as the code labeled on the board. "Item" indicates the BOM code. "Description" indicates the board description in English. "Manufactured" indicates the manufacturing date of the board. "VendorName" indicates the name of the vendor providing the board. "IssueNumber" indicates the board hardware version. "CLEICode" indicates the common language equipment indicator (CLEI) code of the board. "BOM" indicates the fine-grained item code of the board. "Model" indicates the model displayed on the customer interface, such as Bill of Quotation (BOQ) and paper labels.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-BoardType.html">Type(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-BoardSerial.html">Serial Number(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the bar code of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-BoardDesc.html">Description(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the description about the services and functions provided by the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-BoardManu.html">Date of Manufacture(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the manufacturing date of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-BoardVendor.html">Vendor(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the manufacturer of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-BoardIssue.html">Issue Number(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the issue number of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-RuType.html">Config Type(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of a board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-BoardTemperature.html">Board Temperature(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the temperature of a board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-HPATemperature.html">HPA Temperature(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the temperature of the power amplifier. A power amplifier is a component on an RF module. If there is no power amplifier on an RF module, this parameter value is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-DevType.html">DEVTYPE(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the type of the device.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-SoftVer.html">Software Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the software version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-HardVer.html">Hardware Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the hardware version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-BtrmVer.html">BootROM Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the BootROM version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/FMU-GtmuWorkMode.html">WorkMode(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the working mode of the board. the value SINGLEOM indicates that the GTMU works as the main control board and provides the main control, transmission, and RF port functions. The value EVOLUTION indicates that the GTMU works as the evolved board and provides the transmission and RF port functions. NORMAL indicates that the main control and transmission board works in normal mode. TDS-EVOLUTION indicates that the main control and transmission board works in TDS evolution mode. NULL is displayed for boards other than GTMU or when the working mode cannot be queried.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

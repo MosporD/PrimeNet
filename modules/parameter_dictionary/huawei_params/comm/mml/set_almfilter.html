@@ -1,0 +1,246 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Alarm Filter (SET ALMFILTER)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_almfilter">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Alarm Filter (SET ALMFILTER)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_almfilter"></a><a name="set_almfilter"></a>
+
+
+<h1 class="topictitle1">Set Alarm Filter (SET ALMFILTER)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_almfilter__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set parameters related to the duration-based alarm filtering rule and times-based alarm filtering rule. The times-based alarm filtering rule is complementary to the duration-based alarm filtering rule to ensure that all useful alarms are reported.</p>
+<p>An alarm is reported when the accumulated fault duration reaches the threshold or when the accumulated number of fault occurrences reaches the threshold. A cleared alarm is reported when the accumulated alarm cease duration and the number of fault recoveries reach the thresholds.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_almfilter__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>The Alarm Raise Time Window and Alarm Raise Time Threshold parameters must be both set to 0 or non-zero values.</p>
+</li><li><p>The value for Alarm Raise Time Threshold cannot be greater than that for Alarm Raise Time Window.</p>
+</li><li><p>The value of Alarm Cease Time Threshold must be smaller than the value of Alarm Cease Time Window.</p>
+</li><li><p>The ratio of Alarm Raise Time Threshold to Alarm Raise Time Window must be greater than the ratio of Alarm Cease Time Threshold to Alarm Cease Time Window.</p>
+</li><li><p>If both Alarm Raise Time Window and Alarm Raise Time Threshold are 0 but Alarm Cease Time Window is not 0, clear alarms, which are cleared and generated intermittently, will be filtered. If neither Alarm Raise Time Window nor Alarm Raise Time Threshold is 0 but both Alarm Cease Time Window and Alarm Cease Time Threshold are 0, generated alarms, which are generated and cleared intermittently, will be filtered.</p>
+</li><li><p>If Alarm Raise Time Window, Alarm Raise Time Threshold, Alarm Cease Time Window, and Alarm Cease Time Threshold are all 0, the alarm will not be filtered.</p>
+</li><li><p>The value of Alarm Raise Frequency Threshold must be greater than the value of Alarm Cease Frequency Threshold.</p>
+</li><li><p>If the values of Alarm Stat Time Window, Alarm Raise Frequency Threshold, and Alarm Cease Frequency Threshold are all 0, times-based alarm filtering is not performed.</p>
+</li><li><p>When Window for Raising Alarm is 0, do not set Alarm Stat Time Window, Alarm Raise Frequency Threshold, and Alarm Cease Frequency Threshold.</p>
+</li><li><p>When Alarm Raise Time Window is set to 0, Alarm Measurement Time Window, Alarm Raise Frequency Threshold and Alarm Cease Frequency Threshold will be set to 0 automatically.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_almfilter__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-ALMID.html">AID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Alarm ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the alarm ID.The alarm ID is the only index for alarms.</p>
+<p>GUI Value Range: 1~65533</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~65533</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-RATIO.html">RTP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Filter Rule Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the alarm filtering type.</p>
+<p>GUI Value Range: RATIO(Ratio), STAT(Stat)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RATIO, STAT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-RTW.html">RTW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Window for Raising Alarm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time window of alarm generating.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-RTH.html">RTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Threshold for Raising Alarm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the accumulated fault persistence duration in the alarm generating time window.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-CTW.html">CTW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Window for Ceasing Alarm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time window of alarm clearing.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-CTH.html">CTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Threshold for Ceasing Alarm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the accumulated fault persistence duration in the alarm clearing time window.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-STATTW.html">STATTW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Alarm Stat Time Window</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time window in which alarms are measured.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-STATRTH.html">STATRTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Alarm Raise Frequency Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the accumulated number of fault occurrences in the alarm stat time window (STATTW).</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: time</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ALMFILTER-STATCTH.html">STATCTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Alarm Cease Frequency Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the accumulated number of fault recoveries in the alarm stat time window (STATTW).</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: time</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_almfilter__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To set the alarm filtering parameters as follows: Alarm ID: 26819, Filter Rule Type: RATIO, Window for Raising Alarm: 10, Threshold for Raising Alarm: 5, Window for Ceasing Alarm: 12, Threshold for Ceasing Alarm: 5, run the following command:
+SET ALMFILTER: AID=26819, RTP=RATIO, RTW=10, RTH=5, CTW=12, CTH=5;
+Example 2: To set the alarm filtering parameters as follows: Alarm ID: 26819, Filter Rule Type: STAT, Alarm Stat Time Window: 10, Alarm Raise Frequency Threshold: 5, Alarm Cease Frequency Threshold: 2, run the following command: 
+SET ALMFILTER: AID=26819, RTP=STAT, STATTW=10, STATRTH=5, STATCTH=2;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

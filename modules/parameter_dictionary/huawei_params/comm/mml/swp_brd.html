@@ -1,0 +1,145 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Switch over Active/Standby Board (SWP BRD)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="swp_brd">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Switch over Active/Standby Board (SWP BRD)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="swp_brd"></a><a name="swp_brd"></a>
+
+
+<h1 class="topictitle1">Switch over Active/Standby Board (SWP BRD)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="swp_brd__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to manually start the swap of the active and standby boards. When this command is executed successfully, the previous standby board becomes active and functions as the active board, while the previous active one becomes standby.</p>
+</div></div>
+
+<div class="mmlnote"><a name="swp_brd__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The active and standby boards cannot be switched over when the two boards are synchronizing data, downloading software, supplementing software, or activating software.</p>
+</li><li><p>The BS will be reset after the swap. To avoid data inconsistency before and after the swap, the BS forces the active and standby main control boards to synchronize data after this command is executed, and the BS will be reset only after the data synchronization is complete.</p>
+</li><li><p>In the current version, only the swap of the active and standby main control boards in the same BBU is supported.</p>
+</li><li><p>It takes some time to back up and synchronize data between the active and standby main control boards. Before running this command, ensure that the two boards have worked properly for more than half an hour and no modification is made to the data of the base station during this period of time. Otherwise, data on the active main control board may not be synchronized to the standby main control board and data may be inconsistent between the active and standby main control boards after the two boards are swapped.</p>
+</li><li><p>If the key data on the active and standby boards is inconsistent, data synchronization will be performed between the active and standby boards. After the synchronization, these two boards will not be swapped.</p>
+</li><li><p>The slot number in this command is set to the slot number of the first board in the HA group. For example, if the HA group consists of the main control boards configured in slot 6 and slot 7, the slot number is set to 6.</p>
+</li><li><p>The BLADEBBU does not support this command.</p>
+</li><li><p>When HA Switch is set to OFF, the active/standby switchover of the main control board is disabled. You can run the <a href="dsp_hasw.html">DSP HASW</a> command to query the active/standby switchover switch and run the <a href="set_hasw.html">SET HASW</a> command to set the switch.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="swp_brd__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Equipment-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the board is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Equipment-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Equipment-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board.</p>
+<p>GUI Value Range: 6</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 6</p>
+<p>MML Default Value: 6</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="swp_brd__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To perform the active/standby board swap with parameters as follows: Cabinet No.: 0, Subrack No.: 0, Slot No.: 6, run the following command:
+SWP BRD: CN=0, SRN=0, SN=6;
+The result is shown as follows:
++++    0        2016-10-20 11:06:55
+O&amp;M    #103
+%%SWP BRD:;%%
+RETCODE = 0  Operation succeeded.
+
+
+To be continued...
+---    END
+
++++    0        2016-10-20 11:07:03
+O&amp;M    #103
+%%SWP BRD:;%%
+RETCODE = 0  Operation succeeded.
+
+2 reports in total
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

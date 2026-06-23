@@ -1,0 +1,161 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="NRDUCellOp">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="NRDUCellOp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>NRDUCellOp</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="NRDUCellOp"></a><a name="NRDUCellOp"></a>
+
+
+<h1 class="topictitle1">NRDUCellOp</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="gNodeBFunction.html">gNodeBFunction</a>
+  +-<a href="NRDUCell.html">NRDUCell</a>
+    +-<a href="NRDUCellOp.html"><strong>NRDUCellOp</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO is used to identify the operator of an NR DU cell. In different operator modes, the number of NRDUCellOp MO instances that can be configured for each NR DU cell is different. In independent operator mode, no NRDUCellOp MO instance is configured for each cell. In MORAN mode, only one NRDUCellOp MO instance can be configured for each cell. In MOCN mode, a maximum of six NRDUCellOp MO instances can be configured for each cell.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="NRDUCell.html">NRDUCell</a></li><li>Relation with the <strong>gNBSharingMode</strong> and <strong>NRDUCell</strong> MOs:<ul><li>When <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to INDEPENDENT, the number of <strong>NRDUCellOp</strong> MO instances corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO must be 0.</li><li>When <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to SHARED_FREQ, the number of <strong>NRDUCellOp</strong> MO instances corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO must be less than or equal to 6.</li><li>When <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to SEPARATED_FREQ, the number of <strong>NRDUCellOp</strong> MO instances corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO must be less than or equal to 1.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong> MO:<ul><li>When <strong>DuplexMode</strong> in an <strong>NRDUCell</strong> MO is set to CELL_SUL, the number of <strong>NRDUCellOp</strong> MO instances corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO must be 0.</li><li>If <strong>CellPrimaryOpFlag</strong> in an <strong>NRDUCellOp</strong> MO is set to TRUE, the value of <strong>CellId</strong> in the <strong>NRDUCellOp</strong> MO must be identical with that of <strong>CellId</strong> in the corresponding <strong>NRDUCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>gNBOperator</strong> MO:<ul><li><strong>OperatorId</strong> in an <strong>NRDUCellOp</strong> MO must be set to a value configured in the corresponding <strong>gNBOperator</strong> MO.</li><li>If the <strong>CellId</strong> parameter in an <strong>NRDUCellOp</strong> MO is set to a value other than 65535, and the <strong>gNBIdLength</strong> parameter in an <strong>gNBOperator</strong> MO is set to a value other than 255, the value of this parameter must not exceed the maximum value 2^(36 - N) - 1, where N is specified by <strong>gNBIdLength</strong> in the <strong>gNBOperator</strong> MO corresponding to <strong>OperatorId</strong> in the <strong>NRDUCellOp</strong> MO.</li></ul>
+</li><li>Relation with the <strong>gNBSharingMode</strong>, <strong>NRDUCell</strong>, and <strong>gNBOperator</strong> MOs:<ul><li>If <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to SHARED_FREQ or SEPARATED_FREQ, and <strong>NrNetworkingOption</strong> is set to SA or SA_NSA in at least one of the <strong>gNBOperator</strong> MOs corresponding to <strong>OperatorId</strong> in all the <strong>NRDUCellOp</strong> MOs associated with <strong>NrDuCellId</strong> in an <strong>NRDUCell</strong> MO, <strong>SsbDescMethod</strong> in the <strong>NRDUCell</strong> MO must be set to SSB_DESC_TYPE_GSCN.</li></ul>
+</li><li>Relation with the <strong>NRDUCellAlgoSwitch</strong> and <strong>gNBOperator</strong> MOs:<ul><li>If the LNR_SMART_CARRIER_SHUTDOWN_SW option of <strong>PowerSavingSwitch</strong> in an <strong>NRDUCellAlgoSwitch</strong> MO is selected and the <strong>NRDUCellOp</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO is not configured, <strong>NrNetworkingOption</strong> in the <strong>gNBOperator</strong> MO with <strong>OperatorType</strong> set to PRIMARY_OPERATOR must be set to NSA or SA_NSA.</li><li>If the LNR_SMART_CARRIER_SHUTDOWN_SW option of <strong>PowerSavingSwitch</strong> in an <strong>NRDUCellAlgoSwitch</strong> MO is selected and the <strong>NRDUCellOp</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO is configured, <strong>NrNetworkingOption</strong> in the <strong>gNBOperator</strong> MO corresponding to <strong>OperatorId</strong> in all the <strong>NRDUCellOp</strong> MO instances corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO must be set to NSA or SA_NSA.</li></ul>
+</li><li>Relation with the <strong>NRCell</strong>, <strong>gNBSharingMode</strong>, and <strong>NRDUCell</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is CELL_ACTIVE and <strong>gNBMultiOpSharingMode</strong> is set to SEPARATED_FREQ, the <strong>NRDUCellOp</strong> MO corresponding to <strong>NrDuCellId</strong> associated with <strong>CellId</strong> corresponding to <strong>NrCellId</strong> in the <strong>NRCell</strong> MO must already be configured.</li><li>When the <strong>CellActiveState</strong> parameter in an <strong>NRCell</strong> MO is set to CELL_ACTIVE and the <strong>MultipleNCISwitch</strong> parameter in the <strong>gNBSharingMode</strong> MO is set to ON, the <strong>CellPrimaryOpFlag</strong> parameter must be set to TRUE in one of the <strong>NRDUCellOp</strong> MOs corresponding to the <strong>NrDuCellId</strong> parameter in the <strong>NRDUCell</strong> MO associated with the <strong>CellId</strong> parameter in the <strong>NRCell</strong> MO.</li><li>When the <strong>CellActiveState</strong> parameter in an <strong>NRCell</strong> MO is set to CELL_ACTIVE and the <strong>MultipleNCISwitch</strong> parameter in the <strong>gNBSharingMode</strong> MO is set to OFF, the <strong>CellPrimaryOpFlag</strong> parameter in the <strong>NRDUCellOp</strong> MO corresponding to the <strong>NrDuCellId</strong> parameter in the <strong>NRDUCell</strong> MO associated with the <strong>CellId</strong> parameter in the <strong>NRCell</strong> MO can only be set to FALSE.</li></ul>
+</li><li>Relation with the <strong>NRCell</strong>, <strong>gNBSharingMode</strong>, <strong>NRDUCell</strong>, and <strong>gNBOperator</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is CELL_ACTIVE and <strong>gNBMultiOpSharingMode</strong> is set to SHARED_FREQ, the <strong>NRDUCellOp</strong> MO corresponding to <strong>NrDuCellId</strong> associated with <strong>CellId</strong> corresponding to <strong>NrCellId</strong> in the <strong>NRCell</strong> MO must already be configured. In addition, there must be a <strong>gNBOperator</strong> MO specified by <strong>OperatorId</strong> with <strong>OperatorType</strong> set to PRIMARY_OPERATOR.</li><li>When <strong>CellActiveState</strong> in an <strong>NRCell</strong> MO is set to CELL_ACTIVE and <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to ON, <strong>CellId</strong> in the <strong>NRDUCellOp</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO associated with <strong>CellId</strong> in the <strong>NRCell</strong> MO must be different from the 3GPP-defined NR Cell Identity (NCI) determined based on <strong>gNBId</strong> and <strong>gNBIdLength</strong> in the <strong>gNBOperator</strong> MO associated with OperatorId in the <strong>NRDUCellOp</strong> MO. This rule applies to all the <strong>NRDUCellOp</strong> MOs corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO associated with <strong>CellId</strong> in the <strong>NRCell</strong> MO.</li></ul>
+</li><li>Relation with the <strong>gNBCUNgOp</strong>, <strong>NRCell</strong>, and <strong>gNBOperator</strong> MOs:<ul><li>If <strong>CellActiveState</strong> in any <strong>NRCell</strong> MO is CELL_ACTIVE and the gNodeB has at least two <strong>NRDUCellOp</strong> MO instances with <strong>OperatorId</strong> specifying operators for which <strong>NrNetworkingOption</strong> is set to SA or SA_NSA, the <strong>gNBCUNgOp</strong> MOs corresponding to such <strong>OperatorId</strong> values must be configured.</li></ul>
+</li><li>Relation with the <strong>NRCellOpPolicy</strong>, <strong>NRCell</strong>, and <strong>NRDUCell</strong> MOs:<ul><li>The value of <strong>OperatorId</strong> in an <strong>NRCellOpPolicy</strong> MO must have been configured in all the <strong>NRDUCellOp</strong> MOs corresponding to the <strong>NRDUCell</strong> MO associated with <strong>CellId</strong> in the <strong>NRCell</strong> MO corresponding to the <strong>NRCellOpPolicy</strong> MO.</li></ul>
+</li><li>Relation with the <strong>NRCellInterRHoMeaGrp</strong>, <strong>gNBSharingMode</strong>, <strong>NRCell</strong>, <strong>NRCellQciBearer</strong>, <strong>gNBOperator</strong>, <strong>gNBOperatorQciParam</strong>, and <strong>NRDUCell</strong> MOs:<ul><li>If <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to SEPARATED_FREQ or SHARED_FREQ, and the QCIs in all the <strong>NRCellQciBearer</strong> MOs corresponding to an <strong>NRCell</strong> MO and those in all the <strong>gNBOperatorQciParam</strong> MOs corresponding to the <strong>gNBOperator</strong> MO associated with the <strong>NRCell</strong> MO are the same, the following condition must be met: <strong>InterRatHoA2RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO corresponding to <strong>InterRatHoMeasGroupId</strong> in the <strong>NRCellQciBearer</strong> MO + <strong>EutranA2B2RsrpThldOffset</strong> in the <strong>gNBOperatorQciParam</strong> MO &lt; <strong>InterRatHoA1RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO. All the <strong>gNBOperator</strong> MOs corresponding to an <strong>NRCell</strong> MO are determined by the <strong>gNBOperator</strong> MOs corresponding to the <strong>NRDUCellOp</strong> MOs associated with the <strong>NRDUCell</strong> MO identified by <strong>CellId</strong>.</li><li>If <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to SEPARATED_FREQ or SHARED_FREQ, and the QCIs in all the <strong>NRCellQciBearer</strong> MOs corresponding to an <strong>NRCell</strong> MO and those in all the <strong>gNBOperatorQciParam</strong> MOs corresponding to the <strong>gNBOperator</strong> associated with the <strong>NRCell</strong> MO are the same, the following condition must be met: <strong>InterRatHoA2RsrpThld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO corresponding to <strong>InterRatHoMeasGroupId</strong> in the <strong>NRCellQciBearer</strong> MO + <strong>EutranA2B2RsrpThldOffset</strong> in the <strong>gNBOperatorQciParam</strong> MO &gt; <strong>CovHoToEutranBlindA2Thld</strong> in the <strong>NRCellInterRHoMeaGrp</strong> MO. All the <strong>gNBOperator</strong> MOs corresponding to an <strong>NRCell</strong> MO are determined by the <strong>gNBOperator</strong> MOs corresponding to the <strong>NRDUCellOp</strong> MOs associated with the <strong>NRDUCell</strong> MO identified by <strong>CellId</strong>.</li></ul>
+</li><li>Relation with the <strong>gNBOperator</strong> and <strong>gNBTrackingArea</strong> MOs:<ul><li>If <strong>TrackingAreaId</strong> in an <strong>NRDUCellOp</strong> MO is not set to 4294967295 and <strong>NrNetworkingOption</strong> in the <strong>gNBOperator</strong> MO corresponding to <strong>OperatorId</strong> is set to SA or SA_NSA, <strong>Tac</strong> in the <strong>gNBTrackingArea</strong> MO corresponding to <strong>TrackingAreaId</strong> cannot be set to 4294967295.</li></ul>
+</li><li>Relation with the <strong>gNBSharingMode</strong> MO:<ul><li><strong>TrackingAreaId</strong> in an <strong>NRDUCellOp</strong> MO can be set to a value in the range of 0 to 65535 only when <strong>gNBMultiOpSharingMode</strong> in the <strong>gNBSharingMode</strong> MO is set to SHARED_FREQ.</li><li>When the <strong>MultipleNCISwitch</strong> parameter in the <strong>gNBSharingMode</strong> MO is set to ON, the <strong>CellId</strong> parameter in an <strong>NRDUCellOp</strong> MO must not be set to 65535.</li><li>When the <strong>MultipleNCISwitch</strong> parameter in the <strong>gNBSharingMode</strong> MO is set to ON, the <strong>CellId</strong> parameter values must be unique in all the <strong>NRDUCellOp</strong> MOs with the same <strong>OperatorId</strong> parameter value.</li></ul>
+</li><li>Relation with the <strong>gNBTrackingArea</strong> MO:<ul><li>If <strong>TrackingAreaId</strong> in an <strong>NRDUCellOp</strong> MO is not set to 4294967295, the value of <strong>TrackingAreaId</strong> must be set to the value configured in a <strong>gNBTrackingArea</strong> MO.</li></ul>
+</li><li>Relation with the <strong>gNBSharingMode</strong>, <strong>NRCellRelation</strong>, <strong>gNBOperator</strong>, <strong>NRDUCell</strong>, and <strong>NRCell</strong> MOs:<ul><li>If <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to ON, the NR CGI of the serving cell (consisting of <strong>Mcc</strong>, <strong>Mnc</strong>, <strong>gNBId</strong>, and <strong>CellId</strong> corresponding to <strong>OperatorId</strong> in the <strong>NRDUCellOp</strong> MO with <strong>CellPrimaryOpFlag</strong> set to TRUE associated with the <strong>NRDUCell</strong> MO corresponding to <strong>NrCellId</strong> in the <strong>NRCellRelation</strong> MO) must not be identical with the CGIs of neighboring cells. The CGI of a neighboring cell consists of the MCC, MNC, gNodeB ID, and cell ID, which are specified by <strong>Mcc</strong>, <strong>Mnc</strong>, <strong>gNBId</strong>, and <strong>CellId</strong>, respectively.</li></ul>
+</li><li>Relation with the <strong>gNBOperator</strong>, <strong>NRCellRelation</strong>, and <strong>gNBSharingMode</strong> MOs:<ul><li>If <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to ON and the combination of <strong>Mcc</strong>, <strong>Mnc</strong>, and <strong>gNBId</strong> in an <strong>NRCellRelation</strong> MO has been configured in a <strong>gNBOperator</strong> MO, the combination of <strong>CellId</strong> and <strong>OperatorId</strong> corresponding to <strong>Mnc</strong> and <strong>Mcc</strong> must already be configured in an <strong>NRDUCellOp</strong> MO with <strong>CellPrimaryOpFlag</strong> set to TRUE.</li></ul>
+</li><li>Relation with the <strong>NRCellRelation</strong>, <strong>NRDUCell</strong>, <strong>NRCell</strong>, <strong>gNBOperator</strong>, and <strong>gNBSharingMode</strong> MOs:<ul><li>Assume that <strong>MultipleNCISwitch</strong> in the <strong>gNBSharingMode</strong> MO is set to ON and two <strong>NRDUCell</strong> MO instances meet the following conditions: (1) The first <strong>NRDUCell</strong> MO instance is associated with <strong>CellId</strong> in an <strong>NRCell</strong> MO, which referenced by <strong>NrCellId</strong> in an <strong>NRCellRelation</strong> MO. The combination of <strong>gNBId</strong>, <strong>Mcc</strong>, and <strong>Mnc</strong> in this <strong>NRCellRelation</strong> MO has been configured in the <strong>gNBOperator</strong>. In addition, <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is set to CELL_FDD or CELL_TDD. (2) The second <strong>NRDUCell</strong> MO instance is associated with <strong>NrDuCellId</strong> in the <strong>NRDUCellOp</strong> MO in which the combination of <strong>OperatorId</strong> and <strong>CellId</strong> corresponding to <strong>Mnc</strong> and <strong>Mcc</strong> in the <strong>NRCellRelation</strong> MO has been configured. In addition, <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is set to CELL_FDD or CELL_TDD. Based on this assumption, if the values of <strong>PhysicalCellId</strong> and <strong>SsbDescMethod</strong> are equal to their counterparts in the two <strong>NRDUCell</strong> MO instances, the values of <strong>SsbFreqPos</strong> in the two <strong>NRDUCell</strong> MO instances must be different. If the values of <strong>PhysicalCellId</strong> are the same but the values of <strong>SsbDescMethod</strong> are different in the two <strong>NRDUCell</strong> MO instances, the NR-ARFCNs corresponding to <strong>SsbFreqPos</strong> in the two <strong>NRDUCell</strong> MO instances must be different.</li></ul>
+</li><li>Relation with the <strong>NRDUCell</strong>, <strong>gNBOperator</strong>, and <strong>gNBTrackingArea</strong> MOs:<ul><li>In the <strong>NRDUCellOp</strong> MO corresponding to <strong>NrDuCellId</strong> in the <strong>NRDUCell</strong> MO, if <strong>NrNetworkingOption</strong> in any <strong>gNBOperator</strong> MO corresponding to <strong>OperatorId</strong> is set to SA or SA_NSA, and <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is not set to CELL_SUL, <strong>Tac</strong> in the <strong>gNBTrackingArea</strong> MO corresponding to <strong>TrackingAreaId</strong> in the <strong>NRDUCell</strong> MO cannot be set to 4294967295.</li><li>If the <strong>NRDUCellOp</strong> MO corresponding to <strong>NrDuCellId</strong> in an <strong>NRDUCell</strong> MO does not exist, <strong>OperatorType</strong> in a <strong>gNBOperator</strong> MO is set to PRIMARY_OPERATOR, and <strong>NrNetworkingOption</strong> in the <strong>gNBOperator</strong> MO is set to SA or SA_NSA, and <strong>DuplexMode</strong> in the <strong>NRDUCell</strong> MO is not set to CELL_SUL, <strong>Tac</strong> in the <strong>gNBTrackingArea</strong> MO corresponding to <strong>TrackingAreaId</strong> in the <strong>NRDUCell</strong> MO cannot be set to 4294967295.</li></ul>
+</li><li>Relation with the <strong>NRDUCellUacBar</strong> MO:<ul><li>When <strong>OperatorId</strong> in the <strong>NRDUCellUacBar</strong> MO is not set to 255, the <strong>NRDUCellOp</strong> MO with <strong>OperatorId</strong> set to the same value as <strong>OperatorId</strong> must already be configured.</li></ul>
+</li><li>Relation with the <strong>NRDUCellAlgoSwitch</strong> MO:<ul><li>When RB_DYNAMIC_SHARING_SW or MAX_RB_LIMIT_SW of <strong>RanSharingAlgoSwitch</strong> in an <strong>NRDUCellAlgoSwitch</strong> MO is selected and the <strong>NRDUCellOp</strong> MO associated with <strong>NrDuCellId</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO has been configured, <strong>CellResId</strong> in an <strong>NRDUCellOp</strong> MO associated with <strong>NrDuCellId</strong> cannot be set to 255.</li></ul>
+</li><li>Relation with the <strong>NRDUCellAlgoSwitch</strong> and <strong>NRDUCellRes</strong> MOs:<ul><li>When RB_DYNAMIC_SHARING_SW of <strong>RanSharingAlgoSwitch</strong> in an <strong>NRDUCellAlgoSwitch</strong> MO is selected and the <strong>NRDUCellOp</strong> MO associated with <strong>NrDuCellId</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO has been configured, neither <strong>DlRbAverageRatio</strong> nor <strong>UlRbAverageRatio</strong> in an <strong>NRDUCellRes</strong> MO associated with <strong>CellResId</strong> in an <strong>NRDUCellOp</strong> MO can be set to 255.</li><li>When MAX_RB_LIMIT_SW of <strong>RanSharingAlgoSwitch</strong> in an <strong>NRDUCellAlgoSwitch</strong> MO is selected and the <strong>NRDUCellOp</strong> MO associated with <strong>NrDuCellId</strong> in the <strong>NRDUCellAlgoSwitch</strong> MO has been configured, neither <strong>DlRbMaxRatio</strong> nor <strong>UlRbMaxRatio</strong> in an <strong>NRDUCellRes</strong> MO associated with <strong>CellResId</strong> in an <strong>NRDUCellOp</strong> MO can be set to 255.</li></ul>
+</li><li>Relation with the <strong>NRDUCellRes</strong> MO:<ul><li>If <strong>CellResId</strong> in an <strong>NRDUCellOp</strong> MO is not set to 255, the <strong>NRDUCellRes</strong> MO associated with <strong>NrDuCellId</strong> and <strong>CellResId</strong> must have been configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#NRDUCellOp__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="NRDUCellOp__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellOp__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_nrducellop.html">ADD NRDUCELLOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an NR DU cell operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_nrducellop.html">LST NRDUCELLOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list an NR DU cell operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_nrducellop.html">MOD NRDUCELLOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify an NR DU cell operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_nrducellop.html">RMV NRDUCELLOP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an NR DU cell operator.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#NRDUCellOp__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="NRDUCellOp__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="NRDUCellOp__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellOp-NrDuCellId.html">NR DU Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an NR DU cell, which uniquely identifies the cell within a gNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellOp-OperatorId.html">Operator ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellOp-TrackingAreaId.html">Tracking Area ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a tracking area, which uniquely identifies an entry of tracking area information. This parameter is used only within the gNodeB and is not used in the information exchanged with the core network. It is different from the TAI configured in the TAL of the core network. If this parameter is set to 4294967295, the TAI of the operator corresponding to the cell is the value of TrackingAreaId in the NRDUCell MO. If this parameter is set to a value in the range of 0 to 65535, the TAI of the operator corresponding to the cell is the value of this parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellOp-PolicySwitch.html">Policy Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy switches configured for different operators in non-independent operator mode.</p>
+<p>OP_SUL_SWITCH: Indicates whether Super Uplink or UL and DL Decoupling can be enabled for an operator. This option applies only to SUL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellOp-CellId.html">Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the operator-specific cell ID of an NR cell. This cell ID and the gNodeB ID of the operator compose the 3GPP-defined NR cell ID (NCI) of the operator. The NCI and the PLMN ID compose the NCGI. For details, see 3GPP TS 38.413. If this parameter is set to 65535, this parameter is invalid. In this case, no exclusive cell ID is available for the operator. If this parameter is set to a value in the range of 0 to 16383 and gNBSharingMode.MultipleNCISwitch is set to ON, the setting of this parameter takes effect. In this case, operators use their own cell IDs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellOp-CellPrimaryOpFlag.html">Cell Primary Operator Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the primary operator of a cell. If the gNBSharingMode.MultipleNCISwitch parameter is set to ON, the primary operator must be specified. If the gNBSharingMode.MultipleNCISwitch parameter is set to OFF, there is no need to specify the primary operator.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/NRDUCellOp-CellResId.html">Cell Resource ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the NR DU cell resource ID, which is used to add cell resources for an operator in multi-operator sharing scenarios. The value 255 indicates an invalid value, which means that cell resources are not added for the operator.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

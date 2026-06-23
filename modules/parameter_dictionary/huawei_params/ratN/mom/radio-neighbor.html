@@ -1,0 +1,106 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="Neighboring Cell and Neighbor Relationship MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of neighboring cells and neighbor relationships. It also provides the managed object model (MOM) view and describes the managed objects (MOs).">
+<meta name="description" content="This section describes the functions and concepts of neighboring cells and neighbor relationships. It also provides the managed object model (MOM) view and describes the managed objects (MOs).">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../ratN/mom/gNodeBFunction-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="radio-neighbor">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Neighboring Cell and Neighbor Relationship MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="radio-neighbor"></a><a name="radio-neighbor"></a>
+
+
+<h1 class="topictitle1">Neighboring Cell and Neighbor Relationship MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of neighboring
+cells and neighbor relationships. It also provides the managed object
+model (MOM) view and describes the managed objects (MOs).</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p><strong>NCL</strong></p>
+<p>A neighboring cell list (NCL) of a cell contains information about
+the cells under other base stations (referred to as external cells).
+In the current version, each cell has only one intra-RAT NCL, including
+5G RAN external cells. There are inter-RAT NCLs. Currently, only external
+E-UTRAN cells are supported.</p>
+<p><strong>NRT</strong></p>
+<p>A neighboring
+relation table (NRT) of a cell contains information about the neighbor
+relationships of the cell with external cells. In the current version,
+each cell has only one intra-RAT NRT, including 5G RAN intra-frequency
+neighbor relationships and 5G RAN inter-frequency neighbor relationships.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">MOM View</h4><div class="p"><a href="#radio-neighbor__fig1">Figure 1</a> shows
+the MOM for 5G RAN neighboring cells and neighbor relationships, which
+is a subset of the gNodeBFunction MOM. <div class="fignone" id="radio-neighbor__fig1"><a name="radio-neighbor__fig1"></a><a name="fig1"></a><span class="figcap"><b>Figure 1 </b>MOM for 5G RAN Neighboring Cells and Neighbor Relationships</span>
+
+<br><span><img src="../image/mom/gnb-mom14.png"></span></div>
+The MOs related
+to 5G RAN neighboring cells and neighbor relationships are defined
+as follows:<ul><li><a href="../mo/NRExternalNCell.html">NRExternalNCell</a>:
+An NRExternalNCell MO defines the basic information about an external
+5G RAN intra-RAT cell, including the gNodeB ID, mobile country code,
+mobile network code, cell ID, frequency information, physical cell
+ID, and tracking area code. This MO is used to create intra-frequency
+or inter-frequency NR neighbor relationships for one or more NR cells
+of the local base station. </li><li><a href="../mo/NRCellRelation.html">NRCellRelation</a>: An
+NRCellRelation MO defines the neighbor relationship for an NR cell,
+including the neighboring cell information (gNodeB ID, mobile country
+code, mobile network code, and cell ID), neighboring cell measurement
+parameters (such as cell individual offset). Neighbor
+relationships are used for handovers and cell reselections.</li><li><a href="../mo/NRExternalNCellPlmn.html">NRExternalNCellPlmn</a>: An NRExternalNCellPlmn MO defines the PLMN list of the NR external
+neighboring cells.</li><li><a href="../mo/gNBNCellPlmnList.html">gNBNCellPlmnList</a>: A GnbNCellPlmnList MO defines gNodeB neighboring cell PLMN list.</li><li><a href="../mo/NRCellFreqRelation.html">NRCellFreqRelation</a>: An NRCellFreqRelation MO consists of parameters related to non-serving frequencies, which are used for inter-frequency handovers and cell reselection.</li><li><a href="../mo/gNBServiceBlacklist.html">gNBServiceBlacklist</a>: A gNBServiceBlacklist MO is used to record whether cells in a tracking area support specific services. It serves as a criterion for continuity of specific services. Parameters in this MO need to be set only when cells in a tracking area do not support specific services. If parameters in this MO are not set for an external neighboring cell, all services are supported by default in the external neighboring cell.</li></ul>
+</div>
+<div class="p"><a href="#radio-neighbor__fig2">Figure 2</a> shows the MOM for 5G RAN neighboring
+cells and neighbor relationships with E-UTRAN, which is a subset of
+the gNodeBFunction MOM. <div class="fignone" id="radio-neighbor__fig2"><a name="radio-neighbor__fig2"></a><a name="fig2"></a><span class="figcap"><b>Figure 2 </b>MOM for 5G RAN neighboring cells and neighbor relationships
+with E-UTRAN</span>
+
+<br><span><img src="../image/mom/gnb-mom17.png"></span></div>
+The MOs related
+to 5G RAN neighboring cells and neighbor relationships are defined
+as follows:<ul><li><a href="../mo/gNBEutraExternalCell.html">gNBEutraExternalCell</a>: A gNBEutraExternalCell MO defines an external E-UTRAN cell. The
+NCL of the neighboring E-UTRAN cells of the local gNodeB is the common
+parameter. It is used to create neighbor E-UTRAN relationships for
+one or more serving cells of the local gNodeB. In RAN sharing scenarios,
+the PLMN of the external E-UTRAN cell needs to be added.</li><li><a href="../mo/gNBEutraExtCellPlmn.html">gNBEutraExtCellPlmn</a>: A gNBEutraExtCellPlmn MO defines the PLMN list of an external E-UTRAN
+cell for a gNodeB.</li><li><a href="../mo/NRCellEutraNRelation.html">NRCellEutraNRelation</a>: An NRCellEutraNRelation MO defines the parameters of an inter-RAT
+neighboring E-UTRAN cell and is used for handovers.</li><li><a href="../mo/NRCellEutranNFreq.html">NRCellEutranNFreq</a>: An NRCellEutranNFreq MO defines neighboring E-UTRAN frequencies.
+Common parameters such as reselection priority and measurement bandwidth
+are configured for neighboring E-UTRAN frequencies. These parameters
+are used for measurement control and inter-frequency reselection of
+SIB5.</li><li><a href="../mo/NRInterRatHoParam.html">NRInterRatHoParam</a>: An NRInterRatHoParam MO defines parameters related to inter-RAT
+handovers.</li><li><a href="../mo/gNBNrLteCellComb.html">gNBNrLteCellComb</a>: A gNBNrLteCellComb MO is used to configure an NR and LTE cell combination in NSA networking.
+</li></ul>
+</div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../ratN/mom/gNodeBFunction-mom.html" title="This section describes the functions and concepts of the gNodeBFunction. It also provides the classification of the gNodeBFunction.">gNodeBFunction MOM Description</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

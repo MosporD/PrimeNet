@@ -1,0 +1,126 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start Reference Clock Excessive Frequency Deviation Check (STR FREQDIFFCHK)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_freqdiffchk">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start Reference Clock Excessive Frequency Deviation Check (STR FREQDIFFCHK)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_freqdiffchk"></a><a name="str_freqdiffchk"></a>
+
+
+<h1 class="topictitle1">Start Reference Clock Excessive Frequency Deviation Check (STR FREQDIFFCHK)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="str_freqdiffchk__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to check the cause of an excessive frequency deviation when ALM-26262 External Clock Reference Problem is reported and the alarm cause is Excessive Frequency Difference Between Clock Reference and Local Crystal Oscillator.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_freqdiffchk__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The reference clock excessive frequency deviation check takes about 15 minutes and services will be interrupted during the check. It is recommended that this command be executed when there is no service or the traffic is light.</p>
+</li><li><p>You need to run the <a href="str_clktst.html">STR CLKTST</a> command before running this command. This command can check the cause of an excessive frequency deviation only when the frequency deviation in the output of the <a href="str_clktst.html">STR CLKTST</a> command is fixed (the latest three frequency jitters between -0.16 Hz and +0.16 Hz). Otherwise, the output of this command is meaningless.</p>
+</li><li><p>If there is no excessive frequency deviation when this command is executed, this command returns failure.</p>
+</li><li><p>This command cannot be executed on IP clocks. Otherwise, this command fails to be started.</p>
+</li><li><p>When an excessive frequency deviation check is in progress, the values of the Center DA, Current DA, Clock Synchronization Mode, and Air Interface Soft Synchronization Switch parameters cannot be modified.</p>
+</li><li><p>Run the <a href="dsp_freqdiffrslt.html">DSP FREQDIFFRSLT</a> command to query the test result.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="str_freqdiffchk__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the system clock is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the system clock is located.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tasm-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where the system clock is located.</p>
+<p>GUI Value Range: 6~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 6~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, R, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_freqdiffchk__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To start reference clock excessive frequency deviation check in slot 6, run the following command:
+STR FREQDIFFCHK: SN=6;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

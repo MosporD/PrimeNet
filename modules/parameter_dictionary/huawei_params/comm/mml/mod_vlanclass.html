@@ -1,0 +1,180 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Mapping from Traffic Type to VLAN (MOD VLANCLASS)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_vlanclass">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Mapping from Traffic Type to VLAN (MOD VLANCLASS)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_vlanclass"></a><a name="mod_vlanclass"></a>
+
+
+<h1 class="topictitle1">Modify Mapping from Traffic Type to VLAN (MOD VLANCLASS)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_vlanclass__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify a mapping from traffic types to VLANs.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_vlanclass__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>If the local and peer ends have different settings of the VLANID and VLANPRIO parameters for a specific type of traffic, services of that type will be interrupted.</p>
+</li><li><p>This operation may interrupt the services or OM channels that rely on this VLAN ID. It is recommended that you determine whether to enable the automatic configuration data rollback function depending on scenarios. For details, see the help of the <a href="cfm_cb.html">CFM CB</a> command.</p>
+</li><li><p>[eNodeB,gNodeB]A GTP-U frame is a type of user data packet. If the VLAN is planned, you need to configure the VLAN priority mapping with Traffic Type set to USERDATA(User Data) and User Data Service Priority set to the same value as the GTP-U DSCP. If an IP path with Path Type set to FIXED(Fixed QoS) is configured, you also need to configure the VLAN priority mapping with Traffic Type set to USERDATA(User Data) and User Data Service Priority set to the DSCP of this IP path.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_vlanclass__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANCLASS-VLANGroupNo.html">VLANGROUPNO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN Group No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VLAN group that the added VLAN mapping belongs to. Multiple VLAN groups are used in the scenario in which telecom operators share transport resources and use different VLAN policies.</p>
+<p>GUI Value Range: 0~3</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~3</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANCLASS-TrafficType.html">TRAFFIC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Traffic Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the traffic type. Traffic of different types is transmitted through different VLANs. OTHER data is the data except the user data, signaling, high-priority OM data, and low-priority OM data. OTHER data includes the data of the IEEE 1588 V2 clock, clock over IP, and Address Resolution Protocol (ARP) services. OM_HIGH data includes the data of the NTP, switchover between remote maintenance channels, and TCP services.</p>
+<p>GUI Value Range: USERDATA(User Data), SIG(Signaling Data), OM_HIGH(High Level Maintenance Data), OM_LOW(Low Level Maintenance Data), OTHER(Other Data)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: USERDATA, SIG, OM_HIGH, OM_LOW, OTHER</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANCLASS-UserDataPri.html">SRVPRIO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Data Service Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DSCP priority of user data.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that the value of this parameter be consistent with the implementation of the differentiated service.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANCLASS-VLANID.html">VLANID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VLAN ID that the service data belongs to.</p>
+<p>GUI Value Range: 1~4094</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4094</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANCLASS-VLANPri.html">VLANPRIO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the VLAN priority. A greater parameter value indicates a higher priority.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A smaller parameter value indicates a lower priority of the data transmission in layer 2 and affects the QoS.</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/VLANCLASS-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether forcible changes of VLANCLASS configurations are made. When this parameter is set to NO(No), forcible changes of VLANCLASS configurations affecting upper-layer objects are not allowed. When this parameter is set to YES(Yes), forcible changes of VLANCLASS configurations are made. This parameter is invalid when a WMPT, LMPT, GTMUb, or GTMUc serves as the main control board.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_vlanclass__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify a VLAN priority mapping configuration with the parameters as follows: VLAN Group No.: 0, Traffic Type: USERDATA, User Data Service Priority: 46, VLAN ID: 1024, VLAN Priority: 3, run the following command:
+MOD VLANCLASS: VLANGROUPNO=0, TRAFFIC=USERDATA, SRVPRIO=46, VLANID=1024, VLANPRIO=3;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

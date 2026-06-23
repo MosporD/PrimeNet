@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet — Cell heatmap</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="{{ url_for('cell_heatmap.static', filename='cell_heatmap.css') }}?v=5.3">
+</head>
+<body class="ch-page">
+    <header class="ch-topbar">
+        <a href="/dashboard" class="ch-back">Dashboard</a>
+        <div class="ch-topbar-title">
+            <span class="ch-brand">Cell heatmap</span>
+            <span class="ch-sub">Nokia 4G · PM overlay</span>
+        </div>
+        <div class="ch-topbar-actions">
+            <span class="ch-user">{{ user.username }}</span>
+            <button type="button" class="ch-btn ch-btn-ghost" onclick="logout()">Log out</button>
+        </div>
+    </header>
+
+    <div class="ch-shell">
+        <div id="heatmap-map" class="ch-map" role="application" aria-label="Cell heatmap map"></div>
+
+        <div class="ch-map-hud">
+            <button type="button" class="ch-btn ch-btn-dark" id="fit-bounds-btn" title="Zoom to loaded cells">Fit map</button>
+        </div>
+
+        <aside class="ch-drawer" id="ch-drawer">
+            <button type="button" class="ch-drawer-toggle" id="ch-drawer-toggle" aria-expanded="true" aria-controls="ch-drawer-panel">
+                <span class="ch-drawer-toggle-label">Filters</span>
+                <span class="ch-drawer-chevron" aria-hidden="true"></span>
+            </button>
+            <div class="ch-drawer-panel" id="ch-drawer-panel">
+                <p class="ch-drawer-lead">Survey-style KPI field: green = good, red = investigate. Orange/red dots mark problem cells (see legend).</p>
+
+                <div class="ch-field">
+                    <label for="band-filter">Band</label>
+                    <select id="band-filter">
+                        <option value="">All bands</option>
+                    </select>
+                </div>
+
+                <div class="ch-field">
+                    <label for="data-scope-filter">PM resolution</label>
+                    <select id="data-scope-filter">
+                        <option value="daily">Daily</option>
+                        <option value="hourly">Hourly</option>
+                    </select>
+                </div>
+
+                <div class="ch-field">
+                    <label for="kpi-filter">KPI</label>
+                    <select id="kpi-filter"></select>
+                </div>
+
+                <div class="ch-field ch-field-row">
+                    <div>
+                        <label for="good-thr">Good (green)</label>
+                        <input id="good-thr" type="number" step="any" inputmode="decimal" placeholder="Preset">
+                    </div>
+                    <div>
+                        <label for="bad-thr">Bad (red)</label>
+                        <input id="bad-thr" type="number" step="any" inputmode="decimal" placeholder="Preset">
+                    </div>
+                </div>
+
+                <div class="ch-field" id="heat-tuning">
+                    <label for="heat-aura-opacity">Aura strength <span id="heat-aura-opacity-val" class="ch-mono">72</span>%</label>
+                    <input id="heat-aura-opacity" type="range" min="25" max="100" step="1" value="72">
+                    <label for="heat-aura-blur">Aura blend <span id="heat-aura-blur-val" class="ch-mono">18</span> px</label>
+                    <input id="heat-aura-blur" type="range" min="6" max="48" step="1" value="18">
+                </div>
+
+                <div class="ch-field">
+                    <label for="point-limit">Max cells</label>
+                    <input id="point-limit" type="number" min="100" max="20000" step="100" value="20000">
+                </div>
+
+                <div class="ch-actions">
+                    <button type="button" class="ch-btn ch-btn-primary" id="load-btn">Load data</button>
+                </div>
+
+                <div id="ch-status" class="ch-status" aria-live="polite">
+                    <span class="ch-status-dot" id="ch-status-dot"></span>
+                    <span id="ch-status-text">Ready.</span>
+                </div>
+
+                <div id="ch-stats" class="ch-stats" hidden></div>
+            </div>
+        </aside>
+
+        <div id="heat-legend" class="ch-legend" aria-hidden="true"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('cell_heatmap.static', filename='cell_heatmap.js') }}?v=6.0"></script>
+</body>
+</html>

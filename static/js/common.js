@@ -34,7 +34,7 @@ const FEATURE_NAV_SECTIONS = [
     {
         title: 'Administration',
         links: [
-            { label: 'Admin Panel', href: '/admin-panel' },
+            { label: 'Admin Panel', href: '/admin-panel?section=user-admin' },
             { label: 'User Profile', href: '/profile' },
         ],
     },
@@ -112,7 +112,7 @@ function toggleDarkMode() {
 }
 
 function _ensureThemeToggle() {
-    if (_isDashboardPage() || _isPublicAuthPage()) return;
+    if (_isPublicAuthPage()) return;
     if (document.getElementById('dark-mode-btn')) return;
     const btn = document.createElement('button');
     btn.id = 'dark-mode-btn';
@@ -122,6 +122,9 @@ function _ensureThemeToggle() {
     btn.setAttribute('aria-label', 'Toggle dark mode');
     btn.addEventListener('click', toggleDarkMode);
 
+    // The dashboard groups its header buttons inside `.header-actions`; on
+    // module pages the same selector also exists. Map pages use a custom
+    // `.map-header .header-right` container instead.
     const mount = document.querySelector('header .header-actions')
         || document.querySelector('header .header-right')
         || document.querySelector('.map-header .header-right');

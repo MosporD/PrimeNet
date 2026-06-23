@@ -1,0 +1,273 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Policy Against IP Attack (SET IPGUARD)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_ipguard">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Policy Against IP Attack (SET IPGUARD)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_ipguard"></a><a name="set_ipguard"></a>
+
+
+<h1 class="topictitle1">Set Policy Against IP Attack (SET IPGUARD)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_ipguard__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set the global parameters related to ARP spoofing detection, ARP strict learning, illegal packet detection, IPSec replay alarm detection, DOS attack, and ND Spoofing detection.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_ipguard__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>ARP spoofing detection is enabled by default, but the default alarm threshold is 120. You need to manually adjust the threshold. If the ARP spoofing alarm threshold in the IP firewall attack defense policy is lower than the ARP packet flood threshold in flood attack defense, an ARP spoofing alarm cannot be reported.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]ND spoofing detection is enabled by default, but the default alarm threshold is 120. You need to manually adjust the threshold. If the ND spoofing alarm threshold in the IP firewall attack defense policy is lower than the ND packet flood threshold in flood attack defense, an ND spoofing alarm cannot be reported.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_ipguard__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-ArpSpoofCheckSwitch.html">ARPSPOOFCHKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ARP Spoofing Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to perform an ARP spoofing check. If this parameter is set to ENABLE, an alarm is reported when an ARP spoofing attack occurs. If this parameter is set to DISABLE, no alarm is reported when an ARP spoofing attack occurs.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-ArpSpoofAlarmThreshold.html">ARPSPOOFALMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ARP Spoofing Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ARP spoofing alarm threshold. When the ARP spoofing check switch is turned on, an ARP spoofing alarm is reported if the number of ARP update attempts reaches this threshold within one minute. Note that the number of ARP update attempts from trusted MAC addresses is not counted. This alarm is cleared if no request for updating the MAC address mapping to the IP address indicated by the alarm is received within one or two minutes.</p>
+<p>GUI Value Range: 10~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 10~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-ArpLearnStrictSwitch.html">ARPLRNSTRICTSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ARP Learning Strict Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable ARP strict learning. ARP learning strict is a function that enables a BS to learn the acknowledgement packets in response to only ARP request packets sent by itself. With ARP strict learning, the BS can reject most ARP request and acknowledge packet attacks.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-InvalidPacketCheckSwitch.html">INVALIDPKTCHKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Invalid Packet Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to report an alarm when the number of invalid packets received by a BS exceeds a specified threshold. If this parameter is set to ENABLE, an alarm is reported when the number of invalid packets received by a BS exceeds the specified threshold. If this parameter is set to DISABLE, no alarm is reported when the number of invalid packets received by a BS exceeds the specified threshold. Invalid packets are those filtered according to the packet filter criteria.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-InvalidPacketAlarmThreshold.html">INVALIDPKTALMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Invalid Packet Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for the excessive flood packet alarm. When Invalid Packet Check Switch is set to ENABLE, the system measures the RX rate of invalid packets every 10 seconds. If the measured value exceeds this threshold, an excessive invalid packet alarm is reported. The alarm is cleared if the RX rate of invalid packets keeps below the threshold for 5 consecutive minutes.</p>
+<p>GUI Value Range: 20~200000</p>
+<p>Unit: packet/s</p>
+<p>Actual Value Range: 20~200000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-IPSecReplayCheckSwitch.html">IPSECREPLAYCHKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Replay Alarm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to report an IPSec packet replay alarm.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-IPSecReplayAlarmThd.html">IPSECREPLAYALMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPSec Replay Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IPSec anti-replay alarm threshold.</p>
+<p>GUI Value Range: 1~100000</p>
+<p>Unit: packet/s</p>
+<p>Actual Value Range: 1~100000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-RedirectDosChkSW.html">REDIRECTDOSCHKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IKEv2 Redirect DOS Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for checking IKEv2 redirection DOS attacks. When this parameter is set to ENABLE, ALM-25950 Base Station Being Attacked is reported when the number of IKEv2 redirections received by the base station exceeds the IKEv2 redirection DOS attack threshold in 300 consecutive seconds, with Specific Problem set to DOS Attack. After the number of IKEv2 redirections received by the base station exceeds the IKEv2 redirection DOS attack threshold, the base station does not respond to IKEv2 redirection packets. When this parameter is set to DISABLE, DOS attacks are not processed.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ENABLE(Enable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-MaxRedirects.html">MAXREDIRECTS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max Redirects Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the IKEv2 redirection DOS attack threshold. ALM-25950 Base Station Being Attacked is reported when the number of IKEv2 redirections received by the base station exceeds the IKEv2 redirection DOS attack threshold in 300 consecutive seconds, with Specific Problem set to DOS Attack. After the number of IKEv2 redirections received by the base station exceeds the IKEv2 redirection DOS attack threshold, the base station does not respond to IKEv2 redirection packets. This alarm is cleared when the number of IKEv2 redirections received by the base station is less than or equal to the IKEv2 redirection DOS attack threshold in 300 consecutive seconds.</p>
+<p>GUI Value Range: 1~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-NdSpoofCheckSwitch.html">NDSPOOFCHKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ND Spoofing Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to detect ND spoofing. If this parameter is set to ENABLE, an alarm is reported when ND spoofing occurs. If this parameter is set to DISABLE, no alarm is reported when ND spoofing occurs.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPGUARD-NdSpoofAlarmThreshold.html">NDSPOOFALMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ND Spoofing Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for reporting an ND spoofing alarm. When the number of ND spoofing times reaches the threshold, an alarm is reported. After ND spoofing detection is enabled, an ND spoofing alarm is reported if the number of ND update attempts exceeds the threshold within one minute. If any trusted MAC address exists, the update requests initiated by the trusted MAC address is not counted. This alarm is cleared when the IP address for which the alarm is generated does not receive any MAC address request within 1 minute to 2 minutes.</p>
+<p>GUI Value Range: 10~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 10~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_ipguard__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set policies for defense of IP firewall attacks with the parameters as follows: ARP Spoofing Check Switch: ENABLE, ARP Spoofing Alarm Threshold: 120, ARP Learning Strict Switch: ENABLE, Invalid Packet Check Switch: ENABLE, Invalid Packet Alarm Threshold: 2000, IPSec Replay Alarm Switch: ENABLE, IPSec Replay Alarm Threshold: 100, IKEv2 Redirect DOS Check Switch: ENABLE, Max Redirects Number: 5, ND Spoofing Check Switch: ENABLE, ND Spoofing Alarm Threshold: 10, run the following command: 
+SET IPGUARD: ARPSPOOFCHKSW=ENABLE, ARPSPOOFALMTHD=120, ARPLRNSTRICTSW=ENABLE, INVALIDPKTCHKSW=ENABLE, INVALIDPKTALMTHD=2000, IPSECREPLAYCHKSW=ENABLE, IPSECREPLAYALMTHD=100, REDIRECTDOSCHKSW=ENABLE, MAXREDIRECTS=5, NDSPOOFCHKSW=ENABLE, NDSPOOFALMTHD=10;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

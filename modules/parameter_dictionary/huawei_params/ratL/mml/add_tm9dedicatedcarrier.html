@@ -1,0 +1,133 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add TM9 Dedicated Carrier Config (ADD TM9DEDICATEDCARRIER)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_tm9dedicatedcarrier">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add TM9 Dedicated Carrier Config (ADD TM9DEDICATEDCARRIER)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_tm9dedicatedcarrier"></a><a name="add_tm9dedicatedcarrier"></a>
+
+
+<h1 class="topictitle1">Add TM9 Dedicated Carrier Config (ADD TM9DEDICATEDCARRIER)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="add_tm9dedicatedcarrier__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add the configuration of a TM9-dedicated carrier.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_tm9dedicatedcarrier__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If the CrsTransmissionStrategy parameter is set to CENTRAL_RB_ON, adding the MO will cause the cell to reset.</p>
+</li><li><p>Configurations related to dedicated carrier for TM9 do not take effect when the LMPT is used as the main control board.</p>
+</li><li><p>If the main control board is not an LMPT, a maximum of 16 downlink EARFCNs of TM9-dedicated carriers can be configured.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_tm9dedicatedcarrier__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tm9DedicatedCarrier-Tm9CcDlEarfcn.html">Tm9CcDlEarfcn</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TM9 CC Downlink EARFCN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink EARFCN of a TM9-dedicated carrier. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~70545,229376~229575</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~70545,229376~229575</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When there is a low TM9 penetration rate, the setting of TM9-dedicated carriers may result in a decrease in UE throughput due to UE capabilities of CA combinations. However, on these carriers, TM9 delivers performance that is not worse than TM4 performance.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tm9DedicatedCarrier-CrsTransmissionStrategy.html">CrsTransmissionStrategy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CRS Transmission Strategy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to transmit PDSCH CRSs across the entire channel bandwidth or using only central RBs on the TM9-dedicated carrier. If this parameter is set to ALL_RB_ON, the CRSs are transmitted across the entire channel bandwidth. If this parameter is set to CENTRAL_RB_ON, the CRSs are transmitted using only the six RBs in the center of the channel bandwidth. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: ALL_RB_ON(ALL_RB_ON), CENTRAL_RB_ON(CENTRAL_RB_ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ALL_RB_ON, CENTRAL_RB_ON</p>
+<p>MML Default Value: ALL_RB_ON(ALL_RB_ON)</p>
+<p>Recommended Value: ALL_RB_ON(ALL_RB_ON)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the CrsTransmissionStrategy parameter in a Tm9DedicatedCarrier MO is set to CENTRAL_RB_ON, the WorkMode parameter in the Tm9DedicatedCarrier MO must be set to TM9_DEDICATED_SCC.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: Setting this parameter to ALL_RB_ON helps prevent inaccurate RSRP measurements caused by UE incompatibility but causes a decrease in throughput gains. Setting this parameter to CENTRAL_RB_ON helps increase throughput gains but may cause inaccurate RSRP measurements due to UE incompatibility. The inaccurate RSRP measurements affect the handover success rate and service drop rate.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Tm9DedicatedCarrier-WorkMode.html">WorkMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Work Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the working mode of the TM9-dedicated carrier. When this parameter is set to TM9_DEDICATED_SCC, the TM9-dedicated carrier can be configured only as an SCC. When this parameter is set to TM9_DEDICATED_CC, the TM9-dedicated carrier can be configured as a PCC or an SCC. When this parameter is set to R10PLUS_DEDICATED_CC, the TM9-dedicated carrier can only be used by UEs complying with 3GPP Release 10 or later. If this parameter is set to NON_TM9_SCC, the TM9-dedicated carrier can be configured as an SCC for TM9-incapable UEs and as a PCC or SCC for TM9-capable UEs. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: TM9_DEDICATED_SCC(TM9_DEDICATED_SCC), TM9_DEDICATED_CC(TM9_DEDICATED_CC), R10PLUS_DEDICATED_CC(R10PLUS_DEDICATED_CC), NON_TM9_SCC(NON_TM9_SCC)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TM9_DEDICATED_SCC, TM9_DEDICATED_CC, R10PLUS_DEDICATED_CC, NON_TM9_SCC</p>
+<p>MML Default Value: TM9_DEDICATED_SCC(TM9_DEDICATED_SCC)</p>
+<p>Recommended Value: TM9_DEDICATED_SCC(TM9_DEDICATED_SCC)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the CrsTransmissionStrategy parameter in a Tm9DedicatedCarrier MO is set to CENTRAL_RB_ON, the WorkMode parameter in the Tm9DedicatedCarrier MO must be set to TM9_DEDICATED_SCC.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to TM9_DEDICATED_SCC, the TM9-dedicated carrier can be configured with one CRS port, reducing the CRS overhead and interference and yielding large throughput gains. When this parameter is set to TM9_DEDICATED_CC, the TM9-dedicated carrier can be configured as a PCC or SCC for TM9 UEs. In this case, the configuration of two CRS ports is recommended. This yields smaller UE throughput gains than the dedicated TM9 carrier configured as an SCC, but assures the handover success rate and the service drop rate. Setting this parameter to R10PLUS_DEDICATED_CC has no impact on network performance. When this parameter is set to NON_TM9_SCC, the proportion of traffic volume absorbed by the TM9-dedicated carrier increases. Therefore, the value NON_TM9_SCC is favourable to scenarios with a low penetration rate of TM9-capable UEs.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_tm9dedicatedcarrier__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add the interference configuration of Tm9DedicatedCarrier with the parameters as follows: TM9 CC Downlink EARFCN: 1800, run the following command:
++++    0        2017-11-23 09:41:11
+O&amp;M    #806354967
+%%ADD TM9DEDICATEDCARRIER: Tm9CcDlEarfcn=1800;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

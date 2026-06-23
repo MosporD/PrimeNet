@@ -1,0 +1,341 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify SRS Configuration (MOD SRSCFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_srscfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify SRS Configuration (MOD SRSCFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_srscfg"></a><a name="mod_srscfg"></a>
+
+
+<h1 class="topictitle1">Modify SRS Configuration (MOD SRSCFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_srscfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the SRS configuration.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_srscfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>The modifications on the SRS configuration of an active cell would result in the automatic reset of the cell.</p>
+</li><li><p>The TddSrsCfgMode parameter in the SRSCfg MO must be set to ACCESS_FIRST(Access First) or EXPERIENCE_FIRST(Experience First) for 1.4 MHz and 3 MHz LTE TDD cells. Otherwise, these cells cannot be activated.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_srscfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-SrsSubframeCfg.html">SrsSubframeCfg</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRS subframe configuration</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of SRS subframe configuration for the cell.</p>
+<p>The value SCn, where n is variable, represents configuration n. For example, the value SC0 indicates subframe configuration 0, and the value SC1 indicates subframe configuration 1. For an FDD cell, value SC15 is reserved; for a TDD cell, values SC14 and SC15 are both reserved. Reserved values are not used for configuration. For the relationship between the subframe configuration index and the cell-specific subframe cycle/offset, see 3GPP TS 36.211. In FDD mode, this parameter is always valid. In TDD mode, this parameter is valid only if TddSrsCfgMode is set to EXPERIENCE_FIRST. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: SC0(0), SC1(1), SC2(2), SC3(3), SC4(4), SC5(5), SC6(6), SC7(7), SC8(8), SC9(9), SC10(10), SC11(11), SC12(12), SC13(13), SC14(14)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SC0, SC1, SC2, SC3, SC4, SC5, SC6, SC7, SC8, SC9, SC10, SC11, SC12, SC13, SC14</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default. The default values are as follows:</p>
+<p>The value SC3(3) is recommended for FDD cells.</p>
+<p>The value SC0(0) is recommended for TDD cells.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The number of configured SRS subframes affects the uplink UE throughput and cell throughput. A larger number of SRS subframes results in a larger decrease in the uplink cell throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-AnSrsSimuTrans.html">AnSrsSimuTrans</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRS ACK/NACK simultaneous transmission</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the sounding reference signal (SRS) of a UE and the ACK/NACK or scheduling request (SR) on the PUCCH are allowed to use the same time resources for simultaneous transmission in the case of time domain conflict. This parameter does not take effect on eMTC UEs. In the case of time domain conflict, the SRS of eMTC UEs and the ACK/NACK or SR on the PUCCH are allowed to use the same time resources for simultaneous transmission.</p>
+<p>If this parameter is set to BOOLEAN_FALSE, simultaneous transmission is not allowed. In this situation, the UE discards the SRS and only transmits the ACK/NACK or SR on the PUCCH.</p>
+<p>If this parameter is set to BOOLEAN_TRUE, simultaneous transmission is allowed. In this situation, the UE transmits the truncated ACK/NACK or SR. For details, see 3GPP TS 36.211. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_TRUE(True)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: This parameter setting affects the format of ACK/NACK or SR on the PUCCH. If this parameter is set to BOOLEAN_TRUE, the ACK/NACK or SR on the PUCCH can be transmitted simultaneously with SRS. In this situation, the UE transmits the truncated ACK/NACK or SR. As a result, the ACK/NACK or SR demodulation performance deteriorates, possibly resulting in longer uplink delay and lower downlink throughput. If this parameter is set to BOOLEAN_FALSE, the UE does not transmit the truncated ACK/NACK or SR. In this situation, the UE discards the SRS and transmits only the ACK/NACK or SR on the PUCCH in the same TTI. As a result, the corresponding timer may expire and the UE may fail to access the network.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-SrsCfgInd.html">SrsCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRS Configuration Indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure sounding reference signal (SRS) resources for UEs in a cell. The value BOOLEAN_TRUE indicates that SRS resources are available in the cell and can be configured for UEs in the cell. The value BOOLEAN_FALSE indicates that no SRS resource is available in the cell, and therefore no UE in the cell is configured with SRS resources. This parameter does not take effect on: (1) FDD cell that is established on an LBBPc and uses four or more RX antennas. (2) FDD cell that is established on an LBBPc and uses extended cyclic prefix (CP) in the uplink. (3) TDD cell established on an LBBPc. If this parameter does not take effect on a cell but SRS resources are available in the cell, SRS resources can be configured for UEs in the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: BOOLEAN_FALSE(False), BOOLEAN_TRUE(True)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: BOOLEAN_FALSE, BOOLEAN_TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: BOOLEAN_TRUE(True)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to BOOLEAN_TRUE, SRS is supported, and higher performance gains are obtained in features that are dependent on SRS measurements, such as beamforming and uplink frequency selective scheduling. However, the uplink cell peak rate decreases due to SRS overheads. If this parameter is set to BOOLEAN_FALSE, no SRS resource is available in the cell, and no UE is configured with SRS resources, and therefore the optimum uplink cell peak rate can be obtained. However, lower performance gains are obtained in features depending on SRS measurements.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-TddSrsCfgMode.html">TddSrsCfgMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TDD SRS Configuration Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SRS configuration for LTE TDD. If this parameter is set to ACCESS_FIRST, the SRS configuration designed to preferentially guarantee the maximum number of UEs that can access a cell and BHCA is used. If this parameter is set to EXPERIENCE_FIRST, the SRS configuration designed to preferentially guarantee user experience (for example, beamforming performance) is used. If this parameter is set to EXPERIENCE_ENHANCED, downlink experience improves compared with that obtained when this parameter is set to ACCESS_FIRST. If this parameter is set to ACCESS_ENHANCED, more UEs can access the network compared with that obtained when this parameter is set to EXPERIENCE_ENHANCED. The values EXPERIENCE_ENHANCED and ACCESS_ENHANCED are not supported by the LBBPc. If this parameter is set to EXPERIENCE_ENHANCED or ACCESS_ENHANCED for a cell established on an LBBPc board, the value is automatically changed to ACCESS_FIRST when this parameter takes effect. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: ACCESS_FIRST(Access First), EXPERIENCE_FIRST(Experience First), EXPERIENCE_ENHANCED(Experience Enhanced), ACCESS_ENHANCED(Access Enhanced)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ACCESS_FIRST, EXPERIENCE_FIRST, EXPERIENCE_ENHANCED, ACCESS_ENHANCED</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ACCESS_ENHANCED(Access Enhanced)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The SriPeriodAdaptEnhancedOptSw option of the SriAlgoSwitch parameter in the CELLPUCCHALGO MO can be selected only if the FddTddInd parameter in the Cell MO is set to CELL_TDD, the PucchSwitch option of the PucchAlgoSwitch parameter in the CELLALGOSWITCH MO is selected, the TddSrsCfgMode parameter in the SRSCFG MO is set to ACCESS_ENHANCED, and the SriPeriodAdaptive parameter in the PUCCHCFG MO is set to QCIADAPTIVE or NOQCIADAPTIVE.</li><li>If the WTTxSRSIntrfAvoidanceSw option of the SrsCfgPolicySwitch parameter in the SRSCfg MO is selected, the TddSrsCfgMode parameter in the SRSCfg MO must be set to ACCESS_ENHANCED.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ACCESS_FIRST, a maximum number of UEs can access TDD cells, but the performance of features that are dependent on SRS measurements cannot be ensured.</p>
+<p>If this parameter is set to EXPERIENCE_FIRST, large uplink throughput of TDD cells and good beamforming performance in the downlink can be ensured.</p>
+<p>If this parameter is set to EXPERIENCE_ENHANCED, a maximum number of UEs (the same number as that in ACCESS_FIRST mode) can access TDD cells and performance of features that are dependent on SRS measurements can be ensured for all UEs when there are few UEs and for certain UEs if there are many UEs.</p>
+<p>If this parameter is set to ACCESS_ENHANCED, the number of UEs that can access TDD cells exceeds the specifications in EXPERIENCE_ENHANCED mode, and performance of features that are dependent on SRS measurements can be ensured for all UEs when there are few UEs and for certain UEs if there are many UEs. When there are many UEs, a large amount of PUCCH resources are used. As a result, PUSCH resources decrease and average uplink throughput in the cell may decrease.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-FddSrsCfgMode.html">FddSrsCfgMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">FDD SRS Configuration Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the allocation mode of sounding reference signal (SRS) resources in LTE FDD. This parameter must be set when the SrsCfgInd parameter is set to BOOLEAN_TRUE(True). If the FddSrsCfgMode parameter is set to DEFAULTMODE(Default Mode), SRS resource allocation is activated by default after a cell is established, and SRS resources are allocated to UEs that access the cell. If this parameter is set to ADAPTIVEMODE(Adaptive Mode), SRS resource allocation can be adaptively activated or deactivated based on the cell load. After this parameter is set to ADAPTIVEMODE(Adaptive Mode), settings of parameters SrsAlgoSwitch, SrsSubframeCfg, and UserSrsPeriod do not take effect. The parameter value ADAPTIVEMODE(Adaptive Mode) is recommended in heavy-traffic scenarios where there is a large number of UEs in the cell. The parameter value ADAPTIVEMODE(Adaptive Mode) does not apply to cells established on an LBBPc. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: DEFAULTMODE(Default Mode), ADAPTIVEMODE(Adaptive Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULTMODE, ADAPTIVEMODE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The parameter value ADAPTIVEMODE(Adaptive Mode) is recommended for common cells. The parameter value DEFAULTMODE(Default Mode) is recommended for SFN cells, CSPC cells, high-speed cells, and ultra-high-speed cells.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to DEFAULTMODE, higher performance gains are obtained in features that are dependent on SRS measurements. However, the peak uplink data rate in the cell decreases because of SRS overheads. If this parameter is set to ADAPTIVEMODE, then: (1) SRS resource allocation can be adaptively deactivated when there is a small number of UEs in the cell and the traffic volume is small. In this case, no SRS overheads are generated, and therefore uplink performance improves. (2) SRS resource allocation can be adaptively activated when there is a large number of UEs in the cell and the traffic volume is large. In this case, resources used for uplink timing are reduced, cell performance in the uplink and downlink improves, and the access success rate increases.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-SrsAlgoOptSwitch.html">SrsAlgoOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRS Algorithm Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable SRS algorithm optimization.</p>
+<p>SrsSubframeRecfgOptSwitch: Indicates whether to perform SRS subframe reconfiguration optimization. This option applies only to LTE FDD. If this option is selected, the SRS subframe reconfiguration path is optimized to avoid the configurations that may cause UE compatibility issues. If this option is deselected, the SRS subframe reconfiguration path is not optimized.</p>
+<p>UlVolteSrsFssSwitch: The function controlled by this option does not take effect. Non-service-specific uplink frequency selective scheduling takes effect no matter whether this option is selected or not. This option applies only to LTE FDD.</p>
+<p>GUI Value Range: SrsSubframeRecfgOptSwitch(SrsSubframeRecfgOptSwitch), UlVolteSrsFssSwitch(UlVolteSrsFssSwitch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SrsSubframeRecfgOptSwitch, UlVolteSrsFssSwitch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SrsSubframeRecfgOptSwitch:Off, UlVolteSrsFssSwitch:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: SrsSubframeRecfgOptSwitch: If this option is deselected, the SRS subframe reconfiguration path is not optimized. If SrsCfgInd is set to BOOLEAN_TRUE and FddSrsCfgMode is set to DEFAULTMODE for the FDD cell in FDD+TDD networking scenarios, UE compatibility issues may occur when UEs are handed over from a TDD cell to the FDD cell, causing handover failures. If this option is selected, the preceding UE compatibility issues are avoided. However, when the cell load is medium or high, the increase in the number of SRS subframes, that is, the increase in SRS overhead can cause uplink cell performance to deteriorate.</p>
+<p>UlVolteSrsFssSwitch: If this option is selected and the SrsCfgInd parameter is set to BOOLEAN_TRUE, SRS-measurement-based frequency selective scheduling takes effect for VoLTE services, and this decreases the uplink voice packet loss rate. If this option is deselected, uplink frequency selective scheduling is performed without differentiating between services, which has no impact on network performance.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-SrsCfgPolicySwitch.html">SrsCfgPolicySwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRS Configure Policy Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SRS configuration policy. This parameter applies only to LTE TDD.</p>
+<p>SRSPolicyforUL2LayersMIMO: Indicates the two-antenna-port SRS configuration policy if two antenna ports are configured for a UE in the uplink. If this option is deselected, the eNodeB preferentially allocates short-term SRSs (including single-antenna-port SRSs). If this option is selected, the eNodeB preferentially allocates two-antenna-port SRSs (including long-term SRSs).</p>
+<p>SrvBasedSRSAdjAlgo: Indicates whether to enable service-based SRS adjustment. If this option is selected, the eNodeB can adjust SRSs for UEs based on the identified UE services for SRS adjustment. If this option is deselected, the eNodeB does not identify UE services for SRS adjustment. This option applies only to LTE TDD.</p>
+<p>WTTxSRSIntrfAvoidanceSw: Indicates whether to enable SRS interference avoidance in WTTx scenarios. If this option is selected, the eNodeB uses resources at different positions for SRS transmission in WTTx cells. If this option is deselected, the eNodeB uses resources at the original positions for SRS transmission in WTTx cells. This option applies only to LTE TDD.</p>
+<p>GUI Value Range: SRSPolicyforUL2LayersMIMO(SRSPolicyforUL2LayersMIMO), SrvBasedSRSAdjAlgo(SrvBasedSRSAdjAlgo), WTTxSRSIntrfAvoidanceSw(WTTxSRSIntrfAvoidanceSw)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SRSPolicyforUL2LayersMIMO, SrvBasedSRSAdjAlgo, WTTxSRSIntrfAvoidanceSw</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Select the SRSPolicyforUL2LayersMIMO option if the uplink MIMO performance must be guaranteed. Deselect the SRSPolicyforUL2LayersMIMO option if the downlink beamforming performance must be guaranteed.</p>
+<p>Select the SrvBasedSRSAdjAlgo option for massive MIMO cells and deselect this option for other cells.</p>
+<p>In WTTx massive MIMO scenarios where SRS interference from neighboring cells is severe, it is recommended that the WTTxSRSIntrfAvoidanceSw option be selected. In other scenarios, it is recommended that the WTTxSRSIntrfAvoidanceSw option be deselected.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the WTTxSRSIntrfAvoidanceSw option of the SrsCfgPolicySwitch parameter in the SRSCfg MO is selected, the TddSrsCfgMode parameter in the SRSCfg MO must be set to ACCESS_ENHANCED.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: SRSPolicyforUL2LayersMIMO: If this option is selected, the eNodeB preferentially allocates two-antenna-port SRSs (including long-term SRSs), increasing the ratio of UEs with SRSs allocated to both antenna ports in the uplink and the uplink throughput. If this option is deselected, the eNodeB preferentially allocates short-term SRSs (including single-antenna-port SRSs), improving the downlink beamforming performance, which is dependent on SRSs.</p>
+<p>SrvBasedSRSAdjAlgo: If this option is selected, service-based SRS adjustment is enabled, which fully leverages SRS resources and improving the performance of UEs using heavy-traffic services. This increases the cell throughput, but leads to higher CPU usage. If this option is deselected, service-based SRS adjustment is disabled.</p>
+<p>WTTxSRSIntrfAvoidanceSw: If this option is selected, the eNodeB allocates resources at different positions to UEs for them to transmit SRSs for WTTx cells, improving the downlink spectral efficiency. If this option is deselected, the eNodeB allocates resources at the original positions to UEs for them transmit SRSs for WTTx cells. In this case, the downlink spectral efficiency in the cell cannot be improved.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-RsvResSrsPeriod1.html">RsvResSrsPeriod1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reserved Resource SRS Period 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SRS period for resources always reserved in the first half frame for inter-cell D-MIMO, DL CoMP, and UL CAMC. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 10ms(10ms), 20ms(20ms), 40ms(40ms), 5ms(5ms)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 10ms, 20ms, 40ms, 5ms</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10ms(10ms)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the SRSCfg MO, if RsvResSrsPeriod1 is set to 5ms, the value of RsvResSrsPeriod2 must be changed to 5ms; if RsvResSrsPeriod1 is changed from 5ms to another value, RsvResSrsPeriod2 must also be changed to a value other than 5ms.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 10ms(10ms), the SRS period for UEs with reserved resources is short, and user experience is good. However, the number of UEs supported for measurement is small. If this parameter is set to 40ms(40ms), the SRS period for UEs with reserved resources is long, and user experience is poor. However, the number of UEs supported for measurement is large. If this parameter is set to 20ms(20ms), the SRS period for UEs with reserved resources, user experience, and the number of UEs supported for measurement are in the middle. If this parameter is modified after resource reservation takes effect, the reserved resources are no longer available for UEs that use them before the parameter modification, and the SRS period for these resources is reconfigured.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-RsvResSrsPeriod2.html">RsvResSrsPeriod2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reserved Resource SRS Period 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SRS period for resources always reserved in the second half frame for inter-cell D-MIMO, DL CoMP, and UL CAMC. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 10ms(10ms), 20ms(20ms), 40ms(40ms), 5ms(5ms)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 10ms, 20ms, 40ms, 5ms</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20ms(20ms)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In the SRSCfg MO, if RsvResSrsPeriod1 is set to 5ms, the value of RsvResSrsPeriod2 must be changed to 5ms; if RsvResSrsPeriod1 is changed from 5ms to another value, RsvResSrsPeriod2 must also be changed to a value other than 5ms.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to 10ms(10ms), the SRS period for UEs with reserved resources is short, and user experience is good. However, the number of UEs supported for measurement is small. If this parameter is set to 40ms(40ms), the SRS period for UEs with reserved resources is long, and user experience is poor. However, the number of UEs supported for measurement is large. If this parameter is set to 20ms(20ms), the SRS period for UEs with reserved resources, user experience, and the number of UEs supported for measurement are in the middle. If this parameter is modified after resource reservation takes effect, the reserved resources are no longer available for UEs that use them before the parameter modification, and the SRS period for these resources is reconfigured.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-SrsResOptSwitch.html">SrsResOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRS Resource Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to optimize SRS resource allocation for 2R access enhancement. If this parameter is set to ON(On), quadruple code division can be used for SRS resource allocation to enhance 2R access. If this parameter is set to OFF(Off), quadruple code division cannot be used for SRS resource allocation to enhance 2R access. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Set this parameter to ON(On) only when all BBP boards are UBBPe or high-specification UBBPd boards. Set this parameter to OFF(Off) when an LBBPd or low-specification UBBPd board is installed in the BBU.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON(On), the eNodeB uses short SRS periods for more UEs in the cell, improving performance of beamforming UEs and downlink spectral efficiency of the cell. If this parameter is set to OFF(Off), the eNodeB uses short SRS periods for fewer UEs in the cell. In this case, the performance of beamforming UEs deteriorates and downlink spectral efficiency of the cell decreases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-SrsInterfAvoidOptSwitch.html">SrsInterfAvoidOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRS Interference Avoid Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates how SRS allocation is optimized to avoid interference based on the physical beam serving UEs. The default value OFF indicates that the optimization does not take effect. If this parameter is set to CLOCKWISE_COMB1, comb 1 SRS resources are preferentially allocated to UEs in the clockwise direction to the boundary beam, and comb 0 SRS resources are preferentially allocated to UEs in the counterclockwise direction to the boundary beam. If this parameter is set to ANTICLOCKWISE_COMB1, comb 0 SRS resources are preferentially allocated to UEs in the clockwise direction to the boundary beam, and comb 1 SRS resources are preferentially allocated to UEs in the counterclockwise direction to the boundary beam. A changed parameter value takes effect only for UEs that newly access the network or move from one side to the other side of the boundary beam. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(OFF), CLOCKWISE_COMB1(CLOCKWISE_COMB1), ANTICLOCKWISE_COMB1(ANTICLOCKWISE_COMB1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, CLOCKWISE_COMB1, ANTICLOCKWISE_COMB1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: It is recommended that this parameter be set to CLOCKWISE_COMB1 when multiple massive MIMO cells served by the same eNodeB interfere with each other, and to OFF in other scenarios. The value ANTICLOCKWISE_COMB1 is not recommended. This is because setting this parameter to ANTICLOCKWISE_COMB1 for one cell and to CLOCKWISE_COMB1 for another may lead to interference between these cells and produce negative gains if the settings do not match the interference pattern. Consider the interference pattern if you need to set this parameter to ANTICLOCKWISE_COMB1.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, SRS resource allocation is not optimized to avoid interference, and network performance is not affected. If this parameter is set to CLOCKWISE_COMB1 or ANTICLOCKWISE_COMB1, SRS resource allocation is optimized to avoid interference, reducing interference between SRSs of UEs in different massive MIMO cells. If this parameter is set to ANTICLOCKWISE_COMB1 for one cell and to CLOCKWISE_COMB1 for another and these settings do not match the interference pattern, interference may occur between these cells, producing negative gains. Consider the interference pattern if you need to set this parameter to ANTICLOCKWISE_COMB1.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SRSCfg-SrsResExpansionSwitch.html">SrsResExpansionSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRS Resource Expansion Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable SRS resource expansion. If this parameter is set to OFF, SRS resource expansion is disabled. If this parameter is set to SRS_RES_EXPANSION_MODE, SRS resource expansion is enabled. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: OFF(OFF), SRS_RES_EXPANSION_MODE(SRS_RES_EXPANSION_MODE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, SRS_RES_EXPANSION_MODE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: In scenarios where there is a large proportion of mobile UEs and a small proportion of UEs with large delay spreads: SRS_RES_EXPANSION_MODE;</p>
+<p>In other scenarios: OFF</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, the current SRS resource allocation mode is used, and network performance is not affected. If this parameter is set to SRS_RES_EXPANSION_MODE, the air interface resources used for transmitting SRS in a cell increase, and the downlink spectral efficiency of the cell increases.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_srscfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To modify the SRS configuration with the parameters as follows: Local cell ID: 0, SRS subframe configuration: SC12, run the following command:
+MOD SRSCFG: LocalCellId=0, SrsSubframeCfg=SC12;
+Example 2: To modify the SRS configuration with the parameters as follows: Local cell ID: 0, SRS ACK/NACK simultaneous transmission: BOOLEAN_TRUE, run the following command:
+MOD SRSCFG: LocalCellId=0, AnSrsSimuTrans=BOOLEAN_TRUE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

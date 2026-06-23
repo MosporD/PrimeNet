@@ -1,0 +1,267 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display IPv4 Route Table (DSP IPROUTE4)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_iproute4">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display IPv4 Route Table (DSP IPROUTE4)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_iproute4"></a><a name="dsp_iproute4"></a>
+
+
+<h1 class="topictitle1">Display IPv4 Route Table (DSP IPROUTE4)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="dsp_iproute4__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the information about all the static IPv4 routes.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_iproute4__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>The <a href="dsp_iproute4.html">DSP IPROUTE4</a> command output shows the MTU value that takes effect. If an MTU value has been configured using the <a href="add_iproute4.html">ADD IPROUTE4</a> command, the effective MTU value is the smaller one between the MTU value of the actual outbound interface and the configured MTU value. If an MTU value has not been configured using the <a href="add_iproute4.html">ADD IPROUTE4</a> command, the effective MTU value is the MTU value of the actual outbound interface.</p>
+</li><li><p>The MTU value of the direct route is the MTU value of the actual outbound interface.</p>
+</li><li><p>The IPv4 route index cannot be used to query a single route that does not take effect.</p>
+</li><li><p>When the port type of the queried IPv4 route is interface, the port ID indicates the interface number. That is, IPv4 packets are transmitted through this interface.</p>
+</li><li><p>When active and standby OM channels are used, the active and standby OM channels must be bound to routes. Only the route that is bound to the activated OM channel takes effect, and the route that is bound to the deactivated OM channel does not take effect. This command can be used to query the ineffective route bound to the OM channel.</p>
+</li><li><p>The queried values of Port Type and Port ID are invalid for the direct gateway route generated using an IP address synchronized from the USU side. The IP address can be queried using the <a href="dsp_tpmsyninfo.html">DSP TPMSYNINFO</a> command.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_iproute4__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPROUTE4-RTID.html">RTIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Route Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of an IPv4 route.</p>
+<p>GUI Value Range: 0~149</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~149</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPROUTE4-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>IPROUTE4</strong> MO, if <strong>VRFIDX</strong> is set to a value in the range of 1 to 7, <strong>PT</strong> in the referenced <strong>IPROUTE4</strong> MO cannot be set to PPP, MPGRP, TUNNEL, IPOA, and AIRLNK.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPROUTE4-DstIP.html">DSTIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination IP address of the IPv4 route.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>DSTIP</strong> in an <strong>IPROUTE4</strong> MO must be a valid IP address of class A, B, or C. It can be set to 0.0.0.0, but cannot be set to 0.x.x.x or 127.x.x.x.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If one of <strong>DSTMASK</strong> and <strong>DSTIP</strong> in an <strong>IPROUTE4</strong> MO is set to 0.0.0.0, the other must be set to 0.0.0.0, too.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The result of <strong>DSTIP</strong> AND <strong>DSTMASK</strong> in an <strong>IPROUTE4</strong> MO must be equal to <strong>DSTIP</strong>. That is, <strong>DSTIP</strong> must be set to a network IP address.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_iproute4__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query IPv4 Route Table with the parameters as follows: run the following command:
+DSP IPROUTE4:;
+The result is shown as follows:
++++    0        2018-04-12 15:27:31
+O&amp;M    #89
+%%DSP IPROUTE4:;%%
+RETCODE = 0  Operation succeeded.
+
+Display IPv4 Route Table
+------------------------
+Route Index  VRF Index  Destination IP  Mask           Route Type  Next Hop IP     Port Type  Port ID  Peer IP  Maximum Transmission Unit(byte)  Preference  Cabinet No.  Subrack No.  Slot No.  Actual Port Type  Actual Port No.  Route Protocol  Valid State
+
+0            0          192.168.101.0   255.255.255.0  Next Hop    192.168.100.1   Interface  0        NULL     1500                             60          0            0            6         Ethernet Port     0                Static Gateway  Valid      
+NULL         0          192.168.100.0   255.255.255.0  Next Hop    192.168.100.10  Interface  0        NULL     1500                             0           0            0            6         Ethernet Port     0                Gateway         Valid      
+(Number of results = 2)
+
+
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_iproute4__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Route Index</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the index of an IPv4 route.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>VRF Index</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Destination IP</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the destination IP address of the IPv4 route.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Mask</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the destination subnet mask of the IPv4 route.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Route Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of an IPv4 route. The value NEXTHOP indicates that IP packets transmitted through the route are forwarded to a specified next-hop IP address. The value IF indicates that IP packets transmitted through the route are forwarded to a specified outbound interface.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Next Hop IP</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the next-hop IP address.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of the port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Port ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the port ID of an IPv4 route.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Peer IP</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the peer IP address of an air interface link. Only UMPT/LMPT/UMDU boards for LTE support IP routes of the air interface link type.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Maximum Transmission Unit(byte)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the maximum transmission unit of a transmission link. The smaller value between this parameter value and the maximum transmission unit configured for interface corresponding to the routed interface prevails on the base station.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Preference</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the priority of the routing entry. A smaller parameter value indicates a higher priority.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Cabinet No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the cabinet number of the board to which an IPv4 route belongs.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Subrack No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the subrack number of the board to which an IPv4 route belongs.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Slot No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the slot number of the board to which an IPv4 route belongs.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Actual Port Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of the actual port.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Actual Port No.</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the number of the actual port. When the actual port type is Ethernet trunk, the actual port number indicates the port ID of the Ethernet trunk. When the actual port type is tunnel, the actual port number indicates the port ID of the backplane tunnel.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Route Protocol</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of the router entry of an IPv4 route. A static host route is a manually configured route with the subnet mask set to 255.255.255.255. A static gateway route is a manually configured route with the subnet mask not being 255.255.255.255. A direct host route is a dynamically generated IPv4 route with the subnet mask being 255.255.255.255. A direct gateway route is a dynamically generated IPv4 route with the subnet mask not being 255.255.255.255.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Valid State</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the validity state of an IPv4 route.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

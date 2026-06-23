@@ -1,0 +1,186 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellCsiRsParaCfg">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellCsiRsParaCfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellCsiRsParaCfg</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellCsiRsParaCfg"></a><a name="CellCsiRsParaCfg"></a>
+
+
+<h1 class="topictitle1">CellCsiRsParaCfg</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellCsiRsParaCfg.html"><strong>CellCsiRsParaCfg</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellCsiRsParaCfg MO consists of parameters related to channel state information (CSI) reference signal (RS) configuration.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>CellAlgoExtSwitch</strong>, <strong>SectorSplitCell</strong>, and <strong>SectorSplitGroup</strong> MOs:<ul><li>When <strong>CsiRsSwitch</strong> in a <strong>CellCsiRsParaCfg</strong> MO is set to FIXED_CFG or ADAPTIVE_CFG, TM9Switch or TM10Switch of <strong>EnhMIMOSwitch</strong>, FDDHomNetDlCompSwitch or FDDHetNetDlCompSwitch or Tm9JtSwitch of <strong>DlCompSwitch</strong>, SfnJtSwitch of <strong>SfnAlgoSwitch</strong>, or 4TxTM9MuMimoSwitch of <strong>EmimoSwitch</strong> in the associated <strong>CellAlgoSwitch</strong> MO must be selected, or Tm9FourLayerPairSwitch of <strong>WttxMuMimoSwitch</strong> in a <strong>CellAlgoExtSwitch</strong> MO must be selected, or JOINT_SCHEDULING_SWITCH of <strong>IntelligentBeamSchSwitch</strong> in <strong>SectorSplitGroup</strong> MO must be selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> and <strong>MultiRruCellFlag</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD and BOOLEAN_TRUE respectively and the <strong>CsiRsSwitch</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to FIXED_CFG or ADAPTIVE_CFG, the <strong>MultiRruCellMode</strong> parameter in the <strong>Cell</strong> MO must be set to CELL_COMBINATION, SFN, or MPRU_AGGREGATION.</li><li>When the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD and the <strong>MultiRruCellFlag</strong> parameter in the same MO is set to BOOLEAN_FALSE, if TM9Switch(TM9Switch) under the <strong>EnhMIMOSwitch</strong> parameter is selected in the <strong>CellAlgoSwitch</strong> MO, the <strong>CsiRsSwitch</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is not set to NOT_CFG, and the <strong>CsiRsPortNum</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to CSI_RS_PORT_8, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO must be set to 8T8R or 32T32R or 64T64R.</li><li>If the SfnJtSwitch option of the <strong>SfnAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected and the <strong>FddTddInd</strong>, <strong>MultiRruCellFlag</strong>, and <strong>MultiRruCellMode</strong> parameters in the <strong>Cell</strong> MO are set to CELL_TDD, BOOLEAN_TRUE, and MPRU_AGGREGATION respectively, the <strong>SfnUlSchSwitch</strong> and <strong>SfnDlSchSwitch</strong> parameters in the <strong>CellAlgoSwitch</strong> MO must be set to JOINT, and the <strong>CsiRsPortNum</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO must be set to CSI_RS_PORT_4.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>CellAlgoExtSwitch</strong>, <strong>SectorSplitGroup</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>When TM9Switch and TM10Switch of <strong>EnhMIMOSwitch</strong>, FDDHomNetDlCompSwitch and FDDHetNetDlCompSwitch and Tm9JtSwitch of <strong>DlCompSwitch</strong>, and SfnJtSwitch of <strong>SfnAlgoSwitch</strong>, and 4TxTM9MuMimoSwitch of <strong>EmimoSwitch</strong> in a <strong>CellAlgoSwitch</strong> MO, and Tm9FourLayerPairSwitch of <strong>WttxMuMimoSwitch</strong> in a <strong>CellAlgoExtSwitch</strong> MO, and JOINT_SCHEDULING_SWITCH of <strong>IntelligentBeamSchSwitch</strong> in <strong>SectorSplitGroup</strong> MO are deselected, <strong>CsiRsSwitch</strong> in the associated <strong>CellCsiRsParaCfg</strong> MO must be set to NOT_CFG.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>CellAlgoSwitch</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>The TM9HybridPrecodingSwitch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO can be selected only if the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the TM9Switch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO is set to 64T64R or 32T32R, no <strong>SectorSplitCell</strong> MO is configured for the <strong>Cell</strong> MO, and the <strong>CsiRsSwitch</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to FIXED_CFG or ADAPTIVE_CFG.</li></ul>
+</li><li>Relation with the <strong>CellDlschAlgo</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>The TM9HybridPrecodingSwitch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must not be selected if the <strong>CsiRsPortNum</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to CSI_RS_PORT_4 and the <strong>CsiRsPeriod</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to ms5, or the UnCfgCsiRsUEDeOrderSchSwitch option of the <strong>CsiRsSfSchStrSwitch</strong> parameter in the <strong>CellDlschAlgo</strong> MO is selected, or the UnCfgCsiRsUESchSwitch option of the <strong>CsiRsSfSchStrSwitch</strong> parameter in the <strong>CellDlschAlgo</strong> MO is selected.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>eUCellSectorEqm</strong>, <strong>SectorSplitGroup</strong>, <strong>SectorSplitCell</strong>, and <strong>Cell</strong> MOs:<ul><li>If the <strong>CsiRsAdaptBeamCount</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is not set to ADAPTIVE_BEAM_DISABLED and cell is active, the following requirements must be met:</li><li>The JOINT_SCHEDULING_SWITCH option of the <strong>IntelligentBeamSchSwitch</strong> parameter in the <strong>SectorSplitGroup</strong> MO corresponding to the <strong>Cell</strong> MO must be selected, the 8T4PortTM9EnhanceSwitch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be selected, or the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO under the <strong>Cell</strong> MO must be set to MASSIVE_MIMO_Ph2 and the number of <strong>SectorSplitCell</strong> MO instances under the <strong>SectorSplitGroup</strong> MO corresponding to the <strong>Cell</strong> MO is less than or equal to 2 and the TM9Switch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be selected.</li></ul>
+</li><li>Relation with the <strong>eUCellSectorEqm</strong>, <strong>SectorEqm</strong>, <strong>Cell</strong>, and <strong>CellAlgoSwitch</strong> MOs:<ul><li>When the <strong>FddTddInd</strong> parameter in the <strong>Cell</strong> MO is set to CELL_TDD, the <strong>MultiRruCellFlag</strong> parameter in the same MO is set to BOOLEAN_TRUE, and the <strong>MultiRruCellMode</strong> parameter in the <strong>Cell</strong> MO is set to CELL_COMBINATION or SFN, if TM9Switch(TM9Switch) under the <strong>EnhMIMOSwitch</strong> parameter is selected in the <strong>CellAlgoSwitch</strong> MO, the <strong>CsiRsSwitch</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is not set to NOT_CFG, and the <strong>CsiRsPortNum</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to 8, the <strong>TxRxMode</strong> parameter in the <strong>Cell</strong> MO must be set to 8T8R, and the number of TX antennas (whose TX Antenna Master/Slave Mode is set to MASTER) specified by the SECTOREQMANTENNA parameter in the <strong>SECTOREQM</strong> MO corresponding to the <strong>eUCellSectorEqm</strong> MO must not be 4.</li></ul>
+</li><li>Relation with the <strong>Cell</strong>, <strong>eUCellSectorEqm</strong>, and <strong>SectorSplitCell</strong> MOs:<ul><li>When the <strong>CellActiveState</strong> parameter in the <strong>Cell</strong> MO is set to CELL_ACTIVE, the <strong>CellBeamMode</strong> parameter in the <strong>eUCellSectorEqm</strong> MO associated with the <strong>Cell</strong> MO is set to MASSIVE_MIMO_Ph2, and there is only one <strong>SectorSplitCell</strong> MO in the <strong>SectorSplitGroup</strong> MO to which the <strong>Cell</strong> MO belongs, the <strong>CsiRsPeriod</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO associated with the <strong>Cell</strong> MO must not be set to ms80.</li></ul>
+</li><li>Relation with the <strong>CellEmtcAlgo</strong> MO:<ul><li>If the <strong>CsiRsSwitch</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to FIXED_CFG or ADAPTIVE_CFG, the MPDCCH_PDSCH_FREQ_HOPPING_SW option of the <strong>EmtcFreqHoppingSwitch</strong> parameter in the <strong>CellEmtcAlgo</strong> MO associated through LocalCellId must not be selected.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> and <strong>SpectrumCloud</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_FDD, the <strong>SpectrumCloudSwitch</strong> parameter in the <strong>SpectrumCloud</strong> MO under this <strong>Cell</strong> MO is set to LTE_NR_SPECTRUM_SHR, and the <strong>CsiRsSwitch</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO under this <strong>Cell</strong> MO is set to a value other than NOT_CFG, the <strong>CsiRsPeriod</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO cannot be set to ms5.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong>, <strong>Cell</strong>, and <strong>CellBf</strong> MOs:<ul><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the cell is activated, the TM9HybridPrecodingSwitch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, and the <strong>CsiRsPortNum</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to CSI_RS_PORT_8, then the <strong>PdschSplitBeamConfigIndex</strong> parameter in the <strong>CellBf</strong> MO must be set to CONFIG_INDEX4.</li><li>If the <strong>FddTddInd</strong> parameter in a <strong>Cell</strong> MO is set to CELL_TDD, the cell is activated, the TM9HybridPrecodingSwitch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, and the <strong>PdschSplitBeamConfigIndex</strong> parameter in the <strong>CellBf</strong> MO is set to CONFIG_INDEX4, then the <strong>CsiRsPortNum</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO must be set to CSI_RS_PORT_8.</li></ul>
+</li><li>Relation with the <strong>CellAlgoSwitch</strong> MO:<ul><li>If the <strong>CsiRsPortNum</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MO is set to CSI_RS_PORT_8 and the TM9HybridPrecodingSwitch option of the <strong>EnhMIMOSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is selected, the TM9SplitSdmaSwitch option of the <strong>MuBfAlgoSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>SectorSplitCell</strong> and <strong>SectorSplitGroup</strong> MOs:<ul><li>If the ENH_JOINT_SCHEDULING_SWITCH option of the <strong>IntelligentBeamSchSwitch</strong> parameter in a <strong>SectorSplitGroup</strong> MO is selected, the <strong>CsiRsAdaptBeamCount</strong> parameter in the <strong>CellCsiRsParaCfg</strong> MOs that correspond to all the <strong>SectorSplitCell</strong> MOs under this <strong>SectorSplitGroup</strong> MO must be set to CSI_RS_BEAM_6, CSI_RS_BEAM_7, CSI_RS_BEAM_8, CSI_RS_BEAM_9, CSI_RS_BEAM_10, or ADAPTIVE_BEAM_DISABLED.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellCsiRsParaCfg__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellCsiRsParaCfg__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellCsiRsParaCfg__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_cellcsirsparacfg.html">DSP CELLCSIRSPARACFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query whether a CSI-RS is sent.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellcsirsparacfg.html">LST CELLCSIRSPARACFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query parameters related to CSI-RS configuration in the cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellcsirsparacfg.html">MOD CELLCSIRSPARACFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to configure CSI-RS in a cell.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellCsiRsParaCfg__tab2">Table 2</a> and <a href="#CellCsiRsParaCfg__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellCsiRsParaCfg__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellCsiRsParaCfg__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsSwitch.html">CSI-RS Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to configure CSI-RSs for UEs. If this parameter is set to NOT_CFG(Not configure), the eNodeB does not configure CSI-RSs for UEs. If this parameter is set to FIXED_CFG(Fixed configure), the eNodeB configures CSI-RSs for UEs that support CSI-RSs. If this parameter is set to ADAPTIVE_CFG(ADAPTIVE_CFG), the eNodeB determines whether to configure CSI-RSs for UEs that support CSI-RSs based on the proportion of TM9 UEs. When SfnLoadBasedAdptSwitch is deselected in a TDD cell with adaptive SFN enabled, neither FIXED_CFG nor ADAPTIVE_CFG takes effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsPeriod.html">CSI-RS Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the channel state information (CSI) reference signal (RS) measurement period. This parameter does not take effect if the FddTddInd parameter in the Cell MO is set to CELL_TDD, the TM9HybridPrecodingSwitch option of the EnhMIMOSwitch parameter in the CellAlgoSwitch MO is selected, and the CsiRsPortNum parameter in the CellCsiRsParaCfg MO is set to CSI_RS_PORT_8. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsConfigUserNumTh.html">CSI-RS Config User Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold, which is the number of RRC_CONNECTED UEs supporting CSI-RSs, for determining a change from the CSI-RS unconfigured state to the CSI-RS configured state when adaptive CSI-RS configuration is used. The number must be equal to or larger than this threshold for determining a change from the CSI-RS unconfigured state to the CSI-RS configured state. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsUnconfigUserNumTh.html">CSI-RS Unconfig User Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold, which is the number of RRC_CONNECTED UEs supporting CSI-RSs, for determining a change from the CSI-RS configured state to the CSI-RS unconfigured state when adaptive CSI-RS configuration is adopted. The number must be smaller than this threshold for determining a change from the CSI-RS configured state to the CSI-RS unconfigured state. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsConfigUserRatioTh.html">CSI-RS Config User Ratio Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold, which is the proportion of RRC_CONNECTED UEs supporting CSI-RSs, for determining a change from the CSI-RS unconfigured state to the CSI-RS configured state when adaptive CSI-RS configuration is adopted. The proportion must be equal to or larger than this threshold for determining a change from the CSI-RS unconfigured state to the CSI-RS configured state. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsUnconfigUserRatioTh.html">CSI-RS Unconfig User Ratio Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold, which is the proportion of RRC_CONNECTED UEs supporting CSI-RSs, for determining a change from the CSI-RS configured state to the CSI-RS unconfigured state when adaptive CSI-RS configuration is adopted. The proportion must be equal to or smaller than this threshold for determining a change from the CSI-RS configured state to the CSI-RS unconfigured state. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsSetJudgeHysTimer.html">CSI-RS Set Judge Hysteresis Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to trigger the hysteresis timer for a switch to the CSI-RS unconfigured state for UEs in the CSI-RS state when adaptive CSI-RS configuration is adopted. The timer is triggered when a UE enters the CSI-RS configured state and the decision mechanism for a switch to the CSI-RS unconfigured state is triggered after the timer expires. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsSetJudgeTimer.html">CSI-RS Set Judge Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the timer for determining a switch between the CSI-RS unconfigured state and the CSI-RS configured state when adaptive CSI-RS configuration is adopted. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsPortNum.html">CsiRs Port Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of CSI-RS ports. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsAdaptBeamCount.html">CSI-RS Adaptive Beam Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of CSI-RS beams during CSI-RS beam adaptation. If this parameter is set to ADAPTIVE_BEAM_DISABLED, CSI-RS beam adaptation is disabled. If this parameter is set to a value other than ADAPTIVE_BEAM_DISABLED, the number in the value indicates the maximum number of CSI-RS beams that can be configured during CSI-RS beam adaptation. For example, if this parameter is set to CSI_RS_BEAM_5, the maximum number of CSI-RS beams that can be configured during CSI-RS beam adaptation is 5. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="CellCsiRsParaCfg__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="CellCsiRsParaCfg__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/CellCsiRsParaCfg-CsiRsState.html">CsiRs State</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates whether the CSI-RS is configured. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

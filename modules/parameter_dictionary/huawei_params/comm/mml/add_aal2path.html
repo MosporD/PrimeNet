@@ -1,0 +1,529 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add AAL2 Path (ADD AAL2PATH)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_aal2path">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add AAL2 Path (ADD AAL2PATH)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_aal2path"></a><a name="add_aal2path"></a>
+
+
+<h1 class="topictitle1">Add AAL2 Path (ADD AAL2PATH)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS5900, BTS5900 WCDMA</p>
+
+<div class="mmlfunc"><a name="add_aal2path__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an AAL2 path.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_aal2path__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,NodeB]Before adding an AAL2 path, ensure that the ATM link (such as an IMA group or a UNI link) used to carry the AAL2 path and the associated AAL2 node have been configured.</p>
+</li><li><p>[Co-MPT,NodeB]When configuring logical resources, the BS checks the bandwidth according to the following rules:</p>
+<p>- Bandwidth configuration rule 1: If A is the bandwidth of the bearer physical port and an AAL2 path does not join a transmission resource group, the total bandwidth of the remote maintenance channels and SAAL links carried on the physical port must be lower than or equal to A and the maximum bandwidth of AAL2 paths or treelink PVCs carried on the port must be lower than or equal to A. The bandwidth of the remote maintenance channel or an SAAL link is determined by the type of carried service. The bandwidth for VBR services is calculated based on the SCR. The bandwidth for CBR or UBR services is calculated based on the PCR. The bandwidth for UBR+ services is calculated based on the MCR. The bandwidth of an AAL2 path or a treelink PVC is calculated based on the PCR.</p>
+<p>- Bandwidth configuration rule 2: If an AAL2 path has joined a transmission resource group (that is, a transmission resource group exists at the bearer physical port) and B is the bandwidth of the physical port, the total bandwidth of the remote maintenance channels and SAAL links carried on the physical port but not added to any transmission resource group must be lower than or equal to B. In addition, the maximum bandwidth of treelink PVCs carried on the port but not added to any transmission resource group must be lower than or equal to B. If C is the TX bandwidth of the transmission resource group, the total bandwidth of the remote maintenance channels and SAAL links that join the transmission resource group must be lower than or equal to C, and the maximum bandwidth of the AAL2 paths or treelink PVCs that join the transmission resource group must be lower than or equal to C. In addition, the total TX bandwidth or RX bandwidth of all the transmission resource groups carried on the physical port must be lower than or equal to B. The bandwidth of the remote maintenance channel or an SAAL link is determined by the type of carried service. The bandwidth for VBR services is calculated based on the SCR. The bandwidth for CBR or UBR services is calculated based on the PCR. The bandwidth for UBR+ services is calculated based on the MCR. The bandwidth of an AAL2 path or a treelink PVC is calculated based on the PCR. </p>
+<p>Method of calculating the physical bandwidth (A) of the transmission interface: </p>
+<p>1. E1 mode (unit: Mbit/s): </p>
+<p>(1) IMA group: </p>
+<p>When timeslot 16 is not used: then A = (1.92 x 2048/2049 x (TX frame length - 1)/TX frame length) x Number of IMA links.</p>
+<p>When timeslot 16 is used: then A = (1.984 x 2048/2049 x (TX frame length - 1)/TX frame length) x Number of IMA links.</p>
+<p>(2) UNI link: </p>
+<p>When timeslot 16 is not used: then A = 1.92.</p>
+<p>When timeslot 16 is used: then A = 1.984.</p>
+<p>(3) Fractional ATM: A = 0.064 x Number of occupied timeslots.</p>
+<p>2. T1 mode (unit: Mbit/s): </p>
+<p>(1) IMA group: A = (1.536 x 2048/2049 x (TX frame length - 1)/TX frame length) x Number of IMA links</p>
+<p>(2) UNI link: then A = 1.536. </p>
+<p>(3) Fractional ATM: A = 0.064 x Number of occupied timeslots.</p>
+</li><li><p>[Co-MPT,NodeB]The permanent virtual circuit (PVC) that carries the AAL2 path must be different from those that exist on the bearer physical port of the AAL2 path.</p>
+</li><li><p>[Co-MPT,NodeB]All the AAL2 paths added on the physical port must join the transmission resource groups that already exist, or none of these AAL2 paths join the transmission resource groups.</p>
+</li><li><p>[Co-MPT,NodeB]An AAL2 path can only join an existing transmission resource group.</p>
+</li><li><p>[Co-MPT,NodeB]A maximum of 248 micro paths can be configured on an AAL2 path.</p>
+</li><li><p>[Co-MPT,NodeB]When a lower-level base station is connected to the RNC through a hub base station, both the AAL2 paths from the hub base station to the RNC and to the lower-level base station are added to transmission resource groups or neither of them is added to a resource group. If both AAL2 paths are added to transmission resource groups, ensure that they are added to transmission resource groups with the same ID. Otherwise, the lower-level base station cannot establish services.</p>
+</li><li><p>[Co-MPT,NodeB]The sum of the following numbers cannot exceed 200: (1) Twice the number of the treelink PVCs configured on this board (2) Total number of the following objects configured on this board: OMCH in which the Bearer Type parameter is set to ATM(ATM), AAL2PATH, and SAALLNK.</p>
+</li><li><p>[Co-MPT,NodeB]System specifications: If the WMPT/UMPT is the main control board, a maximum of 64 AAL2 paths can be configured. If the UMDU is the main control board, a maximum of 32 AAL2 paths can be configured.</p>
+</li><li><p>[Co-MPT,NodeB]Board specifications: A maximum of 32 AAL2 paths can be configured on a WMPT/UMPTa/UMPTb/UMDU/UTRP (subboard type: UAEC).</p>
+</li><li><p>[Co-MPT,NodeB]A maximum of 16 AAL2 paths can be configured on a physical port or for a transmission resource group.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_aal2path__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-NT.html">NT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Node Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of an AAL2 path. If the local end node is selected, the AAL2 path is used by local services. If the switching node is selected, the AAL2 path is used to connect to the controller through the hub BS. If the adjacent node is selected, the AAL2 path is used to connect to the lower-level BS through the hub BS.</p>
+<p>GUI Value Range: LOCAL(End Node), HUB(Switching Node), ADJNODE(Adjacent Node)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LOCAL, HUB, ADJNODE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-ANI.html">ANI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Adjacent Node ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the adjacent node ID of an AAL2 path.</p>
+<p>GUI Value Range: 0~31</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~31</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-PATHID.html">PATHID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Path ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of an AAL2 path.</p>
+<p>GUI Value Range: 1~4294967295</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4294967295</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-CN.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where an AAL2 path is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-SRN.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where an AAL2 path is located.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-SN.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where an AAL2 path is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where an AAL2 path is established.</p>
+<p>GUI Value Range: E1_COVERBOARD(E1 Cover Board), UNCHANNELLED_COVERBOARD(Unchannelled Cover Board), BASE_BOARD(Base Board), BACK_BOARD(Back Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E1_COVERBOARD, UNCHANNELLED_COVERBOARD, BASE_BOARD, BACK_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>SN</strong> is within the range from 0 to 5, this parameter can be set to UNCHANNELLED_COVERBOARD or E1_COVERBOARD.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD or BACK_BOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-PT.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearer Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of port on which an AAL2 path is carried.</p>
+<p>GUI Value Range: STM1(STM1), IMA(IMA Group), UNI(UNI Link), FRAATM(FRAATM Link)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: STM1, IMA, UNI, FRAATM</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If SBT is set to E1_COVERBOARD or BASE_BOARD, you are advised to set PT to IMA.</p>
+<p>If SBT is set to UNCHANNELLED_COVERBOARD, you are advised to set PT to STM1.</p>
+<p>If SBT is set to BACK_BOARD, you are advised to set PT to UNI.</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>SN</strong> is within the range from 0 to 5 and <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, this parameter must be set to STM1.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SN</strong> is within the range from 0 to 5 and <strong>SBT</strong> is set to E1_COVERBOARD, this parameter can be set to IMA, UNI, or FRAATM.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SN</strong> is set to 6 or 7 and <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to IMA, UNI, or FRAATM.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SN</strong> is set to 6 or 7 and <strong>SBT</strong> is set to BACK_BOARD, this parameter can be set to UNI or FRAATM.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-PN.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearer Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the port on which an AAL2 path is carried.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In a <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to E1_COVERBOARD, the value range of this parameter is from 0 to 7.</li><li>In a <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to 0 or 1.</li><li>In a <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to UNI or FRAATM, the value range of this parameter is from 0 to 3.</li><li>In a <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to E1_COVERBOARD and <strong>PT</strong> is set to IMA, the value range of this parameter is from 0 to 3.</li><li>In a <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BACK_BOARD, the value range of this parameter is from 0 to 3.</li><li>In a <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, this parameter must be set to 0.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-JNVCG.html">JNRSCGRP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Join Transmission Resource Group</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether an AAL2 path joins a transmission resource group.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-VCGID.html">RSCGRPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the transmission resource group to which an AAL2 path is added.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-VPI.html">VPI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VPI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the virtual path identifier (VPI) of an AAL2 path.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-VCI.html">VCI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the virtual channel identifier (VCI) of an AAL2 path.</p>
+<p>GUI Value Range: 32~511</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 32~511</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-RateUnit.html">RU</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rate Unit</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the unit of the peak cell rate (PCR), minimum cell rate (MCR), sustainable cell rate (SCR), and receive cell rate (RCR). 1 cell/s is equal to 0.424 kbit/s. If the rate is converted from cell/s to kbit/s, the result value must be rounded down to the nearest integer. For example, 73 cell/s is converted to 30 kbit/s.</p>
+<p>GUI Value Range: KBPS(kbit/s), CELL/S(cell/s)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: KBPS, CELL/S</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-ST.html">ST</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearer Service Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the service carried on an AAL2 path. From the perspective of flow control, services carried by an AAL2 path are classified into five categories: the constant bit rate (CBR) service, real-time variable bit rate (RTVBR) service, non-real-time variable bit rate (NRTVBR) service, unspecified bit rate plus (UBR+) service, and unspecified bit rate (UBR) service.</p>
+<p>GUI Value Range: CBR(CBR), RTVBR(RTVBR), NRTVBR(NRTVBR), UBR+(UBR+), UBR(UBR)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CBR, RTVBR, NRTVBR, UBR+, UBR</p>
+<p>MML Default Value: RTVBR(RTVBR)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-PCR.html">PCR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peak Cell Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peak cell rate (PCR) of an AAL2 path, which is the maximum cell burst rate supported by the AAL2 path. The value of this parameter is subject to the actual network. Setting the parameter to an improper value affects the service quality.</p>
+<p>GUI Value Range: 30~49529</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 30~49529</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>ST</strong> and <strong>RU</strong> are set to UBR+ and KBPS, respectively, <strong>MCR</strong> must be less than <strong>PCR</strong>.</li><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>ST</strong> is set to UBR+ and <strong>RU</strong> is set to CELL/S, <strong>MCR</strong> must be less than <strong>PCR</strong> after the rate unit is changed to kbit/s and both rates are rounded down.</li><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR and <strong>RU</strong> is set to KBPS, <strong>SCR</strong> must be less than <strong>PCR</strong>.</li><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR and <strong>RU</strong> is set to CELL/S, <strong>SCR</strong> must be less than <strong>PCR</strong> after the rate unit is changed to kbit/s and both rates are rounded down.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, <strong>RU</strong> is set to KBPS, and <strong>ST</strong> is set to RTVBR, NRTVBR, or UBR+, the value range of this parameter is from 31 to 15800.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, <strong>RU</strong> is set to KBPS, and <strong>ST</strong> is set to CBR or UBR, the value range of this parameter is from 30 to 15800.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, <strong>RU</strong> is set to CELL/S, and <strong>ST</strong> is set to RTVBR, NRTVBR, or UBR+, the value range of this parameter is from 74 to 37265.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, <strong>RU</strong> is set to CELL/S, and <strong>ST</strong> is set to CBR or UBR, the value range of this parameter is from 71 to 37265.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, <strong>RU</strong> is set to KBPS, and <strong>ST</strong> is set to RTVBR, NRTVBR, or UBR+, the value range of this parameter is from 31 to 21000.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, <strong>RU</strong> is set to KBPS, and <strong>ST</strong> is set to CBR or UBR, the value range of this parameter is from 30 to 21000.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, <strong>RU</strong> is set to CELL/S, and <strong>ST</strong> is set to RTVBR, NRTVBR, or UBR+, the value range of this parameter is from 74 to 49529.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, <strong>RU</strong> is set to CELL/S, and <strong>ST</strong> is set to CBR or UBR, the value range of this parameter is from 71 to 49529.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-SCR.html">SCR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sustain Cell Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the Sustainable Cell Rate (SCR) of the AAL2 path. The value of this parameter is subject to the actual network. Setting the parameter to an improper value affects the service quality.</p>
+<p>The SCR value determines the average rate at which cells are sent over a Variable Bit Rate (VBR) connection.</p>
+<p>GUI Value Range: 30~49526</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 30~49526</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR and <strong>RU</strong> is set to KBPS, <strong>SCR</strong> must be less than <strong>PCR</strong>.</li><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>ST</strong> is set to RTVBR or NRTVBR and <strong>RU</strong> is set to CELL/S, <strong>SCR</strong> must be less than <strong>PCR</strong> after the rate unit is changed to kbit/s and both rates are rounded down.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, <strong>RU</strong> is set to KBPS, and <strong>ST</strong> is set to RTVBR or NRTVBR, the value range of this parameter is from 30 to 15799.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, <strong>RU</strong> is set to CELL/S, and <strong>ST</strong> is set to RTVBR or NRTVBR, the value range of this parameter is from 71 to 37262.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, <strong>RU</strong> is set to KBPS, and <strong>ST</strong> is set to RTVBR or NRTVBR, the value range of this parameter is from 30 to 20999.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, <strong>RU</strong> is set to CELL/S, and <strong>ST</strong> is set to RTVBR or NRTVBR, the value range of this parameter is from 71 to 49526.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-MCR.html">MCR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Min Cell Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the minimum cell rate (MCR) of an AAL2 path. The value of this parameter is subject to the actual network. Setting the parameter to an improper value affects the service quality. The MCR is the minimum cell transmission rate acceptable by the user.</p>
+<p>GUI Value Range: 30~49526</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 30~49526</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>ST</strong> and <strong>RU</strong> are set to UBR+ and KBPS, respectively, <strong>MCR</strong> must be less than <strong>PCR</strong>.</li><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>ST</strong> is set to UBR+ and <strong>RU</strong> is set to CELL/S, <strong>MCR</strong> must be less than <strong>PCR</strong> after the rate unit is changed to kbit/s and both rates are rounded down.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, <strong>RU</strong> is set to KBPS, and <strong>ST</strong> is set to UBR+, the value range of this parameter is from 30 to 15799.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, <strong>RU</strong> is set to CELL/S, and <strong>ST</strong> is set to UBR+, the value range of this parameter is from 71 to 37262.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, <strong>RU</strong> is set to KBPS, and <strong>ST</strong> is set to UBR+, the value range of this parameter is from 30 to 20999.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD, <strong>RU</strong> is set to CELL/S, and <strong>ST</strong> is set to UBR+, the value range of this parameter is from 71 to 49526.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-MBS.html">MBS</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max Burst Size</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum burst size (MBS). The value of this parameter is subject to the actual network. Setting the parameter to an improper value affects the service quality.</p>
+<p>GUI Value Range: 3~10000</p>
+<p>Unit: cell</p>
+<p>Actual Value Range: 3~10000</p>
+<p>MML Default Value: 1000</p>
+<p>Recommended Value: 1000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-RCR.html">RCR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Receive Cell Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the rate at which cells are received. This parameter must be consistent with the TX bandwidth configured on the controller. Otherwise, the RX bandwidth in the flow control algorithm will be inaccurate, affecting flow control.</p>
+<p>GUI Value Range: 30~129717</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 30~129717</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB]In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, and <strong>RU</strong> is set to KBPS, the value range of this parameter is from 30 to 15800.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, BACK_BOARD, or E1_COVERBOARD, and <strong>RU</strong> is set to CELL/S, the value range of this parameter is from 71 to 37265.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD and <strong>RU</strong> is set to KBPS, the value range of this parameter is from 30 to 55000.</li><li>In an <strong>AAL2PATH</strong> MO, if <strong>SBT</strong> is set to UNCHANNELLED_COVERBOARD and <strong>RU</strong> is set to CELL/S, the value range of this parameter is from 71 to 129717.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-CDVT.html">CDVT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Delay Variation Tolerance</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cell delay variation tolerance. The value of this parameter is subject to the actual network. Setting the parameter to an improper value affects the service quality.</p>
+<p>GUI Value Range: 1024~13300000</p>
+<p>Unit: 0.1microsecond</p>
+<p>Actual Value Range: 102.4~1330000, step: 0.1</p>
+<p>MML Default Value: 10240</p>
+<p>Recommended Value: 10240</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/AAL2PATH-UserLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the user-defined information about an AAL2 path.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: U</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_aal2path__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an AAL2 path with the parameters as follows: Node Type: LOCAL, Path ID: 1, Cabinet No.: 0, Subrack No.: 0, Slot No.: 6, Subboard Type: BASE_BOARD, Bearer Port Type: IMA, Bearer Port No.: 0, Join Transmission Resource Group: ENABLE, Transmission Resource Group ID: 0, VPI: 1, VCI: 32, Rate Unit: KBPS, Bearer Service Type: RTVBR, Peak Cell Rate: 31, Sustain Cell Rate: 30, Receive Cell Rate: 30, run the following command:
+ADD AAL2PATH: NT=LOCAL, PATHID=1, CN=0, SRN=0, SN=6, SBT=BASE_BOARD, PT=IMA, PN=0, JNRSCGRP=ENABLE, RSCGRPID=0, VPI=1, VCI=32, RU=KBPS, ST=RTVBR, PCR=31, SCR=30, RCR=30;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

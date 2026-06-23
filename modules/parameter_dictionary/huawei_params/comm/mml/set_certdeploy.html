@@ -1,0 +1,151 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Set Certification Deploy Position (SET CERTDEPLOY)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="set_certdeploy">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Set Certification Deploy Position (SET CERTDEPLOY)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="set_certdeploy"></a><a name="set_certdeploy"></a>
+
+
+<h1 class="topictitle1">Set Certification Deploy Position (SET CERTDEPLOY)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="set_certdeploy__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to set where a certificate is configured.</p>
+</div></div>
+
+<div class="mmlnote"><a name="set_certdeploy__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>All certificate-related commands take effect only on the board specified by this command. When you change the transport board or run this command to deploy a certificate on a board that is not configured with a specified certificate file, an alarm will be reported. Under this circumstance, you need to remove the configuration of the certificate files in the system and apply for a new certificate.</p>
+</li><li><p>When there is an HA group, please ensure the board specified by this command has been configured.</p>
+</li><li><p>If the position where a certificate is configured changes, you must reset the base station to validate the change.</p>
+</li><li><p>This operation may disable certificates, and therefore interrupt ongoing services or disconnect OM channels. You are advised to run the <a href="cfm_cb.html">CFM CB</a> command to enable configuration data rollback.</p>
+</li><li><p>Except for multi-interface IPsec scenarios, the board on which a certificate is deployed must be the same as the board that is bound to the IPsec policy group. In multi-interface IPsec scenarios, multiple boards can be bound to IPsec policy groups and use the same certificate.</p>
+</li><li><p>[Co-MPT,eGBTS]The GTMUb does not support this function.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="set_certdeploy__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CERTDEPLOY-DeployType.html">DEPLOYTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Certification Deploy Position Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the deployment position of a digital certificate. If this parameter is set to DEFAULT, the certificate is configured on the main control board. If this parameter is set to SPECIFIC, the certificate is configured on the board in the specified slot. If this parameter is set to NULL, no certificate is configured on the BS.</p>
+<p>GUI Value Range: DEFAULT(Default), SPECIFIC(Specific), NULL(NULL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DEFAULT, SPECIFIC, NULL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CERTDEPLOY-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where a board is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CERTDEPLOY</strong> MO, this parameter is valid only when <strong>DEPLOYTYPE</strong> is set to SPECIFIC.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CERTDEPLOY-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where a board is located.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CERTDEPLOY</strong> MO, this parameter is valid only when <strong>DEPLOYTYPE</strong> is set to SPECIFIC.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/CERTDEPLOY-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where a board is located.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>CERTDEPLOY</strong> MO, this parameter is valid only when <strong>DEPLOYTYPE</strong> is set to SPECIFIC.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="set_certdeploy__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To set certification deployment position with the parameters as follows: Certification Deploy Position Type: SPECIFIC, Cabinet No.: 0, Subrack No.: 0, Slot No.: 6, run the following command: 
+SET CERTDEPLOY: DEPLOYTYPE=SPECIFIC, CN=0, SRN=0, SN=6;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

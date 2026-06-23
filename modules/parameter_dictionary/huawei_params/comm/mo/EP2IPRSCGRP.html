@@ -1,0 +1,134 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="EP2IPRSCGRP">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="EP2IPRSCGRP">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>EP2IPRSCGRP</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="EP2IPRSCGRP"></a><a name="EP2IPRSCGRP"></a>
+
+
+<h1 class="topictitle1">EP2IPRSCGRP</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="EP2IPRSCGRP.html"><strong>EP2IPRSCGRP</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The EP2IPRSCGRP MO is used to configure the mapping between end points and IP transmission resource groups. Based on the mapping, data flows are assigned to corresponding IP transmission resource groups.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>IPRSCGRP</strong> MO to which an <strong>EP2IPRSCGRP</strong> MO depends must exist and <strong>RSCGRPNO</strong> in the <strong>IPRSCGRP</strong> MO cannot be set to AUTOPORT or DEFAULTPORT.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>EP2IPRSCGRP</strong> MOs that reference an <strong>EPGROUP</strong> or <strong>USERPLANEPEER</strong> MO cannot correspond to different IP transmission resource groups on the same physical port.</li></ul>
+</li><li>Relation with the <strong>EP2IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Two <strong>EP2IPRSCGRP</strong> MOs with the same combination of <strong>MT</strong>, <strong>ENDPOINTID</strong>, and <strong>IPRSCGRPID</strong> cannot coexist.</li></ul>
+</li><li>Relation with the <strong>USERPLANEPEER</strong> and <strong>IPRSCGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>EP2IPRSCGRP</strong> MO cannot be used to map the <strong>USERPLANEPEER</strong> MO of the IPv6 type and the <strong>AUTOCFGFLAG</strong> which is MANUAL_CREATED to the <strong>IPRSCGRP</strong> MO with <strong>PT</strong> set to PPP, MPGRP or TUNNEL.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>EP2IPRSCGRP</strong> MO cannot be used to map the <strong>USERPLANEPEER</strong> MO of the IPv6 type and the <strong>AUTOCFGFLAG</strong> which is MANUAL_CREATED to the <strong>IPRSCGRP</strong> MO with <strong>PT</strong> set to ETHTRK.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]A maximum of 64 <strong>EP2IPRSCGRP</strong> MOs can be configured when the following conditions are met: an <strong>Application</strong> MO with <strong>AT</strong> set to GBTS exists; a <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#EP2IPRSCGRP__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="EP2IPRSCGRP__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="EP2IPRSCGRP__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ep2iprscgrp.html">ADD EP2IPRSCGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add mapping from End Point to IP Transmission Resource Group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ep2iprscgrp.html">LST EP2IPRSCGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list mapping from End Point to IP Transmission Resource Group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ep2iprscgrp.html">RMV EP2IPRSCGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove mapping from End Point to IP Transmission Resource Group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#EP2IPRSCGRP__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="EP2IPRSCGRP__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="EP2IPRSCGRP__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EP2IPRSCGRP-mappingId.html">Mapping ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a mapping between end points and IP transmission resource groups.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EP2IPRSCGRP-mappingType.html">Mapping Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mapping mode between the service and the IP transmission resource group. Two mapping modes are supported: endpoint group mode and endpoint mode. If this parameter is set to ENDPOINT_GROUP, all user-plane peer endpoints in the endpoint group can be added to the specified IP transmission resource group. If this parameter is set to ENDPOINT_NODE, the specified user-plane peer endpoints can be added to the specified IP transmission resource group. When both the endpoint group mode and the endpoint mode are available for mapping all service flows of the same EPPATH to the IP transmission resource group, the endpoint mode is preferentially used for the mapping.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EP2IPRSCGRP-endPointId.html">End Point ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the end point group or user plane peer to be added to the specified IP transmission resource group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EP2IPRSCGRP-resourceGroupID.html">IP Transmission Resource Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the IP transmission resource group to which a node maps.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/EP2IPRSCGRP-userLabel.html">User Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the description of the end point mapping to IP resource group. This parameter takes effect only in LTE and NR.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

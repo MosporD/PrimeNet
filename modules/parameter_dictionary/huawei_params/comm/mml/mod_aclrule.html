@@ -1,0 +1,247 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify ACL Rule (MOD ACLRULE)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_aclrule">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify ACL Rule (MOD ACLRULE)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_aclrule"></a><a name="mod_aclrule"></a>
+
+
+<h1 class="topictitle1">Modify ACL Rule (MOD ACLRULE)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_aclrule__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify an access control list (ACL) rule.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_aclrule__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The execution of this command may disrupt the service that references the ACL rule. For details, see the "Service Interrupted After Modification" of each parameter in this command.</p>
+</li><li><p>If an ACLRULE can be queried by running the <a href="lst_aclrule.html">LST ACLRULE</a> command and the value of the "Auto Config Flag" field is "Auto Created", the ACLRULE object is automatically created by the system and cannot be modified by users.</p>
+</li><li><p>For a UTRP (subboard type: UEOC/UQEC), if 48 ACL rules have taken effect and not all ACL rules referenced by a packet filter have taken effect, running this command to modify any one valid ACL rule makes this ACL rule invalid and automatically validates one ACL rule that is referenced by a packet filter. You can run the <a href="dsp_aclrule.html">DSP ACLRULE</a> command to query the currently valid ACL rules.</p>
+</li><li><p>This operation may interrupt the services or OM channels that references the ACL rule. It is recommended that you determine whether to enable the automatic configuration data rollback function depending on scenarios. For details, see the help of the <a href="cfm_cb.html">CFM CB</a> command.</p>
+</li><li><p>When packet filtering ACL rules are automatically configured by the system or manually configured by users, data forwarding performance fluctuates temporarily.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_aclrule__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-ACLID.html">ACLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ACL ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the access control list (ACL) to which an ACL rule belongs.</p>
+<p>GUI Value Range: 3000~4999,7000~7999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3000~4999,7000~7999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The ACL ID and rule ID of an ACL rule that is manually configured must range from 3000 to 4999 and 1 to 65535, respectively.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-RuleID.html">RULEID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Rule ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an ACL rule. The values 1 to 65535 indicate ACL rules manually configured by users or automatically generated for packet filtering. (When the value of ACL Rule Automatic Setup and Deletion Switch of packet filtering is ON, IDs from 50000 to 59999 cannot be used for manually configured ACL rules and are used for automatically generated ACL rules for packet filtering only.) The values 65431 to 65536 indicate the ACL rules automatically generated during DHCP detection. The values 70000 to 79999 indicate ACL rules automatically generated for packet filtering in endpoint configuration mode. The values 80000 to 89999 indicate ACL rules automatically generated for IPsec in endpoint configuration mode.</p>
+<p>GUI Value Range: 1~65535,70000~89999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~65535,70000~79999,80000~89999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The ACL ID and rule ID of an ACL rule that is manually configured must range from 3000 to 4999 and 1 to 65535, respectively.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-SrcIP.html">SIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IP address of data to which an ACL rule is applied. To add an ACL rule that is applicable to data of all source IP addresses, set this parameter to 0.0.0.0.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-SrcWildcart.html">SWC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Wildcard</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the wildcard of a source IP address. The wildcard is used to determine which bits can be neglected when IP address matching is being performed. It can be considered as the inverse of the corresponding subnet mask.</p>
+<p>GUI Value Range: Valid wildcard of the IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid wildcard of the IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-DstIP.html">DIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination IP address of data to which an ACL rule is applied. To add an ACL rule that is applicable to data of all destination IP addresses, set this parameter to 0.0.0.0.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-DstWildcart.html">DWC</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Wildcard</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the wildcard of a destination IP address. The wildcard is used to determine which bits can be neglected when IP address matching is being performed. It can be considered as the inverse of the corresponding subnet mask.</p>
+<p>GUI Value Range: Valid wildcard of the IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid wildcard of the IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-VLANIDOp.html">VLANIDOP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID Operate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the filter criteria for VLAN IDs. This parameter is valid only when the ACL ID ranges from 4000 to 4999. When this parameter is set to OP_EQ, only the VLAN ID specified by VLANID1 is a valid. When this parameter is set to OP_RANGE, all the VLAN IDs within the range of VLANID1 to VLANID2 are valid. When this parameter is set to OP_NOVLAN, only packets without VLAN tags are valid.</p>
+<p>GUI Value Range: OP_EQ(Equivalent), OP_RANGE(Range), OP_NOVLAN(No Vlan)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OP_EQ, OP_RANGE, OP_NOVLAN</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-VLANID1.html">VLANID1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a VLAN to which service data belongs. When Source Port Operate is set to OP_EQ, this parameter specifies the ID of the matching VLAN. When Source Port Operate is set to OP_RANGE, this parameter specifies the smallest ID of the matching VLANs.</p>
+<p>GUI Value Range: 1~4094</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4094</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>ACLID</strong> ranges from 4000 to 4999 and <strong>VLANIDOP</strong> is set to OP_RANGE, <strong>VLANID1</strong> must be less than <strong>VLANID2</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE-VLANID2.html">VLANID2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VLAN ID 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a VLAN to which service data belongs. When Source Port Operate is set to OP_RANGE, this parameter specifies the largest ID of the matching VLANs. This parameter is valid only when Source Port Operate is set to OP_RANGE.</p>
+<p>GUI Value Range: 1~4094</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~4094</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>ACLID</strong> ranges from 4000 to 4999 and <strong>VLANIDOP</strong> is set to OP_RANGE, <strong>VLANID1</strong> must be less than <strong>VLANID2</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_aclrule__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify an ACL rule with the parameters as follows: ACL ID: 3000, Rule ID: 10, Source IP Address: 192.168.5.5, Source Wildcard: 0.0.0.255, Destination IP Address: 192.168.5.10, Destination Wildcard: 0.0.0.255, run the following command:
+MOD ACLRULE: ACLID=3000, RULEID=10, SIP="192.168.5.5", SWC="0.0.0.255", DIP="192.168.5.10", DWC="0.0.0.255";</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

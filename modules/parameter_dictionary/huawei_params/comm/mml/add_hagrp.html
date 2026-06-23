@@ -1,0 +1,128 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Transport HA Group (ADD HAGRP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_hagrp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Transport HA Group (ADD HAGRP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_hagrp"></a><a name="add_hagrp"></a>
+
+
+<h1 class="topictitle1">Add Transport HA Group (ADD HAGRP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_hagrp__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a high availability (HA) group.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_hagrp__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Adding an HA group fails if the existing data is not configured on the logical slot.</p>
+</li><li><p>Before adding an HA group, ensure that the Ethernet port attributes of the active board and the standby board are set to electrical port or optical port.</p>
+</li><li><p>Before running this command, ensure that the two boards are of the same physical type.</p>
+</li><li><p>The HA group adopts the cold backup scheme. That is, adding an HA group will result in the reset of the BS; the active and standby boards of the HA group are determined after the BS restarts. Due to hardware limitation, a UMDU cannot implement the cold backup of main control and transmission after the UMDU is configured with an HAGRP MO and then resets.</p>
+</li><li><p>After an HA group is added, the BS works in active/standby mode. In this situation, the Ethernet ports for local maintenance and those for services on the active and standby boards must all be connected to a switch or router. Otherwise, the maintenance terminal fails to access the BS through the Ethernet port for local maintenance or that for services after a switchover.</p>
+</li><li><p>System specifications: If the WMPT/UMPT/UMDU/LMPT is the main control board, a maximum of 1 HA groups can be configured.</p>
+</li><li><p>Board specifications: A maximum of 1 HA groups can be configured on a WMPT/UMPT/UMDU/LMPT.</p>
+</li><li><p>In HAGRP scenarios, the board in a non-logical slot automatically creates an ETHPORT MO. You need to remove this MO before adding the board to a high availability group. The default transmission resource group (with Transmission Resource Group ID set to AUTOPORT) related to this port will be automatically removed. After removing an HAGRP MO from a board, you need to create the ETHPORT MO. The default transmission resource group (with Transmission Resource Group ID set to AUTOPORT) related to this port will be automatically added.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_hagrp__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/HAGRP-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet housing the board where the HA group is established.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/HAGRP-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack housing the board where the HA group is established.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/HAGRP-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Logic Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the logical slot number of the HA group. The logical slot number of an HA group is the number of the physical slot housing one of the two boards constituting the HA group.</p>
+<p>GUI Value Range: 6~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 6~7</p>
+<p>MML Default Value: 6</p>
+<p>Recommended Value: 6</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_hagrp__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an HA group with the parameters as follows: Cabinet No.: 0, Subrack No.: 0, Logic Slot No.: 6, run the following command:
+ADD HAGRP: CN=0, SRN=0, SN=6;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

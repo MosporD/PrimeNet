@@ -1,0 +1,499 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellMLB">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellMLB">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellMLB</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellMLB"></a><a name="CellMLB"></a>
+
+
+<h1 class="topictitle1">CellMLB</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellMLB.html"><strong>CellMLB</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CellMLB MO consists of the parameters related to Mobility Load Balancing (MLB) in a cell. When a UE is moving, because of the randomness of the UE location and the diversity of UE services, a cell may be heavily loaded, whereas its neighboring cells may carry relatively low loads. MLB can be used to mitigate the imbalance. Through negotiation with its neighboring cells, the cell with a heavy load transfers a proportion of its UEs to a neighboring cell to balance the cell loads and maximize the utilization of network resources. By means of MLB, both the throughput and performance of the network are improved.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellShutdown</strong> and <strong>CellAlgoSwitch</strong> MOs:<ul><li>When option InterFreqMlbSwitch or InterFreqBlindMlbSwitch of <strong>MlbAlgoSwitch</strong> in <strong>CellAlgoSwitch</strong> is selected, <strong>MlbTriggerMode</strong> in <strong>CellMLB</strong> is set to PRB_ONLY or PRB_OR_UE_NUMBER and <strong>CellShutdownSwitch</strong> in <strong>CellShutdown</strong> is set to a value other than OFF, the sum of <strong>InterFreqMlbThd</strong> and <strong>LoadOffset</strong> in the <strong>CellMLB</strong> MO must be greater than that of <strong>DlPrbThd</strong> and <strong>DlPrbOffset</strong> in the <strong>CellShutdown</strong> MO. In addition, the sum of <strong>InterFreqMlbThd</strong> and <strong>LoadOffset</strong> in the <strong>CellMLB</strong> MO must be greater than that of <strong>UlPrbThd</strong> and <strong>UlPrbOffset</strong> in the <strong>CellShutdown</strong> MO.</li><li>When option InterFreqMlbSwitch or InterFreqBlindMlbSwitch of <strong>MlbAlgoSwitch</strong> in <strong>CellAlgoSwitch</strong> is selected, <strong>MlbTriggerMode</strong> in <strong>CellMLB</strong> is set to PRB_ONLY or PRB_OR_UE_NUMBER and <strong>CellShutdownSwitch</strong> in <strong>CellShutdown</strong> is set to a value other than OFF, <strong>InterFreqMlbThd</strong> in the <strong>CellMLB</strong> MO must be greater than <strong>DlPrbThd</strong> in the <strong>CellShutdown</strong> MO. In addition, <strong>InterFreqMlbThd</strong> in the <strong>CellMLB</strong> MO must be greater than <strong>UlPrbThd</strong> in the <strong>CellShutdown</strong> MO.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>In a <strong>Cell</strong>, if <strong>FddTddInd</strong> is set to CELL_FDD, then the <strong>DlDataMlbMode</strong> in <strong>CellMLB</strong> could only be set to NON_TRIGGERED.</li></ul>
+</li><li>Relation with the <strong>ENodeBAlgoSwitch</strong> MO:<ul><li>If <strong>InterFreqMLBRanShareMode</strong> in the <strong>CellMLB</strong> MO is set to SHARING, INTER_FREQ_IDLE_MLB_SWITCH of <strong>MlbAlgoSwitch</strong> in the <strong>ENodeBAlgoSwitch</strong> MO cannot be selected.</li></ul>
+</li><li>Relation with the <strong>EutranInterNFreq</strong> MO:<ul><li>The sum of values of <strong>InterFreqMlbThd</strong> in the <strong>CellMLB</strong> MO and <strong>InterFreqMlbDlPrbOffset</strong> in the <strong>EutranInterNFreq</strong> MO must be less than or equal to 100.</li><li>The sum of values of <strong>InterFreqMlbUlThd</strong> in the <strong>CellMLB</strong> MO and <strong>InterFreqMlbUlPrbOffset</strong> in the <strong>EutranInterNFreq</strong> MO must be less than or equal to 100.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellMLB__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellMLB__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellMLB__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_cellmlb.html">LST CELLMLB</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the cell MLB algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_cellmlb.html">MOD CELLMLB</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of the cell MLB algorithm.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellMLB__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellMLB__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellMLB__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqMlbThd.html">Inter-Frequency Mobility Load Balancing Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PRB usage threshold used to evaluate whether to trigger inter-frequency MLB. Assume that the MlbTriggerMode parameter is set to PRB_ONLY or PRB_OR_UE_NUMBER. Inter-frequency MLB is triggered when the number of UEs meets the minimum UE quantity condition for triggering inter-frequency MLB and the PRB usage is greater than or equal to the sum of this threshold and the load offset. Inter-frequency MLB stops when the PRB usage is less than this threshold or the number of UEs meets the minimum UE quantity condition for terminating inter-frequency MLB. For NB-IoT, inter-frequency MLB is triggered if the downlink resource usage is greater than or equal to the sum of this threshold and the load offset, regardless of the MLB triggering mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbThd.html">Inter-RAT Mobility Load Balancing Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the PRB usage for triggering inter-RAT load sharing. Inter-RAT load sharing is triggered if the number of synchronized UEs in the cell is greater than or equal to the sum of the InterRatMlbUeNumThd and InterRatMlbUeNumOffset parameter values and the PRB usage of the cell is greater than or equal to the InterRatMlbThd and LoadOffset parameter values. Inter-RAT load sharing stops if the number of synchronized UEs in the cell is less than the InterRatMlbUeNumThd parameter value or the PRB usage of the cell is less than the InterRatMlbThd parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-LoadOffset.html">Load Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of the PRB usage for triggering inter-frequency MLB. Inter-frequency MLB is triggered if the minimum number of UEs meets a specified requirement and the PRB usage is greater than or equal to the sum of the inter-frequency MLB threshold and the load offset, or if the minimum number of UEs meets a specified requirement and the PRB evaluation result is greater than or equal to the sum of the PRB-evaluation-based MLB triggering threshold and the load offset. Inter-RAT MLB is triggered if the number of UEs meets the requirement for triggering inter-RAT MLB and the PRB usage is greater than or equal to the sum of the inter-RAT MLB triggering threshold and the load offset. Inter-RAT idle mode MLB is triggered if the number of UEs meets the requirement for triggering inter-RAT idle mode MLB and the PRB usage is greater than or equal to the sum of the inter-RAT MLB triggering threshold and the load offset. For an NB-IoT cell, this parameter indicates the offset of NB-IoT cell load.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-LoadDiffThd.html">Load Difference Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of PRB usage difference between the serving cell and a neighboring cell. A neighboring cell can be a target cell for intra-RAT MLB only if the result of the PRB usage of the serving cell minus that of the neighboring cell is greater than the value of this parameter. For inter-RAT MLB, the total PRB usage of all UEs to be transferred within an LMB period in the direction where MLB is triggered must be less than half of the sum of the values of CellMLB.LoadDiffThd and CellMLB.LoadDiffThldOffset.</p>
+<p>For NB-IoT cells, this parameter indicates the threshold of subcarrier usage difference between the serving cell and a neighboring cell. When the result of the subcarrier usage of the serving cell minus that of an inter-frequency neighboring cell is greater than the value of this parameter, the neighboring cell can be a target cell for MLB.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbUeNumThd.html">Inter-RAT Mobility Load Balancing UE Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for the number of uplink synchronized UEs in the cell used to trigger PRB-usage-based inter-RAT load sharing. PRB-usage-based inter-RAT load sharing is triggered when the PRB usage condition for triggering the load sharing is met and the number of uplink synchronized UEs in the cell is greater than or equal to the sum of the InterRatMlbUeNumThd and InterRatMlbUeNumOffset parameter values. PRB-usage-based inter-RAT load sharing stops if the number of uplink synchronized UEs in the cell is less than the InterRatMlbUeNumThd parameter value or the PRB usage condition for stopping the load sharing is met. The actual threshold for the number of uplink synchronized UEs equals the percentage value of this parameter multiplied by 1000. For example, the GUI value of 1 indicates that the threshold for the number of uplink synchronized UEs is 10 (1000 x 1%), the GUI value of 2 indicates a threshold of 20, and the GUI value of 10 indicates a threshold of 100. An exception is that if the parameter value is 100 or 99, the threshold for the number of uplink synchronized UEs is 1 or 2, respectively. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InitValidPeriod.html">UTRAN Idle Mode Mobility Load Balancing Initial Valid Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the standard valid duration for load sharing with universal terrestrial radio access network (UTRAN) for UEs in idle mode. The actual duration increases on the basis of a standard valid duration with the increase of the number of uplink-synchronized UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-LoadTransferFactor.html">Load Transfer Factor</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the control factor for the amount of load transferred in a single MLB procedure. The value of this parameter has an impact on the efficiency of the MLB algorithm and the algorithm used to prevent ping-pong load transfer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbTriggerMode.html">Mobility Load Balancing Trigger Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the trigger of the MLB algorithm. In MLB with load information exchange, if this parameter is set to PRB_ONLY, PRB usage is used as a trigger and the number of UEs is used as a supplementary trigger; PRB usage difference between cells is used as a UE transfer condition; the aim of MLB is to achieve the same number of remaining PRBs between cells. If this parameter is set to UE_NUMBER_ONLY, the number of UEs is used as a trigger; the difference of the number of UEs per unit of bandwidth between cells is used as a UE transfer condition; the aim of MLB is to achieve the same number of UEs per unit of bandwidth between cells. If this parameter is set to PRB_OR_UE_NUMBER, the combination of the triggers, UE transfer conditions, and MLB aims for the values UE_NUMBER_ONLY and PRB_ONLY are used.</p>
+<p>In MLB without load information exchange, if this parameter is set to PRB_ONLY, PRB usage is used as a trigger and a UE transfer condition and the number of UEs is used as a supplementary trigger and a supplementary UE transfer condition; the aim of MLB is that the PRB usage is less than the InterFreqMlbThd or InterFreqIdleMlbUeNumThd parameter value. If this parameter is set to UE_NUMBER_ONLY, the number of UEs is used as a trigger and a UE transfer condition; the aim of MLB is that the number of UEs is less than the InterFreqMlbUeNumThd or InterFreqIdleMlbUeNumThd parameter value. If this parameter is set to PRB_OR_UE_NUMBER, the combination of the triggers, UE transfer conditions, and MLB aims for the values UE_NUMBER_ONLY and PRB_ONLY are used. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqMlbUeNumThd.html">Inter-frequency Mobility Load Balancing UE Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UL-sync UE number threshold for triggering inter-frequency MLB. Assume that the MlbTriggerMode parameter is set to UE_NUMBER_ONLY or PRB_OR_UE_NUMBER. Inter-frequency MLB is triggered when the number of UL-sync UEs is greater than or equal to the sum of the InterFreqMlbUeNumThd and MlbUeNumOffset parameter values. Inter-frequency MLB stops when the number of UL-sync UEs is less than the InterFreqMlbUeNumThd parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbUeNumOffset.html">Mobility Load Balancing UE Number Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of the number of uplink-synchronized (UL-sync) UEs for triggering inter-frequency MLB. UE-number-based inter-frequency MLB is triggered if the number of UL-sync UEs in the cell is greater than or equal to the sum of the InterFreqMlbUeNumThd and MlbUeNumOffset parameter values. UE-number-based inter-frequency idle mode MLB is triggered if the number of UL-sync UEs in the cell is greater than or equal to the sum of the InterFreqIdleMlbUeNumThd and MlbUeNumOffset parameter values. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbMaxUeNum.html">Mobility Load Balancing Max UE Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of UEs that can be transferred for inter-frequency MLB triggered by every variable within an MLB period. Inter-frequency MLB triggered by every variable independently uses this parameter. For example, when both PRB-usage-based inter-frequency and user-number-based inter-frequency MLB are triggered, a maximum of MlbMaxUeNum UEs can be transferred for each algorithm. The number of UEs that can be transferred for inter-frequency MLB triggered by different variables is accumulative. The number of UEs transferred at a time must be limited to reduce the impact on neighboring cells. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbUeSelectPrbThd.html">Mobility Load Balancing UE Selection PRB Usage Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE PRB usage threshold for selecting UEs for MLB. If the MlbTriggerMode parameter is set to PRB_ONLY: (1) When downlink MLB is triggered, the eNodeB selects UEs whose downlink PRB usage is greater than this threshold and uplink PRB usage is less than the sum of this threshold and the UeUlPrbLowThdOffset parameter value. (2) When uplink MLB is triggered, the eNodeB selects UEs whose uplink PRB usage is greater than the sum of this threshold and the UeUlPrbHighThdOffset parameter value and downlink PRB usage is less than the sum of this threshold and the UeDlPrbLowThdOffset parameter value. If the MlbTriggerMode parameter is set to UE_NUMBER_ONLY, the eNodeB selects UEs whose downlink PRB usage is less than or equal to the sum of this threshold and the UeDlPrbLowThdOffset parameter value and uplink PRB usage is less than or equal to the sum of this threshold and the UeUlPrbLowThdOffset parameter value. If the MlbTriggerMode parameter is set to PRB_OR_UE_NUMBER, the eNodeB selects UEs that meet the UE selection criterion for either PRB-usage-based or UE-quantity-based MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-DlDataMlbMode.html">Downlink Data-transfer MLB mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether MLB is performed based on the number of downlink data transmission UEs. If this parameter is set to UENUMBASED(UENUMBASED), MLB is performed based on the number of downlink data transmission UEs. If it is set to NON_TRIGGERED(NON_TRIGGERED), MLB is not performed based on the number of downlink data transmission UEs. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqMLBRanShareMode.html">Inter-Frequency MLB RAN Sharing Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable operator-level and operator-group-level inter-frequency MLB. If this parameter is set to NON_SHARING, the eNodeB performs cell-level inter-frequency MLB without distinguishing resources between operators or operator groups. If this parameter is set to SHARING, the eNodeB can perform operator-level inter-frequency MLB based on the resources reserved for each operator in RAN sharing mode. If this parameter is set to OVERSHARING, the eNodeB can perform operator-level inter-frequency MLB based on both the cell load and the operator's load in RAN sharing mode. If this parameter is set to GROUPSHARING, the eNodeB can perform operator-group-level inter-frequency MLB based on the resources reserved for each operator group in RAN sharing mode. If this parameter is set to GROUPOVERSHARING, the eNodeB can perform operator-group-level inter-frequency MLB based on both the overall cell and operator load in RAN sharing mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UeNumDiffThd.html">Ue Number Difference Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for triggering user-number-based MLB to transfer UEs. A neighboring cell can be the target cell for MLB when the following condition is met: (Air interface load of the serving cell - Air interface load of the neighboring cell)/Air interface load of the serving cell &gt; Threshold specified by this parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-HotSpotUeMode.html">Hot Spot UE Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether only UEs at hotspots can be transferred to UTRAN for inter-RAT load balancing. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqIdleMlbMode.html">Inter-Frequency Idle Load Balancing Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the inter-frequency load balancing mode for UEs in idle mode.</p>
+<p>Proportion: Indicates the inter-frequency load balancing mode for non-eMTC UEs in idle mode. When this option is selected, the eNodeB transfers normally released non-eMTC UEs to frequencies based on the preset proportions for neighboring frequencies of the serving frequency so that load balancing for non-eMTC UEs in idle mode is achieved. For FDD and TDD cells, this option must be selected if the InterFreqIdleMlbSwitch option of the MlbAlgoSwitch parameter is selected. Otherwise, the proportions set for neighboring frequencies for load balancing do not take effect. For NB-IoT cells, if this option is selected, the proportions set for neighboring frequencies for load balancing take effect even if the InterFreqIdleMlbSwitch option of the MlbAlgoSwitch parameter is deselected.</p>
+<p>eMtcProportion: Indicates the inter-frequency load balancing mode for eMTC UEs in idle mode. When this option is selected, the eNodeB transfers normally released eMTC UEs to frequencies based on the preset proportions for neighboring frequencies of the serving frequency so that load balancing for eMTC UEs in idle mode is achieved. This option must be selected if the InterFreqIdleMlbSwitch option of the MlbAlgoSwitch parameter is selected. Otherwise, the proportions set for neighboring frequencies for load balancing of eMTC UEs do not take effect. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbMinUeNumThd.html">MLB Minimum UE Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the minimum number of UL-sync UEs for triggering inter-frequency MLB. Assume that the MlbTriggerMode parameter is set to PRB_ONLY or PRB_OR_UE_NUMBER. MLB is triggered when the PRB usage-based load balancing triggering condition is met and the number of UL-sync UEs is greater than or equal to the sum of the MlbMinUeNumThd and MlbMinUeNumOffset parameter values. MLB stops when the PRB usage-based load balancing terminating condition is met or the number of UL-sync UEs falls below the value of the MlbMinUeNumThd parameter. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbMinUeNumOffset.html">MLB Minimum UE Number Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset relative to the minimum number of UL-sync UEs for triggering inter-frequency MLB. Assume that the MlbTriggerMode parameter is set to PRB_ONLY or PRB_OR_UE_NUMBER. Inter-frequency MLB is triggered when the number of UL-sync UEs is greater than or equal to the sum of the MlbMinUeNumThd and MlbMinUeNumOffset parameter values and the PRB-usage-based load balancing triggering condition is met. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqUeTrsfType.html">InterFreq MLB Transfer Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of UEs to be transferred for inter-frequency MLB excluding connected mode offload.</p>
+<p>SynchronizedUE: If this option is selected, synchronized UEs are transferred for inter-frequency user-number-based MLB. This option applies only to LTE FDD and LTE TDD.</p>
+<p>IdleUE: If this option is selected, UEs in idle mode are transferred for inter-frequency user-number-based MLB. This option applies only to LTE FDD and LTE TDD.</p>
+<p>PrbMlbSynchronizedUE: If this option is selected, synchronized UEs are transferred for inter-frequency PRB-usage-based MLB. This option applies only to LTE FDD and LTE TDD.</p>
+<p>PrbMlbIdleUE: If this option is selected, UEs in idle mode are transferred for inter-frequency PRB-usage-based MLB. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqIdleMlbUeNumThd.html">Inter-Freq Idle MLB UE Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UL-sync UE number threshold used to evaluate whether to trigger inter-frequency idle mode MLB. Assume that the MlbTriggerMode parameter is set to UE_NUMBER_ONLY or PRB_OR_UE_NUMBER. Inter-frequency MLB is triggered when the number of UL-sync UEs is greater than or equal to the sum of the InterFreqIdleMlbUeNumThd and MlbUeNumOffset parameter values. Inter-frequency MLB stops when the number of UL-sync UEs is less than the InterFreqIdleMlbUeNumThd parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatIdleMlbUeNumThd.html">Inter-RAT Idle MLB UE Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of UL-synchronized UEs for triggering inter-RAT MLB by transferring UEs in idle mode. Inter-RAT MLB by transferring UEs in idle mode is triggered if the number of UL-synchronized UEs is greater than or equal to the sum of the InterRATIdleMlbUeNumThd and InterRatMlbUeNumOffset parameter values and the PRB usage condition for triggering the MLB is met. Inter-RAT MLB by transferring UEs in idle mode stops if the number of UL-synchronized UEs is less than the InterRATIdleMlbUeNumThd parameter value or the PRB usage condition for stopping the MLB is met. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqLoadEvalPrd.html">Inter-frequency Load Evaluate Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the evaluation period for determining whether to trigger inter-frequency MLB. If the serving cell remains in the heavy-load state within an evaluation period, inter-frequency MLB is triggered and certain UEs are transferred for load balancing. If the UtranMlbSwitch or GeranMlbSwitch option of the MlbAlgoSwitch parameter is selected, the InterFreqMlbSwitch or InterFreqBlindMlbSwitch option of the MlbAlgoSwitch parameter is selected, and the FreqSelectStrategy parameter is set to PRIORITYBASED, the values of the InterRatLoadEvalPrd and InterFreqLoadEvalPrd parameters must be the same. If the two parameters are set to different values, the evaluation period specified by the InterRatLoadEvalPrd parameter is used when both cell-level inter-frequency MLB and inter-RAT MLB are triggered at the same time.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatLoadEvalPrd.html">Inter-Rat Load Evaluate Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the evaluation period for determining whether to trigger inter-RAT load sharing. If the serving cell remains in the heavy load state within an evaluation period, inter-RAT load sharing is triggered and certain UEs are transferred to an inter-RAT neighboring cell. If the UtranMlbSwitch or GeranMlbSwitch option of the MlbAlgoSwitch parameter is selected, the InterFreqMlbSwitch or InterFreqBlindMlbSwitch option of the MlbAlgoSwitch parameter is selected, and the FreqSelectStrategy parameter is set to PRIORITYBASED(PriorityBased), the values of the InterRatLoadEvalPrd and InterFreqLoadEvalPrd parameters must be the same. If the two parameters are set to different values, the evaluation period specified by the InterRatLoadEvalPrd parameter is adapted when both cell-level inter-frequency load balancing and inter-RAT load sharing are triggered at the same time. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-FreqSelectStrategy.html">Load Balancing Frequency Select Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the target frequency selection policy applied for inter-frequency MLB and inter-RAT MLB when candidate cells work at different frequencies. If this parameter is set to FAIRSTRATEGY(FairStrategy), a frequency among all neighboring frequencies of candidate cells is randomly selected as the target frequency in inter-frequency MLB, all inter-RAT neighboring frequencies of candidate cells are selected as the target frequencies in inter-RAT MLB, and a maximum of three frequencies among all neighboring frequencies of candidate cells are randomly selected as the target frequencies in inter-frequency MLB by transferring UEs with low spectral efficiency or heavy uplink traffic load. If this parameter is set to PRIORITYBASED(PriorityBased), the frequency with the high priority among all inter-RAT neighboring frequencies and the frequency with the high priority among all inter-RAT frequencies are selected as target frequencies separately when either inter-frequency MLB or inter-RAT MLB is triggered or operator-level inter-frequency MLB and inter-RAT MLB are triggered in parallel; the frequency with the high priority among all neighboring frequencies when cell-level inter-frequency MLB and inter-RAT MLB are triggered in parallel; a maximum of three frequencies with the high priorities among all different frequencies can be selected as target frequencies when inter-frequency MLB is triggered by transferring UEs with low spectral efficiency or heavy uplink traffic load. If this parameter is set to LOADPRIORITY(LOADPRIORITY), frequencies of neighboring cells with the load differences between them and the serving cell greater than the average load difference between all neighboring cells and the serving cell are selected as target frequencies when inter-frequency MLB transfers RRC_CONNECTED UEs or RRC_REL UEs. When inter-RAT MLB transfers RRC_CONNECTED UEs, a frequency among all neighboring frequencies of candidate cells is randomly selected as the target frequency. When inter-frequency MLB is triggered by transferring UEs with low spectral efficiency or heavy uplink traffic load, a maximum of three frequencies among all different frequencies are selected randomly as target frequencies. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-LoadBalanceNCellScope.html">Load Balancing Neighbor Cell Scope</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy based on which the serving cell selects certain neighboring cells as candidate cells for inter-frequency load balancing if no neighboring cells are manually configured as overlapping neighboring cells. If this parameter is set to ADAPTIVE(Adaptive), the serving cell preferentially selects certain intra-eNodeB neighboring cells as candidate cells for load balancing. For blind load balancing, the serving cell selects only inter-eNodeB neighboring cells. If this parameter is set to ALL(All), the serving cell selects all inter-frequency neighboring cells as candidate cells for inter-frequency load balancing. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbUeNumOffset.html">Inter-RAT Mlb UE Number Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset to the number of uplink synchronized UEs in the cell for triggering inter-RAT load sharing. If the InterRatMlbTriggerMode parameter is set to IRAT_PRB_ONLY: When the PRB usage condition for triggering the load sharing is met and the number of uplink synchronized UEs in the cell is greater than or equal to the sum of the InterRatMlbUeNumThd and InterRatMlbUeNumOffset parameter values, PRB-usage-based inter-RAT load sharing is triggered; when the PRB usage condition for triggering MLB is met and the number of uplink synchronized UEs in the cell is greater than or equal to the sum of the InterRatIdleMlbUeNumThd and InterRatMlbUeNumOffset parameter values, PRB-usage-based idle mode load equalization is triggered. If the InterRatMlbTriggerMode parameter is set to IRAT_UE_NUMBER_ONLY: When the number of uplink synchronized UEs in the cell is greater than or equal to the sum of the InterRatMlbUeNumModeThd and InterRatMlbUeNumOffset parameter values, UE-number-based inter-RAT load sharing is triggered. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-IdleUeSelFreqScope.html">Idle UE Select Frequency Scope</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the frequency selection policy for inter-frequency MLB by transferring RRC_IDLE UEs. When this parameter is set to LOADINFOFREQ, an eNodeB selects the frequencies whose load information can be obtained as the target frequencies. When this parameter is set to ALLFREQ, an eNodeB selects all frequencies as the target frequencies. When this parameter is set to ALLFREQWITHOUTPUNISH, an eNodeB selects all frequencies excluding frequencies in a penalty state as the target frequencies. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbUeSelStrategy.html">InterRAT MLB UE Select Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the strategy for selecting UEs in inter-RAT MLB triggered by the PRB usage. If this parameter is set to PRBRATIOHIGHMODE, the eNodeB transfers UEs whose PRB usage is greater than 2% but less than half of the sum of the values of CellMLB.LoadDiffThd and CellMLB.LoadDiffThdOffset parameters. If this parameter is set to PRBRATIOLOWMODE, the eNodeB transfers UEs whose PRB usage is less than or equal to the CellMLB.InterRatMlbUeSelPrbThd parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbUeSelPrbThd.html">InterRAT MLB UE Select PRB Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PRB usage threshold for selecting UEs in inter-RAT load sharing. If the InterRatMlbTriggerMode parameter is set to IRAT_PRB_ONLY and the InterRatMlbUeSelStrategy parameter is set to PRBRATIOLOWMODE, UEs whose PRB usage is less than or equal to the InterRatMlbUeSelPrbThd parameter value are selected for PRB-usage-based inter-RAT load sharing. If the InterRatMlbTriggerMode parameter is set to IRAT_UE_NUMBER_ONLY, UEs whose PRB usage is less than or equal to the InterRatMlbUeSelPrbThd parameter value are selected for UE-number-based inter-RAT load sharing. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-PrbLoadCalcMethod.html">Prb Load Calculation Method</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the PRB load calculation method when the MlbTriggerMode parameter in the CellMLB MO is set to PRB_ONLY or PRB_OR_UE_NUMBER. The value PRB_USAGE indicates that the PRB usage is used as the PRB load. The value PRB_VALUATION_WITH_CTRL indicates that the PRB load is calculated based on PRB evaluation for channels including control channels. The value PRB_VALUATION_NO_CTRL indicates that the PRB load is calculated based on PRB evaluation for channels excluding control channels. If this parameter is set to PRB_USAGE, the total PRB usage of multiple cells is more likely to reach the maximum value. If this parameter is set to PRB_VALUATION_WITH_CTRL or PRB_VALUATION_NO_CTRL, the transmission rate of each service is more likely to exceed the minimum guaranteed value. Set this parameter based on network requirements. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbUeSelectPunishTimer.html">MLB UE Selection Punish Timer</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the length of the timer for punishing UEs that are selected for MLB but fail to be transferred to target cells. Before the timer expires, the UEs cannot be transferred for MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbHoCellSelectStrategy.html">Mlb Ho Cell select Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the eNodeB is allowed to initiate a handover to one of the secondary strongest neighboring cells when the eNodeB cannot initiate a handover to the strongest neighboring cell triggered by load-information-exchange-based inter-frequency load balancing.</p>
+<p>If this parameter is set to PERMIT_NON_STRONGEST_CELL(Permit Trying Non-Strongest Cell), the eNodeB is allowed to initiate a handover to one of the secondary strongest neighboring cells in the preceding scenario. If this parameter is set to ONLY_STRONGEST_CELL(Only Try Strongest Cell), the eNodeB can only initiate a handover to the strongest neighboring cell in the preceding scenario. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbTriggerMode.html">InterRAT MLB Trigger Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the triggering mode for inter-RAT load sharing by transferring RRC_CONNECTED UEs. If this parameter is set to IRAT_PRB_ONLY, inter-RAT load sharing is triggered based on the physical resource block (PRB) usage and the number of UEs. If the PRB usage of the cell is greater than or equal to the sum of the InterRatMlbThd and LoadOffset parameter values and the number of uplink synchronized UEs in the cell is greater than or equal to the sum of the InterRatMlbUeNumThd and InterRatMlbUeNumOffset parameter values, PRB-usage-based inter-RAT load sharing is triggered. If this parameter is set to IRAT_UE_NUMBER_ONLY, inter-RAT load sharing is triggered only based on the number of UEs. If the number of uplink synchronized UEs in the cell is greater than or equal to the sum of the InterRatMlbUeNumModeThd and InterRatMlbUeNumOffset parameter values, UE-number-based inter-RAT load sharing is triggered. If this parameter is set to IRAT_PRB_OR_UE_NUMBER, inter-RAT load sharing can be triggered based on either PRB usage or the number of UEs when the related triggering conditions are met. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbUeNumModeThd.html">InterRAT MLB UE Number Mode Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for the number of uplink synchronized UEs in the cell used to trigger UE-number-based inter-RAT load sharing. If the number of uplink synchronized UEs in the cell is greater than or equal to the sum of the InterRatMlbUeNumModeThd and InterRatMlbUeNumOffset parameter values, UE-number-based inter-RAT load sharing is triggered. If the number of uplink synchronized UEs in the cell is less than the InterRatMlbUeNumModeThd parameter value, UE-number-based inter-RAT load sharing stops. If the InterRatMlbTriggerMode parameter is set to IRAT_PRB_OR_UE_NUMBER, it is recommended that the InterRatMlbUeNumModeThd parameter be set to a value equal to or greater than the InterRatMlbUeNumThd parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-PunishJudgePrdNum.html">Number of Periods for Punishment Judgement</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of load balancing periods used to determine whether to punish a frequency during load balancing. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-FreqPunishPrdNum.html">Number of Periods for Punishment on Frequency</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of MLB punishment periods for a frequency during which cells operating on this frequency cannot be selected as target cells in load balancing. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-CellPunishPrdNum.html">Number of Periods for Punishment on Cell</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of MLB punishment periods for a cell during which the cell cannot be selected as the target cell in load balancing. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MultiRruMode.html">Multiple RRU Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the RRU-specific load calculation mode for load balancing in a multi-RRU cell.</p>
+<p>When the PrbUsage option is selected, RRU-specific load calculation mode for load balancing in a multi-RRU cell is used. When the PrbUsage option is deselected, RRU-specific load calculation mode for load balancing in a multi-RRU cell is not used. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqOffloadOffset.html">Inter-Freq Offload Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset used in inter-frequency offload to neighboring cells with which the local cell does not exchange load information. Assume that the MlbTriggerMode parameter is set to PRB_ONLY or PRB_OR_UE_NUMBER. When the downlink PRB usage in the local cell is greater than or equal to the sum of the InterFreqMIbThd, InterFreqOffloadOffset, and InterFreqMlbDlPrbOffset parameter values, neighboring cells with which the local cell does not exchange load information can be selected as the target cells for offload in the downlink. When the uplink PRB usage in the local cell is greater than or equal to the sum of the InterFreqMlbUlThd, InterFreqOffloadOffset, and InterFreqMlbUlPrbOffset parameter values, neighboring cells with which the local cell does not exchange load information can be selected as the target cells for offload in the uplink. If the downlink PRB usage in the local cell is greater than or equal to the sum of the InterFreqMIbThd and InterFreqOffloadOffset parameter values or the uplink PRB usage in the local cell is greater than or equal to the sum of the InterFreqMlbUlThd and InterFreqOffloadOffset parameter values, the local cell rejects incoming load-based handover requests. If the downlink PRB usage in the local cell is less than the result of the sum of the InterFreqMlbThd and InterFreqOffloadOffset parameter values minus the LoadOffset parameter value and the uplink PRB usage is less than the result of the sum of the InterFreqMlbUlThd and InterFreqOffloadOffset parameter values minus the LoadOffset parameter value, the local cell can accept incoming load-based handover requests. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFrqUeNumOffloadOffset.html">Inter-Freq UE Number Offload Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE number offset used in inter-frequency offload by transferring UEs to neighboring cells with which the local cell does not exchange load information. Assume that the MlbTriggerMode parameter is set to UE_NUMBER_ONLY or PRB_OR_UE_NUMBER. If the number of UL-sync UEs in the local cell is greater than or equal to the sum of the InterFreqMlbUeNumThd and InterFrqUeNumOffloadOffset parameter values, neighboring cells with which the local cell does not exchange load information can be selected as the target cells for offload, and the local cell rejects incoming load-based handovers. If the number of UL-sync UEs in the local cell is less than the result of (UE number threshold for inter-frequency MLB + UE number offset for inter-frequency offload - UE number threshold for MLB), the local cell allows incoming load-based handovers. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-CellCapacityScaleFactor.html">Cell Capacity Scale Factor</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the scale factor used to determine the MLB capability of a cell. This factor helps adjust the MLB target in UE-number-based MLB. The MLB capability of a cell equals the value calculated by the cell bandwidth (number of RBs) multiplied by the CellCapacityScaleFactor parameter value. MLB with this parameter taking effect aims to achieve even loads in each cell with the same bandwidth. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbMaxUeNum.html">Inter-RAT MLB Maximum Transferred UE Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of UEs that can be transferred within an execution period of PRB-usage- or user-number-based inter-RAT MLB. This parameter is used to prevent excessive UEs from being transferred to inter-RAT neighboring cells within an MLB procedure and the load in inter-RAT neighboring cells from increasing significantly. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterRatMlbHoFailPunish.html">Inter-RAT MLB Handover Failure Punish</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to impose penalty on the target cell when a handover triggered by inter-RAT MLB fails. When this parameter is set to YES, the eNodeB imposes penalty on the target cell to which the load-based handover fails. The cell penalty period is determined by the CellPunishPrdNum parameter. When this parameter is set to NO, the eNodeB does not impose penalty on the target cell to which the load-based handover fails. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-EutranLoadJudgeStrategy.html">EUTRAN Load Judge Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the policy used by the eNodeB to determine the cell load status when a UTRAN cell requests the load status of the E-UTRAN cell. If the parameter is set to L2UMLBTRIGGERSTATUS, the eNodeB determines the cell load status based on the trigger conditions of MLB to UTRAN by transferring UL-sync UEs. If this parameter is set to INTERRATMLBUENUMTHD, the eNodeB determines the cell load status based on the number of UL-sync UEs in a cell and the value of the InterRatMlbUeNumThd parameter. This parameter takes effect only if the UtranMlbSwitch option is selected. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbTrigJudgePeriod.html">MLB Trigger Judge Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period of determining whether to trigger or stop MLB. If the cell load is constantly greater than or equal to the threshold for triggering MLB in this period, MLB is triggered. If the cell load is constantly less than the threshold for stopping MLB in this period, MLB is stopped.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqMlbStrategy.html">Inter-Freq MLB Strategy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE selection policy for inter-frequency MLB.</p>
+<p>WEIGHTEDUENUM: If this option is selected, the sum of the value of the DlschPriorityFactor parameter configured for each synchronized UE is calculated as the number of synchronized UEs for MLB. If this option is deselected, the actual number of synchronized UEs is calculated for MLB. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MaxSpectralEfficiencyValue.html">Max Spectral Efficiency Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum value of the updated cell spectral efficiency. When spectral-efficiency-based load evaluation is used, the eNodeB periodically measures cell spectral efficiency to update the spectral efficiency value. This parameter controls the maximum value of the updated cell spectral efficiency. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MinSpectralEfficiencyValue.html">Min Spectral Efficiency Value</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum value of the updated cell spectral efficiency. When spectral-efficiency-based load evaluation is used, the eNodeB periodically measures cell spectral efficiency to update the spectral efficiency value. This parameter controls the minimum value of the updated cell spectral efficiency. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-SpectralEffAdjustMaxStep.html">Spectral Efficiency Adjust Max Step</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum step value of the updated cell spectral efficiency. When spectral-efficiency-based load evaluation is used, the eNodeB periodically measures the spectral efficiency of the cell for spectral efficiency update. When a measurement period ends and the difference between the current and the previous measurement values is greater than or equal to the configured parameter value, this parameter value can be used as the updated step. When a measurement period ends and the difference between the current and the previous measurement values is smaller than the configured parameter value, the current measurement value can be used as the updated step. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UeNumDiffOffsetTransCa.html">UE Number Difference Offset Transfer CA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE count difference threshold for transferring CA UEs. When the UE-number-based load difference between the serving cell and candidate cell is greater than the sum of the UeNumDiffThd and UeNumDiffOffsetTransCa parameter values, CA UEs can be transferred to the candidate cell without considering the CA aggregation capability of the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MlbIdleUeNumAdjFactor.html">MLB Idle UE Number Adjust Factor</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the factor of the number of RRC_IDLE UEs that can be transferred by intra-RAT MLB within an MLB period. If this parameter is set to 0, all the UEs released in the MLB period can be transferred. If this parameter is set to a value other than 0, the maximum number of RRC_IDLE UEs that can be transferred in MLB is calculated as follows: (1). In PRB-usage-based MLB (or subcarrier-usage-based MLB in NB-IoT): Maximum number = MlbIdleUeNumAdjFactor parameter value x Upper limit percentage of the total number of UEs that can be transferred for PRB-usage-based MLB (or for subcarrier-usage-based MLB in NB-IoT) x Number of UL-sync UEs in the cell; (2) In MLB based on the number of UL-sync UEs: Maximum number = MlbIdleUeNumAdjFactor parameter value x Upper limit of total number of UEs that can be transferred.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-IdleMlbUeNumDiffThd.html">Idle MLB UE Number Difference Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the percentage threshold of the UL-sync UE number difference between serving and neighboring cells for triggering user-number-based MLB to transfer RRC_IDLE UEs. A neighboring cell can be a target cell in MLB when the load difference between the serving cell and the candidate neighboring cell exceeds the threshold. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-L2USmartOffloadThd.html">L2U Smart Offload Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of cell throughput for triggering experience-based MLB to UTRAN. If cell throughput is less than the L2USmartOffloadThd parameter value, experience-based MLB to UTRAN is triggered. If cell throughput is greater than the sum of the L2USmartOffloadThd and L2USmartOffloadOffset parameter values, experience-based MLB to UTRAN stops. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-L2USmartOffloadOffset.html">L2U Smart Offload Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates cell throughput offset of experience-based MLB to UTRAN. If cell throughput is greater than the sum of the L2USmartOffloadThd and L2USmartOffloadOffset parameter values, experience-based MLB to UTRAN stops. The threshold for stopping experience-based MLB to UTRAN is equal to the L2USmartOffloadThd parameter value plus the result of the L2USmartOffloadThd parameter value multiplied by the L2USmartOffloadOffset parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFreqMlbUlThd.html">Inter-Frequency MLB UL Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the uplink PRB usage threshold used to evaluate whether to trigger or stop inter-frequency MLB. If the MlbTriggerMode parameter is set to PRB_ONLY or PRB_OR_UE_NUMBER and the PrbLoadCalcMethod parameter is set to PRB_USAGE, uplink MLB is triggered when the number of UEs meets the minimum UE quantity condition for triggering inter-frequency MLB and the uplink PRB usage is greater than or equal to the sum of this threshold and the load offset. Uplink MLB stops when the uplink PRB usage is less than this threshold or the number of UEs meets the minimum UE quantity condition for stopping uplink MLB. For NB-IoT cells, MLB is triggered when the uplink resource usage is greater than or equal to the sum of this threshold and the load offset, regardless of the MLB triggering mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UeDlPrbLowThdOffset.html">UE DL PRB Usage Low Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the low threshold offset of downlink PRB usage used for MLB-oriented UE selection. If the MlbTriggerMode parameter is set to PRB_ONLY, when uplink MLB is triggered, the eNodeB selects UEs whose uplink PRB usage is greater than the sum of the MlbUeSelectPrbThd and UeUlPrbHighThdOffset parameter values and downlink PRB usage is less than the sum of the MlbUeSelectPrbThd and UeDlPrbLowThdOffset parameter values. If the MlbTriggerMode parameter is set to UE_NUMBER_ONLY, when MLB is triggered, the eNodeB selects UEs whose downlink PRB usage is less than or equal to the sum of the MlbUeSelectPrbThd and UeDlPrbLowThdOffset parameter values and uplink PRB usage is less than or equal to the sum of the MlbUeSelectPrbThd and UeUlPrbLowThdOffset parameter values. If the MlbTriggerMode parameter is set to PRB_OR_UE_NUMBER, the eNodeB selects UEs that meet the UE selection criterion for either PRB-usage-based or user-number-based MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UeUlPrbHighThdOffset.html">UE UL PRB Usage High Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the high threshold offset of uplink PRB usage used for MLB-oriented UE selection. If the MlbTriggerMode parameter is set to PRB_ONLY or PRB_OR_UE_NUMBER, when uplink MLB is triggered, the eNodeB selects UEs whose uplink PRB usage is greater than the sum of the MlbUeSelectPrbThd and UeUlPrbHighThdOffset parameter values, and downlink PRB usage is less than the sum of the MlbUeSelectPrbThd and UeDlPrbLowThdOffset parameter values. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UeUlPrbLowThdOffset.html">UE UL PRB Usage Low Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the low threshold offset of uplink PRB usage used for MLB-oriented UE selection. If the MlbTriggerMode parameter is set to PRB_ONLY, when downlink MLB is triggered, the eNodeB selects UEs whose downlink PRB usage is greater than the MlbUeSelectPrbThd parameter value, and uplink PRB usage is less than the sum of the MlbUeSelectPrbThd and UeUlPrbLowThdOffset parameter values. If the MlbTriggerMode parameter is set to UE_NUMBER_ONLY, when MLB is triggered, the eNodeB selects UEs whose downlink PRB usage is less than or equal to the sum of the MlbUeSelectPrbThd and UeDlPrbLowThdOffset parameter values, and uplink PRB usage is less than or equal to the sum of the MlbUeSelectPrbThd and UeUlPrbLowThdOffset parameter values. If the MlbTriggerMode parameter is set to PRB_OR_UE_NUMBER, the eNodeB selects UEs that meet the UE selection criterion for either PRB-usage-based or user-number-based MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-VideoLoadHighThd.html">Video Load High Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the high video load threshold of a cell. When the video load of the cell is greater than or equal to this threshold, inter-frequency video load balancing is triggered. The video load of a cell is expressed as the result of dividing the sum of guaranteed traffic volumes of all video services in the cell by the downlink radio interface capability of the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-VideoLoadLowThd.html">Video Load Low Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the low video load threshold of a cell. When the video load of the cell is lower than or equal to this threshold, inter-frequency video load balancing is stopped. The video load of a cell is expressed as the result of dividing the sum of guaranteed traffic volumes of all video services in the cell by the downlink radio interface capability of the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-VideoDlPrbThd.html">Video MLB DL PRB Ratio Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the downlink PRB usage threshold for not selecting a cell as the target cell for video load balancing. If the downlink PRB usage of a neighboring cell is greater than or equal to this threshold, the eNodeB does not select this neighboring cell as the target cell for video load balancing. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-InterFIdleUeNumOffloadOfs.html">Inter-Freq Idle UE Number Offload Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UE number offset used in inter-frequency idle mode offload by transferring loads to neighboring cells with which the local cell does not exchange load information. Assume that the MlbTriggerMode parameter is set to UE_NUMBER_ONLY or PRB_OR_UE_NUMBER. When the number of UL-sync UEs in the local cell is greater than or equal to the sum of the InterFreqIdleMlbUeNumThd and InterFIdleUeNumOffloadOfs parameter values, UEs in idle mode can be transferred to neighboring cells with which the local cell does not exchange load information. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UlExperienceDiffThd.html">UL Experience Difference Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the proportion of the difference between the uplink experience rate in a neighboring cell and that in the serving cell to the uplink experience rate in the serving cell, for determining whether a neighboring cell can be selected as the target cell to transfer UEs with a large uplink service volume for uplink experience guarantee based on service steering. If the proportion of the difference between the uplink experience rate in a neighboring cell and that in the serving cell to the uplink experience rate in the serving cell exceeds this threshold, the neighboring can be selected as the target cell to transfer UEs with a large uplink service volume for uplink experience guarantee based on service steering. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UlExperienceEvalPrd.html">UL Experience Evaluation Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period of evaluating the uplink experience. If the period when a cell is in the heavy-load state is longer than the parameter value, the eNodeB selects UEs with a large service volume in the uplink and transfers such UEs to other cells. This parameter must be set to a value greater than the value of the UlHeavyTrafficJudgePeriod parameter in the CellBackOff MO. Otherwise, the eNodeB cannot select UEs with a large service volume in the uplink for load balancing. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UlExperienceMaxUeNum.html">Max Number of UEs for UL Experience Guarantee</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the maximum number of UEs that can be selected in a period of load transfer to guarantee the uplink experience. The number of UEs selected for load transfer at a time must be limited to reduce the impact on neighboring cells. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UlExperienceOffloadThd.html">Rate Threshold for UL Experience Guarantee</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the uplink rate for triggering service steering to guarantee the uplink experience. If the uplink rate of the cell is lower than or equal to this threshold and the number of UEs meets the threshold requirement for triggering inter-frequency load balancing, the eNodeB triggers service steering to guarantee the uplink experience. If the uplink rate of the cell is higher than this threshold multiplied by the sum of 1 and the value of the UlExperienceOffset parameter in the CellMLB MO or the number of UEs meets the threshold requirement for exiting inter-frequency load balancing, the eNodeB terminates service steering for uplink experience guarantee. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-UlExperienceOffset.html">Rate Offset for UL Experience Guarantee</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the proportion of the uplink rate offset to the uplink rate threshold for uplink experience guarantee. The offset to the uplink rate equals this parameter multiplied by the UlExperienceOffloadThd parameter in the CellMLB MO. If the uplink rate of the cell is greater than the UlExperienceOffloadThd parameter in the CellMLB MO multiplied by the sum of 1 and the UlExperienceOffset parameter in the CellMLB MO, the eNodeB terminates service steering for uplink experience guarantee. This parameter applies only to LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MmLoadSteeringUeNumThld.html">MM Load Steering UE Number Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the number of uplink-synchronized UEs for triggering massive MIMO load transfer for non-massive MIMO cells. If the number of uplink-synchronized UEs in a non-massive MIMO cell exceeds the sum of this threshold and the MlbUeNumOffset in the CellMLB MO, the eNodeB triggers load transfer to inter-frequency massive MIMO cells. If the number of uplink-synchronized UEs in a non-massive MIMO cell is less than this threshold, the eNodeB does not transfer load from the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MmLoadSteeringLayerThld.html">MM Load Steering Layer Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the average number of RB layers of the cell for triggering massive MIMO load transfer for massive MIMO cells. If the average number of RB layers of a massive MIMO cell is greater than or equal to this threshold, the eNodeB starts load transfer to inter-frequency non-massive MIMO cells. If the average number of RB layers of the cell is less than this threshold multiplied by 0.9, the eNodeB stops transferring load from the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-NCellHoSuccRateThld.html">Neighboring Cell HO Success Rate Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold of the handover success rate for selecting a target neighboring cell for MLB. If the success rate of handovers from the serving cell to a neighboring cell is higher than or equal to this threshold, the neighboring cell can be selected as a target cell for MLB. If the success rate of handovers from the serving cell to a neighboring cell is lower than this threshold, the neighboring cell cannot be selected as a target cell for MLB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MuMimoPrbStatOptSwitch.html">MU-MIMO PRB Statistic Optimization Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to optimize the method of collecting statistics on the numbers of PRBs used for GBR services and non-GBR services and the total number of PRBs allocated for transmission in the cell in MU-MIMO scenarios.</p>
+<p>If this parameter is set to ON, the eNodeB adds up the frequency-domain numbers of PRBs allocated to paired UEs for GBR services, the frequency-domain numbers of PRBs allocated to paired UEs for non-GBR services, and the total frequency-domain numbers of PRBs allocated for transmission for paired UEs, and takes the sums as the statistical results in the cell. If this parameter is set to OFF, the eNodeB calculates the numbers of PRBs used for GBR services and non-GBR services and the total number of PRBs allocated for transmission differently for FDD and TDD. For downlink 4T, 8T, or 32T in FDD, the eNodeB uses the numbers of PRBs allocated to paired UEs for first-layer transmission to calculate the numbers of PRBs used for GBR services and non-GBR services and the total number of PRBs allocated for transmission in the cell. For downlink 4T or 8T in TDD, the eNodeB adds up the numbers of PRBs allocated to all involved UEs for GBR services, the numbers of PRBs allocated to all involved UEs for non-GBR services, and the total numbers of PRBs allocated for transmission for all involved UEs, and takes the sums as the statistical results in the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-MmLoadSteeringAdmThld.html">Massive MIMO Load Steering Admission Thld</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold, which is the number of uplink-synchronized UEs, used to determine whether the cell can serve as a target cell for inter-frequency load transfer in massive MIMO scenarios. If this parameter is set to 65535 and user-number-based MLB is not triggered in the cell, the cell can serve as a target neighboring cell for load transfer in massive MIMO scenarios. In addition, the cell can serve as a target neighboring cell for load transfer in user-number-based load equalization regardless of whether it is a massive MIMO or non-massive-MIMO cell.</p>
+<p>If this parameter is set to a value other than 65535 and the number of uplink-synchronized UEs in the cell is less than this threshold, the cell can serve as a target neighboring cell for load transfer in massive MIMO scenarios. In addition, if the cell is a massive MIMO cell, it can only serve as a target neighboring cell for load transfer from a massive MIMO cell; if the cell is a non-massive MIMO cell, it can only serve as a target neighboring cell for load transfer from a non-massive MIMO cell. If the number of uplink-synchronized UEs in the cell is greater than or equal to this threshold, the cell cannot serve as a target neighboring cell for load transfer in massive MIMO scenarios. In addition, the cell can serve as a target neighboring cell for load transfer in user-number-based load equalization regardless of whether it is a massive MIMO or non-massive-MIMO cell.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-EnhancedMlbAlgoExtSwitch.html">Enhanced MLB Algorithm Extension Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable extended MLB algorithm enhancement. This parameter provides the following options: UL_EXP_BASED_CA_TFC_STEER_SW: If this option is deselected, RRC_CONNECTED CA UEs configured with SCells cannot be transferred in uplink-experience-oriented service steering. If this option is selected, RRC_CONNECTED CA UEs configured with SCells can be transferred in uplink-experience-oriented service steering. This option applies only to LTE TDD.</p>
+<p>BLIND_MM_LOAD_STEERING_SW: If this option is selected, blind load transfer from massive MIMO cells to inter-frequency non-massive-MIMO cells is enabled. If this option is deselected, blind load transfer from massive MIMO cells to inter-frequency non-massive-MIMO cells is disabled. This option applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-NCellVendorSelectionRange.html">Neighboring Cell Vendor Selection Range</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the scope of vendors for neighboring cell selection in inter-vendor load equalization. If this parameter is set to INTER_VENDOR_NCELL, only inter-vendor neighboring cells can be selected. If this parameter is set to INTRA_VENDOR_NCELL, only intra-vendor neighboring cells can be selected. If this parameter is set to ANY_VENDOR_NCELL, both inter-vendor and intra-vendor neighboring cells can be selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellMLB-LoadDiffThldOffset.html">Load Difference Threshold Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>This parameter is applicable to the transfer of uplink synchronized UEs to an inter-RAT system. The total PRB usage of all UEs to be transferred in the direction where MLB is triggered must be less than half of the sum of the values of CellMLB.LoadDiffThd and CellMLB.LoadDiffThldOffset. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

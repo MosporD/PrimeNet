@@ -1,0 +1,179 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="SECURITYPEER">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="SECURITYPEER">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>SECURITYPEER</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="SECURITYPEER"></a><a name="SECURITYPEER"></a>
+
+
+<h1 class="topictitle1">SECURITYPEER</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="SECURITYPEER.html"><strong>SECURITYPEER</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The SECURITYPEER MO is used to configure the parameters related to a security peer. This MO can be referenced by multiple SCTP peers or user-plane peers for configuring their security attributes.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IPSECPROPOSAL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>SECURITYPEER</strong> MO, if <strong>SEGWSWITCH</strong> is set to ENABLE, <strong>IPSECPROPNAME</strong> must be the same as <strong>PROPNAME</strong> in a configured <strong>IPSECPROPOSAL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>USERPLANEPEER</strong> MO, if <strong>IPSECSWITCH</strong> is set to ENABLE, <strong>SECPEERID</strong> must be the same as <strong>SECURITYPEERID</strong> in a configured <strong>SECURITYPEER</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IPSECSWITCH</strong> and <strong>IPVERSION</strong> in a <strong>USERPLANEPEER</strong> MO are set to ENABLE and IPv4, respectively, the <strong>SECURITYPEER</strong> MO whose security peer ID is the same as <strong>SECPEERID</strong> in the <strong>USERPLANEPEER</strong> MO must meet either of the following conditions: (1) <strong>IPVERSION</strong> in the <strong>SECURITYPEER</strong> MO is set to IPv4. (2) <strong>PEERNAME</strong> in the <strong>SECURITYPEER</strong> MO is the same as <strong>PEERNAME</strong> in an <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In a manual configured <strong>USERPLANEPEER</strong> MO, if <strong>IPSECSWITCH</strong> is set to ENABLE, <strong>SECPEERID</strong> cannot be set to 80000~89999.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPSECSWITCH</strong> and <strong>IPVERSION</strong> in a <strong>USERPLANEPEER</strong> MO are set to ENABLE and IPv6, respectively, the <strong>SECURITYPEER</strong> MO whose security peer ID is the same as <strong>SECPEERID</strong> in the <strong>USERPLANEPEER</strong> MO must meet either of the following conditions: <strong>IPVERSION</strong> in the <strong>USERPLANEPEER</strong> MO is set to IPv6.</li></ul>
+</li><li>Relation with the <strong>SECURITYPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Each <strong>SECURITYPEER</strong> MO must have a unique value of <strong>PEERIKEIPV4</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]Each <strong>SECURITYPEER</strong> MO must have a unique value of <strong>PEERIKEIPV6</strong>.</li><li>[Co-MPT, gNodeB]The total number of <strong>SECURITYPEER</strong> MOs with <strong>IPVERSION</strong> set to IPv4 on a base station must be less than or equal to 384.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SEGWSWITCH</strong> and <strong>IPVERSION</strong> in the <strong>SECURITYPEER</strong> MO are set to DISABLE and IPv4, <strong>PEERIKEIPV4</strong> must be set to a value different from that of <strong>REMOTEIP</strong> in the <strong>IKEPEER</strong> MO whose <strong>CTRLMODE</strong> is set to MANUAL_MODE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>SEGWSWITCH</strong> parameter in the <strong>SECURITYPEER</strong> MO is set to ENABLE, the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO referenced by the <strong>PEERNAME</strong> parameter in the <strong>SECURITYPEER</strong> MO must be set to NONE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>SEGWSWITCH</strong> in a <strong>SECURITYPEER</strong> MO is set to ENABLE, the <strong>IKEPEER</strong> MO corresponding to <strong>PEERNAME</strong> must exist and <strong>IPVERSION</strong> in this <strong>IKEPEER</strong> MO must be set to IPV4.</li><li>[NodeB, eGBTS]In a <strong>SECURITYPEER</strong> MO, if <strong>SEGWSWITCH</strong> is set to ENABLE, <strong>PEERNAME</strong> must be the same as <strong>PEERNAME</strong> in a configured <strong>IKEPEER</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IFIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PEERIKEIPV4</strong> in a <strong>SECURITYPEER</strong> MO must be different from <strong>IP</strong> in an <strong>IFIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SECURITYTEMPLATE</strong> and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO that corresponds to <strong>PEERNAME</strong> in a <strong>SECURITYPEER</strong> MO is set to IKE_V1, <strong>PFS</strong> in all the <strong>SECURITYTEMPLATE</strong> MOs with <strong>SEGWSWITCH</strong> set to ENABLE cannot be set to PFS_GROUP19 or PFS_GROUP20.</li></ul>
+</li><li>Relation with the <strong>SCTPPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>SCTPPEER</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1SECPEERID</strong> must be the same as <strong>SECURITYPEERID</strong> in a configured <strong>SECURITYPEER</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>SIGIP1SECSWITCH</strong> and <strong>IPVERSION</strong> in an <strong>SCTPPEER</strong> MO are set to ENABLE and IPv4, respectively, the <strong>SECURITYPEER</strong> MO whose security peer ID is the same as <strong>SIGIP1SECPEERID</strong> in the <strong>SCTPPEER</strong> MO must meet either of the following conditions: (1) <strong>IPVERSION</strong> in the <strong>SECURITYPEER</strong> MO is set to IPv4. (2) <strong>PEERNAME</strong> in the <strong>SECURITYPEER</strong> MO is the same as <strong>PEERNAME</strong> in a configured <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In an <strong>SCTPPEER</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2SECPEERID</strong> must be the same as <strong>SECURITYPEERID</strong> in a configured <strong>SECURITYPEER</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>SIGIP2SECSWITCH</strong> and <strong>IPVERSION</strong> in an <strong>SCTPPEER</strong> MO are set to ENABLE and IPv4, respectively, the <strong>SECURITYPEER</strong> MO whose security peer ID is the same as <strong>SIGIP2SECPEERID</strong> in the <strong>SCTPPEER</strong> MO must meet either of the following conditions: (1) <strong>IPVERSION</strong> in the <strong>SECURITYPEER</strong> MO is set to IPv4. (2) <strong>PEERNAME</strong> in the <strong>SECURITYPEER</strong> MO is the same as <strong>PEERNAME</strong> in a configured <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In a <strong>SCTPPEER</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1SECPEERID</strong> cannot be set to 80000~89999.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]In a <strong>SCTPPEER</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2SECPEERID</strong> cannot be set to 80000~89999.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>SIGIP1SECSWITCH</strong> and <strong>IPVERSION</strong> in an <strong>SCTPPEER</strong> MO are set to ENABLE and IPv6, respectively, the <strong>SECURITYPEER</strong> MO whose security peer ID is the same as <strong>SIGIP1SECPEERID</strong> in the <strong>SCTPPEER</strong> MO must meet either of the following conditions: <strong>IPVERSION</strong> in the <strong>SECURITYPEER</strong> MO is set to IPv6.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>SIGIP2SECSWITCH</strong> and <strong>IPVERSION</strong> in an <strong>SCTPPEER</strong> MO are set to ENABLE and IPv6, respectively, the <strong>SECURITYPEER</strong> MO whose security peer ID is the same as <strong>SIGIP2SECPEERID</strong> in the <strong>SCTPPEER</strong> MO must meet either of the following conditions: <strong>IPVERSION</strong> in the <strong>SECURITYPEER</strong> MO is set to IPv6.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>MPGRP</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>PEERIKEIPV4</strong> in a <strong>SECURITYPEER</strong> MO must be different from <strong>IP</strong> in a configured <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in a configured <strong>MPGRP</strong> MO, or <strong>LOCALIP</strong> in a configured <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong>, <strong>MPGRP</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>PEERIKEIPV4</strong> in a <strong>SECURITYPEER</strong> MO must be set to a value different from <strong>IP</strong>, <strong>LOCALIP</strong>, or <strong>LOCALIP</strong> in a configured <strong>IPADDR4</strong> MO, <strong>MPGRP</strong> MO, and <strong>PPPLNK</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>SECURITYPEER</strong> MO whose <strong>IPVERSION</strong> is set to IPv6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, <strong>IPVERSION</strong> in the <strong>SECURITYPEER</strong> MO must be set to IPv4.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, a maximum of 256 <strong>SECURITYPEER</strong> MOs can be configured.</li></ul>
+</li><li>Relation with the <strong>DIRECTIPSECBLKLST</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>PEERIKEIPV4</strong> in the <strong>SECURITYPEER</strong> MO must be different from <strong>SECURITYPEERIP</strong> in the <strong>DIRECTIPSECBLKLST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DIRECTIPSECBLACKLIST</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>SECURITYPEER</strong> MO is set to IPv4, <strong>PEERIKEIPV4</strong> in the <strong>SECURITYPEER</strong> MO must be different from <strong>SECURITYPEERIPV4</strong> in the <strong>DIRECTIPSECBLACKLIST</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in a <strong>SECURITYPEER</strong> MO is set to IPv6, <strong>PEERIKEIPV6</strong> in the <strong>SECURITYPEER</strong> MO must be different from <strong>SECURITYPEERIPV6</strong> in a <strong>DIRECTIPSECWHITELIST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>PEERIKEIPV6</strong> in a <strong>SECURITYPEER</strong> MO must be different from <strong>IPV6</strong> in a configured <strong>IPADDR6</strong> MO.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]<strong>PEERIKEIPV6</strong> in a <strong>SECURITYPEER</strong> MO must be different from <strong>IP6</strong> in a configured <strong>OMCH</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TUNNELITF</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>SEGWSWITCH</strong> in a <strong>SECURITYPEER</strong> MO is set to DISABLE and <strong>IPVERSION</strong> is set to IPv6, <strong>PEERIKEIPV6</strong> must be different from <strong>REMOTEIP6</strong> in the <strong>TUNNELITF</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>SECURITYPEER</strong> MOs must be less than or equal to 128 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[gNodeB]<strong>PEERIKEIPV4</strong> in a <strong>SECURITYPEER</strong> MO must be different from <strong>IP</strong> in a configured <strong>DEVIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> MO:<ul><li>[gNodeB]<strong>PEERIKEIPV4</strong> in a <strong>SECURITYPEER</strong> MO must be different from <strong>IP</strong> in a configured <strong>IPADDR4</strong> MO.</li><li>[gNodeB]<strong>PEERIKEIPV4</strong> in an <strong>SECURITYPEER</strong> MO must be set to a value different from <strong>IP</strong> in an <strong>IPADDR4</strong> MO configured in the same routing domain.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#SECURITYPEER__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="SECURITYPEER__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="SECURITYPEER__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_securitypeer.html">ADD SECURITYPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a security peer required by secure automatic establishment.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_securitypeer.html">LST SECURITYPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configurations of a security peer and whether the security peer is created by the system. If the value of Auto Config Flag is set to Manual Created, the security peer is configured by the user manually. If the value of Auto Config Flag is Auto Created, the security peer is created by the system.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_securitypeer.html">MOD SECURITYPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configurations of a security.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_securitypeer.html">RMV SECURITYPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a security peer.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#SECURITYPEER__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="SECURITYPEER__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="SECURITYPEER__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-SecurityPeerID.html">Security Peer ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a security peer. The value of SECURITYPEERID in the SECURITYPEER MOs configured by users ranges from 0 to 65535. The value of SECURITYPEERID in the SECURITYPEER MOs configured by the system ranges from 70000 to 89999.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-SeGWSwitch.html">SeGW Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the peer end to perform IPSec negotiation with the local end through an SeGW. When this parameter is set to DISABLE, the peer end performs IPSec negotiation with the local end directly. When this parameter is set to ENABLE, the peer end establishes an IPSec tunnel to the local end through an SeGW.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-IPVersion.html">IP Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP protocol version of a security peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-PeerIKEIPv4.html">Peer IKE IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IPv4 address of the IKE peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-PeerIKEIPv6.html">Peer IKE IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IPv6 address of the IKE peer that corresponds to a service IP address. This parameter takes effect only in LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-PeerName.html">IKE Peer Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the IKE peer. The IKE peer is the SeGW that performs IKE negotiation with the local end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-IPSecPropName.html">IPSec Proposal Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the IPSec proposal used for IPSec negotiation between the local end and the SeGW.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object can be automatically modified or removed by the system. If this parameter is set to MANUAL_MODE, only users can operate this object. If this parameter is set to AUTO_MODE, the system can modify or remove this object and users can only remove this object.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-UserLabel.html">User Label</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the description of a security peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/SECURITYPEER-AutoCfgFlag.html">Auto Config Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object is created by the system. MANUAL_CREATED means that the object is configured by the user manually. AUTO_CREATED means that the object is created by the system.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

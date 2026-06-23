@@ -1,0 +1,291 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Packet Filtering Policy (ADD PACKETFILTERING)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_packetfiltering">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Packet Filtering Policy (ADD PACKETFILTERING)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_packetfiltering"></a><a name="add_packetfiltering"></a>
+
+
+<h1 class="topictitle1">Add Packet Filtering Policy (ADD PACKETFILTERING)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_packetfiltering__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a packet filtering policy object. A packet filtering policy object binds an ACL to a physical port so that IP packets that are received on the physical port can be filtered by the ACL.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_packetfiltering__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>After being added to an Ethernet trunk, the Ethernet port cannot be bound to a packet filtering policy object independently. After being bound to a packet filtering policy object, the Ethernet port cannot be added to the Ethernet trunk.</p>
+</li><li><p>If ACTION in the ACL rule that is bound to a packet filtering policy object is set to DENY, the data that matches the rule will be discarded.</p>
+</li><li><p>The L2 packet filtering policy function processes not only packets with VLAN tags but also packets without VLAN tags. If the L2 packet filtering policy function prohibits the admission of packets that have no VLAN tags, all packets without a VLAN tag are discarded, regardless of the protocol types.</p>
+</li><li><p>If a base station cannot be maintained by the EMS, it will attempt to restore the OM channel. If user-defined configurations are valid at this time, the base station automatically starts DHCP detection at the currently available transmission link. In this case, if a packet filtering policy is found to have been configured when the base station is in the LISTEN state, the base station will automatically modify the ACL rule that will filter out DHCP broadcast packets in the advanced ACL referenced by this packet filtering policy, to ensure the successful DHCP detection. Alternatively, the base station will add an ACL rule that allows DHCP broadcast packets to pass through. After the OM channel has been successfully established and kept alive for 30 minutes, the base station restores the ACL rule according to the user-defined configurations.</p>
+</li><li><p>When the DHCP procedure or DHCPv6 procedure succeeds and the BS attempts to restore the remote maintenance channel, if the user has configured the packet filter but the TCP packets from MAE to the BS will be filtered, the BS automatically modifies the ACL rule that will filter out the TCP packets or adds a rule to the advanced ACL used by this packet filter to permit the packets from MAE to the OM IP of the BS.</p>
+</li><li><p>When the ACL rule automatic setup and deletion function is enabled for packet filtering policy and the system automatically creates ACL rules, the created ACL rules are added to all the ACL groups referenced by the packet filtering policy that supports the ACL rule automatic setup and deletion function if the base station's IP address in the data flow is 0.0.0.0 or the IP address is configured on a loopback port. Otherwise, the created ACL rules are added only to the ACL groups referenced by the packet filtering policy of the port on which the local IP address is configured.</p>
+</li><li><p>This operation may interrupt the services or OM channels. It is recommended that you determine whether to enable the automatic configuration data rollback function depending on scenarios. For details, see the help of the <a href="cfm_cb.html">CFM CB</a> command.</p>
+</li><li><p>Board specifications: A maximum of 40 packet filters can be configured on a UMPTe/UMPTg/UMPTga/UTRPc. A maximum of 32 packet filters can be configured on a UMPTa/UMPTb. A maximum of 20 packet filters can be configured on a UMDU. A maximum of 21 packet filters can be configured on an LMPT. A maximum of 5 packet filters can be configured on a WMPT. A maximum of 8 packet filters can be configured on a UTRP (subboard type: UQEC)/UCCU/UBBPe/UBBPei/UBBPep/UBBPem/UBBPf0/UBBPg1. A maximum of 4 packet filters can be configured on a UTRP (subboard type: UEOC).</p>
+</li><li><p>System specifications: If the LMPT/WMPT/UMDU is the main control board, a maximum of 40 packet filters can be configured. If the UMPT is the main control board, a maximum of 60 packet filters can be configured.</p>
+</li><li><p>A maximum of one packet filtering policy of each different ACL type can be configured on the same port.</p>
+</li><li><p>When the ACL rule automatic setup and deletion function is enabled for packet filtering policy, the Match Behavior parameter must be set to DENY(Deny) for packet filtering policy, that is, the whitelist mode must be used.</p>
+</li><li><p>When the ACL rule automatic setup and deletion function is enabled for packet filtering policy, the ACL referenced by packet filtering policy cannot contain manually created ACL rules that are numbered from 50000 to 59999 (the value of the Auto Config Flag parameter is Manual Created when queried by running the <a href="lst_aclrule.html">LST ACLRULE</a> command). If these ACL rules exist in the ACL, they must be manually deleted to enable the ACL rule automatic setup and deletion function.</p>
+</li><li><p>When the ACL rule automatic setup and deletion function is enabled for packet filtering policy and if the required ACL rule has existed, the system will use the existing one.</p>
+</li><li><p>When the ACL rule automatic setup and deletion function is enabled for packet filtering policy and if multiple data flows match the same ACL rule, the system will reuse the ACL rule for these data flows. In this case, the corresponding ACL rule whose CTRL MODE is AUTO_MODE can be deleted only when all data flows are deleted.</p>
+</li><li><p>After the system starts, it checks the ACL rules created for packet filtering policy based on the ACL rules that are automatically created to ensure that the automatically created ACL rules match the configured data flows, and the unmatched ACL rules that are automatically created and have CTRL MODE set to AUTO_MODE will be deleted.</p>
+</li><li><p>After the ACL rule automatic setup and deletion function is enabled for packet filtering policy, the system automatically creates 6 ACL rules for the active OM channels and 6 ACL rules for the standby OM channels in the ACL that supports auto-setup. The ACL that supports auto-setup refers to the one referenced by packet filtering policy that supports the ACL rule automatic setup and deletion function. The destination ports of the 6 ACL rules are as follows: 6007, 6006, 6000, 443, 4443, and 45300. As limited by the specifications of ACL rules, it is recommended that sufficient ACL rule numbers be reserved for OM channels data connection to ensure the OM channels connection.</p>
+</li><li><p>When the ACL rule automatic setup and deletion function is disabled for a packet filter, the base station deletes the ACL rule created through the ACL rule automatic setup and deletion function and whose CTRLMODE is set to AUTO_MODE. To prevent services from being affected, it is recommended that users check which ACL rule is removed and manually add an ACL rule to ensure connectivity.</p>
+</li><li><p>When a packet filtering policy object is added to a UTRP (subboard type: UEOC/UQEC) by running this command, the total number of ACL rules referenced by all packet filters cannot exceed 48. The same ACL rules in one ACL referenced by multiple packet filters are regarded as one ACL rule.</p>
+</li><li><p>Before this command is executed, if the ACL on which packet filtering policy depends does not have a bearer object (packet filtering policy, IPSec policy group binding, or IPv6 security policy group binding) on the board for which packet filtering policy is configured, the ACL will try to take effect on the board. If the ACL does not take effect, the packet filtering policy may also not take effect.</p>
+</li><li><p>When the ACL rule automatic setup and deletion function is enabled for packet filtering policy, the system automatically creates an ACL rule for an FTP link which connects to the base station using the local IP address of the remote maintenance channel. If the FTP link is not used for more than 24 hours, the system automatically removes the ACL rule.</p>
+</li><li><p>The UTRPc board cannot be configured with the packet filtering policy object with Port Type set to TUNNEL.</p>
+</li><li><p>The current version does not support the automatic setup and deletion of IPv6 ACL rules for packet filtering.</p>
+</li><li><p>In FTP scenarios, the automatic ACL rule configuration and deletion function for packet filtering must be enabled before the FTP service is started. If automatic ACL rule configuration for packet filtering is enabled after the FTP service is started, the ACL rules used by the FTP service will not be automatically generated, and the FTP link in use will be disconnected. In this case, you need to restart the FTP upload and download services.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]If multiple packet filters reference the same ACL, the ACL rule automatic setup and deletion switches must be either turned on or off for all these packet filters. If the ACL rule automatic setup and deletion switches for some packet filters are turned on while those for other packet filters are turned off, all the switches are regarded as having been turned on.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]If multiple packet filtering policy objects reference the same ACL, the OMCH peer IP limit switches must be either turned on or off for all these packet filters. If the OMCH peer IP limit switches for some packet filtering policy objects are turned on while those for other packet filters are turned off, all the switches are regarded as having been turned on.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]If the ACL rule automatic setup and deletion function is enabled for a packet filter when the configured ACL rules are about to reach the maximum number, the base station adopts a best effort solution. That is, the base station creates ACL rules first for OM channels, then for time services, clock services, manually created IKE peers, and PKI, and finally for the DNS server, manually created SCTP links, and manually created IP paths. When the maximum ACL rules have been configured, no ACL rule can be created for the OM channels, time services, clock services, manually created IKE peers, PKI data flows, DNS server, manually created SCTP links, or manually created IP paths. In this case, users need to properly plan the transport networking and allocate ACL rules.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]When the ACL rule automatic setup and deletion function is enabled for packet filtering policy, the creation of ACL rules will be delayed, and the OM channels, manually created SCTP links, manually created IP paths, time services, clock services, IKE peers, PKI, and DNS server matching these ACL rules will be interrupted.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When the MAE is deployed in distributed mode or uses the remote HA system, you are advised to manually configure access rules for all MAE addresses in advance. Otherwise, the base station may be disconnected during manager migration.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]If multiple PACKETFILTERING objects reference the same ACL, the value of Match Behavior in these PACKETFILTERING objects must be the same. IF any value is different, the value of Match Behavior in the PACKETFILTERING objects that first takes effect prevails.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]When the ACL rule automatic setup and deletion function is enabled for packet filtering policy, the system automatically creates advanced ACL rules and matches them with the following data flows: OM channels, manually created SCTP links, manually created IP paths, time services, clock services, manually created IKE peers, PKI, and DNS server. If these data flows are added or deleted, the ACL rules whose CTRLMODE is AUTO_MODE will be added to or deleted from the ACL that supports the ACL rule automatic setup and deletion function, that is, the ACL referenced by the packet filtering policy that supports the ACL rule automatic setup and deletion function. If any of the preceding data flows is modified, the corresponding ACL rule that has been created automatically will be re-created.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]When this command is executed on the board (UMPT/UMDU) that supports IPv6 to add a packet filtering policy, the total number of IPv6 ACL rules in the IPv6 ACLs referenced by all packet filtering policies cannot exceed 64. If an IPv6 ACL rule is referenced by multiple packet filtering policies, no repeated calculation is required.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB,gNodeB]When the switch for limiting the peer IP address for the remote maintenance channel is enabled, the peer IP address in the ACL rules for the automatically created OMCH is automatically restricted to the IP address for the MAE to log in to the base station when the base station is in the stable state. In this case, the destination port numbers of the ACL rules that have been automatically generated for the remote maintenance channel are 6007, 6006, 6000, 443, 4443, and 45300. If the OM service over these ports connecting the MAE or other tools to the base station does not use the IP address used for login of the MAE to the base station, ACL rules must be manually configured before access is allowed to the base station. For example, the MAE cluster may use multiple IP addresses to access the base station OM service, and the NetEco (6007), TraceServer (6007), or NIC (6000, 6006) that is independently deployed uses a non-MAE IP address to access the base station OM service.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If multiple PACKETFILTERING objects reference the same ACL6, the value of Match Behavior in these PACKETFILTERING objects must be the same.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If a base station cannot be maintained by the EMS, it will attempt to restore the OM channel. If user-defined configurations are valid at this time, the base station automatically starts DHCP detection or DHCPv6 detection at the currently available transmission link. In this case, if a packet filtering policy is found to have been configured when the base station is in the LISTEN state, the base station will automatically modify the ACL rule that will filter out DHCP broadcast packets or DHCPv6 packets in the advanced ACL referenced by this packet filtering policy, to ensure the successful DHCP detection or DHCPv6 detection. Alternatively, the base station will add an ACL rule that allows DHCP broadcast packets or DHCPv6 packets to pass through. After the OM channel has been successfully established and kept alive for 30 minutes, the base station restores the ACL rule according to the user-defined configurations.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]When the packet filtering policy is enabled in IPv6 scenarios, ensure that the ND packets mandatory for IPv6 networking are allowed to pass through. This can be achieved through parameter settings in the ACLRULE6 object of the ICMP6 or IP6 protocol type. The default DSCP value of ND packets is 48. You must configure ND packet rules for all interface addresses even if they are on the same network segment.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]A maximum of 64 ACLRULE6 can be referenced by PACKETFILTERING on a board.</p>
+</li><li><p>[eNodeB,gNodeB]If ACTION in the ACL rule that is bound to a packet filtering policy object is set to PERMIT, the data that matches the rule will be allowed to pass.</p>
+</li><li><p>[NodeB]When the DHCP procedure succeeds and the BS attempts to restore the remote maintenance channel, if the user has configured the packet filter but the TCP packets from MAE to the BS will be filtered, the BS automatically modifies the ACL rule that will filter out the TCP packets or adds a rule to the advanced ACL used by this packet filter to permit the packets from MAE to the OM IP of the BS.</p>
+</li><li><p>[NodeB]When the ACL rule automatic setup and deletion function is enabled for packet filtering policy, the system automatically creates advanced ACL rules and matches them with the following data flows: OM channels, manually created SCTP links, manually created IP paths, time services, clock services, manually created IKE peers, and PKI. If these data flows are added or deleted, the ACL rules whose CTRLMODE is AUTO_MODE will be added to or deleted from the ACL that supports the ACL rule automatic setup and deletion function, that is, the ACL referenced by the packet filtering policy that supports the ACL rule automatic setup and deletion function. If any of the preceding data flows is modified, the corresponding ACL rule that has been created automatically will be re-created.</p>
+</li><li><p>[NodeB]If the ACL rule automatic setup and deletion function is enabled for a packet filter when the configured ACL rules are about to reach the maximum number, the base station adopts a best effort solution. That is, the base station creates ACL rules first for OM channels, then for time services, clock services, manually created IKE peers, and PKI, and finally for manually created SCTP links, and manually created IP paths. When the maximum ACL rules have been configured, no ACL rule can be created for the OM channels, time services, clock services, manually created IKE peers, PKI, manually created SCTP links, or manually created IP paths. In this case, users need to properly plan the transport networking and allocate ACL rules.</p>
+</li><li><p>[NodeB]When the ACL rule automatic setup and deletion function is enabled for packet filtering policy, the creation of ACL rules will be delayed, and the OM channels, manually created SCTP links, manually created IP paths, time services, clock services, IKE peers, and PKI data flows matching these ACL rules will be interrupted.</p>
+</li><li><p>[NodeB]When the main control board is a WMPT, the subboard type is BACK_BOARD, and the port type is TUNNEL, the base station does not support packet filtering policy.</p>
+</li><li><p>[NodeB]When the main control board is a WMPT, the system does not support the ACL rule automatic setup and deletion function for packet filtering policy.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_packetfiltering__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-PacketFilteringID.html">PACKETFILTERINGID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Packet Filtering ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the packet filtering policy.</p>
+<p>GUI Value Range: 0~59</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~59</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-FilterMode.html">FM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Filter Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the packet filtering policy mode. The NE can filter packets based on the advanced ACL or layer-2 ACL.</p>
+<p>GUI Value Range: ADV_ACL(Only Advanced ACL), L2_ACL(Only Layer 2 ACL)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ADV_ACL, L2_ACL</p>
+<p>MML Default Value: ADV_ACL(Only Advanced ACL)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>FM</strong> in the <strong>PACKETFILTERING</strong> MO is L2_ACL, the <strong>PT</strong> can only be set to ETH, ETHTRK or ETHCI, and the range of <strong>ACLID</strong> must be from 4000 to 4999.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>FM</strong> in the <strong>PACKETFILTERING</strong> MO is ADV_ACL, the <strong>PT</strong> can only be set to INTERFACE or TUNNEL, and the range of <strong>ACLID</strong> must be from 3000 to 3999.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-ACLType.html">ACLTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ACL Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the ID of the access control list.</p>
+<p>GUI Value Range: IPV4(IPv4), IPV6(IPv6), L2(Layer 2)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IPV4, IPV6, L2</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port type on which the packet filtering policy depends.</p>
+<p>GUI Value Range: TUNNEL(Tunnel), INTERFACE(Interface), ETH(Ethernet Port), ETHTRK(Ethernet Trunk), ETHCI(Ethernet CI Port)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TUNNEL, INTERFACE, ETH, ETHTRK, ETHCI</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>FM</strong> in the <strong>PACKETFILTERING</strong> MO is L2_ACL, the <strong>PT</strong> can only be set to ETH, ETHTRK or ETHCI, and the range of <strong>ACLID</strong> must be from 4000 to 4999.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>FM</strong> in the <strong>PACKETFILTERING</strong> MO is ADV_ACL, the <strong>PT</strong> can only be set to INTERFACE or TUNNEL, and the range of <strong>ACLID</strong> must be from 3000 to 3999.</li><li>[gNodeB]The value of <strong>PT</strong> in a <strong>PACKETFILTERING</strong> MO cannot be set to ETHCI.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>FM</strong> is set to ADV_ACL, <strong>PT</strong> can be set to TUNNEL or INTERFACE.</li><li>If <strong>FM</strong> is set to L2_ACL, <strong>PT</strong> can be set to ETH, ETHTRK, or ETHCI.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-PortID.html">PORTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the port ID or interface ID. When Port Type is set to Interface, this parameter indicates the interface ID. When Port Type is set to other values, this parameter indicates the port ID. When Port Type is set to Interface, the following are true: if IPsec Policy Group Binding Mode in the IKECFG MO is set to ALL, packet filtering policies can be bound only to a normal interface and take effect on the normal interface and all VLAN subinterfaces in the default routing domain of the physical port to which the normal interface belongs; if IPsec Policy Group Binding Mode in the IKECFG MO is set to SINGLE, packet filtering policies take effect only on the interface bound to the IPsec policies.</p>
+<p>GUI Value Range: 0~9999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~9999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>PACKETFILTERING</strong> MO, if <strong>PT</strong> is set to ETH, <strong>PORTID</strong> ranges from 0 to 9999.</li><li>In the <strong>PACKETFILTERING</strong> MO, if <strong>PT</strong> is set to ETHTRK, <strong>PORTID</strong> ranges from 0 to 23.</li><li>In the <strong>PACKETFILTERING</strong> MO, if <strong>PT</strong> is set to TUNNEL, <strong>PORTID</strong> ranges from 0 to 14.</li><li>In the <strong>PACKETFILTERING</strong> MO, if <strong>PT</strong> is set to ETHCI, <strong>PORTID</strong> ranges from 0 to 9999.</li><li>In the <strong>PACKETFILTERING</strong> MO, if <strong>PT</strong> is set to INTERFACE, <strong>PORTID</strong> ranges from 0 to 1499.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-ACLID.html">ACLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ACL ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an ACL. The value of this parameter ranges from 3000 to 4999. A value in the range of 3000 to 3999 indicates that the ACL rules in this ACL are advanced ACL rules. A value in the range of 4000 to 4999 indicates that the ACL rules in this ACL are layer 2 ACL rules.</p>
+<p>GUI Value Range: 3000~4999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3000~4999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>FM</strong> in the <strong>PACKETFILTERING</strong> MO is L2_ACL, the <strong>PT</strong> can only be set to ETH, ETHTRK or ETHCI, and the range of <strong>ACLID</strong> must be from 4000 to 4999.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>FM</strong> in the <strong>PACKETFILTERING</strong> MO is ADV_ACL, the <strong>PT</strong> can only be set to INTERFACE or TUNNEL, and the range of <strong>ACLID</strong> must be from 3000 to 3999.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-Behavior.html">MB</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Match Behavior</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to permit or reject access of the data that does not match the ACL rule. If this parameter is set to PERMIT, data that does not match the ACL rule is allowed to pass. If this parameter is set to DENY, data that does not match the ACL rule is discarded.</p>
+<p>GUI Value Range: PERMIT(Permit), DENY(Deny)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PERMIT, DENY</p>
+<p>MML Default Value: DENY(Deny)</p>
+<p>Recommended Value: DENY(Deny)</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>PACKETFILTERING</strong> MO, if <strong>ACLAUTOSWITCH</strong> is set to ON, <strong>MB</strong> must be set to DENY.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-ACLAutoSwitch.html">ACLAUTOSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ACL Rule Automatic Setup and Deletion Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable automatic setup of advanced ACL rules for packet filtering policy. When this switch is turned on, the system creates advanced ACL rules that match the following items in the ACL group referenced by the packet filtering policy object: OM data flows, manually created SCTP links, manually created IP paths, time services, clock services, manually created IKE peers, and PKI data flows. When the <a href="mod_packetfiltering.html">MOD PACKETFILTERING</a> command is executed to change the value of this parameter from ON to OFF, the system will automatically delete the automatically created advanced ACL rules in the ACL group referenced by the packet filtering policy object.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>PACKETFILTERING</strong> MO, if the <strong>ACLAUTOSWITCH</strong> parameter is set to ON, the <strong>MB</strong> parameter must be set to DENY.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PACKETFILTERING-OMPeerIPLimtSwitch.html">OMPEERIPLIMITSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">OMCH Peer IP Limit Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the peer IP address is limited by the ACL rules that have been automatically generated for the OM channel when the ACL rule automatic setup and deletion function is enabled. When this parameter is set to ON(ON), the peer IP address must be the IP address of the MAE. In this case, if any one of the NetEco, TraceServer, and NIC is independently deployed, the ACL rules must be manually configured before the preceding device can access the base station.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(OFF)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_packetfiltering__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a packet filtering policy with the parameters as follows: Packet Filtering ID: 0, Filter Mode: Only Advanced ACL, ACL Type: IPv4, Port Type: Interface, Port ID: 0, ACL ID: 3000, ACL Rule Automatic Setup and Deletion Switch: OFF, run the following command: 
+ADD PACKETFILTERING: PACKETFILTERINGID=0, FM=ADV_ACL, ACLTYPE=IPV4, PT=INTERFACE, PORTID=0, ACLID=3000, ACLAUTOSWITCH=OFF;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

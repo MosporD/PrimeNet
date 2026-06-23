@@ -1,0 +1,165 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IPSECBINDITF">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IPSECBINDITF">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IPSECBINDITF</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IPSECBINDITF"></a><a name="IPSECBINDITF"></a>
+
+
+<h1 class="topictitle1">IPSECBINDITF</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IPSECBINDITF.html"><strong>IPSECBINDITF</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO indicates the binding relationship between the IP Security (IPSec) policy group and the interface. An IPSec tunnel is negotiated to protect the data streams on an interface only after an IPSec policy group is bound to the interface.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPSECBINDITF</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, in an <strong>IPSECDTNL</strong> MO, the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to ports; the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to two different <strong>IPSECBINDITF</strong> MOs, and the <strong>SPGN</strong> values in the two <strong>IPSECBINDITF</strong> MOs are the same as the <strong>SPGN</strong> values in the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>IPSECPOLICY</strong> MO associated with an <strong>IPSECBINDITF</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>CTRLMODE</strong> in the <strong>IPSECBINDITF</strong> MO must be set to the same value as <strong>CTRLMODE</strong> in the corresponding <strong>IPSECPOLICY</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPSECBINDITFID</strong> in the <strong>IPSECBINDITF</strong> MOs is different, then the <strong>SPGN</strong> and <strong>ITFID</strong> in the <strong>IPSECBINDITF</strong> MOs must be different, too.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>CTRLMODE</strong> in the <strong>IPSECBINDITF</strong> MO is set to MANUAL_MODE, the <strong>IPSECBINDITFID</strong> in the <strong>IPSECBINDITF</strong> MO must be set to 0~235. If <strong>CTRLMODE</strong> in the <strong>IPSECBINDITF</strong> MO is set to AUTO_MODE, the <strong>IPSECBINDITFID</strong> in the <strong>IPSECBINDITF</strong> MO must be set to 10000~19999.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]A maximum of 54 IPv4 <strong>IPSECBINDITF</strong> MOs can be automatically created in an NE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]A maximum of 54 IPv4 <strong>IPSECBINDITF</strong> MOs can be manually created in an NE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of <strong>IPSECBINDITF</strong> MOs with <strong>CTRLMODE</strong> set to MANUAL_MODE cannot exceed 236.</li></ul>
+</li><li>Relation with the <strong>PORTSECURITY</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]Before adding an <strong>IPSECBINDITF</strong> MO, ensure that <strong>SWITCH</strong> in the <strong>PORTSECURITY</strong> MO on the bound Ethernet port is set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>INTERFACE</strong> MO associated with an <strong>IPSECBINDITF</strong> MO must have been configured and the <strong>PT</strong> of the <strong>INTERFACE</strong> MO can only be ETH, ETHTRK, ETHCI and TUNNELITF.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>CTRLMODE</strong> in the <strong>INTERFACE</strong> MO is set to AUTO, <strong>CTRLMODE</strong> in the <strong>IPSECBINDITF</strong> MO must be set to AUTO.</li><li>[Co-MPT, eNodeB, gNodeB]Only one <strong>IPSECBINDITF</strong> MO can be bound to an <strong>INTERFACE</strong> MO with <strong>PT</strong> set to TUNNELITF.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong>, <strong>IKEPEER</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If the <strong>IPVERSION</strong> of the <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO is IPV6, in the <strong>INTERFACE</strong> MO referenced by the same <strong>IPSECBINDITF</strong> MO, <strong>ITFTYPE</strong> must be set to NORMAL and <strong>PT</strong> must be set to TUNNELITF.</li><li>[Co-MPT, eNodeB, gNodeB]The port where the <strong>INTERFACE</strong> MO of <strong>IPSECBINDITF</strong> MO with parameter <strong>CTRLMODE</strong> set to MANUAL_MODE resides must be the same as the port of the local address of corresponding <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECPOLICY</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, <strong>VRFIDX</strong> in the <strong>INTERFACE</strong> MO identified by <strong>ITFID</strong> in the slave <strong>IPSECBINDITF</strong> MO must be the same as <strong>VRFIDX</strong> in the <strong>INTERFACE</strong> MO identified by <strong>ITFID</strong> in the master <strong>IPSECBINDITF</strong> MO.</li><li>[NodeB]The port where the <strong>INTERFACE</strong> MO of <strong>IPSECBINDITF</strong> MO resides must be the same as the port of the local address of corresponding <strong>IKEPEER</strong> MO.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> and <strong>IKECFG</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to ALL, the <strong>ITFTYPE</strong> of the <strong>INTERFACE</strong> MO associated with an <strong>IPSECBINDITF</strong> MO with parameter <strong>CTRLMODE</strong> set to MANUAL_MODE must be set to NORMAL.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>IPVERSION</strong> of all <strong>IKEPEER</strong> MOs associated with an <strong>IPSECBINDITF</strong> MO must be configured the same.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to SLAVE and the slave and master <strong>IKEPEER</strong> MOs are configured in different <strong>IPSECPOLICY</strong> MOs, the <strong>IPSECPOLICY</strong> MO of the slave <strong>IKEPEER</strong> MO can be added to this board when the following condition is met:</li><li>The <strong>IPSECPOLICY</strong> MO of the master <strong>IKEPEER</strong> MO to which this slave <strong>IKEPEER</strong> MO corresponds must have been added to a board.</li></ul>
+</li><li>Relation with the <strong>ACLRULE</strong>, <strong>IPSECPOLICY</strong>, <strong>INTERFACE</strong>, and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a transmission board is 264.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a main control board is 512.</li><li>[gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a transmission board is 264.</li><li>[gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a main control board is 512.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IPV4 and the <strong>IKEPEER</strong> MO is referenced by an <strong>IPSECPOLICY</strong> MO, <strong>VRFIDX</strong> in the <strong>INTERFACE</strong> MO bound to the <strong>IPSECPOLICY</strong> MO must be set to 0.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO in the <strong>IPSECPOLICY</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO is set to IPV6, the <strong>INTERFACE</strong> MO bound to an <strong>IPSECBINDITF</strong> MO must be carried on a <strong>TUNNELITF</strong> MO, and <strong>IPV6SW</strong> in the <strong>INTERFACE</strong> MO must be set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>INTERFACE</strong> MO bound to an <strong>IPSECBINDITF</strong> MO is set to TUNNELITF, <strong>IPVERSION</strong> in the associated <strong>IKEPEER</strong> MO must be set to IPV6.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]Only one <strong>IPSECPOLICY</strong> MO can be bound to an <strong>INTERFACE</strong> MO with <strong>PT</strong> set to TUNNELITF.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>IPSECPROPOSAL</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO in the <strong>IPSECPOLICY</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO is set to IPV6, <strong>ENCAPMODE</strong> in the associated <strong>IPSECPROPOSAL</strong> MO must be set to TUNNEL.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>ACLRULE6</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO in the <strong>IPSECPOLICY</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO is set to IPV6, <strong>ACTION</strong> in the associated <strong>ACLRULE6</strong> MO must be set to PERMIT.</li></ul>
+</li><li>Relation with the <strong>IPROUTE6</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>IPROUTE6</strong> MO is set to IF, <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO that is bound to the same <strong>IPSECBINDITF</strong> MO as the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>IPROUTE6</strong> MO must be set to IPV6 or IPV4+IPV6.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>SRCIPROUTE6</strong> MO is set to IF, the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>SRCIPROUTE6</strong> MO must be configured with an <strong>IPSECBINDITF</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>IPROUTE4</strong> MO is set to IF, the <strong>INTERFACE</strong> MO corresponding to <strong>PORTID</strong> in the <strong>IPROUTE4</strong> MO must be configured with an <strong>IPSECBINDITF</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE4</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>SRCIPROUTE4</strong> MO is set to IF, the <strong>INTERFACE</strong> MO corresponding to <strong>PORTID</strong> in the <strong>SRCIPROUTE4</strong> MO must be configured with an <strong>IPSECBINDITF</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> is set to IF and <strong>PT</strong> is set to INTERFACE in an <strong>IPROUTE4</strong> MO, <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO that is bound to the same <strong>IPSECBINDITF</strong> MO as this interface must be set to IPV4 or IPV4+IPV6.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong>, <strong>IPSECPOLICY</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]The <strong>IPSECBINDITF</strong> MOs in the active and standby <strong>IPSECPOLICY</strong> MOs of an <strong>IPSECDTNL</strong> MO must be configured in the same board.</li><li>[gNodeB]The <strong>IPSECBINDITF</strong> MOs in the active and standby <strong>IPSECPOLICY</strong> MOs of an <strong>IPSECDTNL</strong> MO must be configured in the same board.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong>, <strong>IPSECPOLICY</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]The <strong>IPSECBINDITF</strong> MOs of the master and slave <strong>IKEPEER</strong> MOs must be configured in the same cabinet, subrack, and slot.</li><li>[gNodeB]The <strong>IPSECBINDITF</strong> MOs of the master and slave <strong>IKEPEER</strong> MOs must be configured in the same cabinet, subrack, and slot.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong>, <strong>IPSECPOLICY</strong>, and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> is set to IF and <strong>PT</strong> is set to INTERFACE in an <strong>IPROUTE4</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>PORTID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>IPROUTE6</strong>, <strong>IPSECPOLICY</strong>, and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>RTTYPE</strong> is set to IF in an <strong>IPROUTE6</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>ITFID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE4</strong>, <strong>IPSECPOLICY</strong>, and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> is set to IF and <strong>PT</strong> is set to INTERFACE in an <strong>SRCIPROUTE4</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>PORTID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE6</strong>, <strong>IPSECPOLICY</strong>, and <strong>IKEPEER</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>RTTYPE</strong> is set to IF in an <strong>SRCIPROUTE6</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>ITFID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong>, <strong>IKEPEER</strong>, and <strong>IPROUTE4</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>IPROUTE4</strong> MO with <strong>RTTYPE</strong> set to IF and <strong>PT</strong> set to INTERFACE has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>IPROUTE4</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>IPROUTE4</strong> MOs in the same IPSec redundancy group) cannot exceed 150.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong>, <strong>IKEPEER</strong>, and <strong>IPROUTE6</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>IPROUTE6</strong> MO with <strong>RTTYPE</strong> set to IF has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>IPROUTE6</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>IPROUTE6</strong> MOs in the same IPSec redundancy group) cannot exceed 128.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong>, <strong>IKEPEER</strong>, and <strong>SRCIPROUTE4</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>SRCIPROUTE4</strong> MO with <strong>RTTYPE</strong> set to IF and <strong>PT</strong> set to INTERFACE has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>SRCIPROUTE4</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>SRCIPROUTE4</strong> MOs in the same IPSec redundancy group) cannot exceed 32.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong>, <strong>IKEPEER</strong>, and <strong>SRCIPROUTE6</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>SRCIPROUTE6</strong> MO with <strong>RTTYPE</strong> set to IF has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>SRCIPROUTE6</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>SRCIPROUTE6</strong> MOs in the same IPSec redundancy group) cannot exceed 32.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE4</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> is set to IF and <strong>PT</strong> is set to INTERFACE in an <strong>SRCIPROUTE4</strong> MO, <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO that is bound to the same <strong>IPSECBINDITF</strong> MO as this interface must be set to IPV4 or IPV4+IPV6.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE6</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> in an <strong>SRCIPROUTE6</strong> MO is set to IF, <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO that is bound to the same <strong>IPSECBINDITF</strong> MO as the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>SRCIPROUTE6</strong> MO must be set to IPV6 or IPV4+IPV6.</li></ul>
+</li><li>Relation with the <strong>ACLRULE</strong>, <strong>IPSECPOLICY</strong>, <strong>GTMU</strong>, <strong>MPT</strong>, <strong>APPLICATION</strong>, <strong>IKEPEER</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eGBTS]When the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on one board is 128.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>IKECFG</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>TYPE</strong> in the <strong>MPT</strong> MO is set to LMPT and <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to ALL, a maximum of four <strong>INTERFACE</strong> MOs with <strong>ITFTYPE</strong> set to VLAN can be configured on the physical ports corresponding to the <strong>INTERFACE</strong> MOs with <strong>ITFTYPE</strong> set to NORMAL, to which all the <strong>IPSECBINDITF</strong> MOs on the same board are bound.</li><li>[Co-MPT, eNodeB]When <strong>TYPE</strong> in the <strong>MPT</strong> MO is set to LMPT and <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to SINGLE, a maximum of four <strong>IPSECBINDITF</strong> MOs that are carried on the <strong>INTERFACE</strong> MOs with <strong>ITFTYPE</strong> set to VLAN can be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>ACLRULE</strong>, <strong>IPSECPOLICY</strong>, <strong>IKEPEER</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBINDITF</strong> that reference <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV4 on one board is 128.</li><li>[gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBINDITF</strong> that reference <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV4 on one board is 128.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IPSECBINDITF__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IPSECBINDITF__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IPSECBINDITF__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ipsecbinditf.html">ADD IPSECBINDITF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to bind an IPSec policy group to an interface. IPSec tunnels are negotiated to protect the data streams flowed through an interface only after an IPSec policy group is bound to the interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ipsecbinditf.html">LST IPSECBINDITF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the binding relation between the IPSECBINDITF MO and the interface.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_ipsecbinditf.html">MOD IPSECBINDITF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the parameters in an IPSECBINDITF object.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ipsecbinditf.html">RMV IPSECBINDITF</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove the binding of an IPSec policy group to an interface. The execution of this command terminates the protection mechanism applied to the data streams flowed through the interface.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IPSECBINDITF__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IPSECBINDITF__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IPSECBINDITF__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBINDITF-IPSecBindItfID.html">IPSec Bind Interface ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an IPSECBINDITF object. The value of IPSECBINDITFID in the IPSECBINDITF MOs configured by users ranges from 0 to 235. The value of IPSECBINDITFID in the IPSECBINDITF MOs configured by the system ranges from 10000 to 19999.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBINDITF-PolicyGroupName.html">Policy Group Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the IPSec policy group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBINDITF-InterfaceID.html">Interface ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the interface to which the IPsec policy group is bound. When IPsec Policy Group Binding Mode in the IKECFG MO is set to ALL, an IPsec policy group can be bound only to a common interface and the IPsec policies take effect on the common interface and all VLAN subinterfaces in the default routing domain of the physical port on which the common interface is located. When IPsec Policy Group Binding Mode in the IKECFG MO is set to SINGLE, the IPsec policies take effect only on the interface bound to the IPsec policy group. The interface IDs in the range of 0 to 1499 are used for user-configured interfaces, and the interface IDs in the range of 10000 to 19999 are used for system-configured interfaces.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IPSECBINDITF-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object can be modified or deleted by the system. The value MANUAL_MODE means that only the user can modify or delete the object. The value AUTO_MODE means only the system can modify or delete the object.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

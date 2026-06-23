@@ -1,0 +1,121 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Start CRS Antenna Port Mapping Optimization Detection (STR CRSPORTOPTDET)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="str_crsportoptdet">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Start CRS Antenna Port Mapping Optimization Detection (STR CRSPORTOPTDET)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="str_crsportoptdet"></a><a name="str_crsportoptdet"></a>
+
+
+<h1 class="topictitle1">Start CRS Antenna Port Mapping Optimization Detection (STR CRSPORTOPTDET)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="str_crsportoptdet__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to start the CRS antenna port mapping optimization detection of the cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="str_crsportoptdet__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<p>When the Automatic Reconfigure Switch is set to OFF, this operation may affect cell KPI badly (result in access rate decreased and drop call rare increased).</p>
+<p>When the Automatic Reconfigure Switch is set to ON, this operation may cause cell automatic reset.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="str_crsportoptdet__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GlobalProcSwitch-AutoRecfgSwitch.html">AutoRecfgSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Automatic Reconfigure Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable either CRS antenna port mapping optimization detection or CRS antenna port mapping reconfiguration. If this parameter is set to OFF, the detection function, rather than the reconfiguration, is executed. If this parameter is set to ON, the configuration function, rather than the detection function, is executed, and the reconfiguration function can be used only after the detection function finishes. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: OFF(Off)</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, only the detection function is executed to detect the optimal CRS antenna port mapping. This does not cause cell reset. If this parameter is set to ON, the CRS antenna port mapping is reconfigured to its optimal setting. This causes cell reset. If the current CRS antenna port mapping is optimal or the optimal setting is unknown, the mapping is not reconfigured and the cell is not reset.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GlobalProcSwitch-CrsAntPortOptDetUserNum.html">CrsAntPortOptDetUserNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CRS Ant Port Opt Mapping Detection User Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of UEs that can be used for CRS antenna port mapping optimization detection per hour. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 1~12</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~12</p>
+<p>MML Default Value: 3</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in smaller inter-cell interference and less impact on the uplink rate and uplink UE-perceived rates. However, the detection efficiency is low. A larger value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="str_crsportoptdet__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">(1)To start the CRS antenna port mapping optimization detection of the cells, run the following command:
+STR CRSPORTOPTDET: AutoRecfgSwitch=OFF, CrsAntPortOptDetUserNum=3;
+The result is shown as follows:
++++    HUAWEI        2017-03-27 09:31:38
+O&amp;M    #807403546
+%%STR CRSPORTOPTDET: AutoRecfgSwitch=OFF, CrsAntPortOptDetUserNum=3;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END
+
+(2)To start the CRS antenna port mapping reconfiguration of the cells, run the following command:
+STR CRSPORTOPTDET: AutoRecfgSwitch=ON;
+The result is shown as follows:
++++    HUAWEI        2017-03-27 09:31:38
+O&amp;M    #807403546
+%%STR CRSPORTOPTDET: AutoRecfgSwitch=ON;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

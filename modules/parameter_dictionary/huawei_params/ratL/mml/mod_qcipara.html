@@ -1,0 +1,1193 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify QCI Parameter (MOD QCIPARA)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_qcipara">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify QCI Parameter (MOD QCIPARA)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_qcipara"></a><a name="mod_qcipara"></a>
+
+
+<h1 class="topictitle1">Modify QCI Parameter (MOD QCIPARA)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_qcipara__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configurations of an eNodeB-level QCI.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_qcipara__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_qcipara__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-Qci.html">Qci</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">QoS Class Identifier</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the QCI, which is an attribute of EPS bearers. Different QCIs represent different QoS specifications such as the packet delay budget, packet loss rate (PLR) and packet error rate (PER), and resource type (whether the service is a GBR service or not). For details, see Table 6.1.7 in 3GPP TS 23.203.</p>
+<p>GUI Value Range: 1~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1,2,3,4,5,6,7,8,9,10~64,65,66,67~68,69,70,71~74,75,76~78,79,80~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a QciPara MO, when the value of Qci is in the range of 1 to 5, 65, 66, 69, and 75, the value of LogicalChannelPriority must be greater than 3 and less than 11.</li><li>In a QciPara MO, when the value of Qci is in the range of 6 to 9, 70, and 79, the value of LogicalChannelPriority must be greater than or equal to 9 and less than or equal to 16.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-ServiceType.html">ServiceType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Service Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the service type corresponding to the operator-defined QCI. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: IMSSignalling(IMS Signalling), LowDelay(Low Delay), TCPorBuffStreaming(TCP Based or Buffered Streaming), CBTC(CBTC)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IMSSignalling, LowDelay, TCPorBuffStreaming, CBTC</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: IMS Signaling: IMSSignalling(IMS Signalling)</p>
+<p>Low delay services: LowDelay(Low Delay)</p>
+<p>TCP-based services and buffered streaming services: TCPorBuffStreaming(TCP Based or Buffered Streaming)</p>
+<p>CBTC services: CBTC(CBTC)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: For CBTC, IMS signaling, and low delay services, the eNodeB schedules them with higher priorities, which consumes a lot of resources to ensure the QoS requirements. Therefore, do not set this parameter to CBTC, IMSSignalling, or LowDelay for TCP-based services and buffered streaming services.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UlschPriorityFactor.html">UlschPriorityFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Scheduling Priority Factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight factor used in the calculation of connection priorities during uplink scheduling. This parameter is invalid when CnOperatorQciPara.UlschPriorityWeightFactor is valid for QCI6~QCI9. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0.001~1, step: 0.001</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>QCI 6: 950</p>
+<p>QCI 7: 900</p>
+<p>QCI 8: 800</p>
+<p>QCI 9: 700</p>
+<p>QCI 70: 1000</p>
+<p>QCI 79: 925</p>
+<p>Other QCIs: IMS signaling: 1000, low-latency service: 900, and TCP service and non-real-time streaming service: 700</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in less uplink bandwidth to be allocated to services with the QCI when the uplink transport bandwidth or uplink licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-DlschPriorityFactor.html">DlschPriorityFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink Scheduling Priority Factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight factor used in the calculation of connection priorities during downlink scheduling. This parameter is invalid when CnOperatorQciPara.DlschPriorityWeightFactor is valid for QCI6~QCI9. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0.001~1, step: 0.001</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>QCI 6: 950</p>
+<p>QCI 7: 900</p>
+<p>QCI 8: 800</p>
+<p>QCI 9: 700</p>
+<p>QCI 70: 1000</p>
+<p>QCI 79: 925</p>
+<p>Other QCIs: IMS signaling: 1000, low-latency service: 900, and TCP service and non-real-time streaming service: 700</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a higher downlink scheduling priority for services with the QCI and also a higher priority with which the data rate for these services is guaranteed. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UlMinGbr.html">UlMinGbr</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink MinGBR</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink minimum guaranteed bit rate. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: MinGbrRate_0_KB(0kB/s), MinGbrRate_1_KB(1kB/s), MinGbrRate_2_KB(2kB/s), MinGbrRate_4_KB(4kB/s), MinGbrRate_8_KB(8kB/s), MinGbrRate_16_KB(16kB/s), MinGbrRate_32_KB(32kB/s), MinGbrRate_64_KB(64kB/s), MinGbrRate_128_KB(128kB/s), MinGbrRate_256_KB(256kB/s), MinGbrRate_512_KB(512kB/s), MinGbrRate_1024_KB(1024kB/s), MinGbrRate_1536_KB(1536kB/s), MinGbrRate_2048_KB(2048kB/s), MinGbrRate_2560_KB(2560kB/s)</p>
+<p>Unit: kB/s</p>
+<p>Actual Value Range: MinGbrRate_0_KB, MinGbrRate_1_KB, MinGbrRate_2_KB, MinGbrRate_4_KB, MinGbrRate_8_KB, MinGbrRate_16_KB, MinGbrRate_32_KB, MinGbrRate_64_KB, MinGbrRate_128_KB, MinGbrRate_256_KB, MinGbrRate_512_KB, MinGbrRate_1024_KB, MinGbrRate_1536_KB, MinGbrRate_2048_KB, MinGbrRate_2560_KB</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MinGbrRate_1_KB(1kB/s)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter indicates a smaller uplink minimum guaranteed bit rate for services with the QCI and results in lower uplink transport load and estimated usage of uplink licensed traffic volume of such services and a larger number of admitted services when the uplink transport bandwidth or licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-DlMinGbr.html">DlMinGbr</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink MinGBR</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink minimum guaranteed bit rate of the service. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: MinGbrRate_0_KB(0kB/s), MinGbrRate_1_KB(1kB/s), MinGbrRate_2_KB(2kB/s), MinGbrRate_4_KB(4kB/s), MinGbrRate_8_KB(8kB/s), MinGbrRate_16_KB(16kB/s), MinGbrRate_32_KB(32kB/s), MinGbrRate_64_KB(64kB/s), MinGbrRate_128_KB(128kB/s), MinGbrRate_256_KB(256kB/s), MinGbrRate_512_KB(512kB/s), MinGbrRate_1024_KB(1024kB/s), MinGbrRate_1536_KB(1536kB/s), MinGbrRate_2048_KB(2048kB/s), MinGbrRate_2560_KB(2560kB/s)</p>
+<p>Unit: kB/s</p>
+<p>Actual Value Range: MinGbrRate_0_KB, MinGbrRate_1_KB, MinGbrRate_2_KB, MinGbrRate_4_KB, MinGbrRate_8_KB, MinGbrRate_16_KB, MinGbrRate_32_KB, MinGbrRate_64_KB, MinGbrRate_128_KB, MinGbrRate_256_KB, MinGbrRate_512_KB, MinGbrRate_1024_KB, MinGbrRate_1536_KB, MinGbrRate_2048_KB, MinGbrRate_2560_KB</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MinGbrRate_1_KB(1kB/s)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in lower downlink transport load and estimated downlink usage of licensed traffic volume of services with the QCI and therefore a larger number of admitted services when the downlink transport bandwidth or licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-PreAllocationWeight.html">PreAllocationWeight</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Pre-allocation Weight</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the pre-allocation weight. The pre-allocation weight of a UE is the pre-allocation weight of services carried by the highest-priority logical channel. If services carried by highest-priority logical channels have different pre-allocation weights, the UE takes the highest pre-allocation weight. When resources are insufficient, pre-allocation weights affect the pre-allocation probabilities of users. The pre-allocation probability has a positive correlation with the pre-allocation weight. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~10</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1, step: 0.1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter results in a higher pre-allocation weight and therefore a shorter pre-allocation delay for services with the QCI. A smaller value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-InterRatPolicyCfgGroupId.html">InterRatPolicyCfgGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">InterRAT Policy Config Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the group ID of the parameters related to the inter-RAT handover with the extended QCI. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~39</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~39</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>QCI 1: 0</p>
+<p>QCI 2: 1</p>
+<p>QCI 3: 1</p>
+<p>QCI 4: 1</p>
+<p>QCI 5: 2</p>
+<p>QCI 6: 3</p>
+<p>QCI 7: 3</p>
+<p>QCI 8: 3</p>
+<p>QCI 9: 3</p>
+<p>QCI 65: 2</p>
+<p>QCI 66: 3</p>
+<p>QCI 69: 3</p>
+<p>QCI 70: 3</p>
+<p>QCI 75: 1</p>
+<p>QCI 79: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-PrioritisedBitRate.html">PrioritisedBitRate</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Prioritised Bit Rate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the prioritized bit rate of the logical channel. The UE scheduler guarantees prioritized bit rates of logical channels in descending order of logical channel priority. For details, see 3GPP TS 36.321. When the parameter is set to a value greater than PBR_256_KBps and not PBR_INFINITY, the parameter value takes effect on UEs complying with 3GPP R10 or later and PBR_256_KBps takes effect on other UEs. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: PBR_0_KBps(0kB/s), PBR_8_KBps(8kB/s), PBR_16_KBps(16kB/s), PBR_32_KBps(32kB/s), PBR_64_KBps(64kB/s), PBR_128_KBps(128kB/s), PBR_256_KBps(256kB/s), PBR_INFINITY(Infinity), PBR_512_KBps(512kB/s), PBR_1024_KBps(1024kB/s), PBR_2048_KBps(2048kB/s)</p>
+<p>Unit: kB/s</p>
+<p>Actual Value Range: PBR_0_KBps, PBR_8_KBps, PBR_16_KBps, PBR_32_KBps, PBR_64_KBps, PBR_128_KBps, PBR_256_KBps, PBR_INFINITY, PBR_512_KBps, PBR_1024_KBps, PBR_2048_KBps</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: PBR_8_KBps</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter indicates a higher prioritized bit rate of logical channels for services with the specific QCI and results in a higher probability that low-priority services fail to be scheduled. If this parameter is set to PBR_INFINITY and the traffic volume of services with the QCI is high, there is a risk that the services with QCIs indicating lower priorities will never be scheduled. A smaller value of this parameter indicates a lower prioritized bit rate of logical channels for services with the QCI and results in a lower probability that low-priority services fail to be scheduled. If this parameter is set to PBR_0_KBps, there is a risk that the services with the corresponding QCI will never be scheduled.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-LogicalChannelPriority.html">LogicalChannelPriority</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Logical Channel Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of the logical channel. The smaller the value of the parameter configuration, the higher the priority. The UE scheduler guarantees prioritized bit rates of logical channels in descending order of logical channel priority. Resources are allocated in descending order of logical channel priority after the prioritized bit rates of all services are guaranteed. For details, see 3GPP TS 36.321. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 4~16</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~16</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>QCI 1: 7</p>
+<p>QCI 2: 9</p>
+<p>QCI 3: 8</p>
+<p>QCI 4: 10</p>
+<p>QCI 5: 6</p>
+<p>QCI 6: 12</p>
+<p>QCI 7: 14</p>
+<p>QCI 8: 15</p>
+<p>QCI 9: 16</p>
+<p>QCI 65: 5</p>
+<p>QCI 66: 7</p>
+<p>QCI 69: 4</p>
+<p>QCI 70: 11</p>
+<p>QCI 75: 8</p>
+<p>QCI 79: 13</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a QciPara MO, when the value of Qci is in the range of 1 to 5, 65, 66, 69, and 75, the value of LogicalChannelPriority must be greater than 3 and less than 11.</li><li>In a QciPara MO, when the value of Qci is in the range of 6 to 9, 70, and 79, the value of LogicalChannelPriority must be greater than or equal to 9 and less than or equal to 16.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter indicates a higher scheduling priority for services with the QCI and results in a higher priority with which the data rate for these services is guaranteed preferentially. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-RlcPdcpParaGroupId.html">RlcPdcpParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RLC PDCP Parameter Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC/PDCP parameter group. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~240</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>QCI 1: 0</p>
+<p>QCI 2: 1</p>
+<p>QCI 3: 2</p>
+<p>QCI 4: 3</p>
+<p>QCI 5: 4</p>
+<p>QCI 6: 5</p>
+<p>QCI 7: 1</p>
+<p>QCI 8: 5</p>
+<p>QCI 9: 5</p>
+<p>QCI 65: 0</p>
+<p>QCI 66: 0</p>
+<p>QCI 69: 4</p>
+<p>QCI 70: 5</p>
+<p>QCI 75: 2</p>
+<p>QCI 79: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-FreeUserFlag.html">FreeUserFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Free User Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the extended QCI is specific to free users or paid users. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: PAID_USER(Paid User), FREE_USER(Free User)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PAID_USER, FREE_USER</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: PAID_USER(Paid User)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-FlowCtrlType.html">FlowCtrlType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Flow Control Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable flow control for the QCI. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: FLOW_CTRL(Flow Control), NON_FLOW_CTRL(Non Flow Control)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FLOW_CTRL, NON_FLOW_CTRL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>QCI 5: NON_FLOW_CTRL(Non Flow Control)</p>
+<p>QCI 6: FLOW_CTRL(Flow Control)</p>
+<p>QCI 7: FLOW_CTRL(Flow Control)</p>
+<p>QCI 8: FLOW_CTRL(Flow Control)</p>
+<p>QCI 9: FLOW_CTRL(Flow Control)</p>
+<p>QCI 69: NON_FLOW_CTRL(Non Flow Control)</p>
+<p>QCI 70: FLOW_CTRL(Flow Control)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this parameter is set to FLOW_CTRL, the eNodeB performs flow control on services with the QCI when transport congestion or licensed traffic congestion occurs. As a result, the delay and packet loss rate increase. However, the transport load and estimated usage of licensed traffic volume are not measured based on the actual traffic volume. The number of admitted services is not affected even if the actual traffic volume of the services with the QCI is large.</p>
+<p>When this parameter is set to NON_FLOW_CTRL, the eNodeB does not perform flow control on services with the QCI when transport congestion or licensed traffic congestion occurs. As a result, the delay and packet loss rate do not increase. However, the transport load and estimated usage of licensed traffic volume are measured based on the actual traffic volume. If the actual traffic volume of the services with the QCI is large, the number of admitted services decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-LtePttDedicatedExtendedQci.html">LtePttDedicatedExtendedQci</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PTT Dedicated Extended QCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether this extended QCI is used as the dedicated QCI for PTT services. If this parameter is set to YES(Yes), the eNodeB ensures the service quality for services with this extended QCI the same as PTT services. If this parameter is set to NO(No), the eNodeB processes the data of services with this extended QCI the same as common services with an extended QCI. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NO, YES</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-LtePttDownlinkPriority.html">LtePttDownlinkPriority</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PTT Downlink Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the relative downlink scheduling priority for dedicated bearers for PTT services. If this parameter is set to EQUAL_PRI_TO_QCI1, the downlink scheduling priority for PTT services is the same as that for VoIP services (with a QCI of 1). If this parameter is set to HIGHER_PRI_THAN_QCI1, the downlink scheduling priority for PTT services is higher than that for VoIP services (with a QCI of 1). This parameter takes effect only if the LtePttQoSSwitch parameter is set to ON and the LtePttDedicatedExtendedQci parameter is set to YES. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: EQUAL_PRI_TO_QCI1(Priority same as QCI1), HIGHER_PRI_THAN_QCI1(Priority Higher than QCI1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: EQUAL_PRI_TO_QCI1, HIGHER_PRI_THAN_QCI1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: EQUAL_PRI_TO_QCI1(Priority same as QCI1)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-LtePttUplinkPriority.html">LtePttUplinkPriority</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PTT Uplink Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the relative uplink scheduling priority for dedicated bearers for PTT voice services. If this parameter is set to EQUAL_PRI_TO_QCI1, the uplink scheduling priority for PTT services is the same as that for VoIP services (with a QCI of 1). If this parameter is set to HIGHER_PRI_THAN_QCI1, the uplink scheduling priority for PTT services is higher than that for VoIP services (with a QCI of 1). This parameter takes effect only if the LtePttQoSSwitch parameter is set to ON and the LtePttDedicatedExtendedQci parameter is set to YES. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: EQUAL_PRI_TO_QCI1(Priority same as QCI1), HIGHER_PRI_THAN_QCI1(Priority Higher than QCI1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: EQUAL_PRI_TO_QCI1, HIGHER_PRI_THAN_QCI1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: EQUAL_PRI_TO_QCI1(Priority same as QCI1)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-ExtQciCounterIndex.html">ExtQciCounterIndex</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Extended QCI Counter Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the counter index to which the extended QCI is mapped. If this parameter is set to Index0, the counters (for example, uplink PDCP-layer service traffic volume) related to this extended QCI can be observed by the mapping counters (for example, the L.Thrp.bits.UL.ExtQCI.Index0 counter). If this parameter is set to NO_COUNTER, performance about this extended QCI is not measured. Each extended QCI can be mapped to a counter index. This parameter can be set to NO_COUNTER for different extended QCIs, and this parameter cannot be set to the same value other than NO_COUNTER for any two extended QCIs. This parameter takes effect only when a new extended QCI is added.</p>
+<p>GUI Value Range: NO_COUNTER(NO_COUNTER), Index0(Index0), Index1(Index1), Index2(Index2), Index3(Index3), Index4(Index4), Index5(Index5), Index6(Index6), Index7(Index7), Index8(Index8)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO_COUNTER, Index0, Index1, Index2, Index3, Index4, Index5, Index6, Index7, Index8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>ExtQciCounterIndex in different QciPara MOs can be set to NO_COUNTER. ExtQciCounterIndex cannot be set to the same value other than NO_COUNTER in any two QciPara MOs. ExtQciCounterIndex does not take effect when the QCI is 1 to 9, 65, 66, 69, 70, 75 or 79.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UeInactiveTimerForQci.html">UeInactiveTimerForQci</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UE Inactive Timer for QCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the UE inactivity timer for UEs that have bearers of a QCI. If the eNodeB detects that a UE has neither received nor sent data for a period exceeding the value of this parameter, the eNodeB releases the RRC connection for this UE. If this parameter is set to 0, the UE inactivity timer is not used. This parameter takes effect only for UEs that will access the network after the parameter is set. If a UE has bearers of several QCIs, the eNodeB selects the longest UE Inactivity Timer of bearers with the highest QCI-specific priority specified by the UeInactiveTimerPri parameter as the UE inactivity timer for the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: QCI 69: 30</p>
+<p>Other QCIs: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in earlier RRC connection releases for UEs without performing services, more frequent RRC connection setup requests, and better KPIs such as the service drop rate due to more normal RRC connection releases. A larger value of this parameter results in later RRC connection releases for UEs without performing services, longer online duration in which radio resources are occupied, and worse KPIs such as the service drop rate due to fewer normal RRC connection releases. If the UE Inactivity Timer is set to a smaller value, the number of times UEs near a cell center access the cell becomes larger, resulting in smaller values of the L.RRC.ConnSetup.TimeAvg and L.E-RAB.Est.TimeAvg counters.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UlSynTimerForQci.html">UlSynTimerForQci</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Synchronization Timer for QCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the timer used to govern the period in which the eNodeB maintains uplink synchronization for UEs that have bearers of a QCI. After this timer expires, the eNodeB does not send the Timing Advance Command to the UE. This parameter does not take effect if it is set to 0. That is, the eNodeB will constantly send the Timing Advance Command to the UE to maintain uplink synchronization for the UE. If a UE has bearers of several QCIs, the eNodeB selects the longest uplink synchronization timer of bearers with the highest QCI-specific priority specified by the UeInactiveTimerPri parameter as the uplink synchronization timer for the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 180</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a higher probability that UEs enter the out-of-synchronization state when they should not and, therefore, a larger number of random access procedures triggered for maintaining uplink synchronization and more occupied resources for random access. A larger value of this parameter results in fewer prompt changes of UE status from uplink-synchronized to out-of-synchronization, more power consumption of UEs, and more PUCCH and SRS resources occupied.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UeInactivityTimerDynDrxQci.html">UeInactivityTimerDynDrxQci</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UE Inactivity Timer Dynamic DRX for QCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the UE inactivity timer for UEs that have entered DRX mode and have bearers of the QCI when dynamic DRX is enabled. If the eNodeB detects that a UE has neither received nor sent data for a period exceeding the value of this parameter, the eNodeB releases the RRC connection for this UE. If this parameter is set to a large value, the amount of signaling is reduced but UE power consumption increases. You are advised to set this parameter to a value greater than that of UlSynTimerDynDrx. In power saving mode, you are advised to set this parameter significantly different to the value of the UlSynTimerDynDrx parameter, for example a gap of 10 seconds, to avoid power consumption increase due to the increase of signaling. If a UE has bearers of several QCIs, the eNodeB selects the longest UE Inactivity Timer of bearers with the highest QCI-specific priority specified by the UeInactiveTimerPri parameter as the UE inactivity timer for the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 10~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 10~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 200</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in earlier RRC connection releases for UEs without performing services, more frequent RRC connection setup requests, and better KPIs such as the service drop rate due to more normal RRC connection releases. A larger value of this parameter results in later RRC connection releases for UEs without performing services, longer online duration in which radio resources are occupied, and worse KPIs such as the service drop rate due to fewer normal RRC connection releases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UeInactiveTimerPri.html">UeInactiveTimerPri</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">QCI-specific UE Inactive Timer Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority of the QCI-specific UE inactivity timer. A larger value of this parameter indicates a higher priority. The eNodeB selects the longest UE inactivity timer with the highest QCI-specific priority as the UE inactivity timer for UEs running services with the specific QCI. The UE inactivity timer for QCI 69 is taken as the UE inactivity timer for the MCPTT UEs.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter indicates a lower priority for the UE inactivity timer for the QCI and a lower probability that this timer is selected for a UE. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-EmtcModeARlcParaGroupId.html">EmtcModeARlcParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eMTC Mode A CL 1 RLC Para Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC parameter group used for eMTC UEs in CE mode A at coverage level 1. This parameter is invalid when it is set to 255. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the system by default. The default value is as follows:</p>
+<p>QCI 1: 45</p>
+<p>QCI 2: 46</p>
+<p>QCI 3: 47</p>
+<p>QCI 4: 48</p>
+<p>QCI 5: 49</p>
+<p>QCI 6: 50</p>
+<p>QCI 7: 46</p>
+<p>QCI 8: 50</p>
+<p>QCI 9: 50</p>
+<p>QCI 65: 45</p>
+<p>QCI 66: 45</p>
+<p>QCI 69: 49</p>
+<p>QCI 70: 50</p>
+<p>QCI 75: 47</p>
+<p>QCI 79: 47</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-EmtcModeBRlcParaGroupId.html">EmtcModeBRlcParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eMTC Mode B CL 3 RLC Para Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC parameter group used for eMTC UEs in CE mode B at coverage level 3. This parameter is invalid when it is set to 255. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the system by default. The default value is as follows:</p>
+<p>QCI 1: 85</p>
+<p>QCI 2: 86</p>
+<p>QCI 3: 87</p>
+<p>QCI 4: 88</p>
+<p>QCI 5: 89</p>
+<p>QCI 6: 90</p>
+<p>QCI 7: 86</p>
+<p>QCI 8: 90</p>
+<p>QCI 9: 90</p>
+<p>QCI 65: 85</p>
+<p>QCI 66: 85</p>
+<p>QCI 69: 89</p>
+<p>QCI 70: 90</p>
+<p>QCI 75: 87</p>
+<p>QCI 79: 87</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-NbRlcPdcpParaGroupId.html">NbRlcPdcpParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT RLC PDCP Para Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC/PDCP parameter group for NB-IoT in coverage level 2. The parameter value 255 indicates an invalid ID. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-CiotUeInactiveTimer.html">CiotUeInactiveTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CIoT UE Inactivity Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the UE inactivity timer for MTC UEs, eMTC UEs, and UEs with the RRC connection setup cause delayTolerant. If the eNodeB detects that such a UE has neither received nor sent data for a period exceeding the value of this parameter, the eNodeB releases the RRC connection for the UE. If this parameter is set to 0, the timer length is infinite. This parameter takes effect only for UEs that will access the network after the parameter is set. If a UE has bearers of several QCIs, the eNodeB selects the longest UE inactivity timer of bearers with the highest QCI-specific priority specified by the UeInactiveTimerPri parameter as the UE inactivity timer for the UE. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~3600</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 0~3600</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 20</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in earlier RRC connection releases for UEs without performing services, more frequent RRC connection setup requests, and better KPIs such as the service drop rate due to more normal RRC connection releases. A larger value of this parameter results in later RRC connection releases for UEs without performing services, longer online duration in which radio resources are occupied, and worse KPIs such as the service drop rate due to fewer normal RRC connection releases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-RlcModeReconfigSwitch.html">RlcModeReconfigSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RLC Mode Reconfig Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to modify the DRB RLC mode during an inter-eNodeB handover if the DRB RLC modes of the source and target eNodeBs are different. If this parameter is set to ON, the target eNodeB delivers the IE fullConfig through the handover command when the target eNodeB receives a handover request from the source eNodeB and determines that their DRB RLC modes are different. If this parameter is set to OFF, the target eNodeB does not change the DRB RLC mode configured in the source eNodeB during the handover. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON and the DRB RLC modes of the source and target eNodeBs are different, the target eNodeB delivers the IE fullConfig-r9 through the handover command. The UE restores the PDCP, RLC, MAC, and PHY layer parameters to their default values. This causes packet losses during the handover or triggers UE incompatibility issues, resulting in a handover failure and RRC connection reestablishment. Setting this parameter to OFF has no impact on network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-QciSpecificBestEffortGbr.html">QciSpecificBestEffortGbr</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">QCI-specific Best Effort GBR</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the QCI-specific best-effort GBR.</p>
+<p>If this parameter is set to 0, the eNodeB does not guarantee the QCI-specific best-effort GBR for bearers with a specific QCI.</p>
+<p>If this parameter is set to a value greater than 0 and less than 1000, the eNodeB guarantees the QCI-specific best-effort GBR of 1000 Kbit/s for bearers with the specific QCI.</p>
+<p>If this parameter is set to a value greater than 1000, the eNodeB guarantees the QCI-specific best-effort GBR of the configured value for bearers with the specific QCI.</p>
+<p>When both the SPID-specific best-effort GBR and QCI-specific best-effort GBR are set to a non-zero value and configured for the same UE, the eNodeB performs SPID-specific best-effort GBR for the UE.</p>
+<p>This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: Kbps</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in lower rates of bearers with the QCI and higher rates of bearers with other QCIs.</p>
+<p>A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-NbCe0RlcPdcpParaGroupId.html">NbCe0RlcPdcpParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT Coverage Level 0 RLC PDCP Para Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC/PDCP parameter group for NB-IoT in coverage level 0. The parameter value 255 indicates an invalid ID. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-NbCe1RlcPdcpParaGroupId.html">NbCe1RlcPdcpParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT Coverage Level 1 RLC PDCP Para Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC/PDCP parameter group for NB-IoT in coverage level 1. The parameter value 255 indicates an invalid ID. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-PdcpSnSizeReconfigSwitch.html">PdcpSnSizeReconfigSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCP SN Size Reconfig Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to modify the PDCP SN size during an inter-eNodeB handover (in which the bearer PDCP type is E-UTRA PDCP on both the source and target eNodeBs).</p>
+<p>If this parameter is set to ON, the target eNodeB reconfigures the PDCP SN size through the handover command when the target eNodeB receives a handover request from the source eNodeB and determines that the PDCP SN sizes of the source and target eNodeBs are different. If the UE complies with 3GPP Release 12 or later and the bearers set up for the UE are in RLC UM mode, the handover command does not contain the fullConfig-r9 IE. Otherwise, the handover command contains the fullConfig-r9 IE.</p>
+<p>If this parameter is set to OFF, the target eNodeB does not modify the PDCP SN size configured in the source eNodeB during the handover. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON and a UE does not support reconfiguration of the PDCP SN size or the IE fullConfig-r9, a UE incompatibility issue occurs and therefore the UE experiences a service drop and RRC connection reestablishment. When the UE receives messages containing the IE fullConfig-r9, the UE restores the PDCP-, RLC-, MAC-, and PHY-layer parameters to their default values. This leads to packet losses during the handover. Setting this parameter to OFF has no impact on network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UlMinGbrForModeA.html">UlMinGbrForModeA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Min GBR for Mode A</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink minimum GBR of services for UEs in mode A. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~2560000</p>
+<p>Unit: byte/s</p>
+<p>Actual Value Range: 0~2560000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower uplink transport load and estimated uplink usage of licensed traffic volume of services with the QCI and therefore a larger number of admitted services when the uplink transport bandwidth or licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-DlMinGbrForModeA.html">DlMinGbrForModeA</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Min GBR for Mode A</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink minimum GBR of services for UEs in mode A. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~2560000</p>
+<p>Unit: byte/s</p>
+<p>Actual Value Range: 0~2560000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower downlink transport load and estimated downlink usage of licensed traffic volume of services with the QCI and therefore a larger number of admitted services when the downlink transport bandwidth or licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UlMinGbrForModeB.html">UlMinGbrForModeB</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">UL Min GBR for Mode B</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the uplink minimum GBR of services for UEs in mode B. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~2560000</p>
+<p>Unit: byte/s</p>
+<p>Actual Value Range: 0~2560000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower uplink transport load and estimated uplink usage of licensed traffic volume of services with the QCI and therefore a larger number of admitted services when the uplink transport bandwidth or licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-DlMinGbrForModeB.html">DlMinGbrForModeB</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DL Min GBR for Mode B</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink minimum GBR of services for UEs in mode B. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~2560000</p>
+<p>Unit: byte/s</p>
+<p>Actual Value Range: 0~2560000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower downlink transport load and estimated downlink usage of licensed traffic volume of services with the QCI and therefore a larger number of admitted services when the downlink transport bandwidth or licensed traffic volume is limited. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-NbUeInactivityTimerForQci.html">NbUeInactivityTimerForQci</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT UE Inactivity Timer for QCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the UE inactivity timer for NB-IoT UEs that have bearers of a QCI. If the eNodeB detects that an NB-IoT UE has neither received nor sent data for a period exceeding the value of this parameter, the eNodeB releases the RRC connection for this UE. The parameter value 65535 indicates an invalid timer. In this case, the UE inactivity timer specified by the NBUeInactiveTimer parameter in the RrcConnStateTimer MO takes effect for the NB-IoT UEs. This parameter takes effect only for UEs that access the network after the parameter is set. If a UE has bearers of several QCIs, the eNodeB selects the longest QCI-specific UE inactivity timer with the highest priority as the UE inactivity timer for the UE. The QCI-specific priority of a QCI-specific UE inactivity timer is specified by the UeInactiveTimerPri parameter. This parameter applies only to NB-IoT.</p>
+<p>DisuseStatement: This parameter is replaced by the TimerDuration parameter in the QciUeTimerConfig MO with the TimerType parameter set to NB_CL0_UE_INACTIVITY_TIMER, NB_CL1_UE_INACTIVITY_TIMER, or NB_CL2_UE_INACTIVITY_TIMER and will be deleted in later versions. (Although the configuration interface in this version supports delivery of the setting of this parameter, the system no longer uses this parameter.) Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 1~3600,65535</p>
+<p>Unit: s</p>
+<p>Actual Value Range: 1~3600,65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: DeployMode is set to STAND_ALONE or GUARD_BAND: 20</p>
+<p>DeployMode is set to IN_BAND: 30</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in earlier RRC connection releases for NB-IoT UEs without performing services, more frequent RRC connection setup requests, and better KPIs such as the service drop rate due to more normal RRC connection releases. A larger value of this parameter results in later RRC connection releases for NB-IoT UEs without performing services, longer online duration in which radio resources are occupied, and worse KPIs such as the service drop rate due to fewer normal RRC connection releases.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-UlForwardPacketWaitTimer.html">UlForwardPacketWaitTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Forward Packet Wait Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time during which the eNodeB waits for uplink packets that are forwarded from a source eNodeB. For details about data forwarding upon handovers, see 3GPP TS 36.300. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~1000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 100</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a large value, delay due to waiting for uplink packets that are forwarded from the source eNodeB is prolonged and the uplink user-plane delay is long during a handover. If this parameter is set to a small value, uplink packet forwarding from the source eNodeB may not finish when the timer expires. In this case, some of the uplink packets to be forwarded are discarded.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-NbUeMobility.html">NbUeMobility</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT UE Mobility</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mobility status of UEs running services indicated by the current QCI. The status can be STATIONARY, LOW_SPEED_MOBILITY, or HIGH_SPEED_MOBILITY. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: STATIONARY(STATIONARY), LOW_SPEED_MOBILITY(LOW_SPEED_MOBILITY), HIGH_SPEED_MOBILITY(HIGH_SPEED_MOBILITY)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: STATIONARY, LOW_SPEED_MOBILITY, HIGH_SPEED_MOBILITY</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Stationary UEs: STATIONARY</p>
+<p>Low-speed mobility UEs: LOW_SPEED_MOBILITY</p>
+<p>High-speed mobility UEs: HIGH_SPEED_MOBILITY</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-NbUeRaiActivationFlag.html">NbUeRaiActivationFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT UE RAI Activation Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the RAI activation flag of a UE. If this parameter is set to FALSE, the RAI of the UE is not activated. If this parameter is set to TRUE, the RAI of the UE is activated. When the RAI of the UE is activated and the uplink data buffer of the UE is empty, the PUSCH does not include the BSR only if there is upcoming uplink data. For details, see 3GPP TS 36.331. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: FALSE(FALSE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to FALSE, the duration in which UEs are in RRC connected mode is longer and more power is consumed. If this parameter is set to TRUE, a UE proactively notifies the eNodeB when the BSR becomes zero. The eNodeB initiates an RRC connection release upon receiving the notification. This may cause frequent RRC connection setup and release for some UEs. However, UEs that do not have data to send in the uplink can enter RRC idle mode in advance, saving UE power.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-DrxParaGroupId.html">DrxParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DRX parameter group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a DRX parameter group. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~49,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~49,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-DlPdbForExtendedQci.html">DlPdbForExtendedQci</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink PDB for Extended QCI</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink packet delay budget (PDB) for an extended QCI. The PDB is used in delay-based differentiated scheduling for the extended QCI. If this parameter is not set to 0, the eNodeB tries its best to assure the downlink packet delay on services with the extended QCI, based on the PDB. If this parameter is set to 0, scheduling with delay preferentially assured is not required. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0,40~500</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 0,40~500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Setting this parameter to 0 has no impacts on services.</p>
+<p>If this parameter is not set to 0, a smaller value of this parameter results in a shorter assured downlink packet delay on services with the extended QCI and a higher priority for assuring its service delay. A larger value of this parameter results in the opposite effects.</p>
+<p>When the number of downlink resources required for all services in a cell exceeds the number of available downlink services in the cell, setting this parameter to a non-zero value results in a decrease in the data rates of non-GBR services without delay assurance. Otherwise, setting this parameter to a non-zero value has no obvious impacts on other services.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-ShortTtiRlcParamGroupId.html">ShortTtiRlcParamGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Short TTI RLC Parameter Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC parameter group for short TTI. This parameter is invalid when it is set to 255. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>QCI 1: 165</p>
+<p>QCI 2: 166</p>
+<p>QCI 3: 167</p>
+<p>QCI 4: 168</p>
+<p>QCI 5: 169</p>
+<p>QCI 6: 170</p>
+<p>QCI 7: 166</p>
+<p>QCI 8: 170</p>
+<p>QCI 9: 170</p>
+<p>QCI 65: 165</p>
+<p>QCI 66: 165</p>
+<p>QCI 69: 169</p>
+<p>QCI 70: 170</p>
+<p>QCI 75: 167</p>
+<p>QCI 79: 165</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-NsaDcRlcPdcpParamGroupId.html">NsaDcRlcPdcpParamGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NSA DC RLC PDCP Parameter Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC/PDCP parameter group for NSA DC services. This parameter is invalid when it is set to 255. If the ID is not exist in the RlcPdcpParaGroup MO, eNodeB will use RlcPdcpParaGroupId to replace. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the eNodeB by default as follows:</p>
+<p>QCI1:215</p>
+<p>QCI2:216</p>
+<p>QCI3:217</p>
+<p>QCI4:218</p>
+<p>QCI5:219</p>
+<p>QCI6:220</p>
+<p>QCI7:221</p>
+<p>QCI8:222</p>
+<p>QCI9:223</p>
+<p>QCI65:224</p>
+<p>QCI66:225</p>
+<p>QCI69:226</p>
+<p>QCI70:227</p>
+<p>QCI75:228</p>
+<p>QCI79:229</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-PdcpDiscardTimerReconfigSw.html">PdcpDiscardTimerReconfigSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PDCP Discard Timer Reconfiguration Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to modify the PDCP discard timer setting during an inter-eNodeB handover (in which the bearer PDCP type is E-UTRA PDCP on both the source and target eNodeBs) if the RLC modes of the source and target eNodeBs are the same but the PDCP discard timer setting of the source eNodeB is different from that of the target eNodeB. If this parameter is set to ON, the target eNodeB delivers the fullConfig IE through the handover command when the target eNodeB receives a handover request from the source eNodeB and determines that their PDCP discard timer settings are different. If this parameter is set to OFF, the target eNodeB does not modify the PDCP discard timer setting configured in the source eNodeB during the handover. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON and the target eNodeB determines that the PDCP discard timer setting of the source eNodeB is different from that of the target eNodeB, the target eNodeB delivers the IE fullConfig-r9 through the handover command. The UE restores the PDCP, RLC, MAC, and physical layer parameters to their default values. This causes packet losses during the handover or triggers UE incompatibility issues, resulting in a handover failure and RRC connection reestablishment. Setting this parameter to OFF has no impact on network performance.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-Eutra5gcRlcPdcpParamGrpId.html">Eutra5gcRlcPdcpParamGrpId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">E-UTRA/5GC RLC PDCP Parameter Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a parameter group which applies to E-UTRA/5GC UEs. An E-UTRA/5GC UE is served by an eNodeB which is connected to the 5GC. This parameter is invalid when it is set to 255. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the system by default. The default value is as follows:</p>
+<p>QCI 1: 231</p>
+<p>QCI 2: 232</p>
+<p>QCI 3: 233</p>
+<p>QCI 4: 234</p>
+<p>QCI 5: 235</p>
+<p>QCI 6: 236</p>
+<p>QCI 7: 232</p>
+<p>QCI 8: 236</p>
+<p>QCI 9: 236</p>
+<p>QCI 65: 231</p>
+<p>QCI 66: 231</p>
+<p>QCI 69: 235</p>
+<p>QCI 70: 236</p>
+<p>QCI 75: 233</p>
+<p>QCI 79: 231</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-OLDscpTransparentTransSw.html">OLDscpTransparentTransSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Outer Loop DSCP Transparent Trans Sw</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable transparent transmission of outer-loop DSCP for data transmission over bearers. If this parameter is set to ON, transparent transmission of outer-loop DSCP for data transmission over bearers is enabled. If this parameter is set to OFF, the eNodeB obtains the DSCP value based on the service mapping by default for data transmission over bearers. The DSCP is used for data processing differentiation.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(Off)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-NbSchPriWeightingFactor.html">NbSchPriWeightingFactor</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NB-IoT Sch Priority Weighting Factor</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the priority weight factor used for scheduling NB-IoT UEs. This parameter is valid only when the Qci parameter is set to a value in the range of 128 to 254. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Smoke sensing services: 7</p>
+<p>White goods services: 6</p>
+<p>Mobile services: 4</p>
+<p>Meter reading services: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter results in a lower scheduling priority for services of the corresponding QCI, lower uplink and downlink data rates of UEs, and a longer latency. A larger value of this parameter results in a higher priority for services of the corresponding QCI, higher uplink and downlink data rates of UEs, and better user experience.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-EmtcModeACl0RlcParaGroupId.html">EmtcModeACl0RlcParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eMTC Mode A CL 0 RLC Para Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC parameter group used for eMTC UEs in CE mode A at coverage level 0. This parameter is invalid when it is set to 255. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the system by default. The default value is as follows:</p>
+<p>QCI 1: 35</p>
+<p>QCI 2: 36</p>
+<p>QCI 3: 37</p>
+<p>QCI 4: 38</p>
+<p>QCI 5: 39</p>
+<p>QCI 6: 40</p>
+<p>QCI 7: 36</p>
+<p>QCI 8: 40</p>
+<p>QCI 9: 40</p>
+<p>QCI 65: 35</p>
+<p>QCI 66: 35</p>
+<p>QCI 69: 39</p>
+<p>QCI 70: 40</p>
+<p>QCI 75: 37</p>
+<p>QCI 79: 37</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-EmtcModeBCl2RlcParaGroupId.html">EmtcModeBCl2RlcParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eMTC Mode B CL 2 RLC Para Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an RLC parameter group used for eMTC UEs in CE mode B at coverage level 2. This parameter is invalid when it is set to 255. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~240,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~240,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: This parameter can be set by the system by default. The default value is as follows:</p>
+<p>QCI 1: 75</p>
+<p>QCI 2: 76</p>
+<p>QCI 3: 77</p>
+<p>QCI 4: 78</p>
+<p>QCI 5: 79</p>
+<p>QCI 6: 80</p>
+<p>QCI 7: 76</p>
+<p>QCI 8: 80</p>
+<p>QCI 9: 80</p>
+<p>QCI 65: 75</p>
+<p>QCI 66: 75</p>
+<p>QCI 69: 79</p>
+<p>QCI 70: 80</p>
+<p>QCI 75: 77</p>
+<p>QCI 79: 77</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QciPara-AggregationAttribute.html">AggregationAttribute</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Aggregation Attribute</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the aggregation attributes of the QCI.</p>
+<p>RATE_GUARANTEE_FLAG: Indicates whether to enable rate guarantee for bearers of this QCI. Rate guarantee for bearers of this QCI is enabled only if this option is selected. This option applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: RATE_GUARANTEE_FLAG(RATE_GUARANTEE_FLAG)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RATE_GUARANTEE_FLAG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RATE_GUARANTEE_FLAG:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: RATE_GUARANTEE_FLAG: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_qcipara__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify an eNodeB-level QCI with the parameters as follows: QoS Class Identifier: 11, Pre-allocation Weight: 3, run the following command:
+MOD QCIPARA: Qci=11, PreAllocationWeight=3;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

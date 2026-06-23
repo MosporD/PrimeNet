@@ -1,0 +1,131 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="concept">
+<meta name="DC.Title" content="GBTS MOM Description">
+<meta name="abstract" content="This section describes the functions and concepts of the GBTS MOM and also provides the managed object model (MOM) view and managed objects (MOs) related to the GBTS.">
+<meta name="description" content="This section describes the functions and concepts of the GBTS MOM and also provides the managed object model (MOM) view and managed objects (MOs) related to the GBTS.">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Relation" scheme="URI" content="../../ratG/mom/GBTSFunction-mom.html">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="GBTS-mom">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>GBTS MOM Description</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="GBTS-mom"></a><a name="GBTS-mom"></a>
+
+
+<h1 class="topictitle1">GBTS MOM Description</h1>
+
+
+<div><p>This section describes the functions and concepts of the
+GBTS MOM and also provides the managed object model (MOM) view and
+managed objects (MOs) related to the GBTS.</p>
+
+<div class="section"><h4 class="sectiontitle">Functions and Concepts</h4><p><strong>GBTSFunction</strong></p>
+<p>GBTSFunction is the root node of a GBTS function.</p>
+<p><strong>GSM Multi-Carrier BTS Standards</strong></p>
+<p>The GSM multi-carrier BTS
+standards are ETSI standards for RF modules, including CLASS0, CLASS1,
+CLASS2, and MSR.</p>
+<p><strong>Multimode Dynamic Power Sharing</strong></p>
+<p>The multimode dynamic power sharing consists of GSM/UMTS dynamic
+power sharing and GSM/LTE dynamic power sharing.</p>
+<p>The GSM/UMTS
+dynamic power sharing applies to GSM/UMTS dual-mode base stations.
+If GSM TRXs and UMTS TRXs share a power amplifier (PA), the UMTS HSDPA
+cells can share idle power of TRXs in GSM cells. This efficiently
+improves power utilization efficiency and UMTS network quality if
+GSM and UMTS networks have different peak hours or imbalanced traffic.
+In the case of traffic burst in GSM cells, the GSM cells can get back
+their power shared with the UMTS HSDPA cells. </p>
+<p>The GSM/LTE dynamic
+power sharing applies to GSM/LTE dual-mode base stations. If GSM cells
+under such a base station experience low traffic load, they share
+their idle power with LTE cells. When the GSM cell load increases
+to a certain value, the GSM cells can get back their power shared
+with the LTE cells.</p>
+<p><strong>Backup Power Saving</strong></p>
+<p>The backup
+power saving function takes different measures to prolong the operating
+period of the eGBTS in case of mains power failure due to power outage,
+snow disaster, or earthquake, thereby ensuring sufficient time for
+repairing the equipment and improving the network robustness. </p>
+<p><strong>Intelligent Voltage Regulation</strong></p>
+<p>The intelligent voltage
+regulation function can adjust the working voltage of the PA of a
+multi-carrier module based on its output power. This improves the
+working efficiency of the PA and reduces the eGBTS power consumption. </p>
+<p><strong>GBTS Baseband Resource</strong></p>
+<p>Resources required by an eGBTS
+to process baseband services in a cell or on a TRX are collectively
+referred to as GBTS baseband resources. A multimode baseband processing
+board can provide baseband resources for different RATs. Adding GBTS
+baseband resource objects to the corresponding multimode baseband
+processing board provides baseband resources for GSM TRXs.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">MOM View</h4><p>MOM view is a subset of the eGBTS
+MOM and provides MOs related to an eGBTS.</p>
+<div class="p"><div class="fignone"><span class="figcap"><b>Figure 1 </b>MOM view for an eGBTS</span>
+
+<br><span><img src="../image/mom/GBTS.png"></span></div>
+</div>
+<p>In the GBTS
+MOM view, all MOs are attributed to the GBTSFUNCTION MO. These MOs
+are described as follows:</p>
+<ul><li>For details about the GBTSFUNCTION MO, see <a href="GBTSFunction-mom.html">GBTSFunction MOM Description</a>. One GBTSFUNCTION MO corresponds
+to one GBTSGLOBALPARA MO and one GBTSENERGYMGTPARA MO.</li><li><a href="../mo/GbtsGlobalPara.html">GBTSGLOBALPARA</a> defines
+the attributes of GBTSFunction global parameters, including the GSM
+multi-carrier BTS standards.</li><li><a href="../mo/GbtsEnergyMgtPara.html">GBTSENERGYMGTPARA</a> defines GBTSFunction energy management parameters. The backup power
+can be saved by configuring the parameters under this MO when the
+eGBTS experiences an external power failure. The GBTSFunction energy
+management parameters are classified into two types: backup power
+saving parameters and PA intelligent adjustment voltage parameters.</li><li><a href="../mo/GbtsPwrShrGrp.html">GBTSPWRSHRGRP</a> defines
+the multimode dynamic power sharing group served by the GBTSFunction.
+The multimode dynamic power sharing function can be enabled by configuring
+the parameters under this MO. The multimode dynamic power sharing
+consists of GSM/UMTS dynamic power sharing and GSM/LTE dynamic power
+sharing. One GBTSFUNCTION MO can be configured with a maximum of 48
+GBTSPWRSHRGRP MOs, and one GBTSPWRSHRGR MO can be configured with
+a maximum of two SECTOREQM MOs.</li><li><a href="../mo/GbtsBbRes.html">GBTSBBRES</a> defines GBTS
+baseband resources. Adding GBTS baseband resource objects to the associated
+multimode baseband processing board can provide baseband resources
+for GSM TRXs. <ul><li>eGBTS with the UMPT/UMDU functioning as the main control board: <ul><li>For eGBTS with the UMPT functioning as the main control board,
+one GBTSFUNCTION MO can be configured with a maximum of six GBTSBBRES
+MOs.</li><li>For eGBTS with the UMDU functioning as the main control board,
+one GBTSFUNCTION MO can be configured with a maximum of one GBTSBBRES
+MOs.</li><li>One GBTSBBRES MO must be bound to only one configured BBP or UMDU.</li></ul>
+</li><li>eGBTS with the GTMUb functioning as the main control board: One
+GBTSFUNCTION MO can be configured with a maximum of two GBTSBBRES
+MOs, and one GBTSBBRES MO must be bound to only one configured BBP.</li></ul>
+</li></ul>
+<div class="note"><img src="../../public_sys-resources/icon-note.gif"><span class="notetitle"> NOTE: </span><div class="notebody"><p>For details about SECTOREQM and BBP MOs,
+see <a href="../../comm/mom/Sector-mom.html">Sector MOM Description</a> and <a href="../../comm/mom/Equip-BBU.html">BBU MOM Description</a>, respectively.</p>
+</div></div>
+</div>
+
+</div>
+
+<div>
+<div class="familylinks">
+<div class="parentlink"><strong>Parent topic:</strong> <a href="../../ratG/mom/GBTSFunction-mom.html" title="This section describes the functions and concepts of GBTSFunction and also provides the managed object model (MOM) view and MOs related to GBTSFunction.">GBTSFunction MOM Description</a></div>
+</div>
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

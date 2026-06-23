@@ -1,0 +1,300 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="PACKETFILTER">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="PACKETFILTER">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>PACKETFILTER</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="PACKETFILTER"></a><a name="PACKETFILTER"></a>
+
+
+<h1 class="topictitle1">PACKETFILTER</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="PACKETFILTER.html"><strong>PACKETFILTER</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The PACKETFILTER MO indicates the filtering of IP packets. The system first obtains the header information about the packets received by NEs, compares the information with the preset ACL rules, and then forwards or discards the packets according to the comparison results. The header information involves the numbers of protocols carried at the IP layer, source addresses and destination addresses of the packets, and source ports and destination ports of the packets.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>ACLRULE</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>ACLAUTOSWITCH</strong> is set to OFF, and <strong>FM</strong> in a <strong>PACKETFILTER</strong> MO is set to ADV_ACL or ADV_AND_L2, at least one <strong>ACLRULE</strong> MO which is created manually is included in the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>FM</strong> in a <strong>PACKETFILTER</strong> MO is set to L2_ACL or ADV_AND_L2, at least one <strong>ACLRULE</strong> MO is included in the <strong>ACL</strong> MO corresponding to <strong>ACLID2</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PACKETFILTER</strong> MO, if <strong>ACLAUTOSWITCH</strong> is set to ON, manually added ACL rules cannot be numbered from 50000 to 59999 because those ACL rule IDs are used by automatically created ACL rules. That is, <strong>RULEID</strong> cannot be set to any value from 50000 to 59999 for a manually created ACL rule. In the <strong>ACLRULE</strong> MO, if the value of <strong>AUTOCFGFLAG</strong> for an ACL rule is MANUAL_CREATED, this ACL rule is manually created.</li></ul>
+</li><li>Relation with the <strong>ETHTRK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in a <strong>PACKETFILTER</strong> MO is set to ETHTRK, ensure that the associated <strong>ETHTRK</strong> MO has been configured.</li></ul>
+</li><li>Relation with the <strong>ETHTRKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in a <strong>PACKETFILTER</strong> MO is set to ETH, and the <strong>ETHPORT</strong> MO is added to an <strong>ETHTRK</strong> MO, the <strong>PACKETFILTER</strong> MO cannot be added.</li></ul>
+</li><li>Relation with the <strong>PORTSECURITY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>ETHPORT</strong> MO that is associated with a <strong>PACKETFILTER</strong> MO must meet either of the following conditions: (1) No <strong>PORTSECURITY</strong> MO is associated with the <strong>ETHPORT</strong> MO; (2) A <strong>PORTSECURITY</strong> MO is associated with the <strong>ETHPORT</strong> MO, but <strong>SWITCH</strong> in the <strong>PORTSECURITY</strong> MO is set to ENABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>ETHCIPORT</strong> MO that is associated with a <strong>PACKETFILTER</strong> MO must meet either of the following conditions: (1) No <strong>PORTSECURITY</strong> MO is associated with the <strong>ETHCIPORT</strong> MO; (2) A <strong>PORTSECURITY</strong> MO is associated with the <strong>ETHCIPORT</strong> MO, but <strong>SWITCH</strong> in the <strong>PORTSECURITY</strong> MO is set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>HAGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In one logical protection group, <strong>SN</strong> in an <strong>HAGRP</strong> MO must be the same as that in a <strong>PACKETFILTER</strong> MO.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>FM</strong> in a <strong>PACKETFILTER</strong> MO is set to ADV_ACL, the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong> must have been configured. If <strong>FM</strong> in a <strong>PACKETFILTER</strong> MO is set to L2_ACL, the <strong>ACL</strong> MO corresponding to <strong>ACLID2</strong> must have been configured. If <strong>FM</strong> in a <strong>PACKETFILTER</strong> MO is set to ADV_AND_L2, the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong> and <strong>ACLID2</strong> must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Only one <strong>PACKETFILTER</strong> MO with <strong>PT</strong> set to TUNNEL can be configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PT</strong> in a <strong>PACKETFILTER</strong> MO is set to SUBIF, if <strong>FM</strong> is set to ADV_ACL, the corresponding <strong>SUBIF</strong> MO must use the same VRF index as the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong>. If <strong>FM</strong> is set to L2_ACL, the corresponding <strong>SUBIF</strong> MO must use the same VRF index as the <strong>ACL</strong> MO corresponding to <strong>ACLID2</strong>. If <strong>FM</strong> is set to ADV_AND_L2, the corresponding <strong>SUBIF</strong> MO must use the same VRF index as the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong> and <strong>ACLID2</strong>.</li></ul>
+</li><li>Relation with the <strong>TUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in a <strong>PACKETFILTER</strong> MO is set to TUNNEL, the <strong>TUNNEL</strong> MO corresponding to <strong>PN</strong> in the <strong>PACKETFILTER</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>EPGROUP</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD and <strong>PACKETFILTERSWITCH</strong> in an <strong>EPGROUP</strong> MO is set to ENABLE, a <strong>PACKETFILTER</strong> MO must exist and <strong>FM</strong> in this <strong>PACKETFILTER</strong> MO cannot be set to L2_ACL.</li></ul>
+</li><li>Relation with the <strong>ACL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>PT</strong> in a <strong>PACKETFILTER</strong> MO is set to ETH, ETHTRK, TUNNEL, or ETHCI. If <strong>FM</strong> is set to ADV_ACL, the <strong>ACL</strong> MO corresponding to <strong>ACLID</strong> must use the default VRF instance. If <strong>FM</strong> is set to L2_ACL, the <strong>ACL</strong> MO corresponding to <strong>ACLID2</strong> must use the default VRF instance. If <strong>FM</strong> is set to ADV_AND_L2, the <strong>ACL</strong> MOs corresponding to <strong>ACLID</strong> and <strong>ACLID2</strong> must use the default VRF instance.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>ACL</strong> MOs corresponding to <strong>ACLID</strong> and <strong>ACLID2</strong> in the <strong>PACKETFILTER</strong> MO must be configured manually.</li></ul>
+</li><li>Relation with the <strong>SUBIF</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PT</strong> in a <strong>PACKETFILTER</strong> MO is set to SUBIF, the corresponding <strong>SUBIF</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>PACKETFILTER</strong> MO, if the <strong>ACLAUTOSWITCH</strong> parameter is set to ON, the <strong>PACKETFILTER</strong> and <strong>IPSECPOLICY</strong> MOs cannot reference the same <strong>ACL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>OMCH</strong> MO must be configured before the ACL auto-setup function is enabled for packet filtering. The <strong>ACLAUTOSWITCH</strong> parameter is set to ON in the <strong>PACKETFILTER</strong> MO for enabling the ACL auto-setup function for packet filtering.</li></ul>
+</li><li>Relation with the <strong>BBP</strong> and <strong>CASCADEPORT</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to SCPRI/SRIO, this board cannot be configured with the <strong>PACKETFILTER</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if the <strong>CASCADEPORT</strong> MO in which the <strong>PN</strong> parameter is set to 6 does not exist, this board cannot be configured with the <strong>PACKETFILTER</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*40GE, and <strong>PT</strong> in the <strong>PACKETFILTER</strong> MO for this board is set to ETH, <strong>PN</strong> can only be set to 0 in the <strong>PACKETFILTER</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to AUTO, and <strong>PT</strong> in the <strong>PACKETFILTER</strong> MO for this board is set to ETH, <strong>PN</strong> can only be set to 0 in the <strong>PACKETFILTER</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP or LCOP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 4*10GE, and <strong>PT</strong> in the <strong>PACKETFILTER</strong> MO for this board is set to ETH, <strong>PN</strong> can only be set to 0, 1, 2, or 3 in the <strong>PACKETFILTER</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]On a UBBP board, if in the <strong>CASCADEPORT</strong> MO, the <strong>PN</strong> parameter is set to 6 and the <strong>PM</strong> parameter is set to 1*100GE, and <strong>PT</strong> in the <strong>PACKETFILTER</strong> MO for this board is set to ETH, <strong>PN</strong> can only be set to 0 in the <strong>PACKETFILTER</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PACKETFILTER</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ETHCIPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PT</strong> in a <strong>PACKETFILTER</strong> MO is set to ETHCI, the corresponding <strong>ETHCIPORT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TYPE</strong> in an <strong>MDU</strong> MO is set to MDUC, the <strong>PACKETFILTER</strong> MO must meet the following conditions: Cabinet No., Subrack No., and Slot No. are set to the same values as those in the <strong>MDU</strong> MO; <strong>SBT</strong> is set to BASE_BOARD; <strong>PT</strong> is set to ETH; <strong>PN</strong> is set to a value within the range 0 to 2.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>PACKETFILTER</strong> MOs must be less than or equal to 4 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#PACKETFILTER__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="PACKETFILTER__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="PACKETFILTER__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_packetfilter.html">ADD PACKETFILTER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add a packet filtering object. A packet filtering object binds an ACL to a physical port so that IP packets that are received on the physical port can be filtered by the ACL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_packetfilter.html">DSP PACKETFILTER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the statistics of the packets that are matched with the ACL rules after the packet filtering is bound to the Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_packetfilter.html">LST PACKETFILTER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configurations of all packet filtering objects.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_packetfilter.html">MOD PACKETFILTER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the settings of packet filtering.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_packetfilter.html">RMV PACKETFILTER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove a packet filtering object.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#PACKETFILTER__tab2">Table 2</a> and <a href="#PACKETFILTER__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="PACKETFILTER__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="PACKETFILTER__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the cabinet number of the board where the packet filtering is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subrack number of the board where the packet filtering is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the slot number of the board where the packet filtering is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-PortType.html">Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port type. This parameter cannot be set to SUBIF for UMTS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-PortNo.html">Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the port number.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-ACLID.html">Advanced ACL ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an advanced ACL. The value of this parameter ranges from 3000 to 3999.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-Behavior.html">Match Behavior</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to permit or reject access of the data that does not match the ACL rule. If this parameter is set to PERMIT, data that does not match the ACL rule is allowed to pass. If this parameter is set to DENY, data that does not match the ACL rule is discarded.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subboard type of the board where the packet filtering is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-ACLID2.html">Layer 2 ACL ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of an ACL at layer 2. The value of this parameter ranges from 4000 to 4999. The BS filters packets based on only VLAN IDs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-FilterMode.html">Filter Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the packet filtering mode. The BS can filter packets based on the advanced ACL, layer-2 ACL, or both at the same time.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-ACLAutoSwitch.html">ACL Rule Automatic Setup and Deletion Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the advanced ACL auto-setup function for packet filtering. After this switch is enabled, ACL rules in the ACL group referenced by a packet filtering object are automatically created and these ACL rules match the following data flows: OM channels, manually created SCTP links, manually created IP paths, time services, clock services, manually created IKE peers, and PKI. When the <a href="../mml/mod_packetfilter.html">MOD PACKETFILTER</a> command is executed to change the value of this parameter from ON(ON) to OFF(OFF), the system will automatically delete the advanced ACL rules that are automatically created in the ACL group referenced by the packet filtering object.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/PACKETFILTER-OMPeerIPLimtSwitch.html">OMCH Peer IP Limit Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the peer IP address is limited by the ACL rules that have been automatically generated for the OM channel when the ACL rule automatic setup and deletion function is enabled. When this parameter is set to ON(ON), the peer IP address must be the IP address of the MAE. In this case, if any one of the NetEco, TraceServer, and NIC is independently deployed, the ACL rules must be manually configured before the preceding device can access the base station.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="PACKETFILTER__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="PACKETFILTER__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-TxPackets.html">Number of TX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted packets. This parameter is reserved for further extension.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-RxPackets.html">Number of RX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-TxPermitPacket.html">Number of TX Permit Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of permitted packets on the TX channel. This parameter is reserved for further extension.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-RxPermitPacket.html">Number of RX Permit Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of permitted packets on the RX channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-TxDenyPacket.html">Number of TX Deny Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of rejected packets on the TX channel. This parameter is reserved for further extension.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-RxDenyPacket.html">Number of RX Deny Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of rejected packets on the RX channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-TxBytes.html">Bytes of TX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes contained in transmitted packets. This parameter is reserved for further extension.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-RxBytes.html">Bytes of RX Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes contained in received packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-TxPermitBytes.html">Bytes of TX Permit Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes contained in permitted packets on the TX channel. This parameter is reserved for further extension.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-RxPermitBytes.html">Bytes of RX Permit Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes contained in permitted packets on the RX channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-TxDenyBytes.html">Bytes of TX Deny Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes contained in rejected packets on the TX channel. This parameter is reserved for further extension.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-RxDenyBytes.html">Bytes of RX Deny Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes contained in rejected packets on the RX channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-RxDefaultBytes.html">Bytes of RX Packets Matched Default Behavior</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bytes contained in the packets that do not match the ACL rules for packet filtering. If MB is set to PERMIT, this parameter measures the number of bytes contained in the accessed packets. If MB is set to DENY, this parameter measures the number of bytes contained in the discarded packets. This parameter is valid only when CATALOG is set to PORT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/PACKETFILTER-RxDefaultPackets.html">Number of RX Packets Matched Default Behavior</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of the packets that do not match the ACL rules for packet filtering. If MB is set to PERMIT, this parameter measures the number of accessed packets. If MB is set to DENY, this parameter measures the number of discarded packets. This parameter is valid only when CATALOG is set to PORT.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#PACKETFILTER__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="PACKETFILTER__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="PACKETFILTER__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460338.html">VS.Firewall.RxL2ACLFilterDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of discarded packets due to L2 ACL filter based on port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460339.html">VS.Firewall.RxAdvACLFilterDropPkts</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of discarded packets due to advanced ACL filter based on port</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

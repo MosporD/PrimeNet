@@ -1,0 +1,221 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="RSCGRPALG">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="RSCGRPALG">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>RSCGRPALG</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="RSCGRPALG"></a><a name="RSCGRPALG"></a>
+
+
+<h1 class="topictitle1">RSCGRPALG</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="RSCGRP.html">RSCGRP</a>
+    +-<a href="RSCGRPALG.html"><strong>RSCGRPALG</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The RSCGRPALG MO consists of parameters related to the algorithm for a transmission resource group. Each transmission resource group corresponds to a type of algorithm. According to the corresponding algorithm, each transmission resource group performs operations such as traffic control.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="RSCGRP.html">RSCGRP</a></li><li>Relation with the <strong>RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before modifying an <strong>RSCGRPALG</strong> MO, ensure that the associated <strong>RSCGRP</strong> MO is configured. An <strong>RSCGRP</strong> MO is associated with an <strong>RSCGRPALG</strong> MO when both the following conditions are met: <strong>BEAR</strong> in the <strong>RSCGRP</strong> MO is set to IP; <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, <strong>SBT</strong>, <strong>PT</strong>, and <strong>PN</strong> in the <strong>RSCGRP</strong> MO are the same as those in the <strong>RSCGRPALG</strong> MO, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When an <strong>RSCGRP</strong> MO whose RSCGRPID is not AUTOPORT is being added, the system automatically adds the associated <strong>RSCGRPALG</strong> MO. Before an <strong>RSCGRP</strong> MO is removed, the system automatically removes the <strong>RSCGRPALG</strong> MO associated with the <strong>RSCGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>RSCGRPALG</strong> MO whose <strong>BEAR</strong> is set to IP cannot be configured.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TYPE</strong> in an <strong>MDU</strong> MO is set to MDUC, the <strong>RSCGRPALG</strong> MO must meet the following conditions: <strong>TXBWAMIN</strong> and <strong>RXBWAMIN</strong> are set to values within the range of 64 to 1000000; <strong>TXRSVBW</strong> and <strong>RXRSVBW</strong> are set to value within the range of 0 to 1000000.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>RSCGRPALG</strong> MOs must be less than or equal to 16 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#RSCGRPALG__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="RSCGRPALG__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="RSCGRPALG__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_rscgrpalg.html">LST RSCGRPALG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the settings of all transmission resource group algorithms.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_rscgrpalg.html">SET RSCGRPALG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the algorithm of a transmission resource group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#RSCGRPALG__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="RSCGRPALG__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="RSCGRPALG__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the cabinet that houses the board where a transmission resource group is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the subrack that houses the board where a transmission resource group is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the slot that houses the board where a transmission resource group is established.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-SubboardType.html">Subboard Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the subboard type of the board where a transmission group is established. This parameter cannot be set to UNCHANNELLED_COVERBOARD for LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-BearType.html">Transmission Resource Group Bear Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the bearer type of a transmission group. This parameter cannot be set to ATM for LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-PhyPortType.html">Bearing Port Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of port where a transmission resource group is carried. This parameter cannot be set to STM1, IMA, UNI, or FRAATM for LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-PhyPortNo.html">Bearing Port No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of the port where the transmission resource group is configured.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-RscGrpNo.html">Transmission Resource Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of a transmission resource group. When you add a PPP link, an MP group, an Ethernet port, an Ethernet trunk, a tunnel, or a PPPoE link, the system automatically creates an algorithm for the transmission resource group with Transmission Resource Group ID set to DEFAULTPORT(Default Port). When you remove any of the preceding objects, the system automatically removes the algorithm for the transmission resource group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-TxGTSSwitch.html">TX Traffic Shaping Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable traffic shaping for a transmission resource group. If this parameter is set to ON, traffic shaping is performed according to the TX bandwidth so that the transmit traffic would not exceed the capability of downstream routers, therefore avoiding unnecessary packet loss and congestion. If this parameter is set to OFF, traffic shaping is not performed during data transmission.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-TxBandwidthAdjustSwitch.html">TX Bandwidth Adjustment Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the dynamic adjustment of the TX bandwidth of a transmission resource group. If this parameter is set to ON, the TX bandwidth is adjusted according to the network performance and dynamic bandwidth adjustment parameters (Packet Loss Ratio Down Threshold and Delay Variation Down Threshold). The network performance is monitored through IP PM sessions, which can be enabled at the local end or at the peer end. If this parameter is set to OFF, the TX bandwidth is not adjusted. If mapping between the transmission resource group and a NodeB IP path or an IP path for no RAT is configured, this parameter does not take effect on the transmission resource group even though the parameter is set to ON. This parameter does not take effect in UMTS and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-RxBandwidthAdjustSwitch.html">RX Bandwidth Adjustment Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the dynamic adjustment of the RX bandwidth of a transmission resource group. If this parameter is set to ON, the RX bandwidth is adjusted according to the network performance and dynamic bandwidth adjustment parameters (Packet Loss Ratio Down Threshold and Delay Variation Down Threshold). The network performance is monitored through IP PM sessions, which can be enabled at the local end or at the peer end. If this parameter is set to OFF, the RX bandwidth is not adjusted. This parameter does not take effect in UMTS and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-DownSpeedPLRThreshold.html">Packet Loss Ratio Down Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the rate downsizing packet loss rate threshold for bandwidth adjustment. When RXBWASW or TXBWASW is set to ON, the estimated available transport bandwidth is reduced if the packet loss rate detected through IP Performance Monitoring (IP PM) is higher than this threshold. If the packet loss rate detected through IP PM is lower than this threshold, the estimated available transport bandwidth is increased.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-DownSpeedDelayThreshold.html">Delay Variation Down Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the rate downsizing packet loss rate threshold for bandwidth adjustment. When RXBWASW or TXBWASW is set to ON, the estimated available transport bandwidth will be reduced if the packet loss rate detected by an IP PM session is higher than this threshold; the estimated available transport bandwidth will be increased if the packet loss rate detected by an IP PM session is lower than this threshold.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-TxBandwidthAdjustMin.html">TX Bandwidth Adjust Minimum</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum amount of adjusted TX bandwidth. If TXBWASW is set to ON, the adjusted bandwidth should be at least greater than this minimum. This parameter does not take effect in UMTS and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-RxBandwidthAdjustMin.html">RX Bandwidth Adjust Minimum</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the minimum amount of adjusted RX bandwidth. If RXBWASW is set to ON, the adjusted bandwidth must be at least greater than this minimum. This parameter does not take effect in UMTS and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-BackPressureCtrlSwitch.html">Traffic Control Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the backpressure algorithm of a transmission resource group.</p>
+<p>The BS monitors the data buffered in the queues of each transmission resource group, determines whether the transmission resource group is congested, and transmits the backpressure signals (number and congestion status of the transmission resource group) to each flow control service.</p>
+<p>If the size of buffered data packets in any backpressure queue exceeds 75% of the queue capacity, the BS regards this transmission resource group as congested and transmits congestion signals.</p>
+<p>If the size of buffered data packets in each backpressure queue is less than 50% of the corresponding buffer capacity, the BS decides that the transmission resource group is not congested. In this situation, no congestion signal or congestion release signal is transmitted.</p>
+<p>When this parameter is set to ENABLE, both intra-mode traffic control and inter-mode traffic control are supported.</p>
+<p>The inter-mode traffic control for transmission resource groups applies only to separate-MPT base stations with co-transmission implemented through backplane interconnection. However, it does not apply to cascaded base stations, base stations with co-transmission implemented through panel interconnection, or base stations enabled with route load sharing.</p>
+<p>When the inter-mode traffic control function is enabled for a separate-MPT base station with co-transmission implemented through backplane interconnection, the Tunnel Type parameter must be set to DL(DL) for the tunnel of the mode providing transmission ports and must be set to UL(UL) for the tunnel of the mode providing no transmission port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-PQNumber.html">PQ Number</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of PQs in a transmission resource group. The queues in a transmission resource group are classified into PQs and non-PQs. The scheduling priority of any PQ is higher than that of any non-PQ. The queues numbered from 0 to the result after this parameter value minus 1 are PQs. PQ scheduling is used between PQs. A smaller PQ number indicates a higher scheduling priority. The queues numbered from this parameter value to 6 are non-PQs. WPR scheduling is used between non-PQs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-CongestTimeThreshold.html">Congestion Time Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the congestion time threshold of a transmission resource group. When TCSW is set to ENABLE, if the buffer time of non-real-time service data in a transmission resource group exceeds the threshold, the transmission resource group is congested, and backpressure signals are transmitted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-DecongestThreshold.html">Congestion Clear Time Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the congestion clear time threshold of a transmission resource group. When TCSW is set to ENABLE, if the buffer time of non-real-time service data in a transmission resource group is less than the threshold, the transmission resource group is not congested, and congestion clear signals are transmitted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-TxResvBandwidth.html">TX Reserved Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the TX bandwidth reserved for signaling data, OM data, or real-time services. This parameter should be set to a value less than the TX bandwidth of a transmission resource group. It is recommended that the reserved TX bandwidth be set to a value less than or equal to 3% of the TX bandwidth of a transmission resource group. The UMTS currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-RxResvBandwidth.html">RX Reserved Bandwidth</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the reserved RX bandwidth, which should be set to a value less than or equal to the RX bandwidth of a transmission resource group. This parameter does not take effect in UMTS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/RSCGRPALG-DropPktNumThreshold.html">Drop Packet Number Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number threshold of discarded packets. This parameter indicates the capability of the queue in an enhanced transmission resource group to buffer packets. A greater parameter value indicates a stronger capability. If this parameter is set to 0, the queue in an enhanced transmission resource group cannot buffer packets, and therefore all the delayed packets on the TX channel are discarded. The number threshold of discarded packets determines the maximum amount of data that can be buffered in an enhanced transmission resource group. The congestion time threshold of an enhanced transmission resource group determines the amount of data that is buffered when the enhanced transmission resource group is congested. Ensure that the maximum amount of data that can be buffered is not less than the amount of data that is buffered during congestion. When the board type is UMPTg or UMPTga, the configuration is not effective. The capacity of the UMPTg and UMPTga queue cache packet is dynamically allocated by the system.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

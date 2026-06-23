@@ -1,0 +1,562 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="IKEPEER">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="IKEPEER">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>IKEPEER</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="IKEPEER"></a><a name="IKEPEER"></a>
+
+
+<h1 class="topictitle1">IKEPEER</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="IKEPEER.html"><strong>IKEPEER</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>An IKEPEER MO consists of the parameters related to the peer end using Internet Key Exchange (IKE).</p>
+<p>If the Redundancy Flag parameter in an IKEPEER MO is set to Master or Slave, the IP Security (IPSec) redundancy function is enabled for this IKE peer. When the IPSec redundancy function is enabled and the negotiation on the master IKE peer fails, the system automatically performs a switchover from master IKE peer to slave IKE peers in descending order of priority until the negotiation succeeds. If the negotiation on the slave IKE peer with the lowest priority fails in one polling, the system starts another polling on the slave IKE peers in descending order of priority. When the IPSec redundancy function is enabled, it is recommended that the DPD detection function also be enabled. Otherwise, an active or standby IKE peer has to wait for a long time before the switchover.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IKEPROPOSAL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring an <strong>IKEPEER</strong> MO, ensure that the <strong>IKEPROPOSAL</strong> MO that is associated with <strong>PROPID</strong> in the <strong>IKEPEER</strong> MO is configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>AUTHMETH</strong> in an <strong>IKEPROPOSAL</strong> MO is set to PRE_SHARED_KEY, <strong>PKEY</strong> in an <strong>IKEPEER</strong> MO must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IKE_V1, <strong>DHGRP</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to DH_GROUP19 or DH_GROUP20.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IKE_V1, <strong>ENCALG</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to AES_GCM_128 or AES_GCM_256.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IKE_V1, <strong>AUTHALG</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to SHA384.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IKE_V1, <strong>PRFALG</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to HMAC_SHA384.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IDTYPE</strong> in an <strong>IKEPEER</strong> MO is set to DN, <strong>AUTHMETH</strong> in the referenced <strong>IKEPROPOSAL</strong> MO cannot be set to PRE_SHARED_KEY.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>REMOTEIP</strong> in each <strong>IKEPEER</strong> MO must be unique.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MOs for the primary and secondary IPSec tunnels in an <strong>IPSECDTNL</strong> MO must be the same as <strong>LOCALIP</strong> in the <strong>IKEPEER</strong> MOs for the primary and secondary <strong>IPSECPOLICY</strong> MOs used by the <strong>IPSECDTNL</strong> MO, respectively. In addition, <strong>DSTIP</strong> in the <strong>BFDSESSION</strong> MOs for the primary and secondary IPSec tunnels must be the same as <strong>REMOTEIP</strong> in the <strong>IKEPEER</strong> MOs for the primary and secondary <strong>IPSECPOLICY</strong> MOs, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same routing domain, <strong>SRCIP</strong> in the <strong>BFD</strong> MOs for the primary and secondary IPSec tunnels in an <strong>IPSECDTNL</strong> MO must be the same as <strong>LOCALIP</strong> in the <strong>IKEPEER</strong> MOs for the primary and secondary <strong>IPSECPOLICY</strong> MOs used by the <strong>IPSECDTNL</strong> MO, respectively. In addition, <strong>DSTIP</strong> in the <strong>BFD</strong> MOs for the primary and secondary IPSec tunnels must be the same as <strong>REMOTEIP</strong> in the <strong>IKEPEER</strong> MOs for the primary and secondary <strong>IPSECPOLICY</strong> MOs, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO is set to SLAVE, the master IKE peer specified by the <strong>MASTERPEERNAME</strong> parameter in the <strong>IKEPEER</strong> MO must exist.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO is set to SLAVE, the values of the <strong>PRIORITY</strong> parameter of all slave IKE peers corresponding to the master IKE peer specified by the <strong>MASTERPEERNAME</strong> parameter in the <strong>IKEPEER</strong> MO must differ.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]A maximum of 128 <strong>IKEPEER</strong> MOs with <strong>IPVERSION</strong> being set to IPV6 and <strong>CTRLMODE</strong> being set to MANUAL_MODE can be configured.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>DN</strong> in a <strong>IKEPEER</strong> MO is set to DN, <strong>IKEVERSION</strong> cannot be set to IKE_V1.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of <strong>IKEPEER</strong> MOs with <strong>CTRLMODE</strong> set to MANUAL_MODE cannot exceed 392.</li><li>[Co-MPT, eNodeB, gNodeB]A maximum of 256 <strong>IKEPEER</strong> MOs with IPVERSION set to IPV4 can be manually created in a base station.</li><li>[Co-MPT, eNodeB, gNodeB]The total number of <strong>IKEPEER</strong> MOs of the IPv4 type configured on a base station must be less than or equal to 392.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO is set to IPV4, the <strong>SPGN</strong> in the <strong>IPSECPOLICY</strong> MO must be different from the <strong>IPSECPOLICY</strong> MO whose <strong>IPVERSION</strong> in the referred <strong>IKEPEER</strong> MO is set to IPV6.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO, if <strong>IPVERSION</strong> is set to IPV6 and <strong>REDUNDANCYFLAG</strong> is set to MASTER or SLAVE, <strong>IKEVERSION</strong> must be set to IKE_V2.</li><li>[Co-MPT, eNodeB, gNodeB]<strong>IPVERSION</strong> of the slave <strong>IKEPEER</strong> MO must be the same as that of the master <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IPV6, <strong>DPD</strong> in the <strong>IKEPEER</strong> MO cannot be set to DISABLE, regardless of whether <strong>REDUNDANCYFLAG</strong> in the <strong>IKEPEER</strong> MO is set to MASTER or SLAVE.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>IFIP</strong>, and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The case is that <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION and <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is not set to 0.0.0.0, the <strong>DEVIP</strong> MO that has the same IP address as <strong>LOCALIP</strong> in the same routing domain must have been configured. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW and <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is not set to 0.0.0.0, the <strong>IFIP</strong> MO that has the same IP address as <strong>LOCALIP</strong> in the same routing domain must have been configured.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]Before configuring an <strong>IPSECPOLICY</strong> MO, ensure that the associated <strong>IKEPEER</strong> MO is configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If an <strong>IPSECPOLICY</strong> MO is manually configured, the corresponding <strong>IKEPEER</strong> MO must also be manually configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>REDUNDANCYFLAG</strong> parameter of the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to SLAVE, the master <strong>IKEPEER</strong> MO corresponding to this <strong>IKEPEER</strong> MO must have been referenced by the <strong>IPSECPOLICY</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO is set to SLAVE or MASTER, this <strong>IKEPEER</strong> MO can be referenced by only one <strong>IPSECPOLICY</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>REDIRECTSW</strong> parameter in the <strong>IKEPEER</strong> MO is set to ON, this <strong>IKEPEER</strong> MO can be referenced by only one <strong>IPSECPOLICY</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>PFS</strong> in an <strong>IPSECPOLICY</strong> MO is set to PFS_GROUP19 or PFS_GROUP20, <strong>IKEVERSION</strong> in the referenced <strong>IKEPEER</strong> MO cannot be set to IKE_V1.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If the <strong>IPSECPOLICY</strong> MOs corresponding to the master and slave <strong>IKEPEER</strong> MOs have the same <strong>ACLTYPE</strong> set to IPV4 or IPV6, the two <strong>IPSECPOLICY</strong> MOs must also have the same <strong>ACLID</strong>. If the two <strong>IPSECPOLICY</strong> MOs have the same <strong>ACLTYPE</strong> set to IPV4+IPV6, they must also have the same <strong>ACLID</strong> and same <strong>ACL2ID</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]When the IPSec Redundancy Among Multiple SeGWs feature is not used, if two <strong>IPSECPOLICY</strong> MOs have the same <strong>ACLID</strong> and their <strong>ACLTYPE</strong> is IPV4, <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MOs referenced by the two <strong>IPSECPOLICY</strong> MOs must be set to IPV4.</li><li>[Co-MPT, eNodeB, gNodeB]If two <strong>IPSECPOLICY</strong> MOs have the same <strong>ACLID</strong>, either of the following conditions must be met: (1) If <strong>ACLTYPE</strong> in the two <strong>IPSECPOLICY</strong> MOs is set to IPV4 and IPV4+IPV6, <strong>REDUNDANCYFLAG</strong> in the <strong>IKEPEER</strong> MOs referenced by the two <strong>IPSECPOLICY</strong> MOs cannot be set to NONE. (2) If <strong>ACLTYPE</strong> of the two <strong>IPSECPOLICY</strong> MOs is set to IPV4, <strong>IPVERSION</strong> of the <strong>IKEPEER</strong> MOs referenced by the two <strong>IPSECPOLICY</strong> MOs must be set to IPV4.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is set to IPV6 and <strong>REDUNDANCYFLAG</strong> in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to NONE, <strong>IPSECPOLICY</strong> MOs must have different <strong>ACLID</strong> values.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is set to IPV4+IPV6 and <strong>REDUNDANCYFLAG</strong> in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to NONE, <strong>IPSECPOLICY</strong> MOs must have different <strong>ACLID</strong> values and different <strong>ACL2ID</strong> values.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO is set to IPV6, the <strong>SPGN</strong> in the <strong>IPSECPOLICY</strong> MO must be unique.</li><li>[Co-MPT, eNodeB, gNodeB]When multiple <strong>IPSECPOLICY</strong> MOs reference the <strong>IKEPEER</strong> MOs with <strong>IPVERSION</strong> set to IPV6, the referenced <strong>IKEPEER</strong> MOs must be different.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IPSECPOLICY</strong> MO, if <strong>ACLTYPE</strong> is set to IPV6 or IPV4+IPV6, and <strong>IPVERSION</strong> and <strong>IPSECPREFRGSW</strong> are set to IPV4 and ON respectively in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO, then <strong>MTU</strong> in the <strong>IKEPEER</strong> MO must be greater than or equal to 1280.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is different from <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO, <strong>IKEVERSION</strong> in the <strong>IKEPEER</strong> MO must be set to IKE_V2.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is different from <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO, <strong>REDIRECTSW</strong> in the <strong>IKEPEER</strong> MO must be set to OFF.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO corresponding to the master <strong>IKEPEER</strong> MO is set to IPV4 and that in the <strong>IPSECPOLICY</strong> MO corresponding to the slave <strong>IKEPEER</strong> MO is set to IPV4+IPV6, or if <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO corresponding to the master <strong>IKEPEER</strong> MO is set to IPV4+IPV6 and that in the <strong>IPSECPOLICY</strong> MO corresponding to the slave <strong>IKEPEER</strong> MO is set to IPV4, the two <strong>IPSECPOLICY</strong> MOs must have the same <strong>ACLID</strong>.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO corresponding to the master <strong>IKEPEER</strong> MO is set to IPV6 and that in the <strong>IPSECPOLICY</strong> MO corresponding to the slave <strong>IKEPEER</strong> MO is set to IPV4+IPV6, <strong>ACLID</strong> in the <strong>IPSECPOLICY</strong> MO corresponding to the master <strong>IKEPEER</strong> MO must be the same as <strong>ACL2ID</strong> in the <strong>IPSECPOLICY</strong> MO corresponding to the slave <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO corresponding to the master <strong>IKEPEER</strong> MO is set to IPV4+IPV6 and that in the <strong>IPSECPOLICY</strong> MO corresponding to the slave <strong>IKEPEER</strong> MO is set to IPV6, <strong>ACL2ID</strong> in the <strong>IPSECPOLICY</strong> MO corresponding to the master <strong>IKEPEER</strong> MO must be the same as <strong>ACLID</strong> in the <strong>IPSECPOLICY</strong> MO corresponding to the slave <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]The values of <strong>ACLTYPE</strong> of the <strong>IPSECPOLICY</strong> MO to which the same group of active and standby <strong>IKEPEER</strong> MOs belong must be the same or contain the same value.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO on which the <strong>IPSECPOLICY</strong> MO depends is set to IPV6, the number of <strong>IPSECPOLICY</strong> MOs whose <strong>CTRLMODE</strong> is MANUAL_MODE must be less than or equal to 128.</li><li>[Co-MPT, eNodeB, gNodeB]Two <strong>IPSECPOLICY</strong> MOs must have different <strong>ACLID</strong> values if either of the following conditions is met: (1) In one <strong>IPSECPOLICY</strong> MO, <strong>ACLTYPE</strong> is set to IPV4, and <strong>IPVERSION</strong> and <strong>REDUNDANCYFLAG</strong> in the referenced <strong>IKEPEER</strong> MO are set to IPV4 and MASTER, respectively. In the other <strong>IPSECPOLICY</strong> MO, <strong>ACLTYPE</strong> is set to IPV4, and <strong>IPVERSION</strong> and <strong>REDUNDANCYFLAG</strong> in the referenced <strong>IKEPEER</strong> MO are set to IPV6 and MASTER, respectively. (2) In one <strong>IPSECPOLICY</strong> MO, <strong>ACLTYPE</strong> is set to IPV4, and <strong>IPVERSION</strong> and <strong>REDUNDANCYFLAG</strong> in the referenced <strong>IKEPEER</strong> MO are set to IPV4 and MASTER, respectively. In the other <strong>IPSECPOLICY</strong> MO, <strong>ACLTYPE</strong> is set to IPV4+IPV6, and <strong>REDUNDANCYFLAG</strong> in the referenced <strong>IKEPEER</strong> MO is set to MASTER.</li><li>[Co-MPT, eNodeB, gNodeB]Two <strong>IPSECPOLICY</strong> MOs must have different <strong>ACLID</strong> values if the following conditions are met: (1) In one <strong>IPSECPOLICY</strong> MO, <strong>ACLTYPE</strong> is set to IPV4, and <strong>IPVERSION</strong> and <strong>REDUNDANCYFLAG</strong> in the referenced <strong>IKEPEER</strong> MO are set to IPV6 and MASTER, respectively. (2) In the other <strong>IPSECPOLICY</strong> MO, <strong>ACLTYPE</strong> is set to IPV4 or IPV4+IPV6, and <strong>REDUNDANCYFLAG</strong> in the referenced <strong>IKEPEER</strong> MO is set to MASTER.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in one <strong>IPSECPOLICY</strong> MO is set to IPV6 and <strong>ACLTYPE</strong> in another <strong>IPSECPOLICY</strong> MO is set to IPV6 or IPV4+IPV6, and if <strong>REDUNDANCYFLAG</strong> in the <strong>IKEPEER</strong> MOs referenced by these MOs is set to MASTER, <strong>ACLID</strong> or <strong>ACL2ID</strong> in the two <strong>IPSECPOLICY</strong> MOs cannot be the same.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in one <strong>IPSECPOLICY</strong> MO is set to IPV4+IPV6 and <strong>ACLTYPE</strong> in another <strong>IPSECPOLICY</strong> MO is set to IPV4, IPV6, or IPV4+IPV6, and if <strong>REDUNDANCYFLAG</strong> in the <strong>IKEPEER</strong> MOs referenced by these MOs is set to MASTER, <strong>ACLID</strong> or <strong>ACL2ID</strong> in the two <strong>IPSECPOLICY</strong> MOs cannot be the same.</li><li>[eGBTS]The <strong>ACLID</strong> and <strong>ACLTYPE</strong> parameters in the <strong>IPSECPOLICY</strong> MOs of master and slave <strong>IKEPEER</strong> MOs in the same group must be set to the same value.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>IPSECPROPOSAL</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>NATTRAV</strong> in an <strong>IKEPEER</strong> MO corresponding to an <strong>IPSECPOLICY</strong> MO is set to ENABLE, <strong>ENCAPMODE</strong> and <strong>TRANMODE</strong> in the <strong>IPSECPROPOSAL</strong> MO must be set to TUNNEL and ESP, respectively.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECPOLICY</strong> MO is set to IKE_V1, <strong>ESPENCALG</strong> in the referenced <strong>IPSECPROPOSAL</strong> MO cannot be set to AES_GCM_128, AES_GCM_256, NULL_AUTH_GMAC_128 or NULL_AUTH_GMAC_256.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is not set to 0.0.0.0, <strong>PT</strong> in a <strong>DEVIP</strong> MO cannot be set to PPP or MPGRP if the <strong>DEVIP</strong> MO has the same IP address as <strong>LOCALIP</strong> in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IFIP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is not set to 0.0.0.0, <strong>PT</strong> in an <strong>IFIP</strong> MO cannot be set to PPP or MPGRP if the <strong>IFIP</strong> MO has the same IP address as <strong>LOCALIP</strong> in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>SECURITYHOST</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>SECURITYHOST</strong> MO, if <strong>IPVERSION</strong> and <strong>SEGWCONFIGMODE</strong> are set to IPv4 and SEGW_CONFIG_ON_HOST, respectively, <strong>PEERNAME</strong> must be the same as <strong>PEERNAME</strong> in a configured <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In a <strong>SECURITYHOST</strong> MO, when <strong>IPVERSION</strong> is set to IPv4 and <strong>SEGWCONFIGMODE</strong> is set to SEGW_CONFIG_ON_HOST, the value of <strong>PEERNAME</strong> in this <strong>SECURITYHOST</strong> MO must be the same as that of <strong>PEERNAME</strong> in a configured <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV4.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>IPVERSION</strong> parameter in the <strong>SECURITYHOST</strong> MO is set to IPv4 and the <strong>SEGWCONFIGMODE</strong> parameter is set to SEGW_CONFIG_ON_HOST, the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO referenced by <strong>PEERNAME</strong> parameter in the <strong>SECURITYHOST</strong> MO must be set to NONE.</li></ul>
+</li><li>Relation with the <strong>SECURITYPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>SEGWSWITCH</strong> and <strong>IPVERSION</strong> in the <strong>SECURITYPEER</strong> MO are set to DISABLE and IPv4, <strong>PEERIKEIPV4</strong> must be set to a value different from that of <strong>REMOTEIP</strong> in the <strong>IKEPEER</strong> MO whose <strong>CTRLMODE</strong> is set to MANUAL_MODE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>SEGWSWITCH</strong> parameter in the <strong>SECURITYPEER</strong> MO is set to ENABLE, the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO referenced by the <strong>PEERNAME</strong> parameter in the <strong>SECURITYPEER</strong> MO must be set to NONE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>SEGWSWITCH</strong> in a <strong>SECURITYPEER</strong> MO is set to ENABLE, the <strong>IKEPEER</strong> MO corresponding to <strong>PEERNAME</strong> must exist and <strong>IPVERSION</strong> in this <strong>IKEPEER</strong> MO must be set to IPV4.</li><li>[NodeB, eGBTS]In a <strong>SECURITYPEER</strong> MO, if <strong>SEGWSWITCH</strong> is set to ENABLE, <strong>PEERNAME</strong> must be the same as <strong>PEERNAME</strong> in a configured <strong>IKEPEER</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The master or slave <strong>IKEPEER</strong> MO cannot coexist with the <strong>IPSECDTNL</strong> MO.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The redirect <strong>IKEPEER</strong> MO cannot coexist with the <strong>IPSECDTNL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPSECBIND</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to SLAVE and the slave and master <strong>IKEPEER</strong> MOs are configured in different <strong>IPSECPOLICY</strong> MOs, the <strong>IPSECPOLICY</strong> MO of the slave <strong>IKEPEER</strong> MO can be added to this board when the following conditions are met:</li><li>The <strong>IPSECPOLICY</strong> MO of the master <strong>IKEPEER</strong> MO to which this slave <strong>IKEPEER</strong> MO corresponds must have been added to a board.</li><li>The <strong>IPSECBIND</strong> MOs of the master and slave <strong>IKEPEER</strong> MOs must be configured in the same cabinet, subrack, and slot.</li></ul>
+</li><li>Relation with the <strong>CERTMK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CERTSOURCE</strong> in an <strong>IKEPEER</strong> MO is set to CERTMK, <strong>APPCERT</strong> in a <strong>CERTMK</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>APPCERT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]<strong>IKEPEER</strong> MO instances cannot reference more than 6 certificates.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If the <strong>BFDDTCTSW</strong> parameter in the <strong>IPSECDTNL</strong> MO is set to OFF, the <strong>DPD</strong> parameter in the <strong>IKEPEER</strong> MOs referenced by the <strong>IPSECPOLICY</strong> MO for the primary IPSec tunnel and the <strong>IPSECPOLICY</strong> MO for the secondary IPSec tunnel in the <strong>IPSECDTNL</strong> MO must be set to PERIODIC.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]<strong>IPSECPOLICY</strong> MO in the corresponding <strong>IPSECDTNL</strong> MO cannot reference <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>SECURITYHOST</strong> and <strong>SECURITYTEMPLATE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IKEVERSION</strong> in the <strong>IKEPEER</strong> MO that corresponds to <strong>PEERNAME</strong> in a <strong>SECURITYHOST</strong> MO is set to IKE_V1, <strong>PFS</strong> in the <strong>SECURITYTEMPLATE</strong> MO that corresponds to <strong>SECURITYTEMPLATEID</strong> in the <strong>SECURITYHOST</strong> MO cannot be set to PFS_GROUP19 or PFS_GROUP20.</li></ul>
+</li><li>Relation with the <strong>SECURITYPEER</strong> and <strong>SECURITYTEMPLATE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IKEVERSION</strong> in an <strong>IKEPEER</strong> MO that corresponds to <strong>PEERNAME</strong> in a <strong>SECURITYPEER</strong> MO is set to IKE_V1, <strong>PFS</strong> in all the <strong>SECURITYTEMPLATE</strong> MOs with <strong>SEGWSWITCH</strong> set to ENABLE cannot be set to PFS_GROUP19 or PFS_GROUP20.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IKEPEER</strong> MO whose <strong>IPVERSION</strong> is set to IPV6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is not set to 0.0.0.0, <strong>PT</strong> in an <strong>INTERFACE</strong> MO referred by an <strong>IPADDR4</strong> MO cannot be set to PPP or MPGRP if the <strong>IPADDR4</strong> MO has the same IP address as <strong>LOCALIP</strong> in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO is set to IPV4 and the <strong>IKEPEER</strong> MO is referenced by an <strong>IPSECPOLICY</strong> MO, <strong>VRFIDX</strong> in the <strong>INTERFACE</strong> MO bound to the <strong>IPSECPOLICY</strong> MO must be set to 0.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO in the <strong>IPSECPOLICY</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO is set to IPV6, the <strong>INTERFACE</strong> MO bound to an <strong>IPSECBINDITF</strong> MO must be carried on a <strong>TUNNELITF</strong> MO, and <strong>IPV6SW</strong> in the <strong>INTERFACE</strong> MO must be set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>ACL</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO is set to IPV4 or IPV4+IPV6, and the <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO referenced by this <strong>IPSECPOLICY</strong> MO is set to IPV4, <strong>VRFIDX</strong> in the <strong>ACL</strong> MO corresponding to an <strong>IPSECPOLICY</strong> MO must be set to 0.</li><li>[eGBTS]If <strong>ACLTYPE</strong> in the <strong>IPSECPOLICY</strong> MO is set to IPV4, and the <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO referenced by this <strong>IPSECPOLICY</strong> MO is set to IPV4, <strong>VRFIDX</strong> in the <strong>ACL</strong> MO corresponding to an <strong>IPSECPOLICY</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If the <strong>IPVERSION</strong> of the <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO is IPV6, in the <strong>INTERFACE</strong> MO referenced by the same <strong>IPSECBINDITF</strong> MO, <strong>ITFTYPE</strong> must be set to NORMAL and <strong>PT</strong> must be set to TUNNELITF.</li><li>[Co-MPT, eNodeB, gNodeB]The port where the <strong>INTERFACE</strong> MO of <strong>IPSECBINDITF</strong> MO with parameter <strong>CTRLMODE</strong> set to MANUAL_MODE resides must be the same as the port of the local address of corresponding <strong>IKEPEER</strong> MO.</li><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECPOLICY</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, <strong>VRFIDX</strong> in the <strong>INTERFACE</strong> MO identified by <strong>ITFID</strong> in the slave <strong>IPSECBINDITF</strong> MO must be the same as <strong>VRFIDX</strong> in the <strong>INTERFACE</strong> MO identified by <strong>ITFID</strong> in the master <strong>IPSECBINDITF</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB]The <strong>IPSECBINDITF</strong> MOs of the master and slave <strong>IKEPEER</strong> MOs must be configured in the same cabinet, subrack, and slot.</li><li>[NodeB]The port where the <strong>INTERFACE</strong> MO of <strong>IPSECBINDITF</strong> MO resides must be the same as the port of the local address of corresponding <strong>IKEPEER</strong> MO.</li><li>[gNodeB]The <strong>IPSECBINDITF</strong> MOs of the master and slave <strong>IKEPEER</strong> MOs must be configured in the same cabinet, subrack, and slot.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>PACKETFILTERING</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]On a base station, if <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is different from <strong>IPVERSION</strong> in the referenced <strong>IKEPEER</strong> MO, <strong>ACLAUTOSWITCH</strong> in the <strong>PACKETFILTERING</strong> MO must be set to OFF.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is set to IPV4 and <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to IPV6, <strong>ACLID</strong> in the <strong>IPSECPOLICY</strong> MO must be different from <strong>ACLID</strong> in the <strong>PACKETFILTERING</strong> MO with <strong>ACLTYPE</strong> set to IPV4.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>EPGROUP</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]On a base station, if <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is different from <strong>IPVERSION</strong> in the referenced <strong>IKEPEER</strong> MO, <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>IPSECBIND</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO referred by the <strong>IPSECBIND</strong> MO can be only set to IPV4.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong> and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>IPVERSION</strong> of all <strong>IKEPEER</strong> MOs associated with an <strong>IPSECBINDITF</strong> MO must be configured the same.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the <strong>REDUNDANCYFLAG</strong> parameter in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to SLAVE and the slave and master <strong>IKEPEER</strong> MOs are configured in different <strong>IPSECPOLICY</strong> MOs, the <strong>IPSECPOLICY</strong> MO of the slave <strong>IKEPEER</strong> MO can be added to this board when the following condition is met:</li><li>The <strong>IPSECPOLICY</strong> MO of the master <strong>IKEPEER</strong> MO to which this slave <strong>IKEPEER</strong> MO corresponds must have been added to a board.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>PT</strong> in an <strong>INTERFACE</strong> MO bound to an <strong>IPSECBINDITF</strong> MO is set to TUNNELITF, <strong>IPVERSION</strong> in the associated <strong>IKEPEER</strong> MO must be set to IPV6.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> and <strong>GTRANSPARA</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is set to a non-zero value, <strong>LOCALIP</strong> in the <strong>IKEPEER</strong> MO must be set to the same value as a configured <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>ACLRULE</strong>, <strong>IPSECPOLICY</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a transmission board is 264.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a main control board is 512.</li><li>[gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a transmission board is 264.</li><li>[gNodeB]The maximum of <strong>ACLRULE</strong> MOs with ACTION set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on a main control board is 512.</li></ul>
+</li><li>Relation with the <strong>MDU</strong> MO:<ul><li>[Co-MPT, eGBTS, eNodeB]When <strong>TYPE</strong> in the <strong>MDU</strong> MO is set to MDUC, a maximum of 100 <strong>IKEPEER</strong> MOs can be manually created in a base station.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> and <strong>ACLRULE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is set to IPV4 and <strong>IPVERSION</strong> in the <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO is set to IPV6, <strong>ACTION</strong> in the <strong>ACLRULE</strong> MO used by the <strong>IPSECPOLICY</strong> MO must be set to PERMIT.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong>, <strong>IPSECBINDITF</strong>, and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> is set to IF and <strong>PT</strong> is set to INTERFACE in an <strong>IPROUTE4</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>PORTID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>IPROUTE6</strong>, <strong>IPSECBINDITF</strong>, and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>RTTYPE</strong> is set to IF in an <strong>IPROUTE6</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>ITFID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE4</strong>, <strong>IPSECBINDITF</strong>, and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>RTTYPE</strong> is set to IF and <strong>PT</strong> is set to INTERFACE in an <strong>SRCIPROUTE4</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>PORTID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE6</strong>, <strong>IPSECBINDITF</strong>, and <strong>IPSECPOLICY</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>RTTYPE</strong> is set to IF in an <strong>SRCIPROUTE6</strong> MO, the <strong>INTERFACE</strong> MO specified by <strong>ITFID</strong> cannot be bound to the <strong>IPSECPOLICY</strong> MO that references an <strong>IKEPEER</strong> MO with <strong>REDUNDANCYFLAG</strong> set to SLAVE and <strong>IPVERSION</strong> set to IPV6.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, and <strong>IPROUTE4</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>IPROUTE4</strong> MO with <strong>RTTYPE</strong> set to IF and <strong>PT</strong> set to INTERFACE has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>IPROUTE4</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>IPROUTE4</strong> MOs in the same IPSec redundancy group) cannot exceed 150.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, and <strong>IPROUTE6</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>IPROUTE6</strong> MO with <strong>RTTYPE</strong> set to IF has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>IPROUTE6</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>IPROUTE6</strong> MOs in the same IPSec redundancy group) cannot exceed 128.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, and <strong>SRCIPROUTE4</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>SRCIPROUTE4</strong> MO with <strong>RTTYPE</strong> set to IF and <strong>PT</strong> set to INTERFACE has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>SRCIPROUTE4</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>SRCIPROUTE4</strong> MOs in the same IPSec redundancy group) cannot exceed 32.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>IPSECPOLICY</strong>, and <strong>SRCIPROUTE6</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>IKEPEER</strong> MO referenced by an <strong>IPSECBINDITF</strong> MO, if <strong>REDUNDANCYFLAG</strong> is set to SLAVE and <strong>IPVERSION</strong> is set to IPV6, and if an <strong>SRCIPROUTE6</strong> MO with <strong>RTTYPE</strong> set to IF has been configured on the master <strong>IPSECBINDITF</strong> MO, the total number of configured <strong>SRCIPROUTE6</strong> MOs and all slave <strong>IPSECBINDITF</strong> MOs (with active <strong>IPSECBINDITF</strong> MOs configured with <strong>SRCIPROUTE6</strong> MOs in the same IPSec redundancy group) cannot exceed 32.</li></ul>
+</li><li>Relation with the <strong>SECURITYHOST</strong>, <strong>IPADDR4</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]The physical port to which the following <strong>INTERFACE</strong> MOs belong must be the same: one <strong>INTERFACE</strong> MO is referenced by <strong>LOCIKEIPV4</strong> in a <strong>SECURITYHOST</strong> MO; another <strong>INTERFACE</strong> MO is referenced by <strong>LOCALIP</strong> in the <strong>IKEPEER</strong> MO that is also referenced by <strong>LOCIKEIPV4</strong> in the <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>MPT</strong>, <strong>IPSECBINDITF</strong>, <strong>ACLRULE</strong>, <strong>IPSECPOLICY</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBINDITF</strong> that reference <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV4 on one board is 128.</li><li>[gNodeB]When an <strong>MPT</strong> MO with <strong>TYPE</strong> set to LMPT exists, and an <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT does not exist, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by <strong>IPSECBINDITF</strong> that reference <strong>IKEPEER</strong> MO with <strong>IPVERSION</strong> set to IPV4 on one board is 128.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The number of <strong>IKEPEER</strong> MOs with IPVERSION set to IPV6 is 0 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li><li>[Co-MPT, eGBTS]The number of <strong>IKEPEER</strong> MOs with IPVERSION set to IPV4 must be less than or equal to 100 when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong>, <strong>ACLRULE</strong>, <strong>IPSECPOLICY</strong>, <strong>GTMU</strong>, <strong>MPT</strong>, <strong>APPLICATION</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eGBTS]When the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured, the maximum of <strong>ACLRULE</strong> MOs with <strong>ACTION</strong> set to PERMIT which are referenced by IPv4 <strong>IPSECBINDITF</strong> on one board is 128.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#IKEPEER__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="IKEPEER__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="IKEPEER__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ikepeer.html">ADD IKEPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to add an Internet Key Exchange (IKE) peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ikepeer.html">DSP IKEPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the IKE peer configuration that takes effect.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ikepeer.html">LST IKEPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the IKE peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_ikepeer.html">MOD IKEPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of the IKE peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ikepeer.html">RMV IKEPEER</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to remove an IKE peer.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#IKEPEER__tab2">Table 2</a> and <a href="#IKEPEER__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="IKEPEER__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="IKEPEER__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-PeerName.html">IKE Peer Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the IKE peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-ProposalID.html">IKE Proposal ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ID of the IKE proposal in use.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-Version.html">Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IKE protocol version.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-ExchangeMode.html">Exchange Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IKE exchange mode. In main mode, keys are exchanged independently from identity authentications. This protects identity information and hence enhances security. The aggressive mode does not have identity authentication protection.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-LocalIDType.html">Local ID Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of the identification payload that the local end transmits. The authentication can be performed based on IPv4 address, IPv6 address, fully qualified domain name (FQDN) or distinguished name (DN).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-IPVersion.html">IP Version</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP protocol version.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-RemoteIP.html">Remote IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP address of the peer end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-RemoteName.html">Remote Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the peer end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-PreShareKey.html">Pre-shared Key</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the pre-shared key. The two negotiation ends must be configured with the same authenticator. This parameter takes effect only when Authentication Method in the corresponding IKEPROPOSAL is set to PRE_SHARED_KEY.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-NATTravSwitch.html">NAT Traversal</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the Network Address Translation (NAT) traversal function. The NAT traversal function is not supported by IKE SA in IPv6 scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-DPDSwitch.html">DPD Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the dead peer detection (DPD) function. When the IPSec redundancy function is enabled, it is recommended that the DPD detection function also be enabled. Otherwise, an active or standby IKE peer has to wait for a long time before the switchover.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-DPDIdleTime.html">DPD Idle Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the dead peer detection (DPD) idle time. If the total time during which the local end does not receive encrypted packets reaches the value specified by the DPD Idle Time parameter, the local end sends the DPD packet to perform DPD. However, the exact time at which the eNodeB sends DPD messages varies depending on network environment.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-DPDRetryInterval.html">DPD Retransmission Interval</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the interval at which DPD detection frames are sent. The interval at which DPD detection frames are sent may slightly vary in various network environments such as network congestion, delay, and jitter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-DPDRetryCount.html">DPD Retransmission Count</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of retransmission attempts after a DPD detection fails.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-CtrlMode.html">Control Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object can be modified or deleted by the system. The value MANUAL_MODE means that only the user can modify or delete the object. The value AUTO_MODE means only the system can modify or delete the object.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-LocalIP.html">Local IP Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the IP address of the local end, which is used in IKE negotiation. This IP address can be set to 0.0.0.0 or a configured interface IP address at the local end. If this parameter is set to 0.0.0.0, the BS automatically uses the interface IP address to negotiate with the peer. If multiple IP addresses are configured at the port, it is recommended that you specify one IP address for the negotiation. If the local BS uses the digital certificate and IP address for authentication in the negotiation, ensure that the IP address in the certificate is the same as the local IP address of the BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-AutoCfgFlag.html">Auto Config Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the object is created by the system. MANUAL_CREATED means that the object is configured by the user manually. AUTO_CREATED means that the object is created by the system.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-RedundancyFlag.html">Redundancy Flag</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the redundancy attribute of an IKE peer. If this parameter is set to NONE(Non-redundancy), the IKE peer does not use the IPSec redundancy function. If this parameter is set to MASTER(Master) or SLAVE(Slave), the IPSec policy group that references the IKE peer has been bound to an interface, the security configurations of the IPSec redundancy group to which the IKE peer belongs are modified, and the modified objects (IKEPROPOSAL, IKEPEER, IPSECPOLICY, IPSECPROPOSAL, IPSECBINDITF, and IPSECBIND) are reloaded, then the system unbinds the the IPSec policy group from the interface and then binds the IPSec policy group to the interface again. In the IPSec redundancy function, if the IKE SA of the slave IKE peer is available (you can run the <a href="../mml/dsp_ikesa.html">DSP IKESA</a> command to query the IKE SAs) or the slave IKE peer is being negotiated (you can check the negotiation status through IKE tracing), the slave IKE peer is being used. Otherwise, the master IKE peer is being used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-MasterPeerName.html">Master Peer Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the master IKE peer to which the current slave IKE peer corresponds.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-Priority.html">Priority</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the priority of the current slave IKE peer. A small value indicates a high priority of the slave IKE peer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-CertSource.html">Certificate Source</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the source of the certificate used for IKE negotiation in the multi-PKI scenario. When this parameter is set to APPCERT, the certificate configured by the APPCERT MO is used. When this parameter is set to CERTMK, the certificate configured by the CERTMK MO is used.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-CertName.html">Certificate File Name</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the name of the certificate file used in the IKE negotiation in the multi-PKI scenario.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-RedirectSW.html">IKEv2 Redirect Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the IKEv2 redirection function. When this parameter is set to OFF, the base station does not support the IKEv2 redirection function, and will discard the redirection packets sent from the peer end. When this parameter is set to ON, the base station supports the IKEv2 redirection function. When the IKEv2 redirection function is enabled, the negotiation must be initiated by the base station. The IKEv2 redirection function is not supported by IKE SA in IPv6 scenarios.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-IPSecPreFragmentSwitch.html">IPSec PreFragment Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether packets can be fragmented before being encrypted. If this parameter is set to OFF and the IPVERSION parameter is set to IPv4 for an IKE peer, the IPv4 traffic is not fragmented, and the IPv6 traffic is fragmented based on the maximum MTU capability of the internal ports. If IPVERSION is set to IPv6 for an IKE peer, the internal system sets the MTU used by IPv4 and IPv6 traffic to the board maximum capability and fragments packets based on the board maximum capability.</p>
+<p>If this parameter is set to ON, packets are fragmented before being encrypted. If the IPVERSION parameter is set to IPv4 for an IKE peer, IPv4 and IPv6 packets are fragmented based on the MTU value of the IKE peer. If the IPVERSION of the IKE peer is set to IPv6, IPv4 and IPv6 traffic is fragmented based on the MTU4 and MTU6 values of the tunnel interface, respectively.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/IKEPEER-MTU.html">Maximum Transmission Unit</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the MTU of IPv4 or IPv6 before packets are encrypted when the IP protocol version of an IKE peer is IPv4. This parameter takes effect for both IPv4 and IPv6 traffic when the ACL type of the IPsec policy that references the IKE peer is IPv4+IPv6.</p>
+<p>If the length of a packet before encryption exceeds the value of this parameter, the system fragments the packet based on the value of this parameter and then encrypts the fragmented packet. If the length of the encrypted packet exceeds the value of MTU in the <strong>ETHPORT</strong> MO, <strong>ETHCIPORT</strong> MO, <strong>ETHTRK</strong> MO, <strong>IPRT</strong> MO, <strong>IPROUTE4</strong> MO, and <strong>INTERFACE</strong> MO, the encrypted packet will be fragmented again based on the MTU of the <strong>ETHPORT</strong> MO, <strong>ETHCIPORT</strong> MO, <strong>ETHTRK</strong> MO, <strong>IPRT</strong> MO, <strong>IPROUTE4</strong> MO, or <strong>INTERFACE</strong> MO.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="IKEPEER__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="IKEPEER__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPEER-RemoteIPv6.html">Remote IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPv6 address of the peer end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPEER-LocalIPv6.html">Local IPv6 Address</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IPv6 address that is used by the local end in IPv6 IKE negotiation. This IP address must be set to a device IPv6 address configured at the local end. If multiple IPv6 addresses are configured for an interface, this parameter can be set to one of the IPv6 addresses to negotiate with the peer end.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPEER-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the cabinet number of the IKE peer board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPEER-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the subrack number of the IKE peer board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPEER-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the slot number of the IKE peer board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/IKEPEER-VrfIndex.html">VRF Index</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#IKEPEER__tab4">Table 4</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="IKEPEER__tab4"></a><a name="tab4"></a><table cellpadding="4" cellspacing="0" summary="" id="IKEPEER__tab4" frame="border" border="1" rules="all"><caption><b>Table 4 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.7.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.7.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460340.html">VS.IKE.RxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE packets received</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460341.html">VS.IKE.TxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE packets transmitted</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460342.html">VS.IKE.SubSARekey.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Re-keys Performed by IKE Child SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460343.html">VS.IKE.DPDSessionFail.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Failed DPD Sessions</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460496.html">VS.IKE.Init.ChildSARekeyFail.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Failed Initiations of Re-key Negotiations for IKE Child SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460497.html">VS.IKE.Response.ChildSARekeyFail.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Failed Responses to Re-key Negotiations for IKE Child SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460498.html">VS.IKE.Init.ChildSARekeySucc.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Successful Initiations of Re-key Negotiations for IKE Child SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460499.html">VS.IKE.Response.ChildSARekeySucc.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Successful Responses to Re-key Negotiations for IKE Child SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460500.html">VS.IKE.Init.SARekeySucc.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Successful Initiations of Re-key Negotiations for IKE SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460501.html">VS.IKE.Response.SARekeySucc.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Successful Responses to Re-key Negotiations for IKE SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460502.html">VS.IKE.Init.SARekeyFail.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Failed Initiations of Re-key Negotiations for IKE SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460503.html">VS.IKE.Response.SARekeyFail.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Failed Responses to Re-key Negotiations for IKE SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460504.html">VS.IKE.Init.V2ReauthSucc.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Successful Initiations of IKEv2 Re-authentications</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460505.html">VS.IKE.Response.V2ReauthSucc.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Successful Responses to IKEv2 Re-authentications</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460506.html">VS.IKE.Init.V2ReauthFail.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Failed Initiations of IKEv2 Re-authentications</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460507.html">VS.IKE.Response.V2ReauthFail.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Failed Responses to IKEv2 Re-authentications</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460510.html">VS.IKE.Receive.InvalidSPIPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Received IP or ESP Packets with SPI That Does Not Match an Existing SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460596.html">VS.IKEPEER.RxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Packets Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460597.html">VS.IKEPEER.TxPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Packets Transmitted by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460598.html">VS.IKEPEER.SubSARekey.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Re-key Negotiations Initiated for IKE Peer Child SA</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460599.html">VS.IKEPEER.DPDSessionFail.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Disconnections Caused by DPD Sessions of an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460600.html">VS.IKEPEER.Resp.Recv.AuthReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Authentication Requests Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460601.html">VS.IKEPEER.Init.Recv.AuthResp.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses Received by an IKE Peer to IKE Authentication Requests</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460602.html">VS.IKEPEER.Resp.Recv.CrChildSAReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Create Child SA Requests Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460603.html">VS.IKEPEER.Init.Recv.CrChildSAResponse</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses to IKE Create Child SA Requests Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460604.html">VS.IKEPEER.RespRecvErrorNotify</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Error Type Notify Messages Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460605.html">VS.IKEPEER.Resp.Recv.StateNotify.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE State Type Notify Messages Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460606.html">VS.IKEPEER.Resp.Recv.DelSAReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Delete SA Requests Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460607.html">VS.IKEPEER.Init.Recv.DelSAResp.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses Received by an IKE Peer to IKE Delete SA Requests</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460608.html">VS.IKEPEER.Init.Recv.ConfigReply.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses Received by an IKE Peer to IKE Configuration Payload Requests</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460609.html">VS.IKEPEER.Resp.Recv.IKEInitReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Initialization Requests Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460610.html">VS.IKEPEER.Init.Recv.IKEInitResp.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses Received by an IKE Peer to IKE Initialization Requests</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460611.html">VS.IKEPEER.Recv.InvalidPackets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Invalid IKE Packets Received by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460612.html">VS.IKEPEER.Init.Send.AuthReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Authentication Requests Sent by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460613.html">VS.IKEPEER.Resp.Send.AuthResp.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses Sent by an IKE Peer to IKE Authentication Requests</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460614.html">VS.IKEPEER.Init.Send.CrChildSAReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Create Child SA Requests Sent by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460615.html">VS.IKEPEER.Resp.Send.CrChildSAResp.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses Sent by an IKE Peer to IKE Create Child SA Requests</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460616.html">VS.IKEPEER.Init.Send.ErrorNotify.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Error Type Notify Messages Sent by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460617.html">VS.IKEPEER.Init.Send.StateNotify.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE State Type Notify Messages Sent by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460618.html">VS.IKEPEER.Init.Send.DelSAReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses Sent by an IKE Peer to IKE Delete SA Requests</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460619.html">VS.IKEPEER.Resp.Send.DelSAResp.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Delete SA Requests Sent by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460620.html">VS.IKEPEER.Init.Send.ConfigReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Configuration Payload Requests Sent by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460621.html">VS.IKEPEER.Init.Send.IKEInitReq.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of IKE Initialization Requests Sent by an IKE Peer</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.7.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1542460622.html">VS.IKEPEER.Resp.Send.IKEInitResp.Times</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.7.3.2.3.1.2 "><p>Number of Responses Sent by an IKE Peer to IKE Initialization Requests</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

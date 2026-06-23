@@ -1,0 +1,183 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify GTP-U Configuration (MOD GTPU)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_gtpu">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify GTP-U Configuration (MOD GTPU)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_gtpu"></a><a name="mod_gtpu"></a>
+
+
+<h1 class="topictitle1">Modify GTP-U Configuration (MOD GTPU)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_gtpu__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify GTP-U global parameters.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_gtpu__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>[Co-MPT,eNodeB,gNodeB]A GTP-U echo request frame is a type of user data packet. When VLAN mapping is performed based on the VLANCLASS object, GTP-U echo request frames on an IP path with Path Type set to FIXED(Fixed QoS) use the DSCP of this IP path, and VLAN tags are attached to these frames based on this DSCP. GTP-U echo request frames on IP paths with Path Type set to ANY(Any QoS) and those on user-plane paths use the DSCP configured for GTP-U, and VLAN tags are attached to these frames based on this DSCP. If VLAN planning is required, you need to configure the VLANCLASS MO with Traffic Type set to USERDATA(User Data) and User Data Service Priority set to the same value as the GTP-U DSCP. In addition, if an IP path with Path Type set to FIXED(Fixed QoS) is configured, you also need to configure the VLANCLASS MO with Traffic Type set to USERDATA(User Data) and User Data Service Priority set to the DSCP of this IP path. Otherwise, faults may occur during GTP-U detection. If the bandwidth is insufficient and the DSCP value is small, GTP-U detection packets may be under flow control, causing link detection faults and affecting services.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]It is recommended that the ECHO Frame Timeout parameter be set to a value greater than 30000 ms when over 256 user-plane links are configured. In this situation, if the GTP-U static detection is enabled and physical transmission links are disconnected, the CPU usage may increase.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]When the software of the base station complies with 3GPP Release 8 or Release 9 and the ACL rule automatic setup and deletion function in the packet filtering object is enabled, it is recommended that the GTP-U static detection not be enabled. If the GTP-U static detection is enabled, the peer base station fails to obtain the IP address of the local base station and fails to create the corresponding ACLRULE MO due to the mechanism for one-way handovers over the X2 interface. In this case, the GTP-U packets sent by the source base station will be discarded by the peer base station, and therefore faults occur in the GTP-U detection.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]GTP-U static detection in the link model has a global switch and a link-level switch. GTP-U static detection in the EP model has a global switch, link-level switch, and endpoint group switch. When <strong>STATICCHKMODE</strong> is set to UPPEERSTATICCHK(User-Plane Peer Static Check) in the <strong>GEPMODELPARA</strong> MO, the global switch and link-level switch take effect. When <strong>STATICCHKMODE</strong> is set to EPSTATICCHK(Endpoint Group Static Check) in the <strong>GEPMODELPARA</strong> MO, the endpoint group static detection switch takes effect.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]After the downlink GTP-U packet sequence number check function is enabled, statistics on the downlink GTP-U service packets on the local end theoretically consumes about 5% of the UMPT/UMDU board forwarding performance.</p>
+</li><li><p>[Co-MPT,gNodeB]In 5G SA networking, it is recommended that the Uplink GTP-U Sequence Number Padding Switch parameter be set to DISABLE.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_gtpu__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GTPU-TimeoutThreshold.html">TIMEOUTTH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ECHO Frame Timeout</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum wait time for an echo response. If no echo response is received during the period specified by this parameter, the timer has expired.</p>
+<p>GUI Value Range: 5000~60000</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 5000~60000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 5000</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter makes ECHO frame timeout less vulnerable to network delay, but it leads to a longer time required to detect disconnection and therefore a higher probability of long-time packet loss. A smaller value of this parameter results in a higher probability of detecting network status, but it leads to higher sensitivity to packet loss and delay and therefore a higher probability of incorrect decisions.</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GTPU-TimeoutMaxCount.html">TIMEOUTCNT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ECHO Frame Timeout Count</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of timeouts of the echo response waiting timer. If no echo response is received after the number specified by this parameter is reached, the GTP-U path in use fails.</p>
+<p>GUI Value Range: 3~6</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3~6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 3</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter makes ECHO frame timeout less vulnerable to network delay, but it leads to a longer time required to detect disconnection and therefore a higher probability of long-time packet loss. A smaller value of this parameter results in a higher probability of detecting network status, but it leads to higher sensitivity to packet loss and delay and therefore a higher probability of incorrect decisions.</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GTPU-DSCP.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the differentiated services code point (DSCP) of a GTP-U control packet.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 46</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GTPU-StaticChk.html">STATICCHK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Static Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable static detection in compliance with GPRS Tunneling Protocol for User Plane (GTP-U). If this parameter is set to ENABLE, the GTP-U static check is enabled. If this parameter is set to DISABLE, the GTP-U static check is disabled.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ENABLE(Enable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GTPU-UlGtpuSnPadSw.html">ULGTPUSNPADSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink GTP-U Sequence Number Padding Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for padding the sequence numbers of uplink GTP-U service packets. If this parameter is set to ENABLE(Enable), consecutive sequence numbers in ascending order will be padded for uplink GTP-U service packets sent by the local end. If this parameter is set to DISABLE(Disable), the padding function will not take effect. This parameter is valid for the S1 interface only and its setting takes effect on the UMPT/UMDU board only.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When this switch is turned on, consecutive sequence numbers in ascending order will be padded for uplink GTP-U service packets sent by the local end and therefore each GTP-U packet will occupy an extra 4-byte transmission bandwidth.</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/GTPU-DlGtpuSnChkSw.html">DLGTPUSNCHKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink GTP-U Sequence Number Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the switch for checking the sequence numbers of downlink GTP-U service packets. If this parameter is set to ENABLE(Enable), the local end performs statistics on the disorders and discontinuous sequence numbers on downlink GTP-U service packets. If this parameter is set to DISABLE(Disable), the check function will not take effect and the values of corresponding performance counters are invalid. This parameter is valid only for the UMPT/UMDU board. The values of corresponding performance counters reported for boards that do not support this parameter are invalid.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_gtpu__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the parameters of the GTP-U control message with the parameters as follows: ECHO Frame Timeout: 5000, ECHO Frame Timeout Count: 3, DSCP: 0, Static Check Switch: Enable, Uplink GTP-U Sequence Number Padding Switch: DISABLE, Downlink GTP-U Sequence Number Check Switch: DISABLE, run the following command:
+MOD GTPU: TIMEOUTTH=5000, TIMEOUTCNT=3, DSCP=0, STATICCHK=ENABLE, ULGTPUSNPADSW=DISABLE, DLGTPUSNCHKSW=DISABLE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

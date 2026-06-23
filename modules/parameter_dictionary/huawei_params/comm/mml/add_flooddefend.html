@@ -1,0 +1,178 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Flood Attack Defense and Alarm Parameters (ADD FLOODDEFEND)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_flooddefend">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Flood Attack Defense and Alarm Parameters (ADD FLOODDEFEND)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_flooddefend"></a><a name="add_flooddefend"></a>
+
+
+<h1 class="topictitle1">Add Flood Attack Defense and Alarm Parameters (ADD FLOODDEFEND)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_flooddefend__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a configuration of the flood attack defense and excessive flood packet alarm for a specific type of flood packet.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_flooddefend__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>Only one FLOODDEFEND object can be configured for each type of flood packet.</p>
+</li><li><p>The configuration of the FLOODDEFEND object takes effect only on boards with Ethernet ports.</p>
+</li><li><p>If both DFDSW and ALMSW are set to ENABLE, it is recommended that the alarm threshold be set to a value smaller than the defend threshold. With this setting, when the RX rate of flood packets exceeds the alarm threshold, the ALM-25950 Base Station Being Attacked is reported. If the alarm threshold is greater than the defend threshold, the ALM-25950 Base Station Being Attacked is not reported.</p>
+</li><li><p>It is recommended that the TCP and UDP flood attack thresholds of the UMPT/UMDU board do not exceed 3600 pps. It is recommended that the TCP and UDP flood attack thresholds of the WMPT/GTMUc board not exceed 720 pps. It is recommended that the TCP and UDP flood attack thresholds of the LMPT board not exceed 290 pps. It is recommended that the TCP and UDP flood attack defense threshold for the UTRP (with the subboard type as UEOC, UQEC, or UTRPc), UCCU, and UBBP boards be less than or equal to 720 packets per second.</p>
+</li><li><p>The eCPRI-supported boards do not support the TCP flood attack defense function.</p>
+</li><li><p>This command can be used to enable the flood attack defense for a specific type of packet. If the flood attack defense is not configured for a specific type of packet, the defense against SCTP flood attacks is disabled and the defense against ARP, ICMP, TCP, SYN, UDP, ICMP6, ND, and PTB flood attacks is enabled by default. The default flood attack defense thresholds are 64 pps for ARP and SYN packets, 128 pps for ICMP packets, 2048 pps for TCP and UDP packets, 768 pps for ICMP6 packets, and 256 pps for ND and PTB packets. By default, the flood attack alarm function for ICMP6/ND/PTB packets is enabled. The default flood attack alarm thresholds are 384 for ICMP6 packets, 192 for ND and PTB packets.</p>
+</li><li><p>It is recommended that the ARP spoofing detection function and the ARP flood attack defense function not be used simultaneously. If the two functions are enabled simultaneously, the ARP Spoofing Alarm Threshold parameter in the IP firewall attack defense policy should be set to a value smaller than the Alarm Threshold parameter or default value for ARP flood attack defense. Otherwise, ARP spoofing alarms cannot be reported.</p>
+</li><li><p>When the system is performing heavy traffic services (such as downloading software versions, uploading a large number of logs, and tracing a large number of UEs), it is recommended that the flood attack defense function be disabled. If this function is required, it is recommended that the defense threshold and alarm threshold be increased.</p>
+</li><li><p>Only the UMPT, SMPT, UMDU, GTMUc, UTRPc, UTRPa, UCCU, and CSPU boards support the defense against SCTP flood attacks.</p>
+</li><li><p>[Co-MPT,eGBTS]The GTMUb does not support FLOODDEFEND.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_flooddefend__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FLOODDEFEND-FLDType.html">FLDTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Flood Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the flood packet. If the control bits are all 0 or both the Synchronize bit and No More Data bit are 1 in TCP packets, the packets are directly discarded and flood attack defense is not performed. SYN packets refer to packets whose Synchronize bit is 1 and Acknowledgement bit is 0. When the defenses against attacks of the SYN and TCP packets are both enabled but the SYN packet data rate does not reach the flood attack defense threshold for SYN packets, the flood attack defense threshold for TCP packets is used to trigger the defense. When the data rate of some SYN packets reaches the flood attack defense threshold for SYN packets, this threshold is used to trigger the defense against the attack of these SYN packets and the flood attack defense threshold for TCP packets is used to defend against the attack of SYN packets of which the rate does not reach the flood attack defense threshold for SYN packets.</p>
+<p>Disuse statement: In the later versions, the value SCTP_INIT (SCTP_INIT) will be removed from the value range of this parameter. In the current version, this value can still be configured but the value does not take effect. Therefore, you are not advised to use the value SCTP_INIT (SCTP_INIT).</p>
+<p>GUI Value Range: ARP(ARP), ICMP(ICMP), TCP(TCP), SYN(SYN), UDP(UDP), SCTP_INIT(SCTP_INIT), SCTP(SCTP), ICMP6(ICMP6), ND(ND), PTB(PTB)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ARP, ICMP, TCP, SYN, UDP, SCTP_INIT, SCTP, ICMP6, ND, PTB</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FLOODDEFEND-DFDSwitch.html">DFDSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Defend Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the protection against excessive flood packets.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FLOODDEFEND-DFDThreshold.html">DFDTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Defend Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for starting the protection against excessive flood packets. If the DFDSW parameter is set to ENABLE, the system discards the extra packets when the RX rate of flood packets exceeds the threshold. It is recommended that the difference between Defend Threshold and Alarm Threshold is greater than 3% of Defend Threshold.</p>
+<p>GUI Value Range: 1~4096</p>
+<p>Unit: packet/s</p>
+<p>Actual Value Range: 1~4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If FLDTYPE is set to ARP or SYN, the recommended value is 64.</p>
+<p>If FLDTYPE is set to ICMP, the recommended value is 128.</p>
+<p>If FLDTYPE is set to TCP or UDP, the recommended value is 2048.</p>
+<p>If FLDTYPE is set to SCTP, the recommended value is 1024.</p>
+<p>If FLDTYPE is set to ICMP6, the recommended value is 768.</p>
+<p>If FLDTYPE is set to ND, the recommended value is 256.</p>
+<p>If FLDTYPE is set to PTB, the recommended value is 256.</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to ARP, <strong>DFDTHD</strong> ranges from 1 to 512.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to ICMP or SYN, <strong>DFDTHD</strong> ranges from 1 to 1024.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to TCP or UDP, <strong>DFDTHD</strong> ranges from 1 to 4096.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to SCTP, <strong>DFDTHD</strong> ranges from 384 to 2048.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to ICMP6, <strong>DFDTHD</strong> ranges from 384 to 1280.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to ND or PTB, <strong>DFDTHD</strong> ranges from 128 to 512.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FLOODDEFEND-ALMSwitch.html">ALMSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Alarm Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to report an alarm when the local end receives excessive flood packets from the peer end.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/FLOODDEFEND-ALMThreshold.html">ALMTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Alarm Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for the excessive flood packet alarm. If the ALMSW parameter is set to ENABLE, the system measures the RX rate of flood packets every 10 seconds. If the measured value exceeds the threshold, an excessive flood packet alarm is reported. The alarm is cleared if the RX rate of flood packets keeps below the threshold for five consecutive minutes. It is recommended that the difference between Defend Threshold and Alarm Threshold is greater than 3% of Defend Threshold.</p>
+<p>GUI Value Range: 1~4096</p>
+<p>Unit: packet/s</p>
+<p>Actual Value Range: 1~4096</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If FLDTYPE is set to ARP or SYN, the recommended value is 32. If FLDTYPE is set to ICMP, the recommended value is 64. If FLDTYPE is set to TCP or UDP, the recommended value is 1024. If FLDTYPE is set to SCTP, the recommended value is 768. If FLDTYPE is set to ICMP6, the recommended value is 384. If FLDTYPE is set to ND, the recommended value is 192. If FLDTYPE is set to PTB, the recommended value is 192.</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to ARP, <strong>ALMTHD</strong> ranges from 1 to 512.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to ICMP or SYN, <strong>ALMTHD</strong> ranges from 1 to 1024.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to TCP or UDP, <strong>ALMTHD</strong> ranges from 1 to 4096.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to SCTP, <strong>ALMTHD</strong> ranges from 384 to 2048.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to ICMP6, <strong>ALMTHD</strong> ranges from 384 to 1280.</li><li>In the <strong>FLOODDEFEND</strong> MO, if <strong>FLDTYPE</strong> is set to ND or PTB, <strong>ALMTHD</strong> ranges from 128 to 512.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_flooddefend__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add a configuration with the parameters as follows: Flood Type: ARP, Defend Switch: ENABLE, Alarm Switch: ENABLE, run the following command:
+ADD FLOODDEFEND: FLDTYPE=ARP, DFDSW=ENABLE, ALMSW=ENABLE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

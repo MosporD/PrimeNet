@@ -1,0 +1,285 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify Cell Sector Equipment (MOD EUCELLSECTOREQM)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_eucellsectoreqm">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify Cell Sector Equipment (MOD EUCELLSECTOREQM)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_eucellsectoreqm"></a><a name="mod_eucellsectoreqm"></a>
+
+
+<h1 class="topictitle1">Modify Cell Sector Equipment (MOD EUCELLSECTOREQM)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_eucellsectoreqm__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of sector equipment of a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_eucellsectoreqm__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>During the modification of the BaseBandEqmId parameter associated with an activated cell, the cell automatically resets if the BaseBandEqmId parameter value is changed to an ID representing a baseband equipment on which the cell is not established.</p>
+<p>A cell automatically resets during the modification of the SectorCpriCompression parameter.</p>
+<p>The baseband resource allocation mode is changed after the modification of the AutoCfgFlag parameter.</p>
+</li><li><p>A cell may automatically resets during the modification of the CellBeamMode parameter.</p>
+</li><li><p>A cell may disrupt cell services during the modification of the WeightNo parameter.</p>
+</li><li><p>When cell mode is 2RRU, if you want to specify baseband, it is recommended to set same BaseBandEqmId for two EUCELLSECTOREQMs, else baseband will be selected in two BaseBandEqmIds.</p>
+</li><li><p>After the power of a cell is changed, it takes 1 to 3 seconds for the change to take effect on the RRUs serving the cell. If the command used to change the cell power needs to be consecutively executed for a cell, it is recommended that the command be executed at an interval of 3 seconds to prevent command execution failure.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_eucellsectoreqm__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local cell ID. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-SectorEqmId.html">SectorEqmId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector equipment ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a piece of sector equipment that serves a cell. It uniquely identifies the sector equipment within an eNodeB.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>SECTORID on which SectorEqmId depends must have been configured.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-ReferenceSignalPwr.html">ReferenceSignalPwr</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reference signal power</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the reference signal power of cell-specific sector equipment. If this parameter is set to 32767, it is invalid, and the cell uses the reference signal power specified in the PDSCHCfg MO to transmit reference signals. For details, see 3GPP TS 36.213. This parameter is valid only when the MultiRruCellFlag parameter in the Cell MO is set to BOOLEAN_TRUE and the MultiRruCellMode parameter in the Cell MO is set to SFN, CELL_COMBINATION, or MPRU_AGGREGATION. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: -600~500,32767</p>
+<p>Unit: 0.1dBm</p>
+<p>Actual Value Range: -60~50,32767</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-BaseBandEqmId.html">BaseBandEqmId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Baseband equipment ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a piece of baseband equipment that serves the cell.</p>
+<p>If this parameter is set to 255 for a cell, baseband equipment is not specified for the cell. In this case, the eNodeB selects BBPs for a cell among all the local available BBPs. The BBP directly connected to the RRU serving the cell is preferentially selected.</p>
+<p>If this parameter is set to another value, baseband equipment is specified for the cell. In this case, the cell can use only the BBPs included in the baseband equipment, and the BBP directly connected to the RRU is preferentially selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~23,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~23,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-ReferenceSignalPwrMargin.html">ReferenceSignalPwrMargin</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Reference Signal Power Margin</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the reference signal power headroom of each physical antenna. This parameter is valid only when the MultiRruCellFlag parameter of the Cell MO is set to BOOLEAN_TRUE(True) and the MultiRruCellMode parameter in the Cell MO is set to SFN(SFN) or CELL_COMBINATION(Cell Combination). This parameter applies only to LTE TDD.</p>
+<p>If this parameter is set to 0, the parameter does not take effect. That is, the reference signal power headroom of the cell equals the value of the ReferenceSignalPwrMargin parameter in the PDSCHCfg MO. If this parameter is set to a non-zero value, the reference signal power headroom of the cell equals this value regardless of the ReferenceSignalPwrMargin parameter in the PDSCHCfg MO set for the sector equipment of the cell.</p>
+<p>GUI Value Range: 0~60</p>
+<p>Unit: 0.1dB</p>
+<p>Actual Value Range: 0~6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-SectorCpriCompression.html">SectorCpriCompression</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector CPRI Compression</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the CPRI compression type of the sector equipment. CPRI compression is used in RRU cascading scenarios to enable more RRUs to be cascaded without changing the CPRI data rate. The parameter can be set to NO_COMPRESSION, NORMAL_COMPRESSION, ENHANCED_COMPRESSION, TRIPLEX_COMPRESSION_10M, 3_2_COMPRESSION, or NULL. The parameter value NO_COMPRESSION indicates that CPRI compression is not used. The parameter value NORMAL_COMPRESSION indicates that CPRI compression is used. The parameter value ENHANCED_COMPRESSION indicates that enhanced CPRI compression is used. The parameter value TRIPLEX_COMPRESSION_10M indicates triple CPRI compression for a 10 MHz cell, and this parameter value is applicable only to LTE FDD. The value 3_2_COMPRESSION indicates that the compression ratio of 3.2:1 is used, and this value is applicable only to TDD. The parameter value NULL indicates that this parameter is invalid. The performance of enhanced CPRI compression is better than that of normal CPRI compression. If the eNodeB is equipped with LBBPd boards and the CPRI data rate is 9.8 Gbit/s for LTE FDD cells or the CPRI data rate is greater than 4.9 Gbit/s for LTE TDD cells, the CPRI compression type of cells served by RRUs in the same RRU chain or ring must be the same. If the value of this parameter is changed, the cell served by the sector equipment automatically restarts. This parameter is used only when MultiRruCellMode is set to SFN or CELL_COMBINATION. This parameter can be set based on the sector equipment. When this parameter is set to NULL, the CPRI compression type of the carrier of the cell depends on the value of the CPRICompression parameter in the Cell MO. When this parameter is set to any other value, the sector equipment CPRI compression type of carriers depends on the value of the SectorCpriCompression parameter in the eUCellSectorEqm MO. Before changing the value of this parameter for a cell served by an RRU in an RRU chain or ring, ensure that all cells served by RRUs in the RRU chain or ring are deactivated. Activate the cells after you change the parameter value. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: NO_COMPRESSION(No Compression), NORMAL_COMPRESSION(Normal Compression), ENHANCED_COMPRESSION(Enhanced Compression), TRIPLEX_COMPRESSION_10M(Triplex Compression for 10M), 3_2_COMPRESSION(3.2 times Compression), NULL(Invalid)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO_COMPRESSION, NORMAL_COMPRESSION, ENHANCED_COMPRESSION, TRIPLEX_COMPRESSION_10M, 3_2_COMPRESSION, NULL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-AutoCfgFlag.html">AutoCfgFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Auto Config Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to automatically or manually bind a baseband equipment ID to a cell. To enable automatic binding, set this parameter to AUTO_MODE_CFG. To enable manual binding, set this parameter to MANUAL_MODE_CFG. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: AUTO_MODE_CFG(AUTO_MOD), MANUAL_MODE_CFG(MANUAL_MODE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AUTO_MODE_CFG, MANUAL_MODE_CFG</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: AUTO_MODE_CFG(AUTO_MOD)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-WeightNO.html">WeightNO</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Weight Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the weight number configured for cell-specific sector equipment. If this parameter is not set to 255, the value of this parameter has a mapping relationship with the DEVICENO parameter in the BFANT MO. If this parameter is set to 255, the smallest weight number specified by the DEVICENO parameter in the BFANT is used. If the value of DEVICENO in the DSP BFANT command output is not equal to the value of this parameter, the default weight is used. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 255</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a value that is different from that configured for sector equipment of other cells, the sector equipment of the cell uses the value of the DEVICENO parameter in the BfAnt MO for the weighting for beamforming transmission.</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-VisualCellId.html">VisualCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Virtual Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates a virtual cell ID used for DMRS and CSI-RS scrambling when adaptive SFN and TM10 are enabled. This parameter should be manually set to a planned value as required when adaptive SFN and TM10 are enabled. This parameter applies only to FDD.</p>
+<p>GUI Value Range: 0~503</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~503</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: 1. If VisualCellId is set to an improper value, the performance of CSI-RS measurement and the performance of DMRS-based channel estimation will both deteriorate.</p>
+<p>2. If the VisualCellId parameter value is changed while a UE is running services, the UE performance deteriorates. If a UE initiates services after the VisualCellId parameter value is changed, the UE performance is not affected.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-SectorEqmCombineGrpId.html">SectorEqmCombineGrpId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment Combine Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of a sector equipment combination group, which contains multiple sets of sector equipment. The value 255 indicates that the sector equipment is not to be included in a combination. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~1,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If the Virtual4T4RSwitch option is selected and the TX/RX mode is 2T2R or 2T4R, the SectorEqmCombineGrpId parameter must be set to 0 for some pieces of sector equipment of the cell and to 1 for the other pieces of sector equipment of the cell. If the SectorEqmCombineGrpId parameter is set to 0 or 1 for all pieces of sector equipment of the cell, the cell does not support Rank 3 or Rank 4 4x4 MIMO, and the throughput decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eUCellSectorEqm-CellBeamMode.html">CellBeamMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cell Beam Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the beam mode of the cell. This parameter has four values: NORMAL, ADVANCED_BEAMFORMING, MASSIVE_MIMO_Ph1, and MASSIVE_MIMO_Ph2. The value NORMAL indicates that the cell is a normal cell. The value ADVANCED_BEAMFORMING indicates that the cell uses AAU-based advanced beamforming. The value MASSIVE_MIMO_Ph1 indicates that the cell uses phase-1 massive MIMO. The value MASSIVE_MIMO_Ph2 indicates that the cell uses phase-2 massive MIMO. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: NORMAL(NORMAL), ADVANCED_BEAMFORMING(ADVANCED_BEAMFORMING), MASSIVE_MIMO_Ph1(MASSIVE_MIMO_Ph1), MASSIVE_MIMO_Ph2(MASSIVE_MIMO_Ph2)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL, ADVANCED_BEAMFORMING, MASSIVE_MIMO_Ph1, MASSIVE_MIMO_Ph2</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NORMAL(NORMAL)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_eucellsectoreqm__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify cell sector equipment with the parameters as follows: LocalCellId: 0, SectorEqmId: 0, BaseBandEqmId: 1, run the following command:
+MOD EUCELLSECTOREQM: LocalCellId=0, SectorEqmId=0, BaseBandEqmId=1;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

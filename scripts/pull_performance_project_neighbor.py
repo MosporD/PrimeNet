@@ -32,7 +32,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def main() -> int:
-    puller = os.path.join(PROJECT_ROOT, "scripts", "pull_nokia_neighbor_raw.py")
+    puller = os.path.join(PROJECT_ROOT, "scripts", "pipeline", "pull_nokia_neighbor_raw.py")
     if not os.path.isfile(puller):
         print(f"[neighbor] missing {puller}")
         return 1

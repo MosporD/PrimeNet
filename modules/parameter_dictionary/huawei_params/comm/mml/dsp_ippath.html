@@ -1,0 +1,214 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Display IP Path Status (DSP IPPATH)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="dsp_ippath">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Display IP Path Status (DSP IPPATH)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="dsp_ippath"></a><a name="dsp_ippath"></a>
+
+
+<h1 class="topictitle1">Display IP Path Status (DSP IPPATH)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS5900, BTS5900 WCDMA, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="dsp_ippath__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to query the status of an IP path.</p>
+</div></div>
+
+<div class="mmlnote"><a name="dsp_ippath__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]If flow control is applied to the transmission resource group associated with the IP path, the bandwidth displayed in the execution result of this command may differ from the actual bandwidth.</p>
+</li><li><p>[Co-MPT,eNodeB]"TX Bandwidth", "Realtime TX Bandwidth", "Non-Realtime TX Bandwidth" specify the service traffic before traffic shaping.</p>
+</li><li><p>[NodeB]You cannot use this command to query whether the IP MUX function is enabled for an IP path on a faulty board.</p>
+</li><li><p>[eNodeB]The transmit bandwidth and receive bandwidth for an IP path are calculated based on the IP layer.</p>
+</li><li><p>[eNodeB]The value of the IP Path Check Result parameter is CHECK_DISABLED in the following cases:</p>
+<p>1. The Static Check Switch parameter in the IPPATH MO is set to DISABLE the IP path.</p>
+<p>2. The Static Check Switch parameter in the IPPATH MO is set to FOLLOW_GLOBAL, and the Static Check Switch parameter in the GTPU MO is set to DISABLE.</p>
+<p>3. The Static Check Switch parameter in the IPPATH MO is modified to ENABLE, but the IP path state has not been detected yet.</p>
+<p>4. The Static Check Switch parameter in the IPPATH MO is set to FOLLOW_GLOBAL and the Static Check Switch parameter in the GTPU MO is modified to ENABLE, but the IP path state has not been detected yet.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="dsp_ippath__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-PathID.html">PATHID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Path ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IP path.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="dsp_ippath__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To query the status of the IP path with the ID of 0, run the following command:
+DSP IPPATH: PATHID=0;
+The result is shown as follows:
++++    0        2010-06-02 14:46:26                                        
+O&amp;M    #286                                                                     
+%%DSP IPPATH: PATHID=0;%%                                                   
+RETCODE = 0  Operation succeeded.                                               
+                                                                                
+DSP IP Path Result                                                              
+------------------                                                              
+                                   Path ID  =  0  
+                      TX Bandwidth(kbit/s)  =  0
+                      RX Bandwidth(kbit/s)  =  0                  
+Non-Realtime Reserved TX Bandwidth(kbit/s)  =  0                                
+Non-Realtime Reserved RX Bandwidth(kbit/s)  =  0                                
+             Realtime TX Bandwidth(kbit/s)  =  0                                
+             Realtime RX Bandwidth(kbit/s)  =  0                                
+         Non-Realtime TX Bandwidth(kbit/s)  =  0                                
+         Non-Realtime RX Bandwidth(kbit/s)  =  0                                
+                Transmission Resource Type  =  High Quality                     
+                      IP Path Check Result  =  IP Path Check Disabled           
+                             IP MUX Switch  =  Disable                          
+                              Service Type  =  NULL
+                     Fault Generation Time  =  NULL
+(Number of results = 1)                                                         
+                                                                                
+                                                                                
+---    END</pre>
+</div></div>
+
+<div class="mmloutput"><a name="dsp_ippath__1.2.6"></a><a name="1.2.6"></a><h2 class="sectiontitle">Output Description</h2>
+<div class="mmloutputbody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.1">Field</th>
+
+<th valign="bottom" align="left" id="mcps1.2.6.1.1.2">Description</th>
+
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Path ID</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the ID of an IP path.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>TX Bandwidth(kbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual total traffic transmitted on the IP path.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>RX Bandwidth(kbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual total traffic received on the IP path.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Non-Realtime Reserved TX Bandwidth(kbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual TX bandwidth reserved for the non-real-time service transmitted on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Non-Realtime Reserved RX Bandwidth(kbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual RX bandwidth reserved for the non-real-time service received on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Realtime TX Bandwidth(kbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual real-time traffic transmitted on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Realtime RX Bandwidth(kbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual real-time traffic received on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Non-Realtime TX Bandwidth(kbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual non-real-time traffic transmitted on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Non-Realtime RX Bandwidth(kbit/s)</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the actual non-real-time traffic received on the IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Transmission Resource Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the type of transport resource for the IP path. The value HQ indicates high-quality transport resources, and the value LQ indicates low-quality transport resources. This parameter must be set in the hybrid transmission scenario. In other scenarios, the default value of this parameter is used. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>IP Path Check Result</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the check result for the GTP-U static detection of an IP path. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>IP MUX Switch</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates whether the IP MUX function is enabled on IP paths. LTE currently does not support this function.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Service Type</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the service type of an IP path.</p>
+</td>
+</tr>
+
+<tr><td valign="top" headers="mcps1.2.6.1.1.1"><p>Fault Generation Time</p>
+</td>
+<td valign="top" headers="mcps1.2.6.1.1.2"><p>Indicates the time when an IP path becomes faulty.</p>
+</td>
+</tr>
+
+</table>
+
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

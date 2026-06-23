@@ -1,0 +1,302 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Mapping from End Point to Transmission Resource Group (ADD EP2RSCGRP)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ep2rscgrp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Mapping from End Point to Transmission Resource Group (ADD EP2RSCGRP)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ep2rscgrp"></a><a name="add_ep2rscgrp"></a>
+
+
+<h1 class="topictitle1">Add Mapping from End Point to Transmission Resource Group (ADD EP2RSCGRP)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_ep2rscgrp__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add mapping from End Point to Transmission Resource Group.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ep2rscgrp__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>Before adding a mapping between an end point and a transmission resource group, ensure that the RSCGRP MO has been added by running the <a href="add_rscgrp.html">ADD RSCGRP</a> command.</p>
+</li><li><p>A base station supports a maximum of 456 mappings between end points and transmission resource groups. If the GTMUb/GTMUc is the main control board, a base station supports a maximum of 64 mappings between end points and transmission resource groups.</p>
+</li><li><p>A base station supports two types of mapping between an end point and a transmission resource group: end point group mapping and end point mapping.</p>
+<p>    End point group mapping: Add all user plane peers in the EPGROUP to the specified transmission resource group.</p>
+<p>    End point mapping: Add the specified user plane peer to the specified transmission resource group.</p>
+<p>If an end point added to the transmission resource group through the end point group mapping and end point mapping conflict, use the end point mapping to add end points to the transmission resource group. If no transmission resource group is specified for a user plane peer, the internal user plane path that is automatically set up between the local base station and the corresponding user plane peer joins the default transmission resource group.</p>
+</li><li><p>In the two types of mapping between an end point and a transmission resource group, the same end point group or end point cannot be added to different transmission resource groups of the same physical port.</p>
+</li><li><p>If the port type for the local IP address of a user-plane host is a loopback interface, the following principles are complied with when the automatically established user-plane link is added to the transmission resource group:</p>
+<p>1. If the loopback interface is on the same board as the actual service outbound interface and the outbound interface is the same as the transmission resource group interface configured in an EP2RSCGRP object, services are carried in the transmission resource group specified in the EP2RSCGRP object. If the loopback interface is on the same board as the actual service outbound interface but the outbound interface is different from the transmission resource group interface configured in an EP2RSCGRP object, services are carried in default transmission resource group with the actual service outbound interface.</p>
+<p>2. If the loopback interface is on a different board from the actual service outbound interface, services are carried in the default transmission resource group with the actual service outbound interface.</p>
+</li><li><p>Running this command may interrupt ongoing services carried on the base station.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ep2rscgrp__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-mappingType.html">MT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mapping Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mapping mode between the service and the transmission resource group. Two mapping modes are supported: endpoint group mode and endpoint mode. If this parameter is set to ENDPOINT_GROUP, all user-plane peer endpoints in the endpoint group can be added to the specified transmission resource group. If this parameter is set to ENDPOINT_NODE, the specified user-plane peer endpoints can be added to the specified transmission resource group. When both the endpoint group mode and the endpoint mode are available for mapping all service flows of the same EPPATH to the transmission resource group, the endpoint mode is preferentially used for the mapping.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Mapping Type parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: ENDPOINT_GROUP(EndPoint Group), ENDPOINT_NODE(EndPoint Node)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ENDPOINT_GROUP, ENDPOINT_NODE</p>
+<p>MML Default Value: ENDPOINT_GROUP(EndPoint Group)</p>
+<p>Recommended Value: ENDPOINT_GROUP(EndPoint Group)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-endPointId.html">ENDPOINTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">End Point ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the end point group or user plane peer to be added to the specified transmission resource group.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the End Point ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~65535,70000~79999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535,70000~79999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When the <strong>MT</strong> parameter in the <strong>EP2RSCGRP</strong> MO is set to ENDPOINT_GROUP, this parameter uses the value of the End Point Group ID parameter (the value range of this parameter is 0~65535) in the <strong>EPGROUP</strong> MO. In this case, all data flows in the EP group whose destination addresses are generated by <strong>USERPLANEPEER</strong> MO can be mapped to the specified transmission resource group. </li><li>When the <strong>MT</strong> parameter in the <strong>EP2RSCGRP</strong> MO is set to ENDPOINT_NODE, this parameter uses the value of the User Plane Peer ID parameter (the value range of this parameter is 0~65535 and 70000~79999) in the <strong>USERPLANEPEER</strong> MO. In this case, all data flows whose destination addresses are generated by the <strong>USERPLANEPEER</strong> MO can be mapped to the specified transmission resource group.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-cabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet where the transmission resource group to which a node maps is configured.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-subrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack where the transmission resource group to which a node maps is configured.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-slotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot where the transmission resource group to which a node maps is configured.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-subboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subboard type of the board where the transmission resource group to which a node maps is configured.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: E1_COVERBOARD(E1 Cover Board), ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board), BACK_BOARD(Back Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E1_COVERBOARD, ETH_COVERBOARD, BASE_BOARD, BACK_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SN</strong> is set to a value in the range of 0 to 5, this parameter can be set to ETH_COVERBOARD or E1_COVERBOARD.</li><li>In the <strong>EP2RSCGRP</strong> MO, if <strong>SN</strong> is set to 6 or 7, this parameter can be set to BASE_BOARD, BACK_BOARD or ETH_COVERBOARD.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-phyPortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearing Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the port where the transmission resource group to which a node maps is configured.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: PPP(PPP Link), MPGRP(Multi-link PPP Group), ETH(Ethernet Port), ETHTRK(Ethernet Trunk), TUNNEL(Tunnel)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PPP, MPGRP, ETH, ETHTRK, TUNNEL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to PPP, MPGRP, ETH or ETHTRK.</li><li>In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to BACK_BOARD, this parameter can be set to PPP or TUNNEL.</li><li>In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to E1_COVERBOARD, this parameter can be set to PPP or MPGRP.</li><li>In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to ETH_COVERBOARD, this parameter can be set to ETH or ETHTRK.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-phyPortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearing Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the port where the transmission resource group to which a node maps is configured.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETHTRK, this parameter can be set to any value in the range of 0 to 2.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to ETH, this parameter can be set to any value in the range of 0 to 5.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to BACK_BOARD and <strong>PT</strong> is set to TUNNEL, this parameter can be set to any value in the range of 0 to 14.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to BACK_BOARD and <strong>PT</strong> is set to PPP, this parameter can be set to any value in the range of 0 to 15.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETHTRK, this parameter can be set to any value in the range of 0 to 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to MPGRP, this parameter can be set to any value in the range of 0 to 3.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to PPP, this parameter can be set to any value in the range of 0 to 15.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to E1_COVERBOARD and <strong>PT</strong> is set to MPGRP, this parameter can be set to any value in the range of 0 to 3.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to E1_COVERBOARD and <strong>PT</strong> is set to PPP, this parameter can be set to any value in the range of 0 to 15.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>EP2RSCGRP</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to ETH, this parameter can be set to any value in the range of 0 to 3.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-resourceGroupBearType.html">BEAR</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Resource Group Bear Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the bearing type of the transmission resource group to which a node maps.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: IP(IP)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IP</p>
+<p>MML Default Value: IP(IP)</p>
+<p>Recommended Value: IP(IP)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-resourceGroupID.html">RSCGRPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the transmission resource group to which a node maps.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/EP2RSCGRP-userLabel.html">USERLABEL</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">User Label</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the description of the end point mapping to resource group. This parameter takes effect only in LTE and NR.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the User Label parameter in the EP2IPRSCGRP MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~256 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~256 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ep2rscgrp__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add mapping from End Point to Transmission Resource with the parameters as follows: End Point ID: 0, Slot No.: 7, Subboard Type: Base Board, Bearing Port Type: Ethernet Port, Transmission Resource Group ID: 0, run the following command:
+ADD EP2RSCGRP: ENDPOINTID=0, SN=7, SBT=BASE_BOARD, PT=ETH, RSCGRPID=0;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

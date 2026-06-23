@@ -1,0 +1,225 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Confirm CB (CFM CB)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="cfm_cb">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Confirm CB (CFM CB)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="cfm_cb"></a><a name="cfm_cb"></a>
+
+
+<h1 class="topictitle1">Confirm CB (CFM CB)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="cfm_cb__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to confirm the active version, including the software version and data configuration file. After the active version is confirmed, a new configuration baseline (CB) is generated. A CB can be manually activated or automatically rolled back:</p>
+<p>(1) If configuration data about OMCH connecting to the NE (such as the IP address and route) is incorrectly modified at the remote end, the OMCH may be interrupted and cannot be restored for a long period of time. To eliminate the need to handle this type of fault onsite, users can run this command with the Automatic Roll Back Switch parameter set to ENABLE(ENABLE) to enable automatic rollback before modifying configuration data. It is recommended that the automatic rollback function be disabled during local modification. Otherwise, an interruption in the OM channel may cause an unexpected rollback.</p>
+<p>(2) You are advised to set Automatic Roll Back Switch to DISABLE(DISABLE) if you only need to back up software version and configuration data of the system for future manual activation or rollback.</p>
+</div></div>
+
+<div class="mmlnote"><a name="cfm_cb__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>The storage space of a base station is limited. Therefore, if configuration date needs to be backed up, it is recommended that you use the automatic configuration backup function on the MAE or run the <a href="bkp_cfgfile.html">BKP CFGFILE</a> and <a href="uld_cfgfile.html">ULD CFGFILE</a> command to back up the configuration data to the MAE or a third-party server. It is recommended that you back up as few CBs as possible.</p>
+</li><li><p>Generally, this command is executed when the configuration data of the current system needs to be backed up and the current CB is not confirmed. It is recommended that this command be not executed frequently.</p>
+</li><li><p>When a CB is being confirmed, it is not recommended that configuration operations be performed.</p>
+</li><li><p>If a CB has been confirmed for the active version (can be queried by <a href="dsp_cb.html">DSP CB</a> command), the CB confirmation fails in unforced mode and can succeed only when MODE is set to FORCED(FORCED).</p>
+</li><li><p>If the output of the <a href="dsp_cb.html">DSP CB</a> command shows that a CB whose Automatic Roll Back Switch parameter is set to ENABLE(ENABLE) exists in the current system, you cannot create a CB whose Automatic Roll Back Switch parameter is set to ENABLE(ENABLE).</p>
+</li><li><p>When the automatic configuration data rollback is being enabled by running this command, the timer specified by RBKTIME starts. The data modification must have been completed before the timer expires. For the existing configuration baseline (CB), you can also run the MML command <a href="mod_cb.html">MOD CB</a> to enable the automatic configuration data rollback function. You can run the MML command <a href="dsp_cb.html">DSP CB</a> to query the remaining rollback time.</p>
+</li><li><p>Before the period of time specified by RBKTIME expires, if the OMCH is normal after its configuration data is modified or recovers to its normal state after an interruption, and users do not require rollback in spite of an OMCH interruption, run the MML command <a href="mod_cb.html">MOD CB</a> to disable the automatic configuration data rollback function. This prevents the rollback of the configuration data in the case of an OMCH interruption.</p>
+</li><li><p>If automatic rollback is enabled, the system is reset and restores the CB confirmed by this command at the end of rollback duration specified by RBKTIME when the link is continuously interrupted and rollback conditions specified by the parameter RBKCONDITION are met. After the rollback is performed, the system reports ALM-26255 Automatic Version Rollback alarm, and automatically disables automatic rollback.</p>
+</li><li><p>When the period of time specified by RBKTIME expires, if the rollback conditions are not met, the system waits five minutes before making a decision again. The remaining rollback time is five minutes and the timing restarts. After the five minutes expire, if rollback conditions specified by the parameter RBKCONDITION are met, the base station resets, data configuration is rolled back to the corresponding CB used to enable this function. If the rollback succeeds, the base station disables this function. If rollback conditions are not met (for example, the OMCH is normal or has recovered to its normal state), the base station disables this function.</p>
+</li><li><p>Before the period of time specified by RBKTIME expires, if the base station resets and related conditions are met, the automatic configuration data rollback function still takes effect after the reset.</p>
+</li><li><p>When the configuration data of base stations is being modified, the configuration data of peripheral NEs may also be modified. After the configuration data of base stations is rolled back successfully, the data of peripheral NEs may also need to be rolled back to ensure a normal OMCH.</p>
+</li><li><p>If Name of CB is set to OSS_AUTO_CFM_CB and Mode of CB is set to FORCED(FORCED), the CB with the same name on the NE will be replaced.</p>
+</li><li><p>Command execution will fail if the MAE is periodically saving configuration data. Please run this command later.</p>
+</li><li><p>OSS_TASK_AUTO_CB is the dedicated name for automatic backup of the NMS. This name cannot be used for manual backup.</p>
+</li><li><p>If the CB file backed up before an upgrade is named OSS_TASK_AUTO_CB (the same as the CB file used for automatic backup in the target version), the target version regards this file as the automatic backup CB file after the upgrade. The file is overwritten during a periodic backup.</p>
+</li><li><p>Check that all applications(Integrated Deployment Mode) are available before you confirm a CB. If any application is unavailable, a CB will fail to be confirmed.</p>
+</li><li><p>A maximum of 10 CBs can be confirmed in a base station(The CB named OSS_TASK_AUTO_CB is not included). The actual number of CBs that can be confirmed in a base station varies depending on the remaining storage space and configurations of the base station. If a failure prompt is displayed when you run the <a href="cfm_cb.html">CFM CB</a> command, manually delete CBs on the base station.</p>
+</li><li><p>If the RBKCONDITION parameter is set to OMCH_AND_SERVICE_FAULT(OMCH_AND_SERVICE_FAULT), the automatic configuration data rollback function will be triggered only when the OMCH and all service channels are faulty.</p>
+</li><li><p>[Co-MPT,NodeB,eNodeB,gNodeB]When a WMPT, LMPT, or GTMUb/GTMUc (used as the main control board of independent NE) is used, the CB file cannot be automatically backed up on the EMS due to limited storage space.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="cfm_cb__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SWMPARA-CB_MODE.html">MODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Mode of CB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode in which the CB is confirmed.</p>
+<p>GUI Value Range: UNFORCED(UNFORCED), FORCED(FORCED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNFORCED, FORCED</p>
+<p>MML Default Value: UNFORCED(UNFORCED)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SWMPARA-CB_NAME.html">NAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Name of CB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the name of the CB. The name of each CB must be unique, and is case insensitive. The name cannot contain any of the following characters: question mark (?), exclamation mark (!), right angle bracket (&gt;), left angle bracket (&lt;), bar (|), slash (/), backslash (\), colon (:), and asterisk (*). It is not recommended that the name contain any space, because an error message will be displayed when the name containing spaces is not supported by a file system in the BS. Different file systems differ from one another in their support for the CB name containing spaces.</p>
+<p>GUI Value Range: 1~48 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~48 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SWMPARA-CB_COMMENT.html">COMMENT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Comment of CB</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the brief description of the CB.</p>
+<p>The value NULL indicates that there is no brief description of the CB.</p>
+<p>GUI Value Range: 0~255 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SWMPARA-CB_AUTO_RBK_SW.html">AUTORBKSW</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Automatic Roll Back Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the automatic rollback function.</p>
+<p>GUI Value Range: DISABLE(DISABLE), ENABLE(ENABLE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(DISABLE)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SWMPARA-CB_RBK_TIME_CFM.html">RBKTIME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Roll Back Time</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the time between opening Automatic Roll Back Switch of CB and triggering Automatic Roll Back Condition.</p>
+<p>GUI Value Range: 10~240</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 10~240</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid only when AUTORBKSW is set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SWMPARA-CB_RBK_CONDITION_CFM_CB.html">RBKCONDITION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Roll Back Condition</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the condition of triggering Automatic Roll Back, including OMCH FAULT and OMCH AND SERVICE FAULT.</p>
+<p>GUI Value Range: OMCH_FAULT(OMCH_FAULT), OMCH_AND_SERVICE_FAULT(OMCH_AND_SERVICE_FAULT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OMCH_FAULT, OMCH_AND_SERVICE_FAULT</p>
+<p>MML Default Value: OMCH_FAULT(OMCH_FAULT)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter is valid only when AUTORBKSW is set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/SWMPARA-BAKCF.html">CF</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Compression Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to compress the backup CB file for storage. If this parameter is set to COMPRESSED, the backup file is compressed.</p>
+<p>GUI Value Range: UNCOMPRESSED(UNCOMPRESSED), COMPRESSED(COMPRESSED)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNCOMPRESSED, COMPRESSED</p>
+<p>MML Default Value: COMPRESSED(COMPRESSED)</p>
+<p>Recommended Value: COMPRESSED</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="cfm_cb__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To confirm a CB with the parameters as follows: Mode of CB: UNFORCED, Name of CB: "CB1", Comment of CB: "Launch", Automatic Roll Back Switch: "ENABLE", Roll Back Time:"30minutes", Roll Back Condition:"OMCH FAULT", run the following command:
+CFM CB: MODE=UNFORCED, NAME="CB1", COMMENT="Launch", AUTORBKSW=ENABLE, RBKTIME=30, RBKCONDITION=OMCH_FAULT;
+
+Example 2: To confirm a CB with the parameters as follows: Mode of CB: FORCED, Name of CB: "CB1", Comment of CB: "Launch", Automatic Roll Back Switch: "DISABLE", run the following command:
+CFM CB: MODE=FORCED, NAME="CB1", COMMENT="Launch", AUTORBKSW=DISABLE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,733 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="RFU">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="RFU">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>RFU</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="RFU"></a><a name="RFU"></a>
+
+
+<h1 class="topictitle1">RFU</h1>
+
+<div>
+<div class="section"><pre>
+<a href="Equipment.html">EQUIPMENT</a>
+  +-<a href="Cabinet.html">CABINET</a>
+    +-<a href="Subrack.html">SUBRACK</a>
+      +-<a href="RFU.html"><strong>RFU</strong></a>
+        +-<a href="AlmPort.html">ALMPORT</a>[0~0]
+        +-<a href="AntennaPort.html">ANTENNAPORT</a>[1~8]
+        +-<a href="CpriPort.html">CPRIPORT</a>[2~2]
+        +-<a href="RxBranch.html">RXBRANCH</a>[0~8]
+        +-<a href="SFP.html">SFP</a>[2~2]
+        +-<a href="TxBranch.html">TXBRANCH</a>[0~8]
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The RFU MO is the RF processing unit of a macro BS, which provides ports for sending and receiving baseband and RF signals and processes the UL and DL baseband signals.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Base class:</p>
+<a href="RE.html">RE</a></li><li><p>Possible parents:</p>
+<a href="Subrack.html">SUBRACK</a></li><li><p>Possible children:</p>
+<a href="AlmPort.html">ALMPORT</a>[0~0];<a href="AntennaPort.html">ANTENNAPORT</a>[1~8];<a href="CpriPort.html">CPRIPORT</a>[2~2];<a href="RxBranch.html">RXBRANCH</a>[0~8];<a href="SFP.html">SFP</a>[2~2];<a href="TxBranch.html">TXBRANCH</a>[0~8]</li><li>Relation with the <strong>TXBRANCH</strong> and <strong>RXBRANCH</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>TXBRANCH</strong> MOs related to an <strong>RFU</strong> MO must be equal to <strong>TXNUM</strong> in the <strong>RFU</strong> MO, and the number of <strong>RXBRANCH</strong> MOs related to the <strong>RFU</strong> MO must be equal to <strong>RXNUM</strong> in the <strong>RFU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TT</strong> in the <strong>RRUCHAIN</strong> MO is set to LOADBALANCE, the number of <strong>RFU</strong> MOs specified by <strong>RCN</strong> and <strong>RRU</strong> MOs specified by <strong>RCN</strong> and with <strong>RT</strong> not set to MPRF must be 0 or 1.</li></ul>
+</li><li>Relation with the <strong>RFU</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>RFU</strong> MO is located must have been configured.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the <strong>RRUCHAIN</strong> MO where the <strong>RFU</strong> MO is located, when <strong>TT</strong> is set to LOADBALANCE, <strong>RS</strong> cannot be set to UO or GO.</li></ul>
+</li><li>Relation with the <strong>TMA</strong> and <strong>RRU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The <strong>RRU</strong> or <strong>RFU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>TMA</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>ANTENNAPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>ANTENNAPORT</strong> MOs configured on one <strong>RFU</strong> MO must be greater than or equal to 1 and smaller than or equal to 8.</li></ul>
+</li><li>Relation with the <strong>ALMPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>ALMPORT</strong> MOs configured on one <strong>RFU</strong> MO must be 0.</li></ul>
+</li><li>Relation with the <strong>SUBRACK</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>RFU</strong> MOs configured on one <strong>SUBRACK</strong> MO must be greater than or equal to 0 and smaller than or equal to 9.</li></ul>
+</li><li>Relation with the <strong>RXBRANCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>RXBRANCH</strong> MOs configured on one <strong>RFU</strong> MO must be greater than or equal to 0 and smaller than or equal to 8.</li></ul>
+</li><li>Relation with the <strong>TXBRANCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>TXBRANCH</strong> MOs configured on one <strong>RFU</strong> MO must be greater than or equal to 0 and smaller than or equal to 8.</li></ul>
+</li><li>Relation with the <strong>CABINET</strong> and <strong>LOCATION</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>LOCATIONNAME</strong> of a <strong>CABINET</strong> housing the <strong>RFU</strong> is not set to NULL, the corresponding <strong>LOCATION</strong> with <strong>LOCATIONTYPE</strong> set to BTSSITE or RFSITE must have been configured.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The total number of <strong>RRU</strong>, <strong>RFU</strong>, <strong>AAMU</strong>, and <strong>CXU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 21.</li></ul>
+</li><li>Relation with the <strong>RET</strong>, <strong>RRU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>RRU</strong>, <strong>RFU</strong>, or <strong>AAMU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>RET</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>RVD</strong>, <strong>RRU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>RRU</strong>, <strong>RFU</strong>, or <strong>AAMU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>RVD</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>SECTOREQM</strong>, <strong>RRU</strong>, <strong>RRUCHAIN</strong>, <strong>CXU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If sector equipment antennas are distributed on multiple radio frequency units, these radio frequency units can neither be configured on different branches of trunk chains, nor be configured in hybrid networking modes including the branches of trunk chain.</li></ul>
+</li><li>Relation with the <strong>RAS</strong>, <strong>RRU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>RRU</strong>, <strong>RFU</strong>, or <strong>AAMU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>RAS</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>CXU</strong> and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TP</strong> in the <strong>RFU</strong> MO is set to BRANCH, the <strong>RRUCHAIN</strong> MO specified by <strong>RCN</strong> in this <strong>RFU</strong> MO must be connected to an RMU.</li></ul>
+</li><li>Relation with the <strong>RAE</strong>, <strong>RRU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>RRU</strong>, <strong>RFU</strong>, or <strong>AAMU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>RAE</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>CXU</strong>, <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>PROTOCOL</strong> is set to eCPRI and <strong>TT</strong> is set to CHAIN or LOADBALANCE in an <strong>RRUCHAIN</strong> MO, then only <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RAESUBUNIT</strong>, <strong>RRU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>RRU</strong>, <strong>RFU</strong>, or <strong>AAMU</strong> MO corresponding to <strong>CONNCN</strong>, <strong>CONNSRN</strong>, and <strong>CONNSN</strong> in the <strong>RAESUBUNIT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RRU</strong>, and <strong>RFU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>BM</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RFU</strong> MO is located is set to HOT, the total number of <strong>AAMU</strong>, <strong>RRU</strong>, and <strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be 0 or 1.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponding to the <strong>RRU</strong> MO, <strong>RFU</strong> MO, or <strong>AAMU</strong> MO is configured on a <strong>CXU</strong> in which <strong>CXUTYPE</strong> is set to RMU, <strong>TP</strong> in the <strong>RRU</strong> MO, <strong>RFU</strong> MO, or <strong>AAMU</strong> MO must be set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RRUCHAIN</strong>, and <strong>EQUIPMENT</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]When <strong>PROTOCOL</strong> in an <strong>EQUIPMENT</strong> MO is set to TDL_IR, the <strong>RRU</strong> or <strong>RFU</strong> MO with <strong>RS</strong> including both TDL and NO cannot be configured in the <strong>RRUCHAIN</strong> MO with <strong>PROTOCOL</strong> set to DEFAULT.</li></ul>
+</li><li>Relation with the <strong>RHUB</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>RHUB</strong> MO is located must not have <strong>RRU</strong> MO, <strong>RFU</strong> MO, <strong>AAMU</strong> MO, and <strong>CXU</strong> MO.</li><li>[gNodeB]The <strong>RRUCHAIN</strong> MO where the <strong>RHUB</strong> MO is located must not have <strong>RRU</strong> MO, <strong>RFU</strong> MO, and <strong>CXU</strong> MO.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]When <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in an <strong>RRUCHAIN</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>RHUB</strong> MO, respectively, the <strong>RT</strong> in the <strong>RRU</strong> MO that is configured on this <strong>RRUCHAIN</strong> MO must be set to MPMU or MPRF.</li></ul>
+</li><li>Relation with the <strong>SASU</strong> and <strong>RRU</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS]The <strong>RRU</strong> or <strong>RFU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>SASU</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>CXU</strong>, <strong>RHUB</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>AAMU</strong> MOs</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU</li><li>3. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RHUB</strong>, <strong>CXU</strong>, <strong>AAMU</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU and <strong>TP</strong> set to BRANCH.</li><li>2. <strong>AAMU</strong> MOs with <strong>TP</strong> set to BRANCH.</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU.</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU and <strong>TP</strong> set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>CXU</strong>, <strong>RRU</strong>, and <strong>AAMU</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to RMU, <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU or <strong>RHUB</strong>.</li><li>[eGBTS]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong>s with <strong>CXUTYPE</strong> set to RMU.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>AAMU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB]Under a base station, the total number of <strong>RRU</strong>, <strong>RFU</strong>, <strong>AAMU</strong>, and <strong>RHUB</strong> MOs must be less than or equal to 420.</li></ul>
+</li><li>Relation with the <strong>AAMU</strong>, <strong>RRU</strong>, <strong>RFU</strong>, <strong>CXU</strong>, and <strong>RHUB</strong> Mos:<ul><li>[Co-MPT, NodeB, eNodeB]The <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU must be at the lowest level of the <strong>RRUCHAIN</strong> MO, and only the <strong>RRU</strong> or <strong>RFU</strong> MO can be configured at the upper level.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> and <strong>AAMU</strong> MOs:<ul><li>[eGBTS]Under a base station, the total number of <strong>RRU</strong>, <strong>RFU</strong> and <strong>AAMU</strong> MOs must be less than or equal to 195.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>CXU</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[eGBTS]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU</li><li>2. <strong>AAMU</strong> MOs</li><li>3. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS</li><li>4. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>RRU</strong>, and <strong>CXU</strong> MOs:<ul><li>[gNodeB]The total number of <strong>RRU</strong>, <strong>RFU</strong>, and <strong>CXU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 21.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]When <strong>HCN</strong>, <strong>HSRN</strong>, and <strong>HSN</strong> in an <strong>RRUCHAIN</strong> MO are the same as <strong>CN</strong>, <strong>SRN</strong>, and <strong>SN</strong> in the <strong>RHUB</strong> MO, respectively, the <strong>RT</strong> in the <strong>RRU</strong> MO that is configured on this <strong>RRUCHAIN</strong> MO must be set to MPMU or MPRF.</li></ul>
+</li><li>Relation with the <strong>RRU</strong> and <strong>RRUCHAIN</strong> MOs:<ul><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponding to the <strong>RRU</strong> MO or <strong>RFU</strong> MO is configured on a <strong>CXU</strong> in which <strong>CXUTYPE</strong> is set to RMU, <strong>TP</strong> in the <strong>RRU</strong> MO or <strong>RFU</strong> MO must be set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RHUB</strong>, <strong>CXU</strong>, and <strong>RRUCHAIN</strong> MOs:<ul><li>[gNodeB]If an <strong>RRUCHAIN</strong> MO corresponds to a <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RMU, only the following MOs corresponding to the <strong>RRUCHAIN</strong> MO can be configured:</li><li>1. <strong>RRU</strong> MOs with <strong>RT</strong> set to MRRU, LRRU, MRXU, PRRU, or AIRU and <strong>TP</strong> set to BRANCH.</li><li>2. <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to CGPS or RPCU.</li><li>3. <strong>RFU</strong> MOs with <strong>RT</strong> set to MRFU and <strong>TP</strong> set to BRANCH.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>CXU</strong>, and <strong>RRU</strong> MOs:<ul><li>[gNodeB]If <strong>TT</strong> is set to TRUNK_CHAIN and <strong>PROTOCOL</strong> is set to CPRI in an <strong>RRUCHAIN</strong> MO, this <strong>RRUCHAIN</strong> MO can be composed only of <strong>CXU</strong> MOs with <strong>CXUTYPE</strong> set to RMU, <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU or <strong>RHUB</strong>.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong>, <strong>CXU</strong>, <strong>RRU</strong>, and <strong>RHUB</strong> MOs:<ul><li>[gNodeB]If <strong>PROTOCOL</strong> is set to eCPRI and <strong>TT</strong> is set to CHAIN or LOADBALANCE in an <strong>RRUCHAIN</strong> MO, then only <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, and <strong>RFU</strong> MOs:<ul><li>[gNodeB]If <strong>BM</strong> in the <strong>RRUCHAIN</strong> MO where the <strong>RFU</strong> MO is located is set to HOT, the total number of <strong>RRU</strong>, and <strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be 0 or 1.</li></ul>
+</li><li>Relation with the <strong>RRUCHAIN</strong> and <strong>RRU</strong> MOs:<ul><li>[gNodeB]The total number of <strong>RRU</strong>and<strong>RFU</strong> MOs configured on the <strong>RRUCHAIN</strong> MO must be smaller than or equal to 21.</li><li>[gNodeB]If <strong>PROTOCOL</strong> is set to eCPRI and <strong>TT</strong> is set to CHAIN or LOADBALANCE in an <strong>RRUCHAIN</strong> MO, then only <strong>RRU</strong> MOs with <strong>RT</strong> set to AIRU can be configured on this <strong>RRUCHAIN</strong> MO.</li></ul>
+</li><li>Relation with the <strong>RET</strong> and <strong>RRU</strong> MOs:<ul><li>[gNodeB]The <strong>RRU</strong>, or <strong>RFU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>RET</strong> MO must have been configured.</li><li>[gNodeB]The <strong>RRU</strong>, or <strong>RFU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>RET</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>RAE</strong> and <strong>RRU</strong> MOs:<ul><li>[gNodeB]The <strong>RRU</strong> or <strong>RFU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>RAE</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>RAESUBUNIT</strong> and <strong>RRU</strong> MOs:<ul><li>[gNodeB]The <strong>RRU</strong> or <strong>RFU</strong> MO corresponding to <strong>CONNCN</strong>, <strong>CONNSRN</strong>, and <strong>CONNSN</strong> in the <strong>RAESUBUNIT</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>RVD</strong> and <strong>RRU</strong> MOs:<ul><li>[gNodeB]The <strong>RRU</strong> or <strong>RFU</strong> MO corresponding to <strong>CTRLCN</strong>, <strong>CTRLSRN</strong>, and <strong>CTRLSN</strong> in the <strong>RVD</strong> MO must have been configured.</li></ul>
+</li><li>Relation with the <strong>RRU</strong>, <strong>RFU</strong>, <strong>CXU</strong>, and <strong>RHUB</strong> Mos:<ul><li>[gNodeB]The <strong>CXU</strong> MO with <strong>CXUTYPE</strong> set to RPCU must be at the lowest level of the <strong>RRUCHAIN</strong> MO, and only the <strong>RRU</strong> or <strong>RFU</strong> MO can be configured at the upper level.</li></ul>
+</li></ul>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#RFU__tab1">Table 1</a> and <a href="#RFU__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="RFU__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="RFU__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-CabinetNo.html">Cabinet No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the number of the cabinet where the RFU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-SubrackNo.html">Subrack No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the number of the subrack where the RFU is located.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-SlotNo.html">Slot No.</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the slot number of the RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RRUType.html">RRU type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the type of the RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-TEMPERATUREALMDETENHSW.html">Temperature Alarm Detection Enh Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates whether to enable the alarm detection enhancement function for the temperature exception for an RFU. If this switch is turned on, the system determines whether to report ALM-26525 RF Unit Temperature Unacceptable based on the RFU board temperature and user-defined RFU temperature alarm threshold. It reminds users to clean up site dust in a timely manner.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-TEMPERATUREALMTHLD.html">Temperature Alarm Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the temperature alarm threshold of the RFU. If the temperature of an RFU board is higher than this threshold, ALM-26525 RF Unit Temperature Unacceptable is reported. The value NULL indicates that the queried RF module does not support querying of this parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-AdmState.html">Administrative State(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the administrative state.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-IffReq.html">Interference Frequency(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the interference frequency. This parameter is set by the user during network planning to avoid the external signal interference around the current received frequency, and accordingly improve the receiver sensitivity of the system. It is recommended that you leave this parameter unspecified if there is no external signal interference.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-VswrAlmSwitch.html">VSWR alarm post-processing switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the VSWR alarm post-processing switch. The pRRU (pRRU3801) does not support this parameter.</p>
+<p>When the switch is set to on and the VSWR is greater than the VSWR alarm post-processing threshold: (1) The TX channel will be shut down if the transmit power is greater than or equal to the hardware maximum output power of the TX channel minus 3 dB. (2) The TX channel will not be shut down if the transmit power is less than the hardware maximum output power of the TX channel minus 3 dB.</p>
+<p>When the switch is set to off and the VSWR is greater than the VSWR alarm post-processing threshold, the RF module will reduce the total transmit power of TX channels by 3 dB to avoid damage caused by high VSWR and provide as many services as possible. Different scenarios are described as follows:</p>
+<p>(1) An RF module degrades its power by decreasing the TX power of carriers sharing TX channels by 3 dB. In GSM mode, non-BCCH carriers on the TX channel are shut down to degrade the RF module's power. If there is only a BCCH carrier on the TX channel where a severe VSWR alarm is generated, to ensure services, the transmit power of the BCCH carrier is reduced so that the TX channel power is reduced by 3 dB.</p>
+<p>(2) In the scenario where two TX channels are configured with transmit diversity and MIMO, the TX power of one channel is decreased by 3 dB if a major VSWR alarm is generated in this channel. Meanwhile, the TX power of the other channel also needs to be decreased by 3 dB for the power balance of TX channels.</p>
+<p>(3) In the scenario where multiple modes share TX channels and a major VSWR alarm is generated in one channel, this TX channel is shut down if the switch is set to ON in any mode. The power of this channel is degraded if this switch is set to OFF in all the modes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-CustomedRFSpecSW.html">RF Specifications Customization Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates whether to enable customization of RF specifications. Select customized RF specifications as required. This specification is customized for a specific RF module and does not take effect for RF modules that do not support this specification.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-VswrAlmThrhld.html">VSWR alarm post-processing threshold(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the VSWR alarm post-processing threshold. If the VSWR alarm post-processing switch is set to ON and the VSWR is greater than the threshold, post-processing is performed to shut down the TX channel. In this case, the TX channel cannot be open automatically after the VSWR is normal. If this parameter is set to different values in different modes of a multimode base station, the smallest value takes effect in all the modes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-VswrReAlmThrhld.html">VSWR alarm threshold(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the VSWR alarm threshold. When the current VSWR is greater than the threshold, a VSWR Abnormal alarm is reported.</p>
+<p>It is recommended that the VSWR alarm threshold be set according to the VSWR required by the engineering quality to reduce the probability that the VSWR alarm is reported falsely.</p>
+<p>To stabilize the false alarm probability to 1%, 0.1%, and 0.01%, you need to set the VSWR alarm threshold to the following recommended values:</p>
+<p>When the VSWR required by the engineering quality is smaller than or equal to 1.4, the recommended thresholds are 1.8, 2.0, and 2.4, respectively.</p>
+<p>When the VSWR required by the engineering quality is smaller than or equal to 1.5, the recommended thresholds are 2.0, 2.2, and 2.6, respectively.</p>
+<p>If this parameter is set to different values in different modes of a multimode base station, the smallest value takes effect in all the modes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-InsertPos.html">RRU Position(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the position of the RRU, RFU, or RHUB on the chain/ring. It is calculated from the start port one by one.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RRUChainId.html">RRU Chain No.(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the ID of the RRU or RFU chain/ring.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-TopoPos.html">Topo Position(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the position where the RRU or RFU is installed in the topology. There are two types of positions for the RRU or RFU: TRUNK and BRANCH. BRANCH indicates that the RRU is connected to the RHUB. TRUNK indicates that the RRU or RFU is located on the main chain/ring. The main chain/ring is connected to the optical port on the baseband processing board.The LampSite high-power modules must be configured as the main chain/ring (TRUNK), and the LampSite low-power modules must be configured as a branch (BRANCH).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-WorkStandard.html">RF Unit Working Mode(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the working standard of the RRU or RFU. For an eCPRI AAU, modifying the working mode of the AAU may cause the AAU to reset.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RxBranchNum.html">Number of RX channels(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the number of RX channels of the RRU or RFU. Set this parameter to the number of antenna ports on the RF module. The system creates RX channels based on the number of configured channels. For 8-channel TDD or FDD RRUs, the RX channels are numbered from 1 in ascending order, and channels 1 to 8 corresponds to antenna ports A to H. For other RRUs/RFUs, RX channels are numbered from 0 in ascending order, and channels 0 to 15 correspond to antenna ports A to P. Ensure that sufficient RX channels are configured before using an RX channel No. For example, if R0D is used, at least four RX channels must have been configured. Operations cannot be performed on a single channel for AAUs capable of beamforming. Therefore, this parameter does not take effect on such AAUs and the recommended value is 0.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-TxBranchNum.html">Number of TX channels(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the number of TX channels of the RRU or RFU. Set this parameter to the number of antenna ports on the RF module. The system creates TX channels based on the number of configured channels. For 8-channel TDD or FDD RRUs, the TX channels are numbered from 1 in ascending order, and channels 1 to 8 corresponds to antenna ports A to H. For other RRUs/RFUs, TX channels are numbered from 0 in ascending order, and channels 0 to 15 correspond to antenna ports A to P. Ensure that sufficient TX channels are configured before using an TX channel No. For example, if R0D is used, at least four TX channels must have been configured. Operations cannot be performed on a single channel for AAUs capable of beamforming. Therefore, this parameter does not take effect on such AAUs and the recommended value is 0.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RfTxSignDetectSwitch.html">DL Signal Quality Detection Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the downlink signal quality detection switch for the RF module. Downlink signal quality can be detected when this parameter is set to ON.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RfTxSignDetectPeriod.html">DL Signal Quality Detection Period(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the downlink signal quality detection period for the RF module. This parameter takes effect only when DL Signal Quality Detection Switch is set to ON.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RfTxSignDetectThrhld.html">DL Signal Quality Detection Sensitivity(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the downlink signal quality detection sensitivity for the RF module. This parameter takes effect only when DL Signal Quality Detection Switch is set to ON.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-Rfds.html">RF Desensitivity(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the RF desensitization intensity of the RRU or RFU. When the air interface is under the impact of strong blocking or interference, the anti-interference capability of RF modules can be improved by decreasing the gain on RX channels and lowering the receiver sensitivity. For example, when the parameter is set to 10 dB, the uplink receiver sensitivity is lowered by 10 dB. Therefore, the anti-interference capability is improved. Currently, this parameter can only be set to 0 dB or 10 dB for RRU3804 and WRFU. The RRU3808, RRU3201, RRU3203, and LRFU do not support this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-FreqBdwh.html">Frequency Min Bandwidth(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the minimum effective bandwidth of the carrier. This parameter takes effect only to UMTS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-Lcpswitch.html">Low Current Protect Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the undercurrent protection switch. If an undercurrent alarm is generated, the ALD power switch for this RRU or RFU is automatically turned off only when this parameter is set to ENABLE. If this parameter is set to NULL, the RRU/RFU undercurrent protection function setting is not changed. If NULL is displayed in the DSP RRU command output, the RRU/RFU does not support undercurrent protection. Only UMTS currently supports this function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-AldReuse.html">ALD Reuse Flag(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates whether the ALD is reused. Value 0 indicates that the ALD is not reused. Value 1 indicates that the ALD is reused. This parameter takes effect only to UMTS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RUSpecification.html">RU Specification(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the type of an RF module. If the user does not need to forcibly verify the RU specifications using the MAE-Deployment, this parameter can be left unspecified. Leaving this parameter unspecified has no impact on the base station. If the user needs to forcibly verify the RU specifications using the MAE-Deployment, this parameter must be set to the hardware type of the RF module. After this parameter is specified, the MAE-Deployment checks the configurations of power, carrier, and receive and transmit capabilities based on the value of this parameter. This ensures that these configurations are correct before they take effect. When this parameter is specified, it must be set to the hardware type of the RF module. For example, this parameter must be set to RRU3908_V1 for RRU3908_V1, RRU3029 for RRU3029, and MRFU_V1 for MRFU_V1.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RFConnRRU2CabinetNo.html">Cabinet No. of RRU2(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the cabinet number of RRU2/RFU2 for RF interconnection. For RF interconnection in outer interconnection mode, value NULL is displayed because the cabinet No., subrack No., and slot No. of the peer RRU remain unknown.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RFConnRRU2SlotNo.html">Slot No. of RRU2(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the slot number of RRU2/RFU2 for RF interconnection. For RF interconnection in outer interconnection mode, value NULL is displayed because the cabinet No., subrack No., and slot No. of the peer RRU remain unknown.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RFConnRRU2SubrackNo.html">Subrack No. of RRU2(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the subrack number of RRU2/RFU2 for RF interconnection. For RF interconnection in outer interconnection mode, value NULL is displayed because the cabinet No., subrack No., and slot No. of the peer RRU remain unknown.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RFConnType.html">RF Connect Type(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the RF interconnection type. Intra interconnection means the interconnection between two RRUs or RFUs managed by the same main control board. Outer connection means the interconnection between two RRUs or RFUs managed by different main control boards.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-DormancySW.html">Dormancy Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the RRU deep dormancy switch. RRU deep dormancy is enabled if this switch is turned on. RRU deep dormancy is disabled if this switch is turned off. This parameter is NULL when the RRU does not support deep dormancy. The effective status of RRU deep dormancy can be queried using the <a href="../mml/dsp_rru.html">DSP RRU</a> command. When Dormancy Switch is set to ON, you need to set the start time and end time of the dormancy period. If you do not set the start time and end time, the dormancy period is 00:00:00 to 06:00:00. This parameter is valid only when RRU type is set to MPMU, MRRU, or AIRU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-DormancyStartTime.html">Dormancy Start Time(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the start time of RRU deep dormancy. A start time later than an end time indicates that RRU deep dormancy ends in the next day.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-DormancyStopTime.html">Dormancy Stop Time(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the end time of RRU deep dormancy.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-DormancyTimer.html">Dormancy Waiting Timer(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the waiting time before a cell enters the forcible dormancy state. After the start time of the dormancy period is reached, new users are not allowed to access the cell and online users are handed over to other cells. If there is no UE in the cell, the cell is deactivated immediately. Otherwise, the cell is deactivated when the waiting time expires. This parameter takes effect only for MRRU and AIRU. If the start time of the dormancy period plus the waiting time exceeds the end time of the dormancy period, forcible cell deactivation is not triggered.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-PAEffSwitch.html">PA Efficiency Improvement Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the power amplifier efficiency improvement switch for an RF module. When this parameter is set to ON, the power amplifier efficiency of an RF module is improved. When this parameter is set to OFF, the power amplifier efficiency of an RF module is not improved. You can run the DSP RRU command to check whether an RF module supports the power amplifier efficiency improvement. This parameter takes effect on RRUs or RFUs working in UMTS, LTE or NR mode and using the CPRI protocol.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-SlaveCpriRate.html">RRU Slave CPRI Line Rate(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the slave CPRI line rate of an RRU. If this parameter is set to a fixed value, this configuration takes effect only when the CPRI line rate of the RRU chain/ring where the RRU is located is set to MANUAL. In other scenarios,  the slave CPRI line rate is negotiated and the negotiated result can be queried using the <a href="../mml/dsp_cprilbr.html">DSP CPRILBR</a>.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RxHwAlmDetectSw.html">RX Hardware Alarm Detection Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the hardware alarm detection switch for the RX channel. When this parameter is set to ON, the hardware alarm detection switch is turned on for the RX channel. In this case, if the RX channel hardware is faulty, ALM-26532 RF Unit Hardware Fault is reported. When this parameter is set to OFF, the hardware alarm detection switch is turned off for the RX channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-RxFreqBandMutualSw.html">Receive Frequency Band Mutual Aid Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates whether to enable the receive frequency band mutual aid function on an RF module. When this switch is set to off, the RF module can receive signals from a single frequency band. When this switch is set to on, the RF module can receive signals from multiple frequency bands.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-MNTMode.html">Maintenance Mode(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the maintenance mode of an RRU. The value INSTALL indicates device creation caused by network capability expansion, device reparenting, or access of a new device to the network. The value EXPAND indicates the subrack or carrier capacity expansion of a device. The value UPGRADE indicates a device upgrade. The value TESTING indicates that an installed device is being commissioned. ExpandStatus1 to ExpandStatus10 can be used by users to define maintenance modes. The default value of this parameter is NORMAL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-StartTime.html">Start Time of Status Setting(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the start time of maintenance status of the RRU. This time refers to the local time (including the DST offset) on the NE. If this parameter is not specified, the start time of the maintenance status is 2000-01-01 00:00:00.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-EndTime.html">End Time of Status Setting(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the end time of maintenance status of the RRU. This time refers to the local time (including the DST offset) on the NE. If this parameter is not specified, the maintenance status ends at 2037-12-31 23:59:59.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-MMSetRemark.html">Maintenance Mode Setting Remark(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the remarks of maintenance status of the RRU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-LedSwitch.html">LED Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the led switch of the RRU. This parameter takes effect only for MPMUs and some MRRUs. This parameter can be set but is invalid for the RRUs that do not support LED configuration.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-PowerSupplyGroupID.html">Power Supply Group ID(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the ID of a group which consists of one or multiple RRUs/RFUs served by the same power supply system. This parameter must be set to the same value for RRUs/RFUs served by the same power supply system. This parameter must be set to different values for RRUs/RFUs served by different power supply systems. The value NULL indicates that the RF module does not support this parameter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../para/RFU-WifiSwitch.html">WiFi Switch(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Indicates the switch for the Wi-Fi function of an RRU. If the value of this parameter is changed from OFF(OFF) to ON(ON) for an RRU, the RRU needs to be manually reset.Only the MPMU board supports this function. GSM and NR do not support this function.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="RFU__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="RFU__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-AlarmState.html">Alarm Status(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the alarm status of the board hardware, which can be set to Normal, Warning, Minor, Major, or Critical. The alarm status of the PSU, PDB, and BDU is in the alarm status of the PMU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-OpState.html">Operational State(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the operational state of the board, which can be set to Enabled or Disabled. Enabled indicates that services can be carried on the board. Disabled indicates that no service can be carried on the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-AvailabilityStatus.html">Availability Status(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the physical status of a board, which can be Uninstalled, Starting up, Normal, Inconsistent, Unconfigured, Power off, Fault, Communication lost, In test, or the combination of multiple states. For example, if a board is not configured and fails to communicate with the main control and transmission board, the availability status of the board is "Unconfigured, Communication lost." If a board is under management of the peer end, the availability status of the board may be Starting up, Communication lost, or Fault.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-Elabel.html">Electronic Label(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the electronic label, which is a text file with a maximum of 2 KB used to record the manufacturing information about equipment such as the board, sub-board, and optical module. "BoardType" indicates the type of the board. "BarCode" indicates the bar code of the board and is the same as the code labeled on the board. "Item" indicates the BOM code. "Description" indicates the board description in English. "Manufactured" indicates the manufacturing date of the board. "VendorName" indicates the name of the vendor providing the board. "IssueNumber" indicates the board hardware version. "CLEICode" indicates the common language equipment indicator (CLEI) code of the board. "BOM" indicates the fine-grained item code of the board. "Model" indicates the model displayed on the customer interface, such as Bill of Quotation (BOQ) and paper labels.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-BoardType.html">Type(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the type of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-BoardSerial.html">Serial Number(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the bar code of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-BoardDesc.html">Description(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the description about the services and functions provided by the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-BoardManu.html">Date of Manufacture(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the manufacturing date of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-BoardVendor.html">Vendor(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the manufacturer of the board or the cabinet.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-BoardIssue.html">Issue Number(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the issue number of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-RuType.html">Config Type(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the type of a board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-BoardTemperature.html">Board Temperature(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the temperature of a board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-HPATemperature.html">HPA Temperature(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the temperature of the power amplifier. A power amplifier is a component on an RF module. If there is no power amplifier on an RF module, this parameter value is NULL.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-DevType.html">DEVTYPE(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the type of the device.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-CarrierNumPerRxBranch.html">Number of carriers on the RX channel(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the number of carriers on each RX channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-CarrierNumPerTxBranch.html">Number of carriers on the TX channel(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the number of carriers on each TX channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-MaxOutPwrPerBranch.html">Maximum output power on the TX channel(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the total output power of TX channels in the RRU/RFU. The precision deviation is &plusmn;0.5 dB. For details, see the description of Output Power in the product description of the corresponding RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-UlBranchGain.html">UL channel gain(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the UL channel gain.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-Level.html">Trunk Level(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the RRU/RFU level on the trunk of the chain/ring.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-DeviceSerialNo.html">Physical device serial No.(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the equipment serial number (ESN) of the board on the RRU chain/ring. Value NULL indicates obtaining the ESN fails. A maximum of 16 digits of the ESN can be displayed for a module compliant with the IR protocol.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-RatType.html">Standard Capability(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the standards that are supported by the RRU or RFU. The value NULL indicates that obtaining the supported modes fails or the board does not support the query of supported modes. The parameter values consist of different RATs. LO, LF, and L indicate LTE-FDD, T and TD indicate LTE-TDD, W and WO indicate WiMAX, C and CO indicate CDMA, G and GO indicate GSM, U and UO indicate UMTS, R and RO indicate RFA, M and MO indicate NB-IoT, NF indicates NR-FDD, and NTD indicates NR-TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-AccessDirection.html">Access Direction(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the access direction of the service plane.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-ULSupporteFeature.html">UL Support Feature(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates whether the RRU or RFU supports the UL features. This parameter takes effect for UMTS only.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-AntennaId.html">Antenna ID(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the serial number of the RU in the AAU. The serial numbers of antennas on other RF modules are invalid.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-AntennaInstallPos.html">Antenna Location(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the slot number of the RU in the AAU. The value of this parameter is NULL for other RF modules. The slots of RUs are numbered from 0 in ascending order from bottom to top.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-SoftVer.html">Software Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the software version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-HardVer.html">Hardware Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the hardware version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-BtrmVer.html">BootROM Version(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the BootROM version of the board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-PAEffCapability.html">PA Efficiency Improvement Capability(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates whether an RF module supports the power amplifier efficiency improvement. This parameter takes effect in UMTS, LTE or NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-MaxTimeDelay.html">RRU/RFU Maximum Delay of Its Channel(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the maximum compensation in antenna delay supported by an RF module. The propagation delay from the output port of an RF unit to the antenna port is compensated. If no TMA is configured, this parameter is set to the propagation delay of the feeder. If the TMA is configured, this parameter also includes the delay of the TMA. NULL indicates that the compensation in antenna delay cannot be queried.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-CurrMNTMode.html">Current Maintenance Mode(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the current maintenance mode of the RRU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-CarrierIndex.html">Carrier Index(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the carrier index of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-DlHighFreq.html">Carrier DL Freq. Band Higher Limit(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the upper limit of the downlink frequency band used by the carrier of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-DlHighFreqSet.html">Set of TRX DL Freq. Band Higher Limits(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the set of the upper limits of the downlink frequency bands used by the TRXs of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-DlLowFreq.html">Carrier DL Freq. Band Lower Limit(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the lower limit of the downlink frequency band used by the carrier of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-DlLowFreqSet.html">Set of TRX DL Freq. Band Lower Limits(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the set of the lower limits of the downlink frequency bands used by the TRXs of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-ModeName.html">Carrier RAT(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the carrier RAT of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-Power.html">Carrier Power(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the carrier power of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-PowerSet.html">TRX Power Set(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the TRX power set of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-UlHighFreq.html">Carrier UL Freq. Band Higher Limit(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the upper limit of the uplink frequency band used by the carrier of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-UlHighFreqSet.html">Set of TRX UL Freq. Band Higher Limits(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the set of the upper limits of the uplink frequency bands used by the TRXs of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-UlLowFreq.html">Carrier UL Freq. Band Lower Limit(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the lower limit of the uplink frequency band used by the carrier of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-UlLowFreqSet.html">Set of TRX UL Freq. Band Lower Limits(from RE)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the set of the lower limits of the uplink frequency bands used by the TRXs of the RRU/RFU.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.4.2.3.1.1 "><a href="../para/RFU-GtmuWorkMode.html">WorkMode(from RU)</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.4.2.3.1.2 "><p>Indicates the working mode of the board. the value SINGLEOM indicates that the GTMU works as the main control board and provides the main control, transmission, and RF port functions. The value EVOLUTION indicates that the GTMU works as the evolved board and provides the transmission and RF port functions. NORMAL indicates that the main control and transmission board works in normal mode. TDS-EVOLUTION indicates that the main control and transmission board works in TDS evolution mode. NULL is displayed for boards other than GTMU or when the working mode cannot be queried.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related Counters</h4><p><a href="#RFU__tab3">Table 3</a> describes the counters related to this MO.</p>
+
+<div class="tablenoborder"><a name="RFU__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="RFU__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Related Counters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Counter Name</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Counter Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835652.html">VS.RADIOEQM.CPRI0.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Downlink ES over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835653.html">VS.RADIOEQM.CPRI0.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Downlink SES over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835654.html">VS.RADIOEQM.CPRI0.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Downlink UAS over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835655.html">VS.RADIOEQM.CPRI0.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Second when downlink measurement results of the CPRI0 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835656.html">VS.RADIOEQM.CPRI0.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Number of downlink bit errors over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835657.html">VS.RADIOEQM.CPRI0.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Uplink ES over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835658.html">VS.RADIOEQM.CPRI0.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Uplink SES over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835659.html">VS.RADIOEQM.CPRI0.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Uplink UAS over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835660.html">VS.RADIOEQM.CPRI0.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Second when uplink measurement results of the CPRI0 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835661.html">VS.RADIOEQM.CPRI0.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Number of uplink bit errors over the CPRI0 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835662.html">VS.RADIOEQM.CPRI1.DES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Downlink ES over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835663.html">VS.RADIOEQM.CPRI1.DSES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Downlink SES over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835664.html">VS.RADIOEQM.CPRI1.DUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Downlink UAS over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835665.html">VS.RADIOEQM.CPRI1.DIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Second when downlink measurement results of the CPRI1 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835666.html">VS.RADIOEQM.CPRI1.DERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Number of downlink bit errors over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835667.html">VS.RADIOEQM.CPRI1.UES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Uplink ES over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835668.html">VS.RADIOEQM.CPRI1.USES</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Uplink SES over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835669.html">VS.RADIOEQM.CPRI1.UUAS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Uplink UAS over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835670.html">VS.RADIOEQM.CPRI1.UIVS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Second when uplink measurement results of the CPRI1 port are invalid</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835671.html">VS.RADIOEQM.CPRI1.UERR</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Number of uplink bit errors over the CPRI1 port</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835675.html">VS.RADIOEQM.DL.Pwr.Avg</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Average RF Unit TX Power</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835675.html">VS.RADIOEQM.DL.Pwr.Max</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Maximum RF Unit TX Power</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835767.html">VS.RADIOEQM.Avail.Dur</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>RF Unit Availability Duration</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../b-comm-perf/Mt-1593835836.html">VS.EnergyCons.BTSBoard</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Power consumption of board</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

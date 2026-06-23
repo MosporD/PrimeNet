@@ -26,43 +26,86 @@ def _load_dotenv_if_present():
         from dotenv import load_dotenv
     except ImportError:
         return
-    # Prefer values from `.env` over inherited shell/session variables (fixes stale DATABASE_URL).
+    # Prefer values from `.env` over inherited shell/session variables.
     load_dotenv(path, override=True)
 
 
 _load_dotenv_if_present()
 
-# ── Database files (all in project root) ────────────────────────────────────
-DATABASES_ROOT = os.path.join(PROJECT_ROOT, 'databases')
+# Persistent data root (databases, sync_downloads, raw). In Docker, mount a volume at NCM_DATA_ROOT.
+_DATA_ROOT_OVERRIDE = (os.getenv('NCM_DATA_ROOT') or '').strip()
+DATA_ROOT = os.path.abspath(_DATA_ROOT_OVERRIDE) if _DATA_ROOT_OVERRIDE else PROJECT_ROOT
+
+# ── Database files (canonical taxonomy under databases/) ────────────────────
+DATABASES_ROOT = os.path.join(DATA_ROOT, 'databases')
+
+# Legacy folder aliases (kept for migration compatibility and old path probes).
 CELLS_DB_DIR = os.path.join(DATABASES_ROOT, 'cells')
 GROUPS_DB_DIR = os.path.join(DATABASES_ROOT, 'groups')
 CELLS_DAILY_DB_DIR = os.path.join(DATABASES_ROOT, 'Cells Daily')
 GROUPS_DAILY_DB_DIR = os.path.join(DATABASES_ROOT, 'Groups Daily')
 METADATA_DB_DIR = os.path.join(DATABASES_ROOT, 'metadata')
 ADMIN_DB_DIR = os.path.join(DATABASES_ROOT, 'admin')
-# Nokia neighbor KPI SQLite (handover relations for map neighbor analysis)
-NOKIA_NEIGHBOR_DB_DIR = os.path.join(DATABASES_ROOT, 'nokia', 'neighbors')
-NEIGHBOR_DB_DIR = NOKIA_NEIGHBOR_DB_DIR  # alias — same path
-os.makedirs(CELLS_DB_DIR, exist_ok=True)
-os.makedirs(GROUPS_DB_DIR, exist_ok=True)
-os.makedirs(CELLS_DAILY_DB_DIR, exist_ok=True)
-os.makedirs(GROUPS_DAILY_DB_DIR, exist_ok=True)
-os.makedirs(METADATA_DB_DIR, exist_ok=True)
-os.makedirs(ADMIN_DB_DIR, exist_ok=True)
-os.makedirs(NOKIA_NEIGHBOR_DB_DIR, exist_ok=True)
 
-NOKIA_PM_DB  = os.path.join(CELLS_DB_DIR, 'nokia_pm_cells.db')
-HUAWEI_PM_DB = os.path.join(CELLS_DB_DIR, 'huawei_pm_cells.db')
-NOKIA_PM_DAILY_DB  = os.path.join(CELLS_DAILY_DB_DIR, 'nokia_pm_cells_daily.db')
-HUAWEI_PM_DAILY_DB = os.path.join(CELLS_DAILY_DB_DIR, 'huawei_pm_cells_daily.db')
-METADATA_DB  = os.path.join(METADATA_DB_DIR, 'metadata.db')
-NCMUSERS_DB  = os.path.join(ADMIN_DB_DIR, 'ncm_users.db')
-NEIGHBOR_KPI_DB = os.path.join(NOKIA_NEIGHBOR_DB_DIR, 'neighbor_kpis.db')
-NOKIA_GROUPS_DB = os.path.join(GROUPS_DB_DIR, 'nokia_cell_groups.db')
-HUAWEI_GROUPS_DB = os.path.join(GROUPS_DB_DIR, 'huawei_cell_groups.db')
-NOKIA_GROUPS_DAILY_DB = os.path.join(GROUPS_DAILY_DB_DIR, 'nokia_cell_groups_daily.db')
-HUAWEI_GROUPS_DAILY_DB = os.path.join(GROUPS_DAILY_DB_DIR, 'huawei_cell_groups_daily.db')
-KPI_DB_DIR = os.path.join(PROJECT_ROOT, 'raw', 'KPIs')
+# Canonical domain/vendor/technology/timeframe folders.
+DB_PM_NOKIA_HOURLY_DIR = os.path.join(DATABASES_ROOT, 'cells', 'nokia', 'all', 'hourly')
+DB_PM_HUAWEI_HOURLY_DIR = os.path.join(DATABASES_ROOT, 'cells', 'huawei', 'all', 'hourly')
+DB_PM_NOKIA_DAILY_DIR = os.path.join(DATABASES_ROOT, 'cells', 'nokia', 'all', 'daily')
+DB_PM_HUAWEI_DAILY_DIR = os.path.join(DATABASES_ROOT, 'cells', 'huawei', 'all', 'daily')
+
+DB_GROUPS_NOKIA_HOURLY_DIR = os.path.join(DATABASES_ROOT, 'groups', 'nokia', 'all', 'hourly')
+DB_GROUPS_HUAWEI_HOURLY_DIR = os.path.join(DATABASES_ROOT, 'groups', 'huawei', 'all', 'hourly')
+DB_GROUPS_NOKIA_DAILY_DIR = os.path.join(DATABASES_ROOT, 'groups', 'nokia', 'all', 'daily')
+DB_GROUPS_HUAWEI_DAILY_DIR = os.path.join(DATABASES_ROOT, 'groups', 'huawei', 'all', 'daily')
+
+DB_METADATA_SNAPSHOT_DIR = os.path.join(DATABASES_ROOT, 'metadata', 'all', 'all', 'snapshot')
+DB_ADMIN_SNAPSHOT_DIR = os.path.join(DATABASES_ROOT, 'admin', 'all', 'all', 'snapshot')
+DB_NEIGHBOR_NOKIA_HOURLY_DIR = os.path.join(DATABASES_ROOT, 'neighbors', 'nokia', 'all', 'hourly')
+DB_NEIGHBOR_HUAWEI_HOURLY_DIR = os.path.join(DATABASES_ROOT, 'neighbors', 'huawei', 'all', 'hourly')
+
+for _d in (
+    CELLS_DB_DIR,
+    GROUPS_DB_DIR,
+    CELLS_DAILY_DB_DIR,
+    GROUPS_DAILY_DB_DIR,
+    METADATA_DB_DIR,
+    ADMIN_DB_DIR,
+    DB_PM_NOKIA_HOURLY_DIR,
+    DB_PM_HUAWEI_HOURLY_DIR,
+    DB_PM_NOKIA_DAILY_DIR,
+    DB_PM_HUAWEI_DAILY_DIR,
+    DB_GROUPS_NOKIA_HOURLY_DIR,
+    DB_GROUPS_HUAWEI_HOURLY_DIR,
+    DB_GROUPS_NOKIA_DAILY_DIR,
+    DB_GROUPS_HUAWEI_DAILY_DIR,
+    DB_METADATA_SNAPSHOT_DIR,
+    DB_ADMIN_SNAPSHOT_DIR,
+    DB_NEIGHBOR_NOKIA_HOURLY_DIR,
+    DB_NEIGHBOR_HUAWEI_HOURLY_DIR,
+):
+    os.makedirs(_d, exist_ok=True)
+
+# Canonical DB files.
+NOKIA_PM_DB = os.path.join(DB_PM_NOKIA_HOURLY_DIR, 'nokia_pm_cells.db')
+HUAWEI_PM_DB = os.path.join(DB_PM_HUAWEI_HOURLY_DIR, 'huawei_pm_cells.db')
+NOKIA_PM_DAILY_DB = os.path.join(DB_PM_NOKIA_DAILY_DIR, 'nokia_pm_cells_daily.db')
+HUAWEI_PM_DAILY_DB = os.path.join(DB_PM_HUAWEI_DAILY_DIR, 'huawei_pm_cells_daily.db')
+METADATA_DB = os.path.join(DB_METADATA_SNAPSHOT_DIR, 'metadata.db')
+NCMUSERS_DB = os.path.join(DB_ADMIN_SNAPSHOT_DIR, 'ncm_users.db')
+# Admin "Reset Password to Default" and new-user initial password (override in .env).
+NCM_DEFAULT_USER_PASSWORD = (os.getenv('NCM_DEFAULT_USER_PASSWORD') or 'Zain@1234').strip()
+NEIGHBOR_KPI_DB = os.path.join(DB_NEIGHBOR_NOKIA_HOURLY_DIR, 'neighbor_kpis.db')
+HUAWEI_NEIGHBOR_RAW_DB = os.path.join(DB_NEIGHBOR_HUAWEI_HOURLY_DIR, 'huawei_neighbor_raw.db')
+NOKIA_GROUPS_DB = os.path.join(DB_GROUPS_NOKIA_HOURLY_DIR, 'nokia_cell_groups.db')
+HUAWEI_GROUPS_DB = os.path.join(DB_GROUPS_HUAWEI_HOURLY_DIR, 'huawei_cell_groups.db')
+NOKIA_GROUPS_DAILY_DB = os.path.join(DB_GROUPS_NOKIA_DAILY_DIR, 'nokia_cell_groups_daily.db')
+HUAWEI_GROUPS_DAILY_DB = os.path.join(DB_GROUPS_HUAWEI_DAILY_DIR, 'huawei_cell_groups_daily.db')
+
+# Backward-compatible directory aliases.
+NOKIA_NEIGHBOR_DB_DIR = DB_NEIGHBOR_NOKIA_HOURLY_DIR
+HUAWEI_NEIGHBOR_DB_DIR = DB_NEIGHBOR_HUAWEI_HOURLY_DIR
+NEIGHBOR_DB_DIR = NOKIA_NEIGHBOR_DB_DIR
+KPI_DB_DIR = os.path.join(DATA_ROOT, 'raw', 'KPIs')
 os.makedirs(KPI_DB_DIR, exist_ok=True)
 KPI_HEADERS_DB = os.path.join(KPI_DB_DIR, 'kpi_headers.db')
 
@@ -105,6 +148,24 @@ def _migrate_legacy_db_names():
             return False
         return False
 
+    def _db_total_rows(path: str) -> int:
+        try:
+            conn = sqlite3.connect(path, timeout=5)
+            total = 0
+            tables = conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+            for (table_name,) in tables:
+                try:
+                    row = conn.execute(f'SELECT COUNT(*) FROM "{table_name}"').fetchone()
+                    total += int((row[0] if row else 0) or 0)
+                except Exception:
+                    continue
+            conn.close()
+            return total
+        except Exception:
+            return 0
+
     legacy_pairs = (
         # PM cells DBs
         (os.path.join(PROJECT_ROOT, 'nokia_pm.db'), NOKIA_PM_DB),
@@ -115,6 +176,7 @@ def _migrate_legacy_db_names():
         (os.path.join(PROJECT_ROOT, 'metadata.db'), METADATA_DB),
         (os.path.join(PROJECT_ROOT, 'ncm_users.db'), NCMUSERS_DB),
         (os.path.join(PROJECT_ROOT, 'neighbor_kpis.db'), NEIGHBOR_KPI_DB),
+        (os.path.join(DATABASES_ROOT, 'admin', 'ncm_users.db'), NCMUSERS_DB),
         (os.path.join(CELLS_DB_DIR, 'metadata.db'), METADATA_DB),
         (os.path.join(CELLS_DB_DIR, 'ncm_users.db'), NCMUSERS_DB),
         (os.path.join(CELLS_DB_DIR, 'neighbor_kpis.db'), NEIGHBOR_KPI_DB),
@@ -126,31 +188,58 @@ def _migrate_legacy_db_names():
     for old_path, new_path in legacy_pairs:
         if not os.path.isfile(old_path):
             continue
+        old_has_data = _db_has_nonzero_rows(old_path)
         if os.path.isfile(new_path):
             # Keep non-empty target DBs; otherwise promote legacy DB if it has data.
             if _db_has_nonzero_rows(new_path):
-                continue
-            if not _db_has_nonzero_rows(old_path):
+                old_rows = _db_total_rows(old_path)
+                new_rows = _db_total_rows(new_path)
+                # If canonical target only has seed rows but legacy has real data, promote legacy content.
+                if not (old_rows > new_rows and new_rows <= 20):
+                    continue
+            if not old_has_data:
                 continue
         try:
             os.replace(old_path, new_path)
         except OSError:
-            # If file is in use, fallback to SQLite backup copy.
-            if not os.path.isfile(new_path) and _db_has_nonzero_rows(old_path):
-                _sqlite_copy_db(old_path, new_path)
+            # If file is in use or destination exists, fallback to SQLite backup copy.
+            if not old_has_data:
+                continue
+            try:
+                if os.path.isfile(new_path) and not _db_has_nonzero_rows(new_path):
+                    os.remove(new_path)
+            except OSError:
+                pass
+            _sqlite_copy_db(old_path, new_path)
 
 
 _migrate_legacy_db_names()
 
-# ── PostgreSQL (optional — one DB, schema per former SQLite file) ───────────
-# export DB_ENGINE=postgresql
-# export DATABASE_URL=postgresql://user:password@localhost:5432/primenet
-DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite').strip().lower()
-DATABASE_URL = os.getenv('DATABASE_URL', '').strip()
-SCHEMA_APP = os.getenv('PG_SCHEMA_APP', 'app')
-SCHEMA_METADATA = os.getenv('PG_SCHEMA_METADATA', 'metadata')
-SCHEMA_NOKIA_PM = os.getenv('PG_SCHEMA_NOKIA_PM', 'nokia_pm')
-SCHEMA_HUAWEI_PM = os.getenv('PG_SCHEMA_HUAWEI_PM', 'huawei_pm')
+# ── Database backend ─────────────────────────────────────────────────────────
+# SQLite only (local files under ``databases/``). PostgreSQL support was removed.
+
+
+def use_postgresql() -> bool:
+    return False
+
+
+def postgres_explicitly_enabled() -> bool:
+    return False
+
+
+def probe_postgresql_at_startup(connect_timeout: int = 5) -> None:
+    """No-op (legacy hook kept for callers)."""
+    return None
+
+
+def _env_float(key: str, default: float) -> float:
+    try:
+        raw = os.getenv(key)
+        if raw is None or str(raw).strip() == '':
+            return default
+        return float(str(raw).strip())
+    except ValueError:
+        return default
 
 
 def _env_int(key: str, default: int) -> int:
@@ -177,12 +266,11 @@ PM_RETENTION_DAYS = _env_int('PM_RETENTION_DAYS', 9)
 # Rows per SQLite executemany batch inside _insert_df (tune for speed vs. memory).
 PM_INSERT_BATCH_SIZE = max(200, min(20000, _env_int('PM_INSERT_BATCH_SIZE', 2500)))
 
-# Master raw pull launcher interval (hours)
-# Runs scripts/pull_all_raw.py which clears raw folders then pulls Huawei/Nokia/Metadata.
-RAW_PULL_INTERVAL_HOURS = max(1, _env_int('RAW_PULL_INTERVAL_HOURS', 2))
+# Hourly pipeline interval (hours) — pull+load orchestrator cadence when scheduler is on.
+RAW_PULL_INTERVAL_HOURS = max(1, _env_int('RAW_PULL_INTERVAL_HOURS', 1))
 # Daily cycle trigger hour (24h clock) for daily raw+load job.
 DAILY_PULL_HOUR = max(0, min(23, _env_int('DAILY_PULL_HOUR', 7)))
-# scripts/watch_remote_new_files_and_pull.py — poll remote SFTP signatures; same env as the CLI script.
+# scripts/pipeline/watch_remote_new_files_and_pull.py — poll remote SFTP signatures; same env as the CLI script.
 PULL_WATCHER_POLL_INTERVAL_SEC = max(60, _env_int('WATCH_POLL_INTERVAL_SEC', 30 * 60))
 # Daily PM/groups DB retention window in days.
 DAILY_RETENTION_DAYS = max(1, _env_int('DAILY_RETENTION_DAYS', 60))
@@ -201,80 +289,34 @@ def _env_bool_loader(key: str, default: bool) -> bool:
     return default
 
 
-# scripts/load_raw_csv_to_databases.py: for PM + group DBs, append rows not seen before
+# scripts/pipeline/load_raw_csv_to_databases.py: for PM + group DBs, append rows not seen before
 # (dedupe via stable SHA-256 over sorted columns). Metadata snapshots stay full replace.
 RAW_LOADER_INCREMENTAL = _env_bool_loader('RAW_LOADER_INCREMENTAL', True)
 
 # Prefer rows with auto-detected date/time strictly after the table MAX(), then hash-dedupe.
 RAW_LOADER_TIME_FILTER = _env_bool_loader('RAW_LOADER_TIME_FILTER', True)
 
-_pg_driver_warned = False
-_postgres_unreachable = False
-_postgres_unreachable_warned = False
+# Incremental PM load: only ingest the newest raw file per RAT (2G/3G/4G/5G).
+RAW_LOADER_LATEST_ONLY = _env_bool_loader('RAW_LOADER_LATEST_ONLY', True)
 
+# Daily scope: append new timestamps into *_DAILY tables (retention trims old rows).
+# When false, each daily load replaces whole tables (no cross-day history).
+RAW_LOADER_DAILY_INCREMENTAL = _env_bool_loader('RAW_LOADER_DAILY_INCREMENTAL', True)
 
-def _psycopg2_available() -> bool:
-    try:
-        import psycopg2  # noqa: F401
+# After a successful PM load, delete all tabular files from raw/ (recommended for OSS hourly/daily drops).
+RAW_DELETE_ALL_AFTER_LOAD = _env_bool_loader('RAW_DELETE_ALL_AFTER_LOAD', True)
+# Legacy: keep N newest per RAT instead of deleting all (only when RAW_DELETE_ALL_AFTER_LOAD=0).
+RAW_PRUNE_AFTER_LOAD = _env_bool_loader('RAW_PRUNE_AFTER_LOAD', True)
+RAW_KEEP_FILES_PER_TECH = max(1, _env_int('RAW_KEEP_FILES_PER_TECH', 1))
 
-        return True
-    except ImportError:
-        return False
+# pull_nokia_raw.py / pull_huawei_raw.py: run load_raw_csv_to_databases after download.
+RAW_PULL_AUTO_LOAD = _env_bool_loader('RAW_PULL_AUTO_LOAD', True)
 
+# Before SFTP pull: delete existing raw PM exports in the target folder.
+RAW_PULL_CLEAR_BEFORE = _env_bool_loader('RAW_PULL_CLEAR_BEFORE', True)
 
-def use_postgresql():
-    """
-    True when Postgres mode is requested **and** ``psycopg2`` is importable
-    **and** startup probing (see ``probe_postgresql_at_startup``) has not
-    marked the server unreachable (wrong password, host down, placeholder URL, etc.).
-    """
-    global _pg_driver_warned
-    if _postgres_unreachable:
-        return False
-    if DB_ENGINE != 'postgresql' or not DATABASE_URL:
-        return False
-    if _psycopg2_available():
-        return True
-    if not _pg_driver_warned:
-        _pg_driver_warned = True
-        import logging
-
-        logging.getLogger(__name__).warning(
-            'DB_ENGINE=postgresql and DATABASE_URL are set but psycopg2 is not installed; '
-            'using local SQLite databases (ncm_users.db, etc.). '
-            'Install psycopg2-binary or unset DB_ENGINE / DATABASE_URL.'
-        )
-    return False
-
-
-def probe_postgresql_at_startup(connect_timeout: int = 5) -> None:
-    """
-    If Postgres is selected, try one connection before migrations.
-    On any failure (e.g. ``FATAL: password authentication failed for user \"USER\"``
-    from a template URL), Postgres is disabled for this process and SQLite is used.
-    """
-    global _postgres_unreachable, _postgres_unreachable_warned
-    if DB_ENGINE != 'postgresql' or not DATABASE_URL:
-        return
-    if not _psycopg2_available():
-        return
-    try:
-        import psycopg2
-
-        conn = psycopg2.connect(DATABASE_URL, connect_timeout=connect_timeout)
-        conn.close()
-    except Exception as e:
-        _postgres_unreachable = True
-        if not _postgres_unreachable_warned:
-            _postgres_unreachable_warned = True
-            import logging
-
-            logging.getLogger(__name__).warning(
-                'PostgreSQL connection failed: %s. '
-                'Using SQLite databases for this process. '
-                'Use a real DATABASE_URL (not placeholders like user USER), or remove DB_ENGINE=postgresql.',
-                e,
-            )
+# After SFTP pull: keep only the newest RAW_KEEP_FILES_PER_TECH file(s) per RAT.
+RAW_PULL_PRUNE_AFTER = _env_bool_loader('RAW_PULL_PRUNE_AFTER', True)
 
 # ── Per-technology PM tables ────────────────────────────────────────────────
 # Each PM database stores data in separate tables per technology instead of
@@ -301,10 +343,10 @@ def pm_table_name(technology):
 # files — the scheduler downloads the LATEST one per folder.
 # ============================================================
 NOKIA_PM_SERVER = {
-    'host':     '10.119.219.77',
-    'port':     22,
-    'username': 'ftpuser',
-    'password': 'Changeme_1234',
+    'host':     (os.getenv('NOKIA_PM_HOST') or '10.119.219.77').strip(),
+    'port':     _env_int('NOKIA_PM_PORT', 22),
+    'username': (os.getenv('NOKIA_PM_USER') or 'ftpuser').strip(),
+    'password': (os.getenv('NOKIA_PM_PASSWORD') or '').strip(),
     'dirs': {
         '2G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project/2G',
         '3G': '/d/oss/global/var/pm/shared/content3/scheduler/exportCustom/Malek/Performance Project/3G',
@@ -485,15 +527,40 @@ NOKIA_PM_COLUMN_MAP = NOKIA_PM_COLUMN_MAPS['4G']
 # Single folder containing one XLSX file with multiple sheets.
 # ============================================================
 HUAWEI_PM_SERVER = {
-    'host':       '10.119.10.104',
-    'port':       22,
-    'username':   'tooluser',
-    'password':   'Zain@1234',
+    'host':       (os.getenv('HUAWEI_PM_HOST') or '10.119.10.104').strip(),
+    'port':       _env_int('HUAWEI_PM_PORT', 22),
+    'username':   (os.getenv('HUAWEI_PM_USER') or 'tooluser').strip(),
+    'password':   (os.getenv('HUAWEI_PM_PASSWORD') or '').strip(),
     'remote_dir': '/export/home/omc/objectstorage/var/prs/result_file/malek.mohammad/Performance_Project/Performance',
     # PRS often drops exports in a date-named subfolder under ``remote_dir``; SFTP then
     # opens the newest subfolder first. Set False if workbooks sit directly in ``remote_dir``.
     'descend_into_newest_subdir': os.getenv('HUAWEI_PM_DESCEND_SUBDIR', '1').strip().lower()
     in ('1', 'true', 'yes', 'on'),
+}
+
+# Huawei neighbor: one .zip on SFTP (contains 2G/3G/4G tabular exports). Pull script routes into raw/huawei/neighbor/<RAT>/.
+_HUAWEI_NEIGHBOR_ROOT_DEFAULT = (
+    '/export/home/omc/objectstorage/var/prs/result_file/malek.mohammad/'
+    'Performance_Project_Neighbor/Performance Neighbors'
+)
+_HUAWEI_NEIGHBOR_ROOT = (
+    (os.getenv('HUAWEI_NEIGHBOR_ROOT') or _HUAWEI_NEIGHBOR_ROOT_DEFAULT).strip()
+    or _HUAWEI_NEIGHBOR_ROOT_DEFAULT
+)
+HUAWEI_NEIGHBOR_SERVER = {
+    'host': HUAWEI_PM_SERVER['host'],
+    'port': HUAWEI_PM_SERVER['port'],
+    'username': HUAWEI_PM_SERVER['username'],
+    'password': HUAWEI_PM_SERVER['password'],
+    # Remote folder containing the latest ``*.zip`` bundle (not per-RAT subfolders).
+    'zip_remote_dir': (os.getenv('HUAWEI_NEIGHBOR_ZIP_DIR') or '').strip() or _HUAWEI_NEIGHBOR_ROOT,
+    'descend_into_newest_subdir': os.getenv('HUAWEI_NEIGHBOR_DESCEND_SUBDIR', '1').strip().lower()
+    in ('1', 'true', 'yes', 'on'),
+}
+
+HUAWEI_NEIGHBOR_TECH_TABLES = {
+    '2G': 'huawei_neighbor_2g',
+    '3G': 'huawei_neighbor_3g',
 }
 
 HUAWEI_PM_DAILY_SERVER = {
@@ -735,10 +802,10 @@ HUAWEI_PM_COLUMN_MAP = HUAWEI_PM_COLUMN_MAPS['4G']
 #   Transmitter 2G - YYYY-MM-DD.csv, …
 # ============================================================
 METADATA_SERVER = {
-    'host':     '192.168.7.207',
-    'port':     22,
-    'username': 'ftpuser',
-    'password': 'Zain@1234',
+    'host':     (os.getenv('METADATA_HOST') or '192.168.7.207').strip(),
+    'port':     _env_int('METADATA_PORT', 22),
+    'username': (os.getenv('METADATA_USER') or 'ftpuser').strip(),
+    'password': (os.getenv('METADATA_PASSWORD') or '').strip(),
     'root_dir': '/',   # dated snapshot folders sit at the SFTP root
 }
 
@@ -832,11 +899,5 @@ PM_PULL_INTERVAL_HOURS       = 2   # Nokia + Huawei PM pulled every 2 hours
 METADATA_PULL_INTERVAL_HOURS = 24  # Metadata pulled once daily
 
 # Local staging directory for downloaded files (absolute path)
-LOCAL_DOWNLOAD_DIR = os.path.join(PROJECT_ROOT, 'sync_downloads')
-
-# After each successful pull, delete older files in that folder that share the same
-# basename prefix (e.g. nokia_4G_*). Set lower to save disk; higher keeps more history.
-try:
-    SYNC_DOWNLOAD_KEEP_FILES = max(1, int(os.getenv('SYNC_DOWNLOAD_KEEP_FILES', '15')))
-except ValueError:
-    SYNC_DOWNLOAD_KEEP_FILES = 15
+LOCAL_DOWNLOAD_DIR = os.path.join(DATA_ROOT, 'sync_downloads')
+os.makedirs(LOCAL_DOWNLOAD_DIR, exist_ok=True)

@@ -1,0 +1,173 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="CellDss">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="CellDss">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>CellDss</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="CellDss"></a><a name="CellDss"></a>
+
+
+<h1 class="topictitle1">CellDss</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="eNodeBFunction.html">eNodeBFunction</a>
+    +-<a href="Cell.html">Cell</a>
+      +-<a href="CellDss.html"><strong>CellDss</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The CELLDSS MO consists of parameters used for GSM and LTE dynamic spectrum sharing and GSM and LTE Zero BufferZone in the E-UTRAN cell.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="Cell.html">Cell</a></li><li>Relation with the <strong>CellAlgoSwitch</strong> and <strong>Cell</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to FALSE, if GLDynSpectrumShareSwitch under <strong>DynSpectrumShareSwitch</strong> in the <strong>CellAlgoSwitch</strong> MO is turned on, the frequency supporting the sum of RB quantities specified by <strong>HighFreqShareRbNum</strong> and <strong>LowFreqShareRbNum</strong> in the <strong>CellDss</strong> MO cannot exceed one third of the value of <strong>DlBandWidth</strong> in the <strong>Cell</strong>.</li></ul>
+</li><li>Relation with the <strong>Cell</strong> MO:<ul><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the <strong>ReMuteSwitch</strong> in the <strong>CellDss</strong> MO must be deselected.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the FlexSpecSchSwitch option of the <strong>SpecShrPfmOptSwitch</strong> in the <strong>CellDss</strong> MO must be deselected.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the UlSchInterfAvdSwitch option of the <strong>SpecShrPfmOptSwitch</strong> in the <strong>CellDss</strong> MO must be deselected.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the HoZoneUserSchSwitch option of the <strong>SpecShrPfmOptSwitch</strong> in the <strong>CellDss</strong> MO must be deselected.</li><li>If <strong>NbCellFlag</strong> in a <strong>Cell</strong> MO is set to TRUE, the UlShrSpecSchSwitch option of the <strong>SpecShrPfmOptSwitch</strong> in the <strong>CellDss</strong> MO must be deselected.</li></ul>
+</li><li>Relation with the <strong>CellEmtcAlgo</strong> and <strong>Cell</strong> MOs:<ul><li>Under the same cell, when the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to FALSE and the EMTC_SWITCH option of the <strong>EmtcAlgoSwitch</strong> parameter in a <strong>CellEmtcAlgo</strong> MO is selected, the <strong>ReMuteSwitch</strong> parameter in a <strong>CellDss</strong> MO must not be set to ON.</li></ul>
+</li><li>Relation with the <strong>NbCellMultiPrbConfig</strong>, <strong>Cell</strong>, <strong>Prb</strong>, <strong>CellAlgoSwitch</strong>, and <strong>CellRbReserve</strong> MOs:<ul><li>When the <strong>NbCellFlag</strong> parameter in a <strong>Cell</strong> MO is set to TRUE, the <strong>NbRfCarrierStrategy</strong> parameter in the <strong>NbCellMultiPrbConfig</strong> under the same cell is set to SHARE, and under the LTE cell associated by the <strong>LteCellId</strong> of the <strong>Prb</strong>, the <strong>DynSpectrumShareSwitch</strong> parameter in the <strong>CellAlgoSwitch</strong> MO is set to GLDynSpectrumShareSwitch switch on, the <strong>RbRsvType</strong> parameter in a <strong>CellRbReserve</strong> MO is set to UPLINK_MODE, and the <strong>RbRsvMode</strong> parameter in the <strong>CellRbReserve</strong> MO is set to NB_RESERVED or NB_DEPLOYMENT, then the <strong>RbRsvStartIndex</strong> and <strong>RbRsvEndIndex</strong> parameters in the <strong>CellRbReserve</strong> MO must be set in such a way that the reserved RBs are 2 RBs away from the shared RBs.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#CellDss__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="CellDss__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="CellDss__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_celldss.html">LST CELLDSS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the configuration of Cell Dynamic Spectrum Sharing Parameters.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/mod_celldss.html">MOD CELLDSS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to modify the configuration of Cell Dynamic Spectrum Sharing Parameters.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#CellDss__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="CellDss__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="CellDss__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-LocalCellId.html">Local cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the local ID of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-HighFreqShareRbNum.html">Shared RB Number in High Frequency</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of high-band RBs that the E-UTRAN cell can share with GERAN cells when the GSM and LTE FDD Dynamic Spectrum Sharing feature and the GSM and LTE Zero Bufferzone feature are enabled. A larger number of shared RBs results in a higher gain that an LTE cell can achieve. For GSM and LTE FDD Dynamic Spectrum Sharing, however, it is recommended that the ratio of the shared bandwidth to the cell bandwidth be less than or equal to 1/5. For GSM and LTE Zero BufferZone, it is recommended that the ratio of the shared bandwidth to the cell bandwidth be less than or equal to 1/2. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-LowFreqShareRbNum.html">Shared RB Number in Low Frequency</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of low-band RBs that the E-UTRAN cell can share with GERAN cells when the GSM and LTE FDD Dynamic Spectrum Sharing feature and the GSM and LTE Zero Bufferzone feature are enabled. A larger number of shared RBs results in a higher gain that an LTE cell can achieve. For GSM and LTE FDD Dynamic Spectrum Sharing, however, it is recommended that the ratio of the shared bandwidth to the cell bandwidth be less than or equal to 1/5. For GSM and LTE Zero BufferZone, it is recommended that the ratio of the shared bandwidth to the cell bandwidth be less than or equal to 1/2. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-ReMuteSwitch.html">Mute RE Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to send REs if the corresponding REs in the shared spectrum are being used by GSM when the GSM and LTE FDD Dynamic Spectrum Sharing feature and the GSM and LTE Zero Bufferzone feature are enabled. If this switch is on, the eNodeB cannot send these REs. If this switch is off, the eNodeB can send these REs. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-UlInterfRestrictionMode.html">UL Narrowband Interference Restriction Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the UL narrowband interference restriction mode used in the GSM and LTE FDD Dynamic Spectrum Sharing(LTE FDD) feature and GSM and LTE Zero Bufferzone feature. The value NONE indicates that UL narrowband interference restriction is not enabled. The value BASEBANDPROCESS indicates that UL narrowband interference is restricted through baseband processing. The interference scope of GSM is reduced and only RBs close to the GSM spectrum are affected. As a result, RBs far away from the GSM spectrum and the LTE spectrum can work properly and LTE performance improves. The value ADAPTIVEPROCESS indicates that UL narrowband interference is restricted through adaptive processing. This algorithm further enhances the interference restriction capability and improves LTE performance. The value INFERIORINTERFPROCESS indicates that only interference from GSM in a neighboring cell is handled through baseband processing. When the setting of the UlInterfRestrictionMode parameter is changed from INFERIORINTERFPROCESS to another value or from another value to INFERIORINTERFPROCESS, the cell must be restarted for the setting change to take effect. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-A3Offset.html">A3 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of a neighboring cell's signal level that triggers event A3 used after the GSM and LTE FDD Dynamic Spectrum Sharing feature or the GSM and LTE Zero Bufferzone feature is enabled. Measurement reports for this event A3 are reported only when the signal quality of at least one neighboring cell is better than that of the local cell by this offset. If this parameter is set to a larger value, the probability of UEs reporting this event A3 is lower. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-A6Offset.html">A6 Offset</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the offset of a neighboring cell's signal level that triggers event A6 used in the GSM and LTE FDD Dynamic Spectrum Sharing feature and the GSM and LTE Zero Bufferzone feature. Measurement reports for this event A6 are reported only when the signal quality of at least one neighboring cell is better than that of the secondary serving cell (SCell) in carrier aggregation (CA) by this offset. If this parameter is set to a larger value, the probability of UEs reporting this event A6 is lower. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-NearAreaSinrThd.html">Near Area Sinr Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SINR threshold used to determine whether RBs in the shared spectrum can be allocated to UEs that are located in the cell center when the GSM and LTE FDD Dynamic Spectrum Sharing feature and the GSM and LTE Zero Bufferzone feature are enabled. If the actual SINR of RBs is greater than or equal to this threshold, these RBs can be allocated to these UEs. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-MiddleAreaSinrThd.html">Middle Area Sinr Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SINR threshold used to determine whether shared RBs can be allocated to UEs that are located at medium distances away from the cell center when the GSM and LTE FDD Dynamic Spectrum Sharing feature and the GSM and LTE Zero Bufferzone feature are enabled. If the SINR of shared RBs is greater than or equal to this threshold, these RBs can be allocated to these UEs. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-FarAreaSinrThd.html">Far Area Sinr Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the SINR threshold used to determine whether RBs in the shared spectrum can be allocated to UEs that are located far away from the cell center when the GSM and LTE FDD Dynamic Spectrum Sharing feature and the GSM and LTE Zero Bufferzone feature are enabled. If the actual SINR of RBs is greater than or equal to this threshold, these RBs can be allocated to these UEs. This parameter applies only to FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-SpecShrPfmOptSwitch.html">Spectrum Sharing Performance Opt Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable spectrum sharing optimization. This parameter provides four options: FlexSpecSchSwitch, UlSchInterfAvdSwitch, HoZoneUserSchSwitch, and UlShrSpecSchSwitch. HoZoneUserSchSwitch and UlShrSpecSchSwitch apply only when GSM and LTE (GL) zero bufferzone is used. This option applies only to LTE FDD.</p>
+<p>FlexSpecSchSwitch: Indicates whether to enable flexible exclusive scheduling of shared RBs in GL dynamic spectrum sharing and GL zero bufferzone. This option applies only to LTE FDD.</p>
+<p>UlSchInterfAvdSwitch: Indicates whether to enable avoidance of GSM interference when uplink exclusive scheduling of shared RBs is enabled in GL dynamic spectrum sharing and GL zero bufferzone. This option applies only to LTE FDD.</p>
+<p>HoZoneUserSchSwitch: Indicates whether to enable scheduling of UEs in handover zones when GL zero bufferzone is used. This option applies only to LTE FDD.</p>
+<p>UlShrSpecSchSwitch: Indicates whether to enable scheduling of uplink shared spectrum resources when GL zero bufferzone is used. This option applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-SinrThdWithoutGsmInterf.html">SINR Threshold Without GSM Interference</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for determining no GSM interference to shared RBs when exclusive scheduling of shared RBs is to be enabled in GSM and LTE (GL) dynamic spectrum sharing and GL zero bufferzone. If the estimated SINR of shared RBs is greater than the threshold, shared RBs are free of GSM interference and can be exclusively scheduled for LTE. This parameter applies only to LTE FDD.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-GsmInterfINThd.html">GSM Interference Noise Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for determining strong GSM interference in the high frequency band or low frequency band when uplink scheduling in dedicated spectrum is enabled in GSM and LTE (GL) dynamic spectrum sharing or GL zero bufferzone. When the difference between the IN values of the high and low frequency bands is greater than the value of this parameter, there is strong GSM interference to the frequency band with the higher IN value. This parameter applies only to LTE FDD cells.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/CellDss-NearPtUserRsrpThd.html">Near Point User Rsrp Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the threshold for scheduling uplink shared spectrum resources for UEs located near the center of the E-UTRAN cell when the GL zero bufferzone feature is used. If the downlink RSRP reported by a UE is greater than the threshold, the UE is located near the center of the E-UTRAN cell. This parameter applies only to LTE FDD cells.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,303 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify UL Time Alignment Timer Configuration (MOD TATIMER)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_tatimer">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify UL Time Alignment Timer Configuration (MOD TATIMER)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_tatimer"></a><a name="mod_tatimer"></a>
+
+
+<h1 class="topictitle1">Modify UL Time Alignment Timer Configuration (MOD TATIMER)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_tatimer__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the parameters of the uplink time alignment timer for UEs in a cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_tatimer__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>None.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_tatimer__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local identity of the cell. It uniquely identifies a cell within an eNodeB. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-TimeAlignmentTimer.html">TimeAlignmentTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink time alignment timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the uplink time alignment timer for UEs in the cell. A UE is considered not time-aligned in the uplink if the timer expires. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: SF500(500 subframes), SF750(750 subframes), SF1280(1280 subframes), SF1920(1920 subframes), SF2560(2560 subframes), SF5120(5120 subframes), SF10240(10240 subframes), INFINITY(Infinity)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SF500, SF750, SF1280, SF1920, SF2560, SF5120, SF10240, INFINITY</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If TimingAdvCmdOptSwitch is off, it is recommended that TimeAlignmentTimer be set to SF1920 in low-speed cells or SF500 in high- or ultra-high-speed cells. If TimingAdvCmdOptSwitch is on, it is recommended that TimeAlignmentTimer be set to SF10240.</p>
+<p>If TimingAdvCmdOptSwitch is off, the TimeAlignmentTimer value determines the valid value of LongDrxCycle. To ensure that the valid value of LongDrxCycle is greater than or equal to SF80, it is recommended that TimeAlignmentTimer be set to INFINITY. If TimingAdvCmdOptSwitch is on, the TimeAlignmentTimer value does not determine the valid value of LongDrxCycle. However, to avoid an increase in the uplink out-of-synchronization probability of UEs in DRX mode, it is recommended that TimeAlignmentTimer be set to SF5120 or larger and LongDrxCycle be set to SF320 or smaller.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If TimingAdvCmdOptSwitch is set to ON, TACmdSendPeriod can be configured only when the GUI value is Invalid or less than or equal to the enumerated value in the following formula: Floor(TimeAlignmentTimer/2-32).</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If TimingAdvCmdOptSwitch is off, a smaller value of TimeAlignmentTimer leads to more uplink timing advance commands delivered over the air interface and more radio resources occupied, but it results in more prompt tracking and correction of uplink timing errors and in particular better uplink time alignment performance for high-mobility UEs. A larger value of TimeAlignmentTimer leads to the opposite effects.</p>
+<p>If TimingAdvCmdOptSwitch is on, it is recommended that TimeAlignmentTimer be set to SF10240. A smaller value of TimeAlignmentTimer, such as SF5120, leads to a higher probability that UEs in DRX mode become out-of-synchronization in the uplink.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-TimingAdvCmdOptSwitch.html">TimingAdvCmdOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink timing advance command optimization switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether optimization of the mechanism for delivering the uplink time alignment command takes effect. If the optimization takes effect, the number of unnecessary uplink time alignment commands delivered to motionless or low-mobility UEs can be reduced to save air interface resources and reduce power consumption of UEs in DRX mode. This ensures the uplink time alignment performance if the length of the uplink time alignment timer is set to a large value.</p>
+<p>If this parameter is set to ON, it is recommended that the TimeAlignmentTimer parameter be set to SF10240. A smaller value of the TimeAlignmentTimer parameter, such as SF5120, leads to a higher probability of becoming out-of-synchronization in the uplink for UEs in DRX mode.</p>
+<p>If this parameter is set to ON, it is recommended that the LongDrxCycle parameter be smaller than or equal to SF320. Otherwise, the uplink time alignment performance of UEs in DRX mode is affected. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The parameter value ON(On) is recommended for common cells. The parameter value OFF(Off) is recommended for high-speed and ultra-high-speed cells.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If TimingAdvCmdOptSwitch is set to ON, TACmdSendPeriod can be configured only when the GUI value is Invalid or less than or equal to the enumerated value in the following formula: Floor(TimeAlignmentTimer/2-32).</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ON and the TimeAlignmentTimer parameter is set to a value greater than or equal to SF5120, the uplink time alignment performance is ensured and the number of unnecessary uplink time alignment commands delivered to motionless or low-mobility UEs can be reduced to reduce power consumption of UEs in DRX mode.</p>
+<p>If this parameter is set to OFF and the TimeAlignmentTimer parameter is set to a value greater than or equal to SF5120, the uplink time alignment performance cannot be ensured, especially for high-mobility UEs.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-TACmdSendPeriod.html">TACmdSendPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TA Command Sending Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval for sending Timing Advance Commands to UEs. This parameter must be set only when the TimingAdvCmdOptSwitch parameter is set to ON. If this parameter is set to INVALID, none of the parameter settings in the MML Command window takes effect. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: INVALID(NULL), SF218(218 subframes), SF343(343 subframes), SF608(608 subframes), SF928(928 subframes), SF1248(1248 subframes), SF2528(2528 subframes), SF5088(5088 subframes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: INVALID, SF218, SF343, SF608, SF928, SF1248, SF2528, SF5088</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: If there are many UEs in high-speed mobility in the cell, the parameter value SF218 is recommended. If there are many UEs in low-speed mobility in the cell, the parameter value SF928 is recommended.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If TimingAdvCmdOptSwitch is set to ON, TACmdSendPeriod can be configured only when the GUI value is Invalid or less than or equal to the enumerated value in the following formula: Floor(TimeAlignmentTimer/2-32).</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a smaller value, Timing Advance Commands are sent at a higher frequency, more radio resources are consumed, and more power is consumed for UEs in discontinuous reception (DRX) state even when the DRX period is long. However, UEs can move at a higher speed, and the uplink timing performance of UEs in high-speed mobility can be ensured.</p>
+<p>If this parameter is set to a larger value, Timing Advance Commands are sent at a lower frequency, fewer radio resources are consumed, and less power is consumed for UEs in DRX state. However, only UEs move at a lower speed can be supported, and the uplink timing performance of UEs in high-speed mobility cannot be ensured. In addition, untimely adjustments of uplink offsets result in RRC reestablishment or service drops.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-TimingMeasMode.html">TimingMeasMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timing Measurement Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the method of measuring uplink timing offsets. If this parameter is set to INVALID, uplink timing offsets are measured based on the demodulation reference signal (DMRS) for PUSCH or sounding reference signal (SRS). If this parameter is set to ALLMEASMODE, uplink timing offsets are measured based on the DMRS for PUSCH and SRS or based on the DMRS for PUSCH and channel quality indicator (CQI) reported over PUCCH. In addition, the value ON of the TimingAdvCmdOptSwitch parameter takes effect regardless of the actual parameter setting. That is, the eNodeB always sends the Timing Advance Command to UEs. In this case, it is recommended that the TimeAlignmentTimer parameter be set to SF10240. The value ALLMEASMODE applies only to LTE FDD cells. The parameter value INVALID takes effect in a cell regardless of the actual parameter setting in any of the following scenarios: (1) The cell is established on an LBBPc. (2) The UlCyclicPrefix parameter is set to EXTENDED_CP. (3) The HighSpeedFlag parameter is set to HIGH_SPEED, ULTRA_HIGH_SPEED, or EXTRA_HIGH_SPEED. (4) The TX/RX mode of the cell is 2T8R. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: INVALID(Invalid Timing Measurement Mode), ALLMEASMODE(All Timing Measurement Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: INVALID, ALLMEASMODE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: INVALID(Invalid Timing Measurement Mode)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to ALLMEASMODE and the eNodeB has not allocated SRS resources to a UE, the eNodeB measures the uplink timing offset of the UE based on CQIs in PUCCH. In this manner, fewer control channel elements (CCEs) in the PDCCH and physical resource blocks (PRBs) in the PUSCH are consumed for measuring uplink timing offset based on DMRS for PUSCH, and therefore the PDCCH supports more UEs and the usage of PRBs in the uplink decreases.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-TimingResOptSwitch.html">TimingResOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Timing Resource Optimization Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the mechanism of optimized resource scheduling for uplink timing. If this parameter is set to OFF, the eNodeB adopts the existing resource scheduling policy for uplink timing, which consumes a large amount of resources used for delivering Timing Advance Commands in large traffic scenarios. If this parameter is set to ON, the eNodeB adopts the mechanism of optimized resource scheduling for uplink timing, which reduces the number of unnecessary Timing Advance Commands to be delivered and reduces resources allocated for uplink timing in large traffic scenarios. The parameter value ON is recommended in heavily loaded cells where there is a large number of UEs. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: OFF(Off), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: The parameter value ON(On) is recommended for common cells. The parameter value OFF(Off) is recommended for high-speed and ultra-high-speed cells.</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If TimingResOptSwitch in the TimeAlignmentTimer MO is set to OFF, the TaEnhancePuschDmrs option of TaEnhance must be deselected.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to OFF, a large number of delivered unnecessary Timing Advance Commands consumes too many resources and especially decreases downlink PRB usage and downlink throughput due to CCE insufficiency in heavily loaded cells where there is a large number of UEs.</p>
+<p>If this parameter is set to ON, the number of unnecessary Timing Advance Commands to be delivered decreases, which decreases the system resource consumption and prevents downlink PRB usage or downlink throughput from being decreased in heavily loaded cells where there is a large number of UEs.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-PucchTimeOffsetCompVal.html">PucchTimeOffsetCompVal</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Pucch Timing Offset Compensation Value</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the offset compensation of the timing advance on the PUCCH. This parameter does not take effect on cells established on an LBBPc. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: Ts</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 15</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: Comparing with other parameter values, set this parameter to 15 increases the expected modulation performance by 0 to 0.5 dB.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-TaEnhance.html">TaEnhance</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TA Enhancement</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: TaEnhancePuschDmrs: Indicates whether to enable enhanced TA. If this option is selected, enhanced TA is enabled, and uplink-synchronization-induced overloads over the air interface decrease. If this option is deselected, enhanced TA is disabled. This option applies only to LTE FDD. This option does not take effect in the following scenarios:</p>
+<p>1. The FddTddInd parameter in the Cell MO is set to CELL_TDD(TDD).</p>
+<p>2. The baseband processing unit type is the LBBPc.</p>
+<p>3. The HoppingMode parameter in the PUSCHCfg MO is set to INTRA_AND_INTER_SUB_FRAME(Inter And Intra).</p>
+<p>4. The HighSpeedFlag parameter in the Cell MO is set to HIGH_SPEED(High speed cell flag), ULTRA_HIGH_SPEED(Ultra high speed cell flag), or EXTRA_HIGH_SPEED(Extra high speed cell flag).</p>
+<p>5. The TimingResOptSwitch parameter in the TimeAlignmentTimer MO is set to OFF.</p>
+<p>TaEnhancePucch: Indicates whether to enable enhanced PUCCH TA. Enhanced PUCCH TA is enabled only after this option is selected. The enhancement helps improve the PUCCH TA measurement accuracy. This option does not take effect in the following scenarios:</p>
+<p>1. The FddTddInd parameter in the Cell MO is set to CELL_TDD(TDD).</p>
+<p>2. The baseband processing unit type is the LBBPc.</p>
+<p>3. The HighSpeedFlag parameter in the Cell MO is set to HIGH_SPEED(High speed cell flag), ULTRA_HIGH_SPEED(Ultra high speed cell flag), or EXTRA_HIGH_SPEED(Extra high speed cell flag).</p>
+<p>GUI Value Range: TaEnhancePuschDmrs(TaEnhancePuschDmrs), TaEnhancePucch(TaEnhancePucch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TaEnhancePuschDmrs, TaEnhancePucch</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: TaEnhancePuschDmrs:Off, TaEnhancePucch:Off</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the FddTddInd in Cell MO is set to CELL_TDD, the TaEnhancePuschDmrs option of TaEnhance must be deselected.</li><li>If HoppingMode in the PUSCHCfg MO is set to INTRA_AND_INTER_SUB_FRAME, the TaEnhancePuschDmrs option of TaEnhance must be deselected.</li><li>If HighSpeedFlag in the Cell MO is set to HIGH_SPEED, ULTRA_HIGH_SPEED, or EXTRA_HIGH_SPEED, the TaEnhancePuschDmrs option of TaEnhance must be deselected.</li><li>If TimingResOptSwitch in the TimeAlignmentTimer MO is set to OFF, the TaEnhancePuschDmrs option of TaEnhance must be deselected.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-HighSpeedTaCmdSendPeriod.html">HighSpeedTaCmdSendPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">High Speed TA Command Sending Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the TA command sending period for high-speed UEs in a high-speed railway cell. This parameter takes effect only when the ProcSwitchBasedOnUserSpeed option is selected. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: SF218(SF218), SF343(SF343), SF608(SF608), SF928(SF928), SF1248(SF1248), SF2528(SF2528), SF5088(SF5088)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SF218, SF343, SF608, SF928, SF1248, SF2528, SF5088</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: SF218(218ms)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to a smaller value, timing advance (TA) commands are sent at a higher frequency, more radio resources are consumed, more power is consumed for UEs in discontinuous reception (DRX) state even when the DRX period is long. However, UEs can move at a higher speed, and the uplink timing performance of UEs in high-speed mobility can be ensured.</p>
+<p>If this parameter is set to a larger value, TA commands are sent at a lower frequency, fewer radio resources are consumed, less power is consumed for UEs in DRX state. However, only UEs that move at a lower speed can be supported, and the uplink timing performance of UEs in high-speed mobility cannot be ensured. In addition, untimely adjustments of uplink offsets result in RRC reestablishments or service drops.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-TaMeasOptSwitch.html">TaMeasOptSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TA Measurement Opt Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable functions related to TA measurement optimization.</p>
+<p>TA_SEARCH_WINDOW_SIZE_OPT_SW: Indicates whether to optimize the TA search window size. If this option is deselected, the default TA search window size is used. If this option is selected, the TA search window size is extended, which reduces the probability of inaccurate TA measurement due to a large multipath delay difference. This option applies only to LTE FDD.</p>
+<p>TA_DETECT_OPT_SW: Indicates whether to optimize TA detection. If this option is deselected, the default TA detection algorithm is used. If this option is selected, the TA detection optimization algorithm is used to increase the TA detection accuracy in multipath scenarios. This option applies only to LTE FDD.</p>
+<p>GUI Value Range: TA_SEARCH_WINDOW_SIZE_OPT_SW(TA_SEARCH_WINDOW_SIZE_OPT_SW), TA_DETECT_OPT_SW(TA_DETECT_OPT_SW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: TA_SEARCH_WINDOW_SIZE_OPT_SW, TA_DETECT_OPT_SW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: TA_SEARCH_WINDOW_SIZE_OPT_SW:Off, TA_DETECT_OPT_SW:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: TA_SEARCH_WINDOW_SIZE_OPT_SW: If this option is deselected, network performance is not affected. If this option is selected, the probability of uplink interference increase as a result of inaccurate TA measurement due to a large multipath delay difference will be reduced.</p>
+<p>TA_DETECT_OPT_SW: If this option is deselected, network performance is not affected. If this option is selected, the accuracy of TA detection in multipath scenarios is improved.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/TimeAlignmentTimer-TaAdjMaxStep.html">TaAdjMaxStep</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TA Adjustment Max Step</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum TA adjustment step. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 2~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 2~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A larger value of this parameter leads to a larger TA adjustment step and shorter TA adjustment duration. A smaller value of this parameter leads to a smaller TA adjustment step and longer TA adjustment duration. In common scenarios, it is recommended that this parameter be set to its default value 2. In multipath long-delay scenarios, this parameter can be set to a larger value to shorten the TA adjustment duration.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_tatimer__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Example 1: To modify the parameters of the uplink time alignment timer for UEs in the cell with the parameters as follows: Local cell ID: 0, Uplink time alignment timer: SF10240, run the following command:
+MOD TATIMER: LocalCellId=0, TimeAlignmentTimer=SF10240;
+Example 2: To modify the parameters of the uplink time alignment timer for UEs in the cell with the parameters as follows: Local cell ID: 0, Timing Measurement Mode: ALLMEASMODE, run the following command:
+MOD TATIMER: LocalCellId=0, TimingMeasMode=ALLMEASMODE;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

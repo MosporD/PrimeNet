@@ -1,0 +1,463 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add IPv6 ACL Rule (ADD ACLRULE6)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_aclrule6">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add IPv6 ACL Rule (ADD ACLRULE6)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_aclrule6"></a><a name="add_aclrule6"></a>
+
+
+<h1 class="topictitle1">Add IPv6 ACL Rule (ADD ACLRULE6)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_aclrule6__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a rule to an IPv6 access control list (ACL).</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_aclrule6__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>[Co-MPT,eNodeB,gNodeB]Before running this command, ensure that the associated IPv6 ACL has been configured.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]In the same IPv6 ACL, the source or destination IPv6 address range as well as the source or destination port number range of different IPv6 ACL rules that have the same IPv6 ACL ID and different IPv6 ACL rule IDs cannot have any inclusion or overlapping relationships. Otherwise, the IPv6 ACL rules conflict.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]When applied to data, ACL rules in one IPv6 ACL are used one by one in ascending order of rule ID.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If the UMPTa/UMPTb/UMDU is the main control board, a maximum of 1536 ACLRULE MOs and ACLRULE6 MOs can take effect on a BS. If the UMPTe is the main control board, a maximum of 2048 ACLRULE MOs and ACLRULE6 MOs can take effect on a BS. If the UMPTg/UMPTga is the main control board, a maximum of 6092 ACLRULE MOs and ACLRULE6 MOs can take effect on a BS.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]System specifications: If a UMPTa/UMPTb/UMDU is used as the main control board, a base station supports a maximum of 320 IPv6 ACL rules. If a UMPTe is used as the main control board, a base station supports a maximum of 512 IPv6 ACL rules. If a UMPTg/UMPTga is used as the main control board, a base station supports a maximum of 584 IPv6 ACL rules. If a UMPTe/UMPTg/UMPTga is used as the main control board, a maximum of 320 manually configured IPv6 ACL rules are supported.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]Board specifications: The UMPTa/UMPTb/UMDU supports a maximum of 320 IPv6 ACL rules, all of which can be manually configured IPv6 ACL rules. The UMPTe supports a maximum of 512 IPv6 ACL rules, among which a maximum of 320 IPv6 ACL rules can be manually configured IPv6 ACL rules. The UMPTg/UMPTga supports a maximum of 584 IPv6 ACL rules, among which a maximum of 320 IPv6 ACL rules can be manually configured IPv6 ACL rules. In IPSec scenarios, if IPVERSION in the IKEPEER MO is set to IPv4, the UMPTa/UMPTb/UMDU board supports a maximum of 264 IPv6 ACL rules with ACTION set to PERMIT. The UMPTe board supports a maximum of 512 IPv6 ACL rules with ACTION set to PERMIT. The UMPTg/UMPTga board supports a maximum of 512 IPv6 ACL rules with ACTION set to PERMIT. In IPSec scenarios, if IPVERSION in the IKEPEER MO is set to IPv6, the UMPTa/UMPTb/UMDU board supports a maximum of 320 IPv6 ACL rules with ACTION set to PERMIT. The UMPTe board supports a maximum of 456 IPv6 ACL rules with ACTION set to PERMIT. The UMPTg/UMPTga board supports a maximum of 584 IPv6 ACL rules with ACTION to PERMIT. In the packet filtering scenario, the UMPT/UMDU board supports a maximum of 64 IPv6 ACL rules.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]An IPv6 ACL rule takes effect on the board where an IPv6 ACL takes effect. If the ACL6 object does not take effect on any board because it does not have a bearer (packet filtering policy or IPsec policy group binding interface) the ACLRULE6 object will also not take effect.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If an ACL6 MO is referenced by an IPSECPOLICY MO, the ACL6 MO cannot be configured with multiple ACLRULE6 MOs of the permit type that have inclusive relationships. Otherwise, any of the following may occur: IPsec SA negotiation fails; IPsec SA negotiation succeeds but is deleted later; different IPsec SA negotiation results are obtained when the narrow down switch is turned on.</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If an ACLRULE6 MO is referenced by an IPSECPOLICY MO of the IPv6 type in IPsec scenarios, neither Source Port Operate nor Destination Port Operate in the ACLRULE6 MO can be set to OP_NEQ (Not Equivalent).</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If an ACLRULE6 MO is referenced by an IPSECPOLICY of the IPv6 type in IPsec scenarios, Match DSCP in the ACLRULE6 MO cannot be set to YES (Yes).</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]In IPSec scenarios, if an IPv6 ACL rule list with configuration conflicts described in the preceding two notes exists and is referenced by an IPSECPOLICY MO, exceptions such as IPSec SA negotiation failures and frequent switchovers may occur on the device (depending on the peer configurations).</p>
+</li><li><p>[Co-MPT,eNodeB,gNodeB]If an IPv6 ACL rule used by an IPSec policy has Protocol Type set to a non-IP type, Match Source Port set to Yes, or Match Destination Port set to Yes, ensure that the IPv6 ACL rule contains PMTU data flows. Otherwise, PMTU data flows will be discarded and PMTU discovery will fail.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_aclrule6__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-ACLID.html">ACLID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 ACL ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IPv6 access control list (ACL) to which the IPv6 access control rule belongs.</p>
+<p>GUI Value Range: 3000~3999,7000~7999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 3000~3999,7000~7999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]The values of ACL ID and Rule ID in a manually configured ACLRULE6 MO must range from 3000 to 3999 and from 1 to 65535, respectively.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-RuleID.html">RULEID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 Rule ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IPv6 ACL rule. The values 1 to 65535 indicate IPv6 ACL rules configured by users. The values 65431 to 65536 indicate the IPv6 ACL rules automatically generated during DHCP detection. The values 70000 to 79999 indicate packet filtering IPv6 ACL rules configured by the system (packet filtering ACL rules are not supported in IPv6 configuration currently). The values 80000 to 89999 indicate IPv6 IPsec ACL rules configured by the system.</p>
+<p>GUI Value Range: 1~65535,70000~89999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~65535,70000~79999,80000~89999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]The values of ACL ID and Rule ID in a manually configured ACLRULE6 MO must range from 3000 to 3999 and from 1 to 65535, respectively.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-Action.html">ACTION</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IPv6 ACL Action</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the action taken on the data that matches an IPv6 ACL rule. When the IPv6 ACL rule is referenced by an IPv6 IPSec policy, the BS encrypts or decrypts the data that matches the rule if this parameter is set to PERMIT, and does not encrypt or decrypt the data if this parameter is set to DENY.</p>
+<p>GUI Value Range: DENY(Deny), PERMIT(Permit)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DENY, PERMIT</p>
+<p>MML Default Value: PERMIT(Permit)</p>
+<p>Recommended Value: PERMIT(Permit)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-ProtocolType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Protocol Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the protocol type of the data to which an IPv6 ACL rule is applied.</p>
+<p>GUI Value Range: IP6(IPv6), TCP(TCP), UDP(UDP), ICMP6(ICMP6), SCTP(SCTP)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: IP6, TCP, UDP, ICMP6, SCTP</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-SrcIP.html">SIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source IPv6 address of data to which an IPv6 ACL rule is applied.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-SrcPfxLen.html">SPFXLEN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Address Prefix Length</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the prefix length of a source IPv6 address. The prefix length is used to determine which bits must be compared for matching when IPv6 address matching is being performed.</p>
+<p>GUI Value Range: 0~128</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-MatchSrcPort.html">SMPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Match Source Port</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to check the source port number of each data stream before applying an ACL rule.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-SrcOp.html">SOP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port Operate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the filter criteria for a source port. If this parameter is set to OP_LT, the ACL rule is applied to the data stream whose source port number is smaller than or equal to the configured port number. If this parameter is set to OP_GT, the ACL rule is applied to the data stream whose source port number is larger than or equal to the configured port number. If this parameter is set to OP_EQ, the ACL rule is applied to the data stream whose source port number is equal to the configured port number. If this parameter is set to OP_NEQ, the ACL rule is applied to the data stream whose source port number is not equal to the configured port number. If this parameter is set to OP_RANGE, the ACL rule is applied to the data stream whose source port number is within the configured range.</p>
+<p>GUI Value Range: OP_LT(Less or Equal), OP_GT(Greater or Equal), OP_EQ(Equivalent), OP_NEQ(Not Equivalent), OP_RANGE(Range)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OP_LT, OP_GT, OP_EQ, OP_NEQ, OP_RANGE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, this parameter is valid when <strong>PT</strong> is set to TCP, UDP or SCTP and <strong>SMPT</strong> is set to YES.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-SrcPort1.html">SPT1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source port number used when SMPT is set to YES. If SOP is set to OP_RANGE, this parameter indicates the smallest source port number. If SOP is not set to OP_RANGE, this parameter indicates a specific source port number.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, if <strong>SOP</strong> is set to OP_RANGE, <strong>SPT1</strong> must be less than <strong>SPT2</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, this parameter is valid when <strong>PT</strong> is set to TCP, UDP or SCTP and <strong>SMPT</strong> is set to YES.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-SrcPort2.html">SPT2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Source Port 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the source port number used when SMPT is set to YES. If SOP is set to OP_RANGE, this parameter indicates the largest source port number. This parameter is valid only when SOP is set to OP_RANGE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, if <strong>SOP</strong> is set to OP_RANGE, <strong>SPT1</strong> must be less than <strong>SPT2</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, this parameter is valid when <strong>PT</strong> is set to TCP, UDP or SCTP, <strong>SMPT</strong> is set to YES, and <strong>SOP</strong> is set to OP_RANGE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-DstIP.html">DIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination IPv6 Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination IPv6 address of the data to which an IPv6 ACL rule is applied.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-DstPfxLen.html">DPFXLEN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Address Prefix Length</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the prefix length of a destination IPv6 address. The prefix length is used to determine which bits must be compared for matching when IPv6 address matching is being performed.</p>
+<p>GUI Value Range: 0~128</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~128</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-MatchDstPort.html">DMPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Match Destination Port</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to check the destination port number of each data stream before applying an ACL rule.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-DstPortOp.html">DOP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port Operate</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the filter criteria for a destination port. This parameter is valid only when DMPT is set to YES. If this parameter is set to OP_LT, the ACL rule is applied to the data stream whose destination port number is smaller than or equal to the configured port number. If this parameter is set to OP_GT, the ACL rule is applied to the data stream whose destination port number is larger than or equal to the configured port number. If this parameter is set to OP_EQ, the ACL rule is applied to the data stream whose destination port number is equal to the configured port number. If this parameter is set to OP_NEQ, the ACL rule is applied to the data stream whose destination port number is not equal to the configured port number. If this parameter is set to OP_RANGE, the ACL rule is applied to the data stream whose destination port number is within the configured range.</p>
+<p>GUI Value Range: OP_LT(Less or Equal), OP_GT(Greater or Equal), OP_EQ(Equivalent), OP_NEQ(Not Equivalent), OP_RANGE(Range)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OP_LT, OP_GT, OP_EQ, OP_NEQ, OP_RANGE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, this parameter is valid when <strong>PT</strong> is set to TCP, UDP, or SCTP and <strong>DMPT</strong> is set to YES.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-DstPort1.html">DPT1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination port number used when DMPT is set to YES. If DOP is set to OP_RANGE, this parameter indicates the smallest destination port number. If DOP is not set to OP_RANGE, this parameter indicates a specific destination port number.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, if <strong>DOP</strong> is set to OP_RANGE, <strong>DPT1</strong> must be less than <strong>DPT2</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, this parameter is valid when <strong>PT</strong> is set to TCP, UDP, or SCTP and <strong>DMPT</strong> is set to YES.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-DstPort2.html">DPT2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Destination Port 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the destination port number used when DMPT is set to YES. If DOP is set to OP_RANGE, this parameter indicates the largest destination port number. This parameter is valid only when DOP is set to OP_RANGE.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, if <strong>DOP</strong> is set to OP_RANGE, <strong>DPT1</strong> must be less than <strong>DPT2</strong>.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, eNodeB, gNodeB]In an <strong>ACLRULE6</strong> MO, this parameter is valid when <strong>PT</strong> is set to TCP, UDP, or SCTP, <strong>DMPT</strong> is set to YES, and <strong>DOP</strong> is set to OP_RANGE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-MatchDSCP.html">MDSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Match DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to check the DSCP of each data stream before applying an IPv6 ACL rule.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: NO(No)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-DSCP.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the DSCP that complies with an IPv6 ACL rule.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/ACLRULE6-SupportForcibleExecution.html">FORCEEXECUTE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Support Forcible Execution</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether a forcible change of an IPv6 ACL rule is made. When this parameter is set to NO(No), the system checks whether the change affects upper-layer services. If the change affects upper-layer services, the forcible change will fail. When this parameter is set to YES(Yes), the system does not check whether the change affects upper-layer services. Upper-layer services include the following: active OM channel (OMCH), DNS service (DNSSRV), certificate authority (CA), CRL update (CRLTSK), IP clock link (IPCLKLINK), NTP (NTPC), ABIS CP/IUB CP/S1 CP/X2 CP/M2 CP/ECO CP/eX2 CP/SO CP/UX2 CP/XW CP/gNBCUX2 CP/gNBCUNg CP/gNBCUXn CP (SCTPLNK/SCTPPEER), and ABIS UP/IPPATH of unknown service type/IUB UP/UX2 UP/S1 UP/X2 UP/eX2 UP/XW UP/gNBCUX2 UP/gNBCUS1 UP/gNBCUNg UP/gNBCUXn UP (USERPLANEPEER).Only the change of the IPv6 ACL rule that is manually configured with Protocol Type set to IPv6 and Match DSCP set to NO in IPsec networking is checked.</p>
+<p>Pay attention to the following when using this parameter:</p>
+<p>1. The system checks whether a forcible change affects upper-layer services based on the configuration data instead of based on the actual running status of these services.</p>
+<p>2. If an NE is configured with an SRCIPROUTE6 MO, the system does not check whether a forcible change of an IPv6 ACL rule affects upper-layer services.</p>
+<p>GUI Value Range: NO(No), YES(Yes)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NO, YES</p>
+<p>MML Default Value: NO(No)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_aclrule6__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an IPv6 ACL rule with the parameters as follows: IPv6 ACL ID: 3000, IPv6 Rule ID: 10, Protocol Type: IP6, Source IPv6 Address: 2001:DB8::1, Source Address Prefix Length: 32, Destination IPv6 Address: 2001:DB8::2, Destination Address Prefix Length: 32, Match DSCP: YES, DSCP: 25, run the following command: 
+ADD ACLRULE6: ACLID=3000, RULEID=10, PT=IP6, SIP="2001:DB8::1", SPFXLEN=32, DIP="2001:DB8::2", DPFXLEN=32, MDSCP=YES, DSCP=25;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

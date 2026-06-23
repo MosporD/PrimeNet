@@ -1,0 +1,718 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="GTRANSPARA">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="Mode" content="UMTS">
+<meta name="Mode" content="LTE FDD">
+<meta name="Mode" content="LTE TDD">
+<meta name="Mode" content="NB-IoT">
+<meta name="Mode" content="5G">
+<meta name="Mode" content="NR">
+<meta name="Mode" content="RFA">
+
+<meta name="Mode" content="GSM">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="GTRANSPARA">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>GTRANSPARA</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="GTRANSPARA"></a><a name="GTRANSPARA"></a>
+
+
+<h1 class="topictitle1">GTRANSPARA</h1>
+
+<div>
+<div class="section"><pre>
+<a href="TRANSPORT.html">TRANSPORT</a>
+  +-<a href="GTRANSPARA.html"><strong>GTRANSPARA</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>This MO defines the global transport parameters for an NE.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Not involved</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="TRANSPORT.html">TRANSPORT</a></li><li>Relation with the <strong>IPSECDTNL</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the value of <strong>MBFDSN</strong> or <strong>SBFDSN</strong> of <strong>IPSECDTNL</strong> MO cannot be greater than 95.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the value of <strong>MBFDSN</strong> or <strong>SBFDSN</strong> of <strong>IPSECDTNL</strong> MO cannot be less than 100 or greater than 195.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong> and <strong>IPSECBIND</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, in an <strong>IPSECDTNL</strong> MO, the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to ports; the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to two different <strong>IPSECBIND</strong> MOs, and the <strong>SPGN</strong> values in the two <strong>IPSECBIND</strong> MOs are the same as the <strong>SPGN</strong> values in the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>IP2RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>IP2RSCGRP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IP2IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IP2IPRSCGRP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DOT1XAUTH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>DOT1XAUTH</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>OMCH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>CHECKTYPE</strong> in the active <strong>OMCH</strong> MO is set to AUTO_UDPSESSION, <strong>OMCHSWITCHBACK</strong> in the <strong>GTRANSPARA</strong> MO must be set to ENABLE.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>OMCH</strong> MO whose <strong>BEAR</strong> is set to IPV6 cannot be configured.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>VRFIDX</strong> in <strong>OMCH</strong> MO must be set to 0.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>VRFIDX</strong> in an <strong>OMCH</strong> MO is not set to 0, <strong>ONLYOMIP</strong> in a <strong>GTRANSPARA</strong> MO must be set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong>, <strong>DEVIP</strong>, and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The case is that <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION and <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is not set to 0.0.0.0, the <strong>DEVIP</strong> MO that has the same IP address as <strong>LOCALIP</strong> in the same routing domain must have been configured. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW and <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is not set to 0.0.0.0, the <strong>IFIP</strong> MO that has the same IP address as <strong>LOCALIP</strong> in the same routing domain must have been configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>IPRT</strong>, and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION and an <strong>IPRT</strong> MO and a <strong>DEVIP</strong> MO whose <strong>PT</strong> is set to ETH, ETHTRK, SUBIF, or ETHCI are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO must be on the same network segment as <strong>IP</strong> in the <strong>DEVIP</strong> MO. In addition, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>DEVIP</strong> MO must be the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>IPRT</strong> MO, respectively. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW and an <strong>IPRT</strong> MO and an <strong>IFIP</strong> MO whose <strong>PT</strong> is set to ETH, ETHTRK, SUBIF, or ETHCI are in the same routing domain, <strong>NEXTHOP</strong> in the <strong>IPRT</strong> MO must be on the same network segment as <strong>IP</strong> in the <strong>IFIP</strong> MO. In addition, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>IFIP</strong> MO must be the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>IPRT</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>EPGROUP</strong> and <strong>PACKETFILTER</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD and <strong>PACKETFILTERSWITCH</strong> in an <strong>EPGROUP</strong> MO is set to ENABLE, a <strong>PACKETFILTER</strong> MO must exist and <strong>FM</strong> in this <strong>PACKETFILTER</strong> MO cannot be set to L2_ACL.</li></ul>
+</li><li>Relation with the <strong>EPGROUP</strong> and <strong>PACKETFILTERING</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>PACKETFILTERSWITCH</strong> in an <strong>EPGROUP</strong> MO is set to ENABLE, a <strong>PACKETFILTERING</strong> MO must be configured and <strong>FM</strong> in this <strong>PACKETFILTERING</strong> MO cannot be set to L2_ACL.</li><li>[Co-MPT, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>PACKETFILTERSWITCH</strong> in an <strong>EPGROUP</strong> MO is set to ENABLE, a <strong>PACKETFILTERING</strong> MO must be configured and <strong>ACLTYPE</strong> in a <strong>PACKETFILTERING</strong> MO cannot be set to IPV6.</li></ul>
+</li><li>Relation with the <strong>SECURITYHOST</strong>, <strong>DEVIP</strong>, and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, the following are true: when <strong>MODELSELECT</strong> in the <strong>GTRANSPARA</strong> MO is set to TRADITION, <strong>LOCIKEIPV4</strong> in a <strong>SECURITYHOST</strong> MO must be set to the same value as <strong>IP</strong> in a configured <strong>DEVIP</strong> MO with Port Type set to ETH, ETHTRK, or ETHCI; when <strong>MODELSELECT</strong> in the <strong>GTRANSPARA</strong> MO is set to HOSTGW, <strong>LOCIKEIPV4</strong> in a <strong>SECURITYHOST</strong> MO must be set to the same value as <strong>IP</strong> in a configured <strong>IFIP</strong> MO with Port Type set to ETH, ETHTRK, or ETHCI.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> and <strong>SECURITYHOST</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD and <strong>PT</strong> in a <strong>DEVIP</strong> MO referenced by <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO is not set to LOOPINT, <strong>LOCIPV4</strong> in the <strong>USERPLANEHOST</strong> MO must be configured on the same physical port as <strong>LOCIKEIPV4</strong> in a referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EPGROUP</strong> and <strong>SCTPHOST</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The number of <strong>EPGROUP</strong> MOs whose <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 plus the number of <strong>EPGROUP</strong> MOs whose <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 that have been created and are to be automatically created by the system must be less than or equal to 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO, the number of <strong>EPGROUP</strong> MOs whose <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 plus the number of <strong>EPGROUP</strong> MOs whose <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 that have created and are to be automatically created by the system must be less than or equal to 1.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is disabled for the <strong>GTRANSPARA</strong> MO, the number of <strong>EPGROUP</strong> MOs whose <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 plus the number of <strong>EPGROUP</strong> MOs whose <strong>TYPEFLAG</strong> is set to CENTRALIZED_EX2 to be automatically created by the system in simplified mode must be less than or equal to 1.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of <strong>SCTPHOSTREFS</strong> parameters in all the <strong>EPGROUP</strong> MOs in a base station plus the number of <strong>SCTPHOST</strong> MOs whose <strong>SIMPLEMODESWITCH</strong> are not set to SIMPLE_MODE_OFF and who are not in the <strong>EPGROUP</strong> MO cannot exceed 64.</li></ul>
+</li><li>Relation with the <strong>IKECFG</strong>, <strong>SECURITYHOST</strong>, <strong>IPADDR4</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>IPSECBINDMODE</strong> in an <strong>IKECFG</strong> MO is set to ALL, at least one <strong>INTERFACE</strong> MO with <strong>ITFTYPE</strong> set to NORMAL and <strong>VRFIDX</strong> set to 0 must exist on the physical port, on which an <strong>INTERFACE</strong> MO corresponding to the <strong>IPADDR4</strong> MO referenced by the <strong>SECURITYHOST</strong> MO is located.</li></ul>
+</li><li>Relation with the <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, and <strong>IPADDR4</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, the value of <strong>LOCIKEIPV4</strong> in a <strong>SECURITYHOST</strong> MO must be the same value as that of <strong>IP</strong> in a configured <strong>IPADDR4</strong> MO with Port Type set to ETH, ETHTRK, or ETHCI.</li></ul>
+</li><li>Relation with the <strong>CFMMA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION and <strong>OAMTYPE</strong> of <strong>GTRANSPARA</strong> is set to ITU_T_Y1731, the length of <strong>MANAME</strong> in the <strong>CFMMA</strong> MO cannot exceed 13 characters.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION and <strong>OAMTYPE</strong> of <strong>GTRANSPARA</strong> is set to ITU_T_Y1731, <strong>MANAME</strong> in the <strong>CFMMA</strong> MO must be different from each other.</li></ul>
+</li><li>Relation with the <strong>GTRANSPARAGW</strong> and <strong>CFMMA</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW and <strong>OAMTYPE</strong> of <strong>GTRANSPARAGW</strong> is set to ITU_T_Y1731, the length of <strong>MANAME</strong> in the <strong>CFMMA</strong> MO cannot exceed 13 characters.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW and <strong>OAMTYPE</strong> of <strong>GTRANSPARAGW</strong> is set to ITU_T_Y1731, <strong>MANAME</strong> in the <strong>CFMMA</strong> MO must be different from each other.</li></ul>
+</li><li>Relation with the <strong>VLANMAP</strong>, <strong>DEVIP</strong>, and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>VLANID</strong> in two <strong>VLANMAP</strong> MOs is the same, <strong>NEXTHOPIP</strong> in the two MOs must be on the same sub-interface.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong>, <strong>SRCIPRT</strong>, and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION and an <strong>SRCIPRT</strong> MO and a <strong>DEVIP</strong> MO whose <strong>PT</strong> is set to ETH, ETHTRK, SUBIF, or ETHCI are in the default routing domain, <strong>NEXTHOP</strong> in the <strong>SRCIPRT</strong> MO must be on the same network segment as <strong>IP</strong> in the <strong>DEVIP</strong> MO. In addition, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>DEVIP</strong> MO must be the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>SRCIPRT</strong> MO, respectively. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW and an <strong>SRCIPRT</strong> MO and an <strong>IFIP</strong> MO whose <strong>PT</strong> is set to ETH, ETHTRK, SUBIF, or ETHCI are in the default routing domain, <strong>NEXTHOP</strong> in the <strong>SRCIPRT</strong> MO must be on the same network segment as <strong>IP</strong> in the <strong>IFIP</strong> MO. In addition, <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>IFIP</strong> MO must be the same as <strong>CN</strong>, <strong>SRN</strong>, <strong>SN</strong>, and <strong>SBT</strong> in the <strong>SRCIPRT</strong> MO, respectively.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>SECURITYHOST</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO is not set to LOOPINT, <strong>LOCIPV4</strong> in the <strong>USERPLANEHOST</strong> MO must be configured on the same physical port as <strong>LOCIKEIPV4</strong> in the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> and <strong>DEVIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>SCTPHOST</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> are valid, and <strong>SIGIP1V4</strong> is configured on a different board from the <strong>DEVIP</strong> MO to which <strong>SIGIP2V4</strong> belongs, then <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> must be set to DISABLE.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, the value of <strong>SIGIP1V4</strong> in an <strong>SCTPHOST</strong> MO must be the same as that of <strong>IP</strong> in a <strong>IP</strong> MO configured in the same routing domain.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, the value other than 0.0.0.0 of <strong>SIGIP2V4</strong> in an <strong>SCTPHOST</strong> MO must be the same as that of <strong>IP</strong> in a <strong>DEVIP</strong> MO configured in the same routing domain.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD and the <strong>SIGIP2V4</strong> parameter in an <strong>SCTPHOST</strong> MO is valid, the <strong>DEVIP</strong> MOs to which <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> belongs must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>SCTPHOST</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> are valid, and <strong>SIGIP1V4</strong> is configured on a different board from the <strong>IPADDR4</strong> MO to which <strong>SIGIP2V4</strong> belongs, then <strong>SIGIP1SECSWITCH</strong> and <strong>SIGIP2SECSWITCH</strong> must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>DEVIP</strong>, and <strong>EPGROUP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>SCTPHOST</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> are valid, and <strong>SIGIP1V4</strong> is configured on a different board from the <strong>DEVIP</strong> MO to which <strong>SIGIP2V4</strong> belongs, then <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MO referencing the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>EPGROUP</strong>, <strong>INTERFACE</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]For an <strong>SCTPHOST</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> are valid, and <strong>SIGIP1V4</strong> is configured on a different board from the <strong>IPADDR4</strong> MO to which <strong>SIGIP2V4</strong> belongs, then <strong>PACKETFILTERSWITCH</strong> in the <strong>EPGROUP</strong> MO referencing the <strong>SCTPHOST</strong> MO must be set to DISABLE.</li></ul>
+</li><li>Relation with the <strong>DSCPMAP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>DSCPMAP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>PRI2QUE</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PRI2QUE</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ETH3AH</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>ETH3AH</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ETHOAM3AH</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>ETHOAM3AH</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SRCIPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>SRCIPRT</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>LOOPBACK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>LOOPBACK</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>CFMMEP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>CFMMEP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>CFMLOCALMEP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>CFMLOCALMEP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> and <strong>IPADDR4</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, the value of <strong>SIGIP1V4</strong> in an <strong>SCTPHOST</strong> MO must be the same as that of <strong>IP</strong> in an <strong>IPADDR4</strong> MO configured in the same routing domain.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, the value other than 0.0.0.0 of <strong>SIGIP2V4</strong> in an <strong>SCTPHOST</strong> MO must be the same as that of <strong>IP</strong> in an <strong>IPADDR4</strong> MO configured in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>DEVIP</strong>, <strong>MPGRP</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, the value of <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO must be the same as that of any of the following parameters in the same routing domain: <strong>IP</strong> in a <strong>DEVIP</strong> MO; <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO; <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, <strong>MPGRP</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, the value of <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO must be the same as that of any of the following parameters configured in the same routing domain: <strong>IP</strong> in an <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO; <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>INTERFACE</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and <strong>CTRLMODE</strong> is set to MANUAL_MODE and <strong>SECLOCIP</strong> is valid in an <strong>SCTPLNK</strong> MO, the <strong>IPADDR4</strong> MOs for <strong>LOCIP</strong> and <strong>SECLOCIP</strong> of this MO must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>ETHTRK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>ETHTRK</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>ETHTRUNK</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ETHTRKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>ETHTRKLNK</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ETHTRUNKLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>ETHTRUNKLNK</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DOT1X</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>DOT1X</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> and <strong>SECURITYHOST</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD and <strong>PT</strong> in the <strong>DEVIP</strong> MO corresponding to <strong>SIGIP1V4</strong> in an <strong>SCTPHOST</strong> MO is not set to LOOPINT, <strong>SIGIP1V4</strong> in the <strong>SCTPHOST</strong> MO must be configured on the same physical port as <strong>LOCIKEIPV4</strong> in the referenced <strong>SECURITYHOST</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD and <strong>PT</strong> in the <strong>DEVIP</strong> MO corresponding to <strong>SIGIP2V4</strong> in an <strong>SCTPHOST</strong> MO is not set to LOOPINT, <strong>SIGIP2V4</strong> in the <strong>SCTPHOST</strong> MO must be configured on the same physical port as <strong>LOCIKEIPV4</strong> in the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> and <strong>SCTPHOST</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of existing <strong>USERPLANEHOST</strong> MOs in a base station plus the number of <strong>USERPLANEHOST</strong> MOs to be automatically created in simplified mode cannot exceed 32.</li></ul>
+</li><li>Relation with the <strong>RSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>RSCGRP</strong> MO whose <strong>BEAR</strong> is set to IP cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPRSCGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPRSCGRP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>RSCGRPALG</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>RSCGRPALG</strong> MO whose <strong>BEAR</strong> is set to IP cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPRSCGRPALG</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPRSCGRPALG</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>UDPSESSION</strong>, <strong>DEVIP</strong>, <strong>IFIP</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, <strong>LOCALIP</strong> in a <strong>UDPSESSION</strong> MO to be added must have been configured. That is, for the <strong>UDPSESSION</strong> MO, <strong>DEVIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board (in the same slot and cabinet), <strong>LOCALIP</strong> in the <strong>UDPSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>DEVIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, <strong>LOCALIP</strong> in a <strong>UDPSESSION</strong> MO to be added must have been configured. That is, for the <strong>UDPSESSION</strong> MO, <strong>IFIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board (in the same slot and cabinet), <strong>LOCALIP</strong> in the <strong>UDPSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>UDPSESSION</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in a <strong>UDPSESSION</strong> MO to be added must have been configured, <strong>LOCALIP</strong> in the <strong>UDPSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IPADDR4</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> and <strong>EPGROUP</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB](1) <strong>SIMPLEMODESWITCH</strong> is set to S1SIMPLE_MODE_ON for an <strong>SCTPHOST</strong> MO and S1SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO. (2) <strong>SIMPLEMODESWITCH</strong> is set to X2SIMPLE_MODE_ON for an <strong>SCTPHOST</strong> MO and X2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO. (3) <strong>SIMPLEMODESWITCH</strong> is set to EX2SIMPLE_MODE_ON for an <strong>SCTPHOST</strong> MO and EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO. If any of the preceding conditions is true, any two different <strong>EPGROUP</strong> MOs that meet the following conditions cannot have the same <strong>USERPLANEPEER</strong> MO: (1) The <strong>EPGROUP</strong> MO corresponds to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> for the <strong>SCTPHOST</strong> MO. (2) The <strong>EPGROUP</strong> MO has the same <strong>SIGIP1V4</strong> as the <strong>SCTPHOST</strong> MO and corresponds to <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID1</strong> for an <strong>SCTPHOST</strong> MO whose <strong>UPEPGROUP1TYPE</strong> is not set to CENTRALIZED_EX2.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When the following conditions are met, the <strong>EPGROUP</strong> MO corresponding to <strong>UPEPGROUPID1</strong> or <strong>UPEPGROUPID2</strong> for the <strong>SCTPHOST</strong> MO whose <strong>SIMPLEMODESWITCH</strong> is not set to SIMPLE_MODE_OFF and <strong>UPEPGROUP1TYPE</strong> is not set to CENTRALIZED_EX2 must have different <strong>USERPLANEPEER</strong> from other <strong>EPGROUP</strong> MOs: (1) <strong>SIMPLEMODESWITCH</strong> is set to S1SIMPLE_MODE_ON for the <strong>SCTPHOST</strong> MO and S1SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO, <strong>SIMPLEMODESWITCH</strong> is set to X2SIMPLE_MODE_ON for the <strong>SCTPHOST</strong> MO and X2SIMPLE_MODE in the <strong>EPCFGMODE</strong> is enabled for the <strong>GTRANSPARA</strong> MO, <strong>SIMPLEMODESWITCH</strong> is set to EX2SIMPLE_MODE_ON for the <strong>SCTPHOST</strong> MO and EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO. (2) The <strong>EPGROUP</strong> MO that has different <strong>UPEPGROUPID1</strong> and <strong>UPEPGROUPID2</strong> from the <strong>SCTPHOST</strong> MO has a <strong>USERPLANEHOST</strong> MO and <strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO is the same as <strong>SIGIP1V4</strong> for the <strong>SCTPHOST</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The <strong>SCTPPEER</strong> MOs in the <strong>EPGROUP</strong> MOs corresponding to <strong>CPEPGROUPID1</strong> and <strong>CPEPGROUPID2</strong> in an <strong>SCTPHOST</strong> MO cannot be in another <strong>EPGROUP</strong> MO when any one of the following conditions is met: (1) The <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is set to S1SIMPLE_MODE_ON and S1SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO; (2) The <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is set to X2SIMPLE_MODE_ON and X2SIMPLE_MODE in the <strong>EPCFGMODE</strong> is enabled for the <strong>GTRANSPARA</strong> MO; (3) The <strong>SIMPLEMODESWITCH</strong> parameter in the <strong>SCTPHOST</strong> MO is set to EX2SIMPLE_MODE_ON and EX2SIMPLE_MODE in the <strong>EPCFGMODE</strong> parameter is enabled for the <strong>GTRANSPARA</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of existing <strong>EPGROUP</strong> MOs in a base station plus the number of <strong>EPGROUP</strong> MOs to be automatically created in simplified mode cannot exceed 74.</li></ul>
+</li><li>Relation with the <strong>IPPATH</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]The <strong>TRANSCFGMODE</strong> of <strong>IPPATH</strong> must be the same with the <strong>TRANSCFGMODE</strong> of <strong>GTRANSPARA</strong>.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> whose IP protocol version is IPv4 comes from <strong>IP</strong> of a <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> of a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> of an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPRESPONDER</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD and <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv4, <strong>LOCALIP</strong> in the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIP</strong> is from <strong>IP</strong> in a <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in a <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> comes from <strong>IP</strong> of an <strong>IPADDR4</strong> MO, <strong>LOCALIP</strong> of a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> of an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPRESPONDER</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv4, <strong>LOCALIP</strong> in the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIP</strong> of the <strong>TWAMPRESPONDER</strong> MO is from <strong>IP</strong> in an <strong>IPADDR4</strong> MO, <strong>LOCALIP</strong> in a <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in an <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>BFDSESSION</strong>, <strong>DEVIP</strong>, <strong>MPGRP</strong>, <strong>PPPLNK</strong>, and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>SRCIP</strong> in a <strong>BFDSESSION</strong> MO to be added must have been configured. That is: (1) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, for the <strong>BFDSESSION</strong> MO, <strong>DEVIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO. (2) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, for the <strong>BFDSESSION</strong> MO, <strong>IFIP</strong> MO, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO, and <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>BFD</strong>, <strong>IPADDR4</strong>, <strong>MPGRP</strong>, and <strong>PPPLNK</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>SRCIP</strong> in a <strong>BFD</strong> MO to be added must have been configured, <strong>SRCIP</strong> in the <strong>BFD</strong> MO must be the same as any of the following: <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO in the same routing domain, or <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO, or <strong>IP</strong> in the <strong>IPADDR4</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>OMCH</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, and <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> MO is set to TRADITION, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> MO is set to HOSTGW, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>IFIP</strong> MO, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>EPGROUP</strong> and <strong>SCTPPEER</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]The number of <strong>SCTPPEERREFS</strong> parameters in all the <strong>EPGROUP</strong> MOs in a base station plus the number of <strong>SCTPPEER</strong> MOs whose <strong>SIMPLEMODESWITCH</strong> are not set to SIMPLE_MODE_OFF and who are not in the <strong>EPGROUP</strong> MOs cannot exceed 1024.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If multiple <strong>SCTPHOST</strong> MOs whose <strong>SIMPLEMODESWITCH</strong> is not set to SIMPLE_MODE_OFF reference the same end point group ID, the corresponding <strong>EPCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO must be simultaneously enabled or disabled.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>SCTPHOST</strong> MO whose <strong>IPVERSION</strong> is set to IPv6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>MODELSELECT</strong> in the <strong>GTRANSPARA</strong> MO is set to TRADITION, <strong>BORROWIFIP</strong> in the <strong>DEVIP</strong> MO must be NO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>MODELSELECT</strong> in the <strong>GTRANSPARA</strong> MO is set to HOSTGW, the <strong>PT</strong> in the <strong>DEVIP</strong> MO must be LOOPINT.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>DEVIP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IFIP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>MODELSELECT</strong> in the <strong>GTRANSPARA</strong> MO is set to TRADITION, the <strong>IFIP</strong> MO cannot be configured.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>IFIP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPPMSESSION</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, and <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO is set to NO, the IP address corresponding to <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must have been configured. That is, for the <strong>IPPMSESSION</strong> MO, <strong>IPADDR4</strong> MO in the same routing domain, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO; or <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>OMCH</strong>, <strong>IPADDR4</strong>, <strong>PPPLNK</strong>, and <strong>MPGRP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, and <strong>DHCPRELAYIPSW</strong> of <strong>DHCPSVRIP</strong> is set to ENABLE, <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO in the same routing domain, <strong>IP</strong> in <strong>IPADDR4</strong> MO in the same routing domain, <strong>LOCALIP</strong> in <strong>PPPLNK</strong> MO in the same routing domain, or <strong>LOCALIP</strong> in <strong>MPGRP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>DEVIP</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, before adding an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE, ensure that the <strong>MPGRP</strong> or <strong>PPPLNK</strong> MO that has the same VRF Index as the <strong>SCTPLNK</strong> MO has been configured. Alternatively, ensure that the <strong>DEVIP</strong> MO, <strong>MPGRP</strong> MO, or <strong>PPPLNK</strong> MO that meets both of the following conditions has been configured: (1) The <strong>DEVIP</strong> MO, <strong>MPGRP</strong> MO, or <strong>PPPLNK</strong> MO is in the same routing domain as the <strong>SCTPLNK</strong> MO. (2) <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO is the same as <strong>IP</strong> in the <strong>DEVIP</strong> MO, <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO, or <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO. The first and the second local IP addresses of an SCTP link must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>IPADDR4</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE is configured, either of the following is true: 1. There must be the following parameters that have the same values as <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO and these IP addresses are in the same routing domain: <strong>IP</strong> in the <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO. 2. There must be either the <strong>MPGRP</strong> MO with <strong>LOCALIP</strong> set to 0.0.0.0 or the <strong>PPPLNK</strong> MO with <strong>LOCALIP</strong> set to 0.0.0.0.</li></ul>
+</li><li>Relation with the <strong>CA</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>CA</strong> MO whose <strong>IPVERSION</strong> is set to IPV6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>CRLTSK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>CRLTSK</strong> MO whose <strong>IPVERSION</strong> is set to IPV6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SCTPPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>SCTPPEER</strong> MO whose <strong>IPVERSION</strong> is set to IPv6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SECURITYHOST</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>SECURITYHOST</strong> MO whose <strong>IPVERSION</strong> is set to IPv6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SECURITYPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>SECURITYPEER</strong> MO whose <strong>IPVERSION</strong> is set to IPv6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>USERPLANEPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>USERPLANEPEER</strong> MO whose <strong>IPVERSION</strong> is set to IPv6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>USERPLANEHOST</strong> MO whose <strong>IPVERSION</strong> is set to IPv6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IKEPEER</strong> MO whose <strong>IPVERSION</strong> is set to IPV6 cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPPMSESSION</strong>, <strong>DEVIP</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, and <strong>IPADDR4</strong> MOs:<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, and <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO is set to NO, the IP address corresponding to <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must have been configured. That is, for the <strong>IPPMSESSION</strong> MO, if <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, <strong>DEVIP</strong> MO in the same routing domain, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>DEVIP</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO; or <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO. When <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>IPADDR4</strong> MO in the same routing domain, <strong>PPPLNK</strong> MO, and <strong>MPGRP</strong> MO configured on the same board, <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IPADDR4</strong> MO; <strong>LOCALIP</strong> in the <strong>PPPLNK</strong> MO; or <strong>LOCALIP</strong> in the <strong>MPGRP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>SECURITYHOST</strong>, <strong>IPADDR4</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>SIGIP1V4</strong> in an <strong>SCTPHOST</strong> MO is not set to LOOPINT, <strong>SIGIP1V4</strong> in the <strong>SCTPHOST</strong> MO must be configured on the same physical port as <strong>LOCIKEIPV4</strong> in the referenced <strong>SECURITYHOST</strong> MO.</li><li>[Co-MPT, NodeB, eNodeB, gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>PT</strong> in the <strong>INTERFACE</strong> MO corresponding to <strong>SIGIP2V4</strong> in an <strong>SCTPHOST</strong> MO is not set to LOOPINT, <strong>SIGIP2V4</strong> in the <strong>SCTPHOST</strong> MO must be configured on the same physical port as <strong>LOCIKEIPV4</strong> in the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>INTERFACE</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>INTERFACE</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPADDR4</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPADDR4</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPROUTE4</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPROUTE4</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE4</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>SRCIPROUTE4</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DSCP2PCPMAP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>DSCP2PCPMAP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DSCP2QUEMAP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>DSCP2QUEMAP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPSECBINDITF</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPSECBINDITF</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPSECBIND</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>IPSECBIND</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>LR</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>LR</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>PORTLR</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>PORTLR</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTER</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PACKETFILTER</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>PACKETFILTERING</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>PACKETFILTERING</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>VLANMAP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, <strong>VRFIDX</strong> in the <strong>VLANMAP</strong> MO must be set to 0.</li></ul>
+</li><li>Relation with the <strong>IKECFG</strong> and <strong>IPSECDTNL</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO is set to ALL, the <strong>IPSECDTNL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>TUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>TUNNEL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>BACKTUNNEL</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>BACKTUNNEL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SUBIF</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>SUBIF</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>LLDP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>LLDP</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>LLDPLOCAL</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>LLDPLOCAL</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ETHPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PORTID</strong> to any two <strong>ETHPORT</strong> MOs must be different and valid.</li></ul>
+</li><li>Relation with the <strong>IPRT</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>IPRT</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IKECFG</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPSECBINDMODE</strong> in the <strong>IKECFG</strong> MO must be set to SINGLE.</li></ul>
+</li><li>Relation with the <strong>IPSECDTNL</strong> and <strong>IPSECBINDITF</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, in an <strong>IPSECDTNL</strong> MO, the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to ports; the active and standby <strong>IPSECPOLICY</strong> MOs must be bound to two different <strong>IPSECBINDITF</strong> MOs, and the <strong>SPGN</strong> values in the two <strong>IPSECBINDITF</strong> MOs are the same as the <strong>SPGN</strong> values in the active and standby <strong>IPSECPOLICY</strong> MOs, respectively.</li></ul>
+</li><li>Relation with the <strong>IKEPEER</strong> and <strong>IPADDR4</strong> MOs:<ul><li>[Co-MPT, NodeB, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>LOCALIP</strong> in an <strong>IKEPEER</strong> MO is set to a non-zero value, <strong>LOCALIP</strong> in the <strong>IKEPEER</strong> MO must be set to the same value as a configured <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>DNSSRV</strong> and <strong>DEVIP</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD and <strong>IPVER</strong> is set to IPv4, <strong>DNSCIP4</strong> in a <strong>DNSSRV</strong> MO must be the same as <strong>IP</strong> in an existing <strong>DEVIP</strong> MO, and <strong>PT</strong> in a <strong>DEVIP</strong> MO is not set to PPP or MPGRP or ETHCI.</li></ul>
+</li><li>Relation with the <strong>DNSSRV</strong>, <strong>IPADDR4</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPVER</strong> is set to IPv4, <strong>DNSCIP4</strong> in a <strong>DNSSRV</strong> MO must be the same as <strong>IP</strong> in an existing <strong>IPADDR4</strong> MO, and <strong>PT</strong> in the <strong>INTERFACE</strong> MO referenced by <strong>IPADDR4</strong> is not set to PPP or MPGRP or ETHCI.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>DHCPSVRIP6</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPPATHRT</strong>, <strong>DEVIP</strong>, and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, eGBTS, eNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, the value of <strong>SRCIP</strong> in an <strong>IPPATHRT</strong> MO must be the same as the IP address in a configured <strong>DEVIP</strong> MO that meets both of the following conditions: (1) The <strong>DEVIP</strong> MO is in the same routing domain as the <strong>IPPATHRT</strong> MO. (2) The port type in the <strong>DEVIP</strong> MO is set to ETH, ETHTRK, LOOPINT, or SUBIF. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, the value of <strong>SRCIP</strong> in an <strong>IPPATHRT</strong> MO must be the same as the IP address in a configured <strong>DEVIP</strong> MO that meets both of the following conditions: (1) The <strong>DEVIP</strong> MO is in the same routing domain as the <strong>IPPATHRT</strong> MO. (2)The <strong>IFIP</strong> MO is in the same routing domain as the <strong>IPPATHRT</strong> MO, the port type in the <strong>IFIP</strong> MO is set to ETH, ETHTRK, or SUBIF.</li><li>[Co-MPT, eGBTS, eNodeB]On the board to which the IP address specified by <strong>SRCIP</strong> in an <strong>IPPATHRT</strong> MO belongs, there must be an IP address that is on the same network segment and in the same routing domain as the IP address specified by <strong>NEXTHOPIP</strong> and these two IP addresses cannot be the same.</li></ul>
+</li><li>Relation with the <strong>IPPATHRT</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, eGBTS, eNodeB]On the board to which the IP address specified by <strong>SRCIP</strong> in an <strong>IPPATHRT</strong> MO belongs, there must be an IP address that is on the same network segment and in the same routing domain as the IP address specified by <strong>NEXTHOPIP</strong> and the latter two IP addresses cannot be the same.</li></ul>
+</li><li>Relation with the <strong>ETHCIPORT</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PORTID</strong> to any two <strong>ETHCIPORT</strong> MOs must be different and valid.</li></ul>
+</li><li>Relation with the <strong>PPPLNK</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PORTID</strong> to any two <strong>PPPLNK</strong> MOs must be different and valid.</li></ul>
+</li><li>Relation with the <strong>MPGRP</strong> MO:<ul><li>[Co-MPT, NodeB, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>PORTID</strong> to any two <strong>MPGRP</strong> MOs must be different and valid.</li></ul>
+</li><li>Relation with the <strong>IPADDR6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPADDR6</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>BLKSCTPPEERIPV6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>BLKSCTPPEERIPV6</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>INTERFACEPARA6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>INTERFACEPARA6</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>ACL6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>ACL6</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>TUNNELITF</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>TUNNELITF</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>PINGFILTER6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>PINGFILTER6</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SRCIPROUTE6</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>SRCIPROUTE6</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DEVIP</strong> and <strong>IFIP</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]On a BS, if <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> MO is set to TRADITION, the sum of <strong>IPADDR6</strong> and <strong>DEVIP</strong> MOs must be less than or equal to 128. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> MO is set to HOSTGW, the sum of <strong>IPADDR6</strong>, <strong>DEVIP</strong> and <strong>IFIP</strong> MOs must be less than or equal to 128.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> and <strong>INTERFACE</strong> MOs:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, <strong>IPVERSION</strong> and <strong>MULTICASTLISTENERSW</strong> in a <strong>USERPLANEHOST</strong> MO are set to IPv6 and ENABLE, the <strong>INTERFACE</strong> MO corresponding to <strong>ITFID</strong> in the <strong>USERPLANEHOST</strong> MO must exist, <strong>PT</strong> must be set to ETH or ETHTRK, and <strong>IPV6SW</strong> must be set to ENABLE.</li></ul>
+</li><li>Relation with the <strong>IPSECPOLICY</strong> MO:<ul><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is different from <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO, <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO must be set to NEW.</li><li>[Co-MPT, eNodeB, gNodeB]If <strong>ACLTYPE</strong> in an <strong>IPSECPOLICY</strong> MO is different from <strong>IPVERSION</strong> in an <strong>IKEPEER</strong> MO referenced by the <strong>IPSECPOLICY</strong> MO, the IPSec bypass function is not supported.</li></ul>
+</li><li>Relation with the <strong>ULFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>ULFLOWCTRLPARA</strong> MO whose <strong>BEAR</strong> is set to IP cannot be configured.</li></ul>
+</li><li>Relation with the <strong>DLFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>DLFLOWCTRLPARA</strong> MO whose <strong>BEAR</strong> is set to IP cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPULFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPULFLOWCTRLPARA</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPDLFLOWCTRLPARA</strong> MO:<ul><li>[Co-MPT, NodeB, eGBTS]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPDLFLOWCTRLPARA</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>GTMU</strong>, <strong>MPT</strong>, and <strong>APPLICATION</strong> MOs:<ul><li>[Co-MPT, eGBTS]The <strong>GTRANSPARA</strong> MOs with <strong>TRANSCFGMODE</strong> must be set to OLD when the <strong>Application</strong> MO with <strong>AT</strong> set to GBTS and the <strong>GTMU</strong> MO with <strong>TYPE</strong> set to GTMU are configured but the <strong>MPT</strong> MO with <strong>TYPE</strong> set to UMPT is not configured.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and the <strong>SIGIP2V4</strong> parameter in an <strong>SCTPHOST</strong> MO is valid, the <strong>IPADDR4</strong> MOs to which <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> belongs must be configured on the same subrack, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>PPPLNK</strong>, <strong>MPGRP</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, eNodeB]When <strong>SIGIP2V6</strong> is valid in an <strong>SCTPHOST</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, eNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li><li>[Co-MPT, eNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, <strong>ETHCIPORT</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[Co-MPT, eNodeB]If <strong>IPSECSWITCH</strong> is set to ENABLE for a <strong>USERPLANEHOST</strong> MO, <strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO must be configured on the same board as <strong>LOCIKEIPV4</strong> for the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>LANSWITCHPORT</strong> MO:<ul><li>[Co-MPT, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>LANSWITCHPORT</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>LSWPORT</strong> MO:<ul><li>[Co-MPT, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>LSWPORT</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>GPM</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>GPM</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>IPGPM</strong> MO:<ul><li>[Co-MPT, NodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>IPGPM</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>BFDSESSION</strong> MO:<ul><li>[Co-MPT, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, the <strong>BFDSESSION</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>BFD</strong> MO:<ul><li>[Co-MPT, eNodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, the <strong>BFD</strong> MO cannot be configured.</li></ul>
+</li><li>Relation with the <strong>SINGLEIPSWITCH</strong>, <strong>DEVIP</strong>, and <strong>IFIP</strong> MOs:<ul><li>[NodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, and <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, <strong>SINGLEIPSW</strong> and <strong>CM</strong> in a <strong>SINGLEIPSWITCH</strong> MO are set to ENABLE and PANEL_INTERCONNECT, respectively, ensure that a <strong>DEVIP</strong> MO corresponding to <strong>UIIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO is configured and that <strong>PT</strong> in the <strong>DEVIP</strong> MO is set to ETH. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, <strong>SINGLEIPSW</strong> and <strong>CM</strong> in a <strong>SINGLEIPSWITCH</strong> MO are set to ENABLE and PANEL_INTERCONNECT, respectively, ensure that an <strong>IFIP</strong> MO corresponding to <strong>UIIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO is configured and that <strong>PT</strong> in the <strong>IFIP</strong> MO is set to ETH.</li><li>[NodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to OLD, and <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION and <strong>SINGLEIPSW</strong> in a <strong>SINGLEIPSWITCH</strong> MO is set to ENABLE, ensure that a <strong>DEVIP</strong> MO corresponding to <strong>UOIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO is configured and that <strong>PT</strong> in the <strong>DEVIP</strong> MO is set to ETH or ETHTRK. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW and <strong>SINGLEIPSW</strong> in a <strong>SINGLEIPSWITCH</strong> MO is set to ENABLE, ensure that an <strong>IFIP</strong> MO corresponding to <strong>UOIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO is configured and that <strong>PT</strong> in the <strong>IFIP</strong> MO is set to ETH or ETHTRK.</li></ul>
+</li><li>Relation with the <strong>SINGLEIPSWITCH</strong>, <strong>IPADDR4</strong>, and <strong>INTERFACE</strong> MOs:<ul><li>[NodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW, and <strong>SINGLEIPSW</strong> is set to ENABLE and <strong>CM</strong> is set to PANEL_INTERCONNECT, the <strong>IPADDR4</strong> MO corresponding to <strong>UIIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO must exist and <strong>PT</strong> in the <strong>INTERFACE</strong> MO referenced by the <strong>IPADDR4</strong> MO must be set to ETH.</li><li>[NodeB]If <strong>TRANSCFGMODE</strong> in the <strong>GTRANSPARA</strong> MO is set to NEW,</li><li>and <strong>SINGLEIPSW</strong> in a <strong>SINGLEIPSWITCH</strong> MO is set to ENABLE, the <strong>IPADDR4</strong> MO corresponding to <strong>UOIP</strong> in the <strong>SINGLEIPSWITCH</strong> MO must exist and <strong>PT</strong> in the <strong>INTERFACE</strong> MO referenced by the <strong>IPADDR4</strong> MO must be set to ETH or ETHTRK.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>OMCH</strong>, and <strong>IPADDR4</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO in the same routing domain, <strong>IP</strong> in <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>BFDSESSION</strong>, <strong>DEVIP</strong>, and <strong>IFIP</strong> MOs:<ul><li>[gNodeB]<strong>SRCIP</strong> in a <strong>BFDSESSION</strong> MO to be added must have been configured. That is: (1) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, for the <strong>BFDSESSION</strong> MO and <strong>DEVIP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain. (2) If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, for the <strong>BFDSESSION</strong> MO and <strong>IFIP</strong> MO configured on the same board, <strong>SRCIP</strong> in the <strong>BFDSESSION</strong> MO must be the same as any of the following: <strong>IP</strong> in the <strong>IFIP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong> and <strong>DEVIP</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, before adding an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE, ensure that the <strong>DEVIP</strong> MO that meets both of the following conditions has been configured: (1) The <strong>DEVIP</strong> MO is in the same routing domain as the <strong>SCTPLNK</strong> MO. (2) <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO is the same as <strong>IP</strong> in the <strong>DEVIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>SCTPLNK</strong> and <strong>IPADDR4</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, before adding an <strong>SCTPLNK</strong> MO with <strong>CTRLMODE</strong> set to MANUAL_MODE, ensure that the <strong>IPADDR4</strong> MO that meets both of the following conditions has been configured: (1) The <strong>IPADDR4</strong> MO is in the same routing domain as the <strong>SCTPLNK</strong> MO. (2) <strong>LOCIP</strong> or <strong>SECLOCIP</strong> in the <strong>SCTPLNK</strong> MO is the same as <strong>IP</strong> in the <strong>IPADDR4</strong> MO.</li></ul>
+</li><li>Relation with the <strong>IPPMSESSION</strong> and <strong>DEVIP</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, if <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO is set to NO, the IP address corresponding to <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must have been configured. That is, for the <strong>IPPMSESSION</strong> MO, <strong>DEVIP</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must be the same as <strong>IP</strong> in the <strong>DEVIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> and <strong>DEVIP</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, the value of <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO must be the same as that of <strong>IP</strong> in a <strong>DEVIP</strong> MO configured in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong> and <strong>DEVIP</strong> MOs:<ul><li>[gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, <strong>LOCALIP</strong> in a <strong>TWAMPCLIENT</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> is <strong>IP</strong> of a <strong>DEVIP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>TWAMPRESPONDER</strong> and <strong>DEVIP</strong> MOs:<ul><li>[gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to OLD, <strong>LOCALIP</strong> in a <strong>TWAMPRESPONDER</strong> MO with <strong>IPVERSION</strong> set to IPv4 must have been configured. That is, <strong>LOCALIP</strong> is <strong>IP</strong> of a <strong>DEVIP</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>DHCPSVRIP</strong>, <strong>OMCH</strong>, <strong>DEVIP</strong>, and <strong>IFIP</strong> MOs:<ul><li>[gNodeB]If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to TRADITION, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>DEVIP</strong> MO. If <strong>MODELSELECT</strong> of <strong>GTRANSPARA</strong> is set to HOSTGW, the <strong>DHCPRELAYIP</strong> parameter in the <strong>DHCPSVRIP</strong> MO must be set to a valid IP address, and this IP address must be equal to any one value of the following parameters: <strong>IP</strong> in <strong>OMCH</strong> MO, <strong>IP</strong> in <strong>IFIP</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TWAMPCLIENT</strong> and <strong>IPADDR4</strong> MOs:<ul><li>[gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, <strong>IPVERSION</strong> in a <strong>TWAMPCLIENT</strong> MO is set to IPv4, <strong>LOCALIP</strong> in the <strong>TWAMPCLIENT</strong> MO must have been configured. That is, <strong>LOCALIP</strong> is <strong>IP</strong> of an <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>IPPMSESSION</strong> and <strong>IPADDR4</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, if <strong>BINDPATH</strong> in an <strong>IPPMSESSION</strong> MO is set to NO, the IP address corresponding to <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must have been configured. That is, for the <strong>IPPMSESSION</strong> MO, <strong>IPADDR4</strong> MO in the same routing domain, <strong>LOCALIP</strong> in the <strong>IPPMSESSION</strong> MO must be the same as <strong>IP</strong> in the <strong>IPADDR4</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong> and <strong>IPADDR4</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW, the value of <strong>LOCIPV4</strong> in a <strong>USERPLANEHOST</strong> MO must be the same as that of <strong>IP</strong> in an <strong>IPADDR4</strong> MO configured in the same routing domain.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[gNodeB]When <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and the <strong>SIGIP2V4</strong> parameter in an <strong>SCTPHOST</strong> MO is valid, the <strong>IPADDR4</strong> MOs to which <strong>SIGIP1V4</strong> and <strong>SIGIP2V4</strong> belongs must be configured on the same subrack, if the two IP addresses are not on the same board, the subboard type of the host IP addresses must be BASE_BOARD, and the bearing port type must be ETH, ETHTRK, or LOOPINT.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR6</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[gNodeB]When <strong>SIGIP2V6</strong> is valid in an <strong>SCTPHOST</strong> MO, the <strong>IPADDR6</strong> MOs for <strong>SIGIP1V6</strong> and <strong>SIGIP2V6</strong> of this MO must be configured on the same board.</li></ul>
+</li><li>Relation with the <strong>SCTPHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP1SECSWITCH</strong> is set to ENABLE, <strong>SIGIP1V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li><li>[gNodeB]In an <strong>SCTPHOST</strong> MO, if <strong>SIGIP2SECSWITCH</strong> is set to ENABLE, <strong>SIGIP2V4</strong> must be configured on the same board as <strong>LOCIKEIPV4</strong> in a referenced <strong>SCTPHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>USERPLANEHOST</strong>, <strong>IPADDR4</strong>, <strong>SECURITYHOST</strong>, <strong>INTERFACE</strong>, <strong>ETHPORT</strong>, <strong>ETHTRUNKLNK</strong>, and <strong>LOOPBACK</strong> MOs:<ul><li>[gNodeB]If <strong>IPSECSWITCH</strong> is set to ENABLE for a <strong>USERPLANEHOST</strong> MO, <strong>LOCIPV4</strong> for the <strong>USERPLANEHOST</strong> MO must be configured on the same board as <strong>LOCIKEIPV4</strong> for the referenced <strong>SECURITYHOST</strong> MO.</li></ul>
+</li><li>Relation with the <strong>TWAMPRESPONDER</strong> and <strong>IPADDR4</strong> MOs:<ul><li>[gNodeB]If <strong>TRANSCFGMODE</strong> in a <strong>GTRANSPARA</strong> MO is set to NEW and <strong>IPVERSION</strong> in a <strong>TWAMPRESPONDER</strong> MO is set to IPv4, <strong>LOCALIP</strong> of the <strong>TWAMPRESPONDER</strong> MO must have been configured. That is, <strong>LOCALIP</strong> of the <strong>TWAMPRESPONDER</strong> MO is <strong>IP</strong> of an <strong>IPADDR4</strong> MO in the same routing domain.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#GTRANSPARA__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="GTRANSPARA__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="GTRANSPARA__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ethciport.html">DSP ETHCIPORT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of an Ethernet CI port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_intercontopo.html">DSP INTERCONTOPO</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the interconnection topology between NEs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipsecbypasscfg.html">DSP IPSECBYPASSCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of the IPSec Bypass function.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipstat.html">DSP IPSTAT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the statistical information about transmitted and received IP packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_ipstat6.html">DSP IPSTAT6</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the statistical information about IPv6 transmitted and received IP packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/dsp_omconnpolicy.html">DSP OMCONNPOLICY</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query the status of the security policy of OM connections.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ethoam.html">LST ETHOAM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to query Ethernet OAM configuration. The Ethernet OAM complies with IEEE 802.1ag or ITU-T Y.1731.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_gtranspara.html">LST GTRANSPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the global transport-related parameters within a BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ipsecbypasscfg.html">LST IPSECBYPASSCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of the IPSec Bypass.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_modelselect.html">LST MODELSELECT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the selection of models.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_netstate.html">LST NETSTATE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list information about the working ports on a device.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_omconnpolicy.html">LST OMCONNPOLICY</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the configuration of security policy of OM connections.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_pingfiltermode.html">LST PINGFILTERMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to list the mode of the ping filter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_ethoam.html">SET ETHOAM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the Ethernet OAM protocol IEEE 802.1ag or ITU-T Y.1731.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_gtranspara.html">SET GTRANSPARA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the global transport parameters within a BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_ipsecbypass.html">SET IPSECBYPASS</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the parameters related to IPSec bypass so that a base station can switch between the IPSec network and the non-security network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_ipsecbypasscfg.html">SET IPSECBYPASSCFG</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the IPSec bypass function. If the IPSec bypass switch is turned on, the base station can switch between the IPSec network and the non-security network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_modelselect.html">SET MODELSELECT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the selection of models.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_omconnpolicy.html">SET OMCONNPOLICY</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the security policy of OM connections.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/set_pingfiltermode.html">SET PINGFILTERMODE</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to set the ping filtering mode.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/stp_transqualityrpt.html">STP TRANSQUALITYRPT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to stop counting transmission quality reports.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_transqualityrpt.html">STR TRANSQUALITYRPT</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start counting transmission quality reports. The transmission quality report collects information about packet reception and transmission on a transmission link, packet loss, error bits, and delay. The report is used for monitoring the transmission performance of a BS.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/str_vlandetection.html">STR VLANDETECTION</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>Use this command to start VLAN detection, which is used to check whether the peer transmission device connected to the base station uses the same VLAN ID for transmission and reception. This command is used only when the base station uses VLANMAP configuration mode. After this command is executed, the base station sends ARP packets to the next hop of the route and the peer IP addresses of the following types of packets in layer 2 networking: IKEPEER, OMCH, IPPATH, USERPLANEPEER, IPCLK, IPPMSESSION, TWAMP, BFDSSESION, BFD, DNSSRV, CA, DHCPSVRIP, FTP, NTP, and PTP. The base station checks whether the VLAN ID of the received ARP response packet is consistent with the VLAN ID of the sent ARP packet.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#GTRANSPARA__tab2">Table 2</a> and <a href="#GTRANSPARA__tab3">Table 3</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="GTRANSPARA__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="GTRANSPARA__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-LogicalPortSchWeightSw.html">Resource Group Scheduling Weight Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch used to control whether to allocate bandwidths to transmission resource groups on the physical port based on their scheduling weights. When RATECFGTYPE (the rate configuration type) is set to SINGLE_RATE and Physical Port Up Link OverBooking Switch or Physical Port Down Link OverBooking Switch is set to OFF, different values of this parameter lead to different bandwidth allocation methods as follows: (1) If this parameter is set to DISABLE and the sum of TX bandwidths of the associated resource groups exceeds the bandwidth of the physical port, each resource group is allocated a bandwidth that is directly proportional to its configured TX bandwidth; (2) If this parameter is set to ENABLE and the sum of TX bandwidths of the associated resource groups exceeds the bandwidth of the physical port, each resource group is allocated a bandwidth that is directly proportional to its scheduling weight. When RATECFGTYPE (the rate configuration type) is set to DUAL_RATE, different values of this parameter lead to different CIR allocation methods as follows: (1) If the sum of CIRs of the associated resource groups exceeds the bandwidth of the physical port, each resource group is allocated a CIR that is directly proportional to its configured CIR; (2) If the sum of CIRs of the associated resource groups is smaller than the bandwidth of the physical port, each resource group is allocated a non-CIR that is directly proportional to its scheduling weight. In this case, the PIR of a resource group is the sum of the CIR and the non-CIR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-RateCfgType.html">Rate Config Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the rate configuration mode of transmission resource groups in the BS, which can be set to SINGLE_RATE or DUAL_RATE. The dual rate configuration refers to the hybrid of the peak information rate (PIR) and committed information rate (CIR). If this parameter is set to SINGLE_RATE, the transmission resource group performs traffic shaping based on its transmit bandwidth. If this parameter is set to DUAL_RATE, the transmission resource group performs traffic shaping based on PIR and the transmission admission algorithm ensures that the non-flow-controllable traffic does not exceed CIR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-RoutingBackDelayTime.html">Switch Back Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period during which the active and standby routes are switched over twice. This period indicates the interval between the time single-hop BFD detects that an active route changes from DOWN to UP and the time the active route becomes available. During the switchover, if the previous standby route becomes faulty, the system waits for 10 seconds and then switches back to the active route.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-ArpAgingTime.html">ARP Aging Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the aging time of a dynamic ARP item of the BS. This parameter does not change the ARP aging time of the local maintenance Ethernet port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-PingFilterMode.html">Ping Filter Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the mode of the ping filtering. When the whitelist is used, only the network segments or hosts specified by the ping filter can ping the NE. When the blacklist is used, the network segments or hosts specified by the ping filter cannot ping the NE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-OAMType.html">Ethernet OAM Type</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the type of Ethernet OAM. The current Ethernet OAM type includes IEEE 802.1ag or ITU-T Y.1731 ETHOAM.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-MonitorPolicy.html">Monitor Policy</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the ITU-T Y.1731 monitoring policy. The monitoring policy includes the following values: PORTID_VLANID (based on PortID and VLANID), PORTID_VLANID_VLANPRI (based on PortID, VLANID, and VLAN PRI), SA_DA_VLANID (based on PortID, source MAC address, destination MAC address, and VLANID), SA_DA_VLANID_VLANPRI (based on PortID, source MAC address, destination MAC address, VLANID, and VLAN PRI), and SA_DA (based on PortID, source MAC address, and destination MAC address).</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-BypassSwitch.html">IPSec Bypass Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the switchover of IPSec Bypass. If this parameter is set to DISABLE, the base station cannot switch between an IPSec network and a non-IPSec network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-Password.html">IPSec Bypass Code</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the password used for switching the base station between an IPSec network and a non-IPSec network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-Status.html">IPSec Status</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the state of IPSec Bypass.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-OmchSwitchBack.html">OMCH Switch Back</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the OM channel supports switchback. This parameter is valid only when the OM channel is bound to a UDP session, UDP session group, or automatic UDP session detection. If this parameter is set to ENABLE and a switchover from the active OM channel to the standby OM channel has been triggered, an OM channel switchback is automatically triggered after a UDP session, UDP session group, or automatic UDP session detects that the active channel recovers. If this parameter is set to DISABLE and a switchover from the active OM channel to the standby OM channel has been triggered, an OM channel switchback will not be automatically triggered.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-OmchSwitchTime.html">OMCH Switch Back Wait Time</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the duration for the detection switching from the standby remote maintenance channel to the active remote maintenance channel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-ControlPortLoadBalanceSw.html">Control Port Load Balance Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether load sharing is enabled among control ports on multiple multi-core transmission boards. When this parameter is set to ENABLE and the base station is configured with multiple multi-core transmission boards, the base station assigns the SCTP associations to the boards based on their processing capabilities, but a UMPTe board can only share load with another UMPTe board, a UMPTg board can only share load with another UMPTg board, a UMPTga board can only share load with another UMPTga board.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-CpListeningMode.html">Control Port Listening Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether the control port supports the listening mode. If this parameter is set to ENABLE, the base station listens to the initial link establishment request of the peer SCTP for creating the control plane link. This parameter needs to be used with the EndPoint.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-SctpRtRptSw.html">SCTP Fault Real-time Reporting Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to report an SCTP link fault alarm in real time. If this parameter is set to ENABLE, the base station considers an SCTP link faulty when it detects that the SCTP link is disconnected. If this parameter is set to DISABLE, the base station starts a timer once it detects that an SCTP link is disconnected. If the base station detects that the SCTP link is disconnected for 18 seconds in the 30-second period, the base station considers that the SCTP link is faulty. Whether an alarm is reported is also determined by the alarm filtering parameter settings.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-DirectIpsecPriMatchSwitch.html">Direct IPSec Priorities Match Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch for preferentially matching the IPSec policy of the directly connected IPv4 IPSec in end point mode. The IPSec policy of a direct IPSec tunnel is automatically generated and the IKE peer on which the IPSec policy depends is also automatically generated. Other types of IPSec policies belong to non-direct IPSec tunnels. When this parameter is set to ENABLE(Enable), the IPSec policy of a direct IPSec tunnel is preferentially matched. If the direct IPSec tunnel corresponding to the IPSec policy is faulty in this case, IPSec policies of other non-direct IPSec tunnels are preferentially matched. When this parameter is set to DISABLE(Disable), the matching is performed based on the default priorities, that is, the IPSec policy with a smaller sequence number is preferentially matched. This parameter takes effect only for LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-TransCfgMode.html">Transmission Configuration Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the configuration mode of the transmission model. The transmission model can be configured in old or new mode.</p>
+<p>In old mode, the transmission model contains information such as cabinet, subrack, and slot numbers. Transmission configurations are bound to device boards.</p>
+<p>In new mode, the transmission model has decoupled transmission and device models, That is, transmission configurations are not bound to device boards. This facilitates the addition of new transmission functions and reduces transmission configuration parameters.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-IpErrFrameSwitch.html">IP Frame Error Rate Alarm Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the switch controlling ALM-25897 IP Excessive Frame Error Rate. When this switch is set to ENABLE, this alarm is detected and reported when the reporting conditions are met.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-IpErrFrameAppearThres.html">IP Frame Error Rate Occur Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the generation threshold of ALM-25897 IP Excessive Frame Error Rate. If IP Frame Error Rate Alarm Switch is set to ENABLE, this alarm is reported when the number of errored IP frames exceeds this threshold within ten minutes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-IpErrFrameDisappearThres.html">IP Frame Error Rate Clear Threshold</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the clearance threshold of ALM-25897 IP Excessive Frame Error Rate. If this alarm is reported, this alarm is cleared when the number of errored IP frames is less than this threshold within ten minutes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-VLANID.html">VLAN ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the VLAN tag used by an NE in the Cloud BB network for communicating with other NEs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-ForwardMode.html">Forward Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the forwarding mode flag. If this parameter is set to HOST, inter-port data routing and forwarding is disabled on the panel, and intra-port data routing and forwarding is also disabled on the panel. If this parameter is set to ROUTE, inter-port data routing and forwarding is enabled on the panel.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-SamePortForwardSW.html">Same Port Forward Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable intra-port data routing and forwarding on the panel. Intra-port forwarding means that after being routed and forwarded, the packets received through a port are transmitted from the same port.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-OnlyOMIP.html">Enable Access to NE Using Maintenance IP Addresses Only</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable only the maintenance of IP (OMCH IP and local IP) access to the network is enabled under the IPV4 group network. This parameter does not take effect when OMCH IP is not configured. It is recommended to enable only the maintenance of IP access elements, or there may be security risks. When an IPv6 OM channel configured, the configured value of the Enable Access to NE Using Maintenance IP Addresses Only parameter is invalid and the function of allowing only the access using the maintenance IP access is enabled.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-DNSPeriod.html">DNS Period</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the period of DNS check. If this parameter value is not 0, the system adds a random time of 0 minutes to 30 minutes to the DNS check period. If this parameter value is 0, the system does not perform DNS check. This parameter takes effect only for LTE and NR.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-EPAutoConfigSwitch.html">Endpoint Object Auto-configure Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the automatic configuration function of the end point-related MOs.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-EPCfgMode.html">End Point Configure Mode</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the configuration mode of an end point object, including S1SIMPLE_MODE(S1 Simple Mode), X2SIMPLE_MODE(X2 Simple Mode) and EX2SIMPLE_MODE(eX2 Simple Mode). This parameter can be set to one or multiple values. The parameter takes effect only in LTE.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-PortModeAutoSwitch.html">Port Mode Auto Switch</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates whether to enable the port mode (data rate and duplex mode) adaptation function for an optical Ethernet port that carries traffic through the remote maintenance channel. When this switch is enabled, the base station uses the port mode adaptation function to restore the remote maintenance channel if the inconsistent port modes between the local and peer ends cause the remote maintenance channel interruption after a base station reset.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/GTRANSPARA-ModelSelect.html">Model Select</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates which transmission configuration MOs and parameters are to be used. When the system supports extended NEs or when the OM model must be consistent with that of extended NEs, set this parameter to HOSTGW(Host-Gateway Mode). In other scenarios, set this parameter to TRADITION(Traditional Mode) (default value).</p>
+<p>When Transmission Configuration Mode is set to OLD(Old):</p>
+<p>The following MOs or parameters are controlled in traditional mode:</p>
+<p>-	DEVIP MO</p>
+<p>-	Resource Group Scheduling Weight Switch, Rate Config Type, Switch Back Time, ARP Aging Time, Ping Filter Mode, Number of Packets Discarded Due to Fragmentation Failures, Ethernet OAM Type, Monitor Policy, IP Frame Error Rate Alarm Switch, IP Frame Error Rate Occur Threshold, IP Frame Error Rate Clear Threshold, Forward Mode, Same Port Forward Switch, and Port Mode Auto Switch in the GTRANSPARA MO</p>
+<p>-	IP Clock Priority in the DIFPRI MO</p>
+<p>-	Physical Port Up Link OverBooking Switch, Physical Port Down Link OverBooking Switch, Physical Port Up Link Admission Switch, and Physical Port Down Link Admission Switch in the TACALG MO</p>
+<p>Only in traditional mode, a non-loopback DEVIP MO can be configured and the preceding parameters in other MOs can take effect.</p>
+<p>The IFIP and GTRANSPARAGW MOs are controlled in host-gateway mode. Only in this mode, an IFIP MO can be configured and the parameters in the GTRANSPARAGW MO can take effect.</p>
+<p>After this parameter value is modified, the NE must be reset to validate the controlled parameters.</p>
+<p>When Transmission Configuration Mode is set to NEW(New), the DEVIP and IFIP MOs are no longer controlled. Other controlled MOs and parameters are the same as those when Transmission Configuration Mode is set to OLD(Old).</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
+
+<div class="tablenoborder"><a name="GTRANSPARA__tab3"></a><a name="tab3"></a><table cellpadding="4" cellspacing="0" summary="" id="GTRANSPARA__tab3" frame="border" border="1" rules="all"><caption><b>Table 3 </b>Dynamic parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.4.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.4.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-BatchFailPkt.html">Number of Packets Discarded Due to Fragmentation Failures</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded due to fragmentation failures on the transmitter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InEncryptedPkt.html">Total Number of Encrypted Packets Received at the IP Layer of the Receiver</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received packets that have been encrypted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InDecryptSucceedPkt.html">Number of Packets Successfully Decrypted at the IP Layer of the Receiver</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets that have been successfully decrypted at the receiver.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InEspDecryptFailPkt.html">Total Number of Packets Failed in ESP Decryption at the IP Layer of the Receiver Hardware</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received packets that fail the ESP-based decryption.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InEspAuthFailPkt.html">Total Number of Packets Failed in ESP Authentication at the IP Layer of the Receiver Hardware</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received packets that fail the ESP-based authentication. The parameter takes effect only in UMPT.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InAhAuthFailPkt.html">Total Number of Packets Failed in AH Authentication at the IP Layer of the Receiver Hardware</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received packets that fail the AH-based authentication.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InShouldNotEncryptedPkt.html">Total Number of Packets Discarded at the IP Layer of the Receiver Due to Having Been Encrypted</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received packets that should not have been encrypted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InTotalPkt.html">Total Number of Packets Received by the Decryption Module of the Receiver</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of packets received by the decryption module of the receiver at the IP layer.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InDecryptFailPkt.html">Number of Failing Decrypted Packets at the Receiver</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of packets that fail decryption at the IP layer of the receiver.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InWrongSIPEncryptedPkt.html">Total Number of Packets Discarded at the IP Layer of the Receiver Due to Invalid Source IP Addresses</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of encrypted packets received by the IP layer of the receiver from invalid IP addresses.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InAntiReplayDropPkt.html">Total Number of Packets Discarded at the IP Layer of the Receiver Due to Replay Attacks</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of packets discarded at the IP layer of the receiver due to replay attacks.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InSaMissDropPkt.html">Total Number of Packets Discarded at the IP Layer of the Receiver Due to No Inbound SA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of packets discarded at the IP layer of the receiver due to a lack of inbound SA.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InUnsupportAhAlgDropPkt.html">Total Number of Packets Discarded at the IP Layer of the Receiver Due to Unsupported AH Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of packets discarded because the IP layer of the receiver does not support the AH algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InUnsupportEspAlgDropPkt.html">Total Number of Packets Discarded at the IP Layer of the Receiver Due to Unsupported ESP Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of packets discarded because the IP layer of the receiver does not support the ESP algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InUnEncryptedPkt.html">Total Number of Plain Packets Received at the IP Layer of the Receiver</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of plain packets received at the IP layer of the receiver.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InShouldEncryptedPkt.html">Number of Packets Discarded at the IP Layer of the Receiver Due to not Being Encrypted</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets received at the IP layer that comply with ACL rules and should have been encrypted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutEncryptSucceedPkt.html">Number of Packets Successfully Encrypted at the IP Layer of the Transmitter</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted packets that are successfully encrypted.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutEncryptFailPkt.html">Total Number of Packets Failed to Be Encrypted at the IP Layer of the Transmitter</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets that fail to be encrypted at the transmitter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutTotalPkt.html">Total Number of Packets Received by the Encryption Module of the Transmitter</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the total number of packets received by the encryption module of the transmitter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutNeedEncryptPkt.html">Number of Packets That Should be Encrypted at the Transmitter</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets that need to be encrypted at the transmitter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutSaMissDropPkt.html">Total Number of Packets Discarded at the IP Layer of the Transmitter due to No Outbound SA</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded at the transmitter because the outbound SAs do not exist.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutUnsupportAhAlgDropPkt.html">Total Number of Packets Discarded at the IP Layer of the Transmitter Due to Unsupported AH Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded because the transmitter does not support the AH algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutUnsupportEspAlgDropPkt.html">Total Number of Packets Discarded at the IP Layer of the Transmitter Due to Unsupported ESP Algorithm</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded because the transmitter does not support the ESP algorithm.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutAhAuthFailPkt.html">Total Number of Packets Failed in AH Authentication at the IP Layer of the Transmitter Hardware</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets that fail the AH-based authentication at the transmitter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutEspDecryptFailPkt.html">Total Number of Packets Failed in ESP Encryption at the IP Layer of the Transmitter</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted packets that fail ESP encryption.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutSeqOverflowDropPkt.html">Total Number of Packets Discarded at the IP Layer of the Transmitter Due to SN Overflow</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets discarded due to transmitting sequence number overflow.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutNoNeedEncryptPkt.html">Total Number of Packets That Should Not Have Been Encrypted at the IP Layer of the Transmitter</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of packets that do not need to be encrypted at the transmitter.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-MstSeGWIP.html">Master SeGW IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IP address of the active security gateway when the base station is located in an IPSec network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-SlvSeGWIP.html">Slave SeGW IP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the IP address of the standby security gateway when the base station is located in an IPSec network.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InICMPPortUnreachPkt.html">Number of Received ICMP Port Unreachable Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received ICMP port unreachable packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InICMPReqPkt.html">Number of Received ICMP Request Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received ICMP echo request packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InICMPReplyPkt.html">Number of Received ICMP Reply Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received ICMP echo reply packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutICMPPortUnreachPkt.html">Number of Transmitted ICMP Port Unreachable Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted ICMP port unreachable packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutICMPReqPkt.html">Number of Transmitted ICMP Request Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted ICMP echo request packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutICMPReplyPkt.html">Number of Transmitted ICMP Reply Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted ICMP echo reply packets.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-InUDPPingPkt.html">Number of Received UDP Ping Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of received UDP ping packets. This parameter is valid only in GSM and UMTS modes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-OutUDPPingPkt.html">Number of Transmitted UDP Ping Loop Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of transmitted UDP ping loop packets. This parameter is valid only in GSM and UMTS modes.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.4.2.3.1.1 "><a href="../para/GTRANSPARA-ByPassPkt.html">Number of Bypass Packets</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.4.2.3.1.2 "><p>Indicates the number of bypass packets at the IP layer.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

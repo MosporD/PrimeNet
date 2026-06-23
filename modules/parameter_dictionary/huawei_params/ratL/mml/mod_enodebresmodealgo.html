@@ -1,0 +1,253 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify eNodeBResModeAlgo (MOD ENODEBRESMODEALGO)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_enodebresmodealgo">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify eNodeBResModeAlgo (MOD ENODEBRESMODEALGO)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_enodebresmodealgo"></a><a name="mod_enodebresmodealgo"></a>
+
+
+<h1 class="topictitle1">Modify eNodeBResModeAlgo (MOD ENODEBRESMODEALGO)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_enodebresmodealgo__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to specify the eNodeBResModeAlgo.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_enodebresmodealgo__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>If the BbpResAutoConfigSw parameter setting is changed to ON(On) on an eNodeB and all cells are successfully activated, the BasebandEqmId parameter setting will be automatically changed to bind cells with baseband resources.</p>
+</li><li><p>When the BbResExclusiveSwitch parameter is set to ON(On), BBPs cannot be shared among cells if the baseband resources and cells are automatically bound.</p>
+</li><li><p>Before changing the setting of CPRI Sharing Switch from ON to OFF, deactivate all the cells using CPRI sharing. Otherwise, the cells will be deactivated after the setting of CPRI Sharing Switch is changed from ON to OFF, and each of the cells will be reestablished on the BBP where the CPRI port of the cell is located.</p>
+</li><li><p>Changing the values of EnbCellDstDeploySw parameter and eNBCellNumCapabilityMode parameter affects the maximum number of cells supported by the eNodeB. You must reset the main control board to make the settings to take effect. If the main control board is not reset 10 minutes after the parameter setting is changed, ALM-26245 Configuration Data Inconsistency is reported.</p>
+</li><li><p>The eNBCellNumCapabilityMode parameter cannot be set to ENHANCED_MODE in BBU interconnection scenarios.</p>
+</li><li><p>Changing the value of AI_ENHANCEMENT_SWITCH switch or UMPTB_ENHANCEMENT_SWITCH switch of ServiceMode parameter. You must reset APP to make the settings to take effect. If the APP is not reset 10 minutes after the parameter setting is changed, ALM-26245 Configuration Data Inconsistency is reported.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_enodebresmodealgo__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-BbpResAutoConfigSw.html">BbpResAutoConfigSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BBP Resource Auto Config Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to automatically or manually bind a baseband equipment ID to a cell. If this parameter is set to ON, the eNodeB automatically changes the BaseBandEqmId parameter value within 5 minutes after all cells are successfully activated, to bind the cells to baseband resources. If this parameter is set to ON_BIND, the eNodeB periodically changes the BaseBandEqmId parameter value for all activated cells to bind the cells to baseband resources. If a BASEBANDEQM MO has been configured for each BBP, the automatic baseband allocation algorithm can take effect. If a BASEBANDEQM MO is not configured for each BBP, the eNodeB automatically configures a BASEBANDEQM MO for each BBP. The MO contains information about only the corresponding BBP. If the automatic configuration fails due to causes such as a specification limit of the baseband equipment, the automatic baseband allocation algorithm does not take effect.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON), ON_BIND(ON_BIND)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON, ON_BIND</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>When the BbResExclusiveSwitch parameter is set to ON(ON), BBPs cannot be shared among cells if the baseband resources and cells are automatically bound. Therefore, it is recommended that this parameter be set to OFF(Off) if the BbpResAutoConfigSw parameter is set to ON(ON).</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-TddBbpResDeployAlgo.html">TddBbpResDeployAlgo</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">TDD BBP Resource Auto Deploy Algorithm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the baseband resource allocation policy for LTE TDD cells. If this parameter is set to RESOURCE_PRIMARY, baseband resources are preferentially allocated based on the minimum resource allocation policy, ensuring that baseband resources can be allocated to as many cells as possible. If this parameter is set to LOAD_BALANCE, the eNodeB allocates baseband resources to cells based on the principle of load balancing to ensure that a cell obtains as many baseband resources as possible. If this parameter is set to ADAPTIVE, the eNodeB automatically allocates baseband resources to cells based on the number of cells. This parameter applies only to LTE TDD.</p>
+<p>GUI Value Range: ADAPTIVE(ADAPTIVE), RESOURCE_PRIMARY(RESOURCE_PRIMARY), LOAD_BALANCE(LOAD_BALANCE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ADAPTIVE, RESOURCE_PRIMARY, LOAD_BALANCE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ADAPTIVE(ADAPTIVE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-FddBbpResDeployAlgo.html">FddBbpResDeployAlgo</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">FDD BBP Resource Auto Deploy Algorithm</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the baseband resource allocation policy for FDD cells. If this parameter is set to RESOURCE_PRIMARY, baseband resources are allocated preferentially based on the minimum resource allocation policy, ensuring that baseband resources can be allocated to as many cells as possible. If this parameter is set to LOAD_BALANCE, baseband resources are allocated to cells preferentially based on the principle of load balancing, ensuring that cells obtain as many baseband resources as possible. If this parameter is set to ADAPTIVE, baseband resources are automatically allocated to cells based on the number of cells. If this parameter is set to ADAPTIVE_POLICY1, baseband resources are automatically allocated to cells based on the number of cells. In addition, resources are allocated preferentially in load balancing mode to both common cells and physical cells in SFN cells if these cells are established on UBBP boards. This parameter applies only to LTE FDD and NB-IoT.</p>
+<p>GUI Value Range: ADAPTIVE(ADAPTIVE), RESOURCE_PRIMARY(RESOURCE_PRIMARY), LOAD_BALANCE(LOAD_BALANCE), ADAPTIVE_POLICY1(ADAPTIVE_POLICY1)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ADAPTIVE, RESOURCE_PRIMARY, LOAD_BALANCE, ADAPTIVE_POLICY1</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ADAPTIVE(ADAPTIVE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-BbpResAutoRecfgTimer.html">BbpResAutoRecfgTimer</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">BBP Resource Auto Reconfig Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum period of time available for cell activation on the bound BBP. When a cell fails to be activated within this period and the BbpResAutoConfigSw parameter is set to ON(On), the eNodeB automatically allocates available baseband resources to the cell until the cell is successfully activated. This parameter is also used to specify the internal protection time length, which is the value of this parameter minus 8 minutes. During the internal protection time, a cell fails to be activated if a fault occurs in the baseband resources bound to the cell or the baseband resources bound to the cell are occupied by another cell.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: min</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-eNBCellNumCapabilityMode.html">eNBCellNumCapabilityMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eNodeB Cell Number Capability Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates how to define the maximum number of cells on a single base station. If this parameter is set to NORMAL_MODE, a single UMPTa or UMPTb supports a maximum of 36 cells, a single UMPTga supports a maximum of 72 cells, and a single UMPTg supports a maximum of 144 cells. If this parameter is set to ENHANCED_MODE, two UMPTa or UMPTb boards in a single base station support a maximum of 48 cells, two UMPTga boards in a single base station support a maximum of 144 cells, and two UMPTg boards in a single base station support a maximum of 216 cells. This parameter is a base-station-level parameter and applies only to UMPTa, UMPTb, UMPTga, and UMPTg boards.</p>
+<p>GUI Value Range: NORMAL_MODE(NORMAL_MODE), ENHANCED_MODE(ENHANCED_MODE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NORMAL_MODE, ENHANCED_MODE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: NORMAL_MODE(NORMAL_MODE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-BbpCpriSharingSwitch.html">BbpCpriSharingSwitch</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CPRI Sharing Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to support CPRI sharing between baseband processing units (BBPs). When this parameter is set to ON, CPRI sharing is supported and CPRI ports of a BBP or CPRI interface board are shared between specified BBPs to enable baseband processing to be independent of CPRI ports. When this parameter is set to OFF, CPRI sharing is not supported.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(On)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to ON, there is no impact on the cells that have already been established. When this parameter is set to OFF, all cells using CPRI sharing are deactivated and each of them is reestablished on the BBP where the CPRI port for the cell is located.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-EnbCellDstDeploySw.html">EnbCellDstDeploySw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">eNodeB Cell Distributed Deployment Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable distributed cell deployment. This parameter takes effect only when a base station is equipped with two main control boards. If this parameter is set to ON, the cell management function can be deployed on two UMPT boards or UMPT+LMPT boards to increase the cell number capacity. If this parameter is set to OFF, the cell management function is deployed only on the primary UMPT.</p>
+<p>GUI Value Range: OFF(OFF), ON(ON)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: OFF(OFF)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: N/A</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-BackplaneBwLackProtectSw.html">BackplaneBwLackProtectSw</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Backplane Bandwidth Lack Protection Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicate whether to establish cells with reduced capacity if the backplane bandwidth is insufficient. If this parameter is set to ON(On) and the backplane bandwidth is insufficient, cells are not established with reduced capacity. If this parameter is set to OFF(Off) and the backplane bandwidth is insufficient, cells are established with reduced capacity. It is recommended that this parameter be set to ON(On) if the IR protocol is used. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(OFF), ON(On)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, ON</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: ON(ON)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/eNodeBResModeAlgo-ServiceMode.html">ServiceMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Service Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the service running mode of the eNodeB. The product specifications vary according to the serving running mode.</p>
+<p>AI_ENHANCEMENT_SWITCH: If this option is selected and the UMPTe or UMPTga board is used, the eNodeB works under the enhanced product specifications applicable when smart features are activated. If this option is deselected, the eNodeB works under the normal product specifications applicable when smart features are deactivated.</p>
+<p>UMPTB_ENHANCEMENT_SWITCH: If this option is selected and UMPTb is used, the eNodeB works under the enhanced product specifications applicable when intelligent features are activated. If this option is deselected, the eNodeB works under the normal product specifications applicable when intelligent features are deactivated.</p>
+<p>GUI Value Range: AI_ENHANCEMENT_SWITCH(AI_ENHANCEMENT_SWITCH), UMPTB_ENHANCEMENT_SWITCH(UMPTB_ENHANCEMENT_SWITCH)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: AI_ENHANCEMENT_SWITCH, UMPTB_ENHANCEMENT_SWITCH</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: AI_ENHANCEMENT_SWITCH:Off, UMPTB_ENHANCEMENT_SWITCH:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: The UE number and signaling specifications of the main control board may change when the parameter setting is changed.</p>
+<p>AI_ENHANCEMENT_SWITCH: If this option is deselected, the default UE number and signaling specifications are used. If this option is selected, the UE number and signaling specifications used are those available when intelligent features are activated.</p>
+<p>UMPTB_ENHANCEMENT_SWITCH: If this option is deselected, the default UE number and signaling specifications are used. If this option is selected, the UE number and signaling specifications used are those available when intelligent features are activated.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_enodebresmodealgo__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify ENODEBRESMODEALGO as follows: BbpResAutoRecfgTimer: 9, run the following command:
+MOD ENODEBRESMODEALGO: BbpResAutoRecfgTimer=9;
+The result is shown as follows:
++++    0        2015-03-31 15:21:03
+O&amp;M    #806354949
+%%MOD ENODEBRESMODEALGO: BbpResAutoRecfgTimer=9;%%
+RETCODE = 0  Operation succeeded.
+
+
+---    END</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

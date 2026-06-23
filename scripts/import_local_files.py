@@ -30,9 +30,9 @@ import re
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sync.db_migration import run_migrations
-from sync.metadata_processor import process_metadata_file, seed_pm_cells_to_metadata
-from sync.pm_processor import process_nokia_pm_file, process_huawei_pm_file, NOKIA_PM_DB, HUAWEI_PM_DB
+from modules.sync.db_migration import run_migrations
+from modules.sync.metadata_processor import process_metadata_file, seed_pm_cells_to_metadata
+from modules.sync.pm_processor import process_nokia_pm_file, process_huawei_pm_file, NOKIA_PM_DB, HUAWEI_PM_DB
 from sync_config import (
     METADATA_CSV_COLUMN_MAPS,
     PROJECT_ROOT

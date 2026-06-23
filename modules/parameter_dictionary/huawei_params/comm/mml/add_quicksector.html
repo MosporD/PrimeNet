@@ -1,0 +1,897 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Quick Sector (ADD QUICKSECTOR)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_quicksector">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Quick Sector (ADD QUICKSECTOR)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_quicksector"></a><a name="add_quicksector"></a>
+
+
+<h1 class="topictitle1">Add Quick Sector (ADD QUICKSECTOR)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="add_quicksector__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to quickly create sectors and sector equipment.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_quicksector__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>When Sector Mode is set to SINGLE_SECTOR(Single Sector), all sector equipment belongs to one sector. When Sector Mode is set to MULTI_SECTOR(Multi Sectors), each set of sector equipment belongs to one sector.</p>
+</li><li><p>If RRUMODE is set to CONTINUE, only RRUs in slot 0 of cabinet 0 can be used. The value CONTINUE indicates that the RRU subrack numbers are arranged in sequential order. If RRUMODE is set to UNCONTINUE, there is no special limitation on the cabinet No., subrack No., and slot No. of RRUs used.</p>
+</li><li><p>Each RRU belongs to one set of sector equipment. RRU antennas are added to a set of sector equipment based on the numbers of TX and RX RRU antennas in each sector equipment set. The antenna channel is numbered from R0A.</p>
+</li><li><p>After the command is executed, you can run the <a href="lst_sector.html">LST SECTOR</a> and <a href="lst_sectoreqm.html">LST SECTOREQM</a> commands to query the configuration information of sectors and sector equipment, run the <a href="mod_sector.html">MOD SECTOR</a> and <a href="mod_sectoreqm.html">MOD SECTOREQM</a> commands to modify the configuration of sectors and sector equipment, and run the <a href="rmv_sector.html">RMV SECTOR</a> and <a href="rmv_sectoreqm.html">RMV SECTOREQM</a> commands to remove the configuration of sectors and sector equipment.</p>
+</li><li><p>Sector equipment cannot be added with ANTCFGMODE set to BEAM.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_quicksector__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorMode.html">SECMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to add a single sector or multiple sectors.</p>
+<p>GUI Value Range: SINGLE_SECTOR(Single Sector), MULTI_SECTOR(Multi Sectors)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: SINGLE_SECTOR, MULTI_SECTOR</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorID.html">SECTORID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of a sector.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>SECMODE</strong> is set to SINGLE_SECTOR.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorIDBegin.html">SECTORIDBEGIN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector ID (Begin)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start number of multiple consecutively numbered sectors. The total number of sectors and sector equipment are the same.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>SECMODE</strong> is set to MULTI_SECTOR.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-locationName.html">LOCATIONNAME</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Location Name</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the location name of the base station. Generally, the LocationName parameter is set to the same value for all sectors in an RF site, and base station can acquire the location information of RF modules through this parameter. However, if the LocationName parameter of the RF module is set in the RRU or AAS MO, the base station will acquire the location information of RF modules through the RRU or AAS MO.</p>
+<p>GUI Value Range: 0~64 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~64 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruMode.html">RRUMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode in which RRUs are numbered.</p>
+<p>GUI Value Range: CONTINUE(Continuous Number), UNCONTINUE(Uncontinuous Number)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: CONTINUE, UNCONTINUE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorEqmIDBegin.html">SECTOREQMIDBEGIN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment ID (Begin)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the start number of the sector equipment.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to CONTINUE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of <strong>SECTOREQMIDEND</strong> must be larger than the value of <strong>SECTOREQMIDBEGIN</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The difference between the values of <strong>SECTOREQMIDEND</strong> and <strong>SECTOREQMIDBEGIN</strong> must be equal to the difference between the values of <strong>SRNE</strong> and <strong>SRNB</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorEqmIDEnd.html">SECTOREQMIDEND</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment ID (End)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the end number of the sector equipment.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to CONTINUE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of <strong>SECTOREQMIDEND</strong> must be larger than the value of <strong>SECTOREQMIDBEGIN</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The difference between the values of <strong>SECTOREQMIDEND</strong> and <strong>SECTOREQMIDBEGIN</strong> must be equal to the difference between the values of <strong>SRNE</strong> and <strong>SRNB</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruBeginCN.html">CNB</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No. of RRU (Begin)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses the first RRU.</p>
+<p>GUI Value Range: 0</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to CONTINUE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruBeginSRN.html">SRNB</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No. of RRU (Begin)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses the first RRU.</p>
+<p>GUI Value Range: 60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to CONTINUE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of <strong>SRNE</strong> must be larger than the value of <strong>SRNB</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The difference between the values of <strong>SECTOREQMIDEND</strong> and <strong>SECTOREQMIDBEGIN</strong> must be equal to the difference between the values of <strong>SRNE</strong> and <strong>SRNB</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruBeginSN.html">SNB</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No. of RRU (Begin)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding the first RRU.</p>
+<p>GUI Value Range: 0</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to CONTINUE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruEndCN.html">CNE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No. of RRU (End)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses the last RRU.</p>
+<p>GUI Value Range: 0</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to CONTINUE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruEndSRN.html">SRNE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No. of RRU (End)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses the last RRU.</p>
+<p>GUI Value Range: 60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to CONTINUE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The value of <strong>SRNE</strong> must be larger than the value of <strong>SRNB</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]The difference between the values of <strong>SECTOREQMIDEND</strong> and <strong>SECTOREQMIDBEGIN</strong> must be equal to the difference between the values of <strong>SRNE</strong> and <strong>SRNB</strong>.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruEndSN.html">SNE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No. of RRU (End)</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding the last RRU.</p>
+<p>GUI Value Range: 0</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to CONTINUE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruNum.html">RRUNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of RRUs.</p>
+<p>GUI Value Range: 1~6</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~6</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUMODE</strong> is set to UNCONTINUE.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-CabinetNo1.html">CN1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No. 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses RRU1.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 1 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SubrackNo1.html">SRN1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No. 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses RRU1.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 1 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SlotNo1.html">SN1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No. 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding RRU1.</p>
+<p>GUI Value Range: 0~8,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 1 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorEqmID1.html">SECTOREQMID1</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment ID 1</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the sector equipment that contains the antenna for RRU1.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 1 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-CabinetNo2.html">CN2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No. 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses RRU2.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 2 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SubrackNo2.html">SRN2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No. 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses RRU2.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 2 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SlotNo2.html">SN2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No. 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding RRU2.</p>
+<p>GUI Value Range: 0~8,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 2 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorEqmID2.html">SECTOREQMID2</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment ID 2</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the sector equipment that contains the antenna for RRU2.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 2 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-CabinetNo3.html">CN3</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No. 3</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses RRU3.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 3 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SubrackNo3.html">SRN3</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No. 3</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses RRU3.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 3 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SlotNo3.html">SN3</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No. 3</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding RRU3.</p>
+<p>GUI Value Range: 0~8,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 3 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorEqmID3.html">SECTOREQMID3</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment ID 3</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the sector equipment that contains the antenna for RRU3.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 3 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-CabinetNo4.html">CN4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No. 4</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses RRU4.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 4 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SubrackNo4.html">SRN4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No. 4</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses RRU4.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 4 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SlotNo4.html">SN4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No. 4</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding RRU4.</p>
+<p>GUI Value Range: 0~8,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 4 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorEqmID4.html">SECTOREQMID4</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment ID 4</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the sector equipment that contains the antenna for RRU4.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 4 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-CabinetNo5.html">CN5</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No. 5</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses RRU5.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 5 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SubrackNo5.html">SRN5</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No. 5</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses RRU5.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 5 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SlotNo5.html">SN5</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No. 5</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding RRU5.</p>
+<p>GUI Value Range: 0~8,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 5 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorEqmID5.html">SECTOREQMID5</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment ID 5</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the sector equipment that contains the antenna for RRU5.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to a value within the range of 5 to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-CabinetNo6.html">CN6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No. 6</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the cabinet that houses RRU6.</p>
+<p>GUI Value Range: 0~62</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~62</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SubrackNo6.html">SRN6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No. 6</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the subrack that houses RRU6.</p>
+<p>GUI Value Range: 4~5,60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 4~5,60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SlotNo6.html">SN6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No. 6</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the slot holding RRU6.</p>
+<p>GUI Value Range: 0~8,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8,255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-SectorEqmID6.html">SECTOREQMID6</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Sector Equipment ID 6</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the sector equipment that contains the antenna for RRU6.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]This parameter is valid only when <strong>RRUNUM</strong> is set to 6.</li></ul>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruTxAntNum.html">RRUTXANTNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU TX Antenna Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of TX antennas on an RRU that are added to a sector and sector equipment. These antenna channels are numbered from R0A.</p>
+<p>GUI Value Range: 1~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/QuickSector-RruRxAntNum.html">RRURXANTNUM</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">RRU RX Antenna Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of RX antennas on an RRU that are added to a sector and sector equipment. These antenna channels are numbered from R0A.</p>
+<p>GUI Value Range: 0~8</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~8</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N, R</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_quicksector__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To quickly add sectors and sector equipment with the parameters as follows: Sector Mode: MULTI_SECTOR, Sector ID (Begin): 0, RRU Mode: CONTINUE, Sector Equipment ID (Begin): 0, Sector Equipment ID (End): 1, Subrack No. of RRU (Begin): 60, Subrack No. of RRU (End): 61, RRU TX Antenna Number: 1, and RRU RX Antenna Number: 2, run the following command:
+ADD QUICKSECTOR: SECMODE=MULTI_SECTOR, SECTORIDBEGIN=0, RRUMODE=CONTINUE, SECTOREQMIDBEGIN=0, SECTOREQMIDEND=1, SRNB=60, SRNE=61, RRUTXANTNUM=1, RRURXANTNUM=2;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

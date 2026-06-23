@@ -1,0 +1,137 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="paramref">
+<meta name="DC.Title" content="ULOCELLSECEQMGRP">
+<meta name="product" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+<meta name="audience" content="">
+<meta name="audience" content="">
+<meta name="DC.Audience.Job" content="Planning">
+<meta name="DC.Audience.Job" content="Configuration">
+<meta name="prodname" content="DBS3900;DBS5900;BTS3900;BTS5900;BTS3900L;BTS5900L;BTS3900A;BTS5900A;BTS3900AL;BTS5900AL;BTS3900C;DBS3900 LampSite;DBS5900 LampSite">
+
+<meta name="Mode" content="UMTS">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="ULoCellSecEqmGrp">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>ULOCELLSECEQMGRP</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="ULoCellSecEqmGrp"></a><a name="ULoCellSecEqmGrp"></a>
+
+
+<h1 class="topictitle1">ULOCELLSECEQMGRP</h1>
+
+<div>
+<div class="section"><pre>
++-<a href="../../comm/mo/NE.html">NE</a>
+  +-<a href="NodeBFunction.html">NODEBFUNCTION</a>
+    +-<a href="ULoCell.html">ULOCELL</a>
+      +-<a href="ULoCellSecEqmGrp.html"><strong>ULOCELLSECEQMGRP</strong></a>
+</pre>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Description</h4><p>The ULOCELLSECEQMGRP MO configures sector equipment group parameters, such as Sector Equipment Group ID and SectorEqm Ref.</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Effective Scenario</h4><p>Immediately</p>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Relations Between MOs</h4><ul><li><p>Possible parents:</p>
+<a href="ULoCell.html">ULOCELL</a></li><li>Relation with the <strong>ULOCELL</strong> MO:<ul><li>If <strong>LOCELLTYPE</strong> under the <strong>ULOCELL</strong> MO is set to MIXED_MULTIRRU_CELL, zero to twelve <strong>ULOCELLSECEQMGRP</strong> MOs are used.</li><li>The number of <strong>ULOCELLSECEQMGRP</strong> MOs is zero if the value of <strong>LOCELLTYPE</strong> under the <strong>ULOCELL</strong> MO is not MIXED_MULTIRRU_CELL.</li><li>If <strong>LOCELLTYPE</strong> under the <strong>ULOCELL</strong> MO is MIXED_MULTIRRU_CELL, the same <strong>SECTOREQM</strong> MO can only be configured in one <strong>ULOCELLSECEQMGRP</strong> MO under the <strong>ULOCELL</strong> MO.</li></ul>
+</li><li>Relation with the <strong>ULOCELLSECEQMGRP</strong> MO:<ul><li>If <strong>LOCELLTYPE</strong> under the <strong>ULOCELL</strong> MO is set to MIXED_MULTIRRU_CELL, 0 to 16 <strong>SECTOREQM</strong> MOs corresponding to the <strong>ULOCELLSECEQMGRP</strong> MO are used.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, and <strong>SECTOREQM</strong> MOs:<ul><li>If <strong>LOCELLTYPE</strong> under the <strong>ULOCELL</strong> MO is set to MIXED_MULTIRRU_CELL, the <strong>SECTOREQM</strong> MOs configured in the <strong>ULOCELLSECEQMGRP</strong> MOs for the <strong>ULOCELL</strong> MO must exist in the <strong>ULOCELLSECTOREQM</strong> MOs.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>BASEBANDEQM</strong>, <strong>SECTOREQM</strong>, and <strong>NODEBALGPARA</strong> MOs:<ul><li>Assume that the sum of number of SECTOREQMs used by MULTIRRU_CELL, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELL cells, and the number of DIST_CELL cells is x, and in the NORMAL_CELL and HALFFREQ_CELL cells, the number of ULOCELLs configured with less than four and greater than zero RX antennas is y, the number of ULOCELLs configured with four RX antennas is z, and the number of <strong>ULOCELL</strong> MOs, for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE and different <strong>DLFREQ</strong> settings are used, is m. When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION and <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_ADPT_CHAN, the sum of x, y, 2*z and m must be less than or equal to 12.</li><li>Assume that the sum of number of SECTOREQMs used by MULTIRRU_CELL, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELL cells, and the number of DIST_CELL cells is x, and in the NORMAL_CELL and HALFFREQ_CELL cells, the number of ULOCELLs configured with less than four and greater than zero RX antennas is y, the number of ULOCELLs configured with four RX antennas is z, and the number of <strong>ULOCELL</strong> MOs, for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used, is m. When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION and <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_ADPT_CHAN, the sum of x, y, 2*z and m must be less than or equal to 12.</li></ul>
+</li><li>Relation with the <strong>BASEBANDEQM</strong>, <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>SECTOREQM</strong>, <strong>NODEBALGPARA</strong>, and <strong>BBP</strong> MOs:<ul><li>When <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION and <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN, assume that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, the number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, the number of NORMAL_CELLs, HALFFREQ_CELLs and DIST_CELLs, and y is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used. If the sum of x and y is greater than 6, the <strong>BASEBANDEQM</strong> MO must be configured with UBBP board on which UMTS must be selected for <strong>BBWS</strong>.</li><li>When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_2_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL_EXTENSION, assume that the sum of number of SECTOREQMs used by MULTIRRU_CELL cells, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELL cells, and number of NORMAL_CELL, HALFFREQ_CELL and DIST_CELL cells is x, and the number of local cells, for which <strong>SECTOREQMPROPERTY</strong> of the used sector equipment is set to ASSISTANCE and frequency settings are different, is y. If the sum of x and y is greater than 6, the <strong>BASEBANDEQM</strong> MO must be configured with <strong>BBP</strong> MOs on which <strong>TYPE</strong> must be set to UBBP and UMTS must be selected for <strong>BBWS</strong>.</li></ul>
+</li><li>Relation with the <strong>ULOCELL</strong>, <strong>ULOCELLSECTOREQM</strong>, <strong>BASEBANDEQM</strong>, <strong>SECTOREQM</strong>, <strong>NODEBALGPARA</strong>, <strong>BEAMCELLGROUP</strong>, and <strong>BEAMCELLGROUPITEM</strong> MOs:<ul><li>Assume that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, and the number of DIST_CELLs, y is the number of HALFFREQ_CELLs configured with a total of two or three RX antennas, z is the number of HALFFREQ_CELLs configured with four RX antennas, m is the number of NORMAL_CELLs with <strong>BFMODE</strong> set to MASSIVEBEAM, NORMALBEAM or COORDINATEDBEAM that are not configured in <strong>BEAMCELLGROUP</strong> MO, n and k are respectively the number of NORMAL_CELLs configured with a total of two or three RX antennas and that of NORMAL_CELLs configured with four RX antennas if <strong>BFMODE</strong> is set to NOTSUPPORT or FOURTXBEAMOPT and the NORMAL_CELLs are not configured in <strong>BEAMCELLGROUP</strong> MO, h and s are respectively the number of NORMAL_CELLs configured with four RX antennas and that of NORMAL_CELLs configured with eight RX antennas in <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM or FOURTXSPLITSECTOR, p is the number of NORMAL_CELLs that are added to the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM and use the <strong>SECTOREQM</strong> MO whose <strong>ANTCFGMODE</strong> is set to BEAM, t is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, w is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, r is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, q is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, and g is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE and different <strong>DLFREQ</strong> settings are used. When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_ADPT_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL, the sum of x, y, 2 multiplied by z, m, n, 2 multiplied by k, 2 multiplied by h, 4 multiplied by s, 2 multiplied by p, t, 4 multiplied by w, r, 2 multiplied by q, and g must be less than or equal to 12.</li><li>Assume that x is the sum of the number of SECTOREQMs used by MULTIRRU_CELLs, number of ULOCELLSECEQMGRPs used by MIXED_MULTIRRU_CELLs, and the number of DIST_CELLs, y is the number of HALFFREQ_CELLs configured with a total of two or three RX antennas, z is the number of HALFFREQ_CELLs configured with four RX antennas, m is the number of NORMAL_CELLs with <strong>BFMODE</strong> set to MASSIVEBEAM, NORMALBEAM or COORDINATEDBEAM that are not configured in <strong>BEAMCELLGROUP</strong> MO, n and k are respectively the number of NORMAL_CELLs configured with a total of two or three RX antennas and that of NORMAL_CELLs configured with four RX antennas if <strong>BFMODE</strong> is set to NOTSUPPORT or FOURTXBEAMOPT and the NORMAL_CELLs are not configured in <strong>BEAMCELLGROUP</strong> MO, h and s are respectively the number of NORMAL_CELLs configured with four RX antennas and that of NORMAL_CELLs configured with eight RX antennas in <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM or FOURTXSPLITSECTOR, p is the number of NORMAL_CELLs that are added to the <strong>BEAMCELLGROUP</strong> MO with <strong>BEAMCELLGROUPTYPE</strong> set to NORMALBEAM and use the <strong>SECTOREQM</strong> MO whose <strong>ANTCFGMODE</strong> is set to BEAM, t is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, w is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM8T8R, r is the number of <strong>BEAMCELLGROUP</strong> MOs that contain one NORMAL_CELL in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, q is the number of <strong>BEAMCELLGROUP</strong> MOs that contain two NORMAL_CELLs in the <strong>BASEBANDEQM</strong> MO and have <strong>BEAMCELLGROUPTYPE</strong> set to MASSIVEBEAM4T4R or COORDINATED2TBEAM, and g is the number of ULOCELLs for which the used <strong>ULOCELLSECTOREQM</strong> MOs have <strong>SECTOREQMPROPERTY</strong> set to ASSISTANCE, <strong>ULFREQIND</strong> is set to TRUE, and different <strong>ULFREQ</strong> settings are used. When <strong>UMTSDEMMODE</strong> under the <strong>BASEBANDEQM</strong> MO is set to DEM_ADPT_CHAN and <strong>ULRESWORKMODE</strong> under the <strong>NODEBALGPARA</strong> MO is set to NORMAL, the sum of x, y, 2 multiplied by z, m, n, 2 multiplied by k, 2 multiplied by h, 4 multiplied by s, 2 multiplied by p, t, 4 multiplied by w, r, 2 multiplied by q, and g must be less than or equal to 12.</li></ul>
+</li></ul>
+</div>
+
+<div class="section"><h4 class="sectiontitle">Related MML Commands</h4><p><a href="#ULoCellSecEqmGrp__tab1">Table 1</a> describes the MML commands related to this MO.</p>
+
+<div class="tablenoborder"><a name="ULoCellSecEqmGrp__tab1"></a><a name="tab1"></a><table cellpadding="4" cellspacing="0" summary="" id="ULoCellSecEqmGrp__tab1" frame="border" border="1" rules="all"><caption><b>Table 1 </b>Related MML commands</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.5.3.2.3.1.1"><p>MML Command</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.5.3.2.3.1.2"><p>Function</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ulocellsectoreqmgrp.html">ADD ULOCELLSECTOREQMGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to add sector equipment groups. Sector equipment groups were introduced for the "Mixed Multiple RRUs In One Cell" sector. Similar to each RRU in the Multi-RRU independent demodulation cell, data of each sector equipment group is processed on the baseband side. That is, all RRUs in the same sector equipment group and their data are allocated the same baseband resources and channel resources.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/add_ulocellsectoreqmgrpitem.html">ADD ULOCELLSECTOREQMGRPITEM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to add sector equipment to a specified sector equipment group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ulocellsectoreqmgrp.html">LST ULOCELLSECTOREQMGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to query the configuration information of a sector equipment group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/lst_ulocellsectoreqmgrpitem.html">LST ULOCELLSECTOREQMGRPITEM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to query the configuration information of the sector equipment in the sector equipment group of a cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ulocellsectoreqmgrp.html">RMV ULOCELLSECTOREQMGRP</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to remove a specified sector equipment group.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.5.3.2.3.1.1 "><a href="../mml/rmv_ulocellsectoreqmgrpitem.html">RMV ULOCELLSECTOREQMGRPITEM</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.5.3.2.3.1.2 "><p>This command is used to remove specified sector equipment from a sector equipment group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+
+<div class="section"><h4 class="sectiontitle">Related Parameters</h4><p><a href="#ULoCellSecEqmGrp__tab2">Table 2</a> describes the parameters related to this MO.</p>
+
+
+<div class="tablenoborder"><a name="ULoCellSecEqmGrp__tab2"></a><a name="tab2"></a><table cellpadding="4" cellspacing="0" summary="" id="ULoCellSecEqmGrp__tab2" frame="border" border="1" rules="all"><caption><b>Table 2 </b>Configuration parameters</caption>
+<thead align="left"><tr><th class="cellrowborder" valign="top" width="22.5%" id="mcps1.3.6.3.2.3.1.1"><p>Parameter</p>
+</th>
+<th class="cellrowborder" valign="top" width="77.5%" id="mcps1.3.6.3.2.3.1.2"><p>Description</p>
+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ULoCellSecEqmGrp-uLoCellId.html">Local Cell ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the Local Cell ID.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ULoCellSecEqmGrp-sectorEqmGrpId.html">Sector Equipment Group ID</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the number of sector equipment group used for the local cell.</p>
+</td>
+</tr>
+
+<tr><td class="cellrowborder" valign="top" width="22.5%" headers="mcps1.3.6.3.2.3.1.1 "><a href="../para/ULoCellSecEqmGrp-sectorEqmRef.html">SectorEqm Ref</a></td>
+<td class="cellrowborder" valign="top" width="77.5%" headers="mcps1.3.6.3.2.3.1.2 "><p>Indicates the sector equipment used by a sector equipment group.</p>
+</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

@@ -1,0 +1,275 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify RET Port (MOD RETPORT)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_retport">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify RET Port (MOD RETPORT)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_retport"></a><a name="mod_retport"></a>
+
+
+<h1 class="topictitle1">Modify RET Port (MOD RETPORT)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS3900 5G, BTS5900, BTS5900 WCDMA, BTS5900 LTE, BTS5900 5G</p>
+
+<div class="mmlfunc"><a name="mod_retport__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the configuration of a remote electrical tilting (RET) port.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_retport__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody"><p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+
+<ul><li><p>This command can be executed only when the RRU corresponding to the port runs normally.</p>
+</li><li><p>The power switches of the antenna port and RET port of the RRU cannot be set to ON at the same time. If both the power switches are set to ON, the system returns a message indicating that the execution of this command fails.</p>
+</li><li><p>The undercurrent alarm threshold is usually set to 20% to 30% of the normal working current of the equipment. The overcurrent alarm threshold is set to 150% to 200% of the normal working current of the equipment. If an antenna is used in a non-regular installation scenario, the alarm threshold type must be set to UER_SELF_DEFINE. In general, the threshold for reporting or clearing a current alarm for a port is the sum of the thresholds for all ALDs connected to the port. Take the threshold for reporting an overcurrent alarm as an example. If there are N ALDs connected to the port, then: Threshold for reporting an overcurrent alarm for the port = This threshold for ALD 1 + This threshold for ALD 2 + ... + This threshold for ALD N. If a non-recommended ALD model is used, it is recommended that the alarm threshold type be set to UER_SELF_DEFINE.</p>
+</li><li><p>When the power supply switch is set to ON, the links of ALDs that are working properly will be intermittently interrupted if this command is executed to modify a current alarm threshold or reset the power supply switch to on.</p>
+</li><li><p>For a port on an RF module in a multimode base station, turning off the ALD power supply switch takes effect only when the ALD Power Switch parameter is set to OFF in each mode.</p>
+</li><li><p>If the RET port is connected to an RPCU, ensure that Overcurrent Alarm Occur Threshold and Overcurrent Alarm Clear Threshold are properly configured.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_retport__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the RRU where the RET port is located.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the RRU where the RET port is located.</p>
+<p>GUI Value Range: 60~254</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 60~254</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the RRU where the RET port is located.</p>
+<p>GUI Value Range: 0~5</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~5</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the RET port on an RRU. This parameter is set to RET_PORT.</p>
+<p>GUI Value Range: RET_PORT(RET_PORT)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RET_PORT</p>
+<p>MML Default Value: RET_PORT(RET_PORT)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-ALDPwrSwitch.html">PWRSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ALD Power Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the state of the ALD power supply switch. If SINGLE_RET (Single-antenna Remote Electrical Tilt Unit), MULTI_RET (Multi-antenna Remote Electrical Tilt Unit), RAE (Remote eAntenna Extension), RVD (Remote Vendor Defined Antenna Line Device), RAS (Remote Azimuth Steering Unit), or RGPS (Remote GPS) is used, the ALD power supply switch must be set to ON. In actual running, the RRU automatically sets this switch to OFF for an RET port when the ALM-26530 RF Module ALD Current Abnormal alarm is reported due to overcurrent, overcurrent protection, or undercurrent protection (the RRU supports undercurrent protection and Low Current Protect Switch is set to ON for the RRU) on the RET port. For details, see ALM-26530 RF Module ALD Current Abnormal.</p>
+<p>GUI Value Range: ON(ON), OFF(OFF)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: ON, OFF</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In the same <strong>RRU</strong> MO, <strong>PWRSWITCH</strong> in the <strong>RETPORT</strong> MO and <strong>PWRSWITCH</strong> in the <strong>ANTENNAPORT</strong> MO cannot be set to ON at the same time.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-AldCurrAlmThreshldType.html">THRESHOLDTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Current Alarm Threshold Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the ALD current alarm threshold. This parameter is valid only if the ALD power supply switch is turned on. If this parameter is not set to UER_SELF_DEFINE, the current alarm thresholds must be set according to the ALD type and connection mode.</p>
+<p>1. For RET antennas only (multi-wire cable), Undercurrent Alarm Occur Threshold must be set to 10 mA, Undercurrent Alarm Clear Threshold must be set to 15 mA, Overcurrent Alarm Occur Threshold must be set to 150 mA, and Overcurrent Alarm Clear Threshold must be set to 120 mA.</p>
+<p>2. For RET antennas and AISUs, Undercurrent Alarm Occur Threshold must be set to 20 mA, Undercurrent Alarm Clear Threshold must be set to 25 mA, Overcurrent Alarm Occur Threshold must be set to 550 mA, and Overcurrent Alarm Clear Threshold must be set to 510 mA.</p>
+<p>3. For AISUs only, Undercurrent Alarm Occur Threshold must be set to 10 mA, Undercurrent Alarm Clear Threshold must be set to 15 mA, Overcurrent Alarm Occur Threshold must be set to 350 mA, and Overcurrent Alarm Clear Threshold must be set to 300 mA.</p>
+<p>4. For RGPS only, Undercurrent Alarm Occur Threshold must be set to 0 mA, Undercurrent Alarm Clear Threshold must be set to 10 mA, Overcurrent Alarm Occur Threshold must be set to 300 mA, and Overcurrent Alarm Clear Threshold must be set to 200 mA.</p>
+<p>5. For RGPSs and AISUs, Undercurrent Alarm Occur Threshold must be set to 10 mA, Undercurrent Alarm Clear Threshold must be set to 15 mA, Overcurrent Alarm Occur Threshold must be set to 350 mA, and Overcurrent Alarm Clear Threshold must be set to 300 mA.</p>
+<p>GUI Value Range: UER_SELF_DEFINE(USER_DEFINED), RET_ONLY_MULTICORE(RET_ONLY_MULTICORE), RET_AISU(RET_AISU), AISU_ONLY(AISU_ONLY), RGPS_ONLY(RGPS_ONLY), RGPS_AISU(RGPS_AISU)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UER_SELF_DEFINE, RET_ONLY_MULTICORE, RET_AISU, AISU_ONLY, RGPS_ONLY, RGPS_AISU</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-UnderCurrAlmOccThreshld.html">UOTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Undercurrent Alarm Occur Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the undercurrent alarm occur threshold. When the ALD current value is smaller than this threshold, an ALM-26530 RF Unit ALD Current Out of Range alarm is reported. The specific problem is undercurrent.</p>
+<p>GUI Value Range: 0~3500</p>
+<p>Unit: mA</p>
+<p>Actual Value Range: 0~3500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RETPORT</strong> MO, if <strong>PWRSWITCH</strong> is set to ON, the value of <strong>UOTHD</strong> must be smaller than <strong>UCTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-UnderCurrAlmClrThreshld.html">UCTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Undercurrent Alarm Clear Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the undercurrent alarm clear threshold. When the ALD current value is greater than this threshold, the ALM-26530 RF Unit ALD Current Out of Range alarm is cleared.</p>
+<p>GUI Value Range: 0~3500</p>
+<p>Unit: mA</p>
+<p>Actual Value Range: 0~3500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RETPORT</strong> MO, if <strong>PWRSWITCH</strong> is set to ON, the value of <strong>UOTHD</strong> must be smaller than <strong>UCTHD</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RETPORT</strong> MO, if <strong>PWRSWITCH</strong> is set to ON, the value of <strong>UCTHD</strong> must be smaller than <strong>OCTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-OverCurrAlmOccThreshld.html">OOTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Overcurrent Alarm Occur Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the overcurrent alarm occur threshold. When the overcurrent alarm occur threshold is lower than the maximum current supported by the hardware, the overcurrent alarm occur threshold prevails. In this case, when the ALD current value is greater than this threshold, ALM-26530 RF Unit ALD Current Out of Range is reported and the specific problem is overcurrent. When the overcurrent alarm occur threshold is higher than the maximum current supported by the hardware, the maximum current supported by the hardware serves as the overcurrent alarm threshold. In this case, when the ALD current value is the same as or greater than the maximum current supported by the hardware, ALM-26530 RF Unit ALD Current Out of Range is reported and the specific problem is overcurrent protection.</p>
+<p>GUI Value Range: 0~3500</p>
+<p>Unit: mA</p>
+<p>Actual Value Range: 0~3500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RETPORT</strong> MO, if <strong>PWRSWITCH</strong> is set to ON, the value of <strong>OCTHD</strong> must be smaller than the value of <strong>OOTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/RetPort-OverCurrAlmClrThreshld.html">OCTHD</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Overcurrent Alarm Clear Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the overcurrent alarm clear threshold. When the overcurrent alarm clear threshold is lower than the maximum current supported by the hardware, the overcurrent alarm clear threshold prevails. When the ALD current value is lower than this threshold, ALM-26530 RF Unit ALD Current Out of Range is cleared.When the overcurrent alarm clear threshold is higher than the maximum current supported by the hardware, the maximum current supported by the hardware serves as the overcurrent alarm threshold. When the ALD current value is lower than the maximum current supported by the hardware, ALM-26530 RF Unit ALD Current Out of Range is cleared.</p>
+<p>GUI Value Range: 0~3500</p>
+<p>Unit: mA</p>
+<p>Actual Value Range: 0~3500</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RETPORT</strong> MO, if <strong>PWRSWITCH</strong> is set to ON, the value of <strong>OCTHD</strong> must be smaller than the value of <strong>OOTHD</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB, gNodeB]In an <strong>RETPORT</strong> MO, if <strong>PWRSWITCH</strong> is set to ON, the value of <strong>UCTHD</strong> must be smaller than <strong>OCTHD</strong>.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L, N</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_retport__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the configuration of an RET port with the parameters as follows: Cabinet No.: 0, Subrack No.: 63, Slot No.: 0, Port No.: RET_PORT, Power Switch: ON, THRESHOLDTYPE: RET_ONLY_MULTICORE, run the following command:
+MOD RETPORT: CN=0, SRN=63, SN=0, PN=RET_PORT, PWRSWITCH=ON, THRESHOLDTYPE=RET_ONLY_MULTICORE;
+</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

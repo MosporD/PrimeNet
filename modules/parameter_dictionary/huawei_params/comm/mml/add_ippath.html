@@ -1,0 +1,608 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add IP Path (ADD IPPATH)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_ippath">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add IP Path (ADD IPPATH)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_ippath"></a><a name="add_ippath"></a>
+
+
+<h1 class="topictitle1">Add IP Path (ADD IPPATH)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 WCDMA, BTS3900 LTE, BTS5900, BTS5900 WCDMA, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="add_ippath__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add an IP path.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_ippath__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<ul><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]In the same routing domain, any two IP paths whose PATHTYPE is set to ANY(Any QoS) must have different address pairs. In the same routing domain, any two IP paths whose PATHTYPE is set to FIXED(Fixed QoS) can have the same address pair, but they must have different DSCP values.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]Before adding an IP path, ensure that the local IP address (excluding 0.0.0.0) of the IP path is configured.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]System specifications: If the WMPT is the main control board, a maximum of 128 IP paths can be configured. If the GTMUb/GTMUc is the main control board, a maximum of 32 IP paths can be configured. If the LMPT/UMPT/UMDU is the main control board, a maximum of 320 IP paths can be configured.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]Board specifications: A maximum of 320 IP paths can be configured on an LMPT/UMPT/UMDU/UTRPc/UBBPe (excluding UBBPe15)/UBBPei/UBBPep/UBBPem/LCOP/UBBPex2/UBBPf1/UBBPf0/UBBPg1/UBBPg2/UBBPg3/UBBPg4/UBBPg5/UBBPg6/UBBPg7/UBBPg9. A maximum of 64 IP paths can be configured on a WMPT/UTRP (subboard type: UEOC/UIEC/UQEC/UAEC). A maximum of 24 IP paths can be configured on a GTMUb/GTMUc.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]The IP path does not support the scenario that meets the following conditions: the local IP address of the IP path is configured as the IP address of the main control board; the transmission extension board provides the transmission port.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]When configuring or modifying an IP path, if the VRF index, local IP address and peer IP address of the IP path are same as the VRF index, the RX destination IP address and the RX source IP address of a running loopback by executing the command <a href="set_udploop.html">SET UDPLOOP</a> whose loopback mode is SPECIALIPUDPPORTREMOTE and the RX destination port number is 65040, if the loopback and the IP path are on the same board, the loopback will be stopped automatically.</p>
+</li><li><p>[Co-MPT,NodeB,eGBTS,eNodeB]When you configure an IP path MO: If Port Type is set to ETH or ETHTRK, Local IP in the IP path MO must use the device IP address configured on the corresponding port; if Port Type is set to PPP or MPGRP, Local IP in the IP path MO must use the device IP address configured on the corresponding port or must use the value of Local IP in the corresponding PPPLNK or MPGRP MO.</p>
+</li><li><p>[Co-MPT,eGBTS,eNodeB]An IP path with Path Type set to ANY(Any QoS) must have different address pairs from an IP path with Path Type set to FIXED(Fixed QoS).</p>
+</li><li><p>[Co-MPT,eNodeB]To achieve hybrid transmission, two IP paths in the same routing domain whose PEERIP is the same and whose PATHTYPE is both set to ANY(Any QoS) must have different QT values.</p>
+</li><li><p>[Co-MPT,eNodeB]To achieve hybrid transmission, two IP paths in the same routing domain whose PEERIP and DSCP are the same and whose PATHTYPE is both set to FIXED(Fixed QoS) must have different QT values.</p>
+</li><li><p>[eNodeB]If the main control board is an LMPT, the IP paths whose port type is set to PPP or MPGRP can be successfully configured but cannot take effect.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_ippath__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-PathID.html">PATHID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Path ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of an IP path.</p>
+<p>GUI Value Range: 0~65535</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~65535</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-TransCfgMode.html">TRANSCFGMODE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Configuration Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the configuration mode of the transmission model. The transmission model can be configured in old or new mode.</p>
+<p>In old mode, the transmission model contains information such as cabinet, subrack, and slot numbers. Transmission configurations are bound to device boards.</p>
+<p>In new mode, the transmission model has decoupled transmission and device models. That is, transmission configuration removes unnecessary cabinet, subrack, and slot configurations.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. To mitigate the risk, it is recommended that this parameter not be used.</p>
+<p>GUI Value Range: OLD(Old), NEW(New)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OLD, NEW</p>
+<p>MML Default Value: OLD(Old)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to DISABLE and <strong>LOCALIP</strong> is set to 0.0.0.0, <strong>BPT</strong> must be set to PPP or MPGRP.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>BPT</strong> is set to LOOPINT, <strong>JNIPRSCGRP</strong> cannot be set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-JoinIpRscGroup.html">JNIPRSCGRP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Join IP Transmission Resource Group</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the IP path is added to an IP transmission resource group. When this parameter is set to DISABLE, the IP path is established on the default IP transmission resource group on a specified physical port.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: If passing-by data exists, set this parameter to ENABLE (Enable). If passing-by data does not exist, set this parameter to DISABLE (Disable).</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to DISABLE and <strong>LOCALIP</strong> is set to 0.0.0.0, <strong>BPT</strong> must be set to PPP or MPGRP.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>BPT</strong> is set to LOOPINT, <strong>JNIPRSCGRP</strong> cannot be set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-IpRscGrpId.html">IPRSCGRPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the IP transmission resource group to which the IP path belongs.</p>
+<p>GUI Value Range: 0~150014</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~150014</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-BearPortType.html">BPT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Bearing Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the physical port type of the IP path.</p>
+<p>GUI Value Range: PPP(PPP Link), MPGRP(Multi-link PPP Group), ETH(Ethernet Port), ETHTRK(Ethernet Trunk), LOOPINT(Loopback Interface), TUNNEL(Tunnel)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PPP, MPGRP, ETH, ETHTRK, LOOPINT, TUNNEL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to DISABLE and <strong>LOCALIP</strong> is set to 0.0.0.0, <strong>BPT</strong> must be set to PPP or MPGRP.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>BPT</strong> is set to LOOPINT, <strong>JNIPRSCGRP</strong> cannot be set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-PortId.html">PORTID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the port to which the IP path belongs.</p>
+<p>GUI Value Range: 0~99999</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~99999</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>BPT</strong> is set to ETH, the value range of this parameter is from 0 to 9999.</li><li>In the <strong>IPPATH</strong> MO, if <strong>BPT</strong> is set to ETHTRK, the value range of this parameter is from 0 to 23.</li><li>In the <strong>IPPATH</strong> MO, if <strong>BPT</strong> is set to LOOPINT, this parameter can be set to 0 to 99999.</li><li>In the <strong>IPPATH</strong> MO, if <strong>BPT</strong> is set to MPGRP, the value range of this parameter is from 0 to 31.</li><li>In the <strong>IPPATH</strong> MO, if <strong>BPT</strong> is set to PPP, this parameter can be set to 0 or 127.</li><li>In the <strong>IPPATH</strong> MO, if <strong>BPT</strong> is set to TUNNEL, the value range of this parameter is from 0 to 14.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-CabinetNo.html">CN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Cabinet No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the cabinet number of the board where the IP path is located.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port ID parameter in the IPPATH MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-SubrackNo.html">SRN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subrack No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the subrack number of the board where the IP path is located.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port ID parameter in the IPPATH MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~1</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-SlotNo.html">SN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Slot No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the slot number of the board where the IP path is located.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port ID parameter in the IPPATH MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-SubboardType.html">SBT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Subboard Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of sub-board on the board where the IP path is established.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port ID parameter in the IPPATH MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: E1_COVERBOARD(E1 Cover Board), ETH_COVERBOARD(Ethernet Cover Board), BASE_BOARD(Base Board), BACK_BOARD(Back Board)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: E1_COVERBOARD, ETH_COVERBOARD, BASE_BOARD, BACK_BOARD</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, this parameter can be set to E1_COVERBOARD or ETH_COVERBOARD if <strong>SN</strong> is set to a value within the range of 0 to 5.</li><li>In an <strong>IPPATH</strong> MO, this parameter can be set to BASE_BOARD or ETH_COVERBOARD if <strong>SN</strong> is set to 6 or 7.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-PortType.html">PT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the physical port type of the IP path.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Bearing Port Type parameter in the IPPATH MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: PPP(PPP Link), MPGRP(Multi-link PPP Group), ETH(Ethernet Port), ETHTRK(Ethernet Trunk), LOOPINT(Loopback Interface), TUNNEL(Tunnel)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: PPP, MPGRP, ETH, ETHTRK, LOOPINT, TUNNEL</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>LOCALIP</strong> is set to 0.0.0.0, <strong>PT</strong> must be set to PPP or MPGRP.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>PT</strong> is set to LOOPINT, <strong>JNRSCGRP</strong> cannot be set to ENABLE.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>PT</strong> and <strong>VRFIDX</strong> are set to LOOPINT and 0, respectively, <strong>PN</strong> can be set to any value in the range of 0 to 3.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>PT</strong> is set to LOOPINT, and <strong>VRFIDX</strong> is not set to 0, <strong>PN</strong> can be set to any value in the range of 4(VRFIDX)+4 to 4(VRFIDX)+7.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD, this parameter can be set to PPP, MPGRP, ETH, ETHTRK, or LOOPINT.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> is set to BACK_BOARD, this parameter can be set to PPP or TUNNEL.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> is set to E1_COVERBOARD, this parameter can be set to PPP or MPGRP.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> is set to ETH_COVERBOARD, this parameter can be set to ETH, ETHTRK, or LOOPINT.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-PortNo.html">PN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Port No.</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of the port where the IP path is configured.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Port ID parameter in the IPPATH MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~35</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~35</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>PT</strong> and <strong>VRFIDX</strong> are set to LOOPINT and 0, respectively, <strong>PN</strong> can be set to any value in the range of 0 to 3.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>PT</strong> is set to LOOPINT, and <strong>VRFIDX</strong> is not set to 0, <strong>PN</strong> can be set to any value in the range of 4(VRFIDX)+4 to 4(VRFIDX)+7.</li></ul>
+<p>-Others:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to BACK_BOARD and PPP, respectively, the value of this parameter ranges from 0 to 15.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD or E1_COVERBOARD and <strong>PT</strong> is set to PPP, the value of this parameter ranges from 0 to 15.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD or E1_COVERBOARD and <strong>PT</strong> is set to MPGRP, the value of this parameter ranges from 0 to 3.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to BASE_BOARD and ETH, respectively, the value of this parameter ranges from 0 to 3.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to BASE_BOARD and ETHTRK, respectively, this parameter can be set to 0 or 1.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to ETH_COVERBOARD and ETH, respectively, the value of this parameter ranges from 0 to 5.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to ETH_COVERBOARD and ETHTRK, respectively, the value of this parameter ranges from 0 to 2.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> is set to BASE_BOARD and <strong>PT</strong> is set to LOOPINT, the value of this parameter ranges from 0 to 3, 8 to 35.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> is set to ETH_COVERBOARD and <strong>PT</strong> is set to LOOPINT, the value of this parameter ranges from 0 to 3.</li><li>In the <strong>IPPATH</strong> MO, if <strong>SBT</strong> and <strong>PT</strong> are set to BACK_BOARD and TUNNEL, respectively, the value of this parameter ranges from 0 to 14.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-JoinRscGroup.html">JNRSCGRP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Join Transmission Resource Group</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the IP path joins a transmission resource group. If this parameter is set to DISABLE, the IP path is established on the default IP transmission resource group on a specific physical port.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the Join IP Transmission Resource Group parameter in the IPPATH MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: If passing-by data exists, set this parameter to ENABLE (Enable). If passing-by data does not exist, set this parameter to DISABLE (Disable).</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>PT</strong> is set to LOOPINT, <strong>JNRSCGRP</strong> cannot be set to ENABLE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-RscGroupNo.html">RSCGRPID</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Resource Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the ID of the transmission resource group established on an IP path.</p>
+<p>Disuse statement: This parameter will be deleted in later versions. In the current version, this parameter can be configured and takes effect when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to OLD, and this parameter cannot be configured and is replaced by the IP Transmission Resource Group ID parameter in the IPPATH MO when the Transmission Configuration Mode parameter in the GTRANSPARA MO is set to NEW. Therefore, avoid using this parameter.</p>
+<p>GUI Value Range: 0~15</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-VrfIndex.html">VRFIDX</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">VRF Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a VRF instance. UMTS currently supports the default routing domain only (the VRF index is 0).</p>
+<p>GUI Value Range: 0~7</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~7</p>
+<p>MML Default Value: 0</p>
+<p>Recommended Value: 0</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>PT</strong> and <strong>VRFIDX</strong> are set to LOOPINT and 0, respectively, <strong>PN</strong> can be set to any value in the range of 0 to 3.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In the <strong>IPPATH</strong> MO, if <strong>PT</strong> is set to LOOPINT, and <strong>VRFIDX</strong> is not set to 0, <strong>PN</strong> can be set to any value in the range of 4(VRFIDX)+4 to 4(VRFIDX)+7.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-LocalIP.html">LOCALIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local IP address of an IP path. The value 0.0.0.0 indicates that the local IP address needs to be negotiated.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>LOCALIP</strong> in an <strong>IPPATH</strong> MO must be an IP address of class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x (including 0.0.0.0).</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, <strong>LOCALIP</strong> must be different from <strong>PEERIP</strong>.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>LOCALIP</strong> is set to 0.0.0.0, <strong>PT</strong> must be set to PPP or MPGRP.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>TRANSCFGMODE</strong> is set to NEW, and <strong>JNIPRSCGRP</strong> is set to DISABLE and <strong>LOCALIP</strong> is set to 0.0.0.0, <strong>BPT</strong> must be set to PPP or MPGRP.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-PeerIP.html">PEERIP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Peer IP Address</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the peer IP address of the IP path.</p>
+<p>GUI Value Range: Valid IP address</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Valid IP address</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]<strong>PEERIP</strong> in an <strong>IPPATH</strong> MO must be an IP address of class A, B, or C. In addition, it cannot be set to 127.x.x.x or 0.x.x.x.</li><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, <strong>LOCALIP</strong> must be different from <strong>PEERIP</strong>.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-TranRscType.html">QT</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Transmission Resource Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of transport resource for the IP path. The value HQ indicates high-quality transport resources, and the value LQ indicates low-quality transport resources. This parameter must be set in the hybrid transmission scenario. In other scenarios, the default value of this parameter is used. The parameter takes effect only in LTE.</p>
+<p>GUI Value Range: HQ(High Quality), LQ(Low Quality)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: HQ, LQ</p>
+<p>MML Default Value: HQ(High Quality)</p>
+<p>Recommended Value: HQ(High Quality)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-PathType.html">PATHTYPE</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Path Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the type of the IP path. FIXED indicates that this IP path is used to carry the service with specified Quality of Service (QoS), that is, with a specified DSCP. ANY indicates that this IP path can be used to carry services of any QoS and hence is used to carry the service without a specified DSCP.</p>
+<p>GUI Value Range: FIXED(Fixed QoS), ANY(Any QoS)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FIXED, ANY</p>
+<p>MML Default Value: FIXED(Fixed QoS)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-DSCP.html">DSCP</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">DSCP</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the differentiated services code point (DSCP) of the services carried on an IP path.</p>
+<p>GUI Value Range: 0~63</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~63</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-MuxSwitch.html">IPMUXSWITCH</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">IP MUX Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the IP MUX function is enabled on IP paths. LTE currently does not support this function.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE</p>
+<p>MML Default Value: DISABLE(Disable)</p>
+<p>Recommended Value: DISABLE(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-MaxSFLen.html">SUBFRAMELEN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximum Length of IP MUX Subframe</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum subframe length of IP MUX. The LTE currently does not support the IP MUX function.</p>
+<p>GUI Value Range: 1~1023</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 1~1023</p>
+<p>MML Default Value: 127</p>
+<p>Recommended Value: 127</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>IPMUXSWITCH</strong> is set to ENABLE, the difference between <strong>FRAMELEN</strong> and <strong>SUBFRAMELEN</strong> must be greater than 4.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-MaxMFLen.html">FRAMELEN</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Maximum Length of IP MUX Multiframe</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum multiframe length of IP MUX. The LTE currently does not support the IP MUX function.</p>
+<p>GUI Value Range: 100~1031</p>
+<p>Unit: byte</p>
+<p>Actual Value Range: 100~1031</p>
+<p>MML Default Value: 270</p>
+<p>Recommended Value: 270</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>[Co-MPT, NodeB, eGBTS, eNodeB]In an <strong>IPPATH</strong> MO, if <strong>IPMUXSWITCH</strong> is set to ENABLE, the difference between <strong>FRAMELEN</strong> and <strong>SUBFRAMELEN</strong> must be greater than 4.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-MuxTimeout.html">TIMER</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">MUX Timer</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the length of the IP MUX timer, which defines the maximum buffer time for IP MUX packets. The LTE currently does not support the IP MUX function.</p>
+<p>GUI Value Range: 1~20</p>
+<p>Unit: ms</p>
+<p>Actual Value Range: 1~20</p>
+<p>MML Default Value: 1</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-LinkStaticChk.html">STATICCHK</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Static Check Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable the GTP-U static detection function for a link. When this parameter is set to ENABLE, the GTP-U static detection function is enabled for a link. When this parameter is set to DISABLE, the GTP-U static detection function is disabled for a link. When this parameter is set to FOLLOW_GLOBAL, the setting of the switch for the GTP-U static detection function is the same as that of the base station-level GTP-U detection switch. This parameter takes effect only in LTE.</p>
+<p>GUI Value Range: DISABLE(Disable), ENABLE(Enable), FOLLOW_GLOBAL(Same as the GTP-U static detection switch)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DISABLE, ENABLE, FOLLOW_GLOBAL</p>
+<p>MML Default Value: FOLLOW_GLOBAL(Same as the GTP-U static detection switch)</p>
+<p>Recommended Value: FOLLOW_GLOBAL(Same as the GTP-U static detection switch)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/IPPATH-Description.html">DESCRI</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Description</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the description about the peer of the IP path.</p>
+<p>GUI Value Range: 0~47 characters</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~47 characters</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: G, U, L</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_ippath__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To add an IP path with the parameters as follows: Path ID: 0, Transmission Configuration Mode: OLD, Cabinet No: 0, Subrack No.: 0, Slot No.: 6, Subboard Type: BASE_BOARD, Port Type: PPP, Port No.: 0, Join Transmission Resource Group: Disable, Local IP: 192.168.11.110, Peer IP: 192.168.22.220, Path Type: Any QoS, run the following command: 
+ADD IPPATH: PATHID=0, TRANSCFGMODE=OLD, CN=0, SRN=0, SN=6, SBT=BASE_BOARD, PT=PPP, PN=0, JNRSCGRP=DISABLE, LOCALIP="192.168.11.110", PEERIP="192.168.22.220", PATHTYPE=ANY;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

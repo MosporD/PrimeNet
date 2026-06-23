@@ -1,0 +1,333 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Modify PUCCH Configuration (MOD PUCCHCFG)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="mod_pucchcfg">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Modify PUCCH Configuration (MOD PUCCHCFG)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="mod_pucchcfg"></a><a name="mod_pucchcfg"></a>
+
+
+<h1 class="topictitle1">Modify PUCCH Configuration (MOD PUCCHCFG)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="mod_pucchcfg__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to modify the PUCCH configuration.</p>
+</div></div>
+
+<div class="mmlnote"><a name="mod_pucchcfg__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>This is a high-risk MML command. Pay attention to the following precautions before running this command:</p>
+<ul><li><p>The modifications on the cyclic shift interval of the PUCCH of an active cell would result in the automatic reset of the cell.</p>
+</li><li><p>A modification to the CqiRbNum parameter will result in automatic reset of the cell.</p>
+</li><li><p>A modification to the NaSriChNum parameter will result in automatic reset of the cell.</p>
+</li><li><p>If the PUCCH flexible configuration switch (PucchFlexCfgSwitch) is turned on and valid, modifications on the total number of RBs at the two ends of the system band that are reserved for the PUSCH of an active cell would result in the automatic reset of the cell.</p>
+</li><li><p>A modification to the Format1ChAllocMode parameter will result in automatic reset of the cell.</p>
+</li><li><p>If the SCCAckResourceCfgSw option of the PucchAlgoSwitch parameter is selected, the cell automatically resets after the Format3RbNum parameter value is changed.</p>
+</li><li><p>If the Dl2CCAckResShareSw and SCCAckResourceCfgSw options of the PucchAlgoSwitch parameter are selected, the cell automatically resets after the Max2CCAckChNum parameter value is changed.</p>
+</li></ul>
+
+</div></div>
+
+<div class="mmlparam"><a name="mod_pucchcfg__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of the cell. It uniquely identifies a cell within a BS. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-DeltaShift.html">DeltaShift</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Delta shift</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the interval between cyclic shifts used for the PUCCH. The interval between cyclic shifts used for the PUCCH can be acquired based on the average delay spread in the cell, where the average delay spread is acquired based on the networking environment. The parameter value DS1_DELTA_SHIFT is not supported by the LBBPc. If a cell is established on an LBBPc but this parameter is set to DS1_DELTA_SHIFT, the value of this parameter is automatically changed to DS2_DELTA_SHIFT when this parameter takes effect. For details, see 3GPP TS 36.211. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: DS1_DELTA_SHIFT(ds1), DS2_DELTA_SHIFT(ds2), DS3_DELTA_SHIFT(ds3)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: DS1_DELTA_SHIFT, DS2_DELTA_SHIFT, DS3_DELTA_SHIFT</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: For a cell established on an LBBPc and configured with the normal cyclic prefix (CP), the parameter value DS2_DELTA_SHIFT is recommended.</p>
+<p>For a cell established on an LBBPc and configured with the extended CP, the parameter value DS3_DELTA_SHIFT is recommended.</p>
+<p>For a cell established on an LBBPd or UBBP and configured with the normal CP, the parameter value DS1_DELTA_SHIFT is recommended.</p>
+<p>For a cell established on an LBBPd or UBBP and configured with extended CP, the parameter value DS3_DELTA_SHIFT is recommended.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a shorter interval between cyclic shifts used for the PUCCH, more UEs supporting code division multiplexing in the same subcarrier, stronger interference between these UEs, and lower demodulation performance, but it leads to less PUCCH overhead and higher uplink throughput. A larger value of this parameter leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-NaSriChNum.html">NaSriChNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">ACK/SRI Channel Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of resource indexes allocated to SRI and semi-persistent ACK at the RRC layer for the cell. If this parameter is set to 0, UEs may fail to access the cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~1000</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~1000</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 6</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter can be set only if the PucchSwitch option of the PucchAlgoSwitch parameter in the CellAlgoSwitch MO is deselected. Otherwise, the parameter setting does not take effect.</li><li>The NaSriChNum parameter must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain when the cell bandwidth is not 1.4 MHz. Otherwise, the cell cannot be activated.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A smaller value results in fewer UEs supported by the cell, less uplink control signaling overhead, and higher uplink throughput. A larger value leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-CqiRbNum.html">CqiRbNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">CQI RB number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the number of RBs allocated to the CQI at the RRC layer of cell. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~20</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>This parameter can be set only if the PucchSwitch option of the PucchAlgoSwitch parameter in the CellAlgoSwitch MO is deselected. Otherwise, the parameter setting does not take effect.</li><li>This parameter must be properly set so that the PRACH RBs and PUCCH RBs do not overlap in the frequency domain. Otherwise, the cell cannot be activated.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A smaller value results in a smaller number of UEs for which periodic CQI resources can be configured in the cell, lower uplink control signaling overhead, and higher uplink throughput. A larger value leads to the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-PucchExtendedRBNum.html">PucchExtendedRBNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PUCCH Extended RB Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the total number of RBs reserved for the PUSCH at both ends of the system band. This parameter is valid only if the PucchFlexCfgSwitch option of the PucchAlgoSwitch parameter is selected. For LTE FDD, consider the number of RBs used by the PRACH, SRSs, and PUCCH when you set this parameter. For LTE TDD, consider the number of RBs used by the PRACH and PUCCH when you set this parameter. If this parameter is set to a too large value, RBs within the cell bandwidth are not enough for the aforementioned physical resources, which cause failures in cell establishment. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 1~24</p>
+<p>Unit: 2RB</p>
+<p>Actual Value Range: 2~48</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 1</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A smaller value results in higher interference to the PUCCH and therefore lower PUCCH demodulation performance, access performance, and downlink throughput. However, the PUSCH resources are more continuous, increasing uplink throughput. A larger value results in lower interference to the PUCCH and therefore higher PUCCH demodulation performance, access performance, and downlink throughput. However, the PUSCH resources are less continuous, decreasing the uplink throughput.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-Format1ChAllocMode.html">Format1ChAllocMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Format1 Channel Allocation Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the mode for allocating PUCCH format 1/1a/1b code channel resources. The setting of this parameter takes effect only when the DeltaShift parameter is set to DS1_DELTA_SHIFT(ds1). If the Format1ChAllocMode parameter is set to FIXEDMODE(Fixed Mode), consecutive PUCCH format 1/1a/1b code channel resources are always allocated. If the Format1ChAllocMode parameter is set to RANDOMMODE(Random Mode), PUCCH format 1/1a/1b code channel resources are randomly allocated. If this parameter is set to OPTISELECTMODE(OPTISELECTMODE), PUCCH format 1 code channel resources are allocated based on the optimized selection mode. If this parameter is set to RBSAVINGMODE(RB Saving Mode), PUCCH format 1/1a/1b code channel resources are allocated in such a way where an RB is allocated to as many UEs as possible to save RBs. The RBSAVINGMODE value takes effect only in LTE FDD. When this parameter is set to RBSAVINGMODE for LTE TDD, the effect is the same as that set to RANDOMMODE. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: FIXEDMODE(Fixed Mode), RANDOMMODE(Random Mode), OPTISELECTMODE(OPTISELECTMODE), RBSAVINGMODE(RBSAVINGMODE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FIXEDMODE, RANDOMMODE, OPTISELECTMODE, RBSAVINGMODE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: When the number of UEs in the cell is small (in newly deployed sites or in off-peak hours), this parameter can be set to either FIXEDMODE(Fixed Mode) or RANDOMMODE(Random Mode).</p>
+<p>When the number of UEs in the cell is large, the parameter value RANDOMMODE(Random Mode) is recommended.</p>
+<p>In high speed railway scenarios, if a small number of PUCCH RB resources is required, the parameter value OPTISELECTMODE(OPTISELECTMODE) is recommended.</p>
+<p>It is recommended that this parameter be set to RBSAVINGMODE(RB Saving Mode) when uplink PRBs may be insufficient.</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to FIXEDMODE and the power differences between adjacent code channels are large, strong inter-symbol interference causes deterioration in format 1/1a/1b PUCCH demodulation performance. As a result, missing detection of format 1/1a/1b PUCCH occurs. If this parameter is set to RANDOMMODE, non-adjacent code channel resources are allocated to UEs for format 1/1a/1b PUCCH transmission. Therefore, the detection performance of format 1/1a/1b PUCCH improves. If this parameter is set to OPTISELECTMODE, the probability that adjacent code channel resources are allocated is minimized, the inter-symbol interference is reduced, and therefore the detection performance of format 1 PUCCH improves. In addition, the SRI demodulation performance achieved when the DeltaShift parameter is set to DS1_DELTA_SHIFT in high speed railway scenarios is the same as that achieved when the DeltaShift parameter is set to DS2_DELTA_SHIFT but with a smaller number of PUCCH RBs used. If this parameter is set to RBSAVINGMODE, the number of UEs reused in each RB increases, the number of PUCCH RBs decreases, and the number of available PUSCH RBs increases. However, interference between code channels increases, and demodulation performance of Format 1 code channel resources may deteriorate.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-SriPeriodAdaptive.html">SriPeriodAdaptive</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">SRI Period Adaptive Switch</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to enable scheduling request indicator (SRI) reporting period adaptation. If this parameter is set to QCIADAPTIVE, the eNodeB adaptively changes the SRI reporting period based on the cell load and bearers with different QCIs. If this parameter is set to NOQCIADAPTIVE, the eNodeB adaptively changes the SRI reporting period only based on the cell load. If this parameter is set to OFF and the FixedSriPeriod parameter in the PUCCHCFG MO is set to Disable, the SRI reporting period equals the value of the FixedSriPeriod parameter in the CELLQCIPARA MO. If this parameter is set to OFF and the FixedSriPeriod parameter in the PUCCHCFG MO is not set to Disable, the SRI reporting period equals the value of the FixedSriPeriod parameter in the PUCCHCFG MO. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: OFF(OFF), QCIADAPTIVE(QCIADAPTIVE), NOQCIADAPTIVE(NOQCIADAPTIVE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: OFF, QCIADAPTIVE, NOQCIADAPTIVE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: QCIADAPTIVE(QCIADAPTIVE)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The SriPeriodAdaptEnhancedOptSw option of the SriAlgoSwitch parameter in the CELLPUCCHALGO MO can be selected only if the FddTddInd parameter in the Cell MO is set to CELL_TDD, the PucchSwitch option of the PucchAlgoSwitch parameter in the CELLALGOSWITCH MO is selected, the TddSrsCfgMode parameter in the SRSCFG MO is set to ACCESS_ENHANCED, and the SriPeriodAdaptive parameter in the PUCCHCFG MO is set to QCIADAPTIVE or NOQCIADAPTIVE.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to NOQCIADAPTIVE, the eNodeB adaptively changes the SRI reporting period for UEs only based on the cell load. This avoids SRI reporting period reconfiguration caused by changes of bearers with different QCIs or changes of the effective status of some features, reducing signaling resource consumption. The decrease in the number of SRI reporting period reconfiguration attempts helps to resolve the issue where the E-RAB setup success rate decreases when abnormal UEs on the live network randomly do not send SRIs. The quality of voice services deteriorates slightly in a cell serving only a few UEs. In addition, the maximum number of UEs does not change after the SRI reporting period adaptively changes based on the SRI algorithm.</p>
+<p>If this parameter is set to QCIADAPTIVE, the SRI reporting period adaptively changes based on the SRI algorithm, and the maximum number of UEs does not change.</p>
+<p>If this parameter is set to OFF, the maximum number of UEs is determined based on the configured SRI reporting period.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-Format2ChAllocMode.html">Format2ChAllocMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Format2 Channel Allocation Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the channel resource allocation mode for PUCCH format 2/2a/2b. If this parameter is set to FIXEDMODE, consecutive channel resources are allocated for PUCCH format 2/2a/2b. If this parameter is set to RANDOMMODE, channel resource allocation is optimized for PUCCH format 2/2a/2b. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: FIXEDMODE(Fixed Mode), RANDOMMODE(Random Mode)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FIXEDMODE, RANDOMMODE</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RANDOMMODE(Random Mode) is recommended though the default value is FIXEDMODE(Fixed Mode).</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: If this parameter is set to FIXEDMODE, PUCCH format 2/2a/2b may be incorrectly demodulated when the power difference between channels is large and inter-channel interference is high. If this parameter is set to RANDOMMODE, enlarged channel spacing decreases inter-channel interference, improves demodulation performance, and increases CQI reliability.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-PucchAllocPolicy.html">PucchAllocPolicy</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PUCCH Allocation Policy</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PUCCH resource allocation policy. RbPriorityModeSW: Indicates whether to preferentially use RBs different from those already allocated when allocating new PUCCH code channel resources. If this option is selected, the eNodeB preferentially uses different RBs when allocating new PUCCH code channel resources. In this case, UEs are scheduled on all RBs, reducing inter-code-channel interference to UEs in a cell and improving PUCCH detection performance. If this option is deselected, the eNodeB fully uses each RB available for the PUCCH when allocating new PUCCH code channel resources. For LTE FDD, this option takes effect only when the PUCCHSWITCH option of the PucchAlgoSwitch parameter is deselected.</p>
+<p>GUI Value Range: RbPriorityModeSW(RbPriorityModeSW)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: RbPriorityModeSW</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: RbPriorityModeSW:Off</p>
+<p>Parameter Relationship:</p>
+<p>-Others:</p>
+<ul><li>Manual setting of the RbPriorityModeSW option takes effect only when the PUCCHSWITCH option of the PucchAlgoSwitch is deselected. Otherwise, this option does not take effect.</li></ul>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: RbPriorityModeSW: If this option is selected, the eNodeB schedules UEs in the cell on all RBs, reducing inter-code-channel interference to most UEs in a cell and improving PUCCH detection performance. When the PUCCHSWITCH option of the PucchAlgoSwitch parameter is selected, the amount of PUCCH resources is less likely to decrease, and the uplink cell throughput decreases. If this option is deselected, the eNodeB schedules most UEs on RBs transmitting the PUCCH at the edge of the frequency band, increasing inter-code-channel interference to such UEs and causing deterioration in PUCCH demodulation performance. When the PUCCHSWITCH option of the PucchAlgoSwitch parameter is selected, the decrease in the amount of PUCCH resources is not affected.</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-Format3RbNum.html">Format3RbNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Format3 RB Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of RBs that can be used by PUCCH resources in Format 3. This parameter takes effect only when the SCCAckResourceCfgSw option of the PucchAlgoSwitch parameter is selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: 0~2</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~2</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 2</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If the parameter is set to a smaller value, fewer RBs are allocated to the PUCCH in format 3 and fewer CA UEs that send HARQ ACK over the PUCCH in format 3 are scheduled in the cell in a TTI. A larger value of this parameter results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-Max2CCAckChNum.html">Max2CCAckChNum</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Max 2CC ACK Channel Number</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the maximum number of code channels that can be used by SCC ACKs in 2CC CA scenarios. This parameter takes effect only when options Dl2CCAckResShareSw and SCCAckResourceCfgSw of the PucchAlgoSwitch parameter are selected. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: MAX_CH_NUM8(Ch8), MAX_CH_NUM16(Ch16), MAX_CH_NUM24(Ch24), MAX_CH_NUM32(Ch32)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: MAX_CH_NUM8, MAX_CH_NUM16, MAX_CH_NUM24, MAX_CH_NUM32</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: MAX_CH_NUM32(Ch32)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: A larger number indicated by this parameter results in more 2CC CA UEs scheduled in the local cell (which is taken as the PCell of these UEs) in a TTI and more PUCCH RBs consumed. A smaller number results in the opposite effects.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-FixedSriPeriod.html">FixedSriPeriod</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Fixed SRI Period</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the SRI period for UEs. This parameter takes effect only when the SriPeriodAdaptive parameter in the PUCCHCfg MO is set to OFF. If this parameter is set to Disable(Disable), the SRI period is specified by the SriPeriodAdaptive parameter in the PUCCHCfg MO. This parameter specifies the SRI period for UEs if it is set to a value other than Disable. This parameter applies only to LTE FDD and LTE TDD.</p>
+<p>GUI Value Range: Disable(Disable), ms5(ms5), ms10(ms10), ms20(ms20), ms40(ms40), ms80(ms80)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: Disable, ms5, ms10, ms20, ms40, ms80</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: Disable(Disable)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A small value of this parameter leads to a short SRI period for UEs in the cell, fast SRI resource expansion, a small number of UEs that can access the network, and a short access delay. A large value of this parameter leads to slow SRI resource expansion, a large number of common UEs that can access the network, and a long access delay. If this parameter is set to Disable(Disable), network performance is not affected.</p>
+<p>Applicable Mode: L-FDD, L-TDD</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/PUCCHCfg-Format1CodeChnExpThld.html">Format1CodeChnExpThld</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Format1 Code Channel Expansion Threshold</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the threshold for increasing the number of code channels for PUCCH format 1 in the cell. When the number of remaining format 1 code channels is less than this threshold, the number of format-1 code channels will be increased. This parameter is valid only when the PucchSwitch option of the CellAlgoSwitch.PucchAlgoSwitch parameter is selected and the DeltaShift parameter is set to DS1_DELTA_SHIFT. This parameter is invalid for the LBBPc. If this parameter is set to 0, the function does not take effect. This parameter applies only to LTE FDD.</p>
+<p>GUI Value Range: 0~20</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~20</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: 10</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: A smaller value of this parameter leads to a lower probability that the number of code channels for PUCCH format 1 will be increased, a smaller number of occupied PUCCH code channels, fewer PUCCH RBs for a given number of UEs, more RBs available for the PUSCH, but a higher probability that access will fail due to insufficient PUCCH format 1 resources. A larger value of this parameter leads to a higher probability that the number of code channels for PUCCH format 1 will be increased, a larger number of occupied PUCCH code channels, more PUCCH RBs for a given number of UEs, fewer RBs available for the PUSCH, but a lower probability that access will fail due to insufficient PUCCH format 1 resources.</p>
+<p>Applicable Mode: L-FDD</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="mod_pucchcfg__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">To modify the PUCCH configuration with the parameters as follows: Local cell ID: 0, Delta shift: DS2_DELTA_SHIFT, run the following command:
+MOD PUCCHCFG: LocalCellId=0, DeltaShift=DS2_DELTA_SHIFT;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>

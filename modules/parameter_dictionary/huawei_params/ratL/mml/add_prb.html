@@ -1,0 +1,479 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en-us" xml:lang="en-us">
+<head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+<meta name="copyright" content="(C) Copyright 2005">
+<meta name="DC.rights.owner" content="(C) Copyright 2005">
+<meta name="DC.Type" content="mmlref">
+<meta name="DC.Title" content="Add Physical Resource Block (ADD PRB)">
+<meta name="DC.Format" content="XHTML">
+<meta name="DC.Identifier" content="add_prb">
+<meta name="DC.Language" content="en-us">
+<link rel="stylesheet" type="text/css" href="../../public_sys-resources/commonltr.css">
+<title>Add Physical Resource Block (ADD PRB)</title>
+</head>
+<body style="clear:both; padding-left:10px; padding-top:5px; padding-right:5px; padding-bottom:5px"><a name="add_prb"></a><a name="add_prb"></a>
+
+
+<h1 class="topictitle1">Add Physical Resource Block (ADD PRB)</h1>
+
+<div>
+<p><strong>Network Element: </strong>BTS3900, BTS3900 LTE, BTS5900, BTS5900 LTE</p>
+
+<div class="mmlfunc"><a name="add_prb__1.2.2"></a><a name="1.2.2"></a><h2 class="sectiontitle">Function</h2>
+<div class="mmlfuncbody"><p>Use this command to add a physical carrier for an NB-IoT cell.</p>
+</div></div>
+
+<div class="mmlnote"><a name="add_prb__1.2.3"></a><a name="1.2.3"></a><h2 class="sectiontitle">Note</h2>
+<div class="mmlnotebody">
+<p>When the DeployMode parameter is set to STAND_ALONE or GUARD_BAND and the UlEarfcnCfgInd parameter is set to CFG, the LteDlRbIndex and LteUlRbIndex parameters can still be set on the Web LMT or using the MML command, but they can only be set to the invalid value 255. In addition, the LteDlRbIndex or LteUlRbIndex parameter can be set only after the WorkMode parameter is set.</p>
+
+</div></div>
+
+<div class="mmlparam"><a name="add_prb__1.2.4"></a><a name="1.2.4"></a><h2 class="sectiontitle">Parameters</h2>
+<div class="mmlparambody">
+<table cellpadding="4" cellspacing="0" summary="" border="1" class="simpletableborder">
+<tr>
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.1">ID</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.2">Name</th>
+
+<th valign="bottom" align="left" id="mcps1.2.4.1.1.3" width="65%">Description</th>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-LocalCellId.html">LocalCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Local Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the local ID of a cell, which uniquely identifies a cell within an eNodeB.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-PrbId.html">PrbId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PRB ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the NB-IoT PRB identity. It uniquely identifies a PRB within a cell. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: N/A</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-DeployMode.html">DeployMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Deployment Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the NB-IoT PRB deployment mode. STAND_ALONE indicates that out-of-band LTE spectrum resources are used to deploy NB-IoT PRB. GUARD_BAND indicates that NB-IoT PRB is deployed on the LTE guardband. IN_BAND indicates that PRB is deployed on the LTE RB resources, which means that fewer RBs are available for LTE. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: STAND_ALONE(STAND_ALONE), GUARD_BAND(GUARD_BAND), IN_BAND(IN_BAND)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: STAND_ALONE, GUARD_BAND, IN_BAND</p>
+<p>MML Default Value: STAND_ALONE(STAND_ALONE)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the AnchorCarrierFlag and DeployMode parameters in a Prb MO are set to TRUE and IN_BAND, respectively: For other PRBs with the same LocalCellId, if the AnchorCarrierFlag and DeployMode parameters are set to FALSE and IN_BAND, respectively, the LteCellId parameter must be the same as that in the Prb MO instance with AnchorCarrierFlag set to TRUE.</li><li>When the AnchorCarrierFlag and DeployMode parameters in a Prb MO are set to TRUE and GUARD_BAND, respectively: For PRBs with the same LocalCellId in the Prb MO, if the AnchorCarrierFlag and DeployMode parameters are set to FALSE and GUARD_BAND, respectively, the LteDlEarfcn and LteBandWidth must be the same as the LteDlEarfcn and LteBandWidth parameters in the Prb MO instance with AnchorCarrierFlag set to TRUE.</li><li>If the DeployMode and AnchorCarrierFlag parameters in a Prb MO are set to STAND_ALONE and TRUE, respectively, the DlFreqOffset parameter in this Prb MO must be set to NEG_0DOT5. If the DeployMode parameter in a Prb MO is not set to STAND_ALONE, the AnchorCarrierFlag parameter in this Prb MO is set to TRUE, and the LteDlRbIndex parameter in this Prb MO is set to an invalid value, then the DlFreqOffset parameter in this Prb MO must be set to NEG_2, NEG_1, POS_0, or POS_1.</li><li>If the DeployMode parameter in the Prb MO is set to IN_BAND and the OtdoaSwitch option of the LcsSwitch parameter in the ENodeBAlgoSwitch MO and the NB_OTDOA_SWITCH option of the CellLcsSwitch parameter in the CellLcsCfg MO are selected, the NprsId parameter (if not set to 65535) in the EuPrbSectorEqm MO must be set to the same value as the PhyCellId parameter in the Cell MO for the LTE cell associated with the NB-IoT cell, or has a different mod 6 value from the PhyCellId parameter.</li><li>When the DeployMode parameter in a Prb MO is STAND_ALONE or GUARD_BAND, the NbDlBitmapSize parameter in the associated PrbSchConfig MO must be set to SF10.</li><li>When the DeployMode parameter in a Prb MO is IN_BAND, the NprsSubframeConfigMode parameter in the associated CellNprsCfg MO must not be set to PART_B.</li><li>In a Prb MO, if the DeployMode parameter is set to STAND_ALONE, the WorkMode parameter is set to UL_DL, and the DlFreqOffset parameter is not set to NEG_0DOT5, then the UlEarfcnCfgInd parameter in this Prb MO must be set to CFG.</li><li>Among the Prb MOs (under a Cell MO) in which DeployMode is set to STAND_ALONE, the downlink center frequencies of the PRBs specified by the Prb MOs in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE must all be greater than or less than the downlink center frequencies of PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE, when the following conditions are met: (1). The number of Prb MOs in which DeployMode is set to STAND_ALONE is greater than 2 and AnchorCarrierFlag is set to TRUE in at least one of these MOs. (2). The difference between the downlink center frequencies of the PRBs specified by the Prb MO in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE and those of the PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE is not an integer multiple of 15 kHz.</li><li>The spacing between the downlink center frequencies of the PRBs meeting the following conditions must be an integer multiple of 15 kHz: In the Prb MOs for these PRBs, the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or DL_ONLY, the DeployMode parameters are set to STAND_ALONE, and the AnchorCarrierFlag parameters are set to FALSE.</li><li>If the number of Prb MOs in which the LocalCellId parameters are set to the same value and the DeployMode parameters are set to STAND_ALONE are greater than two, the spacing between the uplink center frequencies of the PRBs specified in the Prb MOs in which the WorkMode parameters are set to UL_DL or UL_ONLY must be an integer multiple of 15 kHz.</li><li>In a Prb MO, if WorkMode is set to UL_DL, DeployMode is set to IN_BAND, and UlEarfcnCfgInd is set to CFG, then LteDlRbIndex and LteUlRbIndex must be both set to invalid or valid values.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-WorkMode.html">WorkMode</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Work Mode</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the working mode of the carrier for an NB-IoT cell. This parameter must be set to UL_DL for the anchor carrier. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: UL_DL(Uplink and downlink), DL_ONLY(Downlink only), UL_ONLY(Uplink only)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UL_DL, DL_ONLY, UL_ONLY</p>
+<p>MML Default Value: UL_DL(Uplink and downlink)</p>
+<p>Recommended Value: UL_DL(Uplink and downlink)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The differences between the downlink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or DL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>The differences between the uplink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or UL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>If AnchorCarrierFlag in a Prb MO is set to TRUE, WorkMode in this Prb MO must be set to UL_DL.</li><li>In a Prb MO, if the DeployMode parameter is set to STAND_ALONE, the WorkMode parameter is set to UL_DL, and the DlFreqOffset parameter is not set to NEG_0DOT5, then the UlEarfcnCfgInd parameter in this Prb MO must be set to CFG.</li><li>Among the Prb MOs (under a Cell MO) in which DeployMode is set to STAND_ALONE, the downlink center frequencies of the PRBs specified by the Prb MOs in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE must all be greater than or less than the downlink center frequencies of PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE, when the following conditions are met: (1). The number of Prb MOs in which DeployMode is set to STAND_ALONE is greater than 2 and AnchorCarrierFlag is set to TRUE in at least one of these MOs. (2). The difference between the downlink center frequencies of the PRBs specified by the Prb MO in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE and those of the PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE is not an integer multiple of 15 kHz.</li><li>The spacing between the downlink center frequencies of the PRBs meeting the following conditions must be an integer multiple of 15 kHz: In the Prb MOs for these PRBs, the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or DL_ONLY, the DeployMode parameters are set to STAND_ALONE, and the AnchorCarrierFlag parameters are set to FALSE.</li><li>If the number of Prb MOs in which the LocalCellId parameters are set to the same value and the DeployMode parameters are set to STAND_ALONE are greater than two, the spacing between the uplink center frequencies of the PRBs specified in the Prb MOs in which the WorkMode parameters are set to UL_DL or UL_ONLY must be an integer multiple of 15 kHz.</li><li>In a Prb MO, if WorkMode is set to UL_DL, DeployMode is set to IN_BAND, and UlEarfcnCfgInd is set to CFG, then LteDlRbIndex and LteUlRbIndex must be both set to invalid or valid values.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: If this parameter is set to DL_ONLY for a carrier, the number of uplink carriers and that of downlink carriers for the cell will be unbalanced, causing uplink throughput of the cell to decrease. The paging success rate also decreases if a large number of UEs are paged.</p>
+<p>If this parameter is set to UL_ONLY for a carrier, the number of uplink carriers and that of downlink carriers for the cell will be unbalanced, causing downlink throughput of the cell to decrease. The access success rate also decreases if a large number of UEs attempt to access the cell.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-AnchorCarrierFlag.html">AnchorCarrierFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Anchor Carrier Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether the PRB is an anchor carrier. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: TRUE(TRUE)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the AnchorCarrierFlag and DeployMode parameters in a Prb MO are set to TRUE and IN_BAND, respectively: For other PRBs with the same LocalCellId, if the AnchorCarrierFlag and DeployMode parameters are set to FALSE and IN_BAND, respectively, the LteCellId parameter must be the same as that in the Prb MO instance with AnchorCarrierFlag set to TRUE.</li><li>When the AnchorCarrierFlag and DeployMode parameters in a Prb MO are set to TRUE and GUARD_BAND, respectively: For PRBs with the same LocalCellId in the Prb MO, if the AnchorCarrierFlag and DeployMode parameters are set to FALSE and GUARD_BAND, respectively, the LteDlEarfcn and LteBandWidth must be the same as the LteDlEarfcn and LteBandWidth parameters in the Prb MO instance with AnchorCarrierFlag set to TRUE.</li><li>If AnchorCarrierFlag in a Prb MO is set to TRUE and NbDlBitmapSize in the PrbSchConfig MO under the Prb MO is set to SF10, the number of "0" bits in the value of NbDlBitmap10 in the PrbSchConfig MO cannot exceed 3.</li><li>If the AnchorCarrierFlag parameter in a Prb MO is set to TRUE and NbDlBitmapSize in the PrbSchConfig MO under the Prb MO is set to SF40, the number of bits being 0 in the values of the NbDlBitmap30 and NbDlBitmap10 parameters in the PrbSchConfig MO must not exceed 12.</li><li>If AnchorCarrierFlag in a Prb MO is set to TRUE, WorkMode in this Prb MO must be set to UL_DL.</li><li>Among the Prb MOs (under a Cell MO) in which DeployMode is set to STAND_ALONE, the downlink center frequencies of the PRBs specified by the Prb MOs in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE must all be greater than or less than the downlink center frequencies of PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE, when the following conditions are met: (1). The number of Prb MOs in which DeployMode is set to STAND_ALONE is greater than 2 and AnchorCarrierFlag is set to TRUE in at least one of these MOs. (2). The difference between the downlink center frequencies of the PRBs specified by the Prb MO in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE and those of the PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE is not an integer multiple of 15 kHz.</li><li>The spacing between the downlink center frequencies of the PRBs meeting the following conditions must be an integer multiple of 15 kHz: In the Prb MOs for these PRBs, the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or DL_ONLY, the DeployMode parameters are set to STAND_ALONE, and the AnchorCarrierFlag parameters are set to FALSE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-FreqBand.html">FreqBand</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Frequency Band</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency band to which the PRB belongs. For details, see 3GPP TS 36.104. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 1~256</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 1~256</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The FreqBand parameter in a Prb MO must be set to 1, 2, 3, 4, 5, 8, 11, 12, 13, 17, 18, 19, 20, 21, 25, 26, 28, 31, 66, 70, 71, 72, 73, 74, 85, 111, or 222. If the LteDlRbIndex parameter in a Prb MO is set to an invalid value and the WorkMode parameter in this Prb MO is set to UL_DL or DL_ONLY, the FreqBand and DlEarfcn parameters in this Prb MO must be configured in accordance with certain rules. For details about these parameters, see 3GPP TS 36.101. Band 111 and Band 222 are customized for operators. The downlink EARFCN range of Band 111 is 11131 to 11190 and that of Band 222 is 13111 to 13360. If the LteUlRbIndex parameter in a Prb MO is set to an invalid value and the WorkMode parameter in this Prb MO is set to UL_DL or UL_ONLY, the FreqBand and UlEarfcn parameters in this Prb MO must be configured in accordance with certain rules. For details about these parameters, see 3GPP TS 36.101. Band 111 and Band 222 are customized for operators. The uplink EARFCN range of Band 111 is 32111 to 32160 and that of Band 222 is 31111 to 31160.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-UlEarfcnCfgInd.html">UlEarfcnCfgInd</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink EARFCN Configuration Indicator</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether to configure information about the PRB uplink EARFCN. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: NOT_CFG(Not configure), CFG(Configure)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NOT_CFG, CFG</p>
+<p>MML Default Value: NOT_CFG(Not configure)</p>
+<p>Recommended Value: NOT_CFG(Not configure)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the value of the FreqBand parameter in a Prb MO is set to Band 111 or Band 222, the UlEarfcnCfgInd parameter must be set to CFG.</li><li>If the DeployMode and AnchorCarrierFlag parameters in a Prb MO are set to STAND_ALONE and TRUE, respectively, the DlFreqOffset parameter in this Prb MO must be set to NEG_0DOT5. If the DeployMode parameter in a Prb MO is not set to STAND_ALONE, the AnchorCarrierFlag parameter in this Prb MO is set to TRUE, and the LteDlRbIndex parameter in this Prb MO is set to an invalid value, then the DlFreqOffset parameter in this Prb MO must be set to NEG_2, NEG_1, POS_0, or POS_1.</li><li>Among the Prb MOs with the same LocalCellId setting: (1) The DlEarfcn parameter must be set to different values in the Prb MOs in which the LteDlRbIndex parameter is set to an invalid value and the WorkMode parameter is set to UL_DL or DL_ONLY. (2) The DlEarfcn parameter must be set to different values in the Prb MOs in which the WorkMode parameter is set to UL_DL or UL_ONLY. Specifically, if the UlEarfcnCfgInd parameter in a Prb MO is set to CFG and the LteUlRbIndex parameter in this Prb MO is set to an invalid value, the UL EARFCN of the corresponding PRB is specified by the UlEarfcn parameter in this Prb MO; if the UlEarfcnCfgInd parameter in a Prb MO is not set to CFG and the WorkMode and LteDlRbIndex parameters in this Prb MO are set to UL_DL and an invalid value, respectively, the UL EARFCN of the corresponding PRB is automatically calculated based on the values of the DlEarfcn and DlFreqOffset parameters in this Prb MO given that the system is symmetrical in the uplink and downlink.</li><li>Among the Prb MOs with the same LocalCellId setting: (1) The DlEarfcn parameter must be set to different values in the Prb MOs in which the LteDlRbIndex parameter is set to an invalid value and the WorkMode parameter is set to UL_DL or DL_ONLY. (2) The DlEarfcn parameter must be set to different values in the Prb MOs in which the WorkMode parameter is set to UL_DL or UL_ONLY. Specifically, if the UlEarfcnCfgInd parameter in a Prb MO is set to CFG and the LteUlRbIndex parameter in this Prb MO is set to an invalid value, the UL EARFCN of the corresponding PRB is specified by the UlEarfcn parameter in this Prb MO; if the UlEarfcnCfgInd parameter in a Prb MO is not set to CFG and the WorkMode and LteDlRbIndex parameters in this Prb MO are set to UL_DL and an invalid value, respectively, the UL EARFCN of the corresponding PRB is automatically calculated based on the values of the DlEarfcn and DlFreqOffset parameters in this Prb MO given that the system is symmetrical in the uplink and downlink.</li><li>The differences between the uplink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or UL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>In a Prb MO, if the DeployMode parameter is set to STAND_ALONE, the WorkMode parameter is set to UL_DL, and the DlFreqOffset parameter is not set to NEG_0DOT5, then the UlEarfcnCfgInd parameter in this Prb MO must be set to CFG.</li><li>If the number of Prb MOs in which the LocalCellId parameters are set to the same value and the DeployMode parameters are set to STAND_ALONE are greater than two, the spacing between the uplink center frequencies of the PRBs specified in the Prb MOs in which the WorkMode parameters are set to UL_DL or UL_ONLY must be an integer multiple of 15 kHz.</li><li>In a Prb MO, if WorkMode is set to UL_DL, DeployMode is set to IN_BAND, and UlEarfcnCfgInd is set to CFG, then LteDlRbIndex and LteUlRbIndex must be both set to invalid or valid values.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-LteUlRbIndex.html">LteUlRbIndex</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LTE Uplink RB Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a physical layer RB. This parameter is valid only when the DeployMode parameter is set to IN_BAND and the UlEarfcnCfgInd parameter is set to CFG. For details, see 3GPP TS 36.211. The value 255 indicates an invalid RB index. The UlEarfcn and UlFreqOffset parameters can be set only when this parameter is set to 255. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~99,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~99,255</p>
+<p>MML Default Value: 255</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Prb MO, if WorkMode is set to UL_DL, DeployMode is set to IN_BAND, and UlEarfcnCfgInd is set to CFG, then LteDlRbIndex and LteUlRbIndex must be both set to invalid or valid values.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-UlEarfcn.html">UlEarfcn</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink EARFCN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB uplink EARFCN, which is optional. This parameter takes effect only when UlEarfcnCfgInd is set to CFG(Configure). Otherwise, the eNodeB calculates this parameter value based on the rule that RB positions in the uplink and downlink are consistent. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 18000~65535,131072~134181</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 18000~65535,131072~134181</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>The FreqBand parameter in a Prb MO must be set to 1, 2, 3, 4, 5, 8, 11, 12, 13, 17, 18, 19, 20, 21, 25, 26, 28, 31, 66, 70, 71, 72, 73, 74, 85, 111, or 222. If the LteDlRbIndex parameter in a Prb MO is set to an invalid value and the WorkMode parameter in this Prb MO is set to UL_DL or DL_ONLY, the FreqBand and DlEarfcn parameters in this Prb MO must be configured in accordance with certain rules. For details about these parameters, see 3GPP TS 36.101. Band 111 and Band 222 are customized for operators. The downlink EARFCN range of Band 111 is 11131 to 11190 and that of Band 222 is 13111 to 13360. If the LteUlRbIndex parameter in a Prb MO is set to an invalid value and the WorkMode parameter in this Prb MO is set to UL_DL or UL_ONLY, the FreqBand and UlEarfcn parameters in this Prb MO must be configured in accordance with certain rules. For details about these parameters, see 3GPP TS 36.101. Band 111 and Band 222 are customized for operators. The uplink EARFCN range of Band 111 is 32111 to 32160 and that of Band 222 is 31111 to 31160.</li><li>Among the Prb MOs with the same LocalCellId setting: (1) The DlEarfcn parameter must be set to different values in the Prb MOs in which the LteDlRbIndex parameter is set to an invalid value and the WorkMode parameter is set to UL_DL or DL_ONLY. (2) The DlEarfcn parameter must be set to different values in the Prb MOs in which the WorkMode parameter is set to UL_DL or UL_ONLY. Specifically, if the UlEarfcnCfgInd parameter in a Prb MO is set to CFG and the LteUlRbIndex parameter in this Prb MO is set to an invalid value, the UL EARFCN of the corresponding PRB is specified by the UlEarfcn parameter in this Prb MO; if the UlEarfcnCfgInd parameter in a Prb MO is not set to CFG and the WorkMode and LteDlRbIndex parameters in this Prb MO are set to UL_DL and an invalid value, respectively, the UL EARFCN of the corresponding PRB is automatically calculated based on the values of the DlEarfcn and DlFreqOffset parameters in this Prb MO given that the system is symmetrical in the uplink and downlink.</li><li>Among the Prb MOs with the same LocalCellId setting: (1) The DlEarfcn parameter must be set to different values in the Prb MOs in which the LteDlRbIndex parameter is set to an invalid value and the WorkMode parameter is set to UL_DL or DL_ONLY. (2) The DlEarfcn parameter must be set to different values in the Prb MOs in which the WorkMode parameter is set to UL_DL or UL_ONLY. Specifically, if the UlEarfcnCfgInd parameter in a Prb MO is set to CFG and the LteUlRbIndex parameter in this Prb MO is set to an invalid value, the UL EARFCN of the corresponding PRB is specified by the UlEarfcn parameter in this Prb MO; if the UlEarfcnCfgInd parameter in a Prb MO is not set to CFG and the WorkMode and LteDlRbIndex parameters in this Prb MO are set to UL_DL and an invalid value, respectively, the UL EARFCN of the corresponding PRB is automatically calculated based on the values of the DlEarfcn and DlFreqOffset parameters in this Prb MO given that the system is symmetrical in the uplink and downlink.</li><li>The differences between the uplink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or UL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>If the number of Prb MOs in which the LocalCellId parameters are set to the same value and the DeployMode parameters are set to STAND_ALONE are greater than two, the spacing between the uplink center frequencies of the PRBs specified in the Prb MOs in which the WorkMode parameters are set to UL_DL or UL_ONLY must be an integer multiple of 15 kHz.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-UlFreqOffset.html">UlFreqOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink Frequency Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency offset of the PRB uplink central frequency to the uplink frequency. This parameter takes effect only when UlEarfcnCfgInd is set to CFG(Configure). Otherwise, the eNodeB calculates this parameter value based on the rule that RB positions in the uplink and downlink are consistent. For details, see 3GPP TS 36.101. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: NEG_10(NEG_10), NEG_9(NEG_9), NEG_8(NEG_8), NEG_7(NEG_7), NEG_6(NEG_6), NEG_5(NEG_5), NEG_4(NEG_4), NEG_3(NEG_3), NEG_2(NEG_2), NEG_1(NEG_1), POS_0(POS_0), POS_1(POS_1), POS_2(POS_2), POS_3(POS_3), POS_4(POS_4), POS_5(POS_5), POS_6(POS_6), POS_7(POS_7), POS_8(POS_8), POS_9(POS_9)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NEG_10, NEG_9, NEG_8, NEG_7, NEG_6, NEG_5, NEG_4, NEG_3, NEG_2, NEG_1, POS_0, POS_1, POS_2, POS_3, POS_4, POS_5, POS_6, POS_7, POS_8, POS_9</p>
+<p>MML Default Value: POS_0(POS_0)</p>
+<p>Recommended Value: POS_0(POS_0)</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the DeployMode and AnchorCarrierFlag parameters in a Prb MO are set to STAND_ALONE and TRUE, respectively, the DlFreqOffset parameter in this Prb MO must be set to NEG_0DOT5. If the DeployMode parameter in a Prb MO is not set to STAND_ALONE, the AnchorCarrierFlag parameter in this Prb MO is set to TRUE, and the LteDlRbIndex parameter in this Prb MO is set to an invalid value, then the DlFreqOffset parameter in this Prb MO must be set to NEG_2, NEG_1, POS_0, or POS_1.</li><li>The differences between the uplink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or UL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>If the number of Prb MOs in which the LocalCellId parameters are set to the same value and the DeployMode parameters are set to STAND_ALONE are greater than two, the spacing between the uplink center frequencies of the PRBs specified in the Prb MOs in which the WorkMode parameters are set to UL_DL or UL_ONLY must be an integer multiple of 15 kHz.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-LteDlRbIndex.html">LteDlRbIndex</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LTE Downlink RB Index</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the index of a physical layer RB. This parameter is valid only when the DeployMode parameter is set to IN_BAND. For details, see 3GPP TS 36.211. The value 255 indicates an invalid RB index. The DlEarfcn and DlFreqOffset parameters can be set only when this parameter is set to 255. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~99,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~99,255</p>
+<p>MML Default Value: 255</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>In a Prb MO, if WorkMode is set to UL_DL, DeployMode is set to IN_BAND, and UlEarfcnCfgInd is set to CFG, then LteDlRbIndex and LteUlRbIndex must be both set to invalid or valid values.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-DlEarfcn.html">DlEarfcn</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink EARFCN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRB DL EARFCN. For details, see 3GPP TS 36.104. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~70545,255144~256143,260894~262143</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~70545,255144~256143,260894~262143</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the value of the FreqBand parameter in a Prb MO is set to Band 111 or Band 222, the UlEarfcnCfgInd parameter must be set to CFG.</li><li>The FreqBand parameter in a Prb MO must be set to 1, 2, 3, 4, 5, 8, 11, 12, 13, 17, 18, 19, 20, 21, 25, 26, 28, 31, 66, 70, 71, 72, 73, 74, 85, 111, or 222. If the LteDlRbIndex parameter in a Prb MO is set to an invalid value and the WorkMode parameter in this Prb MO is set to UL_DL or DL_ONLY, the FreqBand and DlEarfcn parameters in this Prb MO must be configured in accordance with certain rules. For details about these parameters, see 3GPP TS 36.101. Band 111 and Band 222 are customized for operators. The downlink EARFCN range of Band 111 is 11131 to 11190 and that of Band 222 is 13111 to 13360. If the LteUlRbIndex parameter in a Prb MO is set to an invalid value and the WorkMode parameter in this Prb MO is set to UL_DL or UL_ONLY, the FreqBand and UlEarfcn parameters in this Prb MO must be configured in accordance with certain rules. For details about these parameters, see 3GPP TS 36.101. Band 111 and Band 222 are customized for operators. The uplink EARFCN range of Band 111 is 32111 to 32160 and that of Band 222 is 31111 to 31160.</li><li>The differences between the downlink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or DL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>Among the Prb MOs with the same LocalCellId setting: (1) The DlEarfcn parameter must be set to different values in the Prb MOs in which the LteDlRbIndex parameter is set to an invalid value and the WorkMode parameter is set to UL_DL or DL_ONLY. (2) The DlEarfcn parameter must be set to different values in the Prb MOs in which the WorkMode parameter is set to UL_DL or UL_ONLY. Specifically, if the UlEarfcnCfgInd parameter in a Prb MO is set to CFG and the LteUlRbIndex parameter in this Prb MO is set to an invalid value, the UL EARFCN of the corresponding PRB is specified by the UlEarfcn parameter in this Prb MO; if the UlEarfcnCfgInd parameter in a Prb MO is not set to CFG and the WorkMode and LteDlRbIndex parameters in this Prb MO are set to UL_DL and an invalid value, respectively, the UL EARFCN of the corresponding PRB is automatically calculated based on the values of the DlEarfcn and DlFreqOffset parameters in this Prb MO given that the system is symmetrical in the uplink and downlink.</li><li>Among the Prb MOs with the same LocalCellId setting: (1) The DlEarfcn parameter must be set to different values in the Prb MOs in which the LteDlRbIndex parameter is set to an invalid value and the WorkMode parameter is set to UL_DL or DL_ONLY. (2) The DlEarfcn parameter must be set to different values in the Prb MOs in which the WorkMode parameter is set to UL_DL or UL_ONLY. Specifically, if the UlEarfcnCfgInd parameter in a Prb MO is set to CFG and the LteUlRbIndex parameter in this Prb MO is set to an invalid value, the UL EARFCN of the corresponding PRB is specified by the UlEarfcn parameter in this Prb MO; if the UlEarfcnCfgInd parameter in a Prb MO is not set to CFG and the WorkMode and LteDlRbIndex parameters in this Prb MO are set to UL_DL and an invalid value, respectively, the UL EARFCN of the corresponding PRB is automatically calculated based on the values of the DlEarfcn and DlFreqOffset parameters in this Prb MO given that the system is symmetrical in the uplink and downlink.</li><li>The differences between the uplink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or UL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>Among the Prb MOs (under a Cell MO) in which DeployMode is set to STAND_ALONE, the downlink center frequencies of the PRBs specified by the Prb MOs in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE must all be greater than or less than the downlink center frequencies of PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE, when the following conditions are met: (1). The number of Prb MOs in which DeployMode is set to STAND_ALONE is greater than 2 and AnchorCarrierFlag is set to TRUE in at least one of these MOs. (2). The difference between the downlink center frequencies of the PRBs specified by the Prb MO in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE and those of the PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE is not an integer multiple of 15 kHz.</li><li>The spacing between the downlink center frequencies of the PRBs meeting the following conditions must be an integer multiple of 15 kHz: In the Prb MOs for these PRBs, the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or DL_ONLY, the DeployMode parameters are set to STAND_ALONE, and the AnchorCarrierFlag parameters are set to FALSE.</li><li>If the number of Prb MOs in which the LocalCellId parameters are set to the same value and the DeployMode parameters are set to STAND_ALONE are greater than two, the spacing between the uplink center frequencies of the PRBs specified in the Prb MOs in which the WorkMode parameters are set to UL_DL or UL_ONLY must be an integer multiple of 15 kHz.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-DlFreqOffset.html">DlFreqOffset</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Downlink Frequency Offset</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the frequency offset of the PRB downlink central frequency to the downlink frequency. For details, see 3GPP TS 36.101. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: NEG_10(NEG_10), NEG_9(NEG_9), NEG_8(NEG_8), NEG_7(NEG_7), NEG_6(NEG_6), NEG_5(NEG_5), NEG_4(NEG_4), NEG_3(NEG_3), NEG_2(NEG_2), NEG_1(NEG_1), NEG_0DOT5(NEG_0DOT5), POS_0(POS_0), POS_1(POS_1), POS_2(POS_2), POS_3(POS_3), POS_4(POS_4), POS_5(POS_5), POS_6(POS_6), POS_7(POS_7), POS_8(POS_8), POS_9(POS_9)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: NEG_10, NEG_9, NEG_8, NEG_7, NEG_6, NEG_5, NEG_4, NEG_3, NEG_2, NEG_1, NEG_0DOT5, POS_0, POS_1, POS_2, POS_3, POS_4, POS_5, POS_6, POS_7, POS_8, POS_9</p>
+<p>MML Default Value: NEG_0DOT5(NEG_0DOT5)</p>
+<p>Recommended Value: When the DeployMode parameter is set to STAND_ALONE(STAND_ALONE), the DlFreqOffset parameter must be set to NEG_0DOT5(NEG_0DOT5).</p>
+<p>When the DeployMode parameter is set to IN_BAND(IN_BAND) or GUARD_BAND(GUARD_BAND), the DlFreqOffset parameter must be set to NEG_2(NEG_2), NEG_1(NEG_1), POS_0(POS_0), or POS_1(POS_1).</p>
+<p>When the DeployMode parameter is set to IN_BAND(IN_BAND) and the bandwidth of the associated LTE cell is 5 MHz or 15 MHz, the DlFreqOffset parameter must be set to NEG_2(NEG_2) or POS_1(POS_1). In addition, the first half of the RBs for deploying NB-IoT must be set to NEG_2(NEG_2) in the LTE bandwidth, and the second half of the RBs must be set to POS_1(POS_1).</p>
+<p>When the DeployMode parameter is set to IN_BAND(IN_BAND) and the bandwidth of the associated LTE cell is 10 MHz or 20 MHz, the DlFreqOffset parameter must be set to NEG_1(NEG_1) or POS_0(POS_0). In addition, the first half of the RBs for deploying NB-IoT must be set to POS_0(POS_0) in the LTE bandwidth, and the second half of the RBs must be set to NEG_1(NEG_1).</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>If the DeployMode and AnchorCarrierFlag parameters in a Prb MO are set to STAND_ALONE and TRUE, respectively, the DlFreqOffset parameter in this Prb MO must be set to NEG_0DOT5. If the DeployMode parameter in a Prb MO is not set to STAND_ALONE, the AnchorCarrierFlag parameter in this Prb MO is set to TRUE, and the LteDlRbIndex parameter in this Prb MO is set to an invalid value, then the DlFreqOffset parameter in this Prb MO must be set to NEG_2, NEG_1, POS_0, or POS_1.</li><li>The differences between the downlink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or DL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>The differences between the uplink frequencies of the PRBs specified in the Prb MOs in which the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or UL_ONLY, and the DeployMode parameters are set to STAND_ALONE must not be greater than the result of 20 MHz minus 200 kHz.</li><li>In a Prb MO, if the DeployMode parameter is set to STAND_ALONE, the WorkMode parameter is set to UL_DL, and the DlFreqOffset parameter is not set to NEG_0DOT5, then the UlEarfcnCfgInd parameter in this Prb MO must be set to CFG.</li><li>Among the Prb MOs (under a Cell MO) in which DeployMode is set to STAND_ALONE, the downlink center frequencies of the PRBs specified by the Prb MOs in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE must all be greater than or less than the downlink center frequencies of PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE, when the following conditions are met: (1). The number of Prb MOs in which DeployMode is set to STAND_ALONE is greater than 2 and AnchorCarrierFlag is set to TRUE in at least one of these MOs. (2). The difference between the downlink center frequencies of the PRBs specified by the Prb MO in which WorkMode is set to UL_DL or DL_ONLY and AnchorCarrierFlag is set to FALSE and those of the PRBs specified by the Prb MOs in which AnchorCarrierFlag is set to TRUE is not an integer multiple of 15 kHz.</li><li>The spacing between the downlink center frequencies of the PRBs meeting the following conditions must be an integer multiple of 15 kHz: In the Prb MOs for these PRBs, the LocalCellId parameters are set to the same value, the WorkMode parameters are set to UL_DL or DL_ONLY, the DeployMode parameters are set to STAND_ALONE, and the AnchorCarrierFlag parameters are set to FALSE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-LteBandWidth.html">LteBandWidth</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LTE Bandwidth</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the LTE cell bandwidth. This parameter takes effect only when DeployMode is set to GUARD_BAND. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: LTE_SYSTEM_BW_5M(LTE_SYSTEM_BW_5M), LTE_SYSTEM_BW_10M(LTE_SYSTEM_BW_10M), LTE_SYSTEM_BW_15M(LTE_SYSTEM_BW_15M), LTE_SYSTEM_BW_20M(LTE_SYSTEM_BW_20M)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: LTE_SYSTEM_BW_5M, LTE_SYSTEM_BW_10M, LTE_SYSTEM_BW_15M, LTE_SYSTEM_BW_20M</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the AnchorCarrierFlag and DeployMode parameters in a Prb MO are set to TRUE and GUARD_BAND, respectively: For PRBs with the same LocalCellId in the Prb MO, if the AnchorCarrierFlag and DeployMode parameters are set to FALSE and GUARD_BAND, respectively, the LteDlEarfcn and LteBandWidth must be the same as the LteDlEarfcn and LteBandWidth parameters in the Prb MO instance with AnchorCarrierFlag set to TRUE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: When this parameter is set to LTE_SYSTEM_BW_5M(5MHz), RF specifications of RF modules do not meet 3GPP requirements. As a result, NB-IoT causes interference to LTE and other RATs, and also suffers interference from LTE and other RATs.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-LteDlEarfcn.html">LteDlEarfcn</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LTE Downlink EARFCN</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the downlink EARFCN of an LTE cell. This parameter takes effect only when DeployMode is set to GUARD_BAND. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~70545,255144~256143,260894~262143</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~70545,255144~256143,260894~262143</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the AnchorCarrierFlag and DeployMode parameters in a Prb MO are set to TRUE and GUARD_BAND, respectively: For PRBs with the same LocalCellId in the Prb MO, if the AnchorCarrierFlag and DeployMode parameters are set to FALSE and GUARD_BAND, respectively, the LteDlEarfcn and LteBandWidth must be the same as the LteDlEarfcn and LteBandWidth parameters in the Prb MO instance with AnchorCarrierFlag set to TRUE.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-LteCellId.html">LteCellId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">LTE Cell ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the LTE cell ID. This parameter takes effect only when DeployMode is set to IN_BAND. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~255</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship:</p>
+<p>-Configuration constraints:</p>
+<ul><li>When the AnchorCarrierFlag and DeployMode parameters in a Prb MO are set to TRUE and IN_BAND, respectively: For other PRBs with the same LocalCellId, if the AnchorCarrierFlag and DeployMode parameters are set to FALSE and IN_BAND, respectively, the LteCellId parameter must be the same as that in the Prb MO instance with AnchorCarrierFlag set to TRUE.</li><li>If the DeployMode parameter in the Prb MO is set to IN_BAND and the OtdoaSwitch option of the LcsSwitch parameter in the ENodeBAlgoSwitch MO and the NB_OTDOA_SWITCH option of the CellLcsSwitch parameter in the CellLcsCfg MO are selected, the NprsId parameter (if not set to 65535) in the EuPrbSectorEqm MO must be set to the same value as the PhyCellId parameter in the Cell MO for the LTE cell associated with the NB-IoT cell, or has a different mod 6 value from the PhyCellId parameter.</li></ul>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-UlAllSymbolSendFlag.html">UlAllSymbolSendFlag</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">Uplink All Symbol Send Flag</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates whether all PRB uplink symbols are used for sending. When this parameter is set to TRUE, all NB-IoT PRB uplink symbols are sent. When this parameter is set to FALSE, not all NB-IoT PRB uplink symbols are sent. In in-band scenarios, NB-IoT PRB symbols and LTE SRS symbols must be staggered to avoid interference. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: FALSE(FALSE), TRUE(TRUE)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: FALSE, TRUE</p>
+<p>MML Default Value: TRUE(TRUE)</p>
+<p>Recommended Value: TRUE(TRUE)</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: No (And no impact on the UE in idle mode)</p>
+<p>Impact on Radio Network Performance: When the SRS function is enabled on the LTE side and SRS resources conflict with NB-IoT PRB uplink resources, setting this parameter to TRUE causes interference between LTE SRS and NB-IoT uplink resources. If SRS resources do not conflict with NB-IoT PRB uplink resources or the SRS function is not enabled on the LTE side, setting this parameter to FALSE causes the NB-IoT cell uplink capacity to decrease.</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-PrbBlockPriority.html">PrbBlockPriority</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PRB Block Priority</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the block priority of the PRB when it is a non-anchor carrier. If this parameter is set to HIGH_PRIORITY_BLOCK, the PRB is deactivated immediately. If this parameter is set to MEDIUM_PRIORITY_BLOCK, the access of new UEs is not allowed within 5 minutes and the PRB is deactivated immediately in the case of no existing UEs. Otherwise, the PRB is deactivated after 5 minutes irrespective of whether any UE exists. If this parameter is set to LOW_PRIORITY_BLOCK, the access of new UEs is not allowed and the PRB is deactivated only when no UE occupies the PRBs. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: UNBLOCKED(UNBLOCK), HIGH_PRIORITY_BLOCK(HIGH_PRIORITY_BLOCK), MEDIUM_PRIORITY_BLOCK(MEDIUM_PRIORITY_BLOCK), LOW_PRIORITY_BLOCK(LOW_PRIORITY_BLOCK)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: UNBLOCKED, HIGH_PRIORITY_BLOCK, MEDIUM_PRIORITY_BLOCK, LOW_PRIORITY_BLOCK</p>
+<p>MML Default Value: UNBLOCKED(UNBLOCK)</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-NprsParaGroupId.html">NprsParaGroupId</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">NPRS Parameter Group ID</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates an NPRS parameter group ID. The value 255 indicates an invalid ID. This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: 0~15,255</p>
+<p>Unit: None</p>
+<p>Actual Value Range: 0~15,255</p>
+<p>MML Default Value: 255</p>
+<p>Recommended Value: None</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+<tr>
+<td valign="top" headers="mcps1.2.4.1.1.1"><a href="../para/Prb-PrachCoverageLevelType.html">PrachCoverageLevelType</a></td>
+
+<td valign="top" headers="mcps1.2.4.1.1.2">PRACH Coverage Level Type</td>
+
+<td valign="top" headers="mcps1.2.4.1.1.3"><p>Meaning: Indicates the PRACH coverage level supported by the PRB when it is a non-anchor carrier. A maximum of three coverage levels of PRACH resources are supported.</p>
+<p>COVERAGE_LEVEL_0: When this option is selected, the PRACH configuration of coverage level 0 in the PrbRachCeConfig MO is supported on the PRB. If this option is deselected, the configuration is not supported.</p>
+<p>COVERAGE_LEVEL_1: When this option is selected, the PRACH configuration of coverage level 1 in the PrbRachCeConfig MO is supported on the PRB. If this option is deselected, the configuration is not supported.</p>
+<p>COVERAGE_LEVEL_2: When this option is selected, the PRACH configuration of coverage level 2 in the PrbRachCeConfig MO is supported on the PRB. If this option is deselected, the configuration is not supported.</p>
+<p>If all options are deselected, PRACH is not supported on the PRB.</p>
+<p>This parameter applies only to NB-IoT.</p>
+<p>GUI Value Range: COVERAGE_LEVEL_0(COVERAGE_LEVEL_0), COVERAGE_LEVEL_1(COVERAGE_LEVEL_1), COVERAGE_LEVEL_2(COVERAGE_LEVEL_2)</p>
+<p>Unit: None</p>
+<p>Actual Value Range: COVERAGE_LEVEL_0, COVERAGE_LEVEL_1, COVERAGE_LEVEL_2</p>
+<p>MML Default Value: None</p>
+<p>Recommended Value: COVERAGE_LEVEL_0:Off, COVERAGE_LEVEL_1:Off, COVERAGE_LEVEL_2:Off</p>
+<p>Parameter Relationship: None</p>
+<p>Service Interrupted After Modification: Yes</p>
+<p>Impact on Radio Network Performance: None</p>
+<p>Applicable Mode: L-NB-IOT</p>
+</td>
+
+</tr>
+
+</table>
+
+</div></div>
+
+<div class="mmlexample"><a name="add_prb__1.2.5"></a><a name="1.2.5"></a><h2 class="sectiontitle">Example</h2>
+<div class="mmlexamplebody"><pre class="screen">Add PRB in the LocalCell 0:
+ADD PRB: LocalCellId=0, PrbId=0, DeployMode=STAND_ALONE, FreqBand=1, UlEarfcnCfgInd=NOT_CFG, LteDlRbIndex=255, DlEarfcn=0, DlFreqOffset=NEG_0DOT5;</pre>
+</div></div>
+
+</div>
+
+
+<div class="hrcopyright"><hr size="2"></div><div class="hwcopyright">Huawei Proprietary and Confidential</div><div class="hwcopyright">Copyright &copy; Huawei Technologies Co., Ltd.</div></body>
+</html>
