@@ -269,8 +269,10 @@ def _populate_legacy_tables(conn, table_name, technology):
     lat_cast = 'DOUBLE PRECISION' if is_pg else 'REAL'
     on_site = 'ON CONFLICT (site_id)' if is_pg else 'ON CONFLICT(site_id)'
     if is_pg:
-        lat_expr = f'MAX({_pg_safe_double_col("\"lat\"")})'
-        long_expr = f'MAX({_pg_safe_double_col("\"long\"")})'
+        lat_ident = '"lat"'
+        long_ident = '"long"'
+        lat_expr = f'MAX({_pg_safe_double_col(lat_ident)})'
+        long_expr = f'MAX({_pg_safe_double_col(long_ident)})'
     else:
         lat_expr = f'CAST(MAX(lat)  AS {lat_cast})'
         long_expr = f'CAST(MAX(long) AS {lat_cast})'
