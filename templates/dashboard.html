@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.3">
 </head>
 <body>
     <div class="container">
@@ -353,6 +353,23 @@
 
         <section class="dashboard-ops-panel" aria-label="Operations status">
             <div class="dashboard-ops-grid">
+                <div class="op-sites-summary-card dashboard-last-sync-card">
+                    <div class="op-sites-summary-head dashboard-ops-head">
+                        <span>Last Sync Time</span>
+                        <button type="button" class="op-sites-refresh-btn" id="last-sync-refresh-btn" onclick="refreshPmHealth(true)">
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="dashboard-last-sync-grid" id="dashboard-last-sync-grid">
+                        <span class="pm-health-loading">Loading last sync times…</span>
+                    </div>
+                    <div class="dashboard-refresh-actions" aria-label="Manual data refresh actions">
+                        <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/nokia_pm', this)">Refresh Nokia</button>
+                        <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/huawei_pm', this)">Refresh Huawei</button>
+                        <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/cells_hourly', this)">Refresh Hourly Cells</button>
+                        <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/cells_daily', this)">Refresh Daily Cells</button>
+                    </div>
+                </div>
                 <div class="op-sites-summary-card dashboard-freshness-card">
                     <div class="op-sites-summary-head dashboard-ops-head">
                         <span>Data Freshness</span>
@@ -808,6 +825,28 @@
             }).join('');
         }
 
+        function renderLastSyncCards(dbs) {
+            const grid = document.getElementById('dashboard-last-sync-grid');
+            if (!grid) return;
+            const wanted = ['Nokia PM hourly', 'Huawei PM hourly', 'Nokia PM daily', 'Huawei PM daily'];
+            const cards = wanted.map(label => {
+                const db = dbs.find(item => String(item?.label || '').toLowerCase() === label.toLowerCase());
+                const freshness = db ? freshnessForDb(db) : { label: 'Missing', cls: 'freshness-badge-missing', detail: 'No database' };
+                const latest = db?.latest_data_overall || '—';
+                const modified = db?.file?.modified_utc || '—';
+                const table = db?.latest_data_table || '—';
+                return `<div class="last-sync-card">
+                    <div class="last-sync-card-top">
+                        <strong>${label}</strong>
+                        <span class="freshness-badge ${freshness.cls}">${freshness.label}</span>
+                    </div>
+                    <div class="last-sync-time">${latest}</div>
+                    <div class="last-sync-meta">table ${table} · file ${modified} UTC</div>
+                </div>`;
+            });
+            grid.innerHTML = cards.join('');
+        }
+
         function formatPmHealthRows(tables) {
             if (!Array.isArray(tables) || !tables.length) return '—';
             return tables
@@ -837,6 +876,7 @@
                 </div>`;
 
             const dbs = [...(data.pm_cell_databases || []), ...(data.pm_group_databases || [])];
+            renderLastSyncCards(dbs);
             renderFreshnessBadges(dbs);
             tbody.innerHTML = dbs.map(db => {
                 const totalRows = (db.tables || [])
@@ -884,6 +924,7 @@
         async function refreshPmHealth(force) {
             const btn = document.getElementById('pm-health-refresh-btn');
             const freshnessBtn = document.getElementById('freshness-refresh-btn');
+            const lastSyncBtn = document.getElementById('last-sync-refresh-btn');
             const summaryEl = document.getElementById('pm-health-summary');
             if (!summaryEl) return;
             const defaultLabel = 'Refresh';
@@ -894,6 +935,10 @@
             if (freshnessBtn) {
                 freshnessBtn.disabled = true;
                 freshnessBtn.textContent = 'Checking…';
+            }
+            if (lastSyncBtn) {
+                lastSyncBtn.disabled = true;
+                lastSyncBtn.textContent = 'Checking…';
             }
             summaryEl.innerHTML = '<span class="pm-health-loading">Running health check (may take up to a minute)…</span>';
             try {
@@ -914,6 +959,10 @@
                 if (freshnessBtn) {
                     freshnessBtn.disabled = false;
                     freshnessBtn.textContent = defaultLabel;
+                }
+                if (lastSyncBtn) {
+                    lastSyncBtn.disabled = false;
+                    lastSyncBtn.textContent = defaultLabel;
                 }
             }
         }
@@ -974,6 +1023,38 @@
                     btn.disabled = false;
                     btn.textContent = original || 'Retry';
                 }
+            }
+        }
+
+        async function triggerDashboardRefresh(endpoint, btn) {
+            if (!endpoint) return;
+            const original = btn ? btn.textContent : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Starting…';
+            }
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { Accept: 'application/json' },
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || data.success === false) {
+                    throw new Error(data.error || 'Refresh request failed');
+                }
+                if (btn) btn.textContent = 'Queued';
+                await refreshSchedulerStatus();
+                await refreshSyncTimeline();
+            } catch (err) {
+                alert(err.message || 'Could not start refresh');
+            } finally {
+                setTimeout(() => {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = original || 'Refresh';
+                    }
+                }, 900);
             }
         }
 
