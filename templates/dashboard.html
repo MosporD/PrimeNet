@@ -347,6 +347,9 @@
                 <button type="button" class="operations-panel-download" id="operations-status-download-btn" onclick="downloadOperationsStatus()">
                     Download Status
                 </button>
+                <button type="button" class="operations-panel-download" id="operations-logs-download-btn" onclick="downloadLatestLogs()">
+                    Download Latest Logs
+                </button>
                 <button type="button" class="operations-panel-close" onclick="toggleOperationsPanel(false)" aria-label="Close operations panel">×</button>
             </div>
         </div>
@@ -573,6 +576,43 @@
                 if (btn) {
                     btn.disabled = false;
                     btn.textContent = original || 'Download Status';
+                }
+            }
+        }
+
+        async function downloadLatestLogs() {
+            const btn = document.getElementById('operations-logs-download-btn');
+            const original = btn ? btn.textContent : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Preparing…';
+            }
+            try {
+                const response = await fetch('/api/sync/logs/download?limit=500', {
+                    credentials: 'same-origin',
+                });
+                if (!response.ok) {
+                    const body = await response.json().catch(() => ({}));
+                    throw new Error(body.error || 'Could not download latest logs');
+                }
+                const blob = await response.blob();
+                const disposition = response.headers.get('Content-Disposition') || '';
+                const match = disposition.match(/filename="?([^"]+)"?/i);
+                const filename = match ? match[1] : `primenet_sync_logs_${new Date().toISOString().replace(/[:.]/g, '').slice(0, 15)}.zip`;
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                alert(err.message || 'Could not download latest logs');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = original || 'Download Latest Logs';
                 }
             }
         }

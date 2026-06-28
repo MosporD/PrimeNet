@@ -42,6 +42,21 @@
                 </select>
             </div>
 
+            <div class="perf-filter-presets" aria-label="Saved filter presets">
+                <div class="perf-filter-presets-head">
+                    <span>Filter Presets</span>
+                    <button type="button" class="perf-filter-preset-btn" onclick="savePerformanceFilterPreset()">Save Current</button>
+                </div>
+                <div class="perf-filter-presets-row">
+                    <select id="perf-filter-preset-select" class="perf-filter-preset-select" aria-label="Saved filter presets">
+                        <option value="">No saved presets</option>
+                    </select>
+                    <button type="button" class="perf-filter-preset-btn" onclick="applySelectedPerformanceFilterPreset()">Apply</button>
+                    <button type="button" class="perf-filter-preset-btn perf-filter-preset-btn-danger" onclick="deleteSelectedPerformanceFilterPreset()">Delete</button>
+                </div>
+                <div id="perf-filter-preset-status" class="perf-filter-preset-status"></div>
+            </div>
+
             <div id="cell-list-wrap" class="hw-tree-panel">
                 <div class="perf-sidebar-section perf-sidebar-cells">
                     <button type="button" class="perf-sidebar-toggle" id="perf-toggle-cells"
@@ -288,7 +303,7 @@
 <script>
     window.PERF_KPI_CATEGORY_MAP_URL = "{{ url_for('performance.get_kpi_mapping') }}";
 </script>
-<script src="{{ url_for('performance.static', filename='performance.js') }}?v=8.8"></script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=8.9"></script>
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const params = new URLSearchParams(window.location.search);

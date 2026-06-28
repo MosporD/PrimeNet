@@ -31,6 +31,7 @@ let perfBottomMode = 'kpis';
 let perfLeftPanelCollapsed = false;
 let perfPreferredPmViewMode = 'charts';
 let perfPmViewPrefPromise = null;
+let performanceFilterPresets = [];
 
 /** Hourly chart view: chronological trend vs day-over-day (same hour-of-day across days). */
 let perfChartDisplayMode = 'trend';
@@ -637,6 +638,7 @@ async function loadFilters() {
     await loadKpiColumns();
     await loadCellGroups();
     await loadPerformanceReports();
+    await loadPerformanceFilterPresets();
 
     const res  = await fetch('/api/performance/filters');
     const data = await res.json();
@@ -759,6 +761,129 @@ async function deleteSelectedReport() {
         return;
     }
     await loadPerformanceReports();
+}
+
+function setPerformanceFilterPresetStatus(message, kind = 'info') {
+    const el = document.getElementById('perf-filter-preset-status');
+    if (!el) return;
+    el.textContent = message || '';
+    el.className = `perf-filter-preset-status ${kind ? `is-${kind}` : ''}`;
+}
+
+async function loadPerformanceFilterPresets() {
+    const sel = document.getElementById('perf-filter-preset-select');
+    if (!sel) return;
+    try {
+        const res = await fetch('/api/profile/views?module=performance_filter_presets', {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { Accept: 'application/json' },
+        });
+        const data = await res.json().catch(() => ({}));
+        performanceFilterPresets = res.ok && data.success && Array.isArray(data.views) ? data.views : [];
+        const prev = sel.value;
+        sel.innerHTML = performanceFilterPresets.length
+            ? '<option value="">Select preset...</option>'
+            : '<option value="">No saved presets</option>';
+        performanceFilterPresets.forEach(preset => {
+            const option = document.createElement('option');
+            option.value = String(preset.id || '');
+            option.textContent = String(preset.name || 'Untitled preset');
+            sel.appendChild(option);
+        });
+        if (prev && performanceFilterPresets.some(p => String(p.id) === String(prev))) {
+            sel.value = prev;
+        }
+    } catch (err) {
+        performanceFilterPresets = [];
+        sel.innerHTML = '<option value="">Could not load presets</option>';
+        setPerformanceFilterPresetStatus('Could not load presets.', 'error');
+    }
+}
+
+async function savePerformanceFilterPreset() {
+    const name = prompt('Preset name?', 'My filter preset');
+    if (name == null) return;
+    const trimmed = String(name).trim();
+    if (!trimmed) {
+        setPerformanceFilterPresetStatus('Preset name is required.', 'error');
+        return;
+    }
+    const payload = {
+        module: 'performance_filter_presets',
+        name: trimmed,
+        state: getPerformanceState(),
+    };
+    try {
+        const res = await fetch('/api/profile/views', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Could not save preset');
+        }
+        await loadPerformanceFilterPresets();
+        const sel = document.getElementById('perf-filter-preset-select');
+        if (sel && data.id) sel.value = String(data.id);
+        setPerformanceFilterPresetStatus(`Saved "${trimmed}".`, 'ok');
+    } catch (err) {
+        setPerformanceFilterPresetStatus(err.message || 'Could not save preset.', 'error');
+    }
+}
+
+async function applySelectedPerformanceFilterPreset() {
+    const sel = document.getElementById('perf-filter-preset-select');
+    const id = String(sel?.value || '').trim();
+    if (!id) {
+        setPerformanceFilterPresetStatus('Select a preset first.', 'error');
+        return;
+    }
+    try {
+        setPerformanceFilterPresetStatus('Applying preset...', 'info');
+        const res = await fetch(`/api/profile/views/${encodeURIComponent(id)}`, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { Accept: 'application/json' },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success || !data.view) {
+            throw new Error(data.error || 'Could not load preset');
+        }
+        await applyPerformanceState(data.view.state || {});
+        setPerformanceFilterPresetStatus(`Applied "${data.view.name || 'preset'}". Click Query when ready.`, 'ok');
+    } catch (err) {
+        setPerformanceFilterPresetStatus(err.message || 'Could not apply preset.', 'error');
+    }
+}
+
+async function deleteSelectedPerformanceFilterPreset() {
+    const sel = document.getElementById('perf-filter-preset-select');
+    const id = String(sel?.value || '').trim();
+    if (!id) {
+        setPerformanceFilterPresetStatus('Select a preset first.', 'error');
+        return;
+    }
+    const preset = performanceFilterPresets.find(p => String(p.id) === id);
+    const name = preset?.name || 'selected preset';
+    if (!confirm(`Delete "${name}"?`)) return;
+    try {
+        const res = await fetch(`/api/profile/views/${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' },
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Could not delete preset');
+        }
+        await loadPerformanceFilterPresets();
+        setPerformanceFilterPresetStatus(`Deleted "${name}".`, 'ok');
+    } catch (err) {
+        setPerformanceFilterPresetStatus(err.message || 'Could not delete preset.', 'error');
+    }
 }
 
 async function _applyReportConfig(cfg) {

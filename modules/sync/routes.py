@@ -4,12 +4,16 @@ API endpoints for sync status, history, and manual triggers.
 Admin-only.
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from functools import wraps
+import csv
+import io
+import json
 import os
 import sys
 from datetime import datetime
 import threading
+import zipfile
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from database_enhanced import get_user_by_session
@@ -134,6 +138,59 @@ def sync_history():
     rows = [dict(r) for r in cur.fetchall()]
     conn.close()
     return jsonify({'success': True, 'history': rows})
+
+
+@sync_bp.route('/api/sync/logs/download', methods=['GET'])
+@admin_required
+def download_sync_logs():
+    """Download latest sync_log rows as JSON and CSV in a zip archive."""
+    limit = request.args.get('limit', 500, type=int) or 500
+    limit = max(1, min(limit, 5000))
+    conn = connect_app()
+    try:
+        cur = execute_query(
+            conn,
+            '''
+            SELECT id, started_at, sync_type, technology, status, rows_affected, message
+            FROM sync_log
+            ORDER BY id DESC
+            LIMIT ?
+            ''',
+            (limit,),
+        )
+        rows = [dict(r) for r in cur.fetchall()]
+    finally:
+        conn.close()
+
+    generated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    payload = {
+        'success': True,
+        'generated_at': generated_at,
+        'limit': limit,
+        'row_count': len(rows),
+        'logs': rows,
+    }
+
+    csv_buf = io.StringIO()
+    fieldnames = ['id', 'started_at', 'sync_type', 'technology', 'status', 'rows_affected', 'message']
+    writer = csv.DictWriter(csv_buf, fieldnames=fieldnames, extrasaction='ignore')
+    writer.writeheader()
+    writer.writerows(rows)
+
+    zip_buf = io.BytesIO()
+    with zipfile.ZipFile(zip_buf, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr('sync_logs.json', json.dumps(payload, indent=2, ensure_ascii=False))
+        zf.writestr('sync_logs.csv', csv_buf.getvalue())
+    zip_buf.seek(0)
+
+    _log_sync('admin_command', 'logs', 'ok', len(rows), f'Downloaded latest {len(rows)} sync log rows')
+    return send_file(
+        zip_buf,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name=f'primenet_sync_logs_{stamp}.zip',
+    )
 
 
 @sync_bp.route('/api/sync/trigger/pm', methods=['POST'])
