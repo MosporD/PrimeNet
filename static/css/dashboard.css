@@ -188,13 +188,100 @@ header {
     margin-bottom: 28px;
 }
 
+.operations-panel-toggle {
+    position: fixed;
+    right: 22px;
+    top: 50%;
+    z-index: 9998;
+    transform: translateY(-50%);
+    border: 1px solid #d6e6f5;
+    border-radius: 999px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #eef5fc 100%);
+    color: #5c86a5;
+    box-shadow: 0 8px 24px rgba(44, 62, 80, 0.16);
+    cursor: pointer;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+}
+
+.operations-panel-toggle:hover {
+    color: #2c3e50;
+    box-shadow: 0 10px 28px rgba(44, 62, 80, 0.22);
+}
+
+.operations-panel-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(18, 24, 33, 0.34);
+}
+
+.operations-panel-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 10001;
+    width: min(680px, 94vw);
+    height: 100vh;
+    overflow-y: auto;
+    padding: 22px;
+    background: #f5f7fa;
+    box-shadow: -16px 0 38px rgba(44, 62, 80, 0.24);
+    transform: translateX(105%);
+    transition: transform 0.24s ease;
+}
+
+.operations-panel-drawer.open {
+    transform: translateX(0);
+}
+
+.operations-panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.operations-panel-header h2 {
+    color: #2c3e50;
+    font-size: 1.45em;
+    margin-bottom: 4px;
+}
+
+.operations-panel-header p {
+    color: #7f8c8d;
+    font-size: 0.92em;
+}
+
+.operations-panel-close {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #5c86a5;
+    box-shadow: 0 4px 14px rgba(44, 62, 80, 0.12);
+    cursor: pointer;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.operations-panel-close:hover {
+    color: #2c3e50;
+}
+
 .dashboard-ops-panel {
-    margin-bottom: 28px;
+    margin-bottom: 18px;
 }
 
 .dashboard-ops-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 18px;
 }
 
@@ -290,6 +377,20 @@ header {
 
 .pm-health-card {
     max-width: none;
+}
+
+.operations-panel-drawer .op-sites-summary-card {
+    max-width: none;
+    width: 100%;
+}
+
+.operations-panel-drawer .op-sites-summary-head {
+    font-size: 1em;
+    padding: 20px 18px;
+}
+
+.operations-panel-drawer .op-sites-refresh-btn {
+    right: 10px;
 }
 
 .pm-health-head {
@@ -442,6 +543,25 @@ header {
 body.dark-mode .pm-health-v,
 body.dark-mode .pm-health-db-block h4 {
     color: #e7edf5;
+}
+
+body.dark-mode .operations-panel-toggle,
+body.dark-mode .operations-panel-close {
+    background: #182230;
+    color: #d4deea;
+    border-color: #31445b;
+}
+
+body.dark-mode .operations-panel-drawer {
+    background: #121821;
+}
+
+body.dark-mode .operations-panel-header h2 {
+    color: #e7edf5;
+}
+
+body.dark-mode .operations-panel-header p {
+    color: #b8c4d6;
 }
 
 body.dark-mode .freshness-card {
@@ -1276,6 +1396,19 @@ footer p {
 
 /* Narrow: stack technology rows inside the same card */
 @media (max-width: 720px) {
+    .operations-panel-toggle {
+        right: 14px;
+        bottom: 18px;
+        top: auto;
+        transform: none;
+        writing-mode: horizontal-tb;
+    }
+
+    .operations-panel-drawer {
+        width: 100vw;
+        padding: 18px;
+    }
+
     .dashboard-ops-grid,
     .scheduler-status-grid {
         grid-template-columns: 1fr;

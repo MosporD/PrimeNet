@@ -94,65 +94,9 @@
             </section>
 
             {% if user.role == 'admin' %}
-            <section class="dashboard-ops-panel" aria-label="Operations status">
-                <div class="dashboard-ops-grid">
-                    <div class="op-sites-summary-card dashboard-freshness-card">
-                        <div class="op-sites-summary-head dashboard-ops-head">
-                            <span>Data Freshness</span>
-                            <button type="button" class="op-sites-refresh-btn" id="freshness-refresh-btn" onclick="refreshPmHealth(true)">
-                                Refresh
-                            </button>
-                        </div>
-                        <div class="dashboard-freshness-grid" id="dashboard-freshness-grid">
-                            <span class="pm-health-loading">Loading freshness…</span>
-                        </div>
-                    </div>
-                    <div class="op-sites-summary-card dashboard-scheduler-card">
-                        <div class="op-sites-summary-head dashboard-ops-head">
-                            <span>Scheduler Status</span>
-                            <button type="button" class="op-sites-refresh-btn" id="scheduler-refresh-btn" onclick="refreshSchedulerStatus()">
-                                Refresh
-                            </button>
-                        </div>
-                        <div class="dashboard-scheduler-body" id="dashboard-scheduler-body">
-                            <span class="pm-health-loading">Loading scheduler…</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="dashboard-pm-health" id="pm-health-widget" aria-label="Performance database health">
-                <div class="op-sites-summary-card pm-health-card">
-                    <div class="op-sites-summary-head pm-health-head">
-                        <span>Performance database health</span>
-                        <button type="button" class="op-sites-refresh-btn" id="pm-health-refresh-btn" onclick="refreshPmHealth(true)">
-                            Refresh
-                        </button>
-                    </div>
-                    <div class="pm-health-summary" id="pm-health-summary">
-                        <span class="pm-health-loading">Loading health check…</span>
-                    </div>
-                    <div class="pm-health-table-wrap" id="pm-health-table-wrap" hidden>
-                        <table class="pm-health-table" id="pm-health-table">
-                            <thead>
-                                <tr>
-                                    <th>Database</th>
-                                    <th>Status</th>
-                                    <th>Latest data</th>
-                                    <th>Rows (RAT tables)</th>
-                                    <th>Distinct cells</th>
-                                    <th>Size</th>
-                                </tr>
-                            </thead>
-                            <tbody id="pm-health-tbody"></tbody>
-                        </table>
-                        <details class="pm-health-details">
-                            <summary>Per-table breakdown</summary>
-                            <div id="pm-health-details-body"></div>
-                        </details>
-                    </div>
-                </div>
-            </section>
+            <button type="button" class="operations-panel-toggle" onclick="toggleOperationsPanel(true)">
+                Operations Panel
+            </button>
             {% endif %}
 
             <section class="dashboard-tools-toolbar" aria-label="Dashboard module tools">
@@ -391,6 +335,79 @@
         </footer>
     </div>
 
+    {% if user.role == 'admin' %}
+    <div class="operations-panel-backdrop" id="operations-panel-backdrop" onclick="toggleOperationsPanel(false)" hidden></div>
+    <aside class="operations-panel-drawer" id="operations-panel-drawer" aria-label="Operations panel" aria-hidden="true">
+        <div class="operations-panel-header">
+            <div>
+                <h2>Operations Panel</h2>
+                <p>Freshness, scheduler, and database health</p>
+            </div>
+            <button type="button" class="operations-panel-close" onclick="toggleOperationsPanel(false)" aria-label="Close operations panel">×</button>
+        </div>
+
+        <section class="dashboard-ops-panel" aria-label="Operations status">
+            <div class="dashboard-ops-grid">
+                <div class="op-sites-summary-card dashboard-freshness-card">
+                    <div class="op-sites-summary-head dashboard-ops-head">
+                        <span>Data Freshness</span>
+                        <button type="button" class="op-sites-refresh-btn" id="freshness-refresh-btn" onclick="refreshPmHealth(true)">
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="dashboard-freshness-grid" id="dashboard-freshness-grid">
+                        <span class="pm-health-loading">Loading freshness…</span>
+                    </div>
+                </div>
+                <div class="op-sites-summary-card dashboard-scheduler-card">
+                    <div class="op-sites-summary-head dashboard-ops-head">
+                        <span>Scheduler Status</span>
+                        <button type="button" class="op-sites-refresh-btn" id="scheduler-refresh-btn" onclick="refreshSchedulerStatus()">
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="dashboard-scheduler-body" id="dashboard-scheduler-body">
+                        <span class="pm-health-loading">Loading scheduler…</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-pm-health" id="pm-health-widget" aria-label="Performance database health">
+            <div class="op-sites-summary-card pm-health-card">
+                <div class="op-sites-summary-head pm-health-head">
+                    <span>Database Health</span>
+                    <button type="button" class="op-sites-refresh-btn" id="pm-health-refresh-btn" onclick="refreshPmHealth(true)">
+                        Refresh
+                    </button>
+                </div>
+                <div class="pm-health-summary" id="pm-health-summary">
+                    <span class="pm-health-loading">Loading health check…</span>
+                </div>
+                <div class="pm-health-table-wrap" id="pm-health-table-wrap" hidden>
+                    <table class="pm-health-table" id="pm-health-table">
+                        <thead>
+                            <tr>
+                                <th>Database</th>
+                                <th>Status</th>
+                                <th>Latest data</th>
+                                <th>Rows (RAT tables)</th>
+                                <th>Distinct cells</th>
+                                <th>Size</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pm-health-tbody"></tbody>
+                    </table>
+                    <details class="pm-health-details">
+                        <summary>Per-table breakdown</summary>
+                        <div id="pm-health-details-body"></div>
+                    </details>
+                </div>
+            </div>
+        </section>
+    </aside>
+    {% endif %}
+
     <div id="legalStatementModal" class="legal-modal-overlay" style="display:none">
         <div class="legal-modal">
             <div class="legal-modal-header">
@@ -444,6 +461,17 @@
                     window.location.href = '/login';
                 }
             }
+        }
+
+        function toggleOperationsPanel(open) {
+            const drawer = document.getElementById('operations-panel-drawer');
+            const backdrop = document.getElementById('operations-panel-backdrop');
+            if (!drawer || !backdrop) return;
+            const shouldOpen = Boolean(open);
+            drawer.classList.toggle('open', shouldOpen);
+            drawer.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+            backdrop.hidden = !shouldOpen;
+            document.body.classList.toggle('operations-panel-open', shouldOpen);
         }
 
         let dashboardPreferences = {};
@@ -855,6 +883,11 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupDashboardToolSearch();
             loadDashboardPreferences();
+            document.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    toggleOperationsPanel(false);
+                }
+            });
             if (document.getElementById('pm-health-widget')) {
                 refreshPmHealth(false);
             }
