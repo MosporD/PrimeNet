@@ -373,6 +373,21 @@
             </div>
         </section>
 
+        <section class="dashboard-sync-activity" aria-label="Sync activity timeline">
+            <div class="op-sites-summary-card">
+                <div class="op-sites-summary-head dashboard-ops-head">
+                    <span>Sync Activity</span>
+                    <button type="button" class="op-sites-refresh-btn" id="sync-timeline-refresh-btn" onclick="refreshSyncTimeline()">
+                        Refresh
+                    </button>
+                </div>
+                <div class="sync-alerts" id="sync-alerts"></div>
+                <div class="sync-timeline" id="sync-timeline">
+                    <span class="pm-health-loading">Loading sync activity…</span>
+                </div>
+            </div>
+        </section>
+
         <section class="dashboard-pm-health" id="pm-health-widget" aria-label="Performance database health">
             <div class="op-sites-summary-card pm-health-card">
                 <div class="op-sites-summary-head pm-health-head">
@@ -839,6 +854,129 @@
             return 'pm-health-badge pm-health-badge-warn';
         }
 
+        function isFailedSyncStatus(status) {
+            const s = String(status || '').toLowerCase();
+            return s === 'error' || s === 'failed' || s === 'fail';
+        }
+
+        function retryEndpointForSync(row) {
+            const tech = String(row?.technology || '').toLowerCase();
+            const type = String(row?.sync_type || '').toLowerCase();
+            const combined = `${type} ${tech}`;
+            if (combined.includes('cells_daily')) return '/api/sync/trigger/cells_daily';
+            if (combined.includes('groups_daily')) return '/api/sync/trigger/groups_daily';
+            if (combined.includes('cells_hourly')) return '/api/sync/trigger/cells_hourly';
+            if (combined.includes('groups_hourly')) return '/api/sync/trigger/groups_hourly';
+            if (combined.includes('daily') && combined.includes('cells')) return '/api/sync/trigger/cells_daily';
+            if (combined.includes('daily') && combined.includes('groups')) return '/api/sync/trigger/groups_daily';
+            if (combined.includes('hourly') && combined.includes('cells')) return '/api/sync/trigger/cells_hourly';
+            if (combined.includes('hourly') && combined.includes('groups')) return '/api/sync/trigger/groups_hourly';
+            if (combined.includes('nokia_pm')) return '/api/sync/trigger/nokia_pm';
+            if (combined.includes('huawei_pm')) return '/api/sync/trigger/huawei_pm';
+            if (combined.includes('metadata')) return '/api/sync/trigger/metadata';
+            return '';
+        }
+
+        async function triggerSyncRetry(endpoint, btn) {
+            if (!endpoint) return;
+            const original = btn ? btn.textContent : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Retrying…';
+            }
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { Accept: 'application/json' },
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || data.success === false) {
+                    throw new Error(data.error || 'Retry request failed');
+                }
+                await refreshSchedulerStatus();
+                await refreshSyncTimeline();
+            } catch (err) {
+                alert(err.message || 'Could not trigger retry');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = original || 'Retry';
+                }
+            }
+        }
+
+        function renderFailedSyncAlerts(rows) {
+            const alerts = document.getElementById('sync-alerts');
+            if (!alerts) return;
+            const failed = rows.filter(row => isFailedSyncStatus(row.status)).slice(0, 4);
+            if (!failed.length) {
+                alerts.innerHTML = '<div class="sync-alert sync-alert-ok">No failed sync jobs in recent history.</div>';
+                return;
+            }
+            alerts.innerHTML = failed.map((row, idx) => {
+                const endpoint = retryEndpointForSync(row);
+                return `<div class="sync-alert sync-alert-bad">
+                    <div>
+                        <strong>${row.sync_type || 'sync'} / ${row.technology || 'all'}</strong>
+                        <span>${row.message || 'Sync failed'}</span>
+                        <small>${row.started_at || '—'}</small>
+                    </div>
+                    ${endpoint ? `<button type="button" class="sync-retry-btn" onclick="triggerSyncRetry('${endpoint}', this)">Retry</button>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function renderSyncTimeline(rows) {
+            const timeline = document.getElementById('sync-timeline');
+            if (!timeline) return;
+            if (!rows.length) {
+                timeline.innerHTML = '<span class="pm-health-loading">No sync activity yet</span>';
+                return;
+            }
+            timeline.innerHTML = rows.map(row => {
+                const statusClass = isFailedSyncStatus(row.status) ? 'sync-timeline-dot-bad' : (String(row.status || '').toLowerCase() === 'ok' ? 'sync-timeline-dot-ok' : 'sync-timeline-dot-warn');
+                return `<div class="sync-timeline-item">
+                    <span class="sync-timeline-dot ${statusClass}"></span>
+                    <div class="sync-timeline-content">
+                        <div class="sync-timeline-title">
+                            <strong>${row.sync_type || 'sync'}</strong>
+                            <span>${row.technology || 'all'}</span>
+                            <span class="${schedulerBadgeClass(row.status)}">${row.status || '—'}</span>
+                        </div>
+                        <p>${row.message || 'No message'}</p>
+                        <small>${row.started_at || '—'} · rows ${Number(row.rows_affected || 0).toLocaleString()}</small>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function refreshSyncTimeline() {
+            const timeline = document.getElementById('sync-timeline');
+            const btn = document.getElementById('sync-timeline-refresh-btn');
+            if (!timeline) return;
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Refreshing…';
+            }
+            timeline.innerHTML = '<span class="pm-health-loading">Loading sync activity…</span>';
+            try {
+                const res = await fetch('/api/sync/history?limit=30', { credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) throw new Error(data.error || 'Sync history failed');
+                const rows = Array.isArray(data.history) ? data.history : [];
+                renderFailedSyncAlerts(rows);
+                renderSyncTimeline(rows);
+            } catch (err) {
+                timeline.innerHTML = `<span class="pm-health-error">${err.message || 'Could not load sync activity'}</span>`;
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Refresh';
+                }
+            }
+        }
+
         async function refreshSchedulerStatus() {
             const body = document.getElementById('dashboard-scheduler-body');
             const btn = document.getElementById('scheduler-refresh-btn');
@@ -893,6 +1031,9 @@
             }
             if (document.getElementById('dashboard-scheduler-body')) {
                 refreshSchedulerStatus();
+            }
+            if (document.getElementById('sync-timeline')) {
+                refreshSyncTimeline();
             }
             const maybeShowLegal = () => {
                 const alreadyAcknowledged = sessionStorage.getItem('legalStatementAcknowledged') === '1';
