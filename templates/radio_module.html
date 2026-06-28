@@ -5,85 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - {{ module_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/radio_modules.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/radio_modules.css') }}?v=1.1">
 </head>
 <body class="radio-module-page"
       data-api-url="{{ api_url }}"
       data-module-kind="{{ module_kind }}"
       data-default-technology="{{ default_technology or 'all' }}">
-    <header class="radio-topbar">
-        <a href="/dashboard" class="radio-back">Dashboard</a>
-        <div>
-            <h1>{{ module_title }}</h1>
-            <p>{{ module_subtitle }}</p>
-        </div>
-        <div class="radio-user">
-            <span>{{ user.username }}</span>
-            <button type="button" onclick="logout()">Logout</button>
-        </div>
-    </header>
+    <div class="container">
+        <header class="radio-topbar">
+            <div class="header-content">
+                <a href="/dashboard" class="back-link">Dashboard</a>
+                <div class="header-left">
+                    <h1>{{ module_title }}</h1>
+                    <p>{{ module_subtitle }}</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
 
-    <main class="radio-main">
-        <section class="radio-filters" aria-label="Radio module filters">
-            <label>Area
-                <select id="radio-area">
-                    <option value="all">All areas</option>
-                </select>
-            </label>
-            <label>Vendor
-                <select id="radio-vendor">
-                    <option value="all">All vendors</option>
-                    <option value="nokia">Nokia</option>
-                    <option value="huawei">Huawei</option>
-                </select>
-            </label>
-            <label>Technology
-                <select id="radio-technology">
-                    <option value="all">All RATs</option>
-                    <option value="2G">2G</option>
-                    <option value="3G">3G</option>
-                    <option value="4G-FDD">4G FDD</option>
-                    <option value="4G-TDD">4G TDD</option>
-                    <option value="4G-4G Intra-eNB">4G Neighbor Intra</option>
-                    <option value="4G-4G Inter-eNB">4G Neighbor Inter</option>
-                    <option value="5G">5G</option>
-                </select>
-            </label>
-            <label>Search
-                <input type="search" id="radio-search" placeholder="Cell, site, issue">
-            </label>
-            <button type="button" id="radio-apply">Apply</button>
-        </section>
+        <main class="main-content radio-main">
+            <section class="radio-filters" aria-label="Radio module filters">
+                <label>Area
+                    <select id="radio-area">
+                        <option value="all">All areas</option>
+                    </select>
+                </label>
+                <label>Vendor
+                    <select id="radio-vendor">
+                        <option value="all">All vendors</option>
+                        <option value="nokia">Nokia</option>
+                        <option value="huawei">Huawei</option>
+                    </select>
+                </label>
+                <label>Technology
+                    <select id="radio-technology">
+                        <option value="all">All RATs</option>
+                        <option value="2G">2G</option>
+                        <option value="3G">3G</option>
+                        <option value="4G-FDD">4G FDD</option>
+                        <option value="4G-TDD">4G TDD</option>
+                        <option value="4G-4G Intra-eNB">4G Neighbor Intra</option>
+                        <option value="4G-4G Inter-eNB">4G Neighbor Inter</option>
+                        <option value="5G">5G</option>
+                    </select>
+                </label>
+                <label>Search
+                    <input type="search" id="radio-search" placeholder="Cell, site, issue">
+                </label>
+                <button type="button" class="btn-primary" id="radio-apply">Apply</button>
+            </section>
 
-        <section class="radio-summary" id="radio-summary">
-            <div><span>Total</span><strong id="radio-total">-</strong></div>
-            <div><span>Critical</span><strong id="radio-critical">-</strong></div>
-            <div><span>High</span><strong id="radio-high">-</strong></div>
-            <div><span>Medium</span><strong id="radio-medium">-</strong></div>
-        </section>
+            <section class="radio-summary" id="radio-summary">
+                <div><span>Total</span><strong id="radio-total">-</strong></div>
+                <div><span>Critical</span><strong id="radio-critical">-</strong></div>
+                <div><span>High</span><strong id="radio-high">-</strong></div>
+                <div><span>Medium</span><strong id="radio-medium">-</strong></div>
+            </section>
 
-        <section class="radio-note" id="radio-note" hidden></section>
+            <section class="radio-note" id="radio-note" hidden></section>
 
-        <section class="radio-table-wrap">
-            <table class="radio-table">
-                <thead>
-                    <tr>
-                        <th>Severity</th>
-                        <th>Score</th>
-                        <th>Issue</th>
-                        <th>Area</th>
-                        <th>Vendor</th>
-                        <th>Technology</th>
-                        <th>Cells / Site</th>
-                        <th>Recommendation</th>
-                    </tr>
-                </thead>
-                <tbody id="radio-rows">
-                    <tr><td colspan="8">Loading...</td></tr>
-                </tbody>
-            </table>
-        </section>
-    </main>
+            <section class="radio-table-wrap">
+                <table class="radio-table">
+                    <thead>
+                        <tr>
+                            <th>Severity</th>
+                            <th>Score</th>
+                            <th>Issue</th>
+                            <th>Area</th>
+                            <th>Vendor</th>
+                            <th>Technology</th>
+                            <th>Cells / Site</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="radio-rows">
+                        <tr><td colspan="8">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.6"></script>
     <script src="{{ url_for('static', filename='js/radio_modules.js') }}?v=1.0"></script>
