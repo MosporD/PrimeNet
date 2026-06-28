@@ -2,6 +2,7 @@ let femtoCharts = [];
 let femtoCatalog = { kpis: [], counters: {} };
 let femtoDevices = [];
 let femtoSelectionMode = 'single';
+let femtoAggregation = 'hourly';
 const selectedObjects = new Set();
 const selectedComputedKpis = new Set();
 const selectedCounters = new Set();
@@ -336,9 +337,14 @@ async function loadFemtoTrendChart() {
         if (status) status.textContent = 'Select at least one KPI or counter.';
         return;
     }
-    if (status) status.textContent = `Loading ${series.length} series for ${objectIds.length} object(s)...`;
+    if (status) status.textContent = `Loading ${femtoAggregation} ${series.length} series for ${objectIds.length} object(s)...`;
     const requests = await Promise.all(objectIds.map(async uniqueId => {
-        const params = new URLSearchParams({ unique_id: uniqueId, kpi: series.join(','), limit: '300' });
+        const params = new URLSearchParams({
+            unique_id: uniqueId,
+            kpi: series.join(','),
+            granularity: femtoAggregation,
+            limit: femtoAggregation === 'daily' ? '90' : '300',
+        });
         const res = await fetch('/api/femto-pm/trend?' + params.toString());
         const data = await res.json();
         return { uniqueId, data };
@@ -367,7 +373,7 @@ async function loadFemtoTrendChart() {
     renderFemtoTabs();
     renderFemtoChartsForActiveTab();
     updateFemtoEmptyState(true);
-    if (status) status.textContent = `Loaded ${femtoChartTabs.length} object tab(s).`;
+    if (status) status.textContent = `Loaded ${femtoAggregation} trends for ${femtoChartTabs.length} object tab(s).`;
 }
 
 function renderFemtoTabs() {
@@ -490,6 +496,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             selectedObjects.clear();
             if (first) selectedObjects.add(first);
             renderObjectList();
+        });
+    });
+    document.querySelectorAll('input[name="femto-aggregation"]').forEach(el => {
+        el.addEventListener('change', e => {
+            femtoAggregation = e.target.value === 'daily' ? 'daily' : 'hourly';
         });
     });
 

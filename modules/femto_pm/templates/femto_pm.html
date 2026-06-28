@@ -27,17 +27,6 @@
 
     <div class="perf-body femto-body">
         <aside id="perf-left-panel" class="filter-panel perf-filter-hw femto-filter-panel">
-            <div class="perf-time-window-row femto-summary-row">
-                <div class="femto-summary-pill">
-                    <span class="perf-time-window-label">Data source</span>
-                    <strong>Femto hourly PM</strong>
-                </div>
-                <div class="femto-summary-pill">
-                    <span class="perf-time-window-label">Mode</span>
-                    <strong>Trend charts</strong>
-                </div>
-            </div>
-
             <div id="cell-list-wrap" class="hw-tree-panel femto-tree-panel">
                 <div class="perf-sidebar-section perf-sidebar-cells femto-selector-block is-open">
                     <button type="button" class="perf-sidebar-toggle femto-selector-toggle" data-target="femto-object-block" aria-expanded="true">
@@ -62,14 +51,12 @@
 
                 <div class="kpi-scope-panel femto-catalog-wrap" aria-label="Femto KPIs and counters">
                     <section class="femto-selector-block">
-                        <div class="kpi-scope-head">
-                            <button type="button" class="perf-sidebar-toggle perf-sidebar-toggle--nest femto-selector-toggle"
-                                    data-target="femto-kpi-block" aria-expanded="false" title="Collapse or expand computed KPI list">
-                                <span class="perf-chevron femto-selector-arrow" aria-hidden="true">▶</span>
-                            </button>
-                            <span class="kpi-scope-title">Computed KPIs</span>
+                        <button type="button" class="perf-sidebar-toggle femto-selector-toggle"
+                                data-target="femto-kpi-block" aria-expanded="false" title="Collapse or expand KPI list">
+                            <span class="perf-chevron femto-selector-arrow" aria-hidden="true">▶</span>
+                            <span>KPIs</span>
                             <span id="femto-kpi-count" class="kpi-scope-count femto-kpi-count"></span>
-                        </div>
+                        </button>
                         <div id="femto-kpi-block" class="perf-sidebar-body perf-kpis-body femto-selector-body" style="display:none;">
                             <div class="kpi-scope-controls femto-kpi-actions">
                                 <label class="kpi-scope-select-all femto-select-all">
@@ -85,14 +72,12 @@
                     </section>
 
                     <section class="femto-selector-block">
-                        <div class="kpi-scope-head">
-                            <button type="button" class="perf-sidebar-toggle perf-sidebar-toggle--nest femto-selector-toggle"
-                                    data-target="femto-counter-block" aria-expanded="false" title="Collapse or expand raw counter list">
-                                <span class="perf-chevron femto-selector-arrow" aria-hidden="true">▶</span>
-                            </button>
-                            <span class="kpi-scope-title">Counters</span>
+                        <button type="button" class="perf-sidebar-toggle femto-selector-toggle"
+                                data-target="femto-counter-block" aria-expanded="false" title="Collapse or expand raw counter list">
+                            <span class="perf-chevron femto-selector-arrow" aria-hidden="true">▶</span>
+                            <span>Counters</span>
                             <span id="femto-counter-count" class="kpi-scope-count femto-kpi-count"></span>
-                        </div>
+                        </button>
                         <div id="femto-counter-block" class="perf-sidebar-body perf-kpis-body femto-selector-body" style="display:none;">
                             <div class="kpi-scope-controls femto-kpi-actions">
                                 <label class="kpi-scope-select-all femto-select-all">
@@ -110,8 +95,12 @@
             </div>
 
             <div class="perf-query-bar femto-query-bar" role="region" aria-label="Run Femto query">
+                <div class="femto-aggregation-control" role="radiogroup" aria-label="Femto aggregation">
+                    <label class="hw-radio femto-radio"><input type="radio" name="femto-aggregation" value="hourly" checked> Hourly</label>
+                    <label class="hw-radio femto-radio"><input type="radio" name="femto-aggregation" value="daily"> Daily</label>
+                </div>
                 <button id="femto-load-btn" class="btn-query" type="button">Query</button>
-                <p class="perf-query-hint femto-query-hint">Select Femto NE(s), choose computed KPIs or counters, then query historical PM trends.</p>
+                <p class="perf-query-hint femto-query-hint">Daily mode sums hourly counters before plotting selected counters or computed KPIs.</p>
             </div>
         </aside>
         <button type="button" id="perf-left-panel-toggle" class="perf-left-panel-toggle"
@@ -159,7 +148,7 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-<script src="{{ url_for('femto_pm.static', filename='femto_pm.js') }}?v=2.5"></script>
+<script src="{{ url_for('femto_pm.static', filename='femto_pm.js') }}?v=2.6"></script>
 </body>
 </html>
 

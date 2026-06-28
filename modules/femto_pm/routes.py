@@ -6,6 +6,7 @@ import os
 import re
 import sqlite3
 import ast
+from datetime import datetime, timedelta
 
 import time as _time
 
@@ -425,6 +426,24 @@ def _evaluate_formula(kpi_name: str, formula: str, row_map: dict) -> float | Non
         return None
 
 
+def _computed_defs_for_selected(conn: sqlite3.Connection, selected: list[str]) -> dict[str, str]:
+    if not selected or not _table_exists(conn, FEMTO_COMPUTED_TABLE):
+        return {}
+    placeholders = ", ".join(["?"] * len(selected))
+    rows = conn.execute(
+        f'SELECT kpi_name, formula FROM "{FEMTO_COMPUTED_TABLE}" WHERE kpi_name IN ({placeholders})',
+        selected,
+    ).fetchall()
+    return {str(r["kpi_name"]): str(r["formula"] or "") for r in rows}
+
+
+def _next_day(day: str) -> str:
+    try:
+        return (datetime.strptime(day, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+    except Exception:
+        return day
+
+
 def _series_rows_for_device(conn: sqlite3.Connection, unique_id: str, selected: list[str], limit: int) -> tuple[list[str], list[dict]]:
     ts_rows = conn.execute(
         f"""
@@ -454,14 +473,7 @@ def _series_rows_for_device(conn: sqlite3.Connection, unique_id: str, selected: 
         [unique_id] + ts_list,
     ).fetchall()
 
-    computed_defs = {}
-    if _table_exists(conn, FEMTO_COMPUTED_TABLE):
-        placeholders = ", ".join(["?"] * len(selected)) if selected else "''"
-        rows = conn.execute(
-            f'SELECT kpi_name, formula FROM "{FEMTO_COMPUTED_TABLE}" WHERE kpi_name IN ({placeholders})',
-            selected,
-        ).fetchall() if selected else []
-        computed_defs = {str(r["kpi_name"]): str(r["formula"] or "") for r in rows}
+    computed_defs = _computed_defs_for_selected(conn, selected)
 
     by_ts: dict[str, dict] = {
         str(r["timestamp"]): {"timestamp": str(r["timestamp"]), "measurement_period_sec": r["gp_seconds"]}
@@ -477,6 +489,72 @@ def _series_rows_for_device(conn: sqlite3.Connection, unique_id: str, selected: 
     for ts in ts_list:
         base = by_ts.get(ts, {"timestamp": ts})
         out = {"timestamp": ts}
+        for name in selected:
+            if name in computed_defs:
+                out[name] = _evaluate_formula(name, computed_defs[name], base)
+            else:
+                out[name] = base.get(name)
+        rows.append(out)
+    return selected, rows
+
+
+def _daily_series_rows_for_device(conn: sqlite3.Connection, unique_id: str, selected: list[str], limit: int) -> tuple[list[str], list[dict]]:
+    day_rows = conn.execute(
+        f"""
+        SELECT day, SUM(COALESCE(gp_seconds, 0)) AS gp_seconds
+        FROM (
+            SELECT substr(timestamp, 1, 10) AS day, gp_seconds
+            FROM "{FEMTO_TABLE}"
+            WHERE unique_id = ?
+              AND timestamp IS NOT NULL
+              AND TRIM(timestamp) <> ''
+        )
+        WHERE day IS NOT NULL AND TRIM(day) <> ''
+        GROUP BY day
+        ORDER BY day DESC
+        LIMIT ?
+        """,
+        (unique_id, limit),
+    ).fetchall()
+    days = sorted(str(r["day"]) for r in day_rows if str(r["day"] or "").strip())
+    if not days:
+        return selected, []
+
+    by_day: dict[str, dict] = {
+        str(r["day"]): {"timestamp": str(r["day"]), "measurement_period_sec": r["gp_seconds"]}
+        for r in day_rows
+        if str(r["day"] or "").strip()
+    }
+    start_day = days[0]
+    end_day = _next_day(days[-1])
+    value_rows = conn.execute(
+        f"""
+        SELECT timestamp, kpi_name, kpi_value
+        FROM "{FEMTO_VALUES_TABLE}"
+        WHERE unique_id = ?
+          AND timestamp >= ?
+          AND timestamp < ?
+        """,
+        (unique_id, start_day, end_day),
+    ).fetchall()
+    for r in value_rows:
+        day = str(r["timestamp"] or "")[:10]
+        if day not in by_day:
+            continue
+        name = str(r["kpi_name"] or "")
+        if not name:
+            continue
+        try:
+            value = float(r["kpi_value"])
+        except Exception:
+            continue
+        by_day[day][name] = float(by_day[day].get(name) or 0.0) + value
+
+    computed_defs = _computed_defs_for_selected(conn, selected)
+    rows = []
+    for day in days:
+        base = by_day.get(day, {"timestamp": day})
+        out = {"timestamp": day}
         for name in selected:
             if name in computed_defs:
                 out[name] = _evaluate_formula(name, computed_defs[name], base)
@@ -565,6 +643,9 @@ def femto_pm_trend():
         return jsonify({"error": "unique_id is required"}), 400
     kpi_raw = (request.args.get("kpi") or "").strip()
     req_kpis = [k.strip() for k in kpi_raw.split(",") if k.strip()]
+    granularity = (request.args.get("granularity") or "hourly").strip().lower()
+    if granularity not in {"hourly", "daily"}:
+        granularity = "hourly"
     limit = request.args.get("limit", 240, type=int) or 240
     limit = max(1, min(limit, 2000))
     if not os.path.isfile(FEMTO_PM_DB):
@@ -582,12 +663,16 @@ def femto_pm_trend():
         if not selected:
             return jsonify({"success": True, "rows": [], "columns": []})
 
-        columns, rows = _series_rows_for_device(conn, unique_id, selected, limit)
+        if granularity == "daily":
+            columns, rows = _daily_series_rows_for_device(conn, unique_id, selected, limit)
+        else:
+            columns, rows = _series_rows_for_device(conn, unique_id, selected, limit)
         return jsonify({
             "success": True,
             "columns": ["timestamp"] + columns,
             "rows": rows,
             "unique_id": unique_id,
+            "granularity": granularity,
         })
     finally:
         conn.close()
