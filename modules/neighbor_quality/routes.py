@@ -4,13 +4,13 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import neighbor_quality
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import format_user, get_current_user, json_error, login_required, query_filters
+from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
 
 neighbor_quality_bp = Blueprint("neighbor_quality", __name__)
 
 
 @neighbor_quality_bp.route("/neighbor-quality")
-@login_required
+@admin_required
 def neighbor_quality_page():
     return render_template(
         "radio_module.html",
@@ -24,7 +24,7 @@ def neighbor_quality_page():
 
 
 @neighbor_quality_bp.route("/api/neighbor-quality/issues")
-@login_required
+@admin_required
 def neighbor_quality_issues():
     f = query_filters()
     try:

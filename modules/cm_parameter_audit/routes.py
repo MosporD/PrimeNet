@@ -4,13 +4,13 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import cm_parameter_audit
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import format_user, get_current_user, json_error, login_required, query_filters
+from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
 
 cm_parameter_audit_bp = Blueprint("cm_parameter_audit", __name__)
 
 
 @cm_parameter_audit_bp.route("/cm-parameter-audit")
-@login_required
+@admin_required
 def cm_parameter_audit_page():
     return render_template(
         "radio_module.html",
@@ -24,7 +24,7 @@ def cm_parameter_audit_page():
 
 
 @cm_parameter_audit_bp.route("/api/cm-parameter-audit/issues")
-@login_required
+@admin_required
 def cm_parameter_audit_issues():
     f = query_filters(default_limit=500)
     try:

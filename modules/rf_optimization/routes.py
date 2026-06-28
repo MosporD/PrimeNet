@@ -4,13 +4,13 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import rf_optimization
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import format_user, get_current_user, json_error, login_required, query_filters
+from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
 
 rf_optimization_bp = Blueprint("rf_optimization", __name__)
 
 
 @rf_optimization_bp.route("/rf-optimization")
-@login_required
+@admin_required
 def rf_optimization_page():
     return render_template(
         "radio_module.html",
@@ -24,7 +24,7 @@ def rf_optimization_page():
 
 
 @rf_optimization_bp.route("/api/rf-optimization/issues")
-@login_required
+@admin_required
 def rf_optimization_issues():
     f = query_filters(default_limit=250)
     try:

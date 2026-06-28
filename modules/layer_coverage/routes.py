@@ -4,13 +4,13 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import layer_coverage_gaps
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import format_user, get_current_user, json_error, login_required, query_filters
+from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
 
 layer_coverage_bp = Blueprint("layer_coverage", __name__)
 
 
 @layer_coverage_bp.route("/layer-coverage")
-@login_required
+@admin_required
 def layer_coverage_page():
     return render_template(
         "radio_module.html",
@@ -24,7 +24,7 @@ def layer_coverage_page():
 
 
 @layer_coverage_bp.route("/api/layer-coverage/issues")
-@login_required
+@admin_required
 def layer_coverage_issues():
     f = query_filters(default_limit=500)
     try:

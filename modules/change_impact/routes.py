@@ -4,13 +4,13 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import change_impact
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import format_user, get_current_user, json_error, login_required, query_filters
+from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
 
 change_impact_bp = Blueprint("change_impact", __name__)
 
 
 @change_impact_bp.route("/change-impact")
-@login_required
+@admin_required
 def change_impact_page():
     return render_template(
         "radio_module.html",
@@ -24,7 +24,7 @@ def change_impact_page():
 
 
 @change_impact_bp.route("/api/change-impact/issues")
-@login_required
+@admin_required
 def change_impact_issues():
     f = query_filters(default_limit=200)
     try:

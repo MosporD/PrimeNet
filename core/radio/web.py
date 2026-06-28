@@ -9,6 +9,14 @@ from flask import jsonify, redirect, request, url_for
 from database_enhanced import get_user_by_session
 
 
+def _role(user) -> str:
+    if not user:
+        return ""
+    if isinstance(user, dict):
+        return str(user.get("role") or "").strip().lower()
+    return str(user[6] or "").strip().lower()
+
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -19,6 +27,23 @@ def login_required(f):
         if not user:
             return redirect(url_for("auth.login_page"))
         request.current_user = user
+        return f(*args, **kwargs)
+
+    return decorated
+
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.cookies.get("session_token")
+        if not token:
+            return redirect(url_for("auth.login_page"))
+        user = get_user_by_session(token)
+        if not user:
+            return redirect(url_for("auth.login_page"))
+        request.current_user = user
+        if _role(user) != "admin":
+            return jsonify({"success": False, "error": "Administrator access required."}), 403
         return f(*args, **kwargs)
 
     return decorated

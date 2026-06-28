@@ -4,13 +4,13 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import radio_morning_report
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import format_user, get_current_user, json_error, login_required, query_filters
+from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
 
 radio_morning_report_bp = Blueprint("radio_morning_report", __name__)
 
 
 @radio_morning_report_bp.route("/radio-morning-report")
-@login_required
+@admin_required
 def radio_morning_report_page():
     return render_template(
         "radio_module.html",
@@ -24,7 +24,7 @@ def radio_morning_report_page():
 
 
 @radio_morning_report_bp.route("/api/radio-morning-report/issues")
-@login_required
+@admin_required
 def radio_morning_report_issues():
     f = query_filters(default_limit=100)
     try:

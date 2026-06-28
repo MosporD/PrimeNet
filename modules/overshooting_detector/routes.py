@@ -4,13 +4,13 @@ from flask import Blueprint, jsonify, render_template
 
 from core.radio.insights import overshooting_candidates
 from core.radio.scoring import filter_rows, summarize
-from core.radio.web import format_user, get_current_user, json_error, login_required, query_filters
+from core.radio.web import admin_required, format_user, get_current_user, json_error, query_filters
 
 overshooting_detector_bp = Blueprint("overshooting_detector", __name__)
 
 
 @overshooting_detector_bp.route("/overshooting-detector")
-@login_required
+@admin_required
 def overshooting_detector_page():
     return render_template(
         "radio_module.html",
@@ -24,7 +24,7 @@ def overshooting_detector_page():
 
 
 @overshooting_detector_bp.route("/api/overshooting-detector/issues")
-@login_required
+@admin_required
 def overshooting_detector_issues():
     f = query_filters()
     try:
