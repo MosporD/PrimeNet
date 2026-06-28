@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Femto PM - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
-    <link rel="stylesheet" href="{{ url_for('femto_pm.static', filename='femto_pm.css') }}?v=2.1">
+    <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.2">
+    <link rel="stylesheet" href="{{ url_for('femto_pm.static', filename='femto_pm.css') }}?v=2.4">
     <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
 </head>
-<body class="femto-pm-page">
-<div class="container femto-container">
+<body class="perf-page femto-pm-page">
+<div class="container perf-container femto-container">
     <header>
         <div class="header-content">
             <div class="header-left">
                 <a href="/dashboard" class="back-link">← Dashboard</a>
                 <h1>📶 Femto PM</h1>
-                <p>Femto KPI monitoring and analysis</p>
+                <span class="femto-api-badge">Small Cell PM</span>
             </div>
             <div class="header-right">
                 <span class="user-name">{{ user.username }}</span>
@@ -24,86 +25,133 @@
         </div>
     </header>
 
-    <div class="femto-body">
-        <aside class="femto-filter-panel">
-            <div class="femto-selector-block is-open">
-                <button type="button" class="femto-selector-toggle" data-target="femto-object-block" aria-expanded="true">
-                    <span>FEMTO NE</span>
-                    <span class="femto-selector-arrow">▼</span>
-                </button>
-                <div id="femto-object-block" class="femto-selector-body">
-                    <div class="femto-control">
-                        <label for="femto-object-search">Search</label>
-                        <input id="femto-object-search" type="search" placeholder="Filter objects...">
-                    </div>
-                    <div class="femto-select-mode" role="radiogroup" aria-label="Object selection mode">
-                        <label class="femto-radio"><input type="radio" name="femto-sel-mode" value="single" checked> Single</label>
-                        <label class="femto-radio"><input type="radio" name="femto-sel-mode" value="multiple"> Multiple</label>
-                    </div>
-                    <div class="femto-object-meta"><span id="femto-object-count"></span></div>
-                    <div id="femto-object-list" class="femto-object-list"></div>
+    <div class="perf-body femto-body">
+        <aside id="perf-left-panel" class="filter-panel perf-filter-hw femto-filter-panel">
+            <div class="perf-time-window-row femto-summary-row">
+                <div class="femto-summary-pill">
+                    <span class="perf-time-window-label">Data source</span>
+                    <strong>Femto hourly PM</strong>
+                </div>
+                <div class="femto-summary-pill">
+                    <span class="perf-time-window-label">Mode</span>
+                    <strong>Trend charts</strong>
                 </div>
             </div>
-            <div class="femto-catalog-wrap">
-                <section class="femto-selector-block">
-                    <button type="button" class="femto-selector-toggle" data-target="femto-kpi-block" aria-expanded="false">
-                        <span>KPIs</span>
-                        <span class="femto-selector-arrow">▶</span>
-                    </button>
-                    <div id="femto-kpi-block" class="femto-selector-body" style="display:none;">
-                        <div class="femto-control">
-                            <label for="femto-kpi-search">KPI Search</label>
-                            <input id="femto-kpi-search" type="search" placeholder="Filter computed KPIs...">
-                        </div>
-                        <div class="femto-kpi-actions">
-                            <label class="femto-select-all">
-                                <input type="checkbox" id="femto-kpi-select-all">
-                                <span>Select visible KPIs</span>
-                            </label>
-                            <span id="femto-kpi-count" class="femto-kpi-count"></span>
-                        </div>
-                        <div class="femto-kpi-list-wrap">
-                            <div class="femto-kpi-list-head">Computed KPIs</div>
-                            <div id="femto-kpi-list" class="femto-kpi-list"></div>
-                        </div>
-                    </div>
-                </section>
 
-                <section class="femto-selector-block">
-                    <button type="button" class="femto-selector-toggle" data-target="femto-counter-block" aria-expanded="false">
-                        <span>Counters</span>
-                        <span class="femto-selector-arrow">▶</span>
+            <div id="cell-list-wrap" class="hw-tree-panel femto-tree-panel">
+                <div class="perf-sidebar-section perf-sidebar-cells femto-selector-block is-open">
+                    <button type="button" class="perf-sidebar-toggle femto-selector-toggle" data-target="femto-object-block" aria-expanded="true">
+                        <span class="perf-chevron femto-selector-arrow" aria-hidden="true">▼</span>
+                        <span>Objects</span>
                     </button>
-                    <div id="femto-counter-block" class="femto-selector-body" style="display:none;">
-                        <div class="femto-control">
-                            <label for="femto-counter-search">Counter Search</label>
-                            <input id="femto-counter-search" type="search" placeholder="Filter counters...">
+                    <div id="femto-object-block" class="perf-sidebar-body perf-cells-body femto-selector-body">
+                        <div class="hw-tree-toolbar">
+                            <div class="hw-tree-toolbar-row hw-tree-toolbar-row--tools">
+                                <input id="femto-object-search" class="hw-tree-search" type="search" placeholder="Filter Femto NEs..." autocomplete="off">
+                                <div class="hw-select-mode femto-select-mode" role="radiogroup" aria-label="Object selection mode">
+                                    <label class="hw-radio femto-radio"><input type="radio" name="femto-sel-mode" value="single" checked> Single</label>
+                                    <label class="hw-radio femto-radio"><input type="radio" name="femto-sel-mode" value="multiple"> Multiple</label>
+                                </div>
+                                <button type="button" class="hw-icon-btn hw-icon-btn-refresh" title="Refresh Femto data" onclick="refreshFemtoData()">↻</button>
+                            </div>
+                            <div class="hw-tree-meta femto-object-meta"><span id="femto-object-count"></span></div>
                         </div>
-                        <div class="femto-kpi-actions">
-                            <label class="femto-select-all">
-                                <input type="checkbox" id="femto-counter-select-all">
-                                <span>Select visible counters</span>
-                            </label>
-                            <span id="femto-counter-count" class="femto-kpi-count"></span>
-                        </div>
-                        <div class="femto-kpi-list-wrap">
-                            <div class="femto-kpi-list-head">Counters</div>
-                            <div id="femto-counter-list" class="femto-kpi-list"></div>
-                        </div>
+                        <div id="femto-object-list" class="hw-object-tree femto-object-list" role="tree"></div>
                     </div>
-                </section>
+                </div>
+
+                <div class="kpi-scope-panel femto-catalog-wrap" aria-label="Femto KPIs and counters">
+                    <section class="femto-selector-block">
+                        <div class="kpi-scope-head">
+                            <button type="button" class="perf-sidebar-toggle perf-sidebar-toggle--nest femto-selector-toggle"
+                                    data-target="femto-kpi-block" aria-expanded="false" title="Collapse or expand computed KPI list">
+                                <span class="perf-chevron femto-selector-arrow" aria-hidden="true">▶</span>
+                            </button>
+                            <span class="kpi-scope-title">Computed KPIs</span>
+                            <span id="femto-kpi-count" class="kpi-scope-count femto-kpi-count"></span>
+                        </div>
+                        <div id="femto-kpi-block" class="perf-sidebar-body perf-kpis-body femto-selector-body" style="display:none;">
+                            <div class="kpi-scope-controls femto-kpi-actions">
+                                <label class="kpi-scope-select-all femto-select-all">
+                                    <input type="checkbox" id="femto-kpi-select-all">
+                                    <span>Select visible KPIs</span>
+                                </label>
+                            </div>
+                            <div class="femto-control femto-search-row">
+                                <input id="femto-kpi-search" class="hw-tree-search" type="search" placeholder="Search computed KPIs..." autocomplete="off">
+                            </div>
+                            <div class="kpi-scope-list femto-kpi-list" id="femto-kpi-list"></div>
+                        </div>
+                    </section>
+
+                    <section class="femto-selector-block">
+                        <div class="kpi-scope-head">
+                            <button type="button" class="perf-sidebar-toggle perf-sidebar-toggle--nest femto-selector-toggle"
+                                    data-target="femto-counter-block" aria-expanded="false" title="Collapse or expand raw counter list">
+                                <span class="perf-chevron femto-selector-arrow" aria-hidden="true">▶</span>
+                            </button>
+                            <span class="kpi-scope-title">Counters</span>
+                            <span id="femto-counter-count" class="kpi-scope-count femto-kpi-count"></span>
+                        </div>
+                        <div id="femto-counter-block" class="perf-sidebar-body perf-kpis-body femto-selector-body" style="display:none;">
+                            <div class="kpi-scope-controls femto-kpi-actions">
+                                <label class="kpi-scope-select-all femto-select-all">
+                                    <input type="checkbox" id="femto-counter-select-all">
+                                    <span>Select visible counters</span>
+                                </label>
+                            </div>
+                            <div class="femto-control femto-search-row">
+                                <input id="femto-counter-search" class="hw-tree-search" type="search" placeholder="Search counters..." autocomplete="off">
+                            </div>
+                            <div class="kpi-scope-list femto-kpi-list" id="femto-counter-list"></div>
+                        </div>
+                    </section>
+                </div>
             </div>
-            <button id="femto-load-btn" class="btn-query" type="button">Load Chart</button>
+
+            <div class="perf-query-bar femto-query-bar" role="region" aria-label="Run Femto query">
+                <button id="femto-load-btn" class="btn-query" type="button">Query</button>
+                <p class="perf-query-hint femto-query-hint">Select Femto NE(s), choose computed KPIs or counters, then query historical PM trends.</p>
+            </div>
         </aside>
+        <button type="button" id="perf-left-panel-toggle" class="perf-left-panel-toggle"
+                aria-label="Collapse left panel" aria-expanded="true"
+                title="Collapse filters" onclick="toggleFemtoLeftPanel()">
+            ◀
+        </button>
 
-        <main class="femto-charts-area">
-            <div class="femto-chart-wrap">
-                <div id="femto-status" class="femto-status">Select device and KPI(s), then click Load Chart.</div>
-                <div id="femto-chart-tabs-bar" class="femto-chart-tabs-bar" style="display:none;">
-                    <div id="femto-chart-tabs-strip" class="femto-chart-tabs-strip" role="tablist"></div>
+        <main class="charts-area femto-charts-area">
+            <div class="charts-header">
+                <div class="charts-header-top">
+                    <div class="charts-header-titles">
+                        <div id="charts-title" class="charts-title">Select Femto NE(s), choose KPIs, then Query</div>
+                        <div id="femto-status" class="femto-status">Select device and KPI(s), then click Query.</div>
+                    </div>
+                    <div class="header-actions">
+                        <button type="button" class="btn-refresh" onclick="refreshFemtoData()">
+                            <span class="refresh-icon">↻</span> Refresh
+                        </button>
+                    </div>
                 </div>
+                <div class="charts-header-bottom">
+                    <div class="view-toggle">
+                        <button type="button" class="view-btn active">Charts</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="femto-chart-tabs-bar" class="perf-chart-tabs-bar femto-chart-tabs-bar" style="display:none;">
+                <div id="femto-chart-tabs-strip" class="perf-chart-tabs-strip femto-chart-tabs-strip" role="tablist"></div>
+            </div>
+
+            <div id="no-selection" class="no-selection femto-no-selection">
+                <div class="no-selection-icon">📊</div>
+                <p>Choose <strong>Femto NE</strong>, select KPI(s) or counters, then click <strong>Query</strong>.</p>
+            </div>
+
+            <div class="charts-wrap femto-chart-wrap">
                 <div id="femto-chart-grid" class="femto-chart-grid">
-                    <div class="femto-chart-empty">Select object(s) and KPI(s), then click Load Chart.</div>
+                    <div class="femto-chart-empty">Select object(s) and KPI(s), then click Query.</div>
                 </div>
             </div>
         </main>
@@ -111,7 +159,7 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-<script src="{{ url_for('femto_pm.static', filename='femto_pm.js') }}?v=2.3"></script>
+<script src="{{ url_for('femto_pm.static', filename='femto_pm.js') }}?v=2.4"></script>
 </body>
 </html>
 

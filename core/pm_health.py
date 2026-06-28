@@ -112,7 +112,163 @@ def _detect_ts_col(columns: list[str]) -> str | None:
     return None
 
 
-def _table_stats(conn: sqlite3.Connection, table: str) -> dict:
+def _timestamp_candidates(columns: list[str]) -> list[str]:
+    exact: list[str] = []
+    partial: list[str] = []
+    partial_keywords = ("period_start_time", "period start", "timestamp", "period")
+    for col in columns:
+        low = col.lower().strip()
+        if "latency" in low:
+            continue
+        if low in _TS_KEYWORDS:
+            exact.append(col)
+            continue
+        if any(kw in low for kw in partial_keywords):
+            partial.append(col)
+    return exact + [col for col in partial if col not in exact]
+
+
+def _parse_pm_timestamp(value: Any, label: str, col_name: str) -> datetime | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    if not text or text.lower() in {"none", "null", "nat", "nan"}:
+        return None
+
+    cleaned = " ".join(text.split())
+    if len(cleaned) > 10 and cleaned[10] == "T":
+        cleaned = f"{cleaned[:10]} {cleaned[11:]}"
+    for suffix in (" DST", " STD"):
+        if cleaned.upper().endswith(suffix):
+            cleaned = cleaned[: -len(suffix)].strip()
+            break
+
+    low_label = label.lower()
+    low_col = col_name.lower().strip()
+    prefer_dayfirst = "huawei" in low_label or "/" in cleaned
+    formats: list[str] = []
+
+    if "huawei" in low_label or low_col in {"time", "date"} or "/" in cleaned:
+        formats.extend(
+            [
+                "%d/%m/%Y %H:%M:%S",
+                "%d/%m/%Y %H:%M",
+                "%d/%m/%Y",
+                "%d/%m/%y %H:%M:%S",
+                "%d/%m/%y %H:%M",
+                "%d/%m/%y",
+            ]
+        )
+    if "nokia" in low_label or "." in cleaned:
+        formats.extend(
+            [
+                "%m.%d.%Y %H:%M:%S",
+                "%m.%d.%Y %H:%M",
+                "%m.%d.%Y",
+                "%m.%d.%y %H:%M:%S",
+                "%m.%d.%y %H:%M",
+                "%m.%d.%y",
+                "%d.%m.%Y %H:%M:%S",
+                "%d.%m.%Y %H:%M",
+                "%d.%m.%Y",
+                "%d.%m.%y %H:%M:%S",
+                "%d.%m.%y %H:%M",
+                "%d.%m.%y",
+            ]
+        )
+    formats.extend(
+        [
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%d %H:%M",
+            "%Y-%m-%d",
+            "%Y%m%d%H%M%S",
+            "%Y%m%d%H%M",
+            "%Y%m%d%H",
+            "%Y%m%d",
+        ]
+    )
+
+    seen_formats: set[str] = set()
+    for fmt in formats:
+        if fmt in seen_formats:
+            continue
+        seen_formats.add(fmt)
+        try:
+            return datetime.strptime(cleaned, fmt)
+        except ValueError:
+            pass
+
+    # Ambiguous slash dates in these exports are Huawei-style DD/MM, not US MM/DD.
+    if "/" in cleaned and prefer_dayfirst:
+        parts = cleaned.split(" ", 1)
+        date_parts = parts[0].split("/")
+        if len(date_parts) == 3:
+            try:
+                day, month, year = (int(part) for part in date_parts)
+                if year < 100:
+                    year += 2000
+                time_part = parts[1] if len(parts) > 1 else "00:00:00"
+                hour, minute, second = _parse_time_part(time_part)
+                return datetime(year, month, day, hour, minute, second)
+            except (TypeError, ValueError):
+                return None
+    return None
+
+
+def _parse_time_part(value: str) -> tuple[int, int, int]:
+    parts = value.split(":")
+    hour = int(parts[0]) if len(parts) > 0 and parts[0] else 0
+    minute = int(parts[1]) if len(parts) > 1 and parts[1] else 0
+    second = int(float(parts[2])) if len(parts) > 2 and parts[2] else 0
+    return hour, minute, second
+
+
+def _timestamp_bounds(
+    conn: sqlite3.Connection, table: str, columns: list[str], label: str
+) -> dict[str, Any] | None:
+    best: dict[str, Any] | None = None
+    for col in _timestamp_candidates(columns):
+        parsed_count = 0
+        earliest_dt: datetime | None = None
+        earliest_raw: Any = None
+        latest_dt: datetime | None = None
+        latest_raw: Any = None
+        try:
+            values = conn.execute(
+                f'SELECT DISTINCT "{col}" FROM "{table}" '
+                f'WHERE "{col}" IS NOT NULL AND TRIM(CAST("{col}" AS TEXT)) != ""'
+            )
+        except Exception:
+            continue
+
+        for (raw_value,) in values:
+            parsed = _parse_pm_timestamp(raw_value, label, col)
+            if parsed is None:
+                continue
+            parsed_count += 1
+            if earliest_dt is None or parsed < earliest_dt:
+                earliest_dt = parsed
+                earliest_raw = raw_value
+            if latest_dt is None or parsed > latest_dt:
+                latest_dt = parsed
+                latest_raw = raw_value
+
+        if parsed_count == 0 or earliest_dt is None or latest_dt is None:
+            continue
+        candidate = {
+            "column": col,
+            "earliest": earliest_raw,
+            "latest": latest_raw,
+            "earliest_sort": earliest_dt,
+            "latest_sort": latest_dt,
+            "parsed_distinct_timestamps": parsed_count,
+        }
+        if best is None or parsed_count > best["parsed_distinct_timestamps"]:
+            best = candidate
+    return best
+
+
+def _table_stats(conn: sqlite3.Connection, table: str, label: str) -> dict:
     columns = _column_names(conn, table)
     cell_col = _detect_cell_col(columns)
     ts_col = _detect_ts_col(columns)
@@ -132,7 +288,15 @@ def _table_stats(conn: sqlite3.Connection, table: str) -> dict:
                 f'SELECT COUNT(DISTINCT "{cell_col}") FROM "{table}" WHERE "{cell_col}" IS NOT NULL'
             ).fetchone()[0]
         )
-    if ts_col:
+    bounds = _timestamp_bounds(conn, table, columns, label)
+    if bounds:
+        out["timestamp_column"] = bounds["column"]
+        out["earliest"] = bounds["earliest"]
+        out["latest"] = bounds["latest"]
+        out["_earliest_sort"] = bounds["earliest_sort"]
+        out["_latest_sort"] = bounds["latest_sort"]
+        out["parsed_distinct_timestamps"] = bounds["parsed_distinct_timestamps"]
+    elif ts_col:
         row = conn.execute(
             f'SELECT MIN("{ts_col}"), MAX("{ts_col}") FROM "{table}" WHERE "{ts_col}" IS NOT NULL'
         ).fetchone()
@@ -158,7 +322,7 @@ def audit_db(path: str, label: str, *, cell_scope: bool = True) -> dict:
             ).fetchall()
         ]
         for table in tables:
-            result["tables"].append(_table_stats(conn, table))
+            result["tables"].append(_table_stats(conn, table, label))
 
         if cell_scope:
             unions: list[str] = []
@@ -174,14 +338,23 @@ def audit_db(path: str, label: str, *, cell_scope: bool = True) -> dict:
                 result["distinct_cells_db"] = int(conn.execute(sql).fetchone()[0])
 
         latest_overall = None
+        latest_sort = None
         latest_table = None
         for ts in result["tables"]:
             latest = ts.get("latest")
-            if latest and (latest_overall is None or str(latest) > str(latest_overall)):
+            sort_value = ts.get("_latest_sort")
+            if latest and sort_value and (latest_sort is None or sort_value > latest_sort):
+                latest_overall = latest
+                latest_sort = sort_value
+                latest_table = ts.get("table")
+            elif latest and latest_sort is None and latest_overall is None:
                 latest_overall = latest
                 latest_table = ts.get("table")
         result["latest_data_overall"] = latest_overall
         result["latest_data_table"] = latest_table
+        for table_stats in result["tables"]:
+            table_stats.pop("_earliest_sort", None)
+            table_stats.pop("_latest_sort", None)
 
         empty = [t["table"] for t in result["tables"] if t.get("status") == "EMPTY"]
         pm_tables = [t for t in tables if "GROUP" in t.upper() or "CELL" in t.upper()]

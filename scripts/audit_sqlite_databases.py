@@ -8,6 +8,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sync_config import (  # noqa: E402
+    DATABASES_ROOT,
     HUAWEI_GROUPS_DAILY_DB,
     HUAWEI_GROUPS_DB,
     HUAWEI_PM_DAILY_DB,
@@ -20,7 +21,6 @@ from sync_config import (  # noqa: E402
     NOKIA_GROUPS_DB,
     NOKIA_PM_DAILY_DB,
     NOKIA_PM_DB,
-    PROJECT_ROOT,
 )
 
 
@@ -83,7 +83,7 @@ def main() -> None:
     for label, p in known:
         audit(p, label)
 
-    femto = os.path.join(PROJECT_ROOT, "databases", "cells", "femto_pm_cells.db")
+    femto = os.path.join(DATABASES_ROOT, "cells", "femto_pm_cells.db")
     audit(femto, "Femto PM (optional)")
 
 

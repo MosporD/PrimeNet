@@ -5,13 +5,17 @@ Pull all Femto files from SFTP path into raw/femto.
 from __future__ import annotations
 
 import os
+import sys
 from stat import S_ISDIR
 
 import paramiko
 
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-LOCAL_ROOT = os.path.join(PROJECT_ROOT, "raw", "femto")
+sys.path.insert(0, PROJECT_ROOT)
+from sync_config import DATA_ROOT  # noqa: E402
+
+LOCAL_ROOT = os.path.join(DATA_ROOT, "raw", "femto")
 
 SFTP_CFG = {
     "host": "10.253.92.68",

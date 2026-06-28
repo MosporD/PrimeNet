@@ -10,7 +10,7 @@ import ast
 import time as _time
 
 from database_enhanced import get_user_by_session
-from sync_config import PROJECT_ROOT
+from sync_config import DATABASES_ROOT
 
 
 femto_pm_bp = Blueprint(
@@ -48,7 +48,7 @@ def format_user(user):
     return {"id": user.get("id"), "username": user.get("username"), "role": user.get("role")}
 
 
-FEMTO_PM_DB = os.path.join(PROJECT_ROOT, "databases", "cells", "femto_pm_cells.db")
+FEMTO_PM_DB = os.path.join(DATABASES_ROOT, "cells", "femto_pm_cells.db")
 FEMTO_TABLE = "FEMTO_HOURLY"
 FEMTO_VALUES_TABLE = "FEMTO_HOURLY_VALUES"
 FEMTO_COUNTER_TABLE = "FEMTO_COUNTER_CATALOG"

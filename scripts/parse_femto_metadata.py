@@ -18,10 +18,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sync_config import METADATA_DB, PROJECT_ROOT
+from sync_config import DATA_ROOT, METADATA_DB
 
 
-RAW_FEMTO_DIR = Path(PROJECT_ROOT) / "raw" / "femto"
+RAW_FEMTO_DIR = Path(DATA_ROOT) / "raw" / "femto"
 
 
 def _extract_tag_text(root: ET.Element, tag: str) -> str:

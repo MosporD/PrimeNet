@@ -26,6 +26,32 @@ function selectedObjectIds() {
     return [...selectedObjects].filter(Boolean);
 }
 
+function updateFemtoEmptyState(hasCharts) {
+    const empty = document.getElementById('no-selection');
+    const wrap = document.querySelector('.femto-chart-wrap');
+    if (empty) empty.style.display = hasCharts ? 'none' : 'flex';
+    if (wrap) wrap.style.display = hasCharts ? 'block' : 'none';
+}
+
+function toggleFemtoLeftPanel() {
+    const body = document.querySelector('.femto-body');
+    const btn = document.getElementById('perf-left-panel-toggle');
+    if (!body) return;
+    const collapsed = body.classList.toggle('left-collapsed');
+    if (btn) {
+        btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        btn.textContent = collapsed ? '▶' : '◀';
+        btn.title = collapsed ? 'Expand filters' : 'Collapse filters';
+    }
+}
+
+async function refreshFemtoData() {
+    const status = document.getElementById('femto-status');
+    if (status) status.textContent = 'Refreshing Femto devices and catalog...';
+    await Promise.all([loadFemtoDevices(), loadFemtoCatalog()]);
+    renderObjectList();
+}
+
 async function loadFemtoDevices() {
     const list = document.getElementById('femto-object-list');
     const count = document.getElementById('femto-object-count');
@@ -325,12 +351,14 @@ async function loadFemtoTrendChart() {
     if (!femtoChartTabs.length) {
         renderFemtoTabs();
         renderFemtoChartsForActiveTab();
+        updateFemtoEmptyState(false);
         if (status) status.textContent = 'No trend rows found for this selection.';
         return;
     }
     activeFemtoTabId = femtoChartTabs[0].id;
     renderFemtoTabs();
     renderFemtoChartsForActiveTab();
+    updateFemtoEmptyState(true);
     if (status) status.textContent = `Loaded ${femtoChartTabs.length} object tab(s).`;
 }
 
@@ -360,7 +388,7 @@ function renderFemtoChartsForActiveTab() {
     femtoCharts = [];
     const tab = femtoChartTabs.find(t => t.id === activeFemtoTabId);
     if (!tab) {
-        grid.innerHTML = '<div class="femto-chart-empty">Select object(s) and KPI(s), then click Load Chart.</div>';
+        grid.innerHTML = '<div class="femto-chart-empty">Select object(s) and KPI(s), then click Query.</div>';
         return;
     }
     const labels = tab.rows.map(r => String(r.timestamp || ''));
@@ -426,6 +454,7 @@ function setupToggles() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     setupToggles();
+    updateFemtoEmptyState(false);
     const btn = document.getElementById('femto-load-btn');
     if (btn) btn.addEventListener('click', loadFemtoTrendChart);
 

@@ -16,10 +16,10 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sync_config import PROJECT_ROOT
+from sync_config import DATABASES_ROOT
 
 
-FEMTO_PM_DB = Path(PROJECT_ROOT) / "databases" / "cells" / "femto_pm_cells.db"
+FEMTO_PM_DB = Path(DATABASES_ROOT) / "cells" / "femto_pm_cells.db"
 KPI_CSV = Path.home() / "Downloads" / "kpis.csv"
 COUNTER_CSV = Path.home() / "Downloads" / "counters.csv"
 COMPUTED_TABLE = "FEMTO_COMPUTED_KPIS"

@@ -18,11 +18,11 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from sync_config import FEMTO_RETENTION_DAYS, PROJECT_ROOT
+from sync_config import DATA_ROOT, DATABASES_ROOT, FEMTO_RETENTION_DAYS
 
 
-RAW_FEMTO_DIR = Path(PROJECT_ROOT) / "raw" / "femto"
-FEMTO_PM_DB = Path(PROJECT_ROOT) / "databases" / "cells" / "femto_pm_cells.db"
+RAW_FEMTO_DIR = Path(DATA_ROOT) / "raw" / "femto"
+FEMTO_PM_DB = Path(DATABASES_ROOT) / "cells" / "femto_pm_cells.db"
 FEMTO_TABLE = "FEMTO_HOURLY"
 FEMTO_VALUES_TABLE = "FEMTO_HOURLY_VALUES"
 _FIXED_COLS = {
