@@ -59,6 +59,15 @@ from modules.son_analytics.routes import son_analytics_bp
 from modules.network_health.routes import network_health_bp
 from modules.sector_health.routes import sector_health_bp
 from modules.performance_analytics import performance_analytics_bp
+from modules.radio_api import radio_api_bp
+from modules.neighbor_quality import neighbor_quality_bp
+from modules.capacity_hotspots import capacity_hotspots_bp
+from modules.layer_coverage import layer_coverage_bp
+from modules.overshooting_detector import overshooting_detector_bp
+from modules.rf_optimization import rf_optimization_bp
+from modules.cm_parameter_audit import cm_parameter_audit_bp
+from modules.change_impact import change_impact_bp
+from modules.radio_morning_report import radio_morning_report_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(activation_bp)
@@ -85,6 +94,15 @@ app.register_blueprint(son_analytics_bp)
 app.register_blueprint(network_health_bp)
 app.register_blueprint(sector_health_bp)
 app.register_blueprint(performance_analytics_bp)
+app.register_blueprint(radio_api_bp)
+app.register_blueprint(neighbor_quality_bp)
+app.register_blueprint(capacity_hotspots_bp)
+app.register_blueprint(layer_coverage_bp)
+app.register_blueprint(overshooting_detector_bp)
+app.register_blueprint(rf_optimization_bp)
+app.register_blueprint(cm_parameter_audit_bp)
+app.register_blueprint(change_impact_bp)
+app.register_blueprint(radio_morning_report_bp)
 
 
 def _env_true(key: str, default: bool = False) -> bool:
