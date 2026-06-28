@@ -29,5 +29,11 @@ Legacy `scripts/*.py` remain for one-offs; **production pull/load/watch** backen
 - Full daily pull+load -> `pipeline/orchestrators/orchestrate_daily_full.py`
 - Watcher one-cycle -> `pipeline/orchestrators/orchestrate_watcher_cycle.py`
 
+### Huawei Daily Staging
+
+Huawei daily cells/groups exports are downloaded into `raw/huawei/{cells,groups}/all/daily`
+as a staging area, then split by RAT into `raw/huawei/{cells,groups}/{2g,3g,4g}/daily`
+before `pipeline/load/daily/load_all.py` ingests them into the Huawei daily SQLite DBs.
+
 To delete local PM/group SQLite files (destructive):
 `python scripts/drop_legacy_performance_storage.py --confirm`

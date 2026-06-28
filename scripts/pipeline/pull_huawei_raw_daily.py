@@ -1,8 +1,8 @@
 """
 Step 1 pipeline: pull latest Huawei DAILY raw files.
 
-- Cells file  -> raw/daily/huawei/cells
-- Groups file -> raw/daily/huawei/groups
+Huawei daily exports land in a shared staging folder first, then split into
+per-RAT folders so the shared daily loader can find them.
 """
 
 import os
@@ -17,8 +17,20 @@ import pandas as pd
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from sync_config import HUAWEI_PM_DAILY_SERVER, HUAWEI_GROUPS_DAILY_SERVER, PROJECT_ROOT
-from pipeline.paths import raw_path
+from sync_config import (
+    HUAWEI_PM_DAILY_SERVER,
+    HUAWEI_GROUPS_DAILY_SERVER,
+    PROJECT_ROOT,
+    RAW_KEEP_FILES_PER_TECH,
+    RAW_PULL_CLEAR_BEFORE,
+    RAW_PULL_PRUNE_AFTER,
+)
+from pipeline.paths import iter_pm_raw_paths, raw_path
+from core.raw_pm_files import (
+    clear_tabular_files,
+    prune_stale_pm_files,
+    relocate_legacy_all_folder,
+)
 
 
 ALLOWED_EXTS = (".xlsx", ".xls", ".xlsm", ".csv", ".zip")
@@ -179,15 +191,51 @@ def _normalize_folder_to_csv(folder: str, label: str) -> int:
     return converted
 
 
+def _prepare_raw_folder(folder: str, label: str) -> None:
+    if RAW_PULL_CLEAR_BEFORE:
+        removed = clear_tabular_files(folder)
+        if removed:
+            print(f"[daily/{label}] cleared {removed} old raw file(s) before pull: {folder}")
+
+
+def _finalize_raw_folder(folder: str, label: str) -> None:
+    if RAW_PULL_PRUNE_AFTER:
+        removed = prune_stale_pm_files(folder, keep_per_technology=RAW_KEEP_FILES_PER_TECH)
+        if removed:
+            print(f"[daily/{label}] pruned {removed} older raw file(s) after pull: {folder}")
+
+
+def _prepare_vendor_domain(vendor: str, domain: str, scope: str) -> None:
+    n = relocate_legacy_all_folder(vendor, domain, scope)
+    if n:
+        print(f"[daily/{domain}] relocated {n} file(s) from legacy .../all/... to per-RAT folders")
+    for tech, folder in iter_pm_raw_paths(vendor, domain, scope):
+        _prepare_raw_folder(folder, f"{domain}/{tech}")
+
+
+def _finalize_vendor_domain(vendor: str, domain: str, scope: str) -> None:
+    for tech, folder in iter_pm_raw_paths(vendor, domain, scope):
+        _finalize_raw_folder(folder, f"{domain}/{tech}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Pull latest Huawei daily raw files")
     parser.add_argument("--category", choices=("all", "cells", "groups"), default="all")
     args = parser.parse_args()
 
+    scope = "daily"
+    vendor = "huawei"
     pull_cells = args.category in ("all", "cells")
     pull_groups = args.category in ("all", "groups")
-    cells_dir = raw_path("huawei", "cells", "all", "daily")
-    groups_dir = raw_path("huawei", "groups", "all", "daily")
+    cells_dir = raw_path(vendor, "cells", "all", scope)
+    groups_dir = raw_path(vendor, "groups", "all", scope)
+
+    if pull_cells:
+        _prepare_vendor_domain(vendor, "cells", scope)
+        _prepare_raw_folder(cells_dir, "cells/staging")
+    if pull_groups:
+        _prepare_vendor_domain(vendor, "groups", scope)
+        _prepare_raw_folder(groups_dir, "groups/staging")
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         fut_cells = (
@@ -221,6 +269,17 @@ def main() -> int:
     if pull_groups:
         _extract_zip_csvs(groups_path)
         _normalize_folder_to_csv(groups_dir, "groups")
+
+    n_cells = relocate_legacy_all_folder(vendor, "cells", scope) if pull_cells else 0
+    n_groups = relocate_legacy_all_folder(vendor, "groups", scope) if pull_groups else 0
+    if n_cells or n_groups:
+        print(f"[daily/huawei] split staging exports: cells={n_cells} groups={n_groups} file(s)")
+
+    if pull_cells:
+        _finalize_vendor_domain(vendor, "cells", scope)
+    if pull_groups:
+        _finalize_vendor_domain(vendor, "groups", scope)
+
     if not cells_path and not groups_path:
         return 1
     return 0

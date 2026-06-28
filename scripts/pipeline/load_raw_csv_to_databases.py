@@ -56,6 +56,7 @@ from sync_config import (
 from core.raw_pm_files import (  # noqa: E402
     clear_tabular_files,
     prune_stale_pm_files,
+    relocate_legacy_all_folder,
     select_latest_files_per_technology,
 )
 from modules.sync.pm_processor import (
@@ -1004,10 +1005,24 @@ def _apply_daily_retention_to_db(db_path: str, days: int, label: str) -> None:
     apply_retention(db_path, days, label)
 
 
+def _relocate_legacy_all_inputs(scope: str, vendor: str, category: str) -> None:
+    """Make the loader tolerant of raw files left in legacy ``.../all/<scope>`` staging."""
+    if category == "metadata":
+        return
+    vendors = ("huawei", "nokia") if vendor == "all" else (vendor,)
+    domains = ("cells", "groups") if category == "all" else (category,)
+    for v in vendors:
+        for domain in domains:
+            moved = relocate_legacy_all_folder(v, domain, scope)
+            if moved:
+                print(f"[{v}-{domain}] relocated {moved} file(s) from legacy .../all/{scope} before load")
+
+
 def main() -> int:
     args = _parse_args()
     scope = args.scope
     is_daily = scope == "daily"
+    _relocate_legacy_all_inputs(scope, args.vendor, args.category)
 
     mappings: list[tuple[str, str, str]] = []
     for tech in PM_RATS:

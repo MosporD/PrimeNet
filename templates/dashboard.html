@@ -43,6 +43,12 @@
                         </button>
                     </div>
                     <div class="op-sites-summary-columns" role="presentation">
+                        <div class="op-sites-summary-col op-sites-summary-col-total">
+                            <div class="op-sites-summary-col-title">Unique Sites</div>
+                            <div class="op-sites-summary-col-value" id="op-sites-total-sites">{{ total_sites }}</div>
+                            <div class="op-sites-summary-col-sub">All RATs</div>
+                            <div class="op-sites-summary-col-unit">sites</div>
+                        </div>
                         {% for col in tech_site_columns %}
                         <div class="op-sites-summary-col" data-rat="{{ col['key'] }}">
                             <div class="op-sites-summary-col-title">{{ col['title'] }}</div>
@@ -406,6 +412,10 @@
                     throw new Error(data.error || 'Request failed');
                 }
                 const columns = Array.isArray(data.tech_site_columns) ? data.tech_site_columns : [];
+                const totalSitesEl = document.getElementById('op-sites-total-sites');
+                if (totalSitesEl) {
+                    totalSitesEl.textContent = data.total_sites != null ? data.total_sites : 0;
+                }
 
                 columns.forEach((column) => {
                     const key = column && column.key != null ? String(column.key) : '';

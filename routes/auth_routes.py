@@ -216,11 +216,12 @@ def dashboard():
     if not user:
         return redirect(url_for('auth.login_page'))
 
-    tech_site_columns, _ = get_operational_site_stats()
+    tech_site_columns, total_sites = get_operational_site_stats()
     return render_template(
         'dashboard.html',
         user=format_user_data(user),
         tech_site_columns=tech_site_columns,
+        total_sites=total_sites,
     )
 
 # ============================================================================
