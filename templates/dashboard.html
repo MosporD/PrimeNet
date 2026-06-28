@@ -94,6 +94,33 @@
             </section>
 
             {% if user.role == 'admin' %}
+            <section class="dashboard-ops-panel" aria-label="Operations status">
+                <div class="dashboard-ops-grid">
+                    <div class="op-sites-summary-card dashboard-freshness-card">
+                        <div class="op-sites-summary-head dashboard-ops-head">
+                            <span>Data Freshness</span>
+                            <button type="button" class="op-sites-refresh-btn" id="freshness-refresh-btn" onclick="refreshPmHealth(true)">
+                                Refresh
+                            </button>
+                        </div>
+                        <div class="dashboard-freshness-grid" id="dashboard-freshness-grid">
+                            <span class="pm-health-loading">Loading freshness…</span>
+                        </div>
+                    </div>
+                    <div class="op-sites-summary-card dashboard-scheduler-card">
+                        <div class="op-sites-summary-head dashboard-ops-head">
+                            <span>Scheduler Status</span>
+                            <button type="button" class="op-sites-refresh-btn" id="scheduler-refresh-btn" onclick="refreshSchedulerStatus()">
+                                Refresh
+                            </button>
+                        </div>
+                        <div class="dashboard-scheduler-body" id="dashboard-scheduler-body">
+                            <span class="pm-health-loading">Loading scheduler…</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <section class="dashboard-pm-health" id="pm-health-widget" aria-label="Performance database health">
                 <div class="op-sites-summary-card pm-health-card">
                     <div class="op-sites-summary-head pm-health-head">
@@ -128,6 +155,21 @@
             </section>
             {% endif %}
 
+            <section class="dashboard-tools-toolbar" aria-label="Dashboard module tools">
+                <div class="dashboard-tool-search-wrap">
+                    <label class="dashboard-tool-search-label" for="dashboard-tool-search">Find a tool</label>
+                    <input id="dashboard-tool-search" class="dashboard-tool-search" type="search" placeholder="Search modules…" autocomplete="off">
+                </div>
+            </section>
+
+            <section class="dashboard-pinned-tools" id="dashboard-pinned-tools" aria-label="Pinned tools" hidden>
+                <div class="dashboard-section-title-row">
+                    <h2>Pinned Tools</h2>
+                    <span>Favorites saved to your profile</span>
+                </div>
+                <div class="function-grid pinned-tools-grid" id="pinned-tools-grid"></div>
+            </section>
+
             <div class="dashboard-primary-tabs" role="tablist" aria-label="Main sections">
                 <button type="button" role="tab" class="dashboard-primary-tab active" id="tab-performance"
                         aria-selected="true" aria-controls="section-performance"
@@ -155,47 +197,58 @@
             <!-- ── Performance panel ── -->
             <div class="section-panel" id="section-performance" role="tabpanel" aria-labelledby="tab-performance">
                 <div class="function-grid">
-                    <a href="/performance" class="function-card">
+                    <a href="/performance" class="function-card" data-module-id="performance" data-module-name="Performance Explorer">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Performance Explorer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📈</div>
                         <div class="function-name">Performance Explorer</div>
                     </a>
-                    <a href="/performance-analytics" class="function-card function-card-dev">
+                    <a href="/performance-analytics" class="function-card function-card-dev" data-module-id="performance-analytics" data-module-name="Huawei PM Query Studio">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Huawei PM Query Studio" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📡</div>
                         <div class="function-name">Huawei PM Query Studio</div>
                     </a>
-                    <a href="/cell-heatmap" class="function-card">
+                    <a href="/cell-heatmap" class="function-card" data-module-id="cell-heatmap" data-module-name="Network Coverage Heatmap">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Coverage Heatmap" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🗺️</div>
                         <div class="function-name">Network Coverage Heatmap</div>
                     </a>
-                    <a href="/network-map" class="function-card">
+                    <a href="/network-map" class="function-card" data-module-id="network-map" data-module-name="Network Topology">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Topology" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#127757;</div>
                         <div class="function-name">Network Topology</div>
                     </a>
-                    <a href="/neighbor-analysis" class="function-card">
+                    <a href="/neighbor-analysis" class="function-card" data-module-id="neighbor-analysis" data-module-name="Neighbor Relations Analyzer">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Neighbor Relations Analyzer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#129309;</div>
                         <div class="function-name">Neighbor Relations Analyzer</div>
                     </a>
-                    <a href="/reports" class="function-card">
+                    <a href="/reports" class="function-card" data-module-id="reports" data-module-name="Performance Reports">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Performance Reports" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📊</div>
                         <div class="function-name">Performance Reports</div>
                     </a>
-                    <a href="/sector-health" class="function-card">
+                    <a href="/sector-health" class="function-card" data-module-id="sector-health" data-module-name="Sector Health Monitor">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Sector Health Monitor" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📡</div>
                         <div class="function-name">Sector Health Monitor</div>
                     </a>
-                    <a href="/conflict-map" class="function-card">
+                    <a href="/conflict-map" class="function-card" data-module-id="conflict-map" data-module-name="Conflict Map">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Conflict Map" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">	&#127760;</div>
                         <div class="function-name">Conflict Map</div>
                     </a>
-                    <a href="/femto-pm" class="function-card">
+                    <a href="/femto-pm" class="function-card" data-module-id="femto-pm" data-module-name="Femto Performance Explorer">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Femto Performance Explorer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📶</div>
                         <div class="function-name">Femto Performance Explorer</div>
                     </a>
-                    <a href="/son-analytics" class="function-card function-card-dev">
+                    <a href="/son-analytics" class="function-card function-card-dev" data-module-id="son-analytics" data-module-name="SON Optimization Insights">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin SON Optimization Insights" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🤖</div>
                         <div class="function-name">SON Optimization Insights</div>
                     </a>
-                    <a href="/network-health" class="function-card function-card-dev">
+                    <a href="/network-health" class="function-card function-card-dev" data-module-id="network-health" data-module-name="Network Health Overview">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Health Overview" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">💚</div>
                         <div class="function-name">Network Health Overview</div>
                     </a>
@@ -205,31 +258,38 @@
             <!-- ── Configuration panel ── -->
             <div class="section-panel hidden" id="section-configuration" role="tabpanel" aria-labelledby="tab-configuration" hidden>
                 <div class="function-grid">
-                    <a href="/parameter-dictionary" class="function-card">
+                    <a href="/parameter-dictionary" class="function-card" data-module-id="parameter-dictionary" data-module-name="Parameter Dictionary">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Parameter Dictionary" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📚</div>
                         <div class="function-name">Parameter Dictionary</div>
                     </a>
-                    <a href="/cm-extractor" class="function-card">
+                    <a href="/cm-extractor" class="function-card" data-module-id="cm-extractor" data-module-name="Configuration Data Extractor">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration Data Extractor" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📡</div>
                         <div class="function-name">Configuration Data Extractor</div>
                     </a>
-                    <a href="/xml-parser" class="function-card">
+                    <a href="/xml-parser" class="function-card" data-module-id="xml-parser" data-module-name="Configuration XML Parser">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration XML Parser" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📄</div>
                         <div class="function-name">Configuration XML Parser</div>
                     </a>
-                    <a href="/excel-generator" class="function-card">
+                    <a href="/excel-generator" class="function-card" data-module-id="excel-generator" data-module-name="Configuration XML Generator">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration XML Generator" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">📊</div>
                         <div class="function-name">Configuration XML Generator</div>
                     </a>
-                    <a href="/ne-comparison" class="function-card">
+                    <a href="/ne-comparison" class="function-card" data-module-id="ne-comparison" data-module-name="Network Element Comparison">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Element Comparison" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🔍</div>
                         <div class="function-name">Network Element Comparison</div>
                     </a>
-                    <a href="/config-task-scheduler" class="function-card">
+                    <a href="/config-task-scheduler" class="function-card" data-module-id="config-task-scheduler" data-module-name="Configuration Job Scheduler">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration Job Scheduler" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🗓️</div>
                         <div class="function-name">Configuration Job Scheduler</div>
                     </a>
-                    <a href="/ran-features" class="function-card">
+                    <a href="/ran-features" class="function-card" data-module-id="ran-features" data-module-name="RAN Feature Library">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin RAN Feature Library" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#128218;</div>
                         <div class="function-name">RAN Feature Library</div>
                     </a>
@@ -386,6 +446,124 @@
             }
         }
 
+        let dashboardPreferences = {};
+
+        function dashboardToolCards() {
+            return Array.from(document.querySelectorAll('.function-card[data-module-id]'));
+        }
+
+        function dashboardCardMetadata(card) {
+            return {
+                id: card.dataset.moduleId,
+                name: card.dataset.moduleName || card.querySelector('.function-name')?.textContent?.trim() || card.dataset.moduleId,
+                href: card.getAttribute('href') || '#',
+                icon: card.querySelector('.function-icon')?.innerHTML || '',
+            };
+        }
+
+        function dashboardFavoriteIds() {
+            const raw = dashboardPreferences.dashboard_favorites;
+            return Array.isArray(raw) ? raw.filter(Boolean).map(String) : [];
+        }
+
+        function applyDashboardFavorites() {
+            const favoriteIds = new Set(dashboardFavoriteIds());
+            dashboardToolCards().forEach(card => {
+                const active = favoriteIds.has(card.dataset.moduleId);
+                card.classList.toggle('function-card-favorite', active);
+                const toggle = card.querySelector('.favorite-toggle');
+                if (toggle) {
+                    toggle.textContent = active ? '★' : '☆';
+                    toggle.setAttribute('aria-pressed', active ? 'true' : 'false');
+                    toggle.title = active ? 'Unpin tool' : 'Pin tool';
+                }
+            });
+            renderPinnedTools();
+        }
+
+        function renderPinnedTools() {
+            const section = document.getElementById('dashboard-pinned-tools');
+            const grid = document.getElementById('pinned-tools-grid');
+            if (!section || !grid) return;
+            const cardsById = new Map(dashboardToolCards().map(card => [card.dataset.moduleId, dashboardCardMetadata(card)]));
+            const favorites = dashboardFavoriteIds().map(id => cardsById.get(id)).filter(Boolean);
+            section.hidden = favorites.length === 0;
+            grid.innerHTML = favorites.map(item => `
+                <a href="${item.href}" class="function-card pinned-tool-card">
+                    <div class="function-icon">${item.icon}</div>
+                    <div class="function-name">${item.name}</div>
+                </a>
+            `).join('');
+        }
+
+        async function loadDashboardPreferences() {
+            try {
+                const res = await fetch('/api/profile/preferences', {
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: { Accept: 'application/json' },
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.success && data.preferences && typeof data.preferences === 'object') {
+                    dashboardPreferences = data.preferences;
+                }
+            } catch (err) {
+                console.warn('Could not load dashboard preferences', err);
+            }
+            applyDashboardFavorites();
+        }
+
+        async function saveDashboardPreferences() {
+            const res = await fetch('/api/profile/preferences', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify(dashboardPreferences),
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Could not save dashboard preferences');
+            }
+        }
+
+        async function toggleDashboardFavorite(event, el) {
+            event.preventDefault();
+            event.stopPropagation();
+            const card = el.closest('.function-card[data-module-id]');
+            if (!card) return;
+            const id = card.dataset.moduleId;
+            const favorites = dashboardFavoriteIds();
+            dashboardPreferences.dashboard_favorites = favorites.includes(id)
+                ? favorites.filter(item => item !== id)
+                : [...favorites, id];
+            applyDashboardFavorites();
+            try {
+                await saveDashboardPreferences();
+            } catch (err) {
+                alert(err.message || 'Could not save favorite');
+                await loadDashboardPreferences();
+            }
+        }
+
+        function setupDashboardToolSearch() {
+            const input = document.getElementById('dashboard-tool-search');
+            if (!input) return;
+            input.addEventListener('input', () => {
+                const q = input.value.trim().toLowerCase();
+                dashboardToolCards().forEach(card => {
+                    const text = `${card.dataset.moduleName || ''} ${card.getAttribute('href') || ''}`.toLowerCase();
+                    card.hidden = q ? !text.includes(q) : false;
+                });
+            });
+            document.querySelectorAll('.favorite-toggle').forEach(toggle => {
+                toggle.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        toggleDashboardFavorite(event, toggle);
+                    }
+                });
+            });
+        }
+
         async function refreshOperationalSites() {
             const refreshBtn = document.getElementById('op-sites-refresh-btn');
             if (!refreshBtn || refreshBtn.disabled) {
@@ -471,6 +649,51 @@
             return 'pm-health-badge pm-health-badge-warn';
         }
 
+        function parseDashboardDate(value) {
+            const s = String(value || '').replace(/\s+(DST|STD)\s*$/i, '').trim();
+            if (!s || s === '—') return null;
+            let m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+            if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4] || 0), Number(m[5] || 0), Number(m[6] || 0));
+            m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:\s+(\d{1,2}):(\d{2}))?/);
+            if (m) {
+                const year = Number(m[3].length === 2 ? `20${m[3]}` : m[3]);
+                return new Date(year, Number(m[2]) - 1, Number(m[1]), Number(m[4] || 0), Number(m[5] || 0));
+            }
+            m = s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2,4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+            if (m) {
+                const year = Number(m[3].length === 2 ? `20${m[3]}` : m[3]);
+                return new Date(year, Number(m[1]) - 1, Number(m[2]), Number(m[4] || 0), Number(m[5] || 0), Number(m[6] || 0));
+            }
+            const parsed = new Date(s);
+            return Number.isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        function freshnessForDb(db) {
+            const status = String(db?.overall || '').toUpperCase();
+            if (status === 'MISSING') return { label: 'Missing', cls: 'freshness-badge-missing', detail: 'No database' };
+            const latest = parseDashboardDate(db?.latest_data_overall);
+            if (!latest) return { label: status === 'HEALTHY' ? 'Fresh' : 'Stale', cls: status === 'HEALTHY' ? 'freshness-badge-fresh' : 'freshness-badge-stale', detail: db?.latest_data_overall || 'No timestamp' };
+            const hours = Math.max(0, (Date.now() - latest.getTime()) / 36e5);
+            const expectedHours = /daily/i.test(db?.label || '') ? 48 : 6;
+            if (status === 'HEALTHY' && hours <= expectedHours) {
+                return { label: 'Fresh', cls: 'freshness-badge-fresh', detail: `${Math.round(hours)}h old` };
+            }
+            return { label: 'Stale', cls: 'freshness-badge-stale', detail: `${Math.round(hours)}h old` };
+        }
+
+        function renderFreshnessBadges(dbs) {
+            const grid = document.getElementById('dashboard-freshness-grid');
+            if (!grid) return;
+            grid.innerHTML = dbs.map(db => {
+                const freshness = freshnessForDb(db);
+                return `<div class="freshness-card">
+                    <div class="freshness-card-title">${db.label || 'Database'}</div>
+                    <span class="freshness-badge ${freshness.cls}">${freshness.label}</span>
+                    <div class="freshness-card-meta">${freshness.detail} · latest ${db.latest_data_overall || '—'}</div>
+                </div>`;
+            }).join('');
+        }
+
         function formatPmHealthRows(tables) {
             if (!Array.isArray(tables) || !tables.length) return '—';
             return tables
@@ -500,6 +723,7 @@
                 </div>`;
 
             const dbs = [...(data.pm_cell_databases || []), ...(data.pm_group_databases || [])];
+            renderFreshnessBadges(dbs);
             tbody.innerHTML = dbs.map(db => {
                 const totalRows = (db.tables || [])
                     .filter(t => /CELL|GROUP/i.test(t.table || ''))
@@ -545,12 +769,17 @@
 
         async function refreshPmHealth(force) {
             const btn = document.getElementById('pm-health-refresh-btn');
+            const freshnessBtn = document.getElementById('freshness-refresh-btn');
             const summaryEl = document.getElementById('pm-health-summary');
             if (!summaryEl) return;
             const defaultLabel = 'Refresh';
             if (btn) {
                 btn.disabled = true;
                 btn.textContent = 'Checking…';
+            }
+            if (freshnessBtn) {
+                freshnessBtn.disabled = true;
+                freshnessBtn.textContent = 'Checking…';
             }
             summaryEl.innerHTML = '<span class="pm-health-loading">Running health check (may take up to a minute)…</span>';
             try {
@@ -568,12 +797,69 @@
                     btn.disabled = false;
                     btn.textContent = defaultLabel;
                 }
+                if (freshnessBtn) {
+                    freshnessBtn.disabled = false;
+                    freshnessBtn.textContent = defaultLabel;
+                }
+            }
+        }
+
+        function schedulerBadgeClass(status) {
+            const s = String(status || '').toLowerCase();
+            if (s === 'ok' || s === 'success') return 'pm-health-badge pm-health-badge-ok';
+            if (s === 'error' || s === 'failed') return 'pm-health-badge pm-health-badge-bad';
+            return 'pm-health-badge pm-health-badge-warn';
+        }
+
+        async function refreshSchedulerStatus() {
+            const body = document.getElementById('dashboard-scheduler-body');
+            const btn = document.getElementById('scheduler-refresh-btn');
+            if (!body) return;
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Refreshing…';
+            }
+            body.innerHTML = '<span class="pm-health-loading">Loading scheduler…</span>';
+            try {
+                const res = await fetch('/api/sync/status', { credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) throw new Error(data.error || 'Scheduler status failed');
+                const jobs = Array.isArray(data.jobs) ? data.jobs : [];
+                const hourly = jobs.find(job => String(job.id || '').includes('hourly'));
+                const daily = jobs.find(job => String(job.id || '').includes('daily'));
+                const lastSyncs = Array.isArray(data.last_syncs) ? data.last_syncs.slice(0, 5) : [];
+                body.innerHTML = `
+                    <div class="scheduler-status-grid">
+                        <div><span class="pm-health-k">Mode</span><span class="pm-health-v">${data.scheduler_mode?.mode || 'unknown'}</span></div>
+                        <div><span class="pm-health-k">Watcher</span><span class="pm-health-v">${data.scheduler_mode?.watcher_enabled ? 'Enabled' : 'Disabled'}</span></div>
+                        <div><span class="pm-health-k">Next hourly</span><span class="pm-health-v">${hourly?.next_run || '—'}</span></div>
+                        <div><span class="pm-health-k">Next daily</span><span class="pm-health-v">${daily?.next_run || '—'}</span></div>
+                    </div>
+                    <div class="scheduler-sync-list">
+                        ${lastSyncs.map(row => `<div class="scheduler-sync-row">
+                            <span>${row.sync_type || 'sync'} / ${row.technology || 'all'}</span>
+                            <span class="${schedulerBadgeClass(row.status)}">${row.status || '—'}</span>
+                            <small>${row.started_at || '—'}</small>
+                        </div>`).join('') || '<span class="pm-health-loading">No sync history yet</span>'}
+                    </div>`;
+            } catch (err) {
+                body.innerHTML = `<span class="pm-health-error">${err.message || 'Could not load scheduler status'}</span>`;
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Refresh';
+                }
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            setupDashboardToolSearch();
+            loadDashboardPreferences();
             if (document.getElementById('pm-health-widget')) {
                 refreshPmHealth(false);
+            }
+            if (document.getElementById('dashboard-scheduler-body')) {
+                refreshSchedulerStatus();
             }
             const maybeShowLegal = () => {
                 const alreadyAcknowledged = sessionStorage.getItem('legalStatementAcknowledged') === '1';
