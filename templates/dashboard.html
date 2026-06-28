@@ -343,7 +343,12 @@
                 <h2>Operations Panel</h2>
                 <p>Freshness, scheduler, and database health</p>
             </div>
-            <button type="button" class="operations-panel-close" onclick="toggleOperationsPanel(false)" aria-label="Close operations panel">×</button>
+            <div class="operations-panel-actions">
+                <button type="button" class="operations-panel-download" id="operations-status-download-btn" onclick="downloadOperationsStatus()">
+                    Download Status
+                </button>
+                <button type="button" class="operations-panel-close" onclick="toggleOperationsPanel(false)" aria-label="Close operations panel">×</button>
+            </div>
         </div>
 
         <section class="dashboard-ops-panel" aria-label="Operations status">
@@ -487,6 +492,72 @@
             drawer.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
             backdrop.hidden = !shouldOpen;
             document.body.classList.toggle('operations-panel-open', shouldOpen);
+        }
+
+        async function fetchStatusJson(url) {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                cache: 'no-store',
+                headers: { Accept: 'application/json' },
+            });
+            const body = await response.json().catch(() => null);
+            return {
+                ok: response.ok,
+                status: response.status,
+                url,
+                body,
+            };
+        }
+
+        function downloadJsonFile(filename, payload) {
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        async function downloadOperationsStatus() {
+            const btn = document.getElementById('operations-status-download-btn');
+            const original = btn ? btn.textContent : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Preparing…';
+            }
+            try {
+                const [pmHealth, syncStatus, syncHistory, operationalSites] = await Promise.all([
+                    fetchStatusJson('/api/dashboard/pm-health?refresh=1'),
+                    fetchStatusJson('/api/sync/status'),
+                    fetchStatusJson('/api/sync/history?limit=50'),
+                    fetchStatusJson('/api/dashboard/operational-sites'),
+                ]);
+                const now = new Date();
+                const payload = {
+                    generated_at_local: now.toString(),
+                    generated_at_iso: now.toISOString(),
+                    page_url: window.location.href,
+                    user_agent: navigator.userAgent,
+                    endpoints: {
+                        pm_health: pmHealth,
+                        sync_status: syncStatus,
+                        sync_history: syncHistory,
+                        operational_sites: operationalSites,
+                    },
+                };
+                const stamp = now.toISOString().replace(/[:.]/g, '').slice(0, 15);
+                downloadJsonFile(`primenet_status_${stamp}.json`, payload);
+            } catch (err) {
+                alert(err.message || 'Could not download status');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = original || 'Download Status';
+                }
+            }
         }
 
         let dashboardPreferences = {};
