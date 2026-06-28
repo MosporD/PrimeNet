@@ -142,6 +142,13 @@ document.getElementById('nokia-mo-clear').addEventListener('click', clearMoClass
 document.getElementById('nokia-param-search').addEventListener('input', filterParameterList);
 document.getElementById('nokia-preview-btn').addEventListener('click', previewNokia);
 document.getElementById('nokia-extract-btn').addEventListener('click', () => extract('nokia'));
+const nokiaWritePanel = document.getElementById('nokia-write-panel');
+if (nokiaWritePanel) {
+    document.getElementById('nokia-reimport-file').addEventListener('change', onNokiaReimportFileChanged);
+    document.getElementById('nokia-reimport-preview-btn').addEventListener('click', previewNokiaReimport);
+    document.getElementById('nokia-reimport-execute-btn').addEventListener('click', executeNokiaReimport);
+    document.getElementById('nokia-reimport-confirm').addEventListener('input', updateNokiaReimportExecuteState);
+}
 // Wire Huawei workflow when the tab is present (all users when CM_HUAWEI_ENABLED).
 const huaweiEnabled = Boolean(document.getElementById('huawei-workflow'));
 if (huaweiEnabled) {
@@ -1528,6 +1535,154 @@ function finishExtractProgress(success) {
         setTimeout(() => { section.hidden = true; }, 700);
     } else {
         section.hidden = true;
+    }
+}
+
+let nokiaReimportPreviewToken = null;
+let nokiaReimportSelectedFile = null;
+const NOKIA_REIMPORT_CONFIRMATION = 'APPLY NOKIA EXCEL CHANGES';
+
+function setNokiaReimportStatus(message, type = 'success') {
+    const status = document.getElementById('nokia-reimport-status');
+    if (!status) return;
+    status.hidden = false;
+    status.className = `status-message ${type}`;
+    status.textContent = message;
+}
+
+function updateNokiaReimportExecuteState() {
+    const btn = document.getElementById('nokia-reimport-execute-btn');
+    const confirm = document.getElementById('nokia-reimport-confirm')?.value.trim();
+    if (btn) btn.disabled = !nokiaReimportPreviewToken || confirm !== NOKIA_REIMPORT_CONFIRMATION;
+}
+
+function onNokiaReimportFileChanged(event) {
+    nokiaReimportSelectedFile = event.target.files?.[0] || null;
+    nokiaReimportPreviewToken = null;
+    document.getElementById('nokia-reimport-confirm').value = '';
+    updateNokiaReimportExecuteState();
+    const summary = document.getElementById('nokia-reimport-summary');
+    const diff = document.getElementById('nokia-reimport-diff');
+    if (summary) summary.hidden = true;
+    if (diff) diff.hidden = true;
+    if (nokiaReimportSelectedFile) {
+        setNokiaReimportStatus(`Ready to preview ${nokiaReimportSelectedFile.name}.`, 'success');
+    }
+}
+
+function renderNokiaReimportDiff(data) {
+    const summary = document.getElementById('nokia-reimport-summary');
+    const diff = document.getElementById('nokia-reimport-diff');
+    if (!summary || !diff) return;
+    summary.hidden = false;
+    diff.hidden = false;
+    const warnings = data.warnings || [];
+    summary.innerHTML = `
+        <strong>${data.change_count || 0}</strong> change(s),
+        <strong>${data.blocked_count || 0}</strong> blocked item(s)
+        ${data.executable ? '' : '<span class="danger-text">Not executable until blocked items are resolved.</span>'}
+        ${warnings.length ? `<div>${warnings.map(escapeHtml).join('<br>')}</div>` : ''}
+    `;
+    const rows = (data.changes || []).slice(0, 100).map((change) => `
+        <tr>
+            <td>${escapeHtml(change.sheet || '')}</td>
+            <td>${escapeHtml(change.target || '')}</td>
+            <td>${escapeHtml(change.parameter || '')}</td>
+            <td>${escapeHtml(change.old_value || '')}</td>
+            <td>${escapeHtml(change.new_value || '')}</td>
+        </tr>
+    `).join('');
+    const blocked = (data.blocked || []).slice(0, 50).map((item) => `
+        <li>${escapeHtml(item.sheet || '')} ${escapeHtml(item.target || '')} ${escapeHtml(item.parameter || '')}: ${escapeHtml(item.reason || '')}</li>
+    `).join('');
+    diff.innerHTML = `
+        <table class="reimport-table">
+            <thead><tr><th>Sheet</th><th>MO/DN</th><th>Parameter</th><th>Old</th><th>New</th></tr></thead>
+            <tbody>${rows || '<tr><td colspan="5">No executable parameter changes detected.</td></tr>'}</tbody>
+        </table>
+        ${blocked ? `<h4>Blocked items</h4><ul>${blocked}</ul>` : ''}
+    `;
+}
+
+async function previewNokiaReimport() {
+    if (!lastFileId) {
+        setNokiaReimportStatus('Export a Nokia Excel workbook first so PrimeNet has a baseline to compare against.', 'error');
+        return;
+    }
+    const fileInput = document.getElementById('nokia-reimport-file');
+    const file = nokiaReimportSelectedFile || fileInput?.files?.[0] || null;
+    if (!file) {
+        setNokiaReimportStatus('Choose the edited Nokia Excel workbook first.', 'error');
+        return;
+    }
+    nokiaReimportSelectedFile = file;
+    const form = new FormData();
+    form.append('workbook', file);
+    form.append('baseline_file_id', lastFileId);
+    form.append('allow_blank', document.getElementById('nokia-reimport-allow-blank')?.checked ? '1' : '0');
+    const previewBtn = document.getElementById('nokia-reimport-preview-btn');
+    if (previewBtn) previewBtn.disabled = true;
+    setNokiaReimportStatus(`Uploading ${file.name} and comparing changes...`, 'success');
+    try {
+        const response = await fetch('/api/cm-extractor/nokia/reimport/preview', {
+            method: 'POST',
+            body: form,
+        });
+        const raw = await response.text();
+        let data = {};
+        try {
+            data = raw ? JSON.parse(raw) : {};
+        } catch (parseError) {
+            throw new Error(`Preview endpoint returned HTTP ${response.status}: ${raw.slice(0, 240) || response.statusText}`);
+        }
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || `Preview failed with HTTP ${response.status}`);
+        }
+        nokiaReimportPreviewToken = data.token;
+        renderNokiaReimportDiff(data);
+        updateNokiaReimportExecuteState();
+        setNokiaReimportStatus(
+            data.executable
+                ? 'Preview ready. Review changes, then type the confirmation phrase to execute.'
+                : 'Preview completed, but there are blocked items to resolve before execution.',
+            data.executable ? 'success' : 'error',
+        );
+    } catch (error) {
+        nokiaReimportPreviewToken = null;
+        updateNokiaReimportExecuteState();
+        setNokiaReimportStatus(error.message || 'Could not preview Nokia Excel reimport', 'error');
+    } finally {
+        if (previewBtn) previewBtn.disabled = false;
+    }
+}
+
+async function executeNokiaReimport() {
+    const confirm = document.getElementById('nokia-reimport-confirm')?.value.trim();
+    if (!nokiaReimportPreviewToken || confirm !== NOKIA_REIMPORT_CONFIRMATION) {
+        setNokiaReimportStatus(`Type ${NOKIA_REIMPORT_CONFIRMATION} before executing.`, 'error');
+        return;
+    }
+    if (!window.confirm('This will upload the reviewed Nokia changes and start a CM Operations import job. Continue?')) {
+        return;
+    }
+    try {
+        const response = await fetch('/api/cm-extractor/nokia/reimport/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: nokiaReimportPreviewToken,
+                confirmation: confirm,
+            }),
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Nokia Excel reimport failed');
+        }
+        setNokiaReimportStatus(`Started Nokia operation ${data.operation_id} for ${data.change_count} change(s).`, 'success');
+        showNotification('Nokia Excel reimport started', 'success');
+    } catch (error) {
+        setNokiaReimportStatus(error.message || 'Nokia Excel reimport failed', 'error');
+        showNotification('Nokia Excel reimport failed', 'error');
     }
 }
 

@@ -40,6 +40,11 @@ from core.cm_extractor.site_catalog import (
     merge_huawei_ne_names,
 )
 from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
+from core.cm_extractor.nokia_excel_reimport import (
+    CONFIRMATION_PHRASE,
+    create_preview as create_nokia_reimport_preview,
+    execute_preview as execute_nokia_reimport_preview,
+)
 from core.cm_extractor.nokia_semantics import (
     export_nokia_selection_to_excel,
     fetch_parameters_for_classes,
@@ -170,6 +175,23 @@ def _username(user) -> str:
     return str(user[1] or '').strip()
 
 
+def _cm_write_allowed_users() -> set[str]:
+    raw = os.environ.get('CM_WRITE_ALLOWED_USERS') or 'malek.mohammad'
+    return {item.strip().lower() for item in raw.split(',') if item.strip()}
+
+
+def cm_write_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({'error': 'Unauthorized'}), 401
+        if _username(user).lower() not in _cm_write_allowed_users():
+            return jsonify({'error': 'CM write actions are currently restricted.'}), 403
+        return f(*args, **kwargs)
+    return decorated
+
+
 def _json_body() -> dict:
     return getattr(g, 'sanitized_json', None) or request.get_json(silent=True) or {}
 
@@ -225,6 +247,7 @@ def cm_extractor_page():
         'cm_extractor.html',
         user=format_user_data(user),
         huawei_enabled=huawei_visible(user),
+        cm_write_allowed=_username(user).lower() in _cm_write_allowed_users(),
     )
 
 
@@ -407,6 +430,106 @@ def nokia_discover():
         return jsonify({'error': str(exc)}), 502
     except Exception as exc:
         return jsonify({'error': f'NetAct discovery failed: {exc}'}), 500
+
+
+def _reimport_max_changes() -> int:
+    try:
+        return max(1, int(os.environ.get('NOKIA_CM_REIMPORT_MAX_CHANGES', '100')))
+    except ValueError:
+        return 100
+
+
+@cm_extractor_bp.route('/api/cm-extractor/nokia/reimport/preview', methods=['POST'])
+@cm_write_required
+def nokia_reimport_preview():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    upload = request.files.get('workbook')
+    if not upload or not upload.filename:
+        return jsonify({'error': 'Upload the edited Nokia Excel workbook.'}), 400
+    if not upload.filename.lower().endswith(('.xlsx', '.xlsm')):
+        return jsonify({'error': 'Only .xlsx/.xlsm workbooks are supported.'}), 400
+
+    baseline_file_id = (request.form.get('baseline_file_id') or '').strip()
+    baseline_info = TEMP_FILES.get(baseline_file_id)
+    if not baseline_info or baseline_info.get('user_id') != _user_id(user):
+        return jsonify({
+            'error': 'Original baseline export not found. Export the Nokia Excel file again, then upload your edited copy in the same session.',
+        }), 400
+    baseline_path = baseline_info.get('path')
+    if not baseline_path or not os.path.isfile(baseline_path):
+        return jsonify({'error': 'Original baseline export file is no longer available.'}), 400
+
+    allow_blank = (request.form.get('allow_blank') or '').strip().lower() in ('1', 'true', 'yes', 'on')
+    suffix = '.xlsm' if upload.filename.lower().endswith('.xlsm') else '.xlsx'
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+    tmp.close()
+    try:
+        upload.save(tmp.name)
+        preview = create_nokia_reimport_preview(
+            username=_username(user),
+            baseline_path=baseline_path,
+            edited_path=tmp.name,
+            edited_filename=upload.filename,
+            allow_blank=allow_blank,
+            max_changes=_reimport_max_changes(),
+        )
+    except Exception as exc:
+        return jsonify({'error': f'Could not preview Nokia Excel reimport: {exc}'}), 400
+    finally:
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
+
+    log_activity(
+        _user_id(user),
+        'cm_nokia_reimport_preview',
+        f"Previewed Nokia Excel reimport {preview['token']} with {preview['change_count']} change(s)",
+    )
+    return jsonify({
+        'success': True,
+        'confirmation': CONFIRMATION_PHRASE,
+        **{
+            key: preview[key]
+            for key in (
+                'token', 'edited_filename', 'change_count', 'blocked_count',
+                'changes', 'blocked', 'warnings', 'executable',
+            )
+        },
+    })
+
+
+@cm_extractor_bp.route('/api/cm-extractor/nokia/reimport/execute', methods=['POST'])
+@cm_write_required
+def nokia_reimport_execute():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    data = _json_body()
+    token = str(data.get('token') or '').strip()
+    confirmation = str(data.get('confirmation') or '').strip()
+    if not token:
+        return jsonify({'error': 'Preview token is required.'}), 400
+    if confirmation != CONFIRMATION_PHRASE:
+        return jsonify({'error': f'Type {CONFIRMATION_PHRASE} to execute these Nokia changes.'}), 400
+    wait = str(data.get('wait') or '').strip().lower() in ('1', 'true', 'yes', 'on')
+    try:
+        result = execute_nokia_reimport_preview(_username(user), token, wait=wait)
+    except FileNotFoundError as exc:
+        return jsonify({'error': str(exc)}), 404
+    except ValueError as exc:
+        return jsonify({'error': str(exc)}), 400
+    except Exception as exc:
+        return jsonify({'error': f'Nokia Excel reimport execution failed: {exc}'}), 502
+
+    log_activity(
+        _user_id(user),
+        'cm_nokia_reimport_execute',
+        f"Executed Nokia Excel reimport {token}: operation {result.get('operation_id')}",
+    )
+    return jsonify({'success': True, **result})
 
 
 @cm_extractor_bp.route('/api/cm-extractor/huawei/sites', methods=['GET'])

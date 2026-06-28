@@ -137,6 +137,35 @@
                         <button type="button" class="btn-primary btn-large" id="nokia-extract-btn" disabled>Extract to Excel</button>
                     </div>
 
+                    {% if cm_write_allowed %}
+                    <details class="danger-panel" id="nokia-write-panel">
+                        <summary>Reimport edited Nokia Excel</summary>
+                        <p class="field-hint">
+                            Export Nokia CM to Excel, edit parameter cells, then upload the edited workbook here.
+                            PrimeNet compares it with the original export, shows the exact changes, and only executes
+                            after confirmation.
+                        </p>
+                        <div class="form-row compact-row form-inline-row">
+                            <label class="inline-field" for="nokia-reimport-file">
+                                Edited workbook
+                                <input type="file" id="nokia-reimport-file" accept=".xlsx,.xlsm">
+                            </label>
+                            <label class="inline-field area-filter-toggle">
+                                <input type="checkbox" id="nokia-reimport-allow-blank">
+                                <span>Allow blanking values</span>
+                            </label>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="button" class="btn-secondary" id="nokia-reimport-preview-btn">Preview changes</button>
+                            <input id="nokia-reimport-confirm" class="search-input" placeholder="Type APPLY NOKIA EXCEL CHANGES">
+                            <button type="button" class="btn-danger" id="nokia-reimport-execute-btn" disabled>Execute reviewed changes</button>
+                        </div>
+                        <div id="nokia-reimport-status" class="status-message" hidden></div>
+                        <div id="nokia-reimport-summary" class="reimport-summary" hidden></div>
+                        <div id="nokia-reimport-diff" class="reimport-diff" hidden></div>
+                    </details>
+                    {% endif %}
+
                     <div id="nokia-preview" class="preview-panel" hidden>
                         <div class="preview-head"><span id="nokia-preview-count"></span></div>
                         <div id="nokia-preview-tables"></div>
@@ -404,6 +433,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-    <script src="{{ url_for('cm_extractor.static', filename='cm_extractor.js') }}?v=3.34"></script>
+    <script src="{{ url_for('cm_extractor.static', filename='cm_extractor.js') }}?v=3.36"></script>
 </body>
 </html>
