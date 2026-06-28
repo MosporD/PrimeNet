@@ -18,6 +18,14 @@ function escHtml(s) {
         .replace(/"/g, '&quot;');
 }
 
+function compactFemtoTimeLabel(raw) {
+    const value = String(raw || '').trim();
+    if (!value) return '';
+    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+    if (match) return `${match[2]}-${match[3]} ${match[4]}:${match[5]}`;
+    return value.replace(/:\d{2}(?:\.\d+)?$/, '');
+}
+
 function uniqueSelectedSeries() {
     return [...new Set([...selectedComputedKpis, ...selectedCounters])].slice(0, 20);
 }
@@ -404,6 +412,8 @@ function renderFemtoChartsForActiveTab() {
     tab.series.forEach((name, idx) => {
         const canvas = document.getElementById(`femto-chart-${idx}`);
         if (!canvas) return;
+        const chartWidth = canvas.parentElement?.clientWidth || 480;
+        const maxXAxisTicks = Math.max(3, Math.min(6, Math.floor(chartWidth / 95)));
         const chart = new Chart(canvas.getContext('2d'), {
             type: 'line',
             data: {
@@ -429,7 +439,19 @@ function renderFemtoChartsForActiveTab() {
                 maintainAspectRatio: false,
                 interaction: { mode: 'nearest', intersect: false },
                 plugins: { legend: { display: false } },
-                scales: { x: { ticks: { maxTicksLimit: 8, maxRotation: 0 } } },
+                scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: true,
+                            maxTicksLimit: maxXAxisTicks,
+                            minRotation: 35,
+                            maxRotation: 35,
+                            callback: function(value) {
+                                return compactFemtoTimeLabel(this.getLabelForValue(value));
+                            },
+                        },
+                    },
+                },
             },
         });
         femtoCharts.push(chart);
