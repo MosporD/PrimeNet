@@ -129,6 +129,71 @@ def discover_nes_from_alarms(
     return items
 
 
+def _alarm_value(alarm: dict[str, Any], *keys: str) -> str:
+    for key in keys:
+        value = alarm.get(key)
+        if value is not None and str(value).strip():
+            return str(value).strip()
+    return ''
+
+
+def _normalize_alarm(alarm: dict[str, Any]) -> dict[str, Any]:
+    me_name = _alarm_value(alarm, 'meName', 'neName', 'devName')
+    return {
+        'alarm_id': _alarm_value(alarm, 'alarmId', 'alarmID', 'eventId', 'faultId', 'serialNo'),
+        'me_name': me_name,
+        'site_id': parse_site_id_from_ne_name(me_name),
+        'alarm_name': _alarm_value(alarm, 'alarmName', 'name', 'eventName', 'faultName'),
+        'severity': _alarm_value(alarm, 'severity', 'perceivedSeverity', 'alarmSeverity'),
+        'occur_time': _alarm_value(alarm, 'occurTime', 'firstOccurTime', 'eventTime', 'raisedTime'),
+        'product_name': _alarm_value(alarm, 'productName', 'product'),
+        'location_info': _alarm_value(alarm, 'locationInfo', 'location', 'position'),
+        'probable_cause': _alarm_value(alarm, 'probableCause', 'reason', 'cause'),
+        'raw': alarm,
+    }
+
+
+def fetch_fm_alarms(
+    client: HuaweiCmClient,
+    *,
+    data_type: str = 'CURRENT',
+    limit: int = 200,
+    marker: str = '',
+) -> dict[str, Any]:
+    """Fetch one page of Huawei FM alarms and normalize fields for display."""
+    data_type = (data_type or 'CURRENT').strip().upper()
+    if data_type not in ('CURRENT', 'HISTORY'):
+        data_type = 'CURRENT'
+    limit = max(1, min(int(limit or 200), 1000))
+    path = f'/api/rest/faultSupervisonManagement/v1/alarms?dataType={data_type}&limit={limit}'
+    if marker:
+        path += f'&marker={marker}'
+
+    status, payload = request_json(
+        'GET',
+        client._url(path),
+        headers=client._auth_headers(content_type=''),
+        timeout=120,
+        verify_ssl=client.verify_ssl,
+    )
+    if status != 200 or not isinstance(payload, dict):
+        raise HuaweiCmError(
+            f'FM alarm fetch failed ({data_type}, HTTP {status})',
+            status=status,
+            payload=payload,
+        )
+
+    alarms = payload.get('alarmInformationList') or []
+    if not isinstance(alarms, list):
+        alarms = []
+    return {
+        'alarms': [_normalize_alarm(alarm) for alarm in alarms if isinstance(alarm, dict)],
+        'count': len(alarms),
+        'marker': str(payload.get('marker') or '').strip(),
+        'data_type': data_type,
+    }
+
+
 def discover_u2020_inventory(
     client: HuaweiCmClient,
     *,

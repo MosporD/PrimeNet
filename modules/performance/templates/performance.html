@@ -42,21 +42,6 @@
                 </select>
             </div>
 
-            <div class="perf-filter-presets" aria-label="Saved filter presets">
-                <div class="perf-filter-presets-head">
-                    <span>Filter Presets</span>
-                    <button type="button" class="perf-filter-preset-btn" onclick="savePerformanceFilterPreset()">Save Current</button>
-                </div>
-                <div class="perf-filter-presets-row">
-                    <select id="perf-filter-preset-select" class="perf-filter-preset-select" aria-label="Saved filter presets">
-                        <option value="">No saved presets</option>
-                    </select>
-                    <button type="button" class="perf-filter-preset-btn" onclick="applySelectedPerformanceFilterPreset()">Apply</button>
-                    <button type="button" class="perf-filter-preset-btn perf-filter-preset-btn-danger" onclick="deleteSelectedPerformanceFilterPreset()">Delete</button>
-                </div>
-                <div id="perf-filter-preset-status" class="perf-filter-preset-status"></div>
-            </div>
-
             <div id="cell-list-wrap" class="hw-tree-panel">
                 <div class="perf-sidebar-section perf-sidebar-cells">
                     <button type="button" class="perf-sidebar-toggle" id="perf-toggle-cells"
@@ -84,18 +69,6 @@
                                         <option value="">All Vendors</option>
                                         <option value="Nokia">Nokia</option>
                                         <option value="Huawei">Huawei</option>
-                                    </select>
-                                </div>
-                                <div class="hw-toolbar-field">
-                                    <span class="hw-field-label">Object group</span>
-                                    <select id="filter-area" class="hw-real-select" onchange="onAreaChange()">
-                                        <option value="">Whole Network</option>
-                                    </select>
-                                </div>
-                                <div class="hw-toolbar-field hw-toolbar-field--grow">
-                                    <span class="hw-field-label">Object cluster</span>
-                                    <select id="filter-cluster" class="hw-real-select" onchange="onClusterChange()">
-                                        <option value="">All Clusters</option>
                                     </select>
                                 </div>
                             </div>
@@ -195,7 +168,10 @@
                     </div>
                     <div class="header-actions">
                         <button id="btn-add-charts" class="btn-query" onclick="addChartsFromLastQuery()" style="display:none;">
-                            + Add Charts
+                            Template Charts
+                        </button>
+                        <button id="btn-custom-chart" class="btn-query" onclick="openChartConfigModal()" style="display:none;">
+                            Add Chart
                         </button>
                         <button id="btn-compare-charts" class="btn-query" onclick="addCompareTabFromLastQuery()" style="display:none;"
                                 title="Overlay up to 6 selected cells on the same chart">
@@ -219,12 +195,13 @@
                 </div>
             </div>
 
-            <div id="perf-dod-bar" class="perf-dod-bar" style="display:none;" aria-label="Hourly chart view options">
+            <div id="perf-dod-bar" class="perf-dod-bar" style="display:none;" aria-label="Chart view options">
                 <div class="perf-dod-row perf-dod-row--modes">
-                    <span class="perf-dod-label">Hourly charts</span>
-                    <div class="perf-dod-mode" role="radiogroup" aria-label="Trend or DOD ">
-                        <label class="perf-dod-radio"><input type="radio" name="perf-chart-display" value="trend" checked> Trend</label>
-                        <label class="perf-dod-radio"><input type="radio" name="perf-chart-display" value="dod"> DOD</label>
+                    <span class="perf-dod-label" id="perf-chart-display-label">Charts</span>
+                    <div class="perf-dod-mode" role="radiogroup" aria-label="Chart display mode">
+                        <label class="perf-dod-radio" data-chart-mode-option="trend"><input type="radio" name="perf-chart-display" value="trend" checked> Trend</label>
+                        <label class="perf-dod-radio" data-chart-mode-option="dod"><input type="radio" name="perf-chart-display" value="dod"> DOD</label>
+                        <label class="perf-dod-radio" data-chart-mode-option="mom"><input type="radio" name="perf-chart-display" value="mom"> MOM</label>
                     </div>
                 </div>
                 <div id="perf-dod-days-wrap" class="perf-dod-days-wrap" style="display:none;">
@@ -234,6 +211,16 @@
 
             <div id="perf-chart-tabs-bar" class="perf-chart-tabs-bar" style="display:none;" aria-label="Chart tabs">
                 <div id="perf-chart-tabs-strip" class="perf-chart-tabs-strip" role="tablist"></div>
+            </div>
+            <div id="perf-chart-choice-bar" class="perf-chart-choice-bar" style="display:none;" aria-label="Chart options">
+                <div>
+                    <strong>Visualize query</strong>
+                    <span>Use template charts, or build a chart from selected KPIs.</span>
+                </div>
+                <div class="perf-chart-choice-actions">
+                    <button type="button" class="btn-query" onclick="addChartsFromLastQuery()">Template Charts</button>
+                    <button type="button" class="btn-query" onclick="openChartConfigModal()">Add Chart</button>
+                </div>
             </div>
             <div id="perf-kpi-category-tabs-bar" class="perf-kpi-category-tabs-bar" style="display:none;" aria-label="KPI category tabs">
                 <div id="perf-kpi-category-tabs-strip" class="perf-kpi-category-tabs-strip" role="tablist"></div>
@@ -273,7 +260,7 @@
             <div id="chart-config-modal" class="perf-modal-backdrop" style="display:none;">
                 <div class="perf-modal-card perf-modal-card-wide">
                     <div class="perf-modal-head">
-                        <h3>Switch Object and KPI</h3>
+                        <h3>Add Chart</h3>
                         <button type="button" class="perf-modal-close" onclick="closeChartConfigModal()">&times;</button>
                     </div>
                     <div class="perf-config-grid">
@@ -312,8 +299,12 @@
 
         await loadFilters();
 
-        if (params.get('area'))      document.getElementById('filter-area').value    = params.get('area');
-        if (params.get('cluster'))   document.getElementById('filter-cluster').value = params.get('cluster');
+        if (params.get('area') && document.getElementById('filter-area')) {
+            document.getElementById('filter-area').value = params.get('area');
+        }
+        if (params.get('cluster') && document.getElementById('filter-cluster')) {
+            document.getElementById('filter-cluster').value = params.get('cluster');
+        }
         if (params.get('site_id'))   document.getElementById('filter-site').value   = params.get('site_id');
         if (params.get('cell_id') || params.get('cell_name')) {
             document.getElementById('filter-cell').value = params.get('cell_id') || params.get('cell_name') || '';

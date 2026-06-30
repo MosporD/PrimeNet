@@ -9,6 +9,7 @@
 const TECH_COLORS = {
     '2G-2G':         '#7f8c8d',
     '3G-3G':         '#27ae60',
+    '4G-4G':         '#1a5276',
     '4G-4G Intra-eNB': '#1a5276',
     '4G-4G Inter-eNB': '#8e44ad',
     '4G-4G Intra':     '#1a5276',
@@ -227,14 +228,13 @@ async function loadNetworkStats() {
 const _NEIGHBOR_RAT_OPTIONS_NOKIA = [
     { value: '2G-2G', label: '2G' },
     { value: '3G-3G', label: '3G' },
-    { value: '4G-4G Intra-eNB', label: '4G — Intra-eNB' },
-    { value: '4G-4G Inter-eNB', label: '4G — Inter-eNB' },
+    { value: '4G-4G', label: '4G' },
 ];
-/** Huawei PRS has one 4G export file (no Nokia intra/inter split); values still match API tokens. */
+/** 4G is a single logical relation table; relation_scope flags intra/inter per row. */
 const _NEIGHBOR_RAT_OPTIONS_HUAWEI = [
     { value: '2G-2G', label: '2G' },
     { value: '3G-3G', label: '3G' },
-    { value: '4G-4G Intra-eNB', label: '4G' },
+    { value: '4G-4G', label: '4G' },
 ];
 
 function rebuildNeighborRatSelectForExportVendor() {
@@ -254,7 +254,7 @@ function _syncActiveTechFromNeighborRatSelect() {
     const sel = document.getElementById('neighbor-rat-select');
     if (!sel) return;
     const v = String(sel.value || '').trim();
-    activeTech = v || '4G-4G Intra-eNB';
+    activeTech = v || '4G-4G';
     activeTechSpecific = 'all';
 }
 
@@ -273,8 +273,7 @@ function buildTechButtons(counts) {
         ? [
             { value: '2G-2G', label: '2G-2G', count: Number(counts['2G']) || 0, color: TECH_COLORS['2G'] || '#7f8c8d' },
             { value: '3G-3G', label: '3G-3G', count: Number(counts['3G']) || 0, color: TECH_COLORS['3G'] || '#27ae60' },
-            { value: '4G-4G Intra-eNB', label: '4G-4G Intra-eNB', count: Number(counts['4G-FDD']) || 0, color: TECH_COLORS['4G-4G Intra-eNB'] || '#1a5276' },
-            { value: '4G-4G Inter-eNB', label: '4G-4G Inter-eNB', count: Number(counts['4G-FDD']) || 0, color: TECH_COLORS['4G-4G Inter-eNB'] || '#8e44ad' },
+            { value: '4G-4G', label: '4G-4G', count: Number(counts['4G-FDD']) || 0, color: TECH_COLORS['4G-4G'] || '#1a5276' },
         ]
         : TECH_ORDER.map((tech) => ({
             value: tech,
@@ -323,6 +322,7 @@ async function setTechFilter(tech) {
     if (codeInput) {
         codeInput.placeholder =
             tech === '3G-3G' ? 'Scrambling Code...' :
+            tech === '4G-4G' ||
             tech === '4G-4G Intra-eNB' || tech === '4G-4G Inter-eNB' ||
             tech === '4G-4G Intra' || tech === '4G-4G Inter' ? 'PCI...' :
             tech === '2G-2G' ? 'BCCH...' :
@@ -477,6 +477,7 @@ function cellMatchesMapTechFilter(c) {
     if (activeTech === '2G-2G') return t === '2G'; // backward compatibility
     if (activeTech === '3G-3G') return t === '3G'; // backward compatibility
     if (
+        activeTech === '4G-4G' ||
         activeTech === '4G-4G Intra-eNB' || activeTech === '4G-4G Inter-eNB' ||
         activeTech === '4G-4G Intra' || activeTech === '4G-4G Inter'
     ) return t === '4G-FDD';
@@ -1124,6 +1125,7 @@ function mapChipTechnologyForKpi(tech) {
     if (!tech || tech === 'all') return '';
     if ([
         '2G-2G', '3G-3G',
+        '4G-4G',
         '4G-4G Intra-eNB', '4G-4G Inter-eNB',
         '4G-4G Intra', '4G-4G Inter',
     ].includes(tech)) return tech;
@@ -1759,7 +1761,7 @@ async function refreshNeighborOverlay() {
         neighborLineData = Array.isArray(data.lines) ? data.lines : [];
         renderNeighborLines(neighborLineData);
         await refreshNeighborWedgePresentation();
-        await renderNeighborExplorerPanel(vendor, activeTech, data.period_start, minFilterValue);
+        await renderNeighborExplorerPanel(vendor, activeTech, data.period_start, minFilterValue, Boolean(data.raw_neighbor_tables));
         if (data.skipped_missing_coords > 0) {
             showNotification(
                 `Neighbor Explorer: skipped ${data.skipped_missing_coords} row(s) — could not resolve both ends to cells with coordinates in metadata (ID/name/ECI mismatch or inactive cells).`,
@@ -1877,6 +1879,10 @@ function renderNeighborLines(lines) {
         const hfr = ln.ho_failure_rate_percent;
         const hfrText = (hfr == null || !Number.isFinite(Number(hfr))) ? '—' : `${Number(hfr).toFixed(2)}%`;
         const suc = ln.ho_successes;
+        const relationScope = String(ln.relation_scope || '').toLowerCase();
+        const relationLabel = relationScope === 'intra'
+            ? 'Intra relation'
+            : (relationScope === 'inter' ? 'Inter relation' : '');
         const metricsRows = fo
             ? `<tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Attempts</td>
                         <td style="font-weight:600;">${Number(ln.ho_attempts || 0).toLocaleString()}</td></tr>
@@ -1900,6 +1906,8 @@ function renderNeighborLines(lines) {
                         <td style="font-weight:600;">${escapeHtml(String(ln.source_cell || '—'))}</td></tr>
                     <tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Target</td>
                         <td style="font-weight:600;">${escapeHtml(String(ln.target_cell || '—'))}</td></tr>
+                    ${relationLabel ? `<tr><td style="color:#666;padding:4px 10px 4px 0;vertical-align:top;">Relation</td>
+                        <td style="font-weight:600;">${escapeHtml(relationLabel)}</td></tr>` : ''}
                     ${metricsRows}
                 </table>
             </div>`;
@@ -1907,7 +1915,7 @@ function renderNeighborLines(lines) {
     });
 }
 
-async function renderNeighborExplorerPanel(vendor, technology, periodStart, minAttempts) {
+async function renderNeighborExplorerPanel(vendor, technology, periodStart, minAttempts, rawNeighborTables = false) {
     const panel = document.getElementById('neighbor-explorer-panel');
     if (!panel) return;
     panel.style.display = 'block';
@@ -1915,6 +1923,32 @@ async function renderNeighborExplorerPanel(vendor, technology, periodStart, minA
         panel.innerHTML = `
             <div class="site-meta-row">Select a cell for outgoing/incoming ranking.</div>
             <div class="site-meta-row">Lines on map: ${neighborLineData.length}</div>`;
+        return;
+    }
+    if (rawNeighborTables) {
+        const cellKey = String(selectedNeighborCell || '').trim().toLowerCase();
+        const rows = neighborLineData
+            .filter((ln) => String(ln.source_cell || '').trim().toLowerCase() === cellKey)
+            .slice(0, 10);
+        const mkRows = (items) => items.length
+            ? items.map((r) => {
+                const rel = String(r.relation_scope || '').toLowerCase();
+                const relText = rel === 'intra' ? ' · intra' : (rel === 'inter' ? ' · inter' : '');
+                return `
+                <div class="neighbor-row">
+                    <div class="neighbor-row-name">${escapeHtml(r.target_cell || '')}${relText}</div>
+                    <div class="neighbor-row-attempts">${Number(r.ho_attempts || 0).toLocaleString()}</div>
+                    <div class="neighbor-row-rate">${r.ho_success_rate == null ? '—' : Number(r.ho_success_rate).toFixed(1) + '%'}</div>
+                </div>`;
+            }).join('')
+            : '<div class="site-meta-row">No outgoing rows in current scope.</div>';
+        panel.innerHTML = `
+            <div class="neighbor-subtitle">
+                Cell: <strong>${escapeHtml(selectedNeighborCell)}</strong>
+            </div>
+            <div class="neighbor-list-head">Outgoing neighbors</div>
+            ${mkRows(rows)}
+            <div class="site-meta-row">Relation flag: intra when source and target eNB/site are the same.</div>`;
         return;
     }
     const qs = new URLSearchParams({
@@ -1962,6 +1996,7 @@ function clearCodeSearch() {
 function _codeLabel() {
     if (activeTech === '3G-3G') return 'SC';
     if (
+        activeTech === '4G-4G' ||
         activeTech === '4G-4G Intra-eNB' || activeTech === '4G-4G Inter-eNB' ||
         activeTech === '4G-4G Intra' || activeTech === '4G-4G Inter'
     ) return 'PCI';
@@ -2271,7 +2306,8 @@ async function updateTechSpecificFilter() {
     const apiTech =
         activeTech === '2G-2G' ? '2G' :
         activeTech === '3G-3G' ? '3G' :
-        (activeTech === '4G-4G Intra-eNB' || activeTech === '4G-4G Inter-eNB' ||
+        (activeTech === '4G-4G' ||
+         activeTech === '4G-4G Intra-eNB' || activeTech === '4G-4G Inter-eNB' ||
          activeTech === '4G-4G Intra' || activeTech === '4G-4G Inter') ? '4G-FDD' :
         activeTech;
     if (!['2G', '3G', '4G-FDD', '4G-TDD'].includes(apiTech)) {

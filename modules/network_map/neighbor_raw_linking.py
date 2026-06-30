@@ -1258,6 +1258,9 @@ def build_raw_neighbor_lines(
         tgt_disp = str(tgt.get("cell_name") or "").strip() or tgt_label
         src_v = str(src.get("vendor") or "").strip()
         tgt_v = str(tgt.get("vendor") or "").strip()
+        src_site = src.get("site_id")
+        tgt_site = tgt.get("site_id")
+        is_intra = bool(str(src_site or "").strip() and str(src_site or "").strip() == str(tgt_site or "").strip())
         lines.append(
             {
                 "period_start": period,
@@ -1272,8 +1275,10 @@ def build_raw_neighbor_lines(
                 "technology": technology,
                 "source_cell": src_disp,
                 "target_cell": tgt_disp,
-                "source_site_id": src.get("site_id"),
-                "target_site_id": tgt.get("site_id"),
+                "source_site_id": src_site,
+                "target_site_id": tgt_site,
+                "is_intra_relation": is_intra,
+                "relation_scope": "intra" if is_intra else "inter",
                 "source_lat": src["lat"],
                 "source_lng": src["lng"],
                 "target_lat": tgt["lat"],

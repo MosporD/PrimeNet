@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import argparse
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
@@ -10,8 +11,12 @@ PROJECT_ROOT = os.path.dirname(
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Huawei daily pull wrapper")
+    parser.add_argument("--category", choices=["all", "cells", "groups"], default="all")
+    args = parser.parse_args()
+
     script = os.path.join(PROJECT_ROOT, "scripts", "pipeline", "pull_huawei_raw_daily.py")
-    proc = subprocess.run([sys.executable, script], cwd=PROJECT_ROOT)
+    proc = subprocess.run([sys.executable, script, "--category", args.category], cwd=PROJECT_ROOT)
     return int(proc.returncode or 0)
 
 

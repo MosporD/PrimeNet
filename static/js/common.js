@@ -7,27 +7,47 @@ const BRAND_FAVICON_PATH = '/static/images/favicon.png?v=4';
 const PAGE_TRANSITION_STORAGE_KEY = 'primenetPageEnterDirection';
 const FEATURE_NAV_SECTIONS = [
     {
-        title: 'Main',
+        title: 'Overview & Performance',
         links: [
             { label: 'Dashboard', href: '/dashboard' },
-            { label: 'Analytics', href: '/performance' },
+            { label: 'Performance Explorer', href: '/performance' },
+            { label: 'Huawei PM Query Studio', href: '/performance-analytics' },
+            { label: 'Network Coverage Heatmap', href: '/cell-heatmap' },
             { label: 'Network Map', href: '/network-map' },
             { label: 'Neighbor Analysis', href: '/neighbor-analysis' },
-            { label: 'Report Generation', href: '/reports' },
+            { label: 'Performance Reports', href: '/reports' },
+            { label: 'Sector Health Monitor', href: '/sector-health' },
             { label: 'Conflict Map', href: '/conflict-map' },
             { label: 'Femto PM', href: '/femto-pm' },
+        ],
+    },
+    {
+        title: 'Radio Optimization',
+        links: [
+            { label: 'SON Optimization Insights', href: '/son-analytics' },
+            { label: 'Network Health Overview', href: '/network-health' },
+            { label: 'RF Optimization Workbench', href: '/rf-optimization' },
+            { label: 'Neighbor Quality Analyzer', href: '/neighbor-quality' },
+            { label: 'Capacity Hotspots', href: '/capacity-hotspots' },
+            { label: 'Layer Coverage Gaps', href: '/layer-coverage' },
+            { label: 'Overshooting Detector', href: '/overshooting-detector' },
+            { label: 'Change Impact Tracker', href: '/change-impact' },
+            { label: 'Radio Morning Report', href: '/radio-morning-report' },
         ],
     },
     {
         title: 'Configuration',
         links: [
             { label: 'Parameter Dictionary', href: '/parameter-dictionary' },
+            { label: 'Configuration Data Extractor', href: '/cm-extractor' },
+            { label: 'CM Parameter Audit', href: '/cm-parameter-audit' },
             { label: 'XML Parser', href: '/xml-parser' },
             { label: 'XML Generator', href: '/excel-generator' },
             { label: 'NE Comparison', href: '/ne-comparison' },
             { label: 'Config Task Scheduler', href: '/config-task-scheduler' },
             { label: 'Config History', href: '/config-history' },
             { label: 'Network Management', href: '/network-management' },
+            { label: 'RAN Feature Library', href: '/ran-features' },
             { label: 'Drive Test Viewer', href: '/drive-test-viewer' },
         ],
     },
@@ -87,8 +107,70 @@ function _preferredTheme() {
     try {
         const saved = localStorage.getItem(THEME_STORAGE_KEY);
         if (saved === 'dark' || saved === 'light') return saved;
+        const legacy = localStorage.getItem('darkMode');
+        if (legacy === 'true') return 'dark';
+        if (legacy === 'false') return 'light';
     } catch (_) { /* ignore */ }
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function _chartThemeColors(theme) {
+    if (theme === 'dark') {
+        return {
+            text: '#b8c4d6',
+            grid: 'rgba(148, 163, 184, 0.12)',
+            zero: 'rgba(148, 163, 184, 0.2)',
+            legend: '#d8e2ef',
+        };
+    }
+    return {
+        text: '#6d7f92',
+        grid: 'rgba(127, 166, 194, 0.16)',
+        zero: 'rgba(127, 166, 194, 0.28)',
+        legend: '#2c3e50',
+    };
+}
+
+function _applyScaleTheme(scale, colors) {
+    if (!scale || typeof scale !== 'object') return;
+    scale.ticks = scale.ticks || {};
+    scale.grid = scale.grid || {};
+    scale.ticks.color = colors.text;
+    scale.grid.color = colors.grid;
+    scale.grid.borderColor = colors.zero;
+}
+
+function _syncChartTheme(theme) {
+    if (!window.Chart) return;
+    const colors = _chartThemeColors(theme);
+    try {
+        Chart.defaults.color = colors.text;
+        Chart.defaults.borderColor = colors.grid;
+        if (Chart.defaults.plugins && Chart.defaults.plugins.legend) {
+            Chart.defaults.plugins.legend.labels = Chart.defaults.plugins.legend.labels || {};
+            Chart.defaults.plugins.legend.labels.color = colors.legend;
+        }
+    } catch (_) { /* ignore Chart.js version differences */ }
+
+    const instances = Chart.instances
+        ? (typeof Chart.instances.forEach === 'function'
+            ? Array.from(Chart.instances.values())
+            : Object.values(Chart.instances))
+        : [];
+    instances.forEach((chart) => {
+        if (!chart || !chart.options) return;
+        const scales = chart.options.scales || {};
+        Object.keys(scales).forEach((key) => _applyScaleTheme(scales[key], colors));
+        if (chart.options.plugins && chart.options.plugins.legend) {
+            chart.options.plugins.legend.labels = chart.options.plugins.legend.labels || {};
+            chart.options.plugins.legend.labels.color = colors.legend;
+        }
+        try {
+            chart.update('none');
+        } catch (_) {
+            try { chart.update(); } catch (__) { /* ignore */ }
+        }
+    });
 }
 
 function _applyTheme(theme) {
@@ -97,6 +179,7 @@ function _applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', t);
     try {
         localStorage.setItem(THEME_STORAGE_KEY, t);
+        localStorage.setItem('darkMode', t === 'dark' ? 'true' : 'false');
     } catch (_) { /* ignore */ }
     const btn = document.getElementById('dark-mode-btn');
     if (btn) {
@@ -104,6 +187,8 @@ function _applyTheme(theme) {
         btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
         btn.title = t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
     }
+    _syncChartTheme(t);
+    document.dispatchEvent(new CustomEvent('primenet:theme-change', { detail: { theme: t } }));
 }
 
 function toggleDarkMode() {
@@ -127,7 +212,11 @@ function _ensureThemeToggle() {
     // `.map-header .header-right` container instead.
     const mount = document.querySelector('header .header-actions')
         || document.querySelector('header .header-right')
-        || document.querySelector('.map-header .header-right');
+        || document.querySelector('.map-header .header-right')
+        || document.querySelector('.ch-topbar .ch-topbar-actions')
+        || document.querySelector('.son-topbar .son-topbar-actions')
+        || document.querySelector('.nh-header .nh-header-right')
+        || document.querySelector('.nh-select-header');
     if (!mount) return;
     if (mount && mount.classList && mount.classList.contains('header-actions')) {
         btn.classList.add('btn-header', 'btn-header-outline');
@@ -160,7 +249,7 @@ function _buildFeatureNavPanel() {
                 <h3>Feature Navigation</h3>
                 <button type="button" id="feature-nav-close" class="feature-nav-close" aria-label="Close navigation">x</button>
             </div>
-            <div id="feature-nav-grid" class="feature-nav-grid"></div>
+            <div id="feature-nav-grid" class="feature-nav-grid" role="list"></div>
         </div>
     `;
 
@@ -169,7 +258,7 @@ function _buildFeatureNavPanel() {
         const block = document.createElement('section');
         block.className = 'feature-nav-section';
         const links = section.links
-            .map((item) => `<a href="${item.href}" class="feature-nav-link">${item.label}</a>`)
+            .map((item) => `<a href="${item.href}" class="feature-nav-link" role="listitem">${item.label}</a>`)
             .join('');
         block.innerHTML = `
             <h4>${section.title}</h4>
@@ -215,6 +304,17 @@ function _runFeatureNavTransition(direction, href) {
     setTimeout(() => {
         window.location.href = href;
     }, 420);
+}
+
+function _clearPageTransitionClasses() {
+    document.body.classList.remove(
+        'page-transition-out',
+        'page-transition-out-left',
+        'page-transition-out-right',
+        'page-transition-enter-from-left',
+        'page-transition-enter-from-right',
+        'page-transition-enter-active'
+    );
 }
 
 function _wirePageLinkTransitions() {
@@ -278,12 +378,29 @@ function _runPageEnterTransition() {
     setTimeout(done, 500);
 }
 
+function _wirePageTransitionRestoreGuards() {
+    window.addEventListener('pagehide', () => {
+        _clearPageTransitionClasses();
+    });
+
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted || document.body.classList.contains('page-transition-out')) {
+            _clearPageTransitionClasses();
+            document.dispatchEvent(new CustomEvent('primenet:page-enter-done'));
+        }
+    });
+}
+
 function _ensureFeatureNavButton() {
     if (_isDashboardPage() || _isPublicAuthPage()) return;
     if (document.getElementById('feature-nav-btn')) return;
     const headerContent = document.querySelector('header .header-content');
     const mapHeaderLeft = document.querySelector('.map-header .header-left');
-    const mount = headerContent || mapHeaderLeft;
+    const customTopbar = document.querySelector('.ch-topbar')
+        || document.querySelector('.son-topbar')
+        || document.querySelector('.nh-select-header')
+        || document.querySelector('.nh-header');
+    const mount = headerContent || mapHeaderLeft || customTopbar;
     if (!mount) return;
     const btn = document.createElement('button');
     btn.id = 'feature-nav-btn';
@@ -298,6 +415,7 @@ function _ensureFeatureNavButton() {
 
 document.addEventListener('DOMContentLoaded', () => {
     _runPageEnterTransition();
+    _wirePageTransitionRestoreGuards();
     _ensureBrandFavicon();
     _ensureFeatureNavButton();
     _wirePageLinkTransitions();

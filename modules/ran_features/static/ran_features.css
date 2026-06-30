@@ -193,8 +193,8 @@
 .ran-layout {
     display: flex;
     gap: 0;
-    height: calc(100vh - 210px);
-    min-height: 480px;
+    height: calc(100vh - 170px);
+    min-height: 680px;
 }
 
 .ran-sidebar {
@@ -208,6 +208,10 @@
     border-radius: 10px 0 0 10px;
     background: #f8fafc;
     overflow: hidden;
+    position: sticky;
+    top: 12px;
+    align-self: flex-start;
+    height: 100%;
 }
 
 .ran-search {
@@ -310,6 +314,54 @@
     display: none;
 }
 
+.ran-document-pane {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.ran-content-search {
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+    background: #fff;
+    padding: 10px 12px;
+    position: sticky;
+    top: 12px;
+    z-index: 2;
+}
+
+.ran-content-search-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d7dee8;
+    border-radius: 8px;
+    font-size: 0.9em;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.ran-content-search-input:focus {
+    border-color: #7fa6c2;
+    box-shadow: 0 0 0 3px rgba(127, 166, 194, 0.16);
+}
+
+.ran-content-search-count {
+    margin-top: 6px;
+    font-size: 0.78em;
+    color: #7f8c8d;
+}
+
+.ran-content-search-results {
+    margin-top: 8px;
+    max-height: 210px;
+    overflow-y: auto;
+    border: 1px solid #eef2f7;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
 .ran-search-item {
     display: block;
     width: 100%;
@@ -345,6 +397,14 @@
     line-height: 1.3;
 }
 
+.ran-search-snippet {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.76em;
+    color: #4b5563;
+    line-height: 1.35;
+}
+
 .ran-search-item mark {
     background: #fef08a;
     color: inherit;
@@ -355,6 +415,7 @@
 .ran-frame {
     flex: 1;
     min-width: 0;
+    min-height: 0;
     border: 1px solid #e0e0e0;
     border-radius: 0 10px 10px 0;
     background: #fff;
@@ -373,11 +434,18 @@
         max-height: 42vh;
         border-right: 1px solid #e0e0e0;
         border-radius: 10px 10px 0 0;
+        position: static;
+        height: auto;
     }
 
     .ran-frame {
         min-height: 50vh;
         border-radius: 0 0 10px 10px;
+    }
+
+    .ran-content-search {
+        border-left: 1px solid #e0e0e0;
+        position: static;
     }
 }
 
@@ -389,4 +457,72 @@
     .vendor-btn {
         min-width: 100%;
     }
+}
+
+body.dark-mode .vendor-gate,
+body.dark-mode .vendor-btn,
+body.dark-mode .ran-unavailable,
+body.dark-mode .ran-card,
+body.dark-mode .ran-sidebar,
+body.dark-mode .ran-content-search,
+body.dark-mode .ran-content-search-results {
+    background: #111b27 !important;
+    color: #e8edf3 !important;
+    border-color: #314257 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+}
+
+body.dark-mode .vendor-btn:hover,
+body.dark-mode .ran-card:hover:not(.ran-card-disabled),
+body.dark-mode .ran-search-item:hover {
+    background: #1b2b40 !important;
+}
+
+body.dark-mode .vendor-gate-title,
+body.dark-mode .vendor-label,
+body.dark-mode .ran-unavailable-title,
+body.dark-mode .ran-card-label,
+body.dark-mode .ran-bar-title,
+body.dark-mode .ran-tree-label,
+body.dark-mode .ran-search-name {
+    color: #eef3f8 !important;
+}
+
+body.dark-mode .vendor-gate-subtitle,
+body.dark-mode .ran-unavailable-text,
+body.dark-mode .ran-card-size,
+body.dark-mode .ran-result-count,
+body.dark-mode .ran-content-search-count,
+body.dark-mode .ran-search-path,
+body.dark-mode .ran-search-snippet,
+body.dark-mode .ran-tree-label-muted {
+    color: #a8b7c8 !important;
+}
+
+body.dark-mode .ran-search,
+body.dark-mode .ran-content-search-input,
+body.dark-mode .ran-result-count {
+    background: #162232 !important;
+    border-color: #314257 !important;
+}
+
+body.dark-mode .ran-search,
+body.dark-mode .ran-content-search-input {
+    background: #0f1a28 !important;
+    color: #eef3f8 !important;
+}
+
+body.dark-mode .ran-search-item {
+    color: #e8edf3 !important;
+    border-bottom-color: #314257 !important;
+}
+
+body.dark-mode .ran-search-item.active,
+body.dark-mode .ran-tree-label.active {
+    background: #173456 !important;
+    color: #9fd0ff !important;
+}
+
+body.dark-mode .ran-tree-toggle {
+    color: #a8b7c8 !important;
 }

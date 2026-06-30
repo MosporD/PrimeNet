@@ -601,6 +601,10 @@
 
         const prefix = seriesLabel || (key === 'hourly' ? 'Hourly' : 'Daily');
         const ctx = canvas.getContext('2d');
+        const dark = document.body?.classList?.contains('dark-mode');
+        const tickColor = dark ? '#a9b7c9' : '#6d95b3';
+        const gridColor = dark ? 'rgba(148, 163, 184, 0.12)' : '#e3edf5';
+        const legendColor = dark ? '#d8e2ef' : '#2c3e50';
         state.charts[key] = new Chart(ctx, {
             type: 'line',
             data: {
@@ -635,17 +639,17 @@
                 plugins: {
                     legend: {
                         display: true,
-                        labels: { color: '#2c3e50', boxWidth: 14, font: { size: 11 } },
+                        labels: { color: legendColor, boxWidth: 14, font: { size: 11 } },
                     },
                 },
                 scales: {
                     x: {
-                        ticks: { color: '#6d95b3', maxTicksLimit: 8, font: { size: 10 } },
-                        grid: { color: '#e3edf5' },
+                        ticks: { color: tickColor, maxTicksLimit: 8, font: { size: 10 } },
+                        grid: { color: gridColor },
                     },
                     y: {
-                        ticks: { color: '#6d95b3', font: { size: 10 } },
-                        grid: { color: '#e3edf5' },
+                        ticks: { color: tickColor, font: { size: 10 } },
+                        grid: { color: gridColor },
                     },
                 },
             },

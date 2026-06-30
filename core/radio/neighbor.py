@@ -9,14 +9,14 @@ import sqlite3
 from modules.network_map.neighbor_raw_linking import build_raw_neighbor_lines
 from modules.network_map.routes import (
     _resolve_huawei_neighbor_export_table,
-    _resolve_raw_neighbor_table_for_vendor,
+    _resolve_raw_neighbor_tables_for_vendor,
 )
 from sync_config import HUAWEI_NEIGHBOR_RAW_DB, NEIGHBOR_KPI_DB
 
 from .scoring import bounded_score, issue
 
 
-TECHNOLOGIES = ["2G-2G", "3G-3G", "4G-4G Intra-eNB", "4G-4G Inter-eNB"]
+TECHNOLOGIES = ["2G-2G", "3G-3G", "4G-4G"]
 
 
 def haversine_km(lat1: float, lng1: float, lat2: float, lng2: float) -> float:
@@ -38,23 +38,28 @@ def _load_vendor_lines(vendor: str, technology: str, *, min_attempts: float, max
     conn.row_factory = sqlite3.Row
     try:
         if vendor == "huawei":
-            table = _resolve_huawei_neighbor_export_table(conn, technology)
+            tables = [_resolve_huawei_neighbor_export_table(conn, technology)]
         else:
-            table = _resolve_raw_neighbor_table_for_vendor(conn, technology, vendor)
-        if not table:
+            tables = _resolve_raw_neighbor_tables_for_vendor(conn, technology, vendor)
+        tables = [t for t in tables if t]
+        if not tables:
             return []
-        lines, _skipped, _candidates, _period, _msg = build_raw_neighbor_lines(
-            neighbor_conn=conn,
-            raw_table=table,
-            technology=technology,
-            vendor=vendor,
-            cell_norm="",
-            site_id_filter="",
-            min_attempts=min_attempts,
-            max_lines=max_lines,
-            max_scan_rows=max(max_lines * 50, 8000),
-        )
-        return lines
+        out: list[dict] = []
+        per_table = max(50, max_lines // len(tables))
+        for table in tables:
+            lines, _skipped, _candidates, _period, _msg = build_raw_neighbor_lines(
+                neighbor_conn=conn,
+                raw_table=table,
+                technology=technology,
+                vendor=vendor,
+                cell_norm="",
+                site_id_filter="",
+                min_attempts=min_attempts,
+                max_lines=per_table,
+                max_scan_rows=max(per_table * 50, 8000),
+            )
+            out.extend(lines)
+        return out[:max_lines]
     finally:
         conn.close()
 

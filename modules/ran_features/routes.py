@@ -7,7 +7,7 @@ from functools import wraps
 
 from database_enhanced import get_user_by_session
 from .hdx import HDX_DIR, TECH_FILES, get_home_page, read_file, guess_mimetype
-from .navi import get_navi_payload
+from .navi import get_navi_payload, search_docs, warm_search_index
 
 ran_features_bp = Blueprint(
     "ran_features",
@@ -67,7 +67,36 @@ def ran_features_toc(tech):
     if not os.path.isfile(hdx_path):
         return jsonify({"error": "Documentation not available"}), 404
     payload = get_navi_payload(tech)
+    warm_search_index(tech)
     return jsonify({"success": True, "tech": tech, **payload})
+
+
+@ran_features_bp.route("/api/ran-features/search/<tech>")
+def ran_features_search(tech):
+    user = _current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    tech = tech.lower().strip()
+    if tech not in TECH_FILES:
+        return jsonify({"error": "Not found"}), 404
+
+    query = (request.args.get("q") or "").strip()
+    try:
+        limit = int(request.args.get("limit", "100"))
+    except ValueError:
+        limit = 100
+
+    if len(query) < 2:
+        return jsonify({"success": True, "tech": tech, "query": query, "results": [], "total": 0})
+
+    results = search_docs(tech, query, limit=limit)
+    return jsonify({
+        "success": True,
+        "tech": tech,
+        "query": query,
+        "results": results,
+        "total": len(results),
+    })
 
 
 @ran_features_bp.route("/ran-features/open/<tech>")

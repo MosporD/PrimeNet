@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet - Fault Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.1">
+    <link rel="stylesheet" href="{{ url_for('fault_management.static', filename='fault_management.css') }}?v=1.0">
+</head>
+<body class="fault-management-page">
+    <div class="container fm-container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">← Dashboard</a>
+                    <h1>Fault Management</h1>
+                    <p>Live OSS alarm visibility for Huawei U2000 and Nokia NetAct.</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content fm-main">
+            <section class="fm-panel">
+                <div class="fm-panel-head">
+                    <div>
+                        <h2>Alarm Request</h2>
+                        <p>
+                            Select the OSS, network element, alarm type, and period before requesting alarms.
+                        </p>
+                    </div>
+                    <button type="button" class="fm-primary-btn" id="fm-refresh-btn">Query Faults</button>
+                </div>
+
+                {% if not huawei_configured %}
+                <div class="fm-alert">
+                    Huawei U2000 northbound credentials are not fully configured. Set
+                    <code>HUAWEI_CM_HOST</code>, <code>HUAWEI_CM_USER</code>,
+                    and <code>HUAWEI_CM_PASSWORD</code> in <code>.env</code>.
+                </div>
+                {% endif %}
+
+                <input type="hidden" id="fm-vendor" value="huawei">
+                <div class="fm-vendor-tabs" role="tablist" aria-label="Fault Management OSS">
+                    <button type="button" class="fm-vendor-tab active" data-vendor="huawei" role="tab" aria-selected="true">
+                        <span class="fm-vendor-name">Huawei U2000</span>
+                    </button>
+                    <button type="button" class="fm-vendor-tab" data-vendor="nokia" role="tab" aria-selected="false">
+                        <span class="fm-vendor-name">Nokia NetAct</span>
+                    </button>
+                </div>
+
+                <div class="fm-toolbar" role="region" aria-label="Fault alarm request filters">
+                    <label>
+                        Alarm Type
+                        <select id="fm-data-type">
+                            <option value="CURRENT" selected>Current</option>
+                            <option value="HISTORY">History</option>
+                        </select>
+                    </label>
+                    <label>
+                        Network Element
+                        <input id="fm-ne-name" type="search" placeholder="All NEs or exact NE name">
+                    </label>
+                    <label>
+                        Period
+                        <select id="fm-period">
+                            <option value="1">Last 1 hour</option>
+                            <option value="6">Last 6 hours</option>
+                            <option value="24" selected>Last 24 hours</option>
+                            <option value="72">Last 3 days</option>
+                            <option value="168">Last 7 days</option>
+                            <option value="custom">Custom range</option>
+                        </select>
+                    </label>
+                    <label class="fm-custom-period" hidden>
+                        From
+                        <input id="fm-start-time" type="datetime-local">
+                    </label>
+                    <label class="fm-custom-period" hidden>
+                        To
+                        <input id="fm-end-time" type="datetime-local">
+                    </label>
+                    <label>
+                        Limit
+                        <select id="fm-limit">
+                            <option value="100">100</option>
+                            <option value="200" selected>200</option>
+                            <option value="500">500</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="fm-status" id="fm-status">Query to load FM alarms.</div>
+                <div class="fm-table-wrap" id="fm-table-wrap" hidden></div>
+            </section>
+        </main>
+
+        <div class="fm-info-modal" id="fm-info-modal" hidden role="dialog" aria-modal="true" aria-labelledby="fm-info-title">
+            <div class="fm-info-card">
+                <div class="fm-info-head">
+                    <div>
+                        <h3 id="fm-info-title">Alarm details</h3>
+                        <p id="fm-info-subtitle"></p>
+                    </div>
+                    <button type="button" class="fm-info-close" data-fm-info-close aria-label="Close alarm details">&times;</button>
+                </div>
+                <div class="fm-info-body" id="fm-info-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.7"></script>
+    <script src="{{ url_for('fault_management.static', filename='fault_management.js') }}?v=1.1"></script>
+    <script>
+    async function logout() {
+        if (confirm('Logout?')) {
+            try { await fetch('/api/logout', { method: 'POST' }); } catch (_) {}
+            window.location.href = '/login';
+        }
+    }
+    </script>
+</body>
+</html>

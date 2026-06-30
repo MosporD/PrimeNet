@@ -33,7 +33,7 @@ let perfPreferredPmViewMode = 'charts';
 let perfPmViewPrefPromise = null;
 let performanceFilterPresets = [];
 
-/** Hourly chart view: chronological trend vs day-over-day (same hour-of-day across days). */
+/** Chart view: trend, hourly day-over-day, or daily month-over-month. */
 let perfChartDisplayMode = 'trend';
 let perfDodSelectedDateSet = new Set();
 let perfDodPickerSig = '';
@@ -457,11 +457,24 @@ function _dateKeyLocal(d) {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+function _monthKeyLocal(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
 function _uniqueSortedDateKeysFromTrend(trend) {
     const set = new Set();
     (trend || []).forEach((row) => {
         const d = _parseTrendRowMoment(row);
         if (d) set.add(_dateKeyLocal(d));
+    });
+    return [...set].sort();
+}
+
+function _uniqueSortedMonthKeysFromTrend(trend) {
+    const set = new Set();
+    (trend || []).forEach((row) => {
+        const d = _parseTrendRowMoment(row);
+        if (d) set.add(_monthKeyLocal(d));
     });
     return [...set].sort();
 }
@@ -474,10 +487,26 @@ function _isDodChartMode() {
     return perfChartDisplayMode === 'dod' && _currentDataScope() === 'hourly';
 }
 
+function _isMomChartMode() {
+    return perfChartDisplayMode === 'mom' && _currentDataScope() === 'daily';
+}
+
+function _isPeriodCompareChartMode() {
+    return _isDodChartMode() || _isMomChartMode();
+}
+
 function _dodHourCategoryLabels() {
     const labels = [];
     for (let h = 0; h < 24; h++) {
         labels.push(`${String(h).padStart(2, '0')}:00`);
+    }
+    return labels;
+}
+
+function _momDayCategoryLabels() {
+    const labels = [];
+    for (let d = 1; d <= 31; d++) {
+        labels.push(String(d).padStart(2, '0'));
     }
     return labels;
 }
@@ -512,10 +541,41 @@ function _buildDodDatasetsForKpi(trend, def) {
     return { labels, datasets };
 }
 
-function _populatePerfDodDayCheckboxes(trend) {
+function _buildMomDatasetsForKpi(trend, def) {
+    const sel = _perfDodSelectedDateKeysArray();
+    const labels = _momDayCategoryLabels();
+    const datasets = [];
+    sel.forEach((mk, mi) => {
+        const byDay = Array(31).fill(null);
+        (trend || []).forEach((row) => {
+            const d = _parseTrendRowMoment(row);
+            if (!d || _monthKeyLocal(d) !== mk) return;
+            const v = _toNumericOrNull(row[def.key]);
+            byDay[d.getDate() - 1] = v;
+        });
+        const color = _CHART_COLORS[mi % _CHART_COLORS.length];
+        datasets.push({
+            label: mk,
+            data: byDay,
+            borderColor: color,
+            backgroundColor: color + '18',
+            pointBackgroundColor: color,
+            pointRadius: 2,
+            pointHoverRadius: 4,
+            borderWidth: 2,
+            tension: 0.25,
+            spanGaps: true,
+            fill: false,
+        });
+    });
+    return { labels, datasets };
+}
+
+function _populatePerfPeriodCheckboxes(trend) {
     const wrap = document.getElementById('perf-dod-days');
     if (!wrap) return;
-    const keys = _uniqueSortedDateKeysFromTrend(trend);
+    const mom = _isMomChartMode();
+    const keys = mom ? _uniqueSortedMonthKeysFromTrend(trend) : _uniqueSortedDateKeysFromTrend(trend);
     const sig = keys.join('|');
     if (perfDodPickerNeedsReset || sig !== perfDodPickerSig) {
         perfDodPickerNeedsReset = false;
@@ -541,12 +601,23 @@ function _readPerfDodSelectionsFromDom() {
 }
 
 function _syncPerfDodRadiosFromState() {
+    const scope = _currentDataScope();
+    if ((perfChartDisplayMode === 'dod' && scope !== 'hourly') || (perfChartDisplayMode === 'mom' && scope !== 'daily')) {
+        perfChartDisplayMode = 'trend';
+    }
     document.querySelectorAll('input[name="perf-chart-display"]').forEach((el) => {
         el.checked = el.value === perfChartDisplayMode;
     });
+    document.querySelectorAll('[data-chart-mode-option]').forEach((el) => {
+        const mode = String(el.getAttribute('data-chart-mode-option') || '');
+        const visible = mode === 'trend' || (mode === 'dod' && scope === 'hourly') || (mode === 'mom' && scope === 'daily');
+        el.style.display = visible ? '' : 'none';
+    });
+    const label = document.getElementById('perf-chart-display-label');
+    if (label) label.textContent = scope === 'daily' ? 'Daily charts' : 'Hourly charts';
     const daysWrap = document.getElementById('perf-dod-days-wrap');
     if (daysWrap) {
-        daysWrap.style.display = perfChartDisplayMode === 'dod' ? 'flex' : 'none';
+        daysWrap.style.display = _isPeriodCompareChartMode() ? 'flex' : 'none';
     }
 }
 
@@ -559,11 +630,11 @@ function _wirePerfDodBarOnce() {
         const t = e.target;
         if (!t) return;
         if (t.name === 'perf-chart-display') {
-            perfChartDisplayMode = t.value === 'dod' ? 'dod' : 'trend';
+            perfChartDisplayMode = t.value === 'dod' || t.value === 'mom' ? t.value : 'trend';
             _syncPerfDodRadiosFromState();
             if (Array.isArray(lastTrendData?.trend) && lastTrendData.trend.length) {
-                if (perfChartDisplayMode === 'dod') {
-                    _populatePerfDodDayCheckboxes(lastTrendData.trend);
+                if (_isPeriodCompareChartMode()) {
+                    _populatePerfPeriodCheckboxes(lastTrendData.trend);
                 }
                 renderAllCharts(lastTrendData.trend);
             }
@@ -587,16 +658,16 @@ function _syncPerfDodBar() {
     const tView = document.getElementById('pm-table-view');
     const chartsHidden = tView && tView.style.display === 'none';
     const trend = lastTrendData?.trend;
-    const hourly = _currentDataScope() === 'hourly';
-    if (!chartsHidden || !hourly || !Array.isArray(trend) || !trend.length || !chartTabs.length) {
+    const scope = _currentDataScope();
+    if (!chartsHidden || !['hourly', 'daily'].includes(scope) || !Array.isArray(trend) || !trend.length || !chartTabs.length) {
         bar.style.display = 'none';
         return;
     }
     bar.style.display = 'flex';
     _wirePerfDodBarOnce();
     _syncPerfDodRadiosFromState();
-    if (perfChartDisplayMode === 'dod') {
-        _populatePerfDodDayCheckboxes(trend);
+    if (_isPeriodCompareChartMode()) {
+        _populatePerfPeriodCheckboxes(trend);
         _readPerfDodSelectionsFromDom();
     }
 }
@@ -616,16 +687,42 @@ function _perfTooltipTitleDod(items) {
     return `${lab} ${hh}:00`;
 }
 
+function _perfTooltipTitleMom(items) {
+    if (!items.length) return '';
+    const ds = items[0].dataset;
+    const lab = ds && ds.label ? String(ds.label) : '';
+    const day = String(items[0].dataIndex + 1).padStart(2, '0');
+    return `${lab}-${day}`;
+}
+
+function _perfChartTheme() {
+    const dark = document.body?.classList?.contains('dark-mode');
+    return dark
+        ? { tick: '#a9b7c9', grid: 'rgba(148, 163, 184, 0.12)' }
+        : { tick: '#6d7f92', grid: 'rgba(127, 166, 194, 0.16)' };
+}
+
+function _perfChartYScaleOptions(extra = {}) {
+    const theme = _perfChartTheme();
+    return {
+        ticks: { color: theme.tick, font: { size: 10 } },
+        grid: { color: theme.grid },
+        ...extra,
+    };
+}
+
 function _perfChartXScaleOptions(trend, isDod) {
     const n = Array.isArray(trend) ? trend.length : 0;
+    const theme = _perfChartTheme();
     return {
         ticks: {
+            color: theme.tick,
             maxTicksLimit: isDod ? 24 : Math.min(24, Math.max(10, Math.ceil(n / 6) || 10)),
             font: { size: isDod ? 9 : 10, lineHeight: 1.25 },
             maxRotation: 0,
             autoSkip: !isDod,
         },
-        grid: { color: '#f5f6fa' },
+        grid: { color: theme.grid },
     };
 }
 
@@ -638,7 +735,6 @@ async function loadFilters() {
     await loadKpiColumns();
     await loadCellGroups();
     await loadPerformanceReports();
-    await loadPerformanceFilterPresets();
 
     const res  = await fetch('/api/performance/filters');
     const data = await res.json();
@@ -648,7 +744,6 @@ async function loadFilters() {
     allClusters = data.clusters || [];
     allAreas    = data.areas    || [];
 
-    // Clusters (numeric)
     _populateClusters(allClusters);
     _populateAreas(allAreas);
     _populateSites(allSites);
@@ -1170,8 +1265,7 @@ async function onVendorChange() {
     lastQueryCellKeys = [];
     hwCurrentScopedCellNames = [];
     hwCurrentScopedGroupRefs = [];
-    const addBtn = document.getElementById('btn-add-charts');
-    if (addBtn) addBtn.style.display = 'none';
+    _setPerfChartChoiceVisible(false);
 
     await loadKpiColumns();
     await loadCellGroups();
@@ -1334,6 +1428,7 @@ function _resetPerfChartStateForNewScope() {
     if (exportBtn) exportBtn.style.display = 'none';
     const title = document.getElementById('charts-title');
     if (title) title.textContent = _perfDefaultChartsTitle();
+    _setPerfChartChoiceVisible(false);
     const noSel = document.getElementById('no-selection');
     if (noSel) noSel.style.display = 'flex';
     const loading = document.getElementById('loading-charts');
@@ -1358,6 +1453,16 @@ function _perfQueryUserMessage(msg) {
     const catStrip = document.getElementById('perf-kpi-category-tabs-strip');
     if (catBar) catBar.style.display = 'none';
     if (catStrip) catStrip.innerHTML = '';
+}
+
+function _setPerfChartChoiceVisible(visible) {
+    const display = visible ? 'inline-flex' : 'none';
+    const addBtn = document.getElementById('btn-add-charts');
+    const customBtn = document.getElementById('btn-custom-chart');
+    const choiceBar = document.getElementById('perf-chart-choice-bar');
+    if (addBtn) addBtn.style.display = display;
+    if (customBtn) customBtn.style.display = display;
+    if (choiceBar) choiceBar.style.display = visible ? 'flex' : 'none';
 }
 
 async function maybeAutoReloadCells() {
@@ -1464,8 +1569,7 @@ async function runPerformanceQuery() {
         hwCurrentScopedCellNames = await _resolveCellNamesFromQueryKeys(keys, selectionType, v, t);
     }
 
-    const addBtn = document.getElementById('btn-add-charts');
-    if (addBtn) addBtn.style.display = 'inline-flex';
+    _setPerfChartChoiceVisible(true);
 
     const compareBtn = document.getElementById('btn-compare-charts');
     if (compareBtn) {
@@ -1475,7 +1579,7 @@ async function runPerformanceQuery() {
     }
 
     switchViewMode('table');
-    _perfQueryUserMessage(`Loaded ${keys.length} selected object(s). Use "+ Add Charts" to visualize.`);
+    _perfQueryUserMessage(`Loaded ${keys.length} selected object(s). Choose Template Charts or Add Chart to visualize.`);
     const noSel = document.getElementById('no-selection');
     if (noSel) noSel.style.display = 'none';
 }
@@ -1496,6 +1600,8 @@ async function addChartsFromLastQuery() {
     if (wrap) wrap.style.display = 'none';
     const loading = document.getElementById('loading-charts');
     if (loading) loading.style.display = 'flex';
+    const choiceBar = document.getElementById('perf-chart-choice-bar');
+    if (choiceBar) choiceBar.style.display = 'none';
 
     chartTabs = [];
     activeChartTabId = null;
@@ -1699,8 +1805,8 @@ async function applyFilters(opts = {}) {
     const vendor  = document.getElementById('filter-vendor').value;
     const tech    = document.getElementById('filter-tech').value;
     const selectionType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
-    const cluster = document.getElementById('filter-cluster').value;
-    const area    = document.getElementById('filter-area').value;
+    const cluster = document.getElementById('filter-cluster')?.value || '';
+    const area    = document.getElementById('filter-area')?.value || '';
     const site    = document.getElementById('filter-site').value;
     const cell    = document.getElementById('filter-cell').value;
 
@@ -2527,8 +2633,8 @@ function _renderOneKpiChartWithOptions(canvasId, def, trend, chartType) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
 
-    const dod = _isDodChartMode();
-    if (dod) {
+    const compareMode = _isPeriodCompareChartMode();
+    if (compareMode) {
         _readPerfDodSelectionsFromDom();
         if (!_perfDodSelectedDateKeysArray().length) return;
     }
@@ -2550,8 +2656,11 @@ function _renderOneKpiChartWithOptions(canvasId, def, trend, chartType) {
     const ctx = canvas.getContext('2d');
 
     try {
-        if (dod) {
-            const { labels, datasets } = _buildDodDatasetsForKpi(trend, def);
+        if (compareMode) {
+            const mom = _isMomChartMode();
+            const { labels, datasets } = mom
+                ? _buildMomDatasetsForKpi(trend, def)
+                : _buildDodDatasetsForKpi(trend, def);
             if (!datasets.length) return;
 
             charts[canvasId] = new Chart(ctx, {
@@ -2568,20 +2677,20 @@ function _renderOneKpiChartWithOptions(canvasId, def, trend, chartType) {
                         },
                         tooltip: {
                             callbacks: {
-                                title: items => _perfTooltipTitleDod(items),
+                                title: items => mom ? _perfTooltipTitleMom(items) : _perfTooltipTitleDod(items),
                                 label: (ctx) => {
                                     const v = ctx.parsed.y;
-                                    const day = ctx.dataset.label || '';
+                                    const period = ctx.dataset.label || '';
                                     return v !== null
-                                        ? `${day} · ${def.label}: ${Number(v).toFixed(2)}${def.unit ? ' ' + def.unit : ''}`
+                                        ? `${period} · ${def.label}: ${Number(v).toFixed(2)}${def.unit ? ' ' + def.unit : ''}`
                                         : 'N/A';
                                 },
                             },
                         },
                     },
                     scales: {
-                        x: _perfChartXScaleOptions(trend, true),
-                        y: { ticks: { font: { size: 10 } }, grid: { color: '#f5f6fa' } },
+                        x: _perfChartXScaleOptions(trend, !mom),
+                        y: _perfChartYScaleOptions(),
                     },
                 },
             });
@@ -2632,7 +2741,7 @@ function _renderOneKpiChartWithOptions(canvasId, def, trend, chartType) {
                 },
                 scales: {
                     x: _perfChartXScaleOptions(trend, false),
-                    y: { ticks: { font: { size: 10 } }, grid: { color: '#f5f6fa' } },
+                    y: _perfChartYScaleOptions(),
                 },
             },
         });
@@ -2691,10 +2800,12 @@ function renderAllCharts(trend) {
     const chartType = 'line';
     const renderSeq = ++_perfChartRenderSeq;
 
-    if (_isDodChartMode()) {
+    if (_isPeriodCompareChartMode()) {
         _readPerfDodSelectionsFromDom();
         if (!_perfDodSelectedDateKeysArray().length) {
-            wrap.innerHTML = '<p class="perf-dod-empty">Select at least one day in <strong>Compare days</strong> to plot DOD charts.</p>';
+            const noun = _isMomChartMode() ? 'month' : 'day';
+            const label = _isMomChartMode() ? 'MOM' : 'DOD';
+            wrap.innerHTML = `<p class="perf-dod-empty">Select at least one ${noun} to plot ${label} charts.</p>`;
             document.getElementById('loading-charts').style.display = 'none';
             wrap.style.display = 'grid';
             _syncPerfDodBar();
@@ -2893,7 +3004,8 @@ function switchViewMode(mode) {
         if (chartTabs.length && activeChartTabId) {
             switchPerfChartTab(activeChartTabId);
         } else if (lastQueryCellKeys.length && !chartTabs.length) {
-            addChartsFromLastQuery();
+            _perfQueryUserMessage('Choose Template Charts or Add Chart to visualize this query.');
+            _setPerfChartChoiceVisible(true);
         } else if (activeCellId && cWrap) {
             cWrap.style.display = 'grid';
             if (noSel) noSel.style.display = 'none';
@@ -3053,8 +3165,7 @@ async function onDataScopeChange() {
     lastQueryCellKeys = [];
     hwCurrentScopedCellNames = [];
     hwCurrentScopedGroupRefs = [];
-    const addBtn = document.getElementById('btn-add-charts');
-    if (addBtn) addBtn.style.display = 'none';
+    _setPerfChartChoiceVisible(false);
     await loadKpiHeaderMap();
     await loadKpiColumns();
     await loadCellGroups();
@@ -3356,12 +3467,11 @@ function renderCompareCharts(payload) {
                         },
                     },
                     scales: {
-                        x: { ticks: { font: { size: 10 }, maxRotation: 0, autoSkip: true } },
-                        y: {
-                            ticks: { font: { size: 10 } },
-                            grid: { color: '#f5f6fa' },
-                            ...(normalize ? { suggestedMin: 0, suggestedMax: 1 } : {}),
+                        x: {
+                            ticks: { color: _perfChartTheme().tick, font: { size: 10 }, maxRotation: 0, autoSkip: true },
+                            grid: { color: _perfChartTheme().grid },
                         },
+                        y: _perfChartYScaleOptions(normalize ? { suggestedMin: 0, suggestedMax: 1 } : {}),
                     },
                 },
             });

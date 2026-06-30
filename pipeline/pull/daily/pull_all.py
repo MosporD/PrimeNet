@@ -3,24 +3,32 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import argparse
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 
-def _run(path_parts: list[str]) -> int:
+def _run(path_parts: list[str], category: str | None = None) -> int:
     script = os.path.join(PROJECT_ROOT, *path_parts)
     env = os.environ.copy()
     env["RAW_PULL_AUTO_LOAD"] = "0"
-    proc = subprocess.run([sys.executable, script], cwd=PROJECT_ROOT, env=env)
+    cmd = [sys.executable, script]
+    if category:
+        cmd.extend(["--category", category])
+    proc = subprocess.run(cmd, cwd=PROJECT_ROOT, env=env)
     return int(proc.returncode or 0)
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Daily pull wrapper")
+    parser.add_argument("--category", choices=["cells", "groups"])
+    args = parser.parse_args()
+
     for parts in (
         ["pipeline", "pull", "nokia", "all", "daily", "pull_all.py"],
         ["pipeline", "pull", "huawei", "all", "daily", "pull_all.py"],
     ):
-        rc = _run(parts)
+        rc = _run(parts, args.category)
         if rc != 0:
             return rc
     return 0

@@ -278,21 +278,20 @@ def run_manual_category_sync(category: str):
     project_root = _PROJECT_ROOT
     pull_script = os.path.join('pipeline', 'pull', 'hourly', 'pull_all.py')
     load_script = os.path.join('pipeline', 'load', 'hourly', 'load_all.py')
+    pull_args: list[str] = []
     load_args: list[str] = []
     is_daily = False
     sync_type = category.replace('-', '_')
     if category.endswith('daily'):
         pull_script = os.path.join('pipeline', 'pull', 'daily', 'pull_all.py')
         load_script = os.path.join('pipeline', 'load', 'daily', 'load_all.py')
-        load_args = []
         is_daily = True
-    if category.startswith('cells-') and not is_daily:
+    if category.startswith('cells-'):
+        pull_args.extend(['--category', 'cells'])
         load_args.extend(['--category', 'cells'])
-    elif category.startswith('groups-') and not is_daily:
+    elif category.startswith('groups-'):
+        pull_args.extend(['--category', 'groups'])
         load_args.extend(['--category', 'groups'])
-    elif is_daily and not (category.startswith('cells-') or category.startswith('groups-')):
-        _log_sync('manual_category_sync', category, 'error', 0, 'Unknown category')
-        return
     else:
         _log_sync('manual_category_sync', category, 'error', 0, 'Unknown category')
         return
@@ -304,7 +303,7 @@ def run_manual_category_sync(category: str):
         return
 
     try:
-        pull_proc = subprocess.run([sys.executable, pull_path], cwd=project_root, capture_output=True, text=True)
+        pull_proc = subprocess.run([sys.executable, pull_path] + pull_args, cwd=project_root, capture_output=True, text=True)
         if pull_proc.stdout:
             logger.info('%s pull stdout:\n%s', category, pull_proc.stdout.strip())
         if pull_proc.stderr:

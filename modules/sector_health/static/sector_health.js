@@ -10,6 +10,25 @@ const SH_BAND_COLOR = '#6c3483';
 const SH_OTHER_LTE_COLOR = '#dfe6e9';
 const SH_OTHER_LTE_BORDER = '#bdc3c7';
 
+function shDarkMode() {
+    return document.body.classList.contains('dark-mode');
+}
+
+function shPieColors() {
+    if (!shDarkMode()) {
+        return {
+            band: SH_BAND_COLOR,
+            other: SH_OTHER_LTE_COLOR,
+            border: ['#512e5f', SH_OTHER_LTE_BORDER],
+        };
+    }
+    return {
+        band: '#b59cff',
+        other: '#334155',
+        border: ['#d7caff', '#64748b'],
+    };
+}
+
 const SH_PIE_OPTIONS = {
     responsive: true,
     maintainAspectRatio: true,
@@ -53,6 +72,7 @@ function createLteBandPie(canvasId, bandLabel, withBand, withoutBand) {
     const has = Math.max(0, Number(withBand) || 0);
     const other = Math.max(0, Number(withoutBand) || 0);
     const total = has + other;
+    const colors = shPieColors();
 
     if (_charts[canvasId]) {
         _charts[canvasId].destroy();
@@ -71,8 +91,8 @@ function createLteBandPie(canvasId, bandLabel, withBand, withoutBand) {
             labels: [`With ${bandLabel}`, 'Other LTE'],
             datasets: [{
                 data: [has, other],
-                backgroundColor: [SH_BAND_COLOR, SH_OTHER_LTE_COLOR],
-                borderColor: ['#512e5f', SH_OTHER_LTE_BORDER],
+                backgroundColor: [colors.band, colors.other],
+                borderColor: colors.border,
                 borderWidth: 1,
             }],
         },
@@ -113,8 +133,11 @@ function renderSummary(data) {
     const lteLayers = hs.lte_layer_pct || [];
     const excluded = (data.lte_excluded_bands || []).join(', ');
 
-    const ratCountsHtml = ['2G', '3G', '5G'].map((rat) => {
-        const n = (ratCounts[rat] || {}).sector_count ?? 0;
+    const ratCards = ['2G', '3G', 'LTE', '5G'].map((rat) => {
+        const n = rat === 'LTE' ? lteTotal : ((ratCounts[rat] || {}).sector_count ?? 0);
+        return { rat, n };
+    });
+    const ratCountsHtml = ratCards.map(({ rat, n }) => {
         return `
         <div class="sh-count-box">
             <div class="sh-count-value">${n.toLocaleString()}</div>
@@ -154,7 +177,7 @@ function renderSummary(data) {
         </div>
         ${excludedNote}
         <div class="sh-summary-block">
-            <div class="sh-summary-heading">2G / 3G / 5G — sector count</div>
+            <div class="sh-summary-heading">2G / 3G / LTE / 5G — sector count</div>
             <div class="sh-counts-row">${ratCountsHtml}</div>
         </div>
         <div class="sh-summary-block sh-summary-block--lte">
@@ -236,4 +259,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sh-rat')?.addEventListener('change', scheduleLoad);
     document.getElementById('sh-search')?.addEventListener('input', scheduleLoad);
     loadSectorHealth();
+});
+
+document.addEventListener('primenet:theme-change', () => {
+    const colors = shPieColors();
+    Object.values(_charts).forEach((chart) => {
+        if (!chart?.data?.datasets?.[0]) return;
+        chart.data.datasets[0].backgroundColor = [colors.band, colors.other];
+        chart.data.datasets[0].borderColor = colors.border;
+        try { chart.update('none'); } catch (_) { chart.update(); }
+    });
 });

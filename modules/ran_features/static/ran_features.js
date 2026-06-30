@@ -20,6 +20,10 @@ let ranSearchTimer = null;
 
 let ranVendor = '';
 
+let ranSearchRequest = 0;
+
+let ranContentSearchTimer = null;
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -93,6 +97,22 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(ranSearchTimer);
 
             ranSearchTimer = setTimeout(renderSidebar, 180);
+
+        });
+
+    }
+
+
+
+    const contentSearch = document.getElementById('ran-content-search');
+
+    if (contentSearch) {
+
+        contentSearch.addEventListener('input', () => {
+
+            clearTimeout(ranContentSearchTimer);
+
+            ranContentSearchTimer = setTimeout(runContentSearch, 220);
 
         });
 
@@ -232,6 +252,12 @@ async function openViewer(tech, label, options = {}) {
 
     const search = document.getElementById('ran-search');
 
+    const contentSearch = document.getElementById('ran-content-search');
+
+    const contentCount = document.getElementById('ran-content-search-count');
+
+    const contentResults = document.getElementById('ran-content-search-results');
+
 
 
     if (!ranVendor) {
@@ -253,6 +279,18 @@ async function openViewer(tech, label, options = {}) {
     if (title) title.textContent = label || tech.toUpperCase();
 
     if (search) search.value = '';
+
+    if (contentSearch) contentSearch.value = '';
+
+    if (contentCount) contentCount.textContent = 'Type a parameter name to find related feature pages.';
+
+    if (contentResults) {
+
+        contentResults.hidden = true;
+
+        contentResults.innerHTML = '';
+
+    }
 
     if (countEl) countEl.textContent = 'Loading documentation index…';
 
@@ -312,6 +350,12 @@ function closeViewer(options = {}) {
 
     const frame = document.getElementById('ran-frame');
 
+    const contentSearch = document.getElementById('ran-content-search');
+
+    const contentCount = document.getElementById('ran-content-search-count');
+
+    const contentResults = document.getElementById('ran-content-search-results');
+
 
 
     if (techGate) techGate.hidden = false;
@@ -321,6 +365,18 @@ function closeViewer(options = {}) {
     if (viewer) viewer.hidden = true;
 
     if (frame) frame.src = 'about:blank';
+
+    if (contentSearch) contentSearch.value = '';
+
+    if (contentCount) contentCount.textContent = 'Type a parameter name to find related feature pages.';
+
+    if (contentResults) {
+
+        contentResults.hidden = true;
+
+        contentResults.innerHTML = '';
+
+    }
 
 
 
@@ -392,7 +448,7 @@ function renderSidebar() {
 
     if (term.length >= 2) {
 
-        renderSearchResults(container, countEl, term);
+        renderTitleSearchResults(container, countEl, term);
 
         return;
 
@@ -418,11 +474,11 @@ function renderSidebar() {
 
 
 
-function renderSearchResults(container, countEl, term) {
+function renderTitleSearchResults(container, countEl, term) {
 
     const words = term.split(/\s+/).filter(Boolean);
 
-    let filtered = ranFlat.filter((entry) => {
+    const filtered = ranFlat.filter((entry) => {
 
         const hay = `${entry.name} ${entry.path}`.toLowerCase();
 
@@ -430,27 +486,21 @@ function renderSearchResults(container, countEl, term) {
 
     });
 
-
-
     const CAP = 400;
 
     const capped = filtered.length > CAP;
 
-    if (capped) filtered = filtered.slice(0, CAP);
-
-
+    const results = capped ? filtered.slice(0, CAP) : filtered;
 
     if (countEl) {
 
-        countEl.textContent = `${filtered.length} result${filtered.length !== 1 ? 's' : ''}${capped ? ` (showing first ${CAP})` : ''}`;
+        countEl.textContent = `${results.length} document${results.length !== 1 ? 's' : ''}${capped ? ` (showing first ${CAP})` : ''}`;
 
     }
 
-
-
     const frag = document.createDocumentFragment();
 
-    filtered.forEach((entry) => {
+    results.forEach((entry) => {
 
         const btn = document.createElement('button');
 
@@ -463,6 +513,120 @@ function renderSearchResults(container, countEl, term) {
             <span class="ran-search-name">${highlightMatch(entry.name, term)}</span>
 
             <span class="ran-search-path">${escapeHtml(entry.path)}</span>
+
+        `;
+
+        btn.addEventListener('click', () => navigateDoc(entry.url));
+
+        frag.appendChild(btn);
+
+    });
+
+    container.appendChild(frag);
+
+}
+
+
+
+async function runContentSearch() {
+
+    const input = document.getElementById('ran-content-search');
+
+    const countEl = document.getElementById('ran-content-search-count');
+
+    const resultsEl = document.getElementById('ran-content-search-results');
+
+    const term = (input?.value || '').trim();
+
+    const requestId = ++ranSearchRequest;
+
+    if (!input || !countEl || !resultsEl || !ranTech) return;
+
+    if (term.length < 2) {
+
+        countEl.textContent = 'Type a parameter name to find related feature pages.';
+
+        resultsEl.hidden = true;
+
+        resultsEl.innerHTML = '';
+
+        return;
+
+    }
+
+    countEl.textContent = 'Searching parameter/content index...';
+
+    resultsEl.hidden = true;
+
+    try {
+
+        const CAP = 100;
+
+        const resp = await fetch(`/api/ran-features/search/${encodeURIComponent(ranTech)}?q=${encodeURIComponent(term)}&limit=${CAP}`);
+
+        const data = await resp.json();
+
+        if (requestId !== ranSearchRequest) return;
+
+        if (!resp.ok || !data.success) {
+
+            throw new Error(data.error || 'Search failed');
+
+        }
+
+        renderContentSearchResults(resultsEl, countEl, term, Array.isArray(data.results) ? data.results : [], CAP);
+
+    } catch (err) {
+
+        if (requestId !== ranSearchRequest) return;
+
+        countEl.textContent = `Search unavailable: ${err.message}`;
+
+        resultsEl.hidden = true;
+
+    }
+
+}
+
+
+
+function renderContentSearchResults(container, countEl, term, results, cap) {
+
+    const capped = results.length >= cap;
+
+
+
+    if (countEl) {
+
+        countEl.textContent = `${results.length} content result${results.length !== 1 ? 's' : ''}${capped ? ` (showing first ${cap})` : ''}`;
+
+    }
+
+    container.innerHTML = '';
+
+    container.hidden = results.length === 0;
+
+    if (!results.length) return;
+
+
+
+    const frag = document.createDocumentFragment();
+
+    results.forEach((entry) => {
+
+        const btn = document.createElement('button');
+
+        btn.type = 'button';
+
+        btn.className = 'ran-search-item' + (entry.url === ranActiveUrl ? ' active' : '');
+
+        btn.innerHTML = `
+
+            <span class="ran-search-name">${highlightMatch(entry.name, term)}</span>
+
+            <span class="ran-search-path">${escapeHtml(entry.path)}</span>
+
+            ${entry.snippet ? `<span class="ran-search-snippet">${highlightMatch(entry.snippet, term)}</span>` : ''}
 
         `;
 

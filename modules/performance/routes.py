@@ -20,6 +20,7 @@ import os
 import sys
 import json
 import time
+import threading
 import re
 import math
 import pandas as pd
@@ -438,6 +439,10 @@ _TREND_CACHE_SCHEMA_VER = "v4"
 _PM_TABLE_CACHE_SCHEMA_VER = "v3"
 _PM_TABLE_CACHE = {}
 _PM_TABLE_CACHE_TTL_SEC = 90
+_PM_CELL_NAMES_CACHE = {}
+_PM_CELL_NAMES_CACHE_TTL_SEC = 300
+_PM_CELL_NAMES_CACHE_LOCK = threading.Lock()
+_PM_CELL_NAMES_CACHE_INFLIGHT: set[str] = set()
 
 
 def _db_mtime_token(db_path: str) -> str:
@@ -1139,12 +1144,16 @@ def _pm_cell_names_for_vendor_technology(vendor: str, technology: str, scope: st
             if str(r['cell_name'] or '').strip()
         }
     except sqlite3.Error:
-        current_app.logger.exception(
-            'Could not load PM-backed cell names for vendor=%s technology=%s scope=%s',
-            vendor,
-            technology,
-            scope,
-        )
+        try:
+            current_app.logger.exception(
+                'Could not load PM-backed cell names for vendor=%s technology=%s scope=%s',
+                vendor,
+                technology,
+                scope,
+            )
+        except RuntimeError:
+            # Background cache warmers may run outside a Flask app context.
+            pass
         return set()
     finally:
         if conn is not None:
@@ -1155,23 +1164,73 @@ def _pm_cell_names_for_vendor_technology(vendor: str, technology: str, scope: st
     return names
 
 
-def _mark_rows_with_pm_data(rows: list[dict], scope: str) -> list[dict]:
-    """Annotate metadata cells with retained PM-row availability in the selected scope."""
-    availability: dict[tuple[str, str], set[str]] = {}
+def _pm_cell_names_cache_key(vendor: str, technology: str, scope: str) -> str:
+    vendor = _norm_vendor_for_pm(vendor)
+    tech = '4G' if technology in ('4G-FDD', '4G-TDD') else str(technology or '').strip()
+    version = _pm_data_version_token(vendor, include_metadata=False, scope=scope)
+    return '||'.join([version, vendor, tech, _normalize_data_scope(scope)])
 
-    def available_for(row: dict) -> set[str]:
+
+def _warm_pm_cell_names_cache(vendor: str, technology: str, scope: str, key: str) -> None:
+    try:
+        names = _pm_cell_names_for_vendor_technology(vendor, technology, scope)
+        with _PM_CELL_NAMES_CACHE_LOCK:
+            _PM_CELL_NAMES_CACHE[key] = (time.time() + _PM_CELL_NAMES_CACHE_TTL_SEC, names)
+    finally:
+        with _PM_CELL_NAMES_CACHE_LOCK:
+            _PM_CELL_NAMES_CACHE_INFLIGHT.discard(key)
+
+
+def _cached_pm_cell_names_for_vendor_technology(
+    vendor: str,
+    technology: str,
+    scope: str,
+    *,
+    warm: bool = True,
+) -> set[str] | None:
+    """Return cached PM cell names, warming them in the background on cache miss."""
+    vendor = _norm_vendor_for_pm(vendor)
+    tech = '4G' if technology in ('4G-FDD', '4G-TDD') else str(technology or '').strip()
+    key = _pm_cell_names_cache_key(vendor, tech, scope)
+    now = time.time()
+    with _PM_CELL_NAMES_CACHE_LOCK:
+        item = _PM_CELL_NAMES_CACHE.get(key)
+        if item:
+            expires_at, names = item
+            if expires_at >= now:
+                return names
+            _PM_CELL_NAMES_CACHE.pop(key, None)
+        if warm and key not in _PM_CELL_NAMES_CACHE_INFLIGHT:
+            _PM_CELL_NAMES_CACHE_INFLIGHT.add(key)
+            threading.Thread(
+                target=_warm_pm_cell_names_cache,
+                args=(vendor, tech, scope, key),
+                daemon=True,
+            ).start()
+    return None
+
+
+def _mark_rows_with_pm_data(rows: list[dict], scope: str) -> list[dict]:
+    """Annotate metadata cells with retained PM-row availability when cached.
+
+    On cache miss, start a background warm-up and leave ``has_pm_data`` as None
+    so object-tree loading remains metadata-fast.
+    """
+    availability: dict[tuple[str, str], set[str] | None] = {}
+
+    def available_for(row: dict) -> set[str] | None:
         vendor = _norm_vendor_for_pm(row.get('vendor') or '')
         tech = str(row.get('technology') or '').strip()
         pm_tech = '4G' if tech in ('4G-FDD', '4G-TDD') else tech
         key = (vendor, pm_tech)
         if key not in availability:
-            availability[key] = _pm_cell_names_for_vendor_technology(vendor, pm_tech, scope)
+            availability[key] = _cached_pm_cell_names_for_vendor_technology(vendor, pm_tech, scope)
         return availability[key]
 
     for row in rows:
         cell_name = str(row.get('cell_name') or '').strip().lower()
         pm_names = available_for(row)
-        row['has_pm_data'] = bool(cell_name and cell_name in pm_names)
+        row['has_pm_data'] = None if pm_names is None else bool(cell_name and cell_name in pm_names)
     return rows
 
 

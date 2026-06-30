@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.3">
 </head>
 <body>
@@ -129,6 +130,22 @@
                     <span class="dashboard-primary-tab-text">Configuration</span>
                     <span class="dashboard-primary-tab-desc">Parameters, XML &amp; tooling</span>
                 </button>
+                <button type="button" role="tab" class="dashboard-primary-tab" id="tab-fault-management"
+                        aria-selected="false" aria-controls="section-fault-management"
+                        onclick="openSection('fault-management')">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">&#9888;</span>
+                    <span class="dashboard-primary-tab-text">Fault Management</span>
+                    <span class="dashboard-primary-tab-desc">Alarms, faults &amp; assurance</span>
+                </button>
+                {% if user.role == 'admin' %}
+                <button type="button" role="tab" class="dashboard-primary-tab" id="tab-radio-optimization"
+                        aria-selected="false" aria-controls="section-radio-optimization"
+                        onclick="openSection('radio-optimization')">
+                    <span class="dashboard-primary-tab-icon" aria-hidden="true">&#128225;</span>
+                    <span class="dashboard-primary-tab-text">Radio Optimization</span>
+                    <span class="dashboard-primary-tab-desc">RF, neighbors &amp; coverage</span>
+                </button>
+                {% endif %}
                 <button type="button" role="tab" class="dashboard-primary-tab" id="tab-external-tools"
                         aria-selected="false" aria-controls="section-external-tools"
                         onclick="openSection('external-tools')">
@@ -196,43 +213,6 @@
                         <div class="function-icon">💚</div>
                         <div class="function-name">Network Health Overview</div>
                     </a>
-                    {% if user.role == 'admin' %}
-                    <a href="/rf-optimization" class="function-card" data-module-id="rf-optimization" data-module-name="RF Optimization Workbench">
-                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin RF Optimization Workbench" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
-                        <div class="function-icon">&#128225;</div>
-                        <div class="function-name">RF Optimization Workbench</div>
-                    </a>
-                    <a href="/neighbor-quality" class="function-card" data-module-id="neighbor-quality" data-module-name="Neighbor Quality Analyzer">
-                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Neighbor Quality Analyzer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
-                        <div class="function-icon">&#129309;</div>
-                        <div class="function-name">Neighbor Quality Analyzer</div>
-                    </a>
-                    <a href="/capacity-hotspots" class="function-card" data-module-id="capacity-hotspots" data-module-name="Capacity Hotspots">
-                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Capacity Hotspots" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
-                        <div class="function-icon">&#9889;</div>
-                        <div class="function-name">Capacity Hotspots</div>
-                    </a>
-                    <a href="/layer-coverage" class="function-card" data-module-id="layer-coverage" data-module-name="Layer Coverage Gaps">
-                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Layer Coverage Gaps" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
-                        <div class="function-icon">&#128506;</div>
-                        <div class="function-name">Layer Coverage Gaps</div>
-                    </a>
-                    <a href="/overshooting-detector" class="function-card" data-module-id="overshooting-detector" data-module-name="Overshooting Detector">
-                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Overshooting Detector" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
-                        <div class="function-icon">&#128246;</div>
-                        <div class="function-name">Overshooting Detector</div>
-                    </a>
-                    <a href="/change-impact" class="function-card" data-module-id="change-impact" data-module-name="Change Impact Tracker">
-                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Change Impact Tracker" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
-                        <div class="function-icon">&#128202;</div>
-                        <div class="function-name">Change Impact Tracker</div>
-                    </a>
-                    <a href="/radio-morning-report" class="function-card" data-module-id="radio-morning-report" data-module-name="Radio Morning Report">
-                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Radio Morning Report" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
-                        <div class="function-icon">&#127749;</div>
-                        <div class="function-name">Radio Morning Report</div>
-                    </a>
-                    {% endif %}
                 </div>
             </div>
 
@@ -283,6 +263,60 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Fault Management panel -->
+            <div class="section-panel hidden" id="section-fault-management" role="tabpanel" aria-labelledby="tab-fault-management" hidden>
+                <div class="function-grid">
+                    <a href="/fault-management" class="function-card" data-module-id="fault-management" data-module-name="Fault Management">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Fault Management" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#9888;</div>
+                        <div class="function-name">Fault Management</div>
+                    </a>
+                </div>
+            </div>
+
+            {% if user.role == 'admin' %}
+            <!-- Radio Optimization panel -->
+            <div class="section-panel hidden" id="section-radio-optimization" role="tabpanel" aria-labelledby="tab-radio-optimization" hidden>
+                <div class="function-grid">
+                    <a href="/rf-optimization" class="function-card" data-module-id="rf-optimization" data-module-name="RF Optimization Workbench">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin RF Optimization Workbench" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#128225;</div>
+                        <div class="function-name">RF Optimization Workbench</div>
+                    </a>
+                    <a href="/neighbor-quality" class="function-card" data-module-id="neighbor-quality" data-module-name="Neighbor Quality Analyzer">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Neighbor Quality Analyzer" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#129309;</div>
+                        <div class="function-name">Neighbor Quality Analyzer</div>
+                    </a>
+                    <a href="/capacity-hotspots" class="function-card" data-module-id="capacity-hotspots" data-module-name="Capacity Hotspots">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Capacity Hotspots" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#9889;</div>
+                        <div class="function-name">Capacity Hotspots</div>
+                    </a>
+                    <a href="/layer-coverage" class="function-card" data-module-id="layer-coverage" data-module-name="Layer Coverage Gaps">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Layer Coverage Gaps" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#128506;</div>
+                        <div class="function-name">Layer Coverage Gaps</div>
+                    </a>
+                    <a href="/overshooting-detector" class="function-card" data-module-id="overshooting-detector" data-module-name="Overshooting Detector">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Overshooting Detector" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#128246;</div>
+                        <div class="function-name">Overshooting Detector</div>
+                    </a>
+                    <a href="/change-impact" class="function-card" data-module-id="change-impact" data-module-name="Change Impact Tracker">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Change Impact Tracker" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#128202;</div>
+                        <div class="function-name">Change Impact Tracker</div>
+                    </a>
+                    <a href="/radio-morning-report" class="function-card" data-module-id="radio-morning-report" data-module-name="Radio Morning Report">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Radio Morning Report" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#127749;</div>
+                        <div class="function-name">Radio Morning Report</div>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- ── External tools panel ── -->
             <div class="section-panel hidden" id="section-external-tools" role="tabpanel" aria-labelledby="tab-external-tools" hidden>
@@ -559,11 +593,14 @@
                 panel.classList.remove('hidden');
                 panel.hidden = false;
             }
-            const isPrimary = name === 'performance' || name === 'configuration' || name === 'external-tools';
+            const isPrimary = name === 'performance' || name === 'configuration'
+                || name === 'fault-management' || name === 'radio-optimization'
+                || name === 'external-tools';
             if (isPrimary && tab) {
                 tab.classList.add('active');
                 tab.setAttribute('aria-selected', 'true');
             }
+            replayDashboardCardWash(panel || document);
         }
 
         async function logout() {
@@ -701,6 +738,20 @@
             return Array.from(document.querySelectorAll('.function-card[data-module-id]'));
         }
 
+        function replayDashboardCardWash(scope = document) {
+            const root = scope || document;
+            const cards = Array.from(root.querySelectorAll('.function-grid > .function-card'))
+                .filter(card => !card.hidden && getComputedStyle(card).display !== 'none');
+            cards.forEach((card, index) => {
+                card.classList.remove('dashboard-card-wash');
+                card.style.setProperty('--dashboard-card-delay', `${Math.min(index, 18) * 45}ms`);
+            });
+            if (cards.length) {
+                void cards[0].offsetWidth;
+            }
+            cards.forEach(card => card.classList.add('dashboard-card-wash'));
+        }
+
         function dashboardCardMetadata(card) {
             return {
                 id: card.dataset.moduleId,
@@ -743,6 +794,7 @@
                     <div class="function-name">${item.name}</div>
                 </a>
             `).join('');
+            replayDashboardCardWash(section);
         }
 
         async function loadDashboardPreferences() {
@@ -803,6 +855,8 @@
                     const text = `${card.dataset.moduleName || ''} ${card.getAttribute('href') || ''}`.toLowerCase();
                     card.hidden = q ? !text.includes(q) : false;
                 });
+                document.querySelectorAll('.section-panel:not(.hidden), #dashboard-pinned-tools:not([hidden])')
+                    .forEach(section => replayDashboardCardWash(section));
             });
             document.querySelectorAll('.favorite-toggle').forEach(toggle => {
                 toggle.addEventListener('keydown', event => {
@@ -1376,6 +1430,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupDashboardToolSearch();
             loadDashboardPreferences();
+            replayDashboardCardWash(document.querySelector('.section-panel:not(.hidden)') || document);
             document.addEventListener('keydown', event => {
                 if (event.key === 'Escape') {
                     toggleOperationsPanel(false);

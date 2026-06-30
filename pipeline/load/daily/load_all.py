@@ -9,13 +9,21 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import argparse
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 
 def main() -> int:
-    script = os.path.join(PROJECT_ROOT, "scripts", "pipeline", "load_raw_daily_to_databases.py")
-    proc = subprocess.run([sys.executable, script], cwd=PROJECT_ROOT)
+    parser = argparse.ArgumentParser(description="Daily loader wrapper")
+    parser.add_argument("--category", action="append", choices=["cells", "groups"])
+    args = parser.parse_args()
+
+    script = os.path.join(PROJECT_ROOT, "scripts", "pipeline", "load_raw_csv_to_databases.py")
+    cmd = [sys.executable, script, "--scope", "daily", "--skip-kpi-db"]
+    for category in args.category or []:
+        cmd.extend(["--category", category])
+    proc = subprocess.run(cmd, cwd=PROJECT_ROOT)
     return int(proc.returncode or 0)
 
 

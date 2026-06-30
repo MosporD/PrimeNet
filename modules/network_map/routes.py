@@ -246,12 +246,12 @@ def _normalize_ui_map_tech_token(tech: str) -> str:
     chips = {
         "2g-2g": "2G-2G",
         "3g-3g": "3G-3G",
-        "4g-4g intra-enb": "4G-4G Intra-eNB",
-        "4g-4g inter-enb": "4G-4G Inter-eNB",
+        "4g-4g intra-enb": "4G-4G",
+        "4g-4g inter-enb": "4G-4G",
         # legacy UI tokens
-        "4g-4g intra": "4G-4G Intra-eNB",
-        "4g-4g inter": "4G-4G Inter-eNB",
-        "4g-4g": "4G-4G Intra-eNB",
+        "4g-4g intra": "4G-4G",
+        "4g-4g inter": "4G-4G",
+        "4g-4g": "4G-4G",
         "2g": "2G",
         "3g": "3G",
         "4g-fdd": "4G-FDD",
@@ -264,7 +264,7 @@ def _normalize_ui_map_tech_token(tech: str) -> str:
 def _union_sql_for_map_filter(tech: str | None = None) -> tuple[str, list]:
     """
     UNION for Network Map list/search/export when the UI uses relation-style chips:
-    All → 2G + 3G + LTE FDD/TDD (no 5G on this map); 2G-2G / 3G-3G / 4G-4G Intra-eNB|Inter-eNB use LTE FDD only (no TDD in neighbor HO scope).
+    All → 2G + 3G + LTE FDD/TDD (no 5G on this map); 2G-2G / 3G-3G / 4G-4G use LTE FDD only (no TDD in neighbor HO scope).
     """
     raw = (tech or "").strip()
     if not raw or raw.lower() == "all":
@@ -278,7 +278,7 @@ def _union_sql_for_map_filter(tech: str | None = None) -> tuple[str, list]:
         return _per_tech_union_sql("2G")
     if t == "3G-3G":
         return _per_tech_union_sql("3G")
-    if t in ("4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter"):
+    if t in ("4G-4G", "4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter"):
         sf, _ = _per_tech_union_sql("4G-FDD")
         return sf, []
     if t in ("2G", "3G", "4G-FDD", "4G-TDD", "5G"):
@@ -306,7 +306,7 @@ def _cell_kpi_sql_technologies(req_tech: str) -> list[str] | None:
         return ["2G"]
     if t == "3G-3G":
         return ["3G"]
-    if t in ("4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter"):
+    if t in ("4G-4G", "4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter"):
         return ["4G-FDD"]
     return [t]
 
@@ -510,32 +510,43 @@ def _neighbor_raw_table_name_for_technology(technology: str, prefix: str) -> str
         return f"{prefix}_2g"
     if tok == "3G-3G" or t.startswith("3G"):
         return f"{prefix}_3g"
-    if tok in ("4G-4G Inter-eNB", "4G-4G Inter"):
-        return f"{prefix}_4g_inter"
-    if tok in ("4G-4G Intra-eNB", "4G-4G Intra"):
-        return f"{prefix}_4g_intra"
     if "4G" in t or "LTE" in t:
-        return f"{prefix}_4g_intra"
+        return f"{prefix}_4g"
     return None
+
+
+def _resolve_raw_neighbor_tables_for_vendor(
+    conn: sqlite3.Connection, technology: str, vendor_slug: str
+) -> list[str]:
+    """Resolve one logical RAT to one or more raw tables.
+
+    4G is intentionally a single UI/API technology. Prefer a populated combined
+    ``<prefix>_4g`` table, but also support old split intra/inter tables as
+    implementation details if a loader produced them.
+    """
+    prefix = _neighbor_raw_base_prefix_for_slug(vendor_slug)
+    preferred = _neighbor_raw_table_name_for_technology(technology, prefix)
+    if not preferred:
+        return []
+    t = (technology or "").strip().upper()
+    if "4G" not in t and "LTE" not in t:
+        return [preferred] if _neighbor_table_non_empty(conn, preferred) else []
+
+    tables: list[str] = []
+    combined = f"{prefix}_4g"
+    if _neighbor_table_non_empty(conn, combined):
+        tables.append(combined)
+    for split in (f"{prefix}_4g_intra", f"{prefix}_4g_inter"):
+        if _neighbor_table_non_empty(conn, split):
+            tables.append(split)
+    return tables
 
 
 def _resolve_raw_neighbor_table_for_vendor(
     conn: sqlite3.Connection, technology: str, vendor_slug: str
 ) -> str | None:
-    """Prefer 4G intra/inter slim tables when populated; else legacy ``<prefix>_4g`` wide (Nokia)."""
-    prefix = _neighbor_raw_base_prefix_for_slug(vendor_slug)
-    preferred = _neighbor_raw_table_name_for_technology(technology, prefix)
-    if not preferred:
-        return None
-    if _neighbor_table_non_empty(conn, preferred):
-        return preferred
-    t = (technology or "").strip().upper()
-    if "INTER" in t and ("4G" in t or "LTE" in t):
-        return None
-    legacy_wide = f"{prefix}_4g"
-    if preferred.endswith("_4g_intra") and _neighbor_table_non_empty(conn, legacy_wide):
-        return legacy_wide
-    return None
+    tables = _resolve_raw_neighbor_tables_for_vendor(conn, technology, vendor_slug)
+    return tables[0] if tables else None
 
 
 def _resolve_huawei_neighbor_export_table(_conn: sqlite3.Connection, technology: str) -> str | None:
@@ -553,7 +564,7 @@ def _resolve_huawei_neighbor_export_table(_conn: sqlite3.Connection, technology:
 
 def _any_raw_neighbor_table_exists(nokia_conn: sqlite3.Connection, technology: str) -> bool:
     """Nokia tables in ``neighbor_kpis.db`` or Huawei export tables in ``huawei_neighbor_raw.db``."""
-    if _resolve_raw_neighbor_table_for_vendor(nokia_conn, technology, "nokia"):
+    if _resolve_raw_neighbor_tables_for_vendor(nokia_conn, technology, "nokia"):
         return True
     if not os.path.isfile(HUAWEI_NEIGHBOR_RAW_DB):
         return False
@@ -573,8 +584,8 @@ def _neighbor_hourly_tech_aliases(technology: str) -> list[str]:
         return ["2G", "2G-2G"]
     if tok == "3G-3G" or t.startswith("3G"):
         return ["3G", "3G-3G"]
-    if tok in ("4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter") or "4G" in t or "LTE" in t:
-        return ["4G", "4G-FDD", "LTE", "4G-4G Intra-eNB", "4G-4G Inter-eNB"]
+    if tok in ("4G-4G", "4G-4G Intra-eNB", "4G-4G Inter-eNB", "4G-4G Intra", "4G-4G Inter") or "4G" in t or "LTE" in t:
+        return ["4G", "4G-FDD", "LTE", "4G-4G", "4G-4G Intra-eNB", "4G-4G Inter-eNB"]
     return [tok] if tok else []
 
 
@@ -1744,8 +1755,7 @@ def get_neighbor_lines():
             # (SQLite path, raw table, metadata source-vendor label for linking)
             jobs: list[tuple[str, str, str]] = []
             if not v_req or v_low == "all":
-                nrt = _resolve_raw_neighbor_table_for_vendor(nconn, technology, "nokia")
-                if nrt:
+                for nrt in _resolve_raw_neighbor_tables_for_vendor(nconn, technology, "nokia"):
                     jobs.append((NEIGHBOR_KPI_DB, nrt, "Nokia"))
                 if os.path.isfile(HUAWEI_NEIGHBOR_RAW_DB):
                     htmp = sqlite3.connect(HUAWEI_NEIGHBOR_RAW_DB, timeout=30)
@@ -1768,8 +1778,7 @@ def get_neighbor_lines():
                         finally:
                             htmp.close()
                 else:
-                    nrt = _resolve_raw_neighbor_table_for_vendor(nconn, technology, "nokia")
-                    if nrt:
+                    for nrt in _resolve_raw_neighbor_tables_for_vendor(nconn, technology, "nokia"):
                         jobs.append((NEIGHBOR_KPI_DB, nrt, v_req))
 
             if jobs:
@@ -1913,14 +1922,19 @@ def get_neighbor_lines():
                 if failures_int is None or failures_int < thr - 1e-12:
                     continue
             fr_pct = (failures_int / attempts_val * 100.0) if failures_int is not None and attempts_val > 0 else None
+            src_site = src.get("site_id")
+            dst_site = dst.get("site_id")
+            is_intra = bool(str(src_site or "").strip() and str(src_site or "").strip() == str(dst_site or "").strip())
             lines.append({
                 "period_start": r["period_start"],
                 "vendor": r["vendor"],
                 "technology": r["technology"],
                 "source_cell": r["source_cell"],
                 "target_cell": r["target_cell"],
-                "source_site_id": src.get("site_id"),
-                "target_site_id": dst.get("site_id"),
+                "source_site_id": src_site,
+                "target_site_id": dst_site,
+                "is_intra_relation": is_intra,
+                "relation_scope": "intra" if is_intra else "inter",
                 "source_lat": src["lat"],
                 "source_lng": src["lng"],
                 "target_lat": dst["lat"],

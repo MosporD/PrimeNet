@@ -19,7 +19,7 @@ def overshooting_detector_page():
         module_subtitle="Heuristic long-neighbor, distance, and handover evidence for possible overshooting cells.",
         module_kind="overshooting-detector",
         api_url="/api/overshooting-detector/issues",
-        default_technology="4G-4G Intra-eNB",
+        default_technology="4G-4G",
     )
 
 

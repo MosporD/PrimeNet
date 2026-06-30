@@ -19,7 +19,7 @@ def neighbor_quality_page():
         module_subtitle="Scores low handover SR, failed HOs, distant neighbors, and missing reciprocal relations.",
         module_kind="neighbor-quality",
         api_url="/api/neighbor-quality/issues",
-        default_technology="4G-4G Intra-eNB",
+        default_technology="4G-4G",
     )
 
 
