@@ -489,6 +489,38 @@
                 </div>
             </div>
         </section>
+        <section class="dashboard-pm-health" id="neighbor-health-widget" aria-label="Neighbor database health">
+            <div class="op-sites-summary-card pm-health-card">
+                <div class="op-sites-summary-head pm-health-head">
+                    <span>Neighbor Database Health</span>
+                    <button type="button" class="op-sites-refresh-btn" id="neighbor-health-refresh-btn" onclick="refreshNeighborHealth(true)">
+                        Refresh
+                    </button>
+                </div>
+                <div class="pm-health-summary" id="neighbor-health-summary">
+                    <span class="pm-health-loading">Loading neighbor health…</span>
+                </div>
+                <div class="pm-health-table-wrap" id="neighbor-health-table-wrap" hidden>
+                    <table class="pm-health-table" id="neighbor-health-table">
+                        <thead>
+                            <tr>
+                                <th>Database</th>
+                                <th>Status</th>
+                                <th>Latest data</th>
+                                <th>Rows</th>
+                                <th>Tables</th>
+                                <th>Size</th>
+                            </tr>
+                        </thead>
+                        <tbody id="neighbor-health-tbody"></tbody>
+                    </table>
+                    <details class="pm-health-details">
+                        <summary>Neighbor per-table breakdown</summary>
+                        <div id="neighbor-health-details-body"></div>
+                    </details>
+                </div>
+            </div>
+        </section>
     </aside>
     {% endif %}
 
@@ -593,8 +625,9 @@
                 btn.textContent = 'Preparing…';
             }
             try {
-                const [pmHealth, syncStatus, syncHistory, operationalSites] = await Promise.all([
+                const [pmHealth, neighborHealth, syncStatus, syncHistory, operationalSites] = await Promise.all([
                     fetchStatusJson('/api/dashboard/pm-health?refresh=1'),
+                    fetchStatusJson('/api/dashboard/neighbor-health?refresh=1'),
                     fetchStatusJson('/api/sync/status'),
                     fetchStatusJson('/api/sync/history?limit=50'),
                     fetchStatusJson('/api/dashboard/operational-sites'),
@@ -607,6 +640,7 @@
                     user_agent: navigator.userAgent,
                     endpoints: {
                         pm_health: pmHealth,
+                        neighbor_health: neighborHealth,
                         sync_status: syncStatus,
                         sync_history: syncHistory,
                         operational_sites: operationalSites,
@@ -1005,6 +1039,91 @@
             if (wrapEl) wrapEl.hidden = false;
         }
 
+        function renderNeighborHealth(data) {
+            const summaryEl = document.getElementById('neighbor-health-summary');
+            const wrapEl = document.getElementById('neighbor-health-table-wrap');
+            const tbody = document.getElementById('neighbor-health-tbody');
+            const detailsBody = document.getElementById('neighbor-health-details-body');
+            if (!summaryEl || !tbody) return;
+
+            const dbs = data.neighbor_databases || [];
+            const totalRows = dbs.reduce((sum, db) => sum + (Number(db.total_rows) || 0), 0);
+            const cached = data.cached ? ' (cached)' : '';
+            summaryEl.innerHTML = `
+                <div class="pm-health-summary-grid">
+                    <div><span class="pm-health-k">Checked (UTC)</span><span class="pm-health-v">${data.checked_at_utc || '—'}${cached}</span></div>
+                    <div><span class="pm-health-k">Neighbor DB rows</span><span class="pm-health-v">${totalRows.toLocaleString()}</span></div>
+                    <div><span class="pm-health-k">Databases</span><span class="pm-health-v">${dbs.length}</span></div>
+                </div>`;
+
+            tbody.innerHTML = dbs.map(db => {
+                const latest = db.latest_data_overall || '—';
+                const size = db.file?.size_mb != null ? `${db.file.size_mb} MB` : '—';
+                const rows = db.total_rows != null ? Number(db.total_rows).toLocaleString() : '0';
+                const tables = Array.isArray(db.tables) ? db.tables.length : 0;
+                return `<tr>
+                    <td>${db.label || '—'}</td>
+                    <td><span class="${pmHealthStatusClass(db.overall)}">${db.overall || '—'}</span></td>
+                    <td>${latest}</td>
+                    <td class="pm-health-rows">${rows}</td>
+                    <td>${tables}</td>
+                    <td>${size}</td>
+                </tr>`;
+            }).join('');
+
+            if (detailsBody) {
+                detailsBody.innerHTML = dbs.map(db => `
+                    <div class="pm-health-db-block">
+                        <h4>${db.label} <span class="${pmHealthStatusClass(db.overall)}">${db.overall}</span></h4>
+                        <p class="pm-health-meta">Latest: <strong>${db.latest_data_overall || '—'}</strong>
+                            ${db.latest_data_table ? ` (${db.latest_data_table})` : ''}
+                            ${db.empty_tables?.length ? ` · Empty: ${db.empty_tables.join(', ')}` : ''}</p>
+                        <table class="pm-health-subtable">
+                            <thead><tr><th>Table</th><th>Status</th><th>Rows</th><th>Columns</th><th>Latest</th></tr></thead>
+                            <tbody>
+                                ${(db.tables || []).map(t => `<tr>
+                                    <td>${t.table}</td>
+                                    <td>${t.status || '—'}</td>
+                                    <td>${t.rows != null ? Number(t.rows).toLocaleString() : '—'}</td>
+                                    <td>${t.columns != null ? Number(t.columns).toLocaleString() : '—'}</td>
+                                    <td>${t.latest || '—'}</td>
+                                </tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `).join('');
+            }
+
+            if (wrapEl) wrapEl.hidden = false;
+        }
+
+        async function refreshNeighborHealth(force) {
+            const btn = document.getElementById('neighbor-health-refresh-btn');
+            const summaryEl = document.getElementById('neighbor-health-summary');
+            if (!summaryEl) return;
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Checking…';
+            }
+            summaryEl.innerHTML = '<span class="pm-health-loading">Running neighbor health check…</span>';
+            try {
+                const url = force ? '/api/dashboard/neighbor-health?refresh=1' : '/api/dashboard/neighbor-health';
+                const res = await fetch(url, { credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || 'Neighbor health check failed');
+                }
+                renderNeighborHealth(data);
+            } catch (err) {
+                summaryEl.innerHTML = `<span class="pm-health-error">${err.message || 'Could not load neighbor health'}</span>`;
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Refresh';
+                }
+            }
+        }
+
         async function refreshPmHealth(force) {
             const btn = document.getElementById('pm-health-refresh-btn');
             const freshnessBtn = document.getElementById('freshness-refresh-btn');
@@ -1264,6 +1383,9 @@
             });
             if (document.getElementById('pm-health-widget')) {
                 refreshPmHealth(false);
+            }
+            if (document.getElementById('neighbor-health-widget')) {
+                refreshNeighborHealth(false);
             }
             if (document.getElementById('dashboard-scheduler-body')) {
                 refreshSchedulerStatus();

@@ -1108,6 +1108,76 @@ def _resolve_pm_table_sqlite(
     return candidates[0] if candidates else None
 
 
+def _pm_cell_names_for_vendor_technology(vendor: str, technology: str, scope: str) -> set[str]:
+    """Cell names with retained PM rows for the current Performance object scope."""
+    db_path = _pm_db_for_vendor(vendor, scope)
+    if not os.path.isfile(db_path):
+        return set()
+
+    names: set[str] = set()
+    conn: sqlite3.Connection | None = None
+    try:
+        conn = sqlite3.connect(db_path, timeout=15)
+        conn.row_factory = sqlite3.Row
+        table = _resolve_pm_table_sqlite(conn, vendor, technology)
+        if not table:
+            return set()
+        cell_col, _time_col = _resolve_pm_axis_columns_sqlite(conn, table)
+        if not cell_col:
+            return set()
+        rows = conn.execute(
+            f'''
+            SELECT DISTINCT TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT)) AS cell_name
+            FROM {_sqlite_ident(table)}
+            WHERE {_sqlite_ident(cell_col)} IS NOT NULL
+              AND TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT)) <> ''
+            ''',
+        ).fetchall()
+        names = {
+            str(r['cell_name'] or '').strip().lower()
+            for r in rows
+            if str(r['cell_name'] or '').strip()
+        }
+    except sqlite3.Error:
+        current_app.logger.exception(
+            'Could not load PM-backed cell names for vendor=%s technology=%s scope=%s',
+            vendor,
+            technology,
+            scope,
+        )
+        return set()
+    finally:
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
+    return names
+
+
+def _filter_rows_with_pm_data(rows: list[dict], scope: str) -> list[dict]:
+    """Hide metadata cells that have no retained PM rows in the selected scope."""
+    availability: dict[tuple[str, str], set[str]] = {}
+
+    def available_for(row: dict) -> set[str]:
+        vendor = _norm_vendor_for_pm(row.get('vendor') or '')
+        tech = str(row.get('technology') or '').strip()
+        pm_tech = '4G' if tech in ('4G-FDD', '4G-TDD') else tech
+        key = (vendor, pm_tech)
+        if key not in availability:
+            availability[key] = _pm_cell_names_for_vendor_technology(vendor, pm_tech, scope)
+        return availability[key]
+
+    filtered: list[dict] = []
+    for row in rows:
+        cell_name = str(row.get('cell_name') or '').strip().lower()
+        pm_names = available_for(row)
+        if cell_name and cell_name in pm_names:
+            row['has_pm_data'] = True
+            filtered.append(row)
+    return filtered
+
+
 def _pragma_table_kpi_columns(conn: sqlite3.Connection, table: str) -> list[str]:
     try:
         return [r[1] for r in conn.execute(f'PRAGMA table_info({_sqlite_ident(table)})').fetchall()
@@ -2127,6 +2197,8 @@ def get_cells():
 
     finally:
         conn.close()
+
+    rows = _filter_rows_with_pm_data(rows, data_scope)
 
     # Enrich each row with derived cluster / area + legacy ``status`` alias (network map parity).
     for row in rows:

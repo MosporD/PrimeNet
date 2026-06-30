@@ -441,11 +441,12 @@ def _load_csv_file_incremental_in_chunks(
             raw_db_cols = _pragma_column_names(conn, table)
             db_cols = [c for c in raw_db_cols if c != HASH_COL]
             if set(db_cols) != set(chunk.columns):
-                # Keep behavior consistent with non-chunk path when schema changes.
-                chunk.to_sql(table, conn, if_exists="replace", index=False)
-                inserted_rows += len(chunk)
-                db_cols = list(chunk.columns)
-                continue
+                before_cols = len(db_cols)
+                db_cols = _ensure_table_columns(conn, table, db_cols, list(chunk.columns))
+                print(
+                    f"[{label}] incremental {fn} -> table {table}: "
+                    f"columns changed, evolved schema ({before_cols}->{len(db_cols)} columns)"
+                )
 
         aligned = chunk.reindex(columns=db_cols)
         work = aligned
@@ -619,6 +620,29 @@ def _pragma_column_names(conn: sqlite3.Connection, table: str) -> list[str]:
     return [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
 
 
+def _sqlite_ident(name: str) -> str:
+    return '"' + str(name).replace('"', '""') + '"'
+
+
+def _ensure_table_columns(
+    conn: sqlite3.Connection,
+    table: str,
+    existing_cols: list[str],
+    incoming_cols: list[str],
+) -> list[str]:
+    """Add new incoming columns without replacing retained PM history."""
+    cols = list(existing_cols)
+    seen = {str(c).lower().strip() for c in cols}
+    for col in incoming_cols:
+        key = str(col).lower().strip()
+        if not key or key in seen:
+            continue
+        conn.execute(f'ALTER TABLE {_sqlite_ident(table)} ADD COLUMN {_sqlite_ident(col)} TEXT')
+        cols.append(col)
+        seen.add(key)
+    return cols
+
+
 def _ensure_hash_index(conn: sqlite3.Connection, table: str) -> None:
     """Speed up duplicate checks when tables grow large."""
     idx = re.sub(r"[^a-z0-9_]+", "_", f"idx_{table}_{HASH_COL}")[:56]
@@ -707,12 +731,12 @@ def _load_file_incremental(
         if df_raw.empty:
             print(f"[{label}] incremental {fn} -> table {table}: skip (empty)")
             return
-        df_raw.to_sql(table, conn, if_exists='replace', index=False)
+        before_cols = len(data_cols)
+        data_cols = _ensure_table_columns(conn, table, data_cols, incoming_cols)
         print(
             f"[{label}] incremental {fn} -> table {table}: "
-            f"columns changed, replaced ({len(df_raw)} rows)"
+            f"columns changed, evolved schema ({before_cols}->{len(data_cols)} columns)"
         )
-        return
 
     aligned = df_raw.reindex(columns=data_cols)
     work = aligned

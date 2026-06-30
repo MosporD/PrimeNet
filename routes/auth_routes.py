@@ -353,6 +353,26 @@ def dashboard_pm_health():
         return jsonify({'success': False, 'error': 'PM health check failed'}), 500
 
 
+@auth_bp.route('/api/dashboard/neighbor-health', methods=['GET'])
+def dashboard_neighbor_health():
+    """Neighbor database health (Owner / admin only)."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+
+    force = (request.args.get('refresh') or '').strip().lower() in ('1', 'true', 'yes')
+    try:
+        from core.neighbor_health import get_neighbor_health_cached
+
+        payload = get_neighbor_health_cached(force_refresh=force)
+        return jsonify({'success': True, **payload})
+    except Exception:
+        logger.exception('Neighbor health check failed')
+        return jsonify({'success': False, 'error': 'Neighbor health check failed'}), 500
+
+
 @auth_bp.route('/api/dashboard/operational-sites', methods=['GET'])
 def dashboard_operational_sites():
     """Return latest operational site counts per technology."""
