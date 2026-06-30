@@ -403,6 +403,71 @@ def _dedupe_table_on_cell_time(
     return max(0, before - after)
 
 
+def _existing_cell_time_pairs(
+    conn: sqlite3.Connection,
+    table: str,
+    cell_col: str,
+    ts_col: str,
+    pairs: list[tuple[str, str]],
+) -> set[tuple[str, str]]:
+    """Existing normalized (cell, time) keys for an incoming chunk/frame."""
+    if not pairs:
+        return set()
+    conn.execute(
+        'CREATE TEMP TABLE IF NOT EXISTS _pm_incoming_keys ('
+        'cell_key TEXT NOT NULL, ts_key TEXT NOT NULL, '
+        'PRIMARY KEY (cell_key, ts_key)'
+        ')'
+    )
+    conn.execute('DELETE FROM _pm_incoming_keys')
+    conn.executemany(
+        'INSERT OR IGNORE INTO _pm_incoming_keys (cell_key, ts_key) VALUES (?, ?)',
+        pairs,
+    )
+    rows = conn.execute(
+        f'''
+        SELECT k.cell_key, k.ts_key
+        FROM _pm_incoming_keys k
+        JOIN {_sqlite_ident(table)} t
+          ON LOWER(TRIM(CAST(t.{_sqlite_ident(cell_col)} AS TEXT))) = k.cell_key
+         AND TRIM(CAST(t.{_sqlite_ident(ts_col)} AS TEXT)) = k.ts_key
+        '''
+    ).fetchall()
+    return {(str(r[0]), str(r[1])) for r in rows}
+
+
+def _filter_missing_cell_time_rows(
+    conn: sqlite3.Connection,
+    table: str,
+    df: pd.DataFrame,
+    cell_col: str | None,
+    ts_col: str | None,
+    label: str,
+) -> pd.DataFrame:
+    """
+    Keep only rows whose (cell, timestamp) key is absent from the DB.
+
+    This lets incremental reloads backfill cells at timestamps that already exist
+    from an earlier partial load.
+    """
+    if df.empty or not cell_col or not ts_col or cell_col not in df.columns or ts_col not in df.columns:
+        return df
+
+    cell_keys = df[cell_col].astype(str).str.strip().str.lower()
+    ts_keys = df[ts_col].astype(str).str.strip()
+    parsed_ts = _parse_timestamp_series(df[ts_col], label, ts_col)
+    valid = cell_keys.ne('') & cell_keys.ne('nan') & ts_keys.ne('') & ts_keys.ne('nan') & parsed_ts.notna()
+    if not valid.any():
+        return df.iloc[0:0].copy()
+
+    keys = pd.DataFrame({'cell_key': cell_keys, 'ts_key': ts_keys}, index=df.index)
+    unique_mask = valid & ~keys.duplicated(subset=['cell_key', 'ts_key'], keep='first')
+    incoming_pairs = list(keys.loc[unique_mask, ['cell_key', 'ts_key']].itertuples(index=False, name=None))
+    existing_pairs = _existing_cell_time_pairs(conn, table, cell_col, ts_col, incoming_pairs)
+    missing_pair_mask = ~keys.apply(lambda r: (r['cell_key'], r['ts_key']) in existing_pairs, axis=1)
+    return df.loc[unique_mask & missing_pair_mask].copy()
+
+
 def _load_csv_file_incremental_in_chunks(
     conn: sqlite3.Connection,
     table: str,
@@ -414,6 +479,7 @@ def _load_csv_file_incremental_in_chunks(
     table_exists = _table_exists(conn, table)
     table_existed_at_start = table_exists
     db_cols: list[str] | None = None
+    cell_col: str | None = None
     ts_col: str | None = None
     max_ts: pd.Timestamp | None = None
     total_rows = 0
@@ -451,12 +517,15 @@ def _load_csv_file_incremental_in_chunks(
         aligned = chunk.reindex(columns=db_cols)
         work = aligned
         if RAW_LOADER_TIME_FILTER:
-            if ts_col is None:
-                det = _pick_best_timestamp_column(chunk, list(chunk.columns))
-                ts_col = _match_column_name(db_cols, det)
+            if cell_col is None or ts_col is None:
+                det_cell, det_ts = _resolve_cell_time_key_columns(db_cols, chunk)
+                cell_col = det_cell
+                ts_col = det_ts
                 if ts_col is not None and max_ts is None:
                     max_ts = _max_ts_in_column(conn, table, ts_col, label)
-            if ts_col is not None and max_ts is not None and pd.notna(max_ts):
+            if cell_col is not None and ts_col is not None:
+                work = _filter_missing_cell_time_rows(conn, table, aligned, cell_col, ts_col, label)
+            elif ts_col is not None and max_ts is not None and pd.notna(max_ts):
                 ts_vals = _parse_timestamp_series(aligned[ts_col], label, ts_col)
                 work = aligned.loc[(ts_vals > max_ts) & ts_vals.notna()].copy()
 
@@ -480,11 +549,11 @@ def _load_csv_file_incremental_in_chunks(
         and db_cols
         and first_sample is not None
     ):
-        cell_col, ts_col = _resolve_cell_time_key_columns(db_cols, first_sample)
-        if cell_col and ts_col:
-            removed = _dedupe_table_on_cell_time(conn, table, cell_col, ts_col)
+        dedupe_cell_col, dedupe_ts_col = _resolve_cell_time_key_columns(db_cols, first_sample)
+        if dedupe_cell_col and dedupe_ts_col:
+            removed = _dedupe_table_on_cell_time(conn, table, dedupe_cell_col, dedupe_ts_col)
             if removed:
-                dedupe_note = f", deduped {removed} rows on ({cell_col}, {ts_col})"
+                dedupe_note = f", deduped {removed} rows on ({dedupe_cell_col}, {dedupe_ts_col})"
 
     print(
         f"[{label}] incremental {fn} -> table {table}: "
@@ -743,9 +812,12 @@ def _load_file_incremental(
     time_note = ''
 
     if RAW_LOADER_TIME_FILTER:
-        ts_col = _pick_best_timestamp_column(df_raw, list(df_raw.columns))
+        cell_col, ts_col = _resolve_cell_time_key_columns(data_cols, df_raw)
         db_ts = _match_column_name(data_cols, ts_col)
-        if ts_col is not None and db_ts is not None:
+        if cell_col is not None and db_ts is not None:
+            work = _filter_missing_cell_time_rows(conn, table, aligned, cell_col, db_ts, label)
+            time_note = f'missing ({cell_col}, {db_ts}) keys'
+        elif ts_col is not None and db_ts is not None:
             max_ts = _max_ts_in_column(conn, table, db_ts, label)
             ts_vals = _parse_timestamp_series(aligned[db_ts], label, db_ts)
             if max_ts is not None and pd.notna(max_ts):

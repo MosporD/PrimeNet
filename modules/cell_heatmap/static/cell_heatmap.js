@@ -260,9 +260,11 @@
         const distText = d.avg_distance_m != null ? Number(d.avg_distance_m).toFixed(0) + " m" : "n/a";
         const radiusText = Number.isFinite(radius) ? Math.round(radius) + " m reach" : "n/a";
         const site = d.site_name || d.site_id || "";
+        const scope = [d.vendor, d.technology].filter(Boolean).join(" · ");
         return (
             `<div class="ch-tip"><b>${escapeHtml(d.cell_name || "")}</b>` +
             (site ? `<br><span class="ch-tip-sub">${escapeHtml(String(site))}</span>` : "") +
+            (scope ? `<br><span class="ch-tip-sub">${escapeHtml(scope)}</span>` : "") +
             `<br>Coverage reach: ${escapeHtml(radiusText)}` +
             `<br>${escapeHtml((meta && meta.kpi_label) || "KPI")}: ${escapeHtml(kpiText)}` +
             `<br>UE distance: ${escapeHtml(distText)}</div>`
@@ -448,7 +450,7 @@
                     if (infl > cover) cover = infl;
                     if (infl > 0.1) worstKw = Math.max(worstKw, nearby[i].kw);
                 }
-                if (cover < 0.07 || worstKw <= 0.02) continue;
+                if (cover < 0.07) continue;
 
                 const t = Math.min(1, Math.pow(worstKw, 0.85));
                 const li = Math.min(255, (t * 255) | 0) * 4;
@@ -663,8 +665,12 @@
         const mk = meta && meta.matched_kpi_cells != null ? meta.matched_kpi_cells : "—";
         const ms = meta && meta.matched_size_cells != null ? meta.matched_size_cells : "—";
         const fb = meta && meta.fallback_cells != null ? meta.fallback_cells : "—";
+        const vendor = meta && meta.vendor_scope ? String(meta.vendor_scope) : "all";
+        const tech = meta && meta.technology_scope ? String(meta.technology_scope) : "all";
         box.innerHTML = [
             `<span class="ch-pill">${n} cells</span>`,
+            `<span class="ch-pill ch-pill-muted">${escapeHtml(vendor === "all" ? "All vendors" : vendor)}</span>`,
+            `<span class="ch-pill ch-pill-muted">${escapeHtml(tech === "all" ? "All RATs" : tech)}</span>`,
             `<span class="ch-pill ch-pill-muted">PM KPI: ${mk}</span>`,
             `<span class="ch-pill ch-pill-muted">UE dist: ${ms}</span>`,
             `<span class="ch-pill ch-pill-muted">No KPI: ${fb}</span>`,
@@ -701,12 +707,20 @@
     async function loadBands() {
         const bandSel = $("band-filter");
         if (!bandSel) return;
-        const res = await fetch("/api/cell-heatmap/bands");
+        const params = new URLSearchParams({
+            vendor: String($("vendor-filter")?.value || "all"),
+            technology: String($("technology-filter")?.value || "4G"),
+        });
+        const current = bandSel.value;
+        const res = await fetch(`/api/cell-heatmap/bands?${params.toString()}`);
         const data = await res.json();
         if (!data.success) return;
         const bands = Array.isArray(data.bands) ? data.bands : [];
         bandSel.innerHTML =
             `<option value="">All bands</option>` + bands.map((b) => `<option value="${b}">${b}</option>`).join("");
+        if (current && bands.includes(current)) {
+            bandSel.value = current;
+        }
     }
 
     function fitToData() {
@@ -716,14 +730,18 @@
 
     async function loadHeatmap() {
         const dataScope = String($("data-scope-filter")?.value || "daily").trim();
+        const vendor = String($("vendor-filter")?.value || "all").trim();
+        const technology = String($("technology-filter")?.value || "4G").trim();
         const band = String($("band-filter")?.value || "").trim();
         const limit = String($("point-limit")?.value || "20000").trim();
-        const kpi = String($("kpi-filter")?.value || "drop_rate").trim();
+        const kpi = String($("kpi-filter")?.value || "access_rrc").trim();
         const goodRaw = String($("good-thr")?.value || "").trim();
         const badRaw = String($("bad-thr")?.value || "").trim();
         const loadBtn = $("load-btn");
 
         const params = new URLSearchParams();
+        params.set("vendor", vendor);
+        params.set("technology", technology);
         params.set("data_scope", dataScope);
         params.set("kpi", kpi);
         if (band) params.set("band", band);
@@ -792,12 +810,21 @@
         reapply();
     }
 
+    function bindScopeControls() {
+        const reloadBands = () => {
+            loadBands().catch((err) => console.error(err));
+        };
+        $("vendor-filter")?.addEventListener("change", reloadBands);
+        $("technology-filter")?.addEventListener("change", reloadBands);
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         initMap();
         initDrawer();
         setTimeout(() => map.invalidateSize(), 200);
         $("load-btn")?.addEventListener("click", loadHeatmap);
         $("fit-bounds-btn")?.addEventListener("click", fitToData);
+        bindScopeControls();
         bindHeatTuning();
         loadConfig().then(loadBands).then(loadHeatmap);
     });

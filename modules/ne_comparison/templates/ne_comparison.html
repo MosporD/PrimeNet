@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NE Comparison - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
-    <link rel="stylesheet" href="{{ url_for('ne_comparison.static', filename='ne_comparison.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('ne_comparison.static', filename='ne_comparison.css') }}?v=1.2">
 </head>
 <body>
     <div class="container">
@@ -13,8 +13,8 @@
             <div class="header-content">
                 <div class="header-left">
                     <a href="/dashboard" class="back-link">← Dashboard</a>
-                    <h1>🔍 NE Comparison</h1>
-                    <p>Compare XML configurations between network elements</p>
+                    <h1>NE Comparison</h1>
+                    <p>Compare CM API configuration between same-level network elements</p>
                 </div>
                 <div class="header-right">
                     <span class="user-name">{{ user.username }}</span>
@@ -24,8 +24,83 @@
         </header>
 
         <main class="main-content">
-            <div class="upload-section">
+            <div class="upload-section cm-compare-section">
+                <h2>CM API NE Comparison</h2>
+                <p class="section-help">Select two NEs from the same vendor and hierarchy level. PrimeNet pulls CM data from the configured CM API and highlights parameter differences.</p>
+
+                <form id="cm-compare-form">
+                    <div class="cm-grid">
+                        <div class="file-group">
+                            <label for="cm-vendor">Vendor</label>
+                            <select id="cm-vendor">
+                                <option value="nokia">Nokia NetAct</option>
+                                <option value="huawei">Huawei U2020</option>
+                            </select>
+                        </div>
+
+                        <div class="file-group">
+                            <label for="cm-scope">NE Level</label>
+                            <select id="cm-scope">
+                                <option value="MRBTS">MRBTS</option>
+                                <option value="RNC">RNC</option>
+                                <option value="BSC">BSC</option>
+                            </select>
+                        </div>
+
+                        <div class="file-group">
+                            <label for="cm-conf-id">Configuration ID</label>
+                            <input type="number" id="cm-conf-id" min="1" value="1">
+                        </div>
+                    </div>
+
+                    <div class="file-pair cm-ne-pair">
+                        <div class="file-group">
+                            <label for="cm-ne1">Baseline NE</label>
+                            <input type="search" id="cm-ne1-search" placeholder="Search baseline NE...">
+                            <select id="cm-ne1" size="8"></select>
+                        </div>
+
+                        <div class="file-group">
+                            <label for="cm-ne2">Compare NE</label>
+                            <input type="search" id="cm-ne2-search" placeholder="Search compare NE...">
+                            <select id="cm-ne2" size="8"></select>
+                        </div>
+                    </div>
+
+                    <div class="file-group">
+                        <label for="cm-mo-classes">MO Classes</label>
+                        <select id="cm-mo-classes" multiple size="7"></select>
+                        <small class="field-hint">Recommended classes are selected by default. Leave them selected for the standard full same-level comparison.</small>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-large">Compare Selected NEs</button>
+                </form>
+                <div id="cm-status" class="status-message"></div>
+            </div>
+
+            <div class="upload-section cm-audit-section">
+                <h2>Full NW CM Audit</h2>
+                <p class="section-help">Use the current vendor, NE level, and MO class selection above. Select the NEs to audit, or select all loaded NEs to pull the full visible network scope.</p>
+
+                <form id="cm-audit-form">
+                    <div class="file-group">
+                        <label for="audit-nes">NEs to Audit</label>
+                        <select id="audit-nes" multiple size="10"></select>
+                        <small class="field-hint">Search or change vendor/scope above to refresh this list. Large audits can take time because CM data is pulled live.</small>
+                    </div>
+
+                    <div class="audit-actions">
+                        <button type="button" class="btn-secondary" id="audit-select-all">Select All Loaded NEs</button>
+                        <button type="button" class="btn-secondary" id="audit-clear-selection">Clear Selection</button>
+                        <button type="submit" class="btn-primary btn-large">Run NW Audit</button>
+                    </div>
+                </form>
+                <div id="audit-status" class="status-message"></div>
+            </div>
+
+            <div class="upload-section legacy-upload-section">
                 <h2>Upload XML Files for Comparison</h2>
+                <p class="section-help">Legacy mode: compare two exported XML files and download an Excel report.</p>
                 <form id="upload-form" enctype="multipart/form-data">
                     <div class="file-pair">
                         <div class="file-group">
@@ -57,7 +132,7 @@
             </div>
 
             <div id="results-section" class="results-section" style="display: none;">
-                <h2>Comparison Results</h2>
+                <h2 id="results-title">Comparison Results</h2>
                 <div id="comparison-stats" class="stats-bar"></div>
                 <div id="comparison-results" class="comparison-results"></div>
                 <div class="action-buttons">
@@ -68,6 +143,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-    <script src="{{ url_for('ne_comparison.static', filename='ne_comparison.js') }}?v=1.0"></script>
+    <script src="{{ url_for('ne_comparison.static', filename='ne_comparison.js') }}?v=1.2"></script>
 </body>
 </html>

@@ -6,14 +6,14 @@
     <title>PrimeNet — Cell heatmap</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('cell_heatmap.static', filename='cell_heatmap.css') }}?v=5.3">
+    <link rel="stylesheet" href="{{ url_for('cell_heatmap.static', filename='cell_heatmap.css') }}?v=5.4">
 </head>
 <body class="ch-page">
     <header class="ch-topbar">
         <a href="/dashboard" class="ch-back">Dashboard</a>
         <div class="ch-topbar-title">
             <span class="ch-brand">Cell heatmap</span>
-            <span class="ch-sub">Nokia 4G · PM overlay</span>
+            <span class="ch-sub">Multi-vendor access KPI PM overlay</span>
         </div>
         <div class="ch-topbar-actions">
             <span class="ch-user">{{ user.username }}</span>
@@ -34,7 +34,29 @@
                 <span class="ch-drawer-chevron" aria-hidden="true"></span>
             </button>
             <div class="ch-drawer-panel" id="ch-drawer-panel">
-                <p class="ch-drawer-lead">Survey-style KPI field: green = good, red = investigate. Orange/red dots mark problem cells (see legend).</p>
+                <p class="ch-drawer-lead">Survey-style access KPI field: green = good, red = investigate. Orange/red dots mark problem cells (see legend).</p>
+
+                <div class="ch-field">
+                    <label for="vendor-filter">Vendor</label>
+                    <select id="vendor-filter">
+                        <option value="all">All vendors</option>
+                        <option value="nokia">Nokia</option>
+                        <option value="huawei">Huawei</option>
+                    </select>
+                </div>
+
+                <div class="ch-field">
+                    <label for="technology-filter">Technology</label>
+                    <select id="technology-filter">
+                        <option value="4G" selected>4G FDD + TDD</option>
+                        <option value="4G-FDD">4G FDD</option>
+                        <option value="4G-TDD">4G TDD</option>
+                        <option value="3G">3G</option>
+                        <option value="2G">2G</option>
+                        <option value="5G">5G</option>
+                        <option value="all">All RATs</option>
+                    </select>
+                </div>
 
                 <div class="ch-field">
                     <label for="band-filter">Band</label>
@@ -97,6 +119,6 @@
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{{ url_for('cell_heatmap.static', filename='cell_heatmap.js') }}?v=6.0"></script>
+    <script src="{{ url_for('cell_heatmap.static', filename='cell_heatmap.js') }}?v=6.2"></script>
 </body>
 </html>

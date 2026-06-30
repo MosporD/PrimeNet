@@ -215,7 +215,6 @@ def rf_optimization(*, area: str = "", vendor: str = "all", technology: str = "a
     sections = [
         neighbor_quality(vendor=vendor, technology=technology, area=area, limit=80),
         capacity_hotspots(vendor=vendor, technology=technology, area=area, limit=80),
-        layer_coverage_gaps(area=area, limit=80),
         overshooting_candidates(vendor=vendor, technology=technology, area=area, limit=80),
         cm_parameter_audit(vendor=vendor, technology=technology, limit=80),
         change_impact(vendor=vendor, technology=technology, limit=80),

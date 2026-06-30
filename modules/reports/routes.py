@@ -247,6 +247,13 @@ def _generate_site_inventory(technology: str = 'all'):
     tech_columns: dict[str, list[str]] = {}
     tech_seen_columns: dict[str, set[str]] = {}
 
+    def _format_header(col_name: str) -> str:
+        header = str(col_name).replace('_', ' ').title().replace(' Id', ' ID')
+        for duplicated_prefix in ('Site Site ', 'Cell Cell '):
+            if header.startswith(duplicated_prefix):
+                header = header.replace(duplicated_prefix, duplicated_prefix.split()[0] + ' ', 1)
+        return header
+
     def _register_col(tech_name: str, col_name: str):
         if tech_name not in tech_columns:
             tech_columns[tech_name] = []
@@ -299,6 +306,8 @@ def _generate_site_inventory(technology: str = 'all'):
             # Attach all site columns (if found) to enrich output.
             if sid is not None and sid in site_by_id:
                 for sc, sv in site_by_id[sid].items():
+                    if site_id_col and str(sc).strip().lower() == str(site_id_col).strip().lower():
+                        continue
                     if sc not in record:
                         record[sc] = sv
                     else:
@@ -346,7 +355,7 @@ def _generate_site_inventory(technology: str = 'all'):
             headers = lead_cols + other_cols
 
             for col, h in enumerate(headers, 1):
-                cell = ws.cell(row=1, column=col, value=h.replace('_', ' ').title())
+                cell = ws.cell(row=1, column=col, value=_format_header(h))
                 cell.fill = hdr_fill
                 cell.font = hdr_font
                 cell.alignment = Alignment(horizontal='center')

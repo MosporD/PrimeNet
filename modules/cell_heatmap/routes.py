@@ -5,6 +5,7 @@ Standalone heatmap module for KPI-driven map intensity overlays.
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
 from functools import wraps
+from datetime import datetime
 import sqlite3
 import math
 import re
@@ -29,10 +30,66 @@ cell_heatmap_bp = Blueprint(
 )
 
 KPI_PRESETS = {
-    "drop_rate": {
+    "access_rrc": {
+        "label": "RRC / Radio Access SR (%)",
+        "direction": "higher_better",
+        "good": 99.0,
+        "bad": 95.0,
+        "aliases": [
+            "RRC Setup Success Rate(%)",
+            "RRC Setup Success Rate",
+            "RRC Connection Setup Success Rate",
+            "RRC Conn Setup SR",
+            "Total E-UTRAN RRC conn stp SR",
+            "RRC conn stp SR (Service)",
+            "RRC conn stp SR mos",
+            "Comp Cont based RACH stp SR",
+            "Compl RACH stp SR",
+            "RACH Stp Completion SR",
+            "Radio Access Success Rate",
+            "CSSR(%)",
+            "CSSR",
+            "Call Setup Success Rate",
+            "SDCCH Assignment Success Rate",
+            "TCH Assignment Success Rate",
+            "RACH Success Rate",
+            "Random Access Success Rate",
+        ],
+    },
+    "access_erab": {
+        "label": "E-RAB / Bearer Setup SR (%)",
+        "direction": "higher_better",
+        "good": 99.0,
+        "bad": 96.0,
+        "aliases": [
+            "E-RAB Setup Success Rate (ALL)(%)",
+            "E-RAB Setup Success Rate",
+            "E-UTRAN E-RAB stp SR",
+            "E-RAB stp SR",
+            "ERAB Setup Success Rate",
+            "Bearer Setup Success Rate",
+            "Initial E-RAB Setup Success Rate",
+        ],
+    },
+    "access_initial": {
+        "label": "Initial Access / Attach SR (%)",
+        "direction": "higher_better",
+        "good": 98.5,
+        "bad": 95.0,
+        "aliases": [
+            "Initial Access Success Rate",
+            "Attach Success Rate",
+            "Service Request Success Rate",
+            "S1 Signaling Connection Setup Success Rate",
+            "S1 init ctxt stp SR",
+            "RACH Setup Success Rate",
+            "Random Access Setup Success Rate",
+        ],
+    },
+    "retainability_drop": {
         "label": "Drop Rate (%)",
         "direction": "lower_better",
-        "good": 0,
+        "good": 0.0,
         "bad": 0.7,
         "aliases": [
             "E-UTRAN E-RAB DR, RAN View",
@@ -53,7 +110,104 @@ def _resolve_kpi_preset(key: str) -> tuple[str, dict]:
     k = (key or "").strip()
     if k in KPI_PRESETS:
         return k, KPI_PRESETS[k]
-    return "drop_rate", KPI_PRESETS["drop_rate"]
+    return "access_rrc", KPI_PRESETS["access_rrc"]
+
+
+def _normalize_vendor(raw: str | None) -> str:
+    v = str(raw or "all").strip().lower()
+    return v if v in ("all", "nokia", "huawei") else "all"
+
+
+def _normalize_technology(raw: str | None) -> str:
+    t = str(raw or "4G").strip().upper().replace("_", "-")
+    aliases = {
+        "ALL": "all",
+        "2G": "2G",
+        "3G": "3G",
+        "4G": "4G",
+        "LTE": "4G",
+        "4G-FDD": "4G-FDD",
+        "4G-TDD": "4G-TDD",
+        "5G": "5G",
+        "NR": "5G",
+    }
+    return aliases.get(t, "4G")
+
+
+def _pm_technology(metadata_technology: str) -> str:
+    tech = str(metadata_technology or "").strip().upper()
+    if tech.startswith("4G"):
+        return "4G"
+    return tech or "4G"
+
+
+def _metadata_union_sql() -> str:
+    return """
+        SELECT
+            cell_name,
+            '2G' AS technology,
+            vendor,
+            NULL AS activity_status,
+            azimuth,
+            frequency_band AS frequency_band,
+            site_id AS site_id,
+            site_name AS site_name,
+            CAST(lat AS REAL) AS latitude,
+            CAST("long" AS REAL) AS longitude
+        FROM cells_2g
+        UNION ALL
+        SELECT
+            cell_name,
+            '3G' AS technology,
+            vendor,
+            NULL AS activity_status,
+            azimuth,
+            dl_uarfcn AS frequency_band,
+            nodeb_id AS site_id,
+            nodeb_name AS site_name,
+            CAST(lat AS REAL) AS latitude,
+            CAST("long" AS REAL) AS longitude
+        FROM cells_3g
+        UNION ALL
+        SELECT
+            cell_name,
+            '4G-FDD' AS technology,
+            vendor,
+            NULL AS activity_status,
+            azimuth,
+            band AS frequency_band,
+            enb_id_actual AS site_id,
+            enb_name AS site_name,
+            CAST(lat AS REAL) AS latitude,
+            CAST("long" AS REAL) AS longitude
+        FROM cells_4g_fdd
+        UNION ALL
+        SELECT
+            cell_name,
+            '4G-TDD' AS technology,
+            vendor,
+            NULL AS activity_status,
+            azimuth,
+            band AS frequency_band,
+            enb_id_actual AS site_id,
+            enb_name AS site_name,
+            CAST(lat AS REAL) AS latitude,
+            CAST("long" AS REAL) AS longitude
+        FROM cells_4g_tdd
+        UNION ALL
+        SELECT
+            cell_name,
+            '5G' AS technology,
+            vendor,
+            NULL AS activity_status,
+            azimuth,
+            bw AS frequency_band,
+            gnb_id_actual AS site_id,
+            gnb_name AS site_name,
+            CAST(lat AS REAL) AS latitude,
+            CAST("long" AS REAL) AS longitude
+        FROM cells_5g
+    """
 
 
 def _normalize_scope(raw: str) -> str:
@@ -125,8 +279,30 @@ def _to_float(raw) -> float | None:
 
 
 # Map of known cell-name and timestamp columns per technology table
-_CELL_COL_CANDIDATES = ["LNCEL name", "NRCEL name", "WCEL name", "BTS name", "cell_name"]
-_TS_COL_CANDIDATES = ["PERIOD_START_TIME", "timestamp", "Timestamp", "period_start_time"]
+_CELL_COL_CANDIDATES = [
+    "LNCEL name",
+    "NRCEL name",
+    "WCEL name",
+    "BTS name",
+    "cell_name",
+    "Cell Name",
+    "Cell",
+    "LocalCell Id",
+]
+_TS_COL_CANDIDATES = [
+    "PERIOD_START_TIME",
+    "timestamp",
+    "Timestamp",
+    "period_start_time",
+    "Date",
+    "date",
+    "Time",
+    "time",
+]
+
+
+def _sqlite_ident(name: str) -> str:
+    return '"' + str(name).replace('"', '""') + '"'
 
 
 def _find_col(cols: list[str], candidates: list[str]) -> str | None:
@@ -136,6 +312,70 @@ def _find_col(cols: list[str], candidates: list[str]) -> str | None:
         if matched:
             return matched
     return None
+
+
+def _column_nonempty_count(conn: sqlite3.Connection, table_name: str, column: str) -> int:
+    try:
+        row = conn.execute(
+            f"""
+            SELECT COUNT(*)
+            FROM {_sqlite_ident(table_name)}
+            WHERE {_sqlite_ident(column)} IS NOT NULL
+              AND TRIM(CAST({_sqlite_ident(column)} AS TEXT)) <> ''
+            """
+        ).fetchone()
+        return int(row[0] or 0) if row else 0
+    except sqlite3.Error:
+        return 0
+
+
+def _find_populated_col(conn: sqlite3.Connection, table_name: str, cols: list[str], candidates: list[str]) -> str | None:
+    cols_lower = {c.strip().lower(): c for c in cols}
+    matches: list[str] = []
+    for cand in candidates:
+        matched = cols_lower.get(cand.strip().lower())
+        if matched and matched not in matches:
+            matches.append(matched)
+    if not matches:
+        return None
+    return max(matches, key=lambda c: _column_nonempty_count(conn, table_name, c))
+
+
+def _parse_pm_timestamp(raw) -> datetime | None:
+    if raw is None:
+        return None
+    if isinstance(raw, datetime):
+        return raw
+    s = str(raw).strip()
+    if not s:
+        return None
+    s = s.replace("T", " ").replace("Z", "")
+    s = re.sub(r"\.\d{1,6}$", "", s)
+    for fmt in (
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d %H:%M",
+        "%Y-%m-%d",
+        "%d/%m/%Y %H:%M:%S",
+        "%d/%m/%Y %H:%M",
+        "%d/%m/%Y",
+        "%m/%d/%Y %H:%M:%S",
+        "%m/%d/%Y %H:%M",
+        "%m/%d/%Y",
+        "%d-%m-%Y %H:%M:%S",
+        "%d-%m-%Y %H:%M",
+        "%d-%m-%Y",
+        "%Y/%m/%d %H:%M:%S",
+        "%Y/%m/%d %H:%M",
+        "%Y/%m/%d",
+    ):
+        try:
+            return datetime.strptime(s, fmt)
+        except ValueError:
+            continue
+    try:
+        return datetime.fromisoformat(s)
+    except ValueError:
+        return None
 
 
 def _pm_latest_values_for_cells(pm_db_path: str, table_name: str, kpi_column: str, cell_names: list[str]) -> dict[str, float]:
@@ -151,8 +391,8 @@ def _pm_latest_values_for_cells(pm_db_path: str, table_name: str, kpi_column: st
         if not cols:
             return out
 
-        cell_col = _find_col(cols, _CELL_COL_CANDIDATES)
-        ts_col = _find_col(cols, _TS_COL_CANDIDATES)
+        cell_col = _find_populated_col(conn, table_name, cols, _CELL_COL_CANDIDATES)
+        ts_col = _find_populated_col(conn, table_name, cols, _TS_COL_CANDIDATES)
         if not cell_col or not ts_col:
             return out
         if kpi_column not in cols:
@@ -160,26 +400,38 @@ def _pm_latest_values_for_cells(pm_db_path: str, table_name: str, kpi_column: st
 
         chunk_size = 700
         for i in range(0, len(cell_names), chunk_size):
-            chunk = cell_names[i:i + chunk_size]
+            chunk = [str(name).strip() for name in cell_names[i:i + chunk_size] if str(name or "").strip()]
+            if not chunk:
+                continue
             ph = ",".join("?" for _ in chunk)
             sql = f"""
-                SELECT t."{cell_col}" AS cell_name, t."{kpi_column}" AS kpi_value
-                FROM "{table_name}" t
-                JOIN (
-                    SELECT "{cell_col}", MAX("{ts_col}") AS max_ts
-                    FROM "{table_name}"
-                    WHERE "{cell_col}" IN ({ph})
-                      AND "{kpi_column}" IS NOT NULL
-                    GROUP BY "{cell_col}"
-                ) m
-                    ON m."{cell_col}" = t."{cell_col}" AND m.max_ts = t."{ts_col}"
+                SELECT
+                    {_sqlite_ident(cell_col)} AS cell_name,
+                    {_sqlite_ident(ts_col)} AS ts_value,
+                    {_sqlite_ident(kpi_column)} AS kpi_value
+                FROM {_sqlite_ident(table_name)}
+                WHERE {_sqlite_ident(cell_col)} IN ({ph})
+                  AND {_sqlite_ident(kpi_column)} IS NOT NULL
             """
             rows = conn.execute(sql, chunk).fetchall()
+            latest: dict[str, tuple[tuple[int, datetime | str], float]] = {}
             for r in rows:
                 v = _to_float(r["kpi_value"])
                 if v is None:
                     continue
-                out[str(r["cell_name"])] = v
+                cell_name = str(r["cell_name"] or "").strip()
+                if not cell_name:
+                    continue
+                parsed_ts = _parse_pm_timestamp(r["ts_value"])
+                sort_key: tuple[int, datetime | str]
+                if parsed_ts is not None:
+                    sort_key = (1, parsed_ts)
+                else:
+                    sort_key = (0, str(r["ts_value"] or ""))
+                prev = latest.get(cell_name)
+                if prev is None or sort_key > prev[0]:
+                    latest[cell_name] = (sort_key, v)
+            out.update({cell: val for cell, (_sort_key, val) in latest.items()})
     finally:
         conn.close()
     return out
@@ -270,8 +522,9 @@ def get_heatmap_points():
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
 
-    # Simplified baseline mode: Nokia 4G only.
-    kpi = (request.args.get("kpi") or "drop_rate").strip()
+    kpi = (request.args.get("kpi") or "access_rrc").strip()
+    vendor = _normalize_vendor(request.args.get("vendor"))
+    technology = _normalize_technology(request.args.get("technology"))
     data_scope = _normalize_scope(request.args.get("data_scope"))
     band = (request.args.get("band") or "").strip()
     limit_raw = request.args.get("limit")
@@ -309,33 +562,24 @@ def get_heatmap_points():
         if isinstance(conn, sqlite3.Connection):
             conn.execute("PRAGMA busy_timeout=30000")
             conn.execute("PRAGMA query_only=ON")
-        sql = """
+        tech_clause = ""
+        tech_params: list[object] = []
+        if technology == "4G":
+            tech_clause = "AND v.technology IN ('4G-FDD', '4G-TDD')"
+        elif technology != "all":
+            tech_clause = "AND v.technology = ?"
+            tech_params.append(technology)
+        vendor_clause = ""
+        params: list[object] = []
+        if vendor != "all":
+            vendor_clause = "AND LOWER(TRIM(COALESCE(v.vendor, ''))) = ?"
+            params.append(vendor)
+        params.extend(tech_params)
+        params.extend([band, band, limit])
+
+        sql = f"""
             WITH v AS (
-                SELECT
-                    cell_name,
-                    '4G-FDD' AS technology,
-                    vendor,
-                    active_state AS activity_status,
-                    azimuth,
-                    band AS frequency_band,
-                    enb_id_actual AS site_id,
-                    enb_name AS site_name,
-                    CAST(lat AS REAL) AS latitude,
-                    CAST("long" AS REAL) AS longitude
-                FROM cells_4g_fdd
-                UNION ALL
-                SELECT
-                    cell_name,
-                    '4G-TDD' AS technology,
-                    vendor,
-                    active_state AS activity_status,
-                    azimuth,
-                    band AS frequency_band,
-                    enb_id_actual AS site_id,
-                    enb_name AS site_name,
-                    CAST(lat AS REAL) AS latitude,
-                    CAST("long" AS REAL) AS longitude
-                FROM cells_4g_tdd
+                {_metadata_union_sql()}
             )
             SELECT
                 v.cell_name,
@@ -349,14 +593,15 @@ def get_heatmap_points():
                 v.latitude,
                 v.longitude
             FROM v
-            WHERE LOWER(TRIM(COALESCE(v.vendor, ''))) = 'nokia'
-              AND v.latitude IS NOT NULL
+            WHERE v.latitude IS NOT NULL
               AND v.longitude IS NOT NULL
+              {vendor_clause}
+              {tech_clause}
               AND (? = '' OR LOWER(TRIM(CAST(v.frequency_band AS TEXT))) = LOWER(TRIM(?)))
             ORDER BY v.site_id, v.cell_name
             LIMIT ?
         """
-        rows = execute_query(conn, sql, [band, band, limit]).fetchall()
+        rows = execute_query(conn, sql, params).fetchall()
         conn.close()
 
         cell_rows = [dict(r) for r in rows]
@@ -364,7 +609,7 @@ def get_heatmap_points():
         for r in cell_rows:
             row_vendor = str(r.get("vendor") or "").strip()
             row_tech = str(r.get("technology") or "").strip()
-            pm_tech = "4G" if row_tech in ("4G-FDD", "4G-TDD") else row_tech
+            pm_tech = _pm_technology(row_tech)
             key = (row_vendor, pm_tech)
             by_vendor_tech.setdefault(key, []).append(str(r.get("cell_name") or ""))
 
@@ -409,7 +654,6 @@ def get_heatmap_points():
         matched = 0
         matched_size = 0
         fallback_used = 0
-        radii: list[float] = []
         for r in cell_rows:
             kpi_value = kpi_map.get(str(r["cell_name"]))
             avg_distance = size_map.get(str(r["cell_name"]))
@@ -424,7 +668,6 @@ def get_heatmap_points():
             lat = float(r["latitude"])
             lng = float(r["longitude"])
             size_radius_m = _size_from_avg_distance(avg_distance)
-            radii.append(size_radius_m)
             details.append(
                 {
                     "cell_name": r["cell_name"],
@@ -446,8 +689,10 @@ def get_heatmap_points():
                 }
             )
 
-        min_radius = min(radii) if radii else 0.0
-        max_radius = max(radii) if radii else 0.0
+        details = [d for d in details if d["kpi_value"] is not None]
+        shown_radii = [float(d["size_radius_m"]) for d in details]
+        min_radius = min(shown_radii) if shown_radii else 0.0
+        max_radius = max(shown_radii) if shown_radii else 0.0
         size_vals = [d["size_radius_m"] for d in details]
         size_avg = (sum(size_vals) / len(size_vals)) if size_vals else None
 
@@ -472,8 +717,8 @@ def get_heatmap_points():
                     "kpi": preset_key,
                     "kpi_label": preset["label"],
                     "direction": preset["direction"],
-                    "technology_scope": "4G",
-                    "vendor_scope": "Nokia",
+                    "technology_scope": technology,
+                    "vendor_scope": vendor,
                     "good_threshold": good_thr,
                     "bad_threshold": bad_thr,
                     "data_scope": data_scope,
@@ -521,23 +766,38 @@ def get_heatmap_bands():
     user = get_current_user()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
+    vendor = _normalize_vendor(request.args.get("vendor"))
+    technology = _normalize_technology(request.args.get("technology"))
     try:
         conn = connect_metadata()
+        tech_clause = ""
+        tech_params: list[object] = []
+        if technology == "4G":
+            tech_clause = "AND v.technology IN ('4G-FDD', '4G-TDD')"
+        elif technology != "all":
+            tech_clause = "AND v.technology = ?"
+            tech_params.append(technology)
+        vendor_clause = ""
+        params: list[object] = []
+        if vendor != "all":
+            vendor_clause = "AND LOWER(TRIM(COALESCE(v.vendor, ''))) = ?"
+            params.append(vendor)
+        params.extend(tech_params)
         rows = execute_query(
             conn,
-            """
-            SELECT DISTINCT CAST(band AS TEXT) AS band
-            FROM (
-                SELECT band, vendor FROM cells_4g_fdd
-                UNION ALL
-                SELECT band, vendor FROM cells_4g_tdd
-            ) t
-            WHERE LOWER(TRIM(COALESCE(vendor, ''))) = 'nokia'
-              AND band IS NOT NULL
-              AND TRIM(CAST(band AS TEXT)) <> ''
+            f"""
+            WITH v AS (
+                {_metadata_union_sql()}
+            )
+            SELECT DISTINCT CAST(v.frequency_band AS TEXT) AS band
+            FROM v
+            WHERE v.frequency_band IS NOT NULL
+              AND TRIM(CAST(v.frequency_band AS TEXT)) <> ''
+              {vendor_clause}
+              {tech_clause}
             ORDER BY band
             """,
-            (),
+            params,
         ).fetchall()
         conn.close()
         return jsonify({"success": True, "bands": [str(r["band"]) for r in rows]})
