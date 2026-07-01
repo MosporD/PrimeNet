@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 from urllib.error import HTTPError, URLError
@@ -12,7 +11,12 @@ from urllib.request import Request, urlopen
 
 from flask import Blueprint, jsonify, redirect, render_template, request, url_for
 
-from core.cm_extractor.config import huawei_defaults, nokia_defaults
+from core.cm_extractor.config import (
+    huawei_defaults,
+    nokia_fm_configured,
+    nokia_fm_defaults,
+    nokia_fm_missing_settings,
+)
 from core.cm_extractor.http_util import build_ssl_context, format_connection_error, request_json
 from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
 from core.cm_extractor.huawei_discovery import fetch_fm_alarms
@@ -146,33 +150,40 @@ def _filter_alarms(alarms: list[dict], data: dict) -> list[dict]:
     return out
 
 
+def _netact_fm_token_error_detail(status: int, raw_detail: str) -> str:
+    """Turn Keycloak/OAuth failures into actionable setup guidance."""
+    parsed: dict = {}
+    try:
+        maybe = json.loads(raw_detail or '')
+        if isinstance(maybe, dict):
+            parsed = maybe
+    except json.JSONDecodeError:
+        pass
+
+    err = str(parsed.get('error') or '').strip()
+    desc = str(parsed.get('error_description') or raw_detail or '').strip()
+    if status == 401 and err == 'invalid_client':
+        return (
+            'NetAct FM OAuth client rejected (invalid_client). '
+            'Create/register the FM API client on the fmapi-service node, then set '
+            'NOKIA_FM_CLIENT_ID (and NOKIA_FM_CLIENT_SECRET only if the client is confidential): '
+            '/opt/oss/fmapi-service/tools/api_client.sh --create-client <client_id>. '
+            f'Current client_id={_netact_fm_defaults().get("client_id") or "(not set)"}. '
+            f'Keycloak: {desc or "Invalid client or Invalid client credentials"}'
+        )
+    if status == 401 and err == 'invalid_grant':
+        return (
+            'NetAct FM user credentials rejected (invalid_grant). '
+            'Check NOKIA_CM_USER / NOKIA_CM_PASSWORD (or NOKIA_FM_USER / NOKIA_FM_PASSWORD). '
+            f'Keycloak: {desc or raw_detail}'
+        )
+    if desc:
+        return desc
+    return raw_detail or f'HTTP {status}'
+
+
 def _netact_fm_defaults() -> dict:
-    cfg = nokia_defaults()
-    host = (os.getenv('NOKIA_FM_HOST') or cfg.get('host') or '').strip().rstrip('/')
-    use_https = str(os.getenv('NOKIA_FM_USE_HTTPS') or os.getenv('NOKIA_CM_USE_HTTPS') or '1').lower() not in ('0', 'false', 'no', 'off')
-    scheme = 'https' if use_https else 'http'
-    base_url = (os.getenv('NOKIA_FM_BASE_URL') or '').strip().rstrip('/')
-    if not base_url and host:
-        if host.startswith(('http://', 'https://')):
-            base_url = host
-        else:
-            base_url = f'{scheme}://{host}'
-        base_url = base_url.rstrip('/') + '/api/fm/v1'
-    token_url = (os.getenv('NOKIA_FM_TOKEN_URL') or '').strip()
-    if not token_url and host:
-        token_host = host if host.startswith(('http://', 'https://')) else f'{scheme}://{host}:10448'
-        token_url = token_host.rstrip('/') + '/auth/realms/netact-auth/protocol/openid-connect/token'
-    return {
-        'host': host,
-        'base_url': base_url,
-        'token_url': token_url,
-        'client_id': (os.getenv('NOKIA_FM_CLIENT_ID') or '').strip(),
-        'client_secret': (os.getenv('NOKIA_FM_CLIENT_SECRET') or '').strip(),
-        'username': (os.getenv('NOKIA_FM_USER') or cfg.get('username') or '').strip(),
-        'password': os.getenv('NOKIA_FM_PASSWORD') or cfg.get('password') or '',
-        'verify_ssl': str(os.getenv('NOKIA_FM_VERIFY_SSL') or os.getenv('NOKIA_CM_VERIFY_SSL') or '0').lower() in ('1', 'true', 'yes', 'on'),
-        'timeout': int(os.getenv('NOKIA_FM_TIMEOUT') or cfg.get('timeout') or 180),
-    }
+    return nokia_fm_defaults()
 
 
 def _netact_fm_configured(cfg: dict) -> bool:
@@ -180,14 +191,7 @@ def _netact_fm_configured(cfg: dict) -> bool:
 
 
 def _netact_fm_missing_settings(cfg: dict) -> list[str]:
-    required = {
-        'NOKIA_CM_HOST or NOKIA_FM_BASE_URL': cfg['base_url'],
-        'NOKIA_FM_TOKEN_URL or NOKIA_CM_HOST': cfg['token_url'],
-        'NOKIA_FM_CLIENT_ID': cfg['client_id'],
-        'NOKIA_CM_USER': cfg['username'],
-        'NOKIA_CM_PASSWORD': cfg['password'],
-    }
-    return [name for name, value in required.items() if not value]
+    return nokia_fm_missing_settings(cfg)
 
 
 def _netact_token(cfg: dict) -> str:
@@ -215,7 +219,8 @@ def _netact_token(cfg: dict) -> str:
             payload = json.loads(resp.read().decode('utf-8', errors='replace') or '{}')
     except HTTPError as exc:
         detail = exc.read().decode('utf-8', errors='replace')
-        raise RuntimeError(f'NetAct FM token request failed ({exc.code}): {detail or exc.reason}') from exc
+        message = _netact_fm_token_error_detail(exc.code, detail)
+        raise RuntimeError(f'NetAct FM token request failed ({exc.code}): {message}') from exc
     except (URLError, TimeoutError, OSError) as exc:
         raise ConnectionError(format_connection_error(exc, url=cfg['token_url'], vendor='nokia')) from exc
     token = payload.get('access_token') if isinstance(payload, dict) else ''
@@ -337,6 +342,8 @@ def fault_management_page():
         'fault_management.html',
         user=format_user(user),
         huawei_configured=bool(cfg['host'] and cfg['username'] and cfg['password']),
+        nokia_fm_configured=nokia_fm_configured(),
+        nokia_fm_missing=nokia_fm_missing_settings(),
     )
 
 

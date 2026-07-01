@@ -426,7 +426,12 @@ def create_session(user_id):
     conn = get_db()
     cursor = conn.cursor()
     session_token = secrets.token_urlsafe(32)
-    expires_at = datetime.now() + timedelta(hours=24)
+    try:
+        lifetime_hours = int(os.getenv('SESSION_LIFETIME_HOURS', '2'))
+    except (TypeError, ValueError):
+        lifetime_hours = 2
+    lifetime_hours = max(1, min(lifetime_hours, 24 * 30))
+    expires_at = datetime.now() + timedelta(hours=lifetime_hours)
 
     _exec(
         cursor,

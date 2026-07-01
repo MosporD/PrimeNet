@@ -43,6 +43,19 @@
                 </div>
                 {% endif %}
 
+                {% if not nokia_fm_configured %}
+                <div class="fm-alert" id="fm-nokia-config-alert">
+                    Nokia NetAct FM is not fully configured for OAuth alarm fetch.
+                    {% if nokia_fm_missing %}
+                    Missing: {{ nokia_fm_missing | join(', ') }}.
+                    {% endif %}
+                    Create the FM API client on the fmapi-service node, then set
+                    <code>NOKIA_FM_CLIENT_ID</code> in <code>.env</code>
+                    (and <code>NOKIA_FM_CLIENT_SECRET</code> only if the client is confidential).
+                    CM user/password reuse <code>NOKIA_CM_USER</code> / <code>NOKIA_CM_PASSWORD</code>.
+                </div>
+                {% endif %}
+
                 <input type="hidden" id="fm-vendor" value="huawei">
                 <div class="fm-vendor-tabs" role="tablist" aria-label="Fault Management OSS">
                     <button type="button" class="fm-vendor-tab active" data-vendor="huawei" role="tab" aria-selected="true">

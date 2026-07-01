@@ -113,6 +113,58 @@ def nokia_configured() -> bool:
     return bool(cfg['host'] and cfg['username'] and cfg['password'])
 
 
+def nokia_fm_defaults() -> dict:
+    """
+    Nokia NetAct FM Operations REST API (OAuth / Keycloak).
+
+    Reuses NOKIA_CM_HOST, NOKIA_CM_USER, and NOKIA_CM_PASSWORD unless FM-specific
+    overrides are set. FM also requires NOKIA_FM_CLIENT_ID registered on the
+    fmapi-service node (see .env.example).
+    """
+    cfg = nokia_defaults()
+    host = (_env('NOKIA_FM_HOST') or cfg.get('host') or '').strip().rstrip('/')
+    use_https = _env_bool('NOKIA_FM_USE_HTTPS', cfg.get('use_https', True))
+    scheme = 'https' if use_https else 'http'
+    base_url = _env('NOKIA_FM_BASE_URL').rstrip('/')
+    if not base_url and host:
+        if host.startswith(('http://', 'https://')):
+            base_url = host
+        else:
+            base_url = f'{scheme}://{host}'
+        base_url = base_url.rstrip('/') + '/api/fm/v1'
+    token_url = _env('NOKIA_FM_TOKEN_URL')
+    if not token_url and host:
+        token_host = host if host.startswith(('http://', 'https://')) else f'{scheme}://{host}:10448'
+        token_url = token_host.rstrip('/') + '/auth/realms/netact-auth/protocol/openid-connect/token'
+    return {
+        'host': host,
+        'base_url': base_url,
+        'token_url': token_url,
+        'client_id': _env('NOKIA_FM_CLIENT_ID'),
+        'client_secret': _env('NOKIA_FM_CLIENT_SECRET'),
+        'username': _env('NOKIA_FM_USER') or cfg.get('username') or '',
+        'password': _env('NOKIA_FM_PASSWORD') or cfg.get('password') or '',
+        'verify_ssl': _env_bool('NOKIA_FM_VERIFY_SSL', cfg.get('verify_ssl', False)),
+        'timeout': _env_int('NOKIA_FM_TIMEOUT', cfg.get('timeout') or 180),
+    }
+
+
+def nokia_fm_missing_settings(cfg: dict | None = None) -> list[str]:
+    cfg = cfg or nokia_fm_defaults()
+    required = {
+        'NOKIA_CM_HOST or NOKIA_FM_BASE_URL': cfg.get('base_url'),
+        'NOKIA_FM_TOKEN_URL or NOKIA_CM_HOST': cfg.get('token_url'),
+        'NOKIA_FM_CLIENT_ID': cfg.get('client_id'),
+        'NOKIA_CM_USER': cfg.get('username'),
+        'NOKIA_CM_PASSWORD': cfg.get('password'),
+    }
+    return [name for name, value in required.items() if not value]
+
+
+def nokia_fm_configured() -> bool:
+    return not nokia_fm_missing_settings()
+
+
 def build_nokia_operations_client():
     """CM Operations REST client (Import_Export) using NOKIA_CM_* credentials."""
     from core.cm_extractor.nokia_operations_client import NokiaOperationsClient
