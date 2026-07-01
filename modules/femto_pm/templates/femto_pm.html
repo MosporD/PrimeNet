@@ -6,7 +6,7 @@
     <title>Femto PM - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=2.0">
     <link rel="stylesheet" href="{{ url_for('performance.static', filename='performance.css') }}?v=8.2">
-    <link rel="stylesheet" href="{{ url_for('femto_pm.static', filename='femto_pm.css') }}?v=2.4">
+    <link rel="stylesheet" href="{{ url_for('femto_pm.static', filename='femto_pm.css') }}?v=3.0">
     <script src="{{ url_for('static', filename='js/chart.umd.min.js') }}?v=4.4.0"></script>
 </head>
 <body class="perf-page femto-pm-page">
@@ -63,6 +63,9 @@
                                     <input type="checkbox" id="femto-kpi-select-all">
                                     <span>Select visible KPIs</span>
                                 </label>
+                                <button type="button" id="femto-create-kpi-btn" class="femto-create-kpi-btn" title="Build a KPI from counters">
+                                    + Create KPI
+                                </button>
                             </div>
                             <div class="femto-control femto-search-row">
                                 <input id="femto-kpi-search" class="hw-tree-search" type="search" placeholder="Search computed KPIs..." autocomplete="off">
@@ -147,8 +150,96 @@
     </div>
 </div>
 
+<div id="femto-kpi-modal" class="femto-kpi-modal" hidden aria-hidden="true">
+    <div class="femto-kpi-modal-backdrop" data-close-kpi-modal></div>
+    <div class="femto-kpi-modal-panel" role="dialog" aria-labelledby="femto-kpi-modal-title" aria-modal="true">
+        <header class="femto-kpi-modal-head">
+            <div>
+                <h2 id="femto-kpi-modal-title">Create KPI from Counters</h2>
+                <p class="femto-kpi-modal-sub">Write a simple formula — we translate it into a SQL query against Femto counters.</p>
+            </div>
+            <button type="button" class="femto-kpi-modal-close" data-close-kpi-modal aria-label="Close">×</button>
+        </header>
+
+        <div class="femto-kpi-modal-body">
+            <div class="femto-kpi-form-grid">
+                <label class="femto-kpi-field">
+                    <span>KPI name</span>
+                    <input id="femto-kpi-name" type="text" placeholder="e.g. My CSSR" autocomplete="off">
+                </label>
+                <label class="femto-kpi-field">
+                    <span>Category</span>
+                    <select id="femto-kpi-category">
+                        <option value="Custom">Custom</option>
+                        <option value="Accessibility">Accessibility</option>
+                        <option value="Retainability">Retainability</option>
+                        <option value="Mobility">Mobility</option>
+                        <option value="Throughput">Throughput</option>
+                        <option value="Capacity">Capacity</option>
+                        <option value="Availability">Availability</option>
+                    </select>
+                </label>
+                <label class="femto-kpi-field">
+                    <span>Unit</span>
+                    <input id="femto-kpi-unit" type="text" placeholder="%, Mbps, ms…" autocomplete="off">
+                </label>
+            </div>
+
+            <label class="femto-kpi-field femto-kpi-field-full">
+                <span>Description <em>(optional)</em></span>
+                <input id="femto-kpi-description" type="text" placeholder="What does this KPI measure?" autocomplete="off">
+            </label>
+
+            <section class="femto-formula-section">
+                <div class="femto-formula-head">
+                    <span class="femto-formula-label">Formula</span>
+                    <span class="femto-formula-hint">Use counter names with + − × ÷ ( ) — same idea as a SELECT expression</span>
+                </div>
+                <div class="femto-formula-toolbar">
+                    <button type="button" class="femto-formula-chip" data-insert="(">(</button>
+                    <button type="button" class="femto-formula-chip" data-insert=")">)</button>
+                    <button type="button" class="femto-formula-chip" data-insert=" + ">+</button>
+                    <button type="button" class="femto-formula-chip" data-insert=" - ">−</button>
+                    <button type="button" class="femto-formula-chip" data-insert=" * ">*</button>
+                    <button type="button" class="femto-formula-chip" data-insert=" / ">/</button>
+                    <button type="button" class="femto-formula-chip" data-insert=" * 100">× 100</button>
+                    <button type="button" class="femto-formula-template" data-template="ratio">Success ratio (%)</button>
+                    <button type="button" class="femto-formula-template" data-template="sum">SUM(pattern*)</button>
+                    <button type="button" class="femto-formula-template" data-template="avg">AVG(pattern*)</button>
+                </div>
+                <textarea id="femto-kpi-formula" class="femto-kpi-formula" rows="3"
+                          placeholder="(succ_counter / att_counter) * 100"></textarea>
+                <div class="femto-counter-picker">
+                    <input id="femto-formula-counter-search" class="hw-tree-search" type="search"
+                           placeholder="Search counters to insert…" autocomplete="off">
+                    <div id="femto-formula-counter-list" class="femto-formula-counter-list"></div>
+                </div>
+            </section>
+
+            <section class="femto-sql-preview-section">
+                <div class="femto-sql-preview-head">
+                    <span>Query preview</span>
+                    <span class="femto-sql-badge">SQL</span>
+                </div>
+                <pre id="femto-sql-preview" class="femto-sql-preview">-- Formula updates will appear here as a SELECT query</pre>
+                <p id="femto-formula-feedback" class="femto-formula-feedback"></p>
+            </section>
+
+            <p class="femto-kpi-save-note">
+                Saved to <code>femto_user_kpis.db</code> — your custom KPIs appear in the KPI tree after save.
+            </p>
+        </div>
+
+        <footer class="femto-kpi-modal-foot">
+            <button type="button" class="btn-secondary" data-close-kpi-modal>Cancel</button>
+            <button type="button" id="femto-kpi-validate-btn" class="btn-secondary">Test formula</button>
+            <button type="button" id="femto-kpi-save-btn" class="btn-query">Save KPI</button>
+        </footer>
+    </div>
+</div>
+
 <script src="{{ url_for('static', filename='js/common.js') }}?v=1.0"></script>
-<script src="{{ url_for('femto_pm.static', filename='femto_pm.js') }}?v=2.6"></script>
+<script src="{{ url_for('femto_pm.static', filename='femto_pm.js') }}?v=3.0"></script>
 </body>
 </html>
 

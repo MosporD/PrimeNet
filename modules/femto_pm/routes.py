@@ -12,6 +12,19 @@ import time as _time
 
 from database_enhanced import get_user_by_session
 from sync_config import DATABASES_ROOT
+from modules.femto_pm.kpi_store import (
+    FEMTO_USER_KPI_DB,
+    create_user_kpi,
+    default_categories,
+    delete_user_kpi,
+    formula_to_sql_preview,
+    get_user_kpi,
+    list_user_kpis,
+    update_user_kpi,
+    user_kpi_conn,
+    user_kpi_defs_map,
+    validate_formula,
+)
 
 
 femto_pm_bp = Blueprint(
@@ -271,7 +284,24 @@ def _fetch_catalog(conn: sqlite3.Connection) -> dict:
         rows = conn.execute(
             f'SELECT code, kpi_name, category_l1, formula, unit, description FROM "{FEMTO_COMPUTED_TABLE}" ORDER BY category_l1, kpi_name'
         ).fetchall()
-        kpis = [dict(r) for r in rows]
+        kpis = [{**dict(r), "source": "system", "editable": False} for r in rows]
+    user_rows = list_user_kpis()
+    for row in user_rows:
+        kpis.append(
+            {
+                "id": row.get("id"),
+                "code": None,
+                "kpi_name": row.get("kpi_name"),
+                "category_l1": row.get("category_l1") or "Custom",
+                "formula": row.get("formula"),
+                "unit": row.get("unit") or "",
+                "description": row.get("description") or "",
+                "source": "user",
+                "editable": True,
+                "created_by": row.get("created_by"),
+            }
+        )
+    kpis.sort(key=lambda r: (str(r.get("category_l1") or ""), str(r.get("kpi_name") or "")))
     if _table_exists(conn, FEMTO_COUNTER_TABLE):
         rows = conn.execute(
             f'SELECT counter_name, l1, l2, l3 FROM "{FEMTO_COUNTER_TABLE}" ORDER BY l1, l2, l3, counter_name'
@@ -290,7 +320,7 @@ def _pattern_regex(pattern: str) -> re.Pattern:
 
 
 def _evaluate_formula(kpi_name: str, formula: str, row_map: dict) -> float | None:
-    raw_formula = (_FORMULA_OVERRIDES.get(kpi_name) or formula or "").strip()
+    raw_formula = (formula or _FORMULA_OVERRIDES.get(kpi_name) or "").strip()
     if not raw_formula:
         return None
     expr = raw_formula.replace("%", "")
@@ -427,14 +457,21 @@ def _evaluate_formula(kpi_name: str, formula: str, row_map: dict) -> float | Non
 
 
 def _computed_defs_for_selected(conn: sqlite3.Connection, selected: list[str]) -> dict[str, str]:
-    if not selected or not _table_exists(conn, FEMTO_COMPUTED_TABLE):
+    if not selected:
         return {}
-    placeholders = ", ".join(["?"] * len(selected))
-    rows = conn.execute(
-        f'SELECT kpi_name, formula FROM "{FEMTO_COMPUTED_TABLE}" WHERE kpi_name IN ({placeholders})',
-        selected,
-    ).fetchall()
-    return {str(r["kpi_name"]): str(r["formula"] or "") for r in rows}
+    out: dict[str, str] = {}
+    if _table_exists(conn, FEMTO_COMPUTED_TABLE):
+        placeholders = ", ".join(["?"] * len(selected))
+        rows = conn.execute(
+            f'SELECT kpi_name, formula FROM "{FEMTO_COMPUTED_TABLE}" WHERE kpi_name IN ({placeholders})',
+            selected,
+        ).fetchall()
+        out.update({str(r["kpi_name"]): str(r["formula"] or "") for r in rows})
+    user_defs = user_kpi_defs_map()
+    for name in selected:
+        if name in user_defs:
+            out[name] = user_defs[name]
+    return out
 
 
 def _next_day(day: str) -> str:
@@ -623,11 +660,15 @@ def femto_pm_kpi_columns():
         return jsonify({"success": True, "columns": []})
     conn = _femto_conn()
     try:
+        names: list[str] = []
         if _table_exists(conn, FEMTO_COMPUTED_TABLE):
             rows = conn.execute(
                 f'SELECT kpi_name FROM "{FEMTO_COMPUTED_TABLE}" ORDER BY kpi_name'
             ).fetchall()
-            return jsonify({"success": True, "columns": [str(r[0]) for r in rows]})
+            names.extend(str(r[0]) for r in rows)
+        names.extend(sorted(user_kpi_defs_map().keys()))
+        if names:
+            return jsonify({"success": True, "columns": sorted(set(names))})
         return jsonify({"success": True, "columns": _available_kpi_cols(conn)})
     finally:
         conn.close()
@@ -658,6 +699,7 @@ def femto_pm_trend():
         if _table_exists(conn, FEMTO_COMPUTED_TABLE):
             rows = conn.execute(f'SELECT kpi_name FROM "{FEMTO_COMPUTED_TABLE}"').fetchall()
             computed_allow = {str(r[0]) for r in rows if str(r[0]).strip()}
+        computed_allow |= set(user_kpi_defs_map().keys())
         allow = raw_allow | computed_allow
         selected = [k for k in req_kpis if k in allow] if req_kpis else sorted(list(allow))[:5]
         if not selected:
@@ -674,6 +716,165 @@ def femto_pm_trend():
             "unique_id": unique_id,
             "granularity": granularity,
         })
+    finally:
+        conn.close()
+
+
+@femto_pm_bp.route("/api/femto-pm/user-kpis", methods=["GET"])
+def femto_pm_user_kpis_list():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    rows = list_user_kpis()
+    return jsonify({
+        "success": True,
+        "kpis": rows,
+        "categories": default_categories(),
+        "database": FEMTO_USER_KPI_DB,
+    })
+
+
+@femto_pm_bp.route("/api/femto-pm/user-kpis", methods=["POST"])
+def femto_pm_user_kpis_create():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    payload = request.get_json(silent=True) or {}
+    formula = str(payload.get("formula") or "").strip()
+    known = _counter_names_for_validation()
+    check = validate_formula(formula, known)
+    if not check["ok"]:
+        return jsonify({"success": False, "error": "; ".join(check["errors"]), **check}), 400
+    conn = user_kpi_conn()
+    try:
+        created = create_user_kpi(
+            conn,
+            payload,
+            created_by=str(user.get("username") or user.get("id") or ""),
+        )
+        _kpi_cache["names"] = []
+        _kpi_cache["ts"] = 0.0
+        return jsonify({
+            "success": True,
+            "kpi": created,
+            "sql_preview": formula_to_sql_preview(formula, created.get("kpi_name", "")),
+            "warnings": check.get("warnings") or [],
+        })
+    except sqlite3.IntegrityError:
+        return jsonify({"success": False, "error": "A KPI with this name already exists."}), 409
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
+    finally:
+        conn.close()
+
+
+@femto_pm_bp.route("/api/femto-pm/user-kpis/validate", methods=["POST"])
+def femto_pm_user_kpis_validate():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    payload = request.get_json(silent=True) or {}
+    formula = str(payload.get("formula") or "").strip()
+    kpi_name = str(payload.get("kpi_name") or "my_kpi").strip()
+    unique_id = str(payload.get("unique_id") or "").strip()
+    check = validate_formula(formula, _counter_names_for_validation())
+    sample_value = None
+    sample_timestamp = None
+    if check["ok"] and formula and unique_id and os.path.isfile(FEMTO_PM_DB):
+        sample_value, sample_timestamp = _sample_formula_value(unique_id, kpi_name, formula)
+    return jsonify({
+        "success": True,
+        **check,
+        "sql_preview": check.get("sql_preview") or formula_to_sql_preview(formula, kpi_name),
+        "sample_value": sample_value,
+        "sample_timestamp": sample_timestamp,
+    })
+
+
+@femto_pm_bp.route("/api/femto-pm/user-kpis/<int:kpi_id>", methods=["PUT"])
+def femto_pm_user_kpis_update(kpi_id: int):
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    payload = request.get_json(silent=True) or {}
+    formula = str(payload.get("formula") or "").strip()
+    if formula:
+        check = validate_formula(formula, _counter_names_for_validation())
+        if not check["ok"]:
+            return jsonify({"success": False, "error": "; ".join(check["errors"]), **check}), 400
+    conn = user_kpi_conn()
+    try:
+        updated = update_user_kpi(conn, kpi_id, payload)
+        _kpi_cache["names"] = []
+        _kpi_cache["ts"] = 0.0
+        return jsonify({"success": True, "kpi": updated})
+    except ValueError as exc:
+        return jsonify({"success": False, "error": str(exc)}), 400
+    except sqlite3.IntegrityError:
+        return jsonify({"success": False, "error": "A KPI with this name already exists."}), 409
+    finally:
+        conn.close()
+
+
+@femto_pm_bp.route("/api/femto-pm/user-kpis/<int:kpi_id>", methods=["DELETE"])
+def femto_pm_user_kpis_delete(kpi_id: int):
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    conn = user_kpi_conn()
+    try:
+        if not delete_user_kpi(conn, kpi_id):
+            return jsonify({"success": False, "error": "KPI not found."}), 404
+        _kpi_cache["names"] = []
+        _kpi_cache["ts"] = 0.0
+        return jsonify({"success": True})
+    finally:
+        conn.close()
+
+
+def _counter_names_for_validation() -> set[str]:
+    names: set[str] = set()
+    if not os.path.isfile(FEMTO_PM_DB):
+        return names
+    conn = _femto_conn()
+    try:
+        names = set(_available_kpi_cols(conn))
+    finally:
+        conn.close()
+    return names
+
+
+def _sample_formula_value(unique_id: str, kpi_name: str, formula: str) -> tuple[float | None, str | None]:
+    conn = _femto_conn()
+    try:
+        row = conn.execute(
+            f"""
+            SELECT timestamp, gp_seconds
+            FROM "{FEMTO_TABLE}"
+            WHERE unique_id = ?
+            ORDER BY timestamp DESC
+            LIMIT 1
+            """,
+            (unique_id,),
+        ).fetchone()
+        if not row:
+            return None, None
+        ts = str(row["timestamp"])
+        value_rows = conn.execute(
+            f"""
+            SELECT kpi_name, kpi_value
+            FROM "{FEMTO_VALUES_TABLE}"
+            WHERE unique_id = ? AND timestamp = ?
+            """,
+            (unique_id, ts),
+        ).fetchall()
+        base = {"timestamp": ts, "measurement_period_sec": row["gp_seconds"]}
+        for r in value_rows:
+            base[str(r["kpi_name"])] = r["kpi_value"]
+        val = _evaluate_formula(kpi_name, formula, base)
+        return val, ts
+    except Exception:
+        return None, None
     finally:
         conn.close()
 

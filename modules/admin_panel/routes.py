@@ -440,12 +440,14 @@ def _sqlite_pm_survey(path: str) -> dict:
 def _pm_database_definitions():
     """Ordered list of (label, kind, path) for PM cell databases."""
     femto = os.path.join(DATABASES_ROOT, 'cells', 'femto_pm_cells.db')
+    femto_kpis = os.path.join(DATABASES_ROOT, 'cells', 'femto_user_kpis.db')
     return [
         ('Nokia PM (hourly)', 'nokia_hourly', NOKIA_PM_DB),
         ('Huawei PM (hourly)', 'huawei_hourly', HUAWEI_PM_DB),
         ('Nokia PM (daily)', 'sqlite', NOKIA_PM_DAILY_DB),
         ('Huawei PM (daily)', 'sqlite', HUAWEI_PM_DAILY_DB),
         ('Femto PM', 'sqlite', femto),
+        ('Femto user KPIs', 'sqlite', femto_kpis),
     ]
 
 

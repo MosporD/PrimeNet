@@ -10,7 +10,7 @@ import sqlite3
 import math
 import re
 
-from db.runtime import connect_metadata, execute_query
+from db.runtime import connect_metadata, connect_pm_db, execute_query
 from database_enhanced import get_user_by_session, log_activity
 from core.elevation import coord_key as elevation_coord_key, elevation_for_points
 from sync_config import (
@@ -317,13 +317,14 @@ def _find_col(cols: list[str], candidates: list[str]) -> str | None:
 
 def _column_nonempty_count(conn: sqlite3.Connection, table_name: str, column: str) -> int:
     try:
-        row = conn.execute(
+        row = execute_query(
+            conn,
             f"""
             SELECT COUNT(*)
             FROM {_sqlite_ident(table_name)}
             WHERE {_sqlite_ident(column)} IS NOT NULL
               AND TRIM(CAST({_sqlite_ident(column)} AS TEXT)) <> ''
-            """
+            """,
         ).fetchone()
         return int(row[0] or 0) if row else 0
     except sqlite3.Error:
@@ -379,16 +380,27 @@ def _parse_pm_timestamp(raw) -> datetime | None:
         return None
 
 
-def _pm_latest_values_for_cells(pm_db_path: str, table_name: str, kpi_column: str, cell_names: list[str]) -> dict[str, float]:
+def _pm_conn(cache: dict[str, sqlite3.Connection], pm_db_path: str) -> sqlite3.Connection:
+    conn = cache.get(pm_db_path)
+    if conn is None:
+        conn = connect_pm_db(pm_db_path)
+        conn.execute("PRAGMA query_only=ON")
+        cache[pm_db_path] = conn
+    return conn
+
+
+def _pm_latest_values_for_cells(
+    conn: sqlite3.Connection,
+    table_name: str,
+    kpi_column: str,
+    cell_names: list[str],
+) -> dict[str, float]:
     if not cell_names:
         return {}
     out: dict[str, float] = {}
 
-    conn = sqlite3.connect(pm_db_path, timeout=30)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA busy_timeout=30000")
     try:
-        cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table_name}")').fetchall()]
+        cols = [r[1] for r in execute_query(conn, f'PRAGMA table_info("{table_name}")').fetchall()]
         if not cols:
             return out
 
@@ -414,7 +426,7 @@ def _pm_latest_values_for_cells(pm_db_path: str, table_name: str, kpi_column: st
                 WHERE {_sqlite_ident(cell_col)} IN ({ph})
                   AND {_sqlite_ident(kpi_column)} IS NOT NULL
             """
-            rows = conn.execute(sql, chunk).fetchall()
+            rows = execute_query(conn, sql, chunk).fetchall()
             latest: dict[str, tuple[tuple[int, datetime | str], float]] = {}
             for r in rows:
                 v = _to_float(r["kpi_value"])
@@ -433,16 +445,14 @@ def _pm_latest_values_for_cells(pm_db_path: str, table_name: str, kpi_column: st
                 if prev is None or sort_key > prev[0]:
                     latest[cell_name] = (sort_key, v)
             out.update({cell: val for cell, (_sort_key, val) in latest.items()})
-    finally:
-        conn.close()
+    except sqlite3.OperationalError:
+        return out
     return out
 
 
-def _resolve_kpi_column_in_table(pm_db_path: str, table_name: str, aliases: list[str]) -> str | None:
-    conn = sqlite3.connect(pm_db_path, timeout=30)
-    conn.execute("PRAGMA busy_timeout=30000")
+def _resolve_kpi_column_in_table(conn: sqlite3.Connection, table_name: str, aliases: list[str]) -> str | None:
     try:
-        cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table_name}")').fetchall()]
+        cols = [r[1] for r in execute_query(conn, f'PRAGMA table_info("{table_name}")').fetchall()]
         if not cols:
             return None
         lower_map = {str(c).strip().lower(): c for c in cols}
@@ -463,8 +473,8 @@ def _resolve_kpi_column_in_table(pm_db_path: str, table_name: str, aliases: list
             if any((a and (a in cl or cl in a)) for a in alias_lows):
                 return col
         return None
-    finally:
-        conn.close()
+    except sqlite3.OperationalError:
+        return None
 
 
 def login_required(f):
@@ -561,7 +571,6 @@ def get_heatmap_points():
     try:
         conn = connect_metadata()
         if isinstance(conn, sqlite3.Connection):
-            conn.execute("PRAGMA busy_timeout=30000")
             conn.execute("PRAGMA query_only=ON")
         tech_clause = ""
         tech_params: list[object] = []
@@ -616,34 +625,44 @@ def get_heatmap_points():
 
         kpi_map: dict[str, float] = {}
         size_map: dict[str, float] = {}
-        for (vnd, pm_tech), names in by_vendor_tech.items():
-            if not names:
-                continue
-            if vnd.strip().lower() == "huawei":
-                pm_db_primary = HUAWEI_PM_DAILY_DB if data_scope == "daily" else HUAWEI_PM_DB
-                pm_db_fallback = HUAWEI_PM_DB
-            else:
-                pm_db_primary = NOKIA_PM_DAILY_DB if data_scope == "daily" else NOKIA_PM_DB
-                pm_db_fallback = NOKIA_PM_DB
-            table_name = pm_table_name(pm_tech)
-            if data_scope == "daily":
-                table_name = table_name.replace("_HOURLY", "_DAILY")
+        pm_conns: dict[str, sqlite3.Connection] = {}
+        try:
+            for (vnd, pm_tech), names in by_vendor_tech.items():
+                if not names:
+                    continue
+                if vnd.strip().lower() == "huawei":
+                    pm_db_primary = HUAWEI_PM_DAILY_DB if data_scope == "daily" else HUAWEI_PM_DB
+                    pm_db_fallback = HUAWEI_PM_DB
+                else:
+                    pm_db_primary = NOKIA_PM_DAILY_DB if data_scope == "daily" else NOKIA_PM_DB
+                    pm_db_fallback = NOKIA_PM_DB
+                table_name = pm_table_name(pm_tech)
+                if data_scope == "daily":
+                    table_name = table_name.replace("_HOURLY", "_DAILY")
 
-            # Try primary DB; if table is empty or missing, fall back to hourly
-            pm_db = pm_db_primary
-            tbl = table_name
-            resolved_col = _resolve_kpi_column_in_table(pm_db, tbl, aliases)
-            if not resolved_col and data_scope == "daily":
-                pm_db = pm_db_fallback
-                tbl = pm_table_name(pm_tech)
-                resolved_col = _resolve_kpi_column_in_table(pm_db, tbl, aliases)
+                # Try primary DB; if table is empty or missing, fall back to hourly
+                pm_db = pm_db_primary
+                tbl = table_name
+                pm_conn = _pm_conn(pm_conns, pm_db)
+                resolved_col = _resolve_kpi_column_in_table(pm_conn, tbl, aliases)
+                if not resolved_col and data_scope == "daily":
+                    pm_db = pm_db_fallback
+                    tbl = pm_table_name(pm_tech)
+                    pm_conn = _pm_conn(pm_conns, pm_db)
+                    resolved_col = _resolve_kpi_column_in_table(pm_conn, tbl, aliases)
 
-            if resolved_col:
-                kpi_map.update(_pm_latest_values_for_cells(pm_db, tbl, resolved_col, names))
+                if resolved_col:
+                    kpi_map.update(_pm_latest_values_for_cells(pm_conn, tbl, resolved_col, names))
 
-            size_col = _resolve_kpi_column_in_table(pm_db, tbl, size_aliases)
-            if size_col:
-                size_map.update(_pm_latest_values_for_cells(pm_db, tbl, size_col, names))
+                size_col = _resolve_kpi_column_in_table(pm_conn, tbl, size_aliases)
+                if size_col:
+                    size_map.update(_pm_latest_values_for_cells(pm_conn, tbl, size_col, names))
+        finally:
+            for pm_conn in pm_conns.values():
+                try:
+                    pm_conn.close()
+                except Exception:
+                    pass
 
         matched_vals = [v for v in kpi_map.values() if isinstance(v, (int, float))]
         kpi_avg = (sum(matched_vals) / len(matched_vals)) if matched_vals else None
@@ -774,6 +793,8 @@ def get_heatmap_bands():
     technology = _normalize_technology(request.args.get("technology"))
     try:
         conn = connect_metadata()
+        if isinstance(conn, sqlite3.Connection):
+            conn.execute("PRAGMA query_only=ON")
         tech_clause = ""
         tech_params: list[object] = []
         if technology == "4G":

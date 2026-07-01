@@ -106,6 +106,13 @@ def connect_huawei_pm():
     return _configure_sqlite_conn(conn)
 
 
+def connect_pm_db(db_path: str) -> sqlite3.Connection:
+    """Open any PM SQLite file with WAL + long busy timeout (read-heavy routes)."""
+    require_activation()
+    conn = sqlite3.connect(db_path, timeout=120)
+    return _configure_sqlite_conn(conn)
+
+
 def pm_union_alias(vendor: str) -> str:
     """Attach alias for PM subqueries (single-vendor cell list)."""
     return 'pm'

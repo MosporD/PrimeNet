@@ -10,6 +10,9 @@ const kpiExpanded = new Set();
 const counterExpanded = new Set();
 let femtoChartTabs = [];
 let activeFemtoTabId = '';
+let femtoKpiModalMode = 'create';
+let femtoEditingKpiId = null;
+let femtoFormulaPreviewTimer = null;
 
 function escHtml(s) {
     return String(s ?? '')
@@ -198,10 +201,21 @@ function renderComputedKpis() {
             const key = cat;
             const expanded = kpiExpanded.has(key);
             const childrenHtml = grouped.get(cat).map(row => `
-                <label class="femto-kpi-item" title="${escHtml(row.description || row.formula || '')}">
-                    <input type="checkbox" class="femto-kpi-cb" data-name="${escHtml(row.kpi_name)}" ${selectedComputedKpis.has(row.kpi_name) ? 'checked' : ''}>
-                    <span>${escHtml(row.kpi_name)}${row.unit ? ` <em class="femto-unit">(${escHtml(row.unit)})</em>` : ''}</span>
-                </label>
+                <div class="femto-kpi-row ${row.source === 'user' ? 'is-user-kpi' : ''}">
+                    <label class="femto-kpi-item" title="${escHtml(row.description || row.formula || '')}">
+                        <input type="checkbox" class="femto-kpi-cb" data-name="${escHtml(row.kpi_name)}" ${selectedComputedKpis.has(row.kpi_name) ? 'checked' : ''}>
+                        <span>
+                            ${escHtml(row.kpi_name)}${row.unit ? ` <em class="femto-unit">(${escHtml(row.unit)})</em>` : ''}
+                            ${row.source === 'user' ? '<span class="femto-kpi-user-badge">custom</span>' : ''}
+                        </span>
+                    </label>
+                    ${row.source === 'user' && row.id ? `
+                        <div class="femto-kpi-row-actions">
+                            <button type="button" class="femto-kpi-mini-btn" data-edit-kpi="${row.id}" title="Edit KPI">✎</button>
+                            <button type="button" class="femto-kpi-mini-btn femto-kpi-mini-btn-danger" data-delete-kpi="${row.id}" title="Delete KPI">×</button>
+                        </div>
+                    ` : ''}
+                </div>
             `).join('');
             return renderTreeFolder({
                 key,
@@ -464,6 +478,231 @@ function renderFemtoChartsForActiveTab() {
     });
 }
 
+function allCounterNamesFlat() {
+    const names = [];
+    const tree = femtoCatalog.counters || {};
+    Object.values(tree).forEach(l2Map => {
+        Object.values(l2Map || {}).forEach(l3Map => {
+            Object.values(l3Map || {}).forEach(counters => {
+                (counters || []).forEach(name => names.push(String(name)));
+            });
+        });
+    });
+    return [...new Set(names)].sort((a, b) => a.localeCompare(b));
+}
+
+function openFemtoKpiModal(mode = 'create', kpi = null) {
+    femtoKpiModalMode = mode;
+    femtoEditingKpiId = kpi?.id || null;
+    const modal = document.getElementById('femto-kpi-modal');
+    const title = document.getElementById('femto-kpi-modal-title');
+    const saveBtn = document.getElementById('femto-kpi-save-btn');
+    if (!modal) return;
+    if (title) title.textContent = mode === 'edit' ? 'Edit custom KPI' : 'Create KPI from Counters';
+    if (saveBtn) saveBtn.textContent = mode === 'edit' ? 'Update KPI' : 'Save KPI';
+    document.getElementById('femto-kpi-name').value = kpi?.kpi_name || '';
+    document.getElementById('femto-kpi-category').value = kpi?.category_l1 || 'Custom';
+    document.getElementById('femto-kpi-unit').value = kpi?.unit || '';
+    document.getElementById('femto-kpi-description').value = kpi?.description || '';
+    document.getElementById('femto-kpi-formula').value = kpi?.formula || '';
+    setFormulaFeedback('');
+    renderFormulaCounterPicker();
+    scheduleFormulaPreview();
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('femto-modal-open');
+}
+
+function closeFemtoKpiModal() {
+    const modal = document.getElementById('femto-kpi-modal');
+    if (!modal) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('femto-modal-open');
+    femtoEditingKpiId = null;
+}
+
+function setFormulaFeedback(message, kind = '') {
+    const el = document.getElementById('femto-formula-feedback');
+    if (!el) return;
+    el.textContent = message || '';
+    el.className = 'femto-formula-feedback' + (kind ? ` is-${kind}` : '');
+}
+
+function insertIntoFormula(text) {
+    const area = document.getElementById('femto-kpi-formula');
+    if (!area) return;
+    const start = area.selectionStart ?? area.value.length;
+    const end = area.selectionEnd ?? area.value.length;
+    const before = area.value.slice(0, start);
+    const after = area.value.slice(end);
+    area.value = before + text + after;
+    const pos = start + text.length;
+    area.focus();
+    area.setSelectionRange(pos, pos);
+    scheduleFormulaPreview();
+}
+
+function applyFormulaTemplate(kind) {
+    const templates = {
+        ratio: '(success_counter / attempt_counter) * 100',
+        sum: 'SUM(counter_prefix*)',
+        avg: 'AVG(counter_prefix*)',
+    };
+    const area = document.getElementById('femto-kpi-formula');
+    if (!area) return;
+    area.value = templates[kind] || '';
+    scheduleFormulaPreview();
+}
+
+function renderFormulaCounterPicker() {
+    const list = document.getElementById('femto-formula-counter-list');
+    if (!list) return;
+    const q = String(document.getElementById('femto-formula-counter-search')?.value || '').trim().toLowerCase();
+    const names = allCounterNamesFlat().filter(name => !q || name.toLowerCase().includes(q)).slice(0, 80);
+    if (!names.length) {
+        list.innerHTML = '<p class="femto-list-empty">No counters match.</p>';
+        return;
+    }
+    list.innerHTML = names.map(name => `
+        <button type="button" class="femto-counter-insert-btn" data-counter="${escHtml(name)}">${escHtml(name)}</button>
+    `).join('');
+}
+
+function scheduleFormulaPreview() {
+    if (femtoFormulaPreviewTimer) clearTimeout(femtoFormulaPreviewTimer);
+    femtoFormulaPreviewTimer = setTimeout(refreshFormulaPreview, 350);
+}
+
+async function refreshFormulaPreview() {
+    const formula = String(document.getElementById('femto-kpi-formula')?.value || '').trim();
+    const kpiName = String(document.getElementById('femto-kpi-name')?.value || 'my_kpi').trim();
+    const preview = document.getElementById('femto-sql-preview');
+    if (!formula) {
+        if (preview) preview.textContent = '-- Formula updates will appear here as a SELECT query';
+        return;
+    }
+    try {
+        const res = await fetch('/api/femto-pm/user-kpis/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                formula,
+                kpi_name: kpiName,
+                unique_id: selectedObjectIds()[0] || '',
+            }),
+        });
+        const data = await res.json();
+        if (preview) preview.textContent = data.sql_preview || '--';
+        if (!data.ok) {
+            setFormulaFeedback((data.errors || []).join(' '), 'error');
+        } else if ((data.warnings || []).length) {
+            setFormulaFeedback(data.warnings.join(' '), 'warn');
+        } else if (data.sample_value != null) {
+            setFormulaFeedback(`Latest sample @ ${data.sample_timestamp}: ${Number(data.sample_value).toFixed(4)}`, 'ok');
+        } else {
+            setFormulaFeedback('Formula looks valid.', 'ok');
+        }
+    } catch (_) {
+        if (preview) preview.textContent = '-- Could not build preview';
+    }
+}
+
+async function validateFemtoFormula() {
+    await refreshFormulaPreview();
+}
+
+async function saveFemtoKpi() {
+    const payload = {
+        kpi_name: String(document.getElementById('femto-kpi-name')?.value || '').trim(),
+        category_l1: String(document.getElementById('femto-kpi-category')?.value || 'Custom').trim(),
+        unit: String(document.getElementById('femto-kpi-unit')?.value || '').trim(),
+        description: String(document.getElementById('femto-kpi-description')?.value || '').trim(),
+        formula: String(document.getElementById('femto-kpi-formula')?.value || '').trim(),
+    };
+    if (!payload.kpi_name || !payload.formula) {
+        setFormulaFeedback('KPI name and formula are required.', 'error');
+        return;
+    }
+    const saveBtn = document.getElementById('femto-kpi-save-btn');
+    if (saveBtn) saveBtn.disabled = true;
+    try {
+        const url = femtoKpiModalMode === 'edit' && femtoEditingKpiId
+            ? `/api/femto-pm/user-kpis/${femtoEditingKpiId}`
+            : '/api/femto-pm/user-kpis';
+        const method = femtoKpiModalMode === 'edit' && femtoEditingKpiId ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!data.success) {
+            setFormulaFeedback(data.error || 'Save failed.', 'error');
+            return;
+        }
+        closeFemtoKpiModal();
+        await loadFemtoCatalog();
+        if (payload.kpi_name) selectedComputedKpis.add(payload.kpi_name);
+        renderComputedKpis();
+        const status = document.getElementById('femto-status');
+        if (status) status.textContent = `Saved custom KPI "${payload.kpi_name}".`;
+    } catch (err) {
+        setFormulaFeedback('Network error while saving.', 'error');
+        console.error(err);
+    } finally {
+        if (saveBtn) saveBtn.disabled = false;
+    }
+}
+
+async function deleteFemtoKpi(kpiId) {
+    const row = femtoCatalog.kpis.find(k => Number(k.id) === Number(kpiId));
+    const name = row?.kpi_name || 'this KPI';
+    if (!window.confirm(`Delete custom KPI "${name}"?`)) return;
+    const res = await fetch(`/api/femto-pm/user-kpis/${kpiId}`, { method: 'DELETE' });
+    const data = await res.json();
+    if (!data.success) {
+        alert(data.error || 'Delete failed.');
+        return;
+    }
+    if (row?.kpi_name) selectedComputedKpis.delete(row.kpi_name);
+    await loadFemtoCatalog();
+}
+
+function setupFemtoKpiModal() {
+    document.getElementById('femto-create-kpi-btn')?.addEventListener('click', () => openFemtoKpiModal('create'));
+    document.querySelectorAll('[data-close-kpi-modal]').forEach(el => {
+        el.addEventListener('click', closeFemtoKpiModal);
+    });
+    document.getElementById('femto-kpi-validate-btn')?.addEventListener('click', validateFemtoFormula);
+    document.getElementById('femto-kpi-save-btn')?.addEventListener('click', saveFemtoKpi);
+    document.getElementById('femto-kpi-formula')?.addEventListener('input', scheduleFormulaPreview);
+    document.getElementById('femto-kpi-name')?.addEventListener('input', scheduleFormulaPreview);
+    document.getElementById('femto-formula-counter-search')?.addEventListener('input', renderFormulaCounterPicker);
+    document.getElementById('femto-formula-counter-list')?.addEventListener('click', e => {
+        const btn = e.target.closest('[data-counter]');
+        if (!btn) return;
+        insertIntoFormula(String(btn.getAttribute('data-counter') || ''));
+    });
+    document.querySelectorAll('[data-insert]').forEach(btn => {
+        btn.addEventListener('click', () => insertIntoFormula(String(btn.getAttribute('data-insert') || '')));
+    });
+    document.querySelectorAll('[data-template]').forEach(btn => {
+        btn.addEventListener('click', () => applyFormulaTemplate(String(btn.getAttribute('data-template') || '')));
+    });
+    document.getElementById('femto-kpi-list')?.addEventListener('click', e => {
+        const editBtn = e.target.closest('[data-edit-kpi]');
+        if (editBtn) {
+            const id = Number(editBtn.getAttribute('data-edit-kpi'));
+            const row = femtoCatalog.kpis.find(k => Number(k.id) === id);
+            if (row) openFemtoKpiModal('edit', row);
+            return;
+        }
+        const delBtn = e.target.closest('[data-delete-kpi]');
+        if (delBtn) deleteFemtoKpi(Number(delBtn.getAttribute('data-delete-kpi')));
+    });
+}
+
 function setupToggles() {
     document.querySelectorAll('.femto-selector-toggle').forEach(btn => {
         const targetId = btn.getAttribute('data-target');
@@ -482,6 +721,7 @@ function setupToggles() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     setupToggles();
+    setupFemtoKpiModal();
     updateFemtoEmptyState(false);
     const btn = document.getElementById('femto-load-btn');
     if (btn) btn.addEventListener('click', loadFemtoTrendChart);
