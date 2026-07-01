@@ -32,6 +32,11 @@ _CELL_KEYWORDS = [
 ]
 _TS_KEYWORDS = ["period_start_time", "period start", "timestamp", "date", "time"]
 
+# A table whose newest timestamp is older than this many hours is flagged stale.
+# Hourly exports realistically lag a few hours; daily exports lag ~1 day.
+_HOURLY_STALE_AFTER_HOURS = 6
+_DAILY_STALE_AFTER_HOURS = 48
+
 _CACHE_TTL_SEC = 600
 _cache_lock = threading.Lock()
 _cache: dict[str, Any] = {"expires_at": 0.0, "payload": None}
@@ -352,6 +357,33 @@ def audit_db(path: str, label: str, *, cell_scope: bool = True) -> dict:
                 latest_table = ts.get("table")
         result["latest_data_overall"] = latest_overall
         result["latest_data_table"] = latest_table
+
+        low_label = label.lower()
+        if "hourly" in low_label:
+            stale_after_hours: float | None = _HOURLY_STALE_AFTER_HOURS
+        elif "daily" in low_label:
+            stale_after_hours = _DAILY_STALE_AFTER_HOURS
+        else:
+            stale_after_hours = None
+
+        now_local = datetime.now()
+        stale_tables: list[str] = []
+        for ts in result["tables"]:
+            sort_value = ts.get("_latest_sort")
+            table_name = ts.get("table", "")
+            is_pm_table = "CELL" in table_name.upper() or "GROUP" in table_name.upper()
+            if (
+                stale_after_hours is not None
+                and ts.get("status") == "OK"
+                and sort_value is not None
+                and is_pm_table
+            ):
+                age_hours = (now_local - sort_value).total_seconds() / 3600.0
+                if age_hours > stale_after_hours:
+                    ts["stale"] = True
+                    ts["age_hours"] = round(age_hours, 1)
+                    stale_tables.append(table_name)
+
         for table_stats in result["tables"]:
             table_stats.pop("_earliest_sort", None)
             table_stats.pop("_latest_sort", None)
@@ -365,7 +397,15 @@ def audit_db(path: str, label: str, *, cell_scope: bool = True) -> dict:
             if (t in pm_tables or t.endswith("_HOURLY") or t.endswith("_DAILY"))
             and t not in optional
         ]
-        result["overall"] = "DEGRADED" if empty_pm else "HEALTHY"
+        if empty_pm:
+            result["overall"] = "DEGRADED"
+        elif stale_tables:
+            result["overall"] = "STALE"
+            result["stale_after_hours"] = stale_after_hours
+        else:
+            result["overall"] = "HEALTHY"
+        if stale_tables:
+            result["stale_tables"] = stale_tables
         if optional:
             empty_optional = [t for t in empty if t in optional]
             if empty_optional:

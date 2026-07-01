@@ -7,6 +7,11 @@ import argparse
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# Exit codes shared with the orchestrator / scheduler callers.
+EXIT_OK = 0
+EXIT_ALL_FAILED = 1
+EXIT_PARTIAL = 2
+
 
 def _run(path_parts: list[str], category: str | None = None) -> int:
     script = os.path.join(PROJECT_ROOT, *path_parts)
@@ -24,14 +29,37 @@ def main() -> int:
     parser.add_argument("--category", choices=["cells", "groups"])
     args = parser.parse_args()
 
-    for parts in (
-        ["pipeline", "pull", "nokia", "all", "daily", "pull_all.py"],
-        ["pipeline", "pull", "huawei", "all", "daily", "pull_all.py"],
-    ):
+    critical = [
+        ("nokia", ["pipeline", "pull", "nokia", "all", "daily", "pull_all.py"]),
+        ("huawei", ["pipeline", "pull", "huawei", "all", "daily", "pull_all.py"]),
+    ]
+    results: dict[str, int] = {}
+    for name, parts in critical:
         rc = _run(parts, args.category)
+        results[name] = rc
         if rc != 0:
-            return rc
-    return 0
+            # One vendor's transient miss must not block the other vendor or the
+            # downstream load step.
+            print(
+                f"[pull] warning: {name} daily pull exited {rc}; "
+                "continuing with remaining vendors",
+                file=sys.stderr,
+            )
+
+    succeeded = [n for n, rc in results.items() if rc == 0]
+    failed = [n for n, rc in results.items() if rc != 0]
+
+    if failed:
+        print(
+            f"[pull] vendor summary: ok={succeeded or ['-']} failed={failed}",
+            file=sys.stderr,
+        )
+
+    if not succeeded:
+        return EXIT_ALL_FAILED
+    if failed:
+        return EXIT_PARTIAL
+    return EXIT_OK
 
 
 if __name__ == "__main__":

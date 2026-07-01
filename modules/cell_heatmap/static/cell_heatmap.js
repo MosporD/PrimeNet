@@ -259,6 +259,8 @@
         const kpiText = formatKpiValue(d, meta);
         const distText = d.avg_distance_m != null ? Number(d.avg_distance_m).toFixed(0) + " m" : "n/a";
         const radiusText = Number.isFinite(radius) ? Math.round(radius) + " m reach" : "n/a";
+        const elev = Number(d.elevation_m);
+        const elevText = Number.isFinite(elev) ? `${Math.round(elev)} m` : "unavailable";
         const site = d.site_name || d.site_id || "";
         const scope = [d.vendor, d.technology].filter(Boolean).join(" · ");
         return (
@@ -267,6 +269,7 @@
             (scope ? `<br><span class="ch-tip-sub">${escapeHtml(scope)}</span>` : "") +
             `<br>Coverage reach: ${escapeHtml(radiusText)}` +
             `<br>${escapeHtml((meta && meta.kpi_label) || "KPI")}: ${escapeHtml(kpiText)}` +
+            `<br>Elevation: ${escapeHtml(elevText)}` +
             `<br>UE distance: ${escapeHtml(distText)}</div>`
         );
     }

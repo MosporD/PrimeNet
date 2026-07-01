@@ -15,6 +15,7 @@ from datetime import datetime
 
 from database_enhanced import get_user_by_session, log_activity
 from db.runtime import connect_app, connect_metadata, execute_query
+from core.elevation import coord_key as _shared_coord_key, elevation_for_points as _shared_elevation_for_points
 from .metadata_helpers import _metadata_table_columns, _pick_col, _sql_ident
 from modules.sync.metadata_active_sql import PER_TABLE_ACTIVE_WHERE
 from sync_config import PROJECT_ROOT
@@ -93,7 +94,7 @@ def _safe_float(v):
 
 
 def _coord_key(lat: float, lng: float) -> str:
-    return f'{float(lat):.5f},{float(lng):.5f}'
+    return _shared_coord_key(lat, lng)
 
 
 def _fetch_elevation_remote(points: list[tuple[float, float]]) -> dict[str, float | None]:
@@ -138,58 +139,7 @@ def _elevation_for_points(points: list[tuple[float, float]]) -> dict[str, float 
     """
     Resolve elevations with DB cache first, then remote fetch for misses.
     """
-    unique = []
-    seen = set()
-    for lat, lng in points:
-        if lat is None or lng is None:
-            continue
-        k = _coord_key(lat, lng)
-        if k in seen:
-            continue
-        seen.add(k)
-        unique.append((float(lat), float(lng)))
-    if not unique:
-        return {}
-
-    conn = _ncm()
-    cached: dict[str, float | None] = {}
-    misses: list[tuple[float, float]] = []
-    for lat, lng in unique:
-        k = _coord_key(lat, lng)
-        row = execute_query(
-            conn, 'SELECT elevation_m FROM elevation_cache WHERE coord_key = ?', (k,)
-        ).fetchone()
-        if row is not None:
-            cached[k] = row['elevation_m']
-        else:
-            misses.append((lat, lng))
-
-    fetched = _fetch_elevation_remote(misses)
-    now = datetime.utcnow().isoformat() + 'Z'
-    for lat, lng in misses:
-        k = _coord_key(lat, lng)
-        elev = fetched.get(k)
-        cached[k] = elev
-        if isinstance(conn, sqlite3.Connection):
-            execute_query(
-                conn,
-                'INSERT OR REPLACE INTO elevation_cache (coord_key, lat, lng, elevation_m, updated_at) '
-                'VALUES (?, ?, ?, ?, ?)',
-                (k, float(lat), float(lng), elev, now),
-            )
-        else:
-            execute_query(
-                conn,
-                'INSERT INTO elevation_cache (coord_key, lat, lng, elevation_m, updated_at) '
-                'VALUES (?, ?, ?, ?, ?) '
-                'ON CONFLICT (coord_key) DO UPDATE SET '
-                'lat = EXCLUDED.lat, lng = EXCLUDED.lng, '
-                'elevation_m = EXCLUDED.elevation_m, updated_at = EXCLUDED.updated_at',
-                (k, float(lat), float(lng), elev, now),
-            )
-    conn.commit()
-    conn.close()
-    return cached
+    return _shared_elevation_for_points(points)
 
 
 # ── Page ──────────────────────────────────────────────────────────────────────

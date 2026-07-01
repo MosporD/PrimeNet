@@ -7,6 +7,11 @@ import argparse
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+# Exit codes shared with the orchestrator / scheduler callers.
+EXIT_OK = 0
+EXIT_ALL_FAILED = 1
+EXIT_PARTIAL = 2
+
 
 def _run(path_parts: list[str], category: str | None = None) -> int:
     script = os.path.join(PROJECT_ROOT, *path_parts)
@@ -25,26 +30,48 @@ def main() -> int:
     args = parser.parse_args()
 
     critical = [
-        ["pipeline", "pull", "nokia", "all", "hourly", "pull_all.py"],
-        ["pipeline", "pull", "huawei", "all", "hourly", "pull_all.py"],
+        ("nokia", ["pipeline", "pull", "nokia", "all", "hourly", "pull_all.py"]),
+        ("huawei", ["pipeline", "pull", "huawei", "all", "hourly", "pull_all.py"]),
     ]
-    for parts in critical:
+    results: dict[str, int] = {}
+    for name, parts in critical:
         rc = _run(parts, args.category)
+        results[name] = rc
         if rc != 0:
-            return rc
+            # Do not abort the whole cycle: a transient miss for one vendor must
+            # not block the other vendor or the downstream load step.
+            print(
+                f"[pull] warning: {name} hourly pull exited {rc}; "
+                "continuing with remaining vendors",
+                file=sys.stderr,
+            )
 
-    if args.category:
-        return 0
+    succeeded = [n for n, rc in results.items() if rc == 0]
+    failed = [n for n, rc in results.items() if rc != 0]
 
-    supplementary = [
-        ["scripts", "pipeline", "pull_nokia_neighbor_raw.py"],
-        ["scripts", "pipeline", "pull_huawei_neighbor_raw.py"],
-    ]
-    for parts in supplementary:
-        rc = _run(parts)
-        if rc != 0:
-            print(f"[pull] warning: {parts[-1]} exited {rc} (non-fatal, continuing)")
-    return 0
+    # Supplementary neighbor pulls only run on full (uncategorised) cycles and
+    # are always non-fatal.
+    if not args.category:
+        supplementary = [
+            ["scripts", "pipeline", "pull_nokia_neighbor_raw.py"],
+            ["scripts", "pipeline", "pull_huawei_neighbor_raw.py"],
+        ]
+        for parts in supplementary:
+            rc = _run(parts)
+            if rc != 0:
+                print(f"[pull] warning: {parts[-1]} exited {rc} (non-fatal, continuing)", file=sys.stderr)
+
+    if failed:
+        print(
+            f"[pull] vendor summary: ok={succeeded or ['-']} failed={failed}",
+            file=sys.stderr,
+        )
+
+    if not succeeded:
+        return EXIT_ALL_FAILED
+    if failed:
+        return EXIT_PARTIAL
+    return EXIT_OK
 
 
 if __name__ == "__main__":

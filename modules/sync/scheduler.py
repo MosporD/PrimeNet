@@ -220,7 +220,10 @@ def run_full_sync_cycle():
         if proc.stderr:
             logger.warning('db loader stderr:\n%s', proc.stderr.strip())
 
-        if proc.returncode != 0:
+        # code=2 => partial pull (one vendor failed) but the load still ran on
+        # whatever arrived. Record it as a visible warning, not a hard failure.
+        partial = proc.returncode == 2
+        if proc.returncode not in (0, 2):
             details = _subprocess_failure_detail(proc)
             msg = f'Hourly orchestrator failed (code={proc.returncode})'
             if details:
@@ -228,6 +231,14 @@ def run_full_sync_cycle():
             _log_sync('db_loader', 'all', 'error', 0, msg)
             logger.error('Hourly orchestrator failed with code %s', proc.returncode)
             return
+
+        if partial:
+            details = _subprocess_failure_detail(proc)
+            msg = 'Hourly orchestrator partial: some vendors failed to pull'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync('db_loader', 'all', 'error', 0, msg)
+            logger.warning(msg)
 
         after = {
             'nokia_pm': _all_table_row_counts(NOKIA_PM_DB),
@@ -237,7 +248,7 @@ def run_full_sync_cycle():
             'metadata': _all_table_row_counts(METADATA_DB),
         }
         _log_loader_row_deltas(before, after)
-        logger.info('Full sync cycle completed successfully.')
+        logger.info('Full sync cycle completed%s.', ' (partial pull)' if partial else ' successfully')
     except Exception as e:
         _log_sync('db_loader', 'all', 'error', 0, str(e))
         logger.exception('Full sync cycle failed during DB load: %s', e)
@@ -308,9 +319,21 @@ def run_manual_category_sync(category: str):
             logger.info('%s pull stdout:\n%s', category, pull_proc.stdout.strip())
         if pull_proc.stderr:
             logger.warning('%s pull stderr:\n%s', category, pull_proc.stderr.strip())
-        if pull_proc.returncode != 0:
-            _log_sync(sync_type, 'all', 'error', 0, f'pull failed (code={pull_proc.returncode})')
+        # code=2 => partial pull (one vendor failed); still load whatever arrived.
+        pull_partial = pull_proc.returncode == 2
+        if pull_proc.returncode not in (0, 2):
+            details = _subprocess_failure_detail(pull_proc)
+            msg = f'pull failed (code={pull_proc.returncode})'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync(sync_type, 'all', 'error', 0, msg)
             return
+        if pull_partial:
+            details = _subprocess_failure_detail(pull_proc)
+            msg = 'partial pull: some vendors failed'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync(sync_type, 'all', 'error', 0, msg)
 
         load_proc = subprocess.run([sys.executable, load_path] + load_args, cwd=project_root, capture_output=True, text=True)
         if load_proc.stdout:
@@ -318,9 +341,14 @@ def run_manual_category_sync(category: str):
         if load_proc.stderr:
             logger.warning('%s load stderr:\n%s', category, load_proc.stderr.strip())
         if load_proc.returncode == 0:
-            _log_sync(sync_type, 'all', 'ok', 0, 'Manual category sync completed')
+            done_msg = 'Manual category sync completed (partial pull)' if pull_partial else 'Manual category sync completed'
+            _log_sync(sync_type, 'all', 'ok', 0, done_msg)
         else:
-            _log_sync(sync_type, 'all', 'error', 0, f'load failed (code={load_proc.returncode})')
+            details = _subprocess_failure_detail(load_proc)
+            msg = f'load failed (code={load_proc.returncode})'
+            if details:
+                msg = f'{msg}: {details}'
+            _log_sync(sync_type, 'all', 'error', 0, msg)
     except Exception as e:
         _log_sync(sync_type, 'all', 'error', 0, str(e))
         logger.exception('Manual category sync failed (%s): %s', category, e)
@@ -923,6 +951,45 @@ def _network_health_precalc_cron_hour() -> int:
 # Scheduler lifecycle
 # ---------------------------------------------------------------------------
 
+def _compute_scheduler_flags() -> dict:
+    """Derive scheduler mode/flags from env + config.
+
+    Used both when starting the scheduler and when reporting status from a
+    process that does not itself host the scheduler (e.g. the web tier when the
+    scheduler runs in a separate worker), so the dashboard reflects the
+    configured intent instead of the ``unknown`` placeholder.
+    """
+    from sync_config import (
+        RAW_PULL_INTERVAL_HOURS,
+        DAILY_PULL_HOUR,
+        PULL_WATCHER_POLL_INTERVAL_SEC,
+    )
+
+    legacy_enabled = os.environ.get('NCM_ENABLE_LEGACY_PERFORMANCE_SCHEDULER', '').strip().lower() in ('1', 'true', 'yes')
+    watcher_disabled = os.environ.get('NCM_DISABLE_PULL_WATCHER', '').strip().lower() in ('1', 'true', 'yes')
+    watcher_primary = os.environ.get('NCM_WATCHER_PRIMARY', '1').strip().lower() not in ('0', 'false', 'no')
+    watcher_enabled = not watcher_disabled
+    scheduled_ingest_enabled = (not watcher_enabled) or (not watcher_primary) or legacy_enabled
+
+    if watcher_enabled and watcher_primary and not scheduled_ingest_enabled:
+        mode = 'watcher-primary'
+    elif watcher_enabled:
+        mode = 'scheduled+verify'
+    else:
+        mode = 'scheduled-only'
+
+    return {
+        'mode': mode,
+        'watcher_primary': bool(watcher_primary),
+        'legacy_enabled': bool(legacy_enabled),
+        'watcher_enabled': bool(watcher_enabled),
+        'scheduled_ingest_enabled': bool(scheduled_ingest_enabled),
+        'raw_pull_interval_hours': int(RAW_PULL_INTERVAL_HOURS),
+        'daily_pull_hour': int(DAILY_PULL_HOUR),
+        'watcher_poll_interval_sec': int(PULL_WATCHER_POLL_INTERVAL_SEC),
+    }
+
+
 def start_scheduler():
     global _scheduler
     global _scheduler_mode_summary
@@ -943,12 +1010,11 @@ def start_scheduler():
     )
 
     _scheduler = BackgroundScheduler(daemon=True)
-    legacy_enabled = os.environ.get('NCM_ENABLE_LEGACY_PERFORMANCE_SCHEDULER', '').strip().lower() in ('1', 'true', 'yes')
-    watcher_disabled = os.environ.get('NCM_DISABLE_PULL_WATCHER', '').strip().lower() in ('1', 'true', 'yes')
-    watcher_primary = os.environ.get('NCM_WATCHER_PRIMARY', '1').strip().lower() not in ('0', 'false', 'no')
-    watcher_enabled = not watcher_disabled
-
-    scheduled_ingest_enabled = (not watcher_enabled) or (not watcher_primary) or legacy_enabled
+    flags = _compute_scheduler_flags()
+    legacy_enabled = flags['legacy_enabled']
+    watcher_enabled = flags['watcher_enabled']
+    watcher_primary = flags['watcher_primary']
+    scheduled_ingest_enabled = flags['scheduled_ingest_enabled']
 
     # Scheduled hourly + daily pull→load (OSS cadence: hourly every N hours, daily once per day).
     # In watcher-primary mode the watcher owns these SFTP pipelines, including daily scopes.
@@ -1037,22 +1103,8 @@ def start_scheduler():
         )
 
     _scheduler.start()
-    if watcher_enabled and watcher_primary and not scheduled_ingest_enabled:
-        mode = 'watcher-primary'
-    elif watcher_enabled:
-        mode = 'scheduled+verify'
-    else:
-        mode = 'scheduled-only'
-    _scheduler_mode_summary = {
-        'mode': mode,
-        'watcher_primary': bool(watcher_primary),
-        'legacy_enabled': bool(legacy_enabled),
-        'watcher_enabled': bool(watcher_enabled),
-        'scheduled_ingest_enabled': bool(scheduled_ingest_enabled),
-        'raw_pull_interval_hours': int(RAW_PULL_INTERVAL_HOURS),
-        'daily_pull_hour': int(DAILY_PULL_HOUR),
-        'watcher_poll_interval_sec': int(PULL_WATCHER_POLL_INTERVAL_SEC),
-    }
+    mode = flags['mode']
+    _scheduler_mode_summary = dict(flags)
     logger.info(
         'Scheduler started — mode=%s scheduled_ingest=%s hourly_every=%sh daily_at=%02d:05 watcher=%s watcher_every=%ss legacy_master=%s',
         mode,
@@ -1070,7 +1122,17 @@ def get_scheduler():
 
 
 def get_scheduler_mode_summary() -> dict:
-    return dict(_scheduler_mode_summary)
+    # When this process hosts a running scheduler, report its live summary.
+    if _scheduler is not None and _scheduler_mode_summary.get('mode') != 'unknown':
+        return dict(_scheduler_mode_summary)
+    # Otherwise (e.g. the web tier while the scheduler runs elsewhere), report
+    # the configured intent from env/config rather than the 'unknown' default.
+    try:
+        summary = _compute_scheduler_flags()
+        summary['scheduler_in_process'] = False
+        return summary
+    except Exception:
+        return dict(_scheduler_mode_summary)
 
 # Manual trigger helpers
 def trigger_nokia_pm_now():  pull_nokia_pm()

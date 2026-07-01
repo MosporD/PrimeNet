@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PrimeNet — Radio Network Performance &amp; Configuration Platform</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css" id="theme" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --navy-0: #050a16;
+      --navy-1: #0a1326;
+      --navy-2: #0f1d38;
+      --navy-3: #16294d;
+      --cyan: #22d3ee;
+      --teal: #2dd4bf;
+      --blue: #3b82f6;
+      --ink: #e8f0ff;
+      --muted: #9fb3d1;
+      --line: rgba(120, 170, 255, 0.16);
+      --card: rgba(255, 255, 255, 0.04);
+      --nokia: #38bdf8;
+      --huawei: #fb7185;
+    }
+
+    html, body { height: 100%; }
+
+    .reveal {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--ink);
+      font-weight: 400;
+      letter-spacing: 0.1px;
+    }
+
+    .reveal-viewport {
+      background:
+        radial-gradient(1100px 700px at 85% -10%, rgba(34, 211, 238, 0.10), transparent 60%),
+        radial-gradient(900px 600px at 5% 110%, rgba(59, 130, 246, 0.12), transparent 60%),
+        linear-gradient(160deg, var(--navy-0), var(--navy-1) 55%, #06101f);
+    }
+
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      font-family: 'Inter', sans-serif;
+      color: var(--ink);
+      text-transform: none;
+      letter-spacing: -0.5px;
+      line-height: 1.12;
+      margin: 0 0 0.4em;
+      text-shadow: none;
+      font-weight: 800;
+    }
+    .reveal h1 { font-size: 3.0rem; }
+    .reveal h2 { font-size: 2.0rem; }
+    .reveal h3 { font-size: 1.35rem; }
+    .reveal p, .reveal li { color: var(--muted); line-height: 1.5; }
+
+    .reveal section { text-align: left; }
+    .reveal .slides section { top: 0 !important; }
+
+    .accent { color: var(--cyan); }
+    .grad-text {
+      background: linear-gradient(100deg, #67e8f9, #2dd4bf 45%, #60a5fa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      padding: 7px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(34, 211, 238, 0.07);
+      margin-bottom: 22px;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 12px var(--teal);
+    }
+
+    /* ---------- Layout helpers ---------- */
+    .wrap { padding: 0 2.5%; }
+    .split {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 46px;
+      align-items: center;
+    }
+    .split.media-left { grid-template-columns: 0.95fr 1.05fr; }
+
+    .shot {
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      box-shadow: 0 30px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.02) inset;
+      width: 100%;
+      display: block;
+    }
+
+    .lead { font-size: 1.18rem; color: #c9d8f2; line-height: 1.55; }
+
+    ul.clean { list-style: none; margin: 0; padding: 0; }
+    ul.clean li {
+      position: relative;
+      padding: 9px 0 9px 30px;
+      font-size: 1.02rem;
+      color: #c2d2ec;
+      border-bottom: 1px dashed rgba(120,170,255,0.10);
+    }
+    ul.clean li:last-child { border-bottom: 0; }
+    ul.clean li::before {
+      content: "";
+      position: absolute; left: 4px; top: 17px;
+      width: 9px; height: 9px; border-radius: 2px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      box-shadow: 0 0 10px rgba(34,211,238,0.6);
+      transform: rotate(45deg);
+    }
+    ul.clean li b { color: #eaf2ff; font-weight: 600; }
+
+    /* ---------- Cards ---------- */
+    .cards { display: grid; gap: 18px; }
+    .cards.c2 { grid-template-columns: repeat(2, 1fr); }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px 20px 18px;
+      backdrop-filter: blur(6px);
+      transition: transform .25s ease, border-color .25s ease;
+    }
+    .card:hover { transform: translateY(-4px); border-color: rgba(34,211,238,0.4); }
+    .card .ico {
+      width: 42px; height: 42px; border-radius: 11px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, rgba(34,211,238,0.18), rgba(59,130,246,0.12));
+      border: 1px solid rgba(34,211,238,0.25);
+      font-size: 1.25rem; margin-bottom: 13px;
+    }
+    .card h3 { font-size: 1.06rem; margin-bottom: 6px; }
+    .card p { font-size: 0.9rem; margin: 0; color: var(--muted); line-height: 1.45; }
+    .card .tag { font-size: 0.72rem; color: var(--teal); font-weight: 600; letter-spacing: .4px; }
+
+    /* ---------- Stats ---------- */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .stat {
+      text-align: center;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 26px 14px;
+    }
+    .stat .num {
+      font-size: 2.9rem; font-weight: 800; line-height: 1;
+      background: linear-gradient(120deg, #67e8f9, #60a5fa);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat .lbl { margin-top: 10px; font-size: 0.82rem; color: var(--muted); letter-spacing: .3px; }
+
+    /* ---------- Pills / chips ---------- */
+    .chips { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 8px; }
+    .chip {
+      font-size: 0.78rem; font-weight: 600;
+      padding: 6px 13px; border-radius: 999px;
+      border: 1px solid var(--line); color: #cfe0fb;
+      background: rgba(255,255,255,0.03);
+    }
+    .chip.nokia { border-color: rgba(56,189,248,0.5); color: #bae6fd; }
+    .chip.huawei { border-color: rgba(251,113,133,0.5); color: #fecdd3; }
+
+    /* ---------- Mermaid ---------- */
+    .mermaid-wrap {
+      background: rgba(5, 12, 26, 0.55);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .reveal .mermaid { text-align: center; }
+    .reveal .mermaid svg { max-width: 100%; height: auto; }
+
+    /* ---------- Title slide ---------- */
+    #title { text-align: center; }
+    #title .hero-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 0.30; z-index: -2;
+    }
+    #title .veil {
+      position: absolute; inset: 0; z-index: -1;
+      background: radial-gradient(900px 520px at 50% 38%, rgba(5,10,22,0.25), rgba(5,10,22,0.86) 72%);
+    }
+    #title h1 { font-size: 5.0rem; font-weight: 900; letter-spacing: -2px; }
+    #title .sub { font-size: 1.5rem; color: #d7e6ff; font-weight: 500; margin-top: 6px; }
+    #title .tagline { color: var(--muted); margin-top: 18px; font-size: 1.02rem; }
+
+    .footer-note {
+      position: absolute; bottom: 18px; left: 0; right: 0;
+      text-align: center; font-size: 0.74rem; color: rgba(159,179,209,0.6);
+      letter-spacing: 1px;
+    }
+
+    .kpi-pill {
+      display:inline-block; font-family:'JetBrains Mono', monospace;
+      font-size:0.8rem; color:#9fe9ff; background:rgba(34,211,238,0.08);
+      border:1px solid rgba(34,211,238,0.25); border-radius:8px;
+      padding:3px 9px; margin:2px 3px;
+    }
+
+    .twocol { column-count: 2; column-gap: 34px; }
+    .twocol .card { break-inside: avoid; margin-bottom: 16px; }
+
+    .reveal .slide-number { background: transparent; color: rgba(159,179,209,0.55); font-size: 14px; }
+    .reveal .progress { color: var(--cyan); height: 4px; }
+
+    .legend { display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; font-size:0.82rem; color:var(--muted); }
+    .legend span { display:inline-flex; align-items:center; gap:7px; }
+    .dot { width:11px; height:11px; border-radius:3px; display:inline-block; }
+
+    .section-tag {
+      font-family:'JetBrains Mono', monospace; font-size:0.78rem;
+      color:var(--teal); letter-spacing:1px;
+    }
+    .big-quote { font-size: 1.6rem; color:#dbe8ff; font-weight:600; line-height:1.4; }
+  </style>
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 1 — TITLE -->
+    <section id="title" data-background-color="#050a16">
+      <img class="hero-img" src="assets/hero.png" alt="" />
+      <div class="veil"></div>
+      <div class="eyebrow" style="margin: 0 auto 26px;">Internal Operations Platform · Multi-Vendor RAN</div>
+      <h1 class="grad-text">PrimeNet</h1>
+      <div class="sub">Radio Network Performance &amp; Configuration Platform</div>
+      <p class="tagline">One governed workspace for performance intelligence, configuration discipline,<br/>and daily tool access across Nokia &amp; Huawei networks.</p>
+      <div class="chips" style="justify-content:center; margin-top:26px;">
+        <span class="chip nokia">Nokia</span>
+        <span class="chip huawei">Huawei</span>
+        <span class="chip">2G · 3G · 4G · 5G</span>
+        <span class="chip">Flask Monolith</span>
+        <span class="chip">SQLite</span>
+        <span class="chip">APScheduler</span>
+      </div>
+      <div class="footer-note">Zain Jordan RAN context · Executive &amp; stakeholder briefing</div>
+    </section>
+
+    <!-- 2 — THE PROBLEM -->
+    <section data-background-color="#070d1b">
+      <div class="wrap">
+        <div class="eyebrow">The Problem</div>
+        <h2>Radio operations live in <span class="accent">too many disconnected systems</span></h2>
+        <div class="split" style="margin-top:26px;">
+          <div>
+            <ul class="clean">
+              <li><b>10+ separate tools</b> — vendor OSS, assurance portals, drive-test platforms, site databases, spreadsheets.</li>
+              <li><b>Nokia and Huawei data live apart</b> — inconsistent KPI definitions slow cross-vendor decisions.</li>
+              <li><b>Manual exports &amp; merges</b> — analysts spend hours reconciling before they can analyze.</li>
+              <li><b>No config discipline</b> — nowhere to compare files, track tasks, or retain change history.</li>
+              <li><b>No unified picture</b> — leadership lacks a single view of operational sites by tech &amp; vendor.</li>
+            </ul>
+          </div>
+          <div class="cards c2">
+            <div class="card"><div class="ico">🧭</div><h3>Context switching</h3><p>Every incident means logging into multiple systems.</p></div>
+            <div class="card"><div class="ico">📑</div><h3>Spreadsheet sprawl</h3><p>Ad-hoc merges that don't agree with each other.</p></div>
+            <div class="card"><div class="ico">⏱️</div><h3>Slow to insight</h3><p>Hours between data drop and decision.</p></div>
+            <div class="card"><div class="ico">⚠️</div><h3>Config drift</h3><p>Undetected changes, no audit trail.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 — THE SOLUTION -->
+    <section data-background-color="#070d1b">
+      <div class="wrap">
+        <div class="eyebrow">The Solution</div>
+        <div class="split media-left">
+          <img class="shot" src="assets/pipeline.png" alt="Unified data pipeline" />
+          <div>
+            <h2>One secure web platform that <span class="accent">unifies the workflow</span></h2>
+            <ul class="clean" style="margin-top:14px;">
+              <li><b>Automates collection</b> of PM, grouping, neighbor, metadata &amp; small-cell data on hourly/daily schedules.</li>
+              <li><b>Stores &amp; serves</b> it through one dashboard with consistent KPI definitions across vendors.</li>
+              <li><b>Supports config discipline</b> — lookup, convert, compare, schedule, and version history.</li>
+              <li><b>Acts as an operations hub</b> — live site metrics plus one-click launch of the tools teams already use.</li>
+            </ul>
+            <p class="lead" style="margin-top:18px; color:#9fe9ff;">PrimeNet <b>complements</b> vendor OSS — it does not replace it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 — AT A GLANCE -->
+    <section data-background-color="#060c19">
+      <div class="wrap" style="text-align:center;">
+        <div class="eyebrow" style="margin-left:auto;margin-right:auto;">At a Glance</div>
+        <h2 style="text-align:center;">A modular Flask monolith built for scale</h2>
+        <div class="stats" style="margin-top:34px;">
+          <div class="stat"><div class="num">19</div><div class="lbl">Feature blueprints</div></div>
+          <div class="stat"><div class="num">2</div><div class="lbl">Vendors unified<br/>(Nokia · Huawei)</div></div>
+          <div class="stat"><div class="num">4</div><div class="lbl">Technologies<br/>2G / 3G / 4G / 5G</div></div>
+          <div class="stat"><div class="num">7×24</div><div class="lbl">Automated hourly<br/>+ daily ingest</div></div>
+        </div>
+        <div class="stats" style="margin-top:20px;">
+          <div class="stat"><div class="num">8+</div><div class="lbl">SQLite data stores<br/>(WAL, read-optimized)</div></div>
+          <div class="stat"><div class="num">4</div><div class="lbl">Access roles<br/>user → admin</div></div>
+          <div class="stat"><div class="num">SFTP</div><div class="lbl">Vendor feeds<br/>+ REST/MML APIs</div></div>
+          <div class="stat"><div class="num">KML</div><div class="lbl">+ Excel / XML<br/>export formats</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 — THREE PILLARS -->
+    <section data-background-color="#070d1b">
+      <div class="wrap">
+        <div class="eyebrow">Capability Pillars</div>
+        <h2>Three pillars, one workspace</h2>
+        <div class="split" style="margin-top:18px; grid-template-columns: 0.8fr 1.2fr;">
+          <img class="shot" src="assets/pillars.png" alt="Three capability pillars" />
+          <div class="cards c3" style="gap:14px;">
+            <div class="card">
+              <div class="ico">📈</div>
+              <h3>Performance</h3>
+              <p>KPI analytics &amp; trends · network map &amp; neighbors · reports · conflict / PCI views · Femto monitoring.</p>
+            </div>
+            <div class="card">
+              <div class="ico">⚙️</div>
+              <h3>Configuration</h3>
+              <p>Parameter dictionary · XML ⇄ Excel · NE compare · config tasks · version history.</p>
+            </div>
+            <div class="card">
+              <div class="ico">🛰️</div>
+              <h3>Operations Hub</h3>
+              <p>Live site dashboard by tech &amp; vendor · external tool launcher · drive tests · admin &amp; data health.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 — ARCHITECTURE -->
+    <section data-background-color="#060b17">
+      <div class="wrap">
+        <div class="eyebrow">System Architecture</div>
+        <h2>Everything at a glance</h2>
+        <div class="mermaid-wrap" style="margin-top:10px;">
+          <pre class="mermaid">
+flowchart LR
+    Browser["🌐 Web Browser"]:::client
+    subgraph PN["PrimeNet — Flask Monolith"]
+        App["app.py<br/>+ before/after hooks"]:::core
+        BP["19 Feature Blueprints"]:::core
+        Sched["APScheduler"]:::core
+        Core["ncm_core<br/>XML / Excel"]:::core
+    end
+    subgraph EXT["External Sources"]
+        SFTP["SFTP feeds<br/>Nokia · Huawei · Metadata · Femto"]:::ext
+        APIs["CM/FM/PM REST &amp; MML APIs"]:::ext
+        Up["User uploads<br/>XML · Excel · GPX"]:::ext
+    end
+    subgraph PIPE["Ingestion Pipeline"]
+        Pull["Pull orchestrators"]:::pipe
+        Load["Loaders + processors"]:::pipe
+    end
+    subgraph DB["SQLite Cluster — WAL"]
+        D1["PM cells DBs"]:::db
+        D2["metadata.db"]:::db
+        D3["neighbors / groups"]:::db
+        D4["ncm_users.db<br/>+ sync_log"]:::db
+    end
+    Browser --> App --> BP
+    App --> Sched --> Pull --> Load --> DB
+    SFTP & APIs --> Pull
+    Up --> BP
+    Core --> BP
+    BP --> DB
+    classDef client fill:#0b2540,stroke:#38bdf8,color:#e8f6ff;
+    classDef core fill:#0c2036,stroke:#22d3ee,color:#dffaff;
+    classDef ext fill:#241327,stroke:#fb7185,color:#ffe4ea;
+    classDef pipe fill:#0e2233,stroke:#2dd4bf,color:#dffdf7;
+    classDef db fill:#10182e,stroke:#60a5fa,color:#e3ecff;
+          </pre>
+        </div>
+        <p style="text-align:center; margin-top:12px; font-size:0.9rem;">Flask · SQLite-only · APScheduler background jobs · cookie-session auth · read-optimized for dashboards while writes happen.</p>
+      </div>
+    </section>
+
+    <!-- 7 — DATA PIPELINE -->
+    <section data-background-color="#060b17">
+      <div class="wrap">
+        <div class="eyebrow">Data Ingestion</div>
+        <h2>From vendor file drop to analyst view — automatically</h2>
+        <div class="mermaid-wrap" style="margin-top:8px;">
+          <pre class="mermaid">
+flowchart LR
+    T1["⏱️ Signature watcher"]:::trig
+    T2["📅 Hourly + daily cron"]:::trig
+    T3["🛠️ Admin triggers"]:::trig
+    Pull["Pull phase<br/>SFTP download"]:::pull
+    Stage["Staging<br/>sync_downloads/ · raw/"]:::stage
+    Load["Load phase<br/>parse CSV / XLSX / ZIP"]:::load
+    Proc["Processors<br/>upsert · retention · seed"]:::load
+    DB["SQLite targets<br/>PM · metadata · neighbors · groups"]:::db
+    Log["sync_log<br/>audit + row deltas"]:::log
+    API["Feature APIs → UI"]:::api
+    T1 & T2 & T3 --> Pull --> Stage --> Load --> Proc --> DB --> API
+    Load --> Log
+    Proc --> Log
+    classDef trig fill:#241327,stroke:#fb7185,color:#ffe4ea;
+    classDef pull fill:#0e2233,stroke:#2dd4bf,color:#dffdf7;
+    classDef stage fill:#10182e,stroke:#60a5fa,color:#e3ecff;
+    classDef load fill:#0c2036,stroke:#22d3ee,color:#dffaff;
+    classDef db fill:#10182e,stroke:#60a5fa,color:#e3ecff;
+    classDef log fill:#1c2030,stroke:#9fb3d1,color:#e8f0ff;
+    classDef api fill:#0b2540,stroke:#38bdf8,color:#e8f6ff;
+          </pre>
+        </div>
+        <div class="legend" style="justify-content:center;">
+          <span><b style="color:#9fe9ff;">Watcher-primary</b> — poll signatures, pull+load on change (default)</span>
+          <span><b style="color:#9fe9ff;">Legacy-periodic</b> — hourly + daily full sync</span>
+          <span><b style="color:#9fe9ff;">Manual-only</b> — admin API triggers</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 — PERFORMANCE -->
+    <section data-background-color="#070d1b">
+      <div class="wrap">
+        <div class="eyebrow">Pillar 1 · Performance &amp; Analytics</div>
+        <h2>Hunt degradation. Compare vendors. Map the network.</h2>
+        <div class="cards c3" style="margin-top:20px;">
+          <div class="card"><div class="ico">📊</div><h3>KPI Analytics</h3><p>Cell &amp; group trends, dynamic column introspection, saved filter profiles — the largest engine in the app.</p></div>
+          <div class="card"><div class="ico">🗺️</div><h3>Network Map</h3><p>Geospatial sites, sector wedges, per-cell KPIs, search by cell code, KML / CSV export.</p></div>
+          <div class="card"><div class="ico">🔗</div><h3>Neighbor Analysis</h3><p>Neighbor relation lines &amp; per-cell summaries from dedicated neighbor KPI databases.</p></div>
+          <div class="card"><div class="ico">📡</div><h3>Conflict / PCI Map</h3><p>Distance / bearing / sector-alignment risk scoring with strict→relaxed profiles.</p></div>
+          <div class="card"><div class="ico">🏠</div><h3>Femto PM</h3><p>Small-cell device catalog, KPI columns, and formula-driven trend evaluation.</p></div>
+          <div class="card"><div class="ico">📋</div><h3>Reports</h3><p>Generate, download &amp; archive operational reports with metadata + elevation helpers.</p></div>
+        </div>
+        <div class="chips" style="margin-top:18px;">
+          <span class="kpi-pill">/api/performance/cell/trend</span>
+          <span class="kpi-pill">/api/map/cells/wedge-data</span>
+          <span class="kpi-pill">/api/network-map/neighbors/lines</span>
+          <span class="kpi-pill">/api/conflict-map/export-kml</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 — CONFIGURATION -->
+    <section data-background-color="#070d1b">
+      <div class="wrap">
+        <div class="eyebrow">Pillar 2 · Configuration Tooling</div>
+        <h2>Safer changes with structured, auditable workflows</h2>
+        <div class="mermaid-wrap" style="margin-top:10px;">
+          <pre class="mermaid">
+flowchart LR
+    subgraph C["File-based tools — powered by ncm_core"]
+        X["XML Parser<br/>XML → Excel"]:::t
+        E["Excel Generator<br/>Excel → XML"]:::t
+        N["NE Comparison<br/>diff 2 NE XMLs"]:::t
+    end
+    subgraph H["Stateful tools — app DB"]
+        CH["Config History<br/>versions · diff · download"]:::s
+        TS["Task Scheduler<br/>attachments · status · results"]:::s
+        PD["Parameter Dictionary<br/>MO lookup + search"]:::s
+    end
+    classDef t fill:#0c2036,stroke:#22d3ee,color:#dffaff;
+    classDef s fill:#0e2233,stroke:#2dd4bf,color:#dffdf7;
+          </pre>
+        </div>
+        <div class="cards c3" style="margin-top:14px;">
+          <div class="card"><div class="tag">CONVERT</div><h3>XML ⇄ Excel</h3><p>Translate vendor config files in both directions, reliably.</p></div>
+          <div class="card"><div class="tag">COMPARE</div><h3>Before / after NE</h3><p>Catch drift between network-element snapshots.</p></div>
+          <div class="card"><div class="tag">TRACK</div><h3>History &amp; tasks</h3><p>Version every change; schedule config tasks with traceability.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 — OPERATIONS HUB -->
+    <section data-background-color="#070d1b">
+      <div class="wrap">
+        <div class="eyebrow">Pillar 3 · Operations Hub</div>
+        <h2>The single front door for daily operations</h2>
+        <div class="split">
+          <ul class="clean">
+            <li><b>Live site dashboard</b> — operational sites counted by RAT and vendor from active metadata.</li>
+            <li><b>External tool launcher</b> — curated links to PRS, U2020, NetAct, NetChart, Nemo, TEMS — no more bookmark chaos.</li>
+            <li><b>Drive-test viewer</b> — ingest GPX / NMFS field artifacts into map-ready traces.</li>
+            <li><b>Network management</b> — browse sites &amp; cells, run PCI conflict checks over metadata.</li>
+            <li><b>Admin &amp; data health</b> — manage users, monitor PM freshness, trigger syncs.</li>
+          </ul>
+          <div class="cards c2">
+            <div class="stat"><div class="num">🛰️</div><div class="lbl">Operational sites<br/>by tech &amp; vendor</div></div>
+            <div class="stat"><div class="num">🔌</div><div class="lbl">One-click external<br/>OSS / NMS launch</div></div>
+            <div class="stat"><div class="num">🚗</div><div class="lbl">Drive-test trace<br/>visualization</div></div>
+            <div class="stat"><div class="num">❤️</div><div class="lbl">PM freshness<br/>monitoring</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 — SECURITY & GOVERNANCE -->
+    <section data-background-color="#060b17">
+      <div class="wrap">
+        <div class="eyebrow">Security &amp; Governance</div>
+        <div class="split media-left">
+          <img class="shot" src="assets/security.png" alt="Security and governance" />
+          <div>
+            <h2>Controlled access, full accountability</h2>
+            <ul class="clean" style="margin-top:12px;">
+              <li><b>Role-based access</b> — user → operator → NOC/systems → administrator.</li>
+              <li><b>Server-side sessions</b> — httponly token cookie, expiry &amp; active-user checks.</li>
+              <li><b>Password policy</b> — 60-day rotation enforced globally via before-request gate.</li>
+              <li><b>CSRF + input sanitization</b> on every state-changing request.</li>
+              <li><b>Activity logging</b> &amp; optional license activation for production.</li>
+              <li><b>Registration disabled</b> — provisioned accounts only.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="chips" style="justify-content:center; margin-top:18px;">
+          <span class="chip">CSP &amp; security headers</span>
+          <span class="chip">SQLite WAL + retry on lock</span>
+          <span class="chip">Audit via sync_log</span>
+          <span class="chip">License / activation gate</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 — TECH STACK -->
+    <section data-background-color="#070d1b">
+      <div class="wrap">
+        <div class="eyebrow">Under the Hood</div>
+        <h2>Technology stack</h2>
+        <div class="cards c4" style="margin-top:22px;">
+          <div class="card"><div class="ico">🐍</div><h3>Flask</h3><p>Modular monolith; one blueprint per feature area.</p></div>
+          <div class="card"><div class="ico">🗄️</div><h3>SQLite</h3><p>WAL mode, busy-timeout, attach-based reads.</p></div>
+          <div class="card"><div class="ico">⏰</div><h3>APScheduler</h3><p>Watcher, hourly &amp; daily ingest jobs.</p></div>
+          <div class="card"><div class="ico">🔐</div><h3>Sessions</h3><p>DB-backed tokens, salted hashing, roles.</p></div>
+          <div class="card"><div class="ico">📂</div><h3>SFTP / Paramiko</h3><p>Vendor PM, metadata &amp; neighbor feeds.</p></div>
+          <div class="card"><div class="ico">🔄</div><h3>ncm_core</h3><p>Shared XML / Excel converters &amp; comparators.</p></div>
+          <div class="card"><div class="ico">🐳</div><h3>Docker</h3><p>Web + scheduler services, Gunicorn, healthchecks.</p></div>
+          <div class="card"><div class="ico">🤖</div><h3>Optional AI</h3><p>OpenAI-backed parameter summaries (graceful fallback).</p></div>
+        </div>
+        <p style="text-align:center; margin-top:18px; font-size:0.92rem;">Deployed as <span class="accent">two containers</span> — <code>primenet-web</code> (Gunicorn) and <code>primenet-scheduler</code> — sharing one data volume.</p>
+      </div>
+    </section>
+
+    <!-- 13 — FEATURE CATALOG -->
+    <section data-background-color="#060c19">
+      <div class="wrap">
+        <div class="eyebrow">Feature Catalog</div>
+        <h2>19 blueprints, one coherent platform</h2>
+        <div class="cards c4" style="margin-top:16px; gap:12px; font-size:0.9rem;">
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Performance</h3><p>KPI analytics engine</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Network Map</h3><p>Sites · wedges · KPIs</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Neighbor Analysis</h3><p>Relation lines</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Cell Heatmap</h3><p>Spatial KPI heat</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Conflict Map</h3><p>PCI risk scoring</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Femto PM</h3><p>Small-cell trends</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Reports</h3><p>Generate &amp; archive</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Parameter Dict.</h3><p>MO lookup + search</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">XML Parser</h3><p>XML → Excel</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Excel Generator</h3><p>Excel → XML</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">NE Comparison</h3><p>Diff NE XMLs</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Config History</h3><p>Versions &amp; diff</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Task Scheduler</h3><p>Config task flow</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">RAN Features</h3><p>Feature reference</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Network Mgmt</h3><p>Sites &amp; cells</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Drive-Test Viewer</h3><p>GPX / NMFS</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">User Profile</h3><p>Prefs &amp; activity</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Admin Panel</h3><p>Users &amp; freshness</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Sync</h3><p>Pipeline triggers</p></div>
+          <div class="card" style="padding:14px 15px;"><h3 style="font-size:0.98rem;">Auth</h3><p>Login · dashboard</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 — MATURITY / ROADMAP -->
+    <section data-background-color="#070d1b">
+      <div class="wrap">
+        <div class="eyebrow">Maturity — Honest Snapshot</div>
+        <h2>Shipping today, building tomorrow</h2>
+        <div class="cards c3" style="margin-top:22px;">
+          <div class="card" style="border-color:rgba(45,212,191,0.45);">
+            <div class="tag" style="color:#2dd4bf;">● PRODUCTION TODAY</div>
+            <h3>Live in operations</h3>
+            <p style="line-height:1.7;">KPI analytics · network map · neighbor analysis · reports · conflict map · Femto PM · parameter dictionary · XML/Excel tooling · NE compare · config tasks &amp; history · dashboard · external tools · drive test · network mgmt · tasks.</p>
+          </div>
+          <div class="card" style="border-color:rgba(96,165,250,0.45);">
+            <div class="tag" style="color:#60a5fa;">◐ IN DEVELOPMENT</div>
+            <h3>Coming next</h3>
+            <p style="line-height:1.7;">Cell heatmap · SON analytics · network health dashboard.</p>
+          </div>
+          <div class="card" style="border-color:rgba(159,179,209,0.35);">
+            <div class="tag" style="color:#9fb3d1;">○ PLANNED</div>
+            <h3>On the roadmap</h3>
+            <p style="line-height:1.7;">RAN features catalog · OpenAPI reference · per-DB data dictionary · deployment playbook &amp; incident runbooks.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 — OUTCOMES / ROI -->
+    <section data-background-color="#060b17">
+      <div class="wrap">
+        <div class="eyebrow">Outcomes &amp; Value</div>
+        <h2>Measurable wins — without displacing vendor investments</h2>
+        <div class="cards c2" style="margin-top:20px;">
+          <div class="card"><div class="ico">⚡</div><h3>Time to insight</h3><p>KPI trends &amp; maps available minutes after data lands — fewer manual exports and merges.</p></div>
+          <div class="card"><div class="ico">🤝</div><h3>Cross-vendor consistency</h3><p>One platform, one set of KPI definitions and reporting templates for Nokia &amp; Huawei.</p></div>
+          <div class="card"><div class="ico">👁️</div><h3>Operational visibility</h3><p>Live operational footprint by RAT and vendor; admins watch data freshness &amp; sync health.</p></div>
+          <div class="card"><div class="ico">🛡️</div><h3>Configuration quality</h3><p>Structured compare / convert and task scheduling reduce undetected config drift.</p></div>
+          <div class="card"><div class="ico">🧹</div><h3>Less tool sprawl</h3><p>A single entry point plus curated launchers for the systems teams use daily.</p></div>
+          <div class="card"><div class="ico">📜</div><h3>Governance</h3><p>Roles, session security, password policy, activity logging, licensed deployment.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 — CLOSING -->
+    <section id="title" data-background-color="#050a16">
+      <img class="hero-img" src="assets/hero.png" alt="" style="opacity:0.22;" />
+      <div class="veil"></div>
+      <div class="eyebrow" style="margin:0 auto 24px;">Next Steps</div>
+      <h1 class="grad-text" style="font-size:3.4rem;">One front door for RAN ops</h1>
+      <p class="big-quote" style="max-width:900px; margin:22px auto 0; text-align:center;">
+        PrimeNet turns fragmented radio operations into a single, governed workspace for
+        performance intelligence, configuration support, and daily tool access.
+      </p>
+      <div class="cards c3" style="max-width:980px; margin:34px auto 0;">
+        <div class="card" style="text-align:center;"><h3>1 · Endorse</h3><p>Adopt PrimeNet as the standard internal entry point.</p></div>
+        <div class="card" style="text-align:center;"><h3>2 · Align</h3><p>Set data-freshness SLAs — hourly PM, daily deep sync.</p></div>
+        <div class="card" style="text-align:center;"><h3>3 · Prioritize</h3><p>Network health, SON analytics, cell heatmap.</p></div>
+      </div>
+      <div class="footer-note">PrimeNet · Radio Network Performance &amp; Configuration Platform · June 2026</div>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+  // Render Mermaid diagrams BEFORE Reveal initializes, while all slides are
+  // still visible in the DOM (so getBBox measurements are correct).
+  mermaid.initialize({
+    startOnLoad: false,
+    securityLevel: 'loose',
+    theme: 'base',
+    themeVariables: {
+      fontFamily: 'Inter, sans-serif',
+      fontSize: '15px',
+      lineColor: '#5f86c2',
+      primaryColor: '#0c2036',
+      primaryTextColor: '#e8f0ff',
+      primaryBorderColor: '#22d3ee',
+      tertiaryColor: '#0a1326'
+    },
+    flowchart: { curve: 'basis', useMaxWidth: true, htmlLabels: true, padding: 12 }
+  });
+
+  window.addEventListener('DOMContentLoaded', async () => {
+    try { await mermaid.run({ querySelector: '.mermaid' }); }
+    catch (e) { console.error('mermaid', e); }
+
+    Reveal.initialize({
+      width: 1280,
+      height: 720,
+      margin: 0.05,
+      minScale: 0.2,
+      maxScale: 1.6,
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      backgroundTransition: 'fade',
+      controls: true,
+      progress: true,
+      center: true,
+      plugins: [RevealHighlight, RevealNotes]
+    });
+  });
+</script>
+</body>
+</html>

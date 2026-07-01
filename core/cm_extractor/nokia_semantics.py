@@ -4,7 +4,9 @@ Nokia CM extraction semantics: MO catalog, parameter metadata, query building, e
 
 from __future__ import annotations
 
+import json
 import time
+from pathlib import Path
 from typing import Any
 
 from core.cm_extractor.excel_writer import (
@@ -22,8 +24,16 @@ from core.cm_extractor.site_catalog import (
     scope_dn_needles,
 )
 
-_MO_CLASS_CACHE: dict[str, Any] = {'ts': 0.0, 'items': [], 'version': 0}
+_MO_CLASS_CACHE: dict[str, Any] = {'ts': 0.0, 'items': [], 'by_scope': {}, 'version': 0}
 _CACHE_TTL_SEC = 3600
+
+# Compact MO tree (anchors + full class set per scope) bundled with the app.
+# Lets us map each NetAct CM adaptation to a scope by the anchor classes it
+# exposes, so BTS-side WCDMA/GSM adaptations (e.g. the one carrying
+# WNBTS/WNCEL/WNCELG under the MRBTS tree) are discovered automatically instead
+# of relying on a hard-coded adaptation allow-list.
+_SCOPE_TREE_PATH = Path(__file__).resolve().parent / 'data' / 'nokia_mo_scope_tree.json'
+_SCOPE_TREE_CACHE: dict[str, dict[str, frozenset[str]]] | None = None
 
 # MO Path templates — scoped paths filter by PLMN instance variable (:plmn).
 _MO_PATH_BY_ADAPTATION: dict[str, str] = {
@@ -51,10 +61,21 @@ _SITE_LEVEL_MO_PATH_ALL_PLMNS: dict[tuple[str, str], str] = {
 }
 
 _RAN_ADAPTATION_PREFIXES = ('NOKLTE', 'NOKNR', 'NOKRNC', 'NOKBSC', 'NOKIA', 'NetActCommon', 'MRBTS')
-# Fetch only these from NetAct (full catalog is 200+ adaptations / 30k+ classes).
+# Fallback adaptation set when the full-catalog discovery call fails. The
+# preferred path fetches every adaptation and classifies it by anchor class, so
+# BTS-side WCDMA/GSM classes (WNCEL/WNCELG, …) are not missed.
 RAN_ADAPT_IDS = ['NetActCommon', 'NOKLTE', 'NOKNR', 'NOKRNC', 'NOKBSC', 'NOKIA', 'MRBTS']
 
-_MO_CLASS_CACHE_VERSION = 4
+# Default MO-path template per scope for adaptations without an explicit entry
+# above (used for discovered adaptations such as the WCDMA-on-BTS one). MRBTS
+# scope is rooted at the MRBTS tree so instance() scoping and DN filtering work.
+_DEFAULT_TREE_PATH_BY_SCOPE: dict[str, str] = {
+    'MRBTS': '/NetActCommon:PLMN/MRBTS//{adapt}:{abbr}',
+    'RNC': '/NetActCommon:PLMN//{adapt}:{abbr}',
+    'BSC': '/NetActCommon:PLMN//{adapt}:{abbr}',
+}
+
+_MO_CLASS_CACHE_VERSION = 5
 
 # Structured/list parameters cannot be queried with bare @paramName (needs components).
 _NON_QUERYABLE_PARAM_TYPES = frozenset({'StructuredValue'})
@@ -75,6 +96,62 @@ _CONTROLLER_ROOT_ABBREV = {'NOKRNC': 'RNC', 'NOKBSC': 'BSC'}
 _RNC_OPEN_API_EMPTY_HINT_CLASSES = frozenset({'WBTS', 'WCEL', 'WAC'})
 _RNC_OPEN_API_INCOMPLETE_HINT_CLASSES = frozenset({'FMCS', 'WBTS', 'WCEL', 'WAC'})
 _WORKING_QUERY_PARAMS_CACHE: dict[str, list[str]] = {}
+
+
+def _load_scope_tree() -> dict[str, dict[str, frozenset[str]]]:
+    """Load the bundled anchor/class map used to classify adaptations by scope."""
+    global _SCOPE_TREE_CACHE
+    if _SCOPE_TREE_CACHE is None:
+        anchors: dict[str, frozenset[str]] = {}
+        classes: dict[str, frozenset[str]] = {}
+        try:
+            raw = json.loads(_SCOPE_TREE_PATH.read_text(encoding='utf-8'))
+            raw_anchors = raw.get('anchors') or {}
+            raw_classes = raw.get('classes') or {}
+        except (OSError, json.JSONDecodeError, TypeError):
+            raw_anchors, raw_classes = {}, {}
+        for level in SCOPE_LEVELS:
+            anchors[level] = frozenset(raw_anchors.get(level) or [])
+            classes[level] = frozenset(raw_classes.get(level) or [])
+        _SCOPE_TREE_CACHE = {'anchors': anchors, 'classes': classes}
+    return _SCOPE_TREE_CACHE
+
+
+def discover_scope_adaptations(items: list[dict[str, str]]) -> dict[str, frozenset[str]]:
+    """
+    Map each adaptation to a scope by the anchor classes it exposes.
+
+    An adaptation belongs to MRBTS if it carries a BTS-tree anchor (MRBTS,
+    LNBTS, NRBTS, GNBTS, WNBTS, …), to RNC/BSC for their respective anchors.
+    Anchors never overlap between BTS and controller trees, so the BTS-side
+    WCDMA/GSM adaptations land under MRBTS regardless of their exact id string.
+    The static ``_ADAPTATIONS_BY_SCOPE`` acts as a floor so nothing regresses.
+    """
+    anchors = _load_scope_tree()['anchors']
+    abbrs_by_adapt: dict[str, set[str]] = {}
+    for item in items:
+        adapt = item.get('adaptation')
+        abbr = item.get('abbreviation')
+        if adapt and abbr:
+            abbrs_by_adapt.setdefault(adapt, set()).add(abbr)
+
+    result: dict[str, set[str]] = {
+        level: set(_ADAPTATIONS_BY_SCOPE[level]) for level in SCOPE_LEVELS
+    }
+    for adapt, abbrs in abbrs_by_adapt.items():
+        for level in SCOPE_LEVELS:
+            if abbrs & anchors[level]:
+                result[level].add(adapt)
+    # Controllers stay in their own scope; never let them leak into MRBTS.
+    result['MRBTS'].difference_update(_CONTROLLER_DN_FILTER_ADAPTATIONS)
+    return {level: frozenset(adapts) for level, adapts in result.items()}
+
+
+def _allowed_adaptations_for_scope(scope_level: str) -> frozenset[str]:
+    """Discovered adaptations for a scope, falling back to the static floor."""
+    level = normalize_scope_level(scope_level)
+    by_scope = _MO_CLASS_CACHE.get('by_scope') or {}
+    return by_scope.get(level) or _ADAPTATIONS_BY_SCOPE[level]
 
 
 def flatten_mo_classes(raw: dict[str, Any] | list[Any] | None) -> list[dict[str, str]]:
@@ -145,9 +222,36 @@ def filter_mo_classes_by_scope(
     items: list[dict[str, str]],
     scope_level: str,
 ) -> list[dict[str, str]]:
-    level = normalize_scope_level(scope_level)
-    allowed = _ADAPTATIONS_BY_SCOPE[level]
+    allowed = _allowed_adaptations_for_scope(scope_level)
     return [item for item in items if item.get('adaptation') in allowed]
+
+
+def _fetch_and_classify_mo_classes(
+    client: NokiaCmClient,
+    *,
+    ran_only: bool = True,
+) -> tuple[list[dict[str, str]], dict[str, frozenset[str]]]:
+    """
+    Fetch the MO-class catalog and classify adaptations by scope.
+
+    The full adaptation catalog is fetched so BTS-side WCDMA/GSM adaptations are
+    discovered. If that call fails (large payloads can time out on some NetActs),
+    fall back to the historical curated adaptation set.
+    """
+    try:
+        items = flatten_mo_classes(client.get_mo_classes(None))
+    except NokiaCmError:
+        items = []
+    if not items:
+        items = flatten_mo_classes(client.get_mo_classes(RAN_ADAPT_IDS))
+
+    by_scope = discover_scope_adaptations(items)
+    if ran_only:
+        ran_adaptations: set[str] = set()
+        for adapts in by_scope.values():
+            ran_adaptations |= adapts
+        items = [item for item in items if item.get('adaptation') in ran_adaptations]
+    return items, by_scope
 
 
 def get_mo_class_catalog(
@@ -163,12 +267,10 @@ def get_mo_class_catalog(
         and (now - _MO_CLASS_CACHE['ts']) < _CACHE_TTL_SEC
     )
     if not cache_ok:
-        raw = client.get_mo_classes(RAN_ADAPT_IDS if ran_only else None)
-        items = flatten_mo_classes(raw)
-        if ran_only:
-            items = filter_ran_mo_classes(items)
+        items, by_scope = _fetch_and_classify_mo_classes(client, ran_only=ran_only)
         _MO_CLASS_CACHE['ts'] = now
         _MO_CLASS_CACHE['items'] = items
+        _MO_CLASS_CACHE['by_scope'] = by_scope
         _MO_CLASS_CACHE['version'] = _MO_CLASS_CACHE_VERSION
 
     items = list(_MO_CLASS_CACHE['items'])
@@ -200,12 +302,7 @@ def build_query_variables(plmn: str) -> dict[str, str] | None:
 
 
 def adaptation_supports_path_scope(adaptation: str, scope_level: str) -> bool:
-    level = normalize_scope_level(scope_level)
-    if level == 'MRBTS':
-        return adaptation in _ADAPTATIONS_BY_SCOPE['MRBTS']
-    if level == 'RNC':
-        return adaptation in _ADAPTATIONS_BY_SCOPE['RNC']
-    return adaptation in _ADAPTATIONS_BY_SCOPE['BSC']
+    return adaptation in _allowed_adaptations_for_scope(scope_level)
 
 
 def _is_controller_root_mo(adaptation: str, abbreviation: str) -> bool:
@@ -493,12 +590,16 @@ def build_mo_path(
     element_id: str | None = None,
 ) -> str:
     """Build an all-PLMN MO path (no PLMN instance filter)."""
+    default_template = _MO_PATH_ALL_PLMNS.get(adaptation)
+    if default_template is None:
+        level = normalize_scope_level(scope_level)
+        default_template = _DEFAULT_TREE_PATH_BY_SCOPE.get(
+            level,
+            '/NetActCommon:PLMN//{adapt}:{abbr}',
+        )
     template = _SITE_LEVEL_MO_PATH_ALL_PLMNS.get(
         (adaptation, abbreviation),
-        _MO_PATH_ALL_PLMNS.get(
-        adaptation,
-        '/NetActCommon:PLMN//{adapt}:{abbr}',
-        ),
+        default_template,
     )
     if element_id:
         template = _inject_scope_element(template, scope_level, element_id)

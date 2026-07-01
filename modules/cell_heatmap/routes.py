@@ -12,6 +12,7 @@ import re
 
 from db.runtime import connect_metadata, execute_query
 from database_enhanced import get_user_by_session, log_activity
+from core.elevation import coord_key as elevation_coord_key, elevation_for_points
 from sync_config import (
     NOKIA_PM_DB,
     HUAWEI_PM_DB,
@@ -690,6 +691,9 @@ def get_heatmap_points():
             )
 
         details = [d for d in details if d["kpi_value"] is not None]
+        elevation_map = elevation_for_points(((d["latitude"], d["longitude"]) for d in details), fetch_missing=False)
+        for d in details:
+            d["elevation_m"] = elevation_map.get(elevation_coord_key(d["latitude"], d["longitude"]))
         shown_radii = [float(d["size_radius_m"]) for d in details]
         min_radius = min(shown_radii) if shown_radii else 0.0
         max_radius = max(shown_radii) if shown_radii else 0.0

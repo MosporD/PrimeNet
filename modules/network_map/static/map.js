@@ -30,6 +30,7 @@ const DEFAULT_CENTER = [31.9539, 35.9106];   // Amman, Jordan
 const DEFAULT_ZOOM   = 10;
 const SECTOR_RADIUS_M = 240;                 // wedge radius in metres (was 600; scaled to 0.4×)
 const SECTOR_BEAMWIDTH = 65;                 // 3 dB beamwidth in degrees
+const _ELEVATION_CACHE = new Map();
 
 // Cluster number → Area name  (cluster = Math.floor(site_id / 100))
 const CLUSTER_AREA = {
@@ -353,6 +354,46 @@ function escapeHtml(str) {
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
+}
+
+function elevationCacheKey(lat, lng) {
+    return `${Number(lat).toFixed(5)},${Number(lng).toFixed(5)}`;
+}
+
+function formatElevation(elevationM) {
+    const n = Number(elevationM);
+    return Number.isFinite(n) ? `${Math.round(n)} m` : 'unavailable';
+}
+
+async function fetchElevation(lat, lng) {
+    const la = Number(lat);
+    const lo = Number(lng);
+    if (!Number.isFinite(la) || !Number.isFinite(lo)) return null;
+    const key = elevationCacheKey(la, lo);
+    if (_ELEVATION_CACHE.has(key)) return _ELEVATION_CACHE.get(key);
+    try {
+        const res = await fetch(`/api/elevation?lat=${encodeURIComponent(la)}&lng=${encodeURIComponent(lo)}`, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+        });
+        const data = await res.json().catch(() => ({}));
+        const val = res.ok && data.success ? data.elevation_m : null;
+        _ELEVATION_CACHE.set(key, val);
+        return val;
+    } catch (_) {
+        _ELEVATION_CACHE.set(key, null);
+        return null;
+    }
+}
+
+function fillElevationText(elementId, lat, lng) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.textContent = 'loading...';
+    fetchElevation(lat, lng).then((elev) => {
+        const target = document.getElementById(elementId);
+        if (target) target.textContent = formatElevation(elev);
+    });
 }
 
 function _hasArabicText(str) {
@@ -931,6 +972,7 @@ function drawSectorWedge(site, group) {
 
     // Store group payload for click handlers (avoid giant inline JSON in HTML).
     const groupId = group.groupId;
+    const elevationId = `nm-elev-${String(groupId || '').replace(/[^a-zA-Z0-9_-]/g, '-')}`;
     wedgeGroups[groupId] = group;
 
     const cellCount = group.cells.length;
@@ -989,6 +1031,8 @@ function drawSectorWedge(site, group) {
                 ${ref.pci != null
                     ? `<tr><td style="color:#777;">PCI/SC/BCCH</td>
                            <td>${ref.pci}</td></tr>` : ''}
+                <tr><td style="color:#777;">Elevation</td>
+                    <td id="${elevationId}" style="font-weight:600;">loading...</td></tr>
             </table>
             ${cellCount === 1 ? (
                 cellOperational(ref)
@@ -1013,6 +1057,7 @@ function drawSectorWedge(site, group) {
         </div>
     `);
 
+    polygon.on('popupopen', () => fillElevationText(elevationId, site.latitude, site.longitude));
     polygon.on('click', e => { L.DomEvent.stopPropagation(e); polygon.openPopup(); });
     sectorLayers.push(polygon);
 
@@ -1107,6 +1152,7 @@ function displaySiteInfo(site, cells) {
         <div class="site-meta-row"><strong>Cluster:</strong> ${site.cluster ?? '—'}</div>
         <div class="site-meta-row"><strong>Area:</strong> ${site.area || '—'}</div>
         <div class="site-meta-row"><strong>Vendor:</strong> ${site.vendor || '—'}</div>
+        <div class="site-meta-row"><strong>Elevation:</strong> <span id="site-elevation-value">loading...</span></div>
         <div class="site-meta-row"><strong>Cells shown:</strong> ${cells.length}</div>
         ${offlineNote}
         ${techHtml}
@@ -1116,6 +1162,7 @@ function displaySiteInfo(site, cells) {
         </a>
     `;
     panel.style.display = 'block';
+    fillElevationText('site-elevation-value', site.latitude, site.longitude);
 }
 
 // ─── Cell KPI modal ───────────────────────────────────────────────────────────
@@ -2423,7 +2470,12 @@ function goToCoordinates() {
     map.setView([lat, lng], Math.max(map.getZoom(), 14));
     if (coordMarker) map.removeLayer(coordMarker);
     coordMarker = L.marker([lat, lng]).addTo(map);
-    coordMarker.bindPopup(`<div style="font-weight:700;">📍 Coordinate</div><div>${lat.toFixed(6)}, ${lng.toFixed(6)}</div>`).openPopup();
+    coordMarker.bindPopup(`
+        <div style="font-weight:700;">📍 Coordinate</div>
+        <div>${lat.toFixed(6)}, ${lng.toFixed(6)}</div>
+        <div>Elevation: <span id="coord-elevation-value">loading...</span></div>
+    `).openPopup();
+    fillElevationText('coord-elevation-value', lat, lng);
 
     // If sites are not loaded yet, load them (filters now active via lat/lng)
     if (!sitesData.length) {

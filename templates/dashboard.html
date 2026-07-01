@@ -445,10 +445,10 @@
                         <span class="pm-health-loading">Loading last sync times…</span>
                     </div>
                     <div class="dashboard-refresh-actions" aria-label="Manual data refresh actions">
-                        <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/nokia_pm', this)">Refresh Nokia</button>
-                        <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/huawei_pm', this)">Refresh Huawei</button>
                         <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/cells_hourly', this)">Refresh Hourly Cells</button>
+                        <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/groups_hourly', this)">Refresh Hourly Groups</button>
                         <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/cells_daily', this)">Refresh Daily Cells</button>
+                        <button type="button" class="dashboard-refresh-action" onclick="triggerDashboardRefresh('/api/sync/trigger/groups_daily', this)">Refresh Daily Groups</button>
                     </div>
                 </div>
                 <div class="op-sites-summary-card dashboard-freshness-card">
@@ -974,6 +974,9 @@
         function freshnessForDb(db) {
             const status = String(db?.overall || '').toUpperCase();
             if (status === 'MISSING') return { label: 'Missing', cls: 'freshness-badge-missing', detail: 'No database' };
+            if (status === 'STALE' && db?.stale_tables?.length) {
+                return { label: 'Stale', cls: 'freshness-badge-stale', detail: `${db.stale_tables.length} table(s) behind: ${db.stale_tables.join(', ')}` };
+            }
             const latest = parseDashboardDate(db?.latest_data_overall);
             if (!latest) return { label: status === 'HEALTHY' ? 'Fresh' : 'Stale', cls: status === 'HEALTHY' ? 'freshness-badge-fresh' : 'freshness-badge-stale', detail: db?.latest_data_overall || 'No timestamp' };
             const hours = Math.max(0, (Date.now() - latest.getTime()) / 36e5);
@@ -1073,13 +1076,14 @@
                         <h4>${db.label} <span class="${pmHealthStatusClass(db.overall)}">${db.overall}</span></h4>
                         <p class="pm-health-meta">Latest: <strong>${db.latest_data_overall || '—'}</strong>
                             ${db.latest_data_table ? ` (${db.latest_data_table})` : ''}
+                            ${db.stale_tables?.length ? ` · Stale (>${db.stale_after_hours || ''}h): ${db.stale_tables.join(', ')}` : ''}
                             ${db.empty_tables?.length ? ` · Empty: ${db.empty_tables.join(', ')}` : ''}</p>
                         <table class="pm-health-subtable">
                             <thead><tr><th>Table</th><th>Status</th><th>Rows</th><th>Distinct cells</th><th>Latest</th></tr></thead>
                             <tbody>
                                 ${(db.tables || []).map(t => `<tr>
                                     <td>${t.table}</td>
-                                    <td>${t.status || '—'}</td>
+                                    <td>${t.stale ? `<span class="${pmHealthStatusClass('STALE')}">STALE${t.age_hours != null ? ` ${Math.round(t.age_hours)}h` : ''}</span>` : (t.status || '—')}</td>
                                     <td>${t.rows != null ? Number(t.rows).toLocaleString() : '—'}</td>
                                     <td>${t.distinct_cells != null ? Number(t.distinct_cells).toLocaleString() : '—'}</td>
                                     <td>${t.latest || '—'}</td>

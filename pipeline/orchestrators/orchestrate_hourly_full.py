@@ -26,10 +26,16 @@ def _run(script_name: str, args: list[str] | None = None) -> int:
 
 def main() -> int:
     ensure_taxonomy_dirs()
-    rc = _run(os.path.join("pipeline", "pull", "hourly", "pull_all.py"))
-    if rc != 0:
-        return rc
-    return _run(os.path.join("pipeline", "load", "hourly", "load_all.py"))
+    pull_rc = _run(os.path.join("pipeline", "pull", "hourly", "pull_all.py"))
+    # pull_rc == 2 => partial pull (some vendors failed). Still load whatever
+    # arrived so a single-vendor miss does not stall all ingestion.
+    if pull_rc not in (0, 2):
+        return pull_rc
+    load_rc = _run(os.path.join("pipeline", "load", "hourly", "load_all.py"))
+    # Surface the partial-pull signal upward when the load itself succeeded.
+    if load_rc == 0 and pull_rc == 2:
+        return 2
+    return load_rc
 
 
 if __name__ == "__main__":

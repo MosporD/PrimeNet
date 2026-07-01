@@ -1,5 +1,61 @@
 let conflictMap = null;
 let conflictLayerGroup = null;
+const conflictElevationCache = new Map();
+
+function conflictElevationKey(lat, lng) {
+    return `${Number(lat).toFixed(5)},${Number(lng).toFixed(5)}`;
+}
+
+function conflictFormatElevation(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? `${Math.round(n)} m` : '-';
+}
+
+async function conflictFetchElevation(lat, lng) {
+    const la = Number(lat);
+    const lo = Number(lng);
+    if (!Number.isFinite(la) || !Number.isFinite(lo)) return null;
+    const key = conflictElevationKey(la, lo);
+    if (conflictElevationCache.has(key)) return conflictElevationCache.get(key);
+    try {
+        const res = await fetch(`/api/elevation?lat=${encodeURIComponent(la)}&lng=${encodeURIComponent(lo)}`, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+        });
+        const data = await res.json().catch(() => ({}));
+        const val = res.ok && data.success ? data.elevation_m : null;
+        conflictElevationCache.set(key, val);
+        return val;
+    } catch (_) {
+        conflictElevationCache.set(key, null);
+        return null;
+    }
+}
+
+function conflictFillElevation(id, lat, lng) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = 'loading...';
+    conflictFetchElevation(lat, lng).then((value) => {
+        const target = document.getElementById(id);
+        if (target) target.textContent = conflictFormatElevation(value);
+    });
+}
+
+function conflictFillElevationPair(aId, bId, deltaId, aLat, aLng, bLat, bLng) {
+    Promise.all([conflictFetchElevation(aLat, aLng), conflictFetchElevation(bLat, bLng)]).then(([a, b]) => {
+        const aEl = document.getElementById(aId);
+        const bEl = document.getElementById(bId);
+        const dEl = document.getElementById(deltaId);
+        if (aEl) aEl.textContent = conflictFormatElevation(a);
+        if (bEl) bEl.textContent = conflictFormatElevation(b);
+        if (dEl) {
+            const an = Number(a);
+            const bn = Number(b);
+            dEl.textContent = Number.isFinite(an) && Number.isFinite(bn) ? `${Math.round(an - bn)} m` : '-';
+        }
+    });
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     initConflictMap();
@@ -287,7 +343,7 @@ function renderRows(rows) {
     if (!conflictMap || !conflictLayerGroup) return;
     conflictLayerGroup.clearLayers();
     const bounds = [];
-    (rows || []).forEach((r) => {
+    (rows || []).forEach((r, idx) => {
         const aLat = Number(r.a_lat);
         const aLng = Number(r.a_lng);
         const bLat = Number(r.b_lat);
@@ -295,6 +351,9 @@ function renderRows(rows) {
         if (!Number.isFinite(aLat) || !Number.isFinite(aLng) || !Number.isFinite(bLat) || !Number.isFinite(bLng)) return;
 
         const color = riskColor(r.risk);
+        const aElevId = `conf-elev-${idx}-a`;
+        const bElevId = `conf-elev-${idx}-b`;
+        const dElevId = `conf-elev-${idx}-delta`;
         const line = L.polyline([[aLat, aLng], [bLat, bLng]], { color, weight: 3, opacity: 0.85 });
         line.bindPopup(`
             <strong>${r.risk} Risk</strong> (${r.strictness || '—'} strictness)<br>
@@ -302,16 +361,18 @@ function renderRows(rows) {
             PCI/PSC: ${r.pci} | CoBand: ${r.coband}<br>
             Distance: ${r.distance_km} km<br>
             Az vs bore A→B / B→A: ${r.a_to_b_diff ?? '-'}° / ${r.b_to_a_diff ?? '-'}°<br>
-            Elev A/B/Δ: ${r.a_elevation_m ?? '-'} / ${r.b_elevation_m ?? '-'} / ${r.elevation_delta_m ?? '-'} m<br>
+            Elev A/B/Δ: <span id="${aElevId}">loading...</span> / <span id="${bElevId}">loading...</span> / <span id="${dElevId}">loading...</span><br>
             A: ${r.a_name} (${r.a_site})<br>
             B: ${r.b_name} (${r.b_site})
         `);
+        line.on('popupopen', () => conflictFillElevationPair(aElevId, bElevId, dElevId, aLat, aLng, bLat, bLng));
         conflictLayerGroup.addLayer(line);
         conflictLayerGroup.addLayer(L.circleMarker([aLat, aLng], { radius: 5, color, fillColor: color, fillOpacity: 0.9, weight: 1 }));
         conflictLayerGroup.addLayer(L.circleMarker([bLat, bLng], { radius: 5, color, fillColor: color, fillOpacity: 0.9, weight: 1 }));
         const wa = buildWedge(aLat, aLng, Number(r.a_az));
         const wb = buildWedge(bLat, bLng, Number(r.b_az));
         if (wa) {
+            const wedgeAElevId = `conf-elev-${idx}-wa`;
             const wedgeA = L.polygon(wa, { color, weight: 1, fillColor: color, fillOpacity: 0.16 });
             wedgeA.bindPopup(`
                 <strong>Cell A Wedge</strong><br>
@@ -320,14 +381,16 @@ function renderRows(rows) {
                 Technology: ${r.technology || '-'}<br>
                 Area: ${r.a_area || '-'}<br>
                 Band: ${r.a_band || '-'}<br>
-                Elevation: ${r.a_elevation_m ?? '-'} m<br>
+                Elevation: <span id="${wedgeAElevId}">loading...</span><br>
                 Azimuth: ${r.a_az ?? '-'}<br>
                 PCI/PSC: ${r.pci || '-'}<br>
                 Risk: ${r.risk || '-'}
             `);
+            wedgeA.on('popupopen', () => conflictFillElevation(wedgeAElevId, aLat, aLng));
             conflictLayerGroup.addLayer(wedgeA);
         }
         if (wb) {
+            const wedgeBElevId = `conf-elev-${idx}-wb`;
             const wedgeB = L.polygon(wb, { color, weight: 1, fillColor: color, fillOpacity: 0.16 });
             wedgeB.bindPopup(`
                 <strong>Cell B Wedge</strong><br>
@@ -336,11 +399,12 @@ function renderRows(rows) {
                 Technology: ${r.technology || '-'}<br>
                 Area: ${r.b_area || '-'}<br>
                 Band: ${r.b_band || '-'}<br>
-                Elevation: ${r.b_elevation_m ?? '-'} m<br>
+                Elevation: <span id="${wedgeBElevId}">loading...</span><br>
                 Azimuth: ${r.b_az ?? '-'}<br>
                 PCI/PSC: ${r.pci || '-'}<br>
                 Risk: ${r.risk || '-'}
             `);
+            wedgeB.on('popupopen', () => conflictFillElevation(wedgeBElevId, bLat, bLng));
             conflictLayerGroup.addLayer(wedgeB);
         }
         bounds.push([aLat, aLng], [bLat, bLng]);
