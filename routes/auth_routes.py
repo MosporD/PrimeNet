@@ -13,6 +13,7 @@ from database_enhanced import (
     get_user_by_session, delete_session, log_activity, is_password_change_required
 )
 from db.runtime import connect_metadata, execute_query
+from core.module_access import allowed_hrefs_for_role, navigation_sections_for_role
 from modules.sync.metadata_active_sql import perf_per_tech_union_sql_with_activity
 
 logger = logging.getLogger(__name__)
@@ -266,6 +267,7 @@ def login():
                 'password_changed_at': user[7] if len(user) > 7 else None,
             })
 
+            user_role = (user.get('role') if isinstance(user, dict) else user[6])
             response = make_response(jsonify({
                 'success': True,
                 'message': 'Login successful',
@@ -273,8 +275,10 @@ def login():
                 'user': {
                     'username': (user.get('username') if isinstance(user, dict) else user[1]),
                     'email': (user.get('email') if isinstance(user, dict) else user[2]),
-                    'role': (user.get('role') if isinstance(user, dict) else user[6])
-                }
+                    'role': user_role,
+                },
+                'navigation_sections': navigation_sections_for_role(user_role),
+                'allowed_hrefs': allowed_hrefs_for_role(user_role),
             }))
 
             secure_cookie = (request.headers.get('X-Forwarded-Proto') == 'https') or request.is_secure
@@ -294,6 +298,21 @@ def login():
     except Exception:
         logger.exception('Login error')
         return jsonify({'error': 'Internal server error'}), 500
+
+@auth_bp.route('/api/navigation/allowed', methods=['GET'])
+def navigation_allowed():
+    """Return feature-navigation sections permitted for the current user."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    role = user.get('role') if isinstance(user, dict) else user[6]
+    return jsonify({
+        'success': True,
+        'role': role,
+        'sections': navigation_sections_for_role(role),
+        'allowed_hrefs': allowed_hrefs_for_role(role),
+    })
+
 
 @auth_bp.route('/api/logout', methods=['POST'])
 def logout():

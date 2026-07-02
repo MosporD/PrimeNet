@@ -103,7 +103,7 @@
         <div class="login-brand-transition-subtitle">Network Performance &amp; Configuration Platform</div>
         <div class="login-brand-transition-credit">Developed by Malek Mohammad</div>
     </div>
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.8"></script>
     <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -128,6 +128,14 @@
                 if (response.ok) {
                     sessionStorage.removeItem('legalStatementAcknowledged');
                     sessionStorage.removeItem('primenetPostLoginIntro');
+                    try {
+                        if (Array.isArray(data.navigation_sections)) {
+                            sessionStorage.setItem('primenetNavSections', JSON.stringify(data.navigation_sections));
+                        }
+                        if (data.user && data.user.role) {
+                            sessionStorage.setItem('primenetUserRole', String(data.user.role));
+                        }
+                    } catch (_) { /* ignore */ }
                     if (authContainer) {
                         authContainer.classList.add('login-slide-up');
                     }
