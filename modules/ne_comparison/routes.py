@@ -16,11 +16,10 @@ from ncm_core import XMLComparator
 from database_enhanced import get_user_by_session, log_activity
 from core.cm_extractor.extraction import build_huawei_client, build_nokia_client
 from core.cm_extractor.huawei_client import HuaweiCmError
-from core.cm_extractor.huawei_semantics import build_mml_command, get_mo_object_catalog
-from core.cm_extractor.mml_parser import repair_mml_rows
+from core.cm_extractor.huawei_semantics import _selection_rows, get_mo_object_catalog
 from core.cm_extractor.nokia_client import NokiaCmError
-from core.cm_extractor.nokia_semantics import extract_full_mo_class, get_mo_class_catalog
-from core.cm_extractor.site_catalog import list_huawei_db_sites, list_nokia_db_sites
+from core.cm_extractor.nokia_semantics import extract_nokia_selection, get_mo_class_catalog
+from core.cm_extractor.site_catalog import list_huawei_db_sites, list_nokia_inventory_sites
 
 ne_comparison_bp = Blueprint(
     'ne_comparison', __name__,
@@ -116,14 +115,108 @@ def _huawei_default_classes() -> list[str]:
     return list(HUAWEI_DEFAULT_MO_CLASSES)
 
 
-def _split_nokia_mo_id(mo_id: str) -> tuple[str, str]:
-    raw = (mo_id or '').strip()
-    if ':' not in raw:
-        raise ValueError(f'Invalid Nokia MO class id: {raw}')
-    adaptation, abbreviation = raw.split(':', 1)
-    if not adaptation or not abbreviation:
-        raise ValueError(f'Invalid Nokia MO class id: {raw}')
-    return adaptation, abbreviation
+def _nokia_selections_from_mo_classes(
+    client,
+    scope_level: str,
+    mo_classes: list[str],
+) -> list[dict[str, Any]]:
+    catalog = {
+        item['id']: item
+        for item in get_mo_class_catalog(client, scope_level=scope_level)
+        if item.get('id')
+    }
+    selections: list[dict[str, Any]] = []
+    for mo_id in mo_classes or _nokia_default_classes(scope_level):
+        mo = catalog.get(mo_id) or {}
+        selections.append({
+            'mo_class_id': mo_id,
+            'version': mo.get('version') or '',
+            'export_mode': 'full',
+            'parameters': [],
+        })
+    return selections
+
+
+def _huawei_selections_from_mo_classes(mo_classes: list[str]) -> list[dict[str, Any]]:
+    return [
+        {'mo_id': mo_id, 'export_all': True, 'parameters': []}
+        for mo_id in (mo_classes or _huawei_default_classes())
+    ]
+
+
+def _normalize_nokia_selections(
+    client,
+    scope_level: str,
+    data: dict[str, Any],
+) -> list[dict[str, Any]]:
+    raw = data.get('selections')
+    if isinstance(raw, list) and raw:
+        selections: list[dict[str, Any]] = []
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            mo_class_id = str(item.get('mo_class_id') or item.get('id') or '').strip()
+            if not mo_class_id:
+                continue
+            export_mode = str(item.get('export_mode') or 'selected').strip().lower()
+            params = [str(p).strip() for p in (item.get('parameters') or []) if str(p).strip()]
+            is_full = export_mode == 'full' or bool(item.get('export_all'))
+            selections.append({
+                'mo_class_id': mo_class_id,
+                'version': str(item.get('version') or '').strip(),
+                'export_mode': 'full' if is_full else 'selected',
+                'parameters': [] if is_full else params,
+            })
+        if selections:
+            return selections
+    return _nokia_selections_from_mo_classes(
+        client,
+        scope_level,
+        _as_list(data.get('mo_classes')),
+    )
+
+
+def _normalize_huawei_selections(data: dict[str, Any]) -> list[dict[str, Any]]:
+    raw = data.get('selections')
+    if isinstance(raw, list) and raw:
+        selections: list[dict[str, Any]] = []
+        for item in raw:
+            if not isinstance(item, dict):
+                continue
+            mo_id = str(item.get('mo_id') or item.get('id') or '').strip().upper()
+            if not mo_id:
+                continue
+            export_all = bool(item.get('export_all')) or str(item.get('export_mode') or '').lower() == 'full'
+            params = [str(p).strip() for p in (item.get('parameters') or []) if str(p).strip()]
+            selections.append({
+                'mo_id': mo_id,
+                'export_all': export_all,
+                'parameters': [] if export_all else params,
+            })
+        if selections:
+            return selections
+    return _huawei_selections_from_mo_classes(_as_list(data.get('mo_classes')))
+
+
+def _fetch_nokia_selection_sheet(
+    client,
+    selection: dict[str, Any],
+    *,
+    scope_level: str,
+    site_id: str,
+    site_name: str,
+    conf_id: int,
+) -> tuple[dict[str, Any], list[str]]:
+    sheets, _, _, warnings = extract_nokia_selection(
+        client,
+        selections=[selection],
+        site_ids=[site_id],
+        scope_level=scope_level,
+        conf_id=conf_id,
+    )
+    if not sheets:
+        return {}, list(warnings)
+    return next(iter(sheets.values())), list(warnings)
 
 
 def _sheet_to_records(sheet: dict[str, Any], *, ignore_columns: set[str] | None = None) -> dict[str, dict[str, Any]]:
@@ -220,7 +313,7 @@ def _compare_nokia_cm(
     scope_level: str,
     ne1: dict[str, str],
     ne2: dict[str, str],
-    mo_classes: list[str],
+    selections: list[dict[str, Any]],
     conf_id: int,
 ) -> dict[str, Any]:
     client = build_nokia_client()
@@ -229,28 +322,29 @@ def _compare_nokia_cm(
     stats = {'added': 0, 'removed': 0, 'modified': 0, 'same': 0}
     warnings: list[str] = []
 
-    used_classes = mo_classes or _nokia_default_classes(scope_level)
-    for mo_id in used_classes:
+    for selection in selections:
+        mo_id = str(selection.get('mo_class_id') or selection.get('id') or '').strip()
+        if not mo_id:
+            continue
         try:
-            adaptation, abbreviation = _split_nokia_mo_id(mo_id)
-            sheet1 = extract_full_mo_class(
+            sheet1, warn1 = _fetch_nokia_selection_sheet(
                 client,
-                adaptation,
-                abbreviation,
-                conf_id=conf_id,
+                selection,
+                scope_level=scope_level,
                 site_id=str(ne1.get('site_id') or ''),
-                scope_level=scope_level,
                 site_name=str(ne1.get('site_name') or ''),
-            )
-            sheet2 = extract_full_mo_class(
-                client,
-                adaptation,
-                abbreviation,
                 conf_id=conf_id,
-                site_id=str(ne2.get('site_id') or ''),
-                scope_level=scope_level,
-                site_name=str(ne2.get('site_name') or ''),
             )
+            sheet2, warn2 = _fetch_nokia_selection_sheet(
+                client,
+                selection,
+                scope_level=scope_level,
+                site_id=str(ne2.get('site_id') or ''),
+                site_name=str(ne2.get('site_name') or ''),
+                conf_id=conf_id,
+            )
+            warnings.extend(warn1)
+            warnings.extend(warn2)
             left = _sheet_to_records(sheet1)
             right = _sheet_to_records(sheet2)
             section_diffs, section_stats = _diff_records(
@@ -265,6 +359,8 @@ def _compare_nokia_cm(
                 'section': mo_id,
                 'left_count': len(left),
                 'right_count': len(right),
+                'export_mode': selection.get('export_mode') or 'selected',
+                'parameter_count': len(selection.get('parameters') or []),
                 **section_stats,
             })
         except Exception as exc:
@@ -273,7 +369,7 @@ def _compare_nokia_cm(
     return {
         'vendor': 'nokia',
         'scope_level': scope_level,
-        'mo_classes': used_classes,
+        'selections': selections,
         'stats': stats,
         'summary': summary,
         'differences': differences,
@@ -282,21 +378,25 @@ def _compare_nokia_cm(
     }
 
 
-def _compare_huawei_cm(*, ne1_name: str, ne2_name: str, mo_classes: list[str]) -> dict[str, Any]:
+def _compare_huawei_cm(
+    *,
+    ne1_name: str,
+    ne2_name: str,
+    selections: list[dict[str, Any]],
+) -> dict[str, Any]:
     client = build_huawei_client()
     summary: list[dict[str, Any]] = []
     differences: list[dict[str, Any]] = []
     stats = {'added': 0, 'removed': 0, 'modified': 0, 'same': 0}
     warnings: list[str] = []
 
-    used_classes = mo_classes or _huawei_default_classes()
-    for mo_id in used_classes:
+    for selection in selections:
+        mo_id = str(selection.get('mo_id') or selection.get('id') or '').strip().upper()
+        if not mo_id:
+            continue
         try:
-            command = build_mml_command(mo_id)
-            rows1 = repair_mml_rows(client.run_mml_chunked(command, [ne1_name]))
-            errors1 = client.consume_mml_errors()
-            rows2 = repair_mml_rows(client.run_mml_chunked(command, [ne2_name]))
-            errors2 = client.consume_mml_errors()
+            rows1, errors1 = _selection_rows(client, [ne1_name], selection)
+            rows2, errors2 = _selection_rows(client, [ne2_name], selection)
             for err in errors1 + errors2:
                 warnings.append(f'{mo_id}: {err}')
             left = _rows_to_records(rows1, ignore_columns={'NE'})
@@ -313,6 +413,8 @@ def _compare_huawei_cm(*, ne1_name: str, ne2_name: str, mo_classes: list[str]) -
                 'section': mo_id,
                 'left_count': len(left),
                 'right_count': len(right),
+                'export_all': bool(selection.get('export_all')),
+                'parameter_count': len(selection.get('parameters') or []),
                 **section_stats,
             })
         except Exception as exc:
@@ -321,7 +423,7 @@ def _compare_huawei_cm(*, ne1_name: str, ne2_name: str, mo_classes: list[str]) -
     return {
         'vendor': 'huawei',
         'scope_level': 'ENODEB',
-        'mo_classes': used_classes,
+        'selections': selections,
         'stats': stats,
         'summary': summary,
         'differences': differences,
@@ -440,32 +542,33 @@ def _audit_nokia_cm(
     *,
     scope_level: str,
     nes: list[dict[str, Any]],
-    mo_classes: list[str],
+    selections: list[dict[str, Any]],
     conf_id: int,
 ) -> dict[str, Any]:
     client = build_nokia_client()
-    used_classes = mo_classes or _nokia_default_classes(scope_level)
     buckets: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
     warnings: list[str] = []
     section_counts: dict[str, dict[str, int]] = {
-        mo_id: {'ne_count': 0, 'object_count': 0}
-        for mo_id in used_classes
+        str(sel.get('mo_class_id') or sel.get('id') or ''): {'ne_count': 0, 'object_count': 0}
+        for sel in selections
     }
 
     for ne in nes:
         ne_name = _ne_display_name(ne)
-        for mo_id in used_classes:
+        for selection in selections:
+            mo_id = str(selection.get('mo_class_id') or selection.get('id') or '').strip()
+            if not mo_id:
+                continue
             try:
-                adaptation, abbreviation = _split_nokia_mo_id(mo_id)
-                sheet = extract_full_mo_class(
+                sheet, warn = _fetch_nokia_selection_sheet(
                     client,
-                    adaptation,
-                    abbreviation,
-                    conf_id=conf_id,
-                    site_id=str(ne.get('site_id') or ''),
+                    selection,
                     scope_level=scope_level,
+                    site_id=str(ne.get('site_id') or ''),
                     site_name=str(ne.get('site_name') or ''),
+                    conf_id=conf_id,
                 )
+                warnings.extend(warn)
                 records = _sheet_to_records(sheet)
                 _add_audit_records(buckets, section=mo_id, ne_name=ne_name, records=records)
                 section_counts[mo_id]['ne_count'] += 1
@@ -477,7 +580,7 @@ def _audit_nokia_cm(
     return {
         'vendor': 'nokia',
         'scope_level': scope_level,
-        'mo_classes': used_classes,
+        'selections': selections,
         'ne_count': len(nes),
         'section_summary': [
             {'section': section, **counts}
@@ -488,21 +591,18 @@ def _audit_nokia_cm(
     }
 
 
-def _audit_huawei_cm(*, nes: list[dict[str, Any]], mo_classes: list[str]) -> dict[str, Any]:
+def _audit_huawei_cm(*, nes: list[dict[str, Any]], selections: list[dict[str, Any]]) -> dict[str, Any]:
     client = build_huawei_client()
-    used_classes = mo_classes or _huawei_default_classes()
     buckets: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
     warnings: list[str] = []
     section_counts: dict[str, dict[str, int]] = {
-        mo_id: {'ne_count': 0, 'object_count': 0}
-        for mo_id in used_classes
+        str(sel.get('mo_id') or sel.get('id') or '').strip().upper(): {'ne_count': 0, 'object_count': 0}
+        for sel in selections
     }
 
-    for mo_id in used_classes:
-        try:
-            command = build_mml_command(mo_id)
-        except Exception as exc:
-            warnings.append(f'{mo_id}: {exc}')
+    for selection in selections:
+        mo_id = str(selection.get('mo_id') or selection.get('id') or '').strip().upper()
+        if not mo_id:
             continue
         for ne in nes:
             ne_name = str(ne.get('u2020_ne_name') or ne.get('ne_name') or ne.get('site_name') or '').strip()
@@ -510,8 +610,8 @@ def _audit_huawei_cm(*, nes: list[dict[str, Any]], mo_classes: list[str]) -> dic
                 warnings.append(f'{_ne_display_name(ne)} / {mo_id}: missing Huawei NE name')
                 continue
             try:
-                rows = repair_mml_rows(client.run_mml_chunked(command, [ne_name]))
-                for err in client.consume_mml_errors():
+                rows, errors = _selection_rows(client, [ne_name], selection)
+                for err in errors:
                     warnings.append(f'{ne_name} / {mo_id}: {err}')
                 records = _rows_to_records(rows, ignore_columns={'NE'})
                 _add_audit_records(buckets, section=mo_id, ne_name=ne_name, records=records)
@@ -524,7 +624,7 @@ def _audit_huawei_cm(*, nes: list[dict[str, Any]], mo_classes: list[str]) -> dic
     return {
         'vendor': 'huawei',
         'scope_level': 'ENODEB',
-        'mo_classes': used_classes,
+        'selections': selections,
         'ne_count': len(nes),
         'section_summary': [
             {'section': section, **counts}
@@ -555,7 +655,7 @@ def cm_ne_options():
         query = (request.args.get('q') or '').strip()
         limit = int(request.args.get('limit') or 500)
         if vendor == 'nokia':
-            items = list_nokia_db_sites(query, scope_level=scope_level, limit=limit)
+            items, _source = list_nokia_inventory_sites(query, scope_level=scope_level, limit=limit)
         else:
             items = list_huawei_db_sites(query, scope_level=scope_level, limit=limit)
         return jsonify({'success': True, 'vendor': vendor, 'scope_level': scope_level, 'items': items})
@@ -622,7 +722,6 @@ def compare_cm_nes():
         data = _json_body()
         vendor = _normalize_vendor(data.get('vendor', 'nokia'))
         scope_level = _normalize_scope(vendor, data.get('scope_level', ''))
-        mo_classes = _as_list(data.get('mo_classes'))
         conf_id = int(data.get('conf_id') or 1)
         ne1 = data.get('ne1') or {}
         ne2 = data.get('ne2') or {}
@@ -631,11 +730,15 @@ def compare_cm_nes():
         if vendor == 'nokia':
             if not ne1.get('site_id') or not ne2.get('site_id'):
                 return jsonify({'error': 'Select two Nokia NEs from the same level'}), 400
+            client = build_nokia_client()
+            selections = _normalize_nokia_selections(client, scope_level, data)
+            if not selections:
+                return jsonify({'error': 'Select at least one MO class and parameters to compare'}), 400
             result = _compare_nokia_cm(
                 scope_level=scope_level,
                 ne1=ne1,
                 ne2=ne2,
-                mo_classes=mo_classes,
+                selections=selections,
                 conf_id=conf_id,
             )
         else:
@@ -643,7 +746,10 @@ def compare_cm_nes():
             ne2_name = str(ne2.get('u2020_ne_name') or ne2.get('ne_name') or '').strip()
             if not ne1_name or not ne2_name:
                 return jsonify({'error': 'Select two resolved Huawei NEs from the same level'}), 400
-            result = _compare_huawei_cm(ne1_name=ne1_name, ne2_name=ne2_name, mo_classes=mo_classes)
+            selections = _normalize_huawei_selections(data)
+            if not selections:
+                return jsonify({'error': 'Select at least one MO object and parameters to compare'}), 400
+            result = _compare_huawei_cm(ne1_name=ne1_name, ne2_name=ne2_name, selections=selections)
 
         result['success'] = True
         result['left_ne'] = ne1
@@ -672,7 +778,6 @@ def audit_cm_network():
         data = _json_body()
         vendor = _normalize_vendor(data.get('vendor', 'nokia'))
         scope_level = _normalize_scope(vendor, data.get('scope_level', ''))
-        mo_classes = _as_list(data.get('mo_classes'))
         conf_id = int(data.get('conf_id') or 1)
         nes = data.get('nes') or []
         if not isinstance(nes, list) or not nes:
@@ -682,14 +787,21 @@ def audit_cm_network():
             return jsonify({'error': 'Select at least one valid NE for the NW audit'}), 400
 
         if vendor == 'nokia':
+            client = build_nokia_client()
+            selections = _normalize_nokia_selections(client, scope_level, data)
+            if not selections:
+                return jsonify({'error': 'Select at least one MO class and parameters to audit'}), 400
             result = _audit_nokia_cm(
                 scope_level=scope_level,
                 nes=nes,
-                mo_classes=mo_classes,
+                selections=selections,
                 conf_id=conf_id,
             )
         else:
-            result = _audit_huawei_cm(nes=nes, mo_classes=mo_classes)
+            selections = _normalize_huawei_selections(data)
+            if not selections:
+                return jsonify({'error': 'Select at least one MO object and parameters to audit'}), 400
+            result = _audit_huawei_cm(nes=nes, selections=selections)
 
         result['success'] = True
         result['stats'] = {
@@ -702,7 +814,7 @@ def audit_cm_network():
         log_activity(
             _user_id(user),
             'ne_cm_audit',
-            f'Audited {vendor} {scope_level}: {len(nes)} NE(s), {len(result.get("mo_classes") or [])} MO class(es)',
+            f'Audited {vendor} {scope_level}: {len(nes)} NE(s), {len(result.get("selections") or [])} MO selection(s)',
         )
         return jsonify(result)
     except (NokiaCmError, HuaweiCmError, ValueError) as e:
@@ -800,25 +912,21 @@ def download_report():
 
         row = 2
         for diff in data.get('differences', []):
+            changes = diff.get('changes') or []
+            if changes:
+                for change in changes:
+                    ws[f'A{row}'] = diff.get('type', '')
+                    ws[f'B{row}'] = change.get('parameter', diff.get('section', ''))
+                    ws[f'C{row}'] = str(change.get('old_value', ''))
+                    ws[f'D{row}'] = str(change.get('new_value', ''))
+                    ws[f'E{row}'] = diff.get('path', '')
+                    row += 1
+                continue
             ws[f'A{row}'] = diff.get('type', '')
-            ws[f'B{row}'] = diff.get('parameter', diff.get('mo_class', ''))
+            ws[f'B{row}'] = diff.get('parameter', diff.get('section', diff.get('mo_class', '')))
             ws[f'C{row}'] = str(diff.get('old_value', ''))
             ws[f'D{row}'] = str(diff.get('new_value', ''))
             ws[f'E{row}'] = diff.get('path', '')
-
-            if diff.get('type') == 'added':
-                fill = PatternFill(start_color="D4EDDA", end_color="D4EDDA", fill_type="solid")
-            elif diff.get('type') == 'removed':
-                fill = PatternFill(start_color="F8D7DA", end_color="F8D7DA", fill_type="solid")
-            elif diff.get('type') == 'modified':
-                fill = PatternFill(start_color="FFF3CD", end_color="FFF3CD", fill_type="solid")
-            else:
-                fill = None
-
-            if fill:
-                for cell in ws[row]:
-                    cell.fill = fill
-
             row += 1
 
         temp_path = os.path.join(tempfile.gettempdir(), f"report_{uuid.uuid4()}.xlsx")
