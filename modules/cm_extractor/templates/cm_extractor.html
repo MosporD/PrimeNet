@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CM Extractor - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
-    <link rel="stylesheet" href="{{ url_for('cm_extractor.static', filename='cm_extractor.css') }}?v=3.6">
+    <link rel="stylesheet" href="{{ url_for('cm_extractor.static', filename='cm_extractor.css') }}?v=3.7">
 </head>
 <body data-username="{{ user.username }}" data-user-role="{{ user.role }}" class="{% if user.role == 'admin' %}cm-user-admin{% else %}cm-user-standard{% endif %}">
     <div class="container">
@@ -37,6 +37,13 @@
                 <section id="nokia-panel" class="panel">
                     <h2>Nokia CM extraction</h2>
                     <p class="section-description admin-only">Pick Nokia sites from your network database, then select MO classes and parameters to export from NetAct.</p>
+
+                    <div class="cm-connection-bar admin-only" id="nokia-connection-bar">
+                        <span id="nokia-cm-config-status" class="connection-pill">Checking CM credentials…</span>
+                        <button type="button" class="btn-secondary" id="nokia-test-connection-btn">Test CM API connection</button>
+                        <span id="nokia-test-connection-result" class="connection-result" aria-live="polite"></span>
+                    </div>
+                    <p class="field-hint admin-only">Uses <code>NOKIA_CM_USER</code> / <code>NOKIA_CM_PASSWORD</code> from server <code>.env</code> (NetAct HTTP Basic), not your PrimeNet login.</p>
 
                     <div class="form-row compact-row form-inline-row">
                         <div class="inline-field">
@@ -178,6 +185,12 @@
                 <section id="huawei-panel" class="panel">
                     <h2>Huawei CM extraction</h2>
                     <p class="section-description admin-only">Pick network elements from your database, then select MML object types and parameters to export from U2020.</p>
+
+                    <div class="cm-connection-bar admin-only" id="huawei-connection-bar">
+                        <span id="huawei-cm-config-status" class="connection-pill">Checking CM credentials…</span>
+                        <button type="button" class="btn-secondary" id="huawei-test-connection-btn">Test CM API connection</button>
+                        <span id="huawei-test-connection-result" class="connection-result" aria-live="polite"></span>
+                    </div>
 
                     <div class="picker-section">
                         <div class="picker-head">
@@ -433,6 +446,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.9"></script>
-    <script src="{{ url_for('cm_extractor.static', filename='cm_extractor.js') }}?v=3.36"></script>
+    <script src="{{ url_for('cm_extractor.static', filename='cm_extractor.js') }}?v=3.37"></script>
 </body>
 </html>

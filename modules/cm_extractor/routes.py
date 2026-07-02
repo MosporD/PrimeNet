@@ -257,17 +257,33 @@ def api_defaults():
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
     bulk = nokia_bulk_export_settings()
+    nokia_cfg = nokia_defaults()
+    is_admin = _user_role(user) == 'admin'
+    nokia_info = {
+        'configured': nokia_configured(),
+        'bulk_export_ssh': nokia_export_ssh_settings().get('configured', False),
+        'bulk_operation_timeout_sec': bulk['operation_timeout_sec'],
+    }
+    huawei_cfg = huawei_defaults()
+    huawei_info = {
+        **{k: v for k, v in huawei_cfg.items() if k != 'password'},
+        'password': '',
+        'configured': huawei_configured(),
+    }
+    if is_admin:
+        nokia_info.update({
+            'host': nokia_cfg.get('host') or '',
+            'username': nokia_cfg.get('username') or '',
+            'base_url': nokia_cfg.get('base_url') or '',
+        })
+        huawei_info.update({
+            'host': huawei_cfg.get('host') or '',
+            'username': huawei_cfg.get('username') or '',
+        })
     return jsonify({
-        'nokia': {
-            'configured': nokia_configured(),
-            'bulk_export_ssh': nokia_export_ssh_settings().get('configured', False),
-            'bulk_operation_timeout_sec': bulk['operation_timeout_sec'],
-        },
-        'huawei': {
-            **huawei_defaults(),
-            'password': '',
-            'configured': huawei_configured(),
-        },
+        'nokia': nokia_info,
+        'huawei': huawei_info,
+        'is_admin': is_admin,
     })
 
 

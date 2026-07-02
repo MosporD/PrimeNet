@@ -640,7 +640,12 @@ def _audit_huawei_cm(*, nes: list[dict[str, Any]], selections: list[dict[str, An
 def ne_comparison_page():
     """Render NE Comparison page"""
     user = get_current_user()
-    return render_template('ne_comparison.html', user=format_user_data(user))
+    role = (user.get('role') if isinstance(user, dict) else user[6]) if user else ''
+    return render_template(
+        'ne_comparison.html',
+        user=format_user_data(user),
+        is_admin=str(role).lower() == 'admin',
+    )
 
 
 @ne_comparison_bp.route('/api/ne-comparison/cm/nes', methods=['GET'])

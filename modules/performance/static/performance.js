@@ -2907,34 +2907,58 @@ async function refreshData() {
 // CSV Export
 // ============================================================
 
-function exportCSV() {
-    if (!hwLastTablePayload || !Array.isArray(hwLastTablePayload.rows) || !hwLastTablePayload.rows.length) return;
-    const cols = Array.isArray(hwLastTablePayload.columns) ? hwLastTablePayload.columns : [];
-    const rows = hwLastTablePayload.rows;
-    if (!cols.length) return;
+async function exportCSV() {
+    if (!hwCurrentVendor || !hwCurrentTech) return;
+    if (!hwLastTablePayload || !hwLastTablePayload.total) return;
 
-    const escape = v => {
-        if (v === null || v === undefined) return '';
-        const s = String(v);
-        return s.includes(',') || s.includes('"') || s.includes('\n')
-            ? `"${s.replace(/"/g, '""')}"` : s;
-    };
-
-    const lines = [];
-    lines.push(cols.map(escape).join(','));
-    rows.forEach(row => {
-        lines.push(cols.map(c => escape(row[c])).join(','));
+    const params = new URLSearchParams({
+        vendor: hwCurrentVendor,
+        technology: hwCurrentTech,
+        export: '1',
+        data_scope: _currentDataScope(),
     });
+    if (hwCurrentSearch) params.set('search', hwCurrentSearch);
+    (hwCurrentScopedCellNames || []).forEach(n => params.append('cell_name', n));
+    (hwCurrentScopedGroupRefs || []).forEach(g => params.append('group_ref', g));
 
-    const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `pm_table_export_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const exportBtn = document.getElementById('btn-export');
+    const origText = exportBtn ? exportBtn.textContent : '';
+    if (exportBtn) {
+        exportBtn.disabled = true;
+        exportBtn.textContent = 'Exporting…';
+    }
+
+    try {
+        const res = await fetch('/api/performance/pm-table?' + params, { credentials: 'same-origin' });
+        if (!res.ok) {
+            let message = `Export failed (${res.status})`;
+            try {
+                const err = await res.json();
+                if (err && err.error) message = err.error;
+            } catch (_) { /* CSV error body */ }
+            throw new Error(message);
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const disp = res.headers.get('Content-Disposition') || '';
+        const match = /filename="?([^";]+)"?/.exec(disp);
+        a.download = match
+            ? match[1]
+            : `pm_table_export_${new Date().toISOString().replace(/[:.]/g, '-')}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        _perfQueryUserMessage(e.message || 'Export failed');
+    } finally {
+        if (exportBtn) {
+            exportBtn.disabled = false;
+            exportBtn.textContent = origText || 'Export CSV';
+        }
+    }
 }
 
 // ============================================================

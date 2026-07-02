@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NE Comparison - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
-    <link rel="stylesheet" href="{{ url_for('ne_comparison.static', filename='ne_comparison.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('ne_comparison.static', filename='ne_comparison.css') }}?v=2.1">
 </head>
-<body>
+<body class="{% if is_admin %}nc-admin{% endif %}" data-user-role="{{ user.role }}">
     <div class="container">
         <header>
             <div class="header-content">
@@ -31,6 +31,12 @@
                 <form id="cm-compare-form">
                     <div class="workflow-step">
                         <h3 class="workflow-step-title">1. Vendor &amp; scope</h3>
+                        <div class="cm-connection-bar admin-only" id="cm-connection-bar">
+                            <span id="cm-cm-config-status" class="connection-pill">Checking CM credentials…</span>
+                            <button type="button" class="btn-secondary" id="cm-test-connection-btn">Test CM API connection</button>
+                            <span id="cm-test-connection-result" class="connection-result" aria-live="polite"></span>
+                        </div>
+                        <p class="field-hint admin-only">Live compare uses <code>NOKIA_CM_*</code> or <code>HUAWEI_CM_*</code> from server <code>.env</code> (vendor CM API), not your PrimeNet login role.</p>
                         <div class="cm-grid">
                             <div class="file-group">
                                 <label for="cm-vendor">Vendor</label>
@@ -160,6 +166,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.9"></script>
-    <script src="{{ url_for('ne_comparison.static', filename='ne_comparison.js') }}?v=2.0"></script>
+    <script src="{{ url_for('ne_comparison.static', filename='ne_comparison.js') }}?v=2.1"></script>
 </body>
 </html>

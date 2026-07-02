@@ -77,6 +77,13 @@ _DEFAULT_TREE_PATH_BY_SCOPE: dict[str, str] = {
 
 _MO_CLASS_CACHE_VERSION = 5
 
+
+def invalidate_mo_class_cache() -> None:
+    """Drop in-process MO catalog cache (e.g. after NetAct returns 401)."""
+    _MO_CLASS_CACHE['ts'] = 0.0
+    _MO_CLASS_CACHE['items'] = []
+    _MO_CLASS_CACHE['by_scope'] = {}
+
 # Structured/list parameters cannot be queried with bare @paramName (needs components).
 _NON_QUERYABLE_PARAM_TYPES = frozenset({'StructuredValue'})
 # NetAct rejects MO Path queries above ~275 expressions — use full MO export above this.

@@ -202,12 +202,91 @@ async function loadCmExtractorDefaults() {
         if (response.ok && data.nokia) {
             bulkExportSshConfigured = Boolean(data.nokia.bulk_export_ssh);
             bulkExportTimeoutSec = Number(data.nokia.bulk_operation_timeout_sec) || 3600;
+            updateNokiaConnectionStatus(data.nokia);
+        }
+        if (response.ok && data.huawei) {
+            updateHuaweiConnectionStatus(data.huawei);
         }
     } catch {
         bulkExportSshConfigured = false;
     }
     updateScopeHint();
 }
+
+function updateNokiaConnectionStatus(nokia) {
+    const pill = document.getElementById('nokia-cm-config-status');
+    if (!pill) return;
+    if (!nokia?.configured) {
+        pill.textContent = 'Nokia CM API not configured in .env';
+        pill.className = 'connection-pill connection-bad';
+        return;
+    }
+    const host = nokia.host || nokia.base_url || 'NetAct';
+    const user = nokia.username || '(user not set)';
+    pill.textContent = `Loaded: ${user} @ ${host}`;
+    pill.className = 'connection-pill connection-neutral';
+}
+
+function updateHuaweiConnectionStatus(huawei) {
+    const pill = document.getElementById('huawei-cm-config-status');
+    if (!pill) return;
+    if (!huawei?.configured) {
+        pill.textContent = 'Huawei CM API not configured in .env';
+        pill.className = 'connection-pill connection-bad';
+        return;
+    }
+    const host = huawei.host || 'U2020';
+    const user = huawei.username || '(user not set)';
+    pill.textContent = `Loaded: ${user} @ ${host}`;
+    pill.className = 'connection-pill connection-neutral';
+}
+
+async function testCmApiConnection(vendor) {
+    const btnId = vendor === 'huawei' ? 'huawei-test-connection-btn' : 'nokia-test-connection-btn';
+    const resultId = vendor === 'huawei' ? 'huawei-test-connection-result' : 'nokia-test-connection-result';
+    const pillId = vendor === 'huawei' ? 'huawei-cm-config-status' : 'nokia-cm-config-status';
+    const btn = document.getElementById(btnId);
+    const result = document.getElementById(resultId);
+    const pill = document.getElementById(pillId);
+    if (btn) btn.disabled = true;
+    if (result) {
+        result.textContent = 'Testing live CM API…';
+        result.className = 'connection-result';
+    }
+    try {
+        const response = await fetch('/api/cm-extractor/test-connection', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vendor }),
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || `Connection test failed (HTTP ${response.status})`);
+        }
+        if (pill) {
+            pill.textContent = vendor === 'nokia' ? 'Nokia CM API: connected' : 'Huawei CM API: connected';
+            pill.className = 'connection-pill connection-ok';
+        }
+        if (result) {
+            result.textContent = data.message || 'Connected';
+            result.className = 'connection-result connection-result-ok';
+        }
+        showNotification(data.message || 'CM API connection OK', 'success');
+    } catch (error) {
+        if (pill) pill.className = 'connection-pill connection-bad';
+        if (result) {
+            result.textContent = error.message || 'Connection failed';
+            result.className = 'connection-result connection-result-bad';
+        }
+        showNotification(error.message || 'CM API connection failed', 'error');
+    } finally {
+        if (btn) btn.disabled = false;
+    }
+}
+
+document.getElementById('nokia-test-connection-btn')?.addEventListener('click', () => testCmApiConnection('nokia'));
+document.getElementById('huawei-test-connection-btn')?.addEventListener('click', () => testCmApiConnection('huawei'));
 
 function updateScopeHint() {
     const level = getScopeLevel();

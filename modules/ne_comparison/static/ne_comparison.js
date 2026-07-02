@@ -16,6 +16,7 @@ const cmState = {
     parametersByMo: new Map(),
     selectedParamsByMo: new Map(),
     fullMoByItem: new Set(),
+    cmDefaults: null,
 };
 
 function $(id) {
@@ -85,6 +86,78 @@ function updateScopeOptions() {
             <option value="BSC">BSC</option>
         `;
         if (confGroup) confGroup.style.display = '';
+    }
+    updateCmCredentialStatus();
+}
+
+async function loadCmCredentialDefaults() {
+    try {
+        const res = await fetch('/api/cm-extractor/defaults', { credentials: 'same-origin' });
+        const data = await res.json();
+        if (!res.ok) return;
+        cmState.cmDefaults = data;
+        updateCmCredentialStatus();
+    } catch {
+        /* ignore */
+    }
+}
+
+function updateCmCredentialStatus() {
+    const pill = $('cm-cm-config-status');
+    if (!pill) return;
+    const vendor = currentVendor();
+    const info = vendor === 'nokia' ? cmState.cmDefaults?.nokia : cmState.cmDefaults?.huawei;
+    if (!info?.configured) {
+        const key = vendor === 'nokia' ? 'NOKIA_CM_*' : 'HUAWEI_CM_*';
+        pill.textContent = `${vendor === 'nokia' ? 'Nokia' : 'Huawei'} CM not configured (${key})`;
+        pill.className = 'connection-pill connection-bad';
+        return;
+    }
+    const host = info.host || info.base_url || (vendor === 'nokia' ? 'NetAct' : 'U2020');
+    const user = info.username || '(user not set)';
+    pill.textContent = `Loaded: ${user} @ ${host}`;
+    pill.className = 'connection-pill connection-neutral';
+}
+
+async function testCmApiConnection() {
+    const vendor = currentVendor();
+    const btn = $('cm-test-connection-btn');
+    const result = $('cm-test-connection-result');
+    const pill = $('cm-cm-config-status');
+    if (btn) btn.disabled = true;
+    if (result) {
+        result.textContent = 'Testing live CM API…';
+        result.className = 'connection-result';
+    }
+    try {
+        const res = await fetch('/api/cm-extractor/test-connection', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vendor }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+            throw new Error(data.error || `Connection test failed (HTTP ${res.status})`);
+        }
+        if (pill) {
+            pill.textContent = vendor === 'nokia' ? 'Nokia CM API: connected' : 'Huawei CM API: connected';
+            pill.className = 'connection-pill connection-ok';
+        }
+        if (result) {
+            result.textContent = data.message || 'Connected';
+            result.className = 'connection-result connection-result-ok';
+        }
+        showNotification(data.message || 'CM API connection OK', 'success');
+    } catch (error) {
+        if (pill) pill.className = 'connection-pill connection-bad';
+        if (result) {
+            result.textContent = error.message || 'Connection failed';
+            result.className = 'connection-result connection-result-bad';
+        }
+        showNotification(error.message || 'CM API connection failed', 'error');
+    } finally {
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -605,6 +678,7 @@ function bindCmWorkflow() {
             setStatus('cm-status', error.message, 'error');
         }
     });
+    $('cm-test-connection-btn')?.addEventListener('click', () => testCmApiConnection());
     $('cm-scope')?.addEventListener('change', async () => {
         try {
             await Promise.all([loadCmNes(), loadMoCatalog()]);
@@ -857,6 +931,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     bindCmWorkflow();
     updateScopeOptions();
     updateCompareButton();
+    loadCmCredentialDefaults();
     try {
         await Promise.all([loadCmNes(), loadMoCatalog()]);
     } catch (error) {

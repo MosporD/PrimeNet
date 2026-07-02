@@ -11,10 +11,12 @@ as-is in the PM databases. Queries build their SELECT lists by inspecting the
 live DB schema so no code changes are needed when the file structure changes.
 """
 
-from flask import Blueprint, request, jsonify, render_template, redirect, url_for, current_app
+from flask import Blueprint, request, jsonify, render_template, redirect, url_for, current_app, Response
 from functools import wraps
 from collections import defaultdict
 from datetime import datetime, timedelta
+import csv
+import io
 import sqlite3
 import os
 import sys
@@ -538,6 +540,30 @@ def _trend_cache_get(key: str):
 
 def _trend_cache_set(key: str, payload):
     _TREND_CACHE[key] = (time.time() + _TREND_CACHE_TTL_SEC, payload)
+
+
+_PM_EXPORT_MAX_ROWS = 200_000
+
+
+def _pm_table_csv_response(
+    columns: list[str],
+    column_labels: dict[str, str],
+    rows: list[dict],
+    vendor: str,
+    technology: str,
+) -> Response:
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator='\r\n')
+    writer.writerow([column_labels.get(c, c) for c in columns])
+    for row in rows:
+        writer.writerow(['' if row.get(c) is None else row.get(c) for c in columns])
+    ts = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'pm_{vendor}_{technology}_{ts}.csv'
+    return Response(
+        '\ufeff' + buf.getvalue(),
+        mimetype='text/csv; charset=utf-8',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'},
+    )
 
 
 def _pm_table_cache_key(
@@ -2550,6 +2576,7 @@ def get_pm_table():
     search     = request.args.get('search', '').strip()
     scoped_cell_names = [str(x).strip() for x in request.args.getlist('cell_name') if str(x).strip()]
     scoped_group_refs = [str(x).strip() for x in request.args.getlist('group_ref') if str(x).strip()]
+    export_csv = request.args.get('export', '').lower() in ('1', 'true', 'csv')
     page       = request.args.get('page', 1, type=int)
     page_size  = min(request.args.get('page_size', 100, type=int), 500)
     data_scope = _normalize_data_scope(request.args.get('data_scope'))
@@ -2676,16 +2703,27 @@ def get_pm_table():
             all_rows.sort(key=lambda r: str(r.get('group_name') or ''), reverse=False)
 
         total = len(all_rows)
-        offset = (page - 1) * page_size
-        page_rows = all_rows[offset:offset + page_size]
 
         static_cols = [c for c in ('group_name', 'vendor', 'group_ref') if c in merged_cols]
         ordered_cols = static_cols + [c for c in merged_cols if c not in static_cols]
+        column_labels = {'group_name': 'Group', 'group_ref': 'Group Ref', 'vendor': 'Vendor'}
+        if export_csv:
+            if total > _PM_EXPORT_MAX_ROWS:
+                return jsonify({
+                    'error': (
+                        f'Export is limited to {_PM_EXPORT_MAX_ROWS:,} rows '
+                        f'({total:,} matched). Narrow your selection or search.'
+                    ),
+                }), 400
+            return _pm_table_csv_response(ordered_cols, column_labels, all_rows, vendor, technology)
+
+        offset = (page - 1) * page_size
+        page_rows = all_rows[offset:offset + page_size]
         payload = {
             'success': True,
             'columns': ordered_cols,
             'static_cols': static_cols,
-            'column_labels': {'group_name': 'Group', 'group_ref': 'Group Ref', 'vendor': 'Vendor'},
+            'column_labels': column_labels,
             'rows': page_rows,
             'total': total,
             'page': page,
@@ -2738,11 +2776,12 @@ def get_pm_table():
         page_size,
         _pm_data_version_token(vendor, include_metadata=False, scope=data_scope),
     )
-    cached_table_payload = _pm_table_cache_get(table_cache_key)
-    if cached_table_payload is not None:
-        out = dict(cached_table_payload)
-        out['cached'] = True
-        return jsonify(out)
+    if not export_csv:
+        cached_table_payload = _pm_table_cache_get(table_cache_key)
+        if cached_table_payload is not None:
+            out = dict(cached_table_payload)
+            out['cached'] = True
+            return jsonify(out)
 
     try:
         conn     = sqlite3.connect(db_path, timeout=15)
@@ -2787,14 +2826,6 @@ def get_pm_table():
         total  = conn.execute(
             f'SELECT COUNT(*) FROM "{table}" WHERE {where_clause}', params
         ).fetchone()[0]
-        offset = (page - 1) * page_size
-        rows   = conn.execute(f'''
-            SELECT {col_select} FROM "{table}"
-            WHERE  {where_clause}
-            ORDER  BY {_sqlite_ident(resolved_time_col)} DESC
-            LIMIT  ? OFFSET ?
-        ''', params + [page_size, offset]).fetchall()
-        conn.close()
 
         column_labels = {'timestamp': ts_label, 'cell_name': cell_label}
         for dc in ('Date', 'date'):
@@ -2803,6 +2834,33 @@ def get_pm_table():
                 if 'timestamp' in ordered_cols:
                     column_labels['timestamp'] = 'Timestamp'
                 break
+
+        if export_csv:
+            if total > _PM_EXPORT_MAX_ROWS:
+                conn.close()
+                return jsonify({
+                    'error': (
+                        f'Export is limited to {_PM_EXPORT_MAX_ROWS:,} rows '
+                        f'({total:,} matched). Narrow your selection or search.'
+                    ),
+                }), 400
+            rows = conn.execute(f'''
+                SELECT {col_select} FROM "{table}"
+                WHERE  {where_clause}
+                ORDER  BY {_sqlite_ident(resolved_time_col)} DESC
+            ''', params).fetchall()
+            conn.close()
+            row_dicts = [dict(r) for r in rows]
+            return _pm_table_csv_response(ordered_cols, column_labels, row_dicts, vendor, technology)
+
+        offset = (page - 1) * page_size
+        rows   = conn.execute(f'''
+            SELECT {col_select} FROM "{table}"
+            WHERE  {where_clause}
+            ORDER  BY {_sqlite_ident(resolved_time_col)} DESC
+            LIMIT  ? OFFSET ?
+        ''', params + [page_size, offset]).fetchall()
+        conn.close()
 
         payload = {
             'success':       True,

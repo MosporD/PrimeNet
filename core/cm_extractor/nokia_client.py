@@ -129,6 +129,12 @@ class NokiaCmClient:
                 return None
             if 200 <= status < 300:
                 return payload
+            if status == 401:
+                try:
+                    from core.cm_extractor.nokia_semantics import invalidate_mo_class_cache
+                    invalidate_mo_class_cache()
+                except Exception:
+                    pass
             if status in (429, 503) and attempt < self.max_retries:
                 time.sleep(delay)
                 delay = min(delay * 2, 60.0)
