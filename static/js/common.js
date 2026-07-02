@@ -439,7 +439,7 @@ function _ensureFeatureNavButton() {
     btn.className = 'feature-nav-btn';
     btn.setAttribute('aria-label', 'Open main feature navigation');
     btn.title = 'Features';
-    btn.innerHTML = `<span class="feature-arrow-icon" aria-hidden="true">&gt;</span><span class="feature-nav-btn-label">Features</span>`;
+    btn.innerHTML = '<span class="feature-nav-btn-label">Features</span>';
     btn.addEventListener('click', () => { _openFeatureNav(); });
     mount.appendChild(btn);
 }
