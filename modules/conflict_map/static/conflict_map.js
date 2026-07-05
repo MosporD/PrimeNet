@@ -1,6 +1,7 @@
 let conflictMap = null;
 let conflictLayerGroup = null;
 const conflictElevationCache = new Map();
+let conflictPciFilter = '';
 
 function conflictElevationKey(lat, lng) {
     return `${Number(lat).toFixed(5)},${Number(lng).toFixed(5)}`;
@@ -62,6 +63,7 @@ window.addEventListener('DOMContentLoaded', () => {
     bindFilters();
     syncPanelAnchors();
     window.addEventListener('resize', syncPanelAnchors);
+    applyDeepLinkFromUrl();
 });
 
 function initConflictMap() {
@@ -183,9 +185,10 @@ function refillBandSelect(values) {
     const sel = document.getElementById('conf-band');
     if (!sel) return;
     const current = sel.value;
-    sel.innerHTML = '<option value="" selected disabled>Select band</option>' + (values || [])
-        .map((v) => `<option value="${String(v)}">${String(v)}</option>`)
-        .join('');
+    sel.innerHTML =
+        '<option value="" selected disabled>Select band</option>' +
+        '<option value="all">All Bands</option>' +
+        (values || []).map((v) => `<option value="${String(v)}">${String(v)}</option>`).join('');
     if ([...sel.options].some((o) => o.value === current)) sel.value = current;
 }
 
@@ -257,6 +260,7 @@ function buildQueryParams(requireComplete = false) {
     } else {
         qs.set('area', 'all');
     }
+    if (conflictPciFilter) qs.set('pci', conflictPciFilter);
     return qs;
 }
 
@@ -328,9 +332,10 @@ async function loadConflictMapData() {
         if (statsEl) {
             const st = data.strictness || '';
             const pool = Number(data.candidate_total ?? data.total ?? 0).toLocaleString();
+            const pciNote = data.pci ? ` PCI/PSC ${data.pci} filter.` : '';
             statsEl.textContent = `Showing ${Number(data.filtered_total || 0).toLocaleString()} of ${Number(
                 data.total || 0
-            ).toLocaleString()} links (${data.technology}, ${st}). Pool: ${pool} pair candidates within max distance.`;
+            ).toLocaleString()} links (${data.technology}, ${st}).${pciNote} Pool: ${pool} pair candidates within max distance.`;
         }
         syncPanelAnchors();
     } catch (_) {
@@ -446,4 +451,46 @@ function exportKml() {
         return;
     }
     window.location.href = `/api/conflict-map/export-kml?${qs.toString()}`;
+}
+
+async function applyDeepLinkFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const pci = (params.get('pci') || '').trim();
+    const tech = (params.get('technology') || '').trim();
+    const auto = params.get('auto');
+    if (!pci || !tech) return;
+
+    conflictPciFilter = pci;
+    const techEl = document.getElementById('conf-tech');
+    if (techEl) techEl.value = tech;
+
+    await loadOptionsForTechnology();
+
+    const strictEl = document.getElementById('conf-strictness');
+    const strictness = params.get('strictness');
+    if (strictEl && strictness && [...strictEl.options].some((o) => o.value === strictness)) {
+        strictEl.value = strictness;
+    }
+
+    const riskEl = document.getElementById('conf-risk');
+    const risk = params.get('risk');
+    if (riskEl && risk && [...riskEl.options].some((o) => o.value === risk)) {
+        riskEl.value = risk;
+    }
+
+    const areaEl = document.getElementById('conf-area');
+    const area = params.get('area') || 'all';
+    if (areaEl && [...areaEl.options].some((o) => o.value === area)) {
+        areaEl.value = area;
+    }
+
+    const bandEl = document.getElementById('conf-band');
+    const band = params.get('band') || 'all';
+    if (bandEl && [...bandEl.options].some((o) => o.value === band)) {
+        bandEl.value = band;
+    }
+
+    if (auto === '1') {
+        await loadConflictMapData();
+    }
 }

@@ -110,6 +110,20 @@ def ensure_tables() -> None:
                 FOREIGN KEY (job_id) REFERENCES cm_extractor_jobs(id) ON DELETE CASCADE
             )
         ''')
+        execute_query(conn, '''
+            CREATE TABLE IF NOT EXISTS cm_extractor_job_notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                job_id INTEGER NOT NULL,
+                job_name TEXT,
+                run_id INTEGER,
+                status TEXT NOT NULL,
+                message TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                seen INTEGER NOT NULL DEFAULT 0,
+                FOREIGN KEY (job_id) REFERENCES cm_extractor_jobs(id) ON DELETE CASCADE
+            )
+        ''')
         _migrate_job_schema(conn)
         conn.commit()
     finally:
@@ -532,6 +546,7 @@ def run_job(job_id: int, *, trigger: str = 'schedule', actor_id: int | None = No
         conn.close()
 
     _apply_retention(job_id, job.get('keep_runs') or _DEFAULT_KEEP_RUNS)
+    emit_job_notification(job, run_id, status, message, trigger=trigger)
     return {'success': status == 'ok', 'run_id': run_id, 'status': status, 'message': message}
 
 
@@ -564,3 +579,108 @@ def run_due_jobs() -> int:
         return len(due_ids)
     finally:
         _run_lock.release()
+
+
+# ---------------------------------------------------------------------------
+# Notifications (scheduled runs → in-app toasts)
+# ---------------------------------------------------------------------------
+
+def emit_job_notification(
+    job: dict[str, Any],
+    run_id: int,
+    status: str,
+    message: str,
+    *,
+    trigger: str = 'schedule',
+) -> None:
+    """Record an in-app notification when an unattended scheduled job finishes."""
+    if trigger != 'schedule':
+        return
+    ensure_tables()
+    user_id = int(job.get('created_by') or 0)
+    if not user_id:
+        return
+    conn = connect_app()
+    try:
+        execute_query(conn, '''
+            INSERT INTO cm_extractor_job_notifications (
+                user_id, job_id, job_name, run_id, status, message
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        ''', (
+            user_id,
+            int(job['id']),
+            str(job.get('name') or 'CM extraction')[:200],
+            int(run_id),
+            str(status or 'error')[:32],
+            str(message or '')[:1000],
+        ))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def list_job_notifications(
+    *,
+    user_id: int,
+    since_id: int = 0,
+    unread_only: bool = False,
+    limit: int = 20,
+) -> list[dict[str, Any]]:
+    ensure_tables()
+    conn = connect_app()
+    try:
+        sql = '''
+            SELECT id, user_id, job_id, job_name, run_id, status, message, created_at, seen
+            FROM cm_extractor_job_notifications
+            WHERE user_id = ? AND id > ?
+        '''
+        params: list[Any] = [int(user_id), int(since_id)]
+        if unread_only:
+            sql += ' AND seen = 0'
+        sql += ' ORDER BY id ASC LIMIT ?'
+        params.append(max(1, min(int(limit), 100)))
+        cur = execute_query(conn, sql, tuple(params))
+        rows = [dict(r) for r in cur.fetchall()]
+        for row in rows:
+            row['seen'] = bool(int(row.get('seen') or 0))
+        return rows
+    finally:
+        conn.close()
+
+
+def count_unread_notifications(user_id: int) -> int:
+    ensure_tables()
+    conn = connect_app()
+    try:
+        cur = execute_query(conn, '''
+            SELECT COUNT(*) AS c FROM cm_extractor_job_notifications
+            WHERE user_id = ? AND seen = 0
+        ''', (int(user_id),))
+        row = cur.fetchone()
+        return int(row['c'] if row else 0)
+    finally:
+        conn.close()
+
+
+def mark_notifications_seen(*, user_id: int, ids: list[int] | None = None) -> int:
+    ensure_tables()
+    conn = connect_app()
+    try:
+        if ids:
+            clean = [int(i) for i in ids if int(i) > 0]
+            if not clean:
+                return 0
+            placeholders = ','.join('?' * len(clean))
+            cur = execute_query(conn, f'''
+                UPDATE cm_extractor_job_notifications
+                SET seen = 1
+                WHERE user_id = ? AND id IN ({placeholders})
+            ''', (int(user_id), *clean))
+        else:
+            cur = execute_query(conn, '''
+                UPDATE cm_extractor_job_notifications SET seen = 1 WHERE user_id = ?
+            ''', (int(user_id),))
+        conn.commit()
+        return int(cur.rowcount or 0)
+    finally:
+        conn.close()

@@ -17,6 +17,7 @@ from .logic import (
     _safe_float,
     apply_strictness_to_pairs,
     conflict_strictness_profiles_public,
+    filter_conflict_rows,
     get_cached_conflict_base,
     get_cached_conflict_pairs,
     kmlline_style_id,
@@ -52,28 +53,19 @@ def pci_conflicts_map_data():
         single = str(request.args.get('area', 'all') or 'all').strip()
         if single:
             area_values = [single]
-    area_set = {v for v in area_values if v.lower() != 'all'}
     band = str(request.args.get('band', 'all') or 'all').strip()
+    pci = str(request.args.get('pci', '') or '').strip()
     include_elevation = str(request.args.get('include_elevation', '0')).strip().lower() in ('1', 'true', 'yes', 'on')
     tech_req, base_rows, generated_at, refreshed = get_cached_conflict_base(technology, force_refresh=False)
     rows = apply_strictness_to_pairs(base_rows, strictness)
 
-    def _row_match(r):
-        if risk in ('high', 'medium', 'low') and str(r.get('risk', '')).lower() != risk:
-            return False
-        if area_set:
-            area_a = str(r.get('a_area') or '')
-            area_b = str(r.get('b_area') or '')
-            if (area_a not in area_set) and (area_b not in area_set):
-                return False
-        if band.lower() != 'all':
-            band_a = str(r.get('a_band') or '')
-            band_b = str(r.get('b_band') or '')
-            if band not in (band_a, band_b):
-                return False
-        return True
-
-    filtered = [dict(r) for r in rows if _row_match(r)]
+    filtered = filter_conflict_rows(
+        rows,
+        risk=risk,
+        area_values=area_values,
+        band=band,
+        pci=pci or None,
+    )
     areas = sorted({str(v) for r in base_rows for v in (r.get('a_area'), r.get('b_area')) if v})
     bands = sorted({str(v) for r in base_rows for v in (r.get('a_band'), r.get('b_band')) if v})
 
@@ -108,6 +100,7 @@ def pci_conflicts_map_data():
             'success': True,
             'technology': tech_req,
             'strictness': strictness,
+            'pci': pci or None,
             'candidate_total': len(base_rows),
             'total': len(rows),
             'filtered_total': len(filtered),
@@ -155,26 +148,17 @@ def export_conflict_map_kml():
         single = str(request.args.get('area', 'all') or 'all').strip()
         if single:
             area_values = [single]
-    area_set = {v for v in area_values if v.lower() != 'all'}
     band = str(request.args.get('band', 'all') or 'all').strip()
+    pci = str(request.args.get('pci', '') or '').strip()
     tech_req, rows, _, _ = get_cached_conflict_pairs(technology, strictness, force_refresh=False)
 
-    def _row_match(r):
-        if risk in ('high', 'medium', 'low') and str(r.get('risk', '')).lower() != risk:
-            return False
-        if area_set:
-            area_a = str(r.get('a_area') or '')
-            area_b = str(r.get('b_area') or '')
-            if (area_a not in area_set) and (area_b not in area_set):
-                return False
-        if band.lower() != 'all':
-            band_a = str(r.get('a_band') or '')
-            band_b = str(r.get('b_band') or '')
-            if band not in (band_a, band_b):
-                return False
-        return True
-
-    filtered = [r for r in rows if _row_match(r)]
+    filtered = filter_conflict_rows(
+        rows,
+        risk=risk,
+        area_values=area_values,
+        band=band,
+        pci=pci or None,
+    )
     parts = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<kml xmlns="http://www.opengis.net/kml/2.2"><Document>',

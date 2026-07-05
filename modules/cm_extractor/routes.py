@@ -58,12 +58,15 @@ from core.cm_extractor.site_catalog import (
     list_nokia_inventory_sites,
 )
 from core.cm_extractor.job_scheduler import (
+    count_unread_notifications as cm_count_unread_notifications,
     create_job as cm_create_job,
     delete_job as cm_delete_job,
     get_job as cm_get_job,
     get_run as cm_get_run,
+    list_job_notifications as cm_list_job_notifications,
     list_jobs as cm_list_jobs,
     list_runs as cm_list_runs,
+    mark_notifications_seen as cm_mark_notifications_seen,
     run_job as cm_run_job,
     set_enabled as cm_set_enabled,
 )
@@ -1125,3 +1128,42 @@ def download(file_id):
 
     log_activity(_user_id(user), 'file_download', f'Downloaded {info["filename"]}')
     return send_file(info['path'], as_attachment=True, download_name=info['filename'])
+
+
+@cm_extractor_bp.route('/api/cm-extractor/notifications', methods=['GET'])
+def list_cm_job_notifications():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    since_id = int(request.args.get('since_id', 0) or 0)
+    unread_only = str(request.args.get('unread_only', '')).strip().lower() in ('1', 'true', 'yes', 'on')
+    notifications = cm_list_job_notifications(
+        user_id=_user_id(user),
+        since_id=since_id,
+        unread_only=unread_only,
+    )
+    return jsonify({
+        'success': True,
+        'notifications': notifications,
+        'unread_count': cm_count_unread_notifications(_user_id(user)),
+    })
+
+
+@cm_extractor_bp.route('/api/cm-extractor/notifications/seen', methods=['POST'])
+def mark_cm_job_notifications_seen():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    payload = request.get_json(silent=True) or {}
+    ids = payload.get('ids')
+    if ids is not None and not isinstance(ids, list):
+        return jsonify({'error': 'ids must be a list'}), 400
+    marked = cm_mark_notifications_seen(
+        user_id=_user_id(user),
+        ids=[int(i) for i in (ids or [])] if ids else None,
+    )
+    return jsonify({
+        'success': True,
+        'marked': marked,
+        'unread_count': cm_count_unread_notifications(_user_id(user)),
+    })

@@ -84,6 +84,41 @@ def normalize_strictness(slug: str | None) -> str:
     return DEFAULT_CONFLICT_STRICTNESS
 
 
+def filter_conflict_rows(
+    rows: list[dict],
+    *,
+    risk: str = 'all',
+    area_values: list[str] | None = None,
+    band: str = 'all',
+    pci: str | None = None,
+) -> list[dict]:
+    """Apply UI filters to strictness-scored conflict pair rows."""
+    area_values = area_values or []
+    area_set = {v for v in area_values if str(v).strip() and str(v).lower() != 'all'}
+    band_norm = str(band or 'all').strip()
+    risk_norm = str(risk or 'all').strip().lower()
+    pci_norm = str(pci).strip() if pci not in (None, '') else ''
+
+    out: list[dict] = []
+    for r in rows:
+        if risk_norm in ('high', 'medium', 'low') and str(r.get('risk', '')).lower() != risk_norm:
+            continue
+        if area_set:
+            area_a = str(r.get('a_area') or '')
+            area_b = str(r.get('b_area') or '')
+            if area_a not in area_set and area_b not in area_set:
+                continue
+        if band_norm.lower() != 'all':
+            band_a = str(r.get('a_band') or '')
+            band_b = str(r.get('b_band') or '')
+            if band_norm not in (band_a, band_b):
+                continue
+        if pci_norm and str(r.get('pci') or '').strip() != pci_norm:
+            continue
+        out.append(dict(r))
+    return out
+
+
 def _conflict_profile_thresholds(slug: str) -> dict[str, float]:
     p = CONFLICT_STRICTNESS_PROFILES[normalize_strictness(slug)]
     return {

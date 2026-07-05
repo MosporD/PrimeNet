@@ -1442,6 +1442,52 @@ async function doCodeSearch() {
     }
 }
 
+function conflictMapTechFromCellTech(techRaw) {
+    const t = String(techRaw || '').trim().toUpperCase();
+    if (!t || t === '2G' || t.includes('GSM')) return null;
+    if (t === '3G' || t.includes('UMTS') || t.includes('WCDMA')) return '3G';
+    if (t === '5G' || t.includes('NR')) return '5G';
+    if (t.includes('4G') || t.includes('LTE')) return '4G';
+    return null;
+}
+
+function conflictMapTechFromMatches(matches) {
+    const techs = new Set();
+    for (const cell of matches || []) {
+        const mapped = conflictMapTechFromCellTech(cell.technology);
+        if (mapped) techs.add(mapped);
+    }
+    if (!techs.size) return null;
+    if (techs.size === 1) return [...techs][0];
+    if (techs.has('4G')) return '4G';
+    if (techs.has('3G')) return '3G';
+    return '5G';
+}
+
+function conflictMapTechFromActive() {
+    const t = activeTech || '';
+    if (t === 'all') return null;
+    if (t === '3G-3G' || t === '3G') return '3G';
+    if (t === '5G') return '5G';
+    if (t === '4G-4G' || t === '4G-FDD' || t === '4G' || t.startsWith('4G')) return '4G';
+    return null;
+}
+
+function conflictMapUrlForCode(code, matches) {
+    const tech = conflictMapTechFromActive() || conflictMapTechFromMatches(matches);
+    if (!tech) return null;
+    const qs = new URLSearchParams({
+        technology: tech,
+        pci: String(code),
+        strictness: 'standard',
+        risk: 'all',
+        area: 'all',
+        band: 'all',
+        auto: '1',
+    });
+    return `/conflict-map?${qs.toString()}`;
+}
+
 function drawCodeSearchResults(matches, code) {
     // Hide all regular site markers — only show matching ones
     siteMarkers.forEach(m => map.removeLayer(m));
@@ -1508,18 +1554,28 @@ function drawCodeSearchResults(matches, code) {
     });
 
     const panel = document.getElementById('site-info-panel');
+    const conflictUrl = conflictMapUrlForCode(code, matches);
+    const conflictBtn = conflictUrl
+        ? `<a class="export-btn conflict-map-link" href="${conflictUrl}" target="_blank" rel="noopener">⚡ Check conflicts</a>`
+        : '';
     panel.innerHTML = `
         <h3 class="site-panel-title">🔍 ${techLabel} = ${code}</h3>
         <div class="site-meta-row" style="margin-bottom:8px;">
             ${matches.length} cell${matches.length !== 1 ? 's' : ''}
             across ${Object.keys(siteMap).length} site${Object.keys(siteMap).length !== 1 ? 's' : ''}
         </div>
-        <button class="export-btn" onclick="exportCodeSearch(${code}, '${techParam}')">
-            ⬇ Export to Excel
-        </button>
+        <div class="code-search-actions">
+            ${conflictBtn}
+            <button class="export-btn" onclick="exportCodeSearch(${code}, '${techParam}')">
+                ⬇ Export to Excel
+            </button>
+        </div>
         ${siteHtml}
     `;
     panel.style.display = 'block';
+    requestAnimationFrame(() => {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
 
     const bounds = [];
     matches.forEach((cell) => {

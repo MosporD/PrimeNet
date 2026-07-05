@@ -655,31 +655,8 @@
             </div>`;
     }
 
-    function updateStats(meta, band, n) {
-        const box = $("ch-stats");
-        if (!box) return;
-        if (!n) {
-            box.hidden = true;
-            box.innerHTML = "";
-            return;
-        }
-        box.hidden = false;
-        const scope = (meta && meta.data_scope) || "";
-        const mk = meta && meta.matched_kpi_cells != null ? meta.matched_kpi_cells : "—";
-        const ms = meta && meta.matched_size_cells != null ? meta.matched_size_cells : "—";
-        const fb = meta && meta.fallback_cells != null ? meta.fallback_cells : "—";
-        const vendor = meta && meta.vendor_scope ? String(meta.vendor_scope) : "all";
-        const tech = meta && meta.technology_scope ? String(meta.technology_scope) : "all";
-        box.innerHTML = [
-            `<span class="ch-pill">${n} cells</span>`,
-            `<span class="ch-pill ch-pill-muted">${escapeHtml(vendor === "all" ? "All vendors" : vendor)}</span>`,
-            `<span class="ch-pill ch-pill-muted">${escapeHtml(tech === "all" ? "All RATs" : tech)}</span>`,
-            `<span class="ch-pill ch-pill-muted">PM KPI: ${mk}</span>`,
-            `<span class="ch-pill ch-pill-muted">UE dist: ${ms}</span>`,
-            `<span class="ch-pill ch-pill-muted">No KPI: ${fb}</span>`,
-            `<span class="ch-pill ch-pill-muted">${scope || "—"}</span>`,
-            `<span class="ch-pill ch-pill-muted">${band ? "Band " + escapeHtml(band) : "All bands"}</span>`,
-        ].join("");
+    function updateStats() {
+        /* Cell count / load stats intentionally not shown in UI. */
     }
 
     function applyPresetToThresholds() {
@@ -759,7 +736,7 @@
             const data = await res.json();
             if (!data.success) {
                 setStatus("err", data.error || "Request failed.");
-                updateStats({}, band, 0);
+                updateStats();
                 return;
             }
             lastMeta = data.meta || {};
@@ -776,13 +753,12 @@
             if (lastBounds) {
                 fitToData();
             }
-            const m = lastMeta;
-            setStatus("ok", `Ready — ${lastDetails.length} cells on map.`);
-            updateStats(m, band, lastDetails.length);
+            setStatus("ok", "Heatmap loaded.");
+            updateStats();
         } catch (err) {
             setStatus("err", "Network or server error.");
             console.error(err);
-            updateStats({}, band, 0);
+            updateStats();
         } finally {
             loadBtn.disabled = false;
         }
@@ -829,6 +805,8 @@
         $("fit-bounds-btn")?.addEventListener("click", fitToData);
         bindScopeControls();
         bindHeatTuning();
-        loadConfig().then(loadBands).then(loadHeatmap);
+        loadConfig()
+            .then(loadBands)
+            .then(() => setStatus(null, "Set filters and click Load data."));
     });
 })();

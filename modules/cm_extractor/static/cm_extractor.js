@@ -1947,6 +1947,73 @@ function setupScheduler() {
     onSchedScheduleTypeChange();
     updateSchedStoragePreview();
     loadScheduledJobs();
+    startJobNotificationPolling();
+}
+
+let lastJobNotifId = 0;
+let jobNotifPollTimer = null;
+
+function updateSchedulerNotifBadge(count) {
+    const badge = document.getElementById('scheduler-notif-badge');
+    if (!badge) return;
+    const n = Number(count) || 0;
+    if (n > 0) {
+        badge.textContent = n > 99 ? '99+' : String(n);
+        badge.hidden = false;
+        badge.classList.add('visible');
+    } else {
+        badge.textContent = '';
+        badge.hidden = true;
+        badge.classList.remove('visible');
+    }
+}
+
+async function pollJobNotifications() {
+    try {
+        const res = await fetch(`/api/cm-extractor/notifications?since_id=${lastJobNotifId}`, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.success) return;
+
+        updateSchedulerNotifBadge(data.unread_count);
+
+        const items = data.notifications || [];
+        if (!items.length) return;
+
+        const ids = [];
+        for (const n of items) {
+            lastJobNotifId = Math.max(lastJobNotifId, Number(n.id) || 0);
+            ids.push(n.id);
+            const label = n.job_name || 'Scheduled job';
+            const msg = n.message || (n.status === 'ok' ? 'Completed successfully.' : 'Run failed.');
+            const type = n.status === 'ok' ? 'success' : 'error';
+            if (typeof showNotification === 'function') {
+                showNotification(`${label}: ${msg}`, type);
+            }
+        }
+
+        if (ids.length) {
+            await fetch('/api/cm-extractor/notifications/seen', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ ids }),
+            });
+            updateSchedulerNotifBadge(0);
+        }
+
+        loadScheduledJobs();
+    } catch (_) {
+        // polling is best-effort
+    }
+}
+
+function startJobNotificationPolling() {
+    if (jobNotifPollTimer) return;
+    pollJobNotifications();
+    jobNotifPollTimer = window.setInterval(pollJobNotifications, 60000);
 }
 
 function onSchedScheduleTypeChange() {
