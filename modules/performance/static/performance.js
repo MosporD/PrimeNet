@@ -448,7 +448,19 @@ function formatTrendXLabelHierarchy(raw) {
 function _parseTrendRowMoment(row) {
     const raw = trendXRaw(row);
     if (raw == null) return null;
-    const d = new Date(raw);
+    const s = String(raw).trim();
+    const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (iso) {
+        return new Date(
+            Number(iso[1]),
+            Number(iso[2]) - 1,
+            Number(iso[3]),
+            Number(iso[4] || 0),
+            Number(iso[5] || 0),
+            Number(iso[6] || 0),
+        );
+    }
+    const d = new Date(s);
     if (isNaN(d.getTime())) return null;
     return d;
 }

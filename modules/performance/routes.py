@@ -171,7 +171,7 @@ def _parse_trend_ts(val, prefer_dayfirst: bool | None = None):
             '%m.%d.%Y',
             '%m.%d.%y',
         )
-        if prefer_dayfirst is not False
+        if prefer_dayfirst is True
         else
         (
             '%m.%d.%Y %H:%M:%S',
@@ -206,10 +206,16 @@ def _parse_trend_ts(val, prefer_dayfirst: bool | None = None):
             return datetime.strptime(s[:19], fmt)
         except ValueError:
             continue
-    # Last-resort parsing for mixed exports; prefer day-first, then month-first.
+    # Last-resort parsing for mixed exports.
     try:
         pref = prefer_dayfirst
-        order = (True, False) if pref is not False else (False, True)
+        if pref is True:
+            order = (True, False)
+        elif pref is False:
+            order = (False, True)
+        else:
+            # Ambiguous dotted Nokia PERIOD_START_TIME defaults to month.day.year.
+            order = (False, True)
         for dayfirst in order:
             t = pd.to_datetime(s, errors='coerce', dayfirst=dayfirst)
             if pd.notna(t):
@@ -437,7 +443,7 @@ _CELL_LIST_CACHE = {}
 _CELL_LIST_CACHE_TTL_SEC = 45
 _TREND_CACHE = {}
 _TREND_CACHE_TTL_SEC = 120
-_TREND_CACHE_SCHEMA_VER = "v4"
+_TREND_CACHE_SCHEMA_VER = "v5"
 _PM_TABLE_CACHE_SCHEMA_VER = "v3"
 _PM_TABLE_CACHE = {}
 _PM_TABLE_CACHE_TTL_SEC = 90
@@ -2006,7 +2012,10 @@ def get_group_trend():
             allow = set(requested_kpis)
             kpi_cols = [c for c in kpi_cols if c in allow]
 
-        select_cols = [f'{_sqlite_ident(tcol)} AS "timestamp"'] + [f'{_sqlite_ident(c)}' for c in kpi_cols]
+        select_cols = [
+            f'{_sqlite_ident(tcol)} AS "timestamp"',
+            f'{_sqlite_text_lit(tcol)} AS "__time_source"',
+        ] + [f'{_sqlite_ident(c)}' for c in kpi_cols]
         rows = [
             dict(r)
             for r in conn.execute(
