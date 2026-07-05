@@ -13,11 +13,11 @@ body.perf-page .perf-container {
     overflow: visible;
 }
 
-/* Two columns; align to top so each column’s height follows its content */
+/* Two columns; panel stretches to viewport; side panel scrolls when content overflows */
 .perf-body {
     display: flex;
     flex: 1 1 auto;
-    align-items: flex-start;
+    align-items: stretch;
     min-height: calc(100vh - 80px);
     overflow: visible;
 }
@@ -62,19 +62,37 @@ body.perf-page .perf-container {
     flex-direction: column;
     gap: 12px;
     overflow-y: auto;
+    overflow-x: hidden;
     position: sticky;
     top: 0;
-    height: 100vh;
-    max-height: 100vh;
+    height: calc(100vh - 80px);
+    max-height: calc(100vh - 80px);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+
+.filter-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-panel::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 4px;
 }
 
 /* Huawei-style object browser (left column) */
 .filter-panel.perf-filter-hw {
     padding: 8px 10px 12px;
     gap: 8px;
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     min-height: 0;
     align-self: stretch;
+}
+
+.perf-filter-hw .perf-time-window-row {
+    flex-shrink: 0;
 }
 
 .perf-filter-hw .hw-advanced-filters,
@@ -173,10 +191,8 @@ body.perf-page .perf-container {
 
 .hw-tree-panel {
     flex: 1 1 auto;
-    min-height: 0;
-    /* Fill the left panel down to the page bottom; inner sections stay scrollable. */
+    min-height: 200px;
     max-height: none;
-    height: calc(100vh - 150px);
     display: flex;
     flex-direction: column;
     border: 1px solid #dcdfe6;
@@ -1912,6 +1928,226 @@ body.dark-mode .hw-row-count {
     color: #a9b7c9 !important;
 }
 
+/* Dark mode — sidebar filters, KPI category pills, chart/session chrome */
+body.dark-mode .perf-sidebar-toggle {
+    background: linear-gradient(180deg, #1e2d3d 0%, #172430 100%) !important;
+    color: var(--dm-muted) !important;
+    border-bottom-color: var(--dm-border) !important;
+}
+
+body.dark-mode .perf-sidebar-toggle:hover {
+    background: linear-gradient(180deg, #243447 0%, #1b2a3a 100%) !important;
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .perf-sidebar-toggle--nest {
+    background: var(--dm-panel-3) !important;
+    border-color: var(--dm-border) !important;
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .perf-sidebar-toggle--nest:hover {
+    background: #2a3a4d !important;
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .hw-icon-btn {
+    background: var(--dm-panel-3) !important;
+    border-color: var(--dm-border) !important;
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .hw-icon-btn:hover {
+    background: #2a3a4d !important;
+    border-color: #3d5369 !important;
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .hw-icon-btn-refresh {
+    background: #152820 !important;
+    border-color: #2d5a3d !important;
+    color: #7dcea0 !important;
+}
+
+body.dark-mode .hw-icon-btn-refresh:hover {
+    background: #1a3328 !important;
+    color: #9fe0b8 !important;
+}
+
+body.dark-mode a.hw-toolbar-map {
+    background: #152a3d !important;
+    border-color: #2a5578 !important;
+    color: var(--dm-link) !important;
+}
+
+body.dark-mode a.hw-toolbar-map:hover {
+    background: #1a3348 !important;
+    border-color: #3570a0 !important;
+    color: #a9ceff !important;
+}
+
+body.dark-mode .hw-select-mode,
+body.dark-mode .hw-radio {
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .hw-tree-twisty {
+    background: var(--dm-panel-3) !important;
+    border-color: var(--dm-border) !important;
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .hw-tree-twisty:hover {
+    background: #1a3348 !important;
+    border-color: #3570a0 !important;
+    color: var(--dm-link) !important;
+}
+
+body.dark-mode .hw-tree-folder-name,
+body.dark-mode .hw-object-tree {
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .hw-tree-leaf:hover {
+    background: #1a3348 !important;
+}
+
+body.dark-mode .hw-tree-leaf.active {
+    background: #1e3a52 !important;
+    outline-color: #4a9fd4 !important;
+}
+
+body.dark-mode .hw-tree-children {
+    border-left-color: #3d5369 !important;
+}
+
+body.dark-mode .kpi-scope-item:hover {
+    background: var(--dm-panel-3) !important;
+    border-color: var(--dm-border) !important;
+}
+
+body.dark-mode .kpi-scope-item-label {
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .perf-bottom-mode {
+    border-color: var(--dm-border) !important;
+}
+
+body.dark-mode .perf-mode-btn {
+    background: var(--dm-panel-3) !important;
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .perf-mode-btn.active {
+    background: #2980b9 !important;
+    color: #fff !important;
+}
+
+body.dark-mode .perf-kpi-category-tab {
+    background: var(--dm-panel-3) !important;
+    border-color: var(--dm-border) !important;
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .perf-kpi-category-tab:hover {
+    background: #2a3a4d !important;
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .perf-kpi-category-tab.active {
+    background: #2980b9 !important;
+    border-color: #2980b9 !important;
+    color: #fff !important;
+}
+
+body.dark-mode .perf-chart-tabs-bar {
+    background: #141e2a !important;
+    border-bottom-color: var(--dm-border) !important;
+}
+
+body.dark-mode .perf-chart-tab {
+    background: var(--dm-panel-2) !important;
+    border-color: var(--dm-border) !important;
+}
+
+body.dark-mode .perf-chart-tab:hover:not(.active) {
+    background: var(--dm-panel-3) !important;
+}
+
+body.dark-mode .perf-chart-tab.active {
+    background: var(--dm-panel) !important;
+    border-color: var(--dm-border) !important;
+    box-shadow: none !important;
+}
+
+body.dark-mode .perf-chart-tab-activate {
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .perf-chart-tab.active .perf-chart-tab-activate {
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .perf-chart-tab-close {
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .perf-chart-tab-close:hover,
+body.dark-mode .perf-chart-tab.active .perf-chart-tab-close:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .view-toggle {
+    border-color: var(--dm-border) !important;
+}
+
+body.dark-mode .view-btn {
+    background: var(--dm-panel-3) !important;
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .view-btn + .view-btn {
+    border-left-color: var(--dm-border) !important;
+}
+
+body.dark-mode .view-btn.active {
+    background: #2980b9 !important;
+    color: #fff !important;
+}
+
+body.dark-mode .view-btn:hover:not(.active) {
+    background: #2a3a4d !important;
+    color: var(--dm-link) !important;
+}
+
+body.dark-mode .charts-title {
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .perf-left-panel-toggle {
+    background: #1a2735 !important;
+    border-color: var(--dm-border) !important;
+    color: var(--dm-muted) !important;
+}
+
+body.dark-mode .perf-left-panel-toggle:hover {
+    background: #223246 !important;
+    color: var(--dm-text) !important;
+}
+
+body.dark-mode .hw-advanced-summary {
+    background: linear-gradient(180deg, #1e2d3d 0%, #172430 100%) !important;
+    color: var(--dm-muted) !important;
+    border-bottom-color: var(--dm-border) !important;
+}
+
+body.dark-mode .hw-advanced-summary:hover {
+    background: linear-gradient(180deg, #243447 0%, #1b2a3a 100%) !important;
+    color: var(--dm-text) !important;
+}
+
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 1100px) {
     .charts-wrap {
@@ -1929,12 +2165,21 @@ body.dark-mode .hw-row-count {
         position: static;
         top: auto;
         height: auto;
-        max-height: none;
+        max-height: min(70vh, 520px);
         border-right: none;
         border-bottom: 1px solid #e8ecf0;
+        overflow-y: auto;
     }
     .filter-group { min-width: 130px; flex: 1; }
-    .filter-panel.perf-filter-hw { width: 100%; }
+    .filter-panel.perf-filter-hw {
+        width: 100%;
+        flex-direction: column;
+        flex-wrap: nowrap;
+    }
+    .hw-tree-panel {
+        min-height: 180px;
+        max-height: min(48vh, 380px);
+    }
     .charts-area {
         min-height: min(400px, 80vh);
         height: auto;

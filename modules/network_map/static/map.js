@@ -32,6 +32,9 @@ const SECTOR_RADIUS_M = 240;                 // wedge radius in metres (was 600;
 const SECTOR_BEAMWIDTH = 65;                 // 3 dB beamwidth in degrees
 const _ELEVATION_CACHE = new Map();
 
+/** Zain RanSitesTool site audits (opens tool home — no per-site deep link). */
+const SITE_AUDITS_TOOL_URL = 'https://services.jo.zain.com/RanSitesTool/site-audits/';
+
 // Cluster number → Area name  (cluster = Math.floor(site_id / 100))
 const CLUSTER_AREA = {
      3: 'East Amman',  13: 'East Amman',  17: 'East Amman',  21: 'East Amman',
@@ -322,11 +325,12 @@ async function setTechFilter(tech) {
     const codeInput = document.getElementById('cell-code-search');
     if (codeInput) {
         codeInput.placeholder =
-            tech === '3G-3G' ? 'Scrambling Code...' :
+            tech === '3G-3G' || tech === '3G' ? 'Scrambling Code...' :
             tech === '4G-4G' ||
             tech === '4G-4G Intra-eNB' || tech === '4G-4G Inter-eNB' ||
-            tech === '4G-4G Intra' || tech === '4G-4G Inter' ? 'PCI...' :
-            tech === '2G-2G' ? 'BCCH...' :
+            tech === '4G-4G Intra' || tech === '4G-4G Inter' ||
+            tech === '4G-FDD' || tech === '4G-TDD' || tech === '5G' ? 'PCI...' :
+            tech === '2G-2G' || tech === '2G' ? 'BCCH...' :
             'SC / PCI / BCCH...';
     }
     await updateTechSpecificFilter();
@@ -558,6 +562,7 @@ function runFilters() {
 
     _updateMapCountLabel(filteredSites.length, showRepeaters ? repeaterData.length : 0);
     _zoomToSiteSearchMatches(filteredSites);
+    void _maybeRerunCodeSearch();
 }
 
 // ─── Site loading & display ───────────────────────────────────────────────────
@@ -1146,6 +1151,7 @@ function displaySiteInfo(site, cells) {
         ? `<div class="site-meta-row site-offline-summary"><strong>Offline:</strong> ${offlineN} cell${offlineN === 1 ? '' : 's'} (no sector wedges)</div>`
         : '';
 
+
     panel.innerHTML = `
         <h3 class="site-panel-title">📡 ${site.site_name}</h3>
         <div class="site-meta-row"><strong>Site ID:</strong> ${site.site_id}</div>
@@ -1156,10 +1162,13 @@ function displaySiteInfo(site, cells) {
         <div class="site-meta-row"><strong>Cells shown:</strong> ${cells.length}</div>
         ${offlineNote}
         ${techHtml}
-        <a href="/performance?site_id=${site.site_id}"
+        <div class="site-panel-actions">
+        <a href="/performance?site_id=${encodeURIComponent(site.site_id)}"
            class="kpi-link">
             📈 In-depth KPI
         </a>
+        <a href="${escapeHtmlAttr(SITE_AUDITS_TOOL_URL)}" class="kpi-link site-audits-link" target="_blank" rel="noopener noreferrer">📋 Site Audits</a>
+        </div>
     `;
     panel.style.display = 'block';
     fillElevationText('site-elevation-value', site.latitude, site.longitude);
@@ -1383,6 +1392,19 @@ function closeKPIModal() {
 
 // ─── Cell-code search (SC / PCI / BCCH) ──────────────────────────────────────
 
+function _activeCellCodeSearch() {
+    const code = (document.getElementById('cell-code-search')?.value || '').trim();
+    if (!code || Number.isNaN(Number(code))) return null;
+    return code;
+}
+
+/** Re-apply PCI/BCCH/PSC highlights after map filters reload. */
+function _maybeRerunCodeSearch() {
+    if (!_activeCellCodeSearch()) return;
+    clearTimeout(codeSearchTimer);
+    codeSearchTimer = setTimeout(doCodeSearch, 50);
+}
+
 function cellCodeSearch() {
     clearTimeout(codeSearchTimer);
     const val = document.getElementById('cell-code-search').value.trim();
@@ -1391,8 +1413,8 @@ function cellCodeSearch() {
 }
 
 async function doCodeSearch() {
-    const code = document.getElementById('cell-code-search').value.trim();
-    if (!code || isNaN(code)) return;
+    const code = _activeCellCodeSearch();
+    if (!code) return;
 
     clearHighlights();
 
@@ -1498,6 +1520,18 @@ function drawCodeSearchResults(matches, code) {
         ${siteHtml}
     `;
     panel.style.display = 'block';
+
+    const bounds = [];
+    matches.forEach((cell) => {
+        const lat = Number(cell.latitude);
+        const lng = Number(cell.longitude);
+        if (Number.isFinite(lat) && Number.isFinite(lng)) bounds.push([lat, lng]);
+    });
+    if (map && bounds.length === 1) {
+        map.setView(bounds[0], Math.max(map.getZoom(), 14));
+    } else if (map && bounds.length > 1) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+    }
 }
 
 /** Download matching cells as an Excel file. */
@@ -2041,13 +2075,14 @@ function clearCodeSearch() {
 
 /** Returns the human label for the active-tech code type. */
 function _codeLabel() {
-    if (activeTech === '3G-3G') return 'SC';
+    if (activeTech === '3G-3G' || activeTech === '3G') return 'SC';
     if (
         activeTech === '4G-4G' ||
         activeTech === '4G-4G Intra-eNB' || activeTech === '4G-4G Inter-eNB' ||
-        activeTech === '4G-4G Intra' || activeTech === '4G-4G Inter'
+        activeTech === '4G-4G Intra' || activeTech === '4G-4G Inter' ||
+        activeTech === '4G-FDD' || activeTech === '4G-TDD' || activeTech === '5G'
     ) return 'PCI';
-    if (activeTech === '2G-2G') return 'BCCH';
+    if (activeTech === '2G-2G' || activeTech === '2G') return 'BCCH';
     return 'Code';
 }
 

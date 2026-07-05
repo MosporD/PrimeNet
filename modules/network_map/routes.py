@@ -292,9 +292,8 @@ def _union_sql_for_map_filter(tech: str | None = None) -> tuple[str, list]:
 
 
 def _map_request_tech_filter_to_bcch_band_clause(tech: str) -> bool:
-    """True when tech_value applies to v.pci (BCCH) rather than frequency_band / UARFCN."""
-    t = _normalize_ui_map_tech_token((tech or "").strip())
-    return t in ("2G", "2G-2G")
+    """Tech-specific dropdown always scopes band / UARFCN (``frequency_band``), not PCI/BCCH/PSC."""
+    return False
 
 
 def _cell_kpi_sql_technologies(req_tech: str) -> list[str] | None:
@@ -817,12 +816,12 @@ def get_tech_filter_options():
 
         if tech == '2G':
             rows = execute_query(conn, f'''
-                SELECT DISTINCT CAST(v.pci AS TEXT) AS val
+                SELECT DISTINCT CAST(v.frequency_band AS TEXT) AS val
                 FROM ({union_sql}) v
-                WHERE v.pci IS NOT NULL AND TRIM(CAST(v.pci AS TEXT)) <> ''
-                ORDER BY CAST(v.pci AS INTEGER)
+                WHERE v.frequency_band IS NOT NULL AND TRIM(CAST(v.frequency_band AS TEXT)) <> ''
+                ORDER BY v.frequency_band
             ''', params).fetchall()
-            label = 'BCCH'
+            label = 'Band'
         elif tech == '3G':
             rows = execute_query(conn, f'''
                 SELECT DISTINCT CAST(v.frequency_band AS TEXT) AS val
@@ -1250,13 +1249,14 @@ def search_by_cell_code():
                 v.status,
                 s.site_id,
                 s.site_name,
-                s.latitude,
-                s.longitude
+                COALESCE(s.latitude, v.latitude) AS latitude,
+                COALESCE(s.longitude, v.longitude) AS longitude
             FROM ({union_sql}) v
             JOIN sites s ON s.site_id = v.site_id
             WHERE v.pci = ?
               {where_scope}
-              AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+              AND COALESCE(s.latitude, v.latitude) IS NOT NULL
+              AND COALESCE(s.longitude, v.longitude) IS NOT NULL
             ORDER BY s.site_name, v.technology, v.cell_name
         ''', q_params)
 
@@ -1315,13 +1315,14 @@ def export_cell_code():
                 v.mechanical_tilt,
                 v.electrical_tilt,
                 v.activity_status,
-                s.latitude,
-                s.longitude
+                COALESCE(s.latitude, v.latitude) AS latitude,
+                COALESCE(s.longitude, v.longitude) AS longitude
             FROM ({union_sql}) v
             JOIN sites s ON s.site_id = v.site_id
             WHERE v.pci = ?
               {where_scope}
-              AND s.latitude IS NOT NULL AND s.longitude IS NOT NULL
+              AND COALESCE(s.latitude, v.latitude) IS NOT NULL
+              AND COALESCE(s.longitude, v.longitude) IS NOT NULL
             ORDER BY s.site_name, v.technology, v.cell_name
         ''', q_params).fetchall()
         conn.close()
