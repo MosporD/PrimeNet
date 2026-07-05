@@ -35,6 +35,24 @@ const _ELEVATION_CACHE = new Map();
 /** Zain RanSitesTool site audits (opens tool home — no per-site deep link). */
 const SITE_AUDITS_TOOL_URL = 'https://services.jo.zain.com/RanSitesTool/site-audits/';
 
+function performanceUrlForSite(site) {
+    const params = new URLSearchParams();
+    if (site?.site_id != null) params.set('site_id', String(site.site_id));
+    if (site?.vendor) params.set('vendor', String(site.vendor));
+    const qs = params.toString();
+    return qs ? `/performance?${qs}` : '/performance';
+}
+
+function performanceUrlForCell(cell) {
+    const params = new URLSearchParams();
+    if (cell?.site_id != null) params.set('site_id', String(cell.site_id));
+    if (cell?.cell_name) params.set('cell_name', String(cell.cell_name));
+    if (cell?.technology) params.set('technology', String(cell.technology));
+    if (cell?.vendor) params.set('vendor', String(cell.vendor));
+    const qs = params.toString();
+    return qs ? `/performance?${qs}` : '/performance';
+}
+
 // Cluster number → Area name  (cluster = Math.floor(site_id / 100))
 const CLUSTER_AREA = {
      3: 'East Amman',  13: 'East Amman',  17: 'East Amman',  21: 'East Amman',
@@ -1163,7 +1181,7 @@ function displaySiteInfo(site, cells) {
         ${offlineNote}
         ${techHtml}
         <div class="site-panel-actions">
-        <a href="/performance?site_id=${encodeURIComponent(site.site_id)}"
+        <a href="${escapeHtmlAttr(performanceUrlForSite(site))}"
            class="kpi-link">
             📈 In-depth KPI
         </a>
@@ -1349,14 +1367,7 @@ function renderKPIModal(cell) {
            ${detailsTable}`
         : `<p style="color:#95a5a6;">No KPI data available</p>`;
 
-    const perfUrl = (() => {
-        const params = new URLSearchParams();
-        if (cell.site_id != null) params.set('site_id', String(cell.site_id));
-        if (cell.cell_name) params.set('cell_name', String(cell.cell_name));
-        if (cell.technology) params.set('technology', String(cell.technology));
-        const qs = params.toString();
-        return qs ? `/performance?${qs}` : '/performance';
-    })();
+    const perfUrl = performanceUrlForCell(cell);
 
     document.getElementById('kpi-content').innerHTML = `
         <span class="close-modal" onclick="closeKPIModal()">&times;</span>

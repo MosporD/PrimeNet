@@ -290,14 +290,16 @@
 <script>
     window.PERF_KPI_CATEGORY_MAP_URL = "{{ url_for('performance.get_kpi_mapping') }}";
 </script>
-<script src="{{ url_for('performance.static', filename='performance.js') }}?v=8.9"></script>
+<script src="{{ url_for('performance.static', filename='performance.js') }}?v=9.4"></script>
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const params = new URLSearchParams(window.location.search);
-        if (params.get('vendor'))     document.getElementById('filter-vendor').value = params.get('vendor');
-        if (params.get('technology')) document.getElementById('filter-tech').value   = params.get('technology');
-
-        await loadFilters();
+        if (typeof capturePerfDeepLinkParams === 'function') {
+            capturePerfDeepLinkParams(params);
+        }
+        const dl = window.perfDeepLinkParams || {};
+        if (dl.vendor)     document.getElementById('filter-vendor').value = dl.vendor;
+        if (dl.technology) document.getElementById('filter-tech').value   = dl.technology;
 
         if (params.get('area') && document.getElementById('filter-area')) {
             document.getElementById('filter-area').value = params.get('area');
@@ -305,16 +307,17 @@
         if (params.get('cluster') && document.getElementById('filter-cluster')) {
             document.getElementById('filter-cluster').value = params.get('cluster');
         }
-        if (params.get('site_id'))   document.getElementById('filter-site').value   = params.get('site_id');
-        if (params.get('cell_id') || params.get('cell_name')) {
-            document.getElementById('filter-cell').value = params.get('cell_id') || params.get('cell_name') || '';
+        if (dl.site_id)   document.getElementById('filter-site').value   = dl.site_id;
+        if (dl.cell_name) {
+            document.getElementById('filter-cell').value = dl.cell_name;
         }
 
-        const deepLinkFilters = params.get('site_id') || params.get('area') || params.get('cluster')
-            || params.get('cell_id') || params.get('cell_name');
-        if (deepLinkFilters) {
-            await applyFilters();
+        const deepLinkFilters = dl.site_id || params.get('area') || params.get('cluster') || dl.cell_name;
+        if (deepLinkFilters && typeof bootstrapPerformanceDeepLink === 'function') {
+            await bootstrapPerformanceDeepLink(dl);
         } else {
+            await loadFilterCatalog();
+            scheduleLoadFiltersSidebarExtras();
             await onVendorChange();
         }
 

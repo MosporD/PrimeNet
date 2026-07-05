@@ -28,6 +28,178 @@ let lastQueryCellKeys = [];
 let lastQuerySelectionType = 'cell';
 let performanceReports = [];
 let perfBottomMode = 'kpis';
+
+/** Deep-link query params from Network Map (or other modules). */
+window.perfDeepLinkParams = null;
+
+function _perfNormalizeFilterTech(tech) {
+    const t = String(tech || '').trim();
+    if (!t) return '';
+    const up = t.toUpperCase();
+    if (up === '4G-FDD' || up === '4G-TDD' || up.startsWith('4G-')) return '4G';
+    if (up.startsWith('5G')) return '5G';
+    if (up.startsWith('3G')) return '3G';
+    if (up.startsWith('2G')) return '2G';
+    if (['2G', '3G', '4G', '5G'].includes(up)) return up;
+    return t;
+}
+
+function capturePerfDeepLinkParams(params) {
+    const p = params instanceof URLSearchParams
+        ? params
+        : new URLSearchParams(window.location.search);
+    const technologyRaw = (p.get('technology') || '').trim();
+    window.perfDeepLinkParams = {
+        vendor: (p.get('vendor') || '').trim(),
+        technology: _perfNormalizeFilterTech(technologyRaw),
+        technologyRaw,
+        site_id: (p.get('site_id') || '').trim(),
+        cell_name: (p.get('cell_name') || p.get('cell_id') || '').trim(),
+    };
+}
+
+function _perfDeepLinkTrendContext() {
+    const p = window.perfDeepLinkParams || {};
+    return {
+        vendor: (p.vendor || document.getElementById('filter-vendor')?.value || '').trim(),
+        site_id: (p.site_id || document.getElementById('filter-site')?.value || '').trim(),
+        technology: (p.technologyRaw || p.technology
+            || document.getElementById('filter-tech')?.value || '').trim(),
+        cell_name: (p.cell_name || '').trim(),
+    };
+}
+
+async function _perfFetchJson(url, opts = {}) {
+    const res = await fetch(url, { credentials: 'same-origin', ...opts });
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    let data;
+    if (ct.includes('application/json')) {
+        data = await res.json();
+    } else {
+        const text = await res.text();
+        const hint = text.trimStart().startsWith('<')
+            ? 'Server returned an HTML page (check login or API route).'
+            : text.slice(0, 120);
+        throw new Error(res.ok ? `Non-JSON response: ${hint}` : `HTTP ${res.status}: ${hint}`);
+    }
+    if (!res.ok || data.success === false) {
+        throw new Error(data.error || `HTTP ${res.status}`);
+    }
+    return data;
+}
+
+function _resolveCellKeyFromDeepLink(cellRef, deepLink) {
+    const ref = String(cellRef || '').trim();
+    if (!ref) return '';
+    if (ref.includes('||')) return ref;
+
+    const p = deepLink || window.perfDeepLinkParams || {};
+    const siteId = (p.site_id || '').trim();
+    const vendor = (p.vendor || '').trim();
+    const tech = (p.technologyRaw || p.technology || '').trim();
+
+    let candidates = allCells.filter(c =>
+        String(c.cell_name || '').trim() === ref
+        || String(c.cell_key || c.cell_id || '').trim() === ref
+    );
+    if (siteId) {
+        candidates = candidates.filter(c => String(c.site_id || '') === siteId);
+    }
+    if (vendor) {
+        candidates = candidates.filter(c => String(c.vendor || '') === vendor);
+    }
+    if (tech) {
+        const norm = _perfNormalizeFilterTech(tech);
+        candidates = candidates.filter(c => {
+            const ct = String(c.technology || '');
+            if (ct === tech) return true;
+            if (norm === '4G' && (ct === '4G-FDD' || ct === '4G-TDD')) return true;
+            return _perfNormalizeFilterTech(ct) === norm;
+        });
+    }
+    if (!candidates.length) return ref;
+    return String(candidates[0].cell_key || candidates[0].cell_id || ref);
+}
+
+function _activatePerfTreeCellKey(cellKey) {
+    if (!cellKey) return;
+    document.querySelectorAll('#cell-list .hw-tree-leaf').forEach(leaf => {
+        const k = leaf.getAttribute('data-cell-key') || '';
+        leaf.classList.toggle('active', k === String(cellKey));
+    });
+}
+
+function _syncPerfDeepLinkSite(dl) {
+    const p = dl || window.perfDeepLinkParams;
+    if (!p) return;
+    const siteId = (p.site_id || document.getElementById('filter-site')?.value || '').trim();
+    if (!siteId || !allSites.length) return;
+    const found = allSites.find(s => String(s.site_id) === siteId);
+    const siteHidden = document.getElementById('filter-site');
+    const siteInput = document.getElementById('filter-site-search');
+    if (found && siteHidden && siteInput) {
+        siteHidden.value = String(found.site_id);
+        siteInput.value = `${found.site_name} (${found.site_id})`;
+    }
+}
+
+function _perfShowCellsLoading(show) {
+    const list = document.getElementById('cell-list');
+    if (!list) return;
+    if (show) {
+        list.innerHTML = '<p class="perf-tree-empty">Loading cells…</p>';
+    }
+}
+
+async function applyPerfDeepLinkChart(dl) {
+    const p = dl || window.perfDeepLinkParams;
+    if (!p) return;
+    const cellRef = (document.getElementById('filter-cell')?.value || p.cell_name || '').trim();
+    if (!cellRef) return;
+    await loadCellCharts(cellRef);
+    const resolved = _resolveCellKeyFromDeepLink(cellRef, p);
+    if (!resolved) return;
+    const cellHidden = document.getElementById('filter-cell');
+    if (cellHidden) cellHidden.value = resolved;
+    activeCellId = resolved;
+    _materializeAllAreas();
+    _activatePerfTreeCellKey(resolved);
+}
+
+async function bootstrapPerformanceDeepLink(dl) {
+    _perfShowCellsLoading(true);
+    scheduleLoadFiltersSidebarExtras();
+    const catalogTask = loadFilterCatalog();
+
+    if (dl.cell_name) {
+        await catalogTask;
+        _syncPerfDeepLinkSite(dl);
+        await Promise.all([
+            applyFilters({ skipAutoChart: true, skipKpiColumns: true }),
+            applyPerfDeepLinkChart(dl),
+        ]);
+        _perfShowCellsLoading(false);
+        return;
+    }
+
+    await Promise.all([
+        catalogTask,
+        applyFilters({ skipAutoChart: true, skipKpiColumns: true }),
+    ]);
+    _syncPerfDeepLinkSite(dl);
+    _perfShowCellsLoading(false);
+}
+
+async function applyPerfDeepLinkAfterFilters() {
+    const dl = window.perfDeepLinkParams;
+    if (!dl) return;
+    _syncPerfDeepLinkSite(dl);
+    if (dl.cell_name) await applyPerfDeepLinkChart(dl);
+}
+
+window.capturePerfDeepLinkParams = capturePerfDeepLinkParams;
+window.applyPerfDeepLinkAfterFilters = applyPerfDeepLinkAfterFilters;
+window.bootstrapPerformanceDeepLink = bootstrapPerformanceDeepLink;
 let perfLeftPanelCollapsed = false;
 let perfPreferredPmViewMode = 'charts';
 let perfPmViewPrefPromise = null;
@@ -49,6 +221,8 @@ let hwCurrentVendor = '';
 let hwCurrentScopedCellNames = [];
 let hwCurrentScopedGroupRefs = [];
 let hwLastTablePayload = null;
+let hwChartTrendCache = null;
+let hwChartTrendCacheSig = '';
 let hwSearchTimer   = null;
 const HW_PAGE_SIZE  = 20;
 
@@ -742,23 +916,41 @@ function _perfChartXScaleOptions(trend, isDod) {
 // Filter dropdowns
 // ============================================================
 
-async function loadFilters() {
-    await loadKpiHeaderMap();
-    await loadKpiColumns();
-    await loadCellGroups();
-    await loadPerformanceReports();
-
-    const res  = await fetch('/api/performance/filters');
+async function loadFilterCatalog() {
+    const res = await fetch('/api/performance/filters');
     const data = await res.json();
     if (!data.success) return;
 
-    allSites    = data.sites;
+    allSites = data.sites;
     allClusters = data.clusters || [];
-    allAreas    = data.areas    || [];
+    allAreas = data.areas || [];
 
     _populateClusters(allClusters);
     _populateAreas(allAreas);
     _populateSites(allSites);
+}
+
+async function loadFiltersSidebarExtras() {
+    await Promise.all([
+        loadKpiHeaderMap(),
+        loadKpiColumns(),
+        loadCellGroups(),
+        loadPerformanceReports(),
+    ]);
+}
+
+function scheduleLoadFiltersSidebarExtras() {
+    const run = () => { loadFiltersSidebarExtras().catch(() => {}); };
+    if (typeof requestIdleCallback === 'function') {
+        requestIdleCallback(run, { timeout: 2000 });
+    } else {
+        setTimeout(run, 100);
+    }
+}
+
+async function loadFilters() {
+    await loadFilterCatalog();
+    await loadFiltersSidebarExtras();
 }
 
 function setPerfBottomMode(mode) {
@@ -1279,8 +1471,7 @@ async function onVendorChange() {
     hwCurrentScopedGroupRefs = [];
     _setPerfChartChoiceVisible(false);
 
-    await loadKpiColumns();
-    await loadCellGroups();
+    await Promise.all([loadKpiColumns(), loadCellGroups()]);
     await maybeAutoReloadCells();
 }
 
@@ -1498,6 +1689,14 @@ async function maybeAutoReloadCells() {
 async function runPerformanceQuery() {
     onKpiSelectionChange();
 
+    const btn = document.getElementById('btn-perf-query');
+    const btnLabel = btn ? btn.textContent : '';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Querying…';
+    }
+
+    try {
     const v = (document.getElementById('filter-vendor')?.value || '').trim();
     const t = (document.getElementById('filter-tech')?.value || '').trim();
     const selectionType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
@@ -1567,6 +1766,8 @@ async function runPerformanceQuery() {
 
     lastQueryCellKeys = [...keys];
     lastQuerySelectionType = selectionType;
+    hwChartTrendCache = null;
+    hwChartTrendCacheSig = '';
     // New query = new chart session; avoid old multi-chart tabs resurfacing.
     chartTabs = [];
     activeChartTabId = null;
@@ -1590,10 +1791,21 @@ async function runPerformanceQuery() {
         compareBtn.style.display = (selectionType !== 'group' && cellOnlyCount >= 2) ? 'inline-flex' : 'none';
     }
 
-    switchViewMode('table');
-    _perfQueryUserMessage(`Loaded ${keys.length} selected object(s). Choose Template Charts or Add Chart to visualize.`);
+    switchViewMode('table', { skipTableLoad: true });
+    await loadPmTable(v, t, '', 1, hwCurrentScopedCellNames);
+    if (KPI_DEFS.length && kpiSelectedKeys.size === 0) {
+        _perfQueryUserMessage(`Loaded ${keys.length} object(s). Select KPIs below, then Query again for metric columns.`);
+    } else {
+        _perfQueryUserMessage(`Loaded ${keys.length} selected object(s). Choose Template Charts or Add Chart to visualize.`);
+    }
     const noSel = document.getElementById('no-selection');
     if (noSel) noSel.style.display = 'none';
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = btnLabel || 'Query';
+        }
+    }
 }
 
 async function addChartsFromLastQuery() {
@@ -1622,48 +1834,31 @@ async function addChartsFromLastQuery() {
     if (tabBar) tabBar.style.display = 'none';
 
     const uniqueKeys = [...new Set(lastQueryCellKeys.map(k => String(k || '').trim()).filter(Boolean))];
+    const cellKeys = uniqueKeys.filter(k => !k.includes(':raw:'));
+    const groupKeys = uniqueKeys.filter(k => k.includes(':raw:'));
     let added = 0;
 
-    for (const key of uniqueKeys) {
+    // Fast path: reuse PM table rows (same data you already loaded) instead of N trend API calls.
+    if (cellKeys.length && hwCurrentVendor && hwCurrentTech) {
         try {
-            if (key.includes(':raw:')) {
-                const params = new URLSearchParams({
-                    group_ref: key,
-                    granularity: _currentTrendGranularity(),
-                    data_scope: _currentDataScope(),
-                });
-                if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
-                    params.set('kpi', [...kpiSelectedKeys].join(','));
-                }
-                const res = await fetch(`/api/performance/group/trend?${params.toString()}`);
-                const data = await res.json();
-                if (!data.success) throw new Error(data.error || 'Failed to load group trend');
-                const group = data.group || {};
-                const trend = Array.isArray(data.trend) ? data.trend : [];
-                if (!trend.length) continue;
-                const pseudoPayload = {
-                    cell: {
-                        cell_name: group.name || 'Group',
-                        vendor: group.vendor || '',
-                        technology: '',
-                        site_id: '',
-                        cell_key: key,
-                    },
-                    trend,
-                };
-                upsertPerfChartTab(pseudoPayload, 'full', key);
-                added++;
-            } else {
-                const data = await fetchCellTrendData(key);
-                const trend = Array.isArray(data.trend) ? data.trend : [];
-                if (!trend.length) continue;
-                upsertPerfChartTab(data, 'full', key);
-                added++;
+            const tableData = await _fetchPmTableForCharts();
+            if (tableData?.success && Array.isArray(tableData.rows) && tableData.rows.length) {
+                added += _addChartTabsFromPmTable(tableData, cellKeys);
             }
         } catch (_) {
-            // Skip failed object; continue with the rest.
+            // Fall through to per-cell trend API.
         }
     }
+
+    const chartedKeys = new Set(chartTabs.map(t => t.treeKey).filter(Boolean));
+    const remainingCells = cellKeys.filter(k => !chartedKeys.has(k));
+
+    const tasks = [
+        ...groupKeys.map(key => _fetchAndUpsertGroupChartTab(key)),
+        ...remainingCells.map(key => _fetchAndUpsertCellChartTab(key)),
+    ];
+    const results = await Promise.all(tasks);
+    added += results.filter(Boolean).length;
 
     if (loading) loading.style.display = 'none';
 
@@ -1676,6 +1871,132 @@ async function addChartsFromLastQuery() {
     perfDodPickerNeedsReset = true;
     const br = document.getElementById('btn-refresh');
     if (br) br.style.display = 'inline-flex';
+}
+
+function _pmChartCacheSig() {
+    return [
+        hwCurrentVendor || '',
+        hwCurrentTech || '',
+        _currentDataScope(),
+        [...(hwCurrentScopedCellNames || [])].sort().join('|'),
+        [...(hwCurrentScopedGroupRefs || [])].sort().join('|'),
+    ].join('||');
+}
+
+async function _fetchPmTableForCharts() {
+    if (!hwCurrentVendor || !hwCurrentTech) return null;
+    const sig = _pmChartCacheSig();
+    if (hwChartTrendCache && hwChartTrendCacheSig === sig) {
+        return hwChartTrendCache;
+    }
+    const params = new URLSearchParams({
+        vendor: hwCurrentVendor,
+        technology: hwCurrentTech,
+        for_charts: '1',
+        data_scope: _currentDataScope(),
+    });
+    if (kpiSelectedKeys.size > 0) {
+        params.set('kpi', [...kpiSelectedKeys].join(','));
+    }
+    (hwCurrentScopedCellNames || []).forEach(n => params.append('cell_name', n));
+    (hwCurrentScopedGroupRefs || []).forEach(g => params.append('group_ref', g));
+    const res = await fetch('/api/performance/pm-table?' + params.toString());
+    const data = await res.json();
+    if (!data?.success) throw new Error(data?.error || 'Failed to load chart data');
+    hwChartTrendCache = data;
+    hwChartTrendCacheSig = sig;
+    return data;
+}
+
+function prefetchPmChartData() {
+    if (!hwCurrentVendor || !hwCurrentTech) return;
+    if (!hwCurrentScopedCellNames?.length && !hwCurrentScopedGroupRefs?.length) return;
+    _fetchPmTableForCharts().catch(() => {});
+}
+
+function _cellNameFromQueryKey(key) {
+    const parts = String(key || '').split('||');
+    if (parts.length === 4) return parts[3];
+    const row = allCells.find(c => String(c.cell_key || c.cell_id) === String(key));
+    return row?.cell_name || String(key || '');
+}
+
+function _cellMetaFromQueryKey(key) {
+    const row = allCells.find(c => String(c.cell_key || c.cell_id) === String(key));
+    if (row) return row;
+    const parts = String(key || '').split('||');
+    if (parts.length === 4) {
+        return {
+            cell_name: parts[3],
+            vendor: parts[0],
+            technology: parts[1],
+            site_id: parts[2],
+            cell_key: key,
+        };
+    }
+    return { cell_name: String(key || ''), cell_key: key };
+}
+
+function _addChartTabsFromPmTable(tableData, cellKeys) {
+    const byCell = new Map();
+    (tableData.rows || []).forEach(row => {
+        const cn = String(row.cell_name || '').trim().toLowerCase();
+        if (!cn) return;
+        if (!byCell.has(cn)) byCell.set(cn, []);
+        byCell.get(cn).push(row);
+    });
+
+    let added = 0;
+    cellKeys.forEach(key => {
+        const nameKey = _cellNameFromQueryKey(key).trim().toLowerCase();
+        const trend = byCell.get(nameKey);
+        if (!trend?.length) return;
+        upsertPerfChartTab({ cell: _cellMetaFromQueryKey(key), trend }, 'full', key);
+        added++;
+    });
+    return added;
+}
+
+async function _fetchAndUpsertGroupChartTab(key) {
+    try {
+        const params = new URLSearchParams({
+            group_ref: key,
+            granularity: _currentTrendGranularity(),
+            data_scope: _currentDataScope(),
+        });
+        if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
+            params.set('kpi', [...kpiSelectedKeys].join(','));
+        }
+        const data = await _perfFetchJson(`/api/performance/group/trend?${params.toString()}`);
+        const group = data.group || {};
+        const trend = Array.isArray(data.trend) ? data.trend : [];
+        if (!trend.length) return false;
+        upsertPerfChartTab({
+            cell: {
+                cell_name: group.name || 'Group',
+                vendor: group.vendor || '',
+                technology: '',
+                site_id: '',
+                cell_key: key,
+            },
+            trend,
+        }, 'full', key);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+async function _fetchAndUpsertCellChartTab(key) {
+    try {
+        const data = await fetchCellTrendData(key);
+        const trend = Array.isArray(data.trend) ? data.trend : [];
+        if (!trend.length) return false;
+        upsertPerfChartTab(data, 'full', key);
+        return true;
+    } catch (_) {
+        return false;
+    }
 }
 
 function _buildCellTrendParamsFromKey(cellId) {
@@ -1696,9 +2017,40 @@ function _buildCellTrendParamsFromKey(cellId) {
         params.set('site_id', String(keyParts[2] || ''));
         params.set('cell_name', String(keyParts[3] || ''));
     } else {
-        params.set('cell_name', String(cellId || ''));
+        const ctx = _perfDeepLinkTrendContext();
+        params.set('cell_name', String(cellId || ctx.cell_name || ''));
+        if (ctx.technology) params.set('technology', ctx.technology);
+        if (ctx.site_id) params.set('site_id', ctx.site_id);
+        if (ctx.vendor) params.set('vendor', ctx.vendor);
     }
     return params;
+}
+
+async function _fetchPmTableTrendForCell(cellId) {
+    const meta = _cellMetaFromQueryKey(cellId);
+    const vendor = (meta.vendor
+        || document.getElementById('filter-vendor')?.value
+        || hwCurrentVendor || '').trim();
+    let technology = (meta.technology
+        || window.perfDeepLinkParams?.technologyRaw
+        || document.getElementById('filter-tech')?.value
+        || hwCurrentTech || '').trim();
+    if (technology === '4G' && window.perfDeepLinkParams?.technologyRaw) {
+        technology = window.perfDeepLinkParams.technologyRaw;
+    }
+    if (!vendor || !technology) return null;
+    const cellName = _cellNameFromQueryKey(cellId);
+    const params = new URLSearchParams({
+        vendor,
+        technology,
+        for_charts: '1',
+        data_scope: _currentDataScope(),
+    });
+    params.append('cell_name', cellName);
+    const res = await fetch('/api/performance/pm-table?' + params.toString());
+    const data = await res.json();
+    if (!data?.success || !Array.isArray(data.rows) || !data.rows.length) return null;
+    return { cell: meta, trend: data.rows };
 }
 
 async function fetchCellTrendData(cellId) {
@@ -1706,10 +2058,7 @@ async function fetchCellTrendData(cellId) {
     if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
         params.set('kpi', [...kpiSelectedKeys].join(','));
     }
-    const res = await fetch(`/api/performance/cell/trend?${params.toString()}`);
-    const data = await res.json();
-    if (!data.success) throw new Error(data.error || 'Failed to load trend');
-    return data;
+    return _perfFetchJson(`/api/performance/cell/trend?${params.toString()}`);
 }
 
 async function _resolveCellNamesFromQueryKeys(keys, selectionType, vendor, technology) {
@@ -1774,9 +2123,7 @@ async function loadGroupCharts(groupRef) {
         if (KPI_DEFS.length && kpiSelectedKeys.size > 0) {
             params.set('kpi', [...kpiSelectedKeys].join(','));
         }
-        const res  = await fetch(`/api/performance/group/trend?${params.toString()}`);
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error);
+        const data = await _perfFetchJson(`/api/performance/group/trend?${params.toString()}`);
         const group = data.group || {};
         const trend = data.trend || [];
         const pseudoPayload = {
@@ -1819,7 +2166,8 @@ async function applyFilters(opts = {}) {
     const selectionType = (document.getElementById('filter-selection-type')?.value || 'cell').trim();
     const cluster = document.getElementById('filter-cluster')?.value || '';
     const area    = document.getElementById('filter-area')?.value || '';
-    const site    = document.getElementById('filter-site').value;
+    const site    = (document.getElementById('filter-site').value
+        || window.perfDeepLinkParams?.site_id || '').trim();
     const cell    = document.getElementById('filter-cell').value;
 
     if (cell && !opts.skipAutoChart) {
@@ -1844,7 +2192,12 @@ async function applyFilters(opts = {}) {
 
     const params = new URLSearchParams();
     if (vendor)  params.set('vendor',     vendor);
-    if (tech)    params.set('technology', tech);
+    const dlTech = window.perfDeepLinkParams?.technologyRaw;
+    if (dlTech && /^(2G|3G|4G-FDD|4G-TDD|5G)$/i.test(dlTech)) {
+        params.set('technology', dlTech);
+    } else if (tech) {
+        params.set('technology', tech);
+    }
     if (cluster) params.set('cluster',    cluster);
     if (area)    params.set('area',       area);
     if (site)    params.set('site_id',    site);
@@ -2509,7 +2862,10 @@ async function loadCellCharts(cellId) {
     const hours = 'full';
 
     try {
-        const data = await fetchCellTrendData(cellId);
+        let data = await _fetchPmTableTrendForCell(cellId).catch(() => null);
+        if (!data) {
+            data = await fetchCellTrendData(cellId);
+        }
 
         const cell  = data.cell;
         const trend = data.trend;
@@ -2989,8 +3345,9 @@ function _esc(str) {
 /**
  * Switch between Charts and PM Database modes.
  * @param {'charts'|'table'} mode
+ * @param {{ skipTableLoad?: boolean }} [opts]
  */
-function switchViewMode(mode) {
+function switchViewMode(mode, opts = {}) {
     const noSel     = document.getElementById('no-selection');
     const cWrap     = document.getElementById('charts-wrap');
     const cLoad     = document.getElementById('loading-charts');
@@ -3024,9 +3381,9 @@ function switchViewMode(mode) {
 
         const vendor = document.getElementById('filter-vendor').value;
         const tech   = document.getElementById('filter-tech').value;
-        if (vendor && tech) {
+        if (vendor && tech && !opts.skipTableLoad) {
             loadPmTable(vendor, tech, '', 1, hwCurrentScopedCellNames);
-        } else {
+        } else if (!vendor || !tech) {
             document.getElementById('hw-table-container').innerHTML =
                 '<p class="hw-empty-msg" style="color:#e74c3c">Select a vendor and technology first.</p>';
         }
@@ -3071,6 +3428,9 @@ async function loadPmTable(vendor, technology, search, page, scopedCellNames = n
     const params = new URLSearchParams({ vendor, technology, page, page_size: HW_PAGE_SIZE });
     if (search) params.set('search', search);
     params.set('data_scope', _currentDataScope());
+    if (kpiSelectedKeys.size > 0) {
+        params.set('kpi', [...kpiSelectedKeys].join(','));
+    }
     (hwCurrentScopedCellNames || []).forEach(n => params.append('cell_name', n));
     (hwCurrentScopedGroupRefs || []).forEach(g => params.append('group_ref', g));
 
@@ -3117,8 +3477,13 @@ function renderPmTable(data) {
         if (exportBtn) exportBtn.style.display = 'none';
         return;
     }
+    if (data.kpi_limited) {
+        _perfQueryUserMessage('Showing identifiers only — select KPIs in the left panel, then Query again for metrics.');
+    }
     const exportBtn = document.getElementById('btn-export');
     if (exportBtn) exportBtn.style.display = 'inline-flex';
+
+    prefetchPmChartData();
 
     // Build <thead>
     const colHeaders = columns.map(col => {

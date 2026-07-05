@@ -44,7 +44,11 @@ from sync_config import (
 )
 from db.runtime import connect_app, connect_metadata, execute_query
 from database_enhanced import get_user_by_session, log_activity
-from modules.sync.metadata_active_sql import perf_per_tech_union_sql, perf_per_tech_union_sql_with_activity
+from modules.sync.metadata_active_sql import (
+    perf_per_tech_union_sql,
+    perf_per_tech_union_sql_with_activity,
+    perf_cell_source_sql_with_activity,
+)
 from .kpi_catalog import KPI_HEADERS_MAP
 from .kpi_mapping import get_kpi_mapping_payload
 
@@ -440,17 +444,19 @@ def _drop_duplicate_kpis(cols: list[str]) -> list[str]:
 # Lightweight in-memory cache for cell list queries
 # ---------------------------------------------------------------------------
 _CELL_LIST_CACHE = {}
-_CELL_LIST_CACHE_TTL_SEC = 45
+_CELL_LIST_CACHE_TTL_SEC = 120
 _TREND_CACHE = {}
-_TREND_CACHE_TTL_SEC = 120
+_TREND_CACHE_TTL_SEC = 300
 _TREND_CACHE_SCHEMA_VER = "v5"
-_PM_TABLE_CACHE_SCHEMA_VER = "v3"
+_PM_TABLE_CACHE_SCHEMA_VER = "v4"
 _PM_TABLE_CACHE = {}
-_PM_TABLE_CACHE_TTL_SEC = 90
+_PM_TABLE_CACHE_TTL_SEC = 180
 _PM_CELL_NAMES_CACHE = {}
 _PM_CELL_NAMES_CACHE_TTL_SEC = 300
 _PM_CELL_NAMES_CACHE_LOCK = threading.Lock()
 _PM_CELL_NAMES_CACHE_INFLIGHT: set[str] = set()
+_FILTERS_CACHE = {}
+_FILTERS_CACHE_TTL_SEC = 180
 
 
 def _db_mtime_token(db_path: str) -> str:
@@ -549,6 +555,7 @@ def _trend_cache_set(key: str, payload):
 
 
 _PM_EXPORT_MAX_ROWS = 200_000
+_PM_CHARTS_MAX_ROWS = 15_000
 
 
 def _pm_table_csv_response(
@@ -932,7 +939,105 @@ def _ensure_reports_table():
 def _meta_conn():
     conn = sqlite3.connect(METADATA_DB, timeout=15)
     conn.execute('PRAGMA journal_mode=WAL')
+    conn.execute('PRAGMA synchronous=NORMAL')
+    conn.execute('PRAGMA cache_size=-80000')
     conn.row_factory = sqlite3.Row
+    return conn
+
+
+_PM_INDEX_ENSURED_PATHS: set[str] = set()
+_PM_INDEX_ENSURE_LOCK = threading.Lock()
+_PM_TABLE_META_CACHE: dict[str, dict] = {}
+
+
+def _pm_table_meta_cache_key(db_path: str, vendor: str, technology: str) -> str:
+    return '||'.join([
+        os.path.abspath(str(db_path)),
+        str(vendor or ''),
+        str(technology or ''),
+        _db_mtime_token(db_path),
+    ])
+
+
+def _resolve_pm_table_bundle(
+    conn: sqlite3.Connection,
+    db_path: str,
+    vendor: str,
+    technology: str,
+) -> dict | None:
+    key = _pm_table_meta_cache_key(db_path, vendor, technology)
+    hit = _PM_TABLE_META_CACHE.get(key)
+    if hit:
+        return hit
+    table = _resolve_pm_table_sqlite(conn, vendor, technology, '', None)
+    if not table:
+        return None
+    cell_col, time_col = _resolve_pm_axis_columns_sqlite(conn, table)
+    if not cell_col or not time_col:
+        return None
+    all_cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
+    if not all_cols:
+        return None
+    existing_static, ordered_cols = _build_pm_table_column_layout(
+        vendor, technology, all_cols, cell_col, time_col,
+    )
+    bundle = {
+        'table': table,
+        'cell_col': cell_col,
+        'time_col': time_col,
+        'existing_static': existing_static,
+        'ordered_cols': ordered_cols,
+    }
+    _PM_TABLE_META_CACHE[key] = bundle
+    return bundle
+
+
+def _pm_table_output_columns(
+    existing_static: list[str],
+    ordered_cols: list[str],
+    requested_kpis: list[str] | None,
+    *,
+    export_csv: bool,
+    for_charts: bool,
+) -> list[str]:
+    if export_csv or for_charts:
+        if requested_kpis:
+            allowed = set(existing_static) | set(requested_kpis)
+            return [c for c in ordered_cols if c in allowed]
+        return ordered_cols
+    if requested_kpis:
+        allowed = set(existing_static) | set(requested_kpis)
+        return [c for c in ordered_cols if c in allowed]
+    return list(existing_static)
+
+
+def _pm_table_cell_scope_sql(resolved_cell_col: str, scoped_cell_names: list[str]) -> tuple[str, list]:
+    """Index-friendly cell filter (no LOWER/TRIM expression on the column)."""
+    if not scoped_cell_names:
+        return '', []
+    placeholders = ','.join(['?'] * len(scoped_cell_names))
+    clause = f'{_sqlite_ident(resolved_cell_col)} IN ({placeholders})'
+    return clause, list(scoped_cell_names)
+
+
+def _open_pm_db(db_path: str) -> sqlite3.Connection:
+    """Open PM SQLite with read-friendly pragmas (large DBs on Windows)."""
+    abs_path = os.path.normpath(os.path.abspath(db_path))
+    with _PM_INDEX_ENSURE_LOCK:
+        if abs_path not in _PM_INDEX_ENSURED_PATHS and os.path.isfile(abs_path):
+            _PM_INDEX_ENSURED_PATHS.add(abs_path)
+            try:
+                from core.pm_indexes import ensure_pm_database
+                ensure_pm_database(abs_path, analyze=False)
+            except Exception:
+                pass
+    conn = sqlite3.connect(db_path, timeout=15)
+    conn.row_factory = sqlite3.Row
+    conn.execute('PRAGMA journal_mode=WAL')
+    conn.execute('PRAGMA synchronous=NORMAL')
+    conn.execute('PRAGMA temp_store=MEMORY')
+    conn.execute('PRAGMA cache_size=-80000')
+    conn.execute('PRAGMA mmap_size=268435456')
     return conn
 
 
@@ -2144,13 +2249,21 @@ def get_filters():
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
 
+    meta_ver = _db_mtime_token(METADATA_DB)
+    cached = _FILTERS_CACHE.get(meta_ver)
+    if cached:
+        expires_at, payload = cached
+        if expires_at >= time.time():
+            out = dict(payload)
+            out['cached'] = True
+            return jsonify(out)
+
     conn = _meta_conn()
-    union_sql = perf_per_tech_union_sql()
-    raw_sites = [dict(r) for r in _meta_exec(conn, f'''
-        SELECT DISTINCT s.site_id, s.site_name, s.vendor, s.latitude, s.longitude
-        FROM ({union_sql}) v
-        JOIN sites s ON s.site_id = v.site_id
-        ORDER BY s.site_name
+    raw_sites = [dict(r) for r in _meta_exec(conn, '''
+        SELECT site_id, site_name, vendor, latitude, longitude
+        FROM sites
+        WHERE site_id IS NOT NULL
+        ORDER BY site_name
     ''').fetchall()]
     area_index = _build_site_area_index(conn)
     conn.close()
@@ -2172,7 +2285,9 @@ def get_filters():
     clusters = sorted(cluster_set)
     areas    = [{'cluster': c, 'area': a} for c, a in sorted(area_pairs)]
 
-    return jsonify({'success': True, 'clusters': clusters, 'areas': areas, 'sites': sites})
+    payload = {'success': True, 'clusters': clusters, 'areas': areas, 'sites': sites, 'cached': False}
+    _FILTERS_CACHE[meta_ver] = (time.time() + _FILTERS_CACHE_TTL_SEC, payload)
+    return jsonify(payload)
 
 
 # ---------------------------------------------------------------------------
@@ -2197,7 +2312,7 @@ def get_cells():
         site_id,
         cluster,
         area,
-        _pm_data_version_token(vendor if vendor else "", include_metadata=True, scope=data_scope),
+        _db_mtime_token(METADATA_DB),
     )
     cached_cells = _cell_cache_get(cache_key)
     if cached_cells is not None:
@@ -2216,8 +2331,8 @@ def get_cells():
             where.append('v.technology = ?')
             params.append(technology)
     if site_id:
-        where.append('v.site_id = ?')
-        params.append(site_id)
+        where.append('CAST(v.site_id AS TEXT) = ?')
+        params.append(str(site_id).strip())
 
     meta = _meta_conn()
     area_index = _build_site_area_index(meta)
@@ -2247,14 +2362,11 @@ def get_cells():
     meta.close()
 
     where_sql = ' AND '.join(where)
-    union_sql = perf_per_tech_union_sql_with_activity()
+    source_sql = perf_cell_source_sql_with_activity(technology)
 
-    conn, _pm_alias = _pm_conn(vendor if vendor else None, scope=data_scope)
-
+    # Metadata-only query — do not ATTACH multi-GB PM databases (was causing ~60s opens).
+    conn = _meta_conn()
     try:
-        # Fast path for cell tree loading:
-        # return metadata-driven objects only (no PM latest timestamp join).
-        # The UI does not use kpi_ts for rendering the cell tree.
         sql = f'''
             SELECT
                 v.cell_name AS cell_id,
@@ -2263,33 +2375,14 @@ def get_cells():
                 v.activity_status,
                 st.site_id, st.site_name, st.latitude, st.longitude,
                 NULL AS kpi_ts
-            FROM ({union_sql}) v
-            LEFT JOIN sites st ON v.site_id = st.site_id
+            FROM ({source_sql}) v
+            LEFT JOIN sites st ON CAST(v.site_id AS TEXT) = CAST(st.site_id AS TEXT)
             WHERE {where_sql}
             ORDER BY st.site_name, v.cell_name
         '''
         rows = [dict(r) for r in _meta_exec(conn, sql, params).fetchall()]
-
-    except Exception:
-        # PM db doesn't exist yet (first run before any sync)
-        rows = [dict(r) for r in _meta_exec(conn, f'''
-            SELECT
-                v.cell_name AS cell_id,
-                v.cell_name, v.technology, v.vendor,
-                v.frequency_band, v.azimuth, v.pci,
-                v.activity_status,
-                st.site_id, st.site_name,
-                st.latitude, st.longitude, NULL AS kpi_ts
-            FROM ({union_sql}) v
-            LEFT JOIN sites st ON v.site_id = st.site_id
-            WHERE {where_sql}
-            ORDER BY st.site_name, v.cell_name
-        ''', params).fetchall()]
-
     finally:
         conn.close()
-
-    rows = _mark_rows_with_pm_data(rows, data_scope)
 
     # Enrich each row with derived cluster / area + legacy ``status`` alias (network map parity).
     for row in rows:
@@ -2371,7 +2464,7 @@ def get_cell_trend(cell_id):
     trend = []
     try:
         if table:
-            pm_conn = sqlite3.connect(pm_db)
+            pm_conn = _open_pm_db(pm_db)
             pm_conn.row_factory = sqlite3.Row
             table = _resolve_pm_table_sqlite(pm_conn, str(vendor or ''), str(cell_tech or ''), cell_name, table)
             if table:
@@ -2448,17 +2541,20 @@ def get_cell_trend_by_name():
 
     meta_conn = _meta_conn()
     area_index = _build_site_area_index(meta_conn)
-    union_sql = perf_per_tech_union_sql()
+    source_sql = perf_cell_source_sql_with_activity(technology or None)
     where = ['v.cell_name = ?']
     params = [cell_name]
     if technology:
-        where.append('v.technology = ?')
-        params.append(technology)
+        if technology == '4G':
+            where.append("(v.technology = '4G-FDD' OR v.technology = '4G-TDD')")
+        else:
+            where.append('v.technology = ?')
+            params.append(technology)
     if site_id:
         where.append('CAST(v.site_id AS TEXT) = ?')
         params.append(site_id)
     if vendor:
-        where.append('v.vendor = ?')
+        where.append('LOWER(TRIM(COALESCE(v.vendor, \'\'))) = LOWER(TRIM(?))')
         params.append(vendor)
 
     cell = _meta_exec(meta_conn, f'''
@@ -2467,8 +2563,8 @@ def get_cell_trend_by_name():
             v.cell_name, v.technology, v.vendor,
             v.frequency_band, v.azimuth, v.pci,
             st.site_id, st.site_name, st.latitude, st.longitude
-        FROM ({union_sql}) v
-        LEFT JOIN sites st ON st.site_id = v.site_id
+        FROM ({source_sql}) v
+        LEFT JOIN sites st ON CAST(v.site_id AS TEXT) = CAST(st.site_id AS TEXT)
         WHERE {' AND '.join(where)}
         LIMIT 1
     ''', params).fetchone()
@@ -2510,7 +2606,7 @@ def get_cell_trend_by_name():
     trend = []
     try:
         if table:
-            pm_conn = sqlite3.connect(pm_db)
+            pm_conn = _open_pm_db(pm_db)
             pm_conn.row_factory = sqlite3.Row
             table = _resolve_pm_table_sqlite(pm_conn, str(vendor or ''), str(pm_tech or ''), cell_name, table)
             if table:
@@ -2586,6 +2682,7 @@ def get_pm_table():
     scoped_cell_names = [str(x).strip() for x in request.args.getlist('cell_name') if str(x).strip()]
     scoped_group_refs = [str(x).strip() for x in request.args.getlist('group_ref') if str(x).strip()]
     export_csv = request.args.get('export', '').lower() in ('1', 'true', 'csv')
+    for_charts = request.args.get('for_charts', '').lower() in ('1', 'true', 'yes')
     page       = request.args.get('page', 1, type=int)
     page_size  = min(request.args.get('page_size', 100, type=int), 500)
     data_scope = _normalize_data_scope(request.args.get('data_scope'))
@@ -2759,56 +2856,25 @@ def get_pm_table():
     }
 
     db_path = _pm_db_for_vendor(vendor, data_scope)
-    table = None
-    resolved_cell_col = None
-    resolved_time_col = None
+    empty['cached'] = False
+    requested_kpis = _requested_trend_kpi_names()
     try:
-        pre_conn = sqlite3.connect(db_path, timeout=15)
-        table = _resolve_pm_table_sqlite(pre_conn, vendor, technology, "", None)
-        if table:
-            resolved_cell_col, resolved_time_col = _resolve_pm_axis_columns_sqlite(pre_conn, table)
-        pre_conn.close()
-    except Exception:
-        table = None
-    if not table or not resolved_cell_col or not resolved_time_col:
-        empty['cached'] = False
-        return jsonify(empty)
-
-    scoped_sig = '|'.join(sorted({n.lower() for n in scoped_cell_names}))
-    group_sig = '|'.join(sorted({g.lower() for g in scoped_group_refs}))
-    table_cache_key = _pm_table_cache_key(
-        vendor,
-        technology,
-        table,
-        f'{search}||{scoped_sig}||{group_sig}',
-        page,
-        page_size,
-        _pm_data_version_token(vendor, include_metadata=False, scope=data_scope),
-    )
-    if not export_csv:
-        cached_table_payload = _pm_table_cache_get(table_cache_key)
-        if cached_table_payload is not None:
-            out = dict(cached_table_payload)
-            out['cached'] = True
-            return jsonify(out)
-
-    try:
-        conn     = sqlite3.connect(db_path, timeout=15)
-        conn.row_factory = sqlite3.Row
-        all_cols = [r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()]
-
-        if not all_cols:
+        conn = _open_pm_db(db_path)
+        bundle = _resolve_pm_table_bundle(conn, db_path, vendor, technology)
+        if not bundle:
             conn.close()
-            empty['cached'] = False
             return jsonify(empty)
 
-        # Build column order: static first, then KPIs (legacy cell_name/timestamp slots).
-        existing_static, ordered_cols = _build_pm_table_column_layout(
-            vendor,
-            technology,
-            all_cols,
-            resolved_cell_col,
-            resolved_time_col,
+        table = bundle['table']
+        resolved_cell_col = bundle['cell_col']
+        resolved_time_col = bundle['time_col']
+        existing_static = bundle['existing_static']
+        ordered_cols = _pm_table_output_columns(
+            existing_static,
+            bundle['ordered_cols'],
+            requested_kpis,
+            export_csv=export_csv,
+            for_charts=for_charts,
         )
         col_select = ', '.join(
             _pm_table_select_col(
@@ -2819,22 +2885,37 @@ def get_pm_table():
             for c in ordered_cols
         )
 
+        scoped_sig = '|'.join(sorted({n.lower() for n in scoped_cell_names}))
+        group_sig = '|'.join(sorted({g.lower() for g in scoped_group_refs}))
+        kpi_sig = '|'.join(sorted(requested_kpis or [])) if requested_kpis else '__static__'
+        table_cache_key = _pm_table_cache_key(
+            vendor,
+            technology,
+            table,
+            f'{search}||{scoped_sig}||{group_sig}||{kpi_sig}',
+            page,
+            page_size,
+            _pm_data_version_token(vendor, include_metadata=False, scope=data_scope),
+        )
+        charts_cache_key = table_cache_key + '||for_charts' if for_charts else table_cache_key
+        if not export_csv:
+            cached_table_payload = _pm_table_cache_get(charts_cache_key if for_charts else table_cache_key)
+            if cached_table_payload is not None:
+                out = dict(cached_table_payload)
+                out['cached'] = True
+                conn.close()
+                return jsonify(out)
+
         where_parts = ['1=1']
-        params = []
+        params: list = []
         if search:
             where_parts.append(f'{_sqlite_ident(resolved_cell_col)} LIKE ?')
             params.append(f'%{search}%')
-        if scoped_cell_names:
-            placeholders = ','.join(['?'] * len(scoped_cell_names))
-            where_parts.append(
-                f'LOWER(TRIM(CAST({_sqlite_ident(resolved_cell_col)} AS TEXT))) IN ({placeholders})'
-            )
-            params.extend([n.lower() for n in scoped_cell_names])
+        scope_sql, scope_params = _pm_table_cell_scope_sql(resolved_cell_col, scoped_cell_names)
+        if scope_sql:
+            where_parts.append(scope_sql)
+            params.extend(scope_params)
         where_clause = ' AND '.join(where_parts)
-
-        total  = conn.execute(
-            f'SELECT COUNT(*) FROM "{table}" WHERE {where_clause}', params
-        ).fetchone()[0]
 
         column_labels = {'timestamp': ts_label, 'cell_name': cell_label}
         for dc in ('Date', 'date'):
@@ -2843,6 +2924,44 @@ def get_pm_table():
                 if 'timestamp' in ordered_cols:
                     column_labels['timestamp'] = 'Timestamp'
                 break
+
+        scoped_query = bool(scoped_cell_names)
+        if scoped_query and not export_csv and not for_charts:
+            offset = (page - 1) * page_size
+            rows = conn.execute(f'''
+                SELECT {col_select} FROM "{table}"
+                WHERE  {where_clause}
+                ORDER  BY {_sqlite_ident(resolved_time_col)} DESC
+                LIMIT  ? OFFSET ?
+            ''', params + [page_size, offset]).fetchall()
+            row_dicts = [dict(r) for r in rows]
+            if len(row_dicts) < page_size:
+                total = offset + len(row_dicts)
+            else:
+                total = conn.execute(
+                    f'SELECT COUNT(*) FROM "{table}" WHERE {where_clause}', params
+                ).fetchone()[0]
+            conn.close()
+            payload = {
+                'success':       True,
+                'columns':       ordered_cols,
+                'static_cols':   existing_static,
+                'column_labels': column_labels,
+                'rows':          row_dicts,
+                'total':         total,
+                'page':          page,
+                'page_size':     page_size,
+                'cell_label':    cell_label,
+                'kpi_limited':   not bool(requested_kpis),
+            }
+            _pm_table_cache_set(table_cache_key, payload)
+            out = dict(payload)
+            out['cached'] = False
+            return jsonify(out)
+
+        total  = conn.execute(
+            f'SELECT COUNT(*) FROM "{table}" WHERE {where_clause}', params
+        ).fetchone()[0]
 
         if export_csv:
             if total > _PM_EXPORT_MAX_ROWS:
@@ -2861,6 +2980,37 @@ def get_pm_table():
             conn.close()
             row_dicts = [dict(r) for r in rows]
             return _pm_table_csv_response(ordered_cols, column_labels, row_dicts, vendor, technology)
+
+        if for_charts:
+            if total > _PM_CHARTS_MAX_ROWS:
+                conn.close()
+                return jsonify({
+                    'error': (
+                        f'Too many rows ({total:,}) to chart at once '
+                        f'(limit {_PM_CHARTS_MAX_ROWS:,}). Narrow your cell selection.'
+                    ),
+                }), 400
+            rows = conn.execute(f'''
+                SELECT {col_select} FROM "{table}"
+                WHERE  {where_clause}
+                ORDER  BY {_sqlite_ident(resolved_time_col)} ASC
+            ''', params).fetchall()
+            conn.close()
+            payload = {
+                'success':       True,
+                'columns':       ordered_cols,
+                'static_cols':   existing_static,
+                'column_labels': column_labels,
+                'rows':          [dict(r) for r in rows],
+                'total':         total,
+                'page':          1,
+                'page_size':     total,
+                'cell_label':    cell_label,
+                'for_charts':    True,
+                'cached':        False,
+            }
+            _pm_table_cache_set(charts_cache_key, payload)
+            return jsonify(payload)
 
         offset = (page - 1) * page_size
         rows   = conn.execute(f'''

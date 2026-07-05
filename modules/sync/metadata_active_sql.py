@@ -278,3 +278,65 @@ def perf_per_tech_union_sql_with_activity() -> str:
             {_STATUS_5G} AS activity_status
         FROM cells_5g
     """
+
+
+def perf_cell_source_sql_with_activity(technology: str | None = None) -> str:
+    """Metadata cell rows for Performance — one RAT table when possible (avoids 5-way UNION)."""
+    tech = str(technology or '').strip()
+    if tech == '2G':
+        return f"""
+        SELECT
+            cell_name, site_id AS site_id, site_name AS site_name,
+            '2G' AS technology, vendor, frequency_band AS frequency_band,
+            CAST(azimuth AS REAL) AS azimuth,
+            CAST(COALESCE(NULLIF(TRIM(bcch), ''), NULLIF(TRIM(bcc), '')) AS INTEGER) AS pci,
+            {_STATUS_2G} AS activity_status
+        FROM cells_2g"""
+    if tech == '3G':
+        return f"""
+        SELECT
+            cell_name, nodeb_id AS site_id, nodeb_name AS site_name,
+            '3G' AS technology, vendor, dl_uarfcn AS frequency_band,
+            CAST(azimuth AS REAL) AS azimuth, CAST(psc AS INTEGER) AS pci,
+            {_STATUS_3G_FDD} AS activity_status
+        FROM cells_3g"""
+    if tech == '4G-FDD':
+        return f"""
+        SELECT
+            cell_name, enb_id_actual AS site_id, enb_name AS site_name,
+            '4G-FDD' AS technology, vendor, band AS frequency_band,
+            CAST(azimuth AS REAL) AS azimuth, CAST(pci AS INTEGER) AS pci,
+            {_STATUS_4G_FDD} AS activity_status
+        FROM cells_4g_fdd"""
+    if tech == '4G-TDD':
+        return f"""
+        SELECT
+            cell_name, enb_id_actual AS site_id, enb_name AS site_name,
+            '4G-TDD' AS technology, vendor, band AS frequency_band,
+            CAST(azimuth AS REAL) AS azimuth, CAST(pci AS INTEGER) AS pci,
+            {_STATUS_4G_TDD} AS activity_status
+        FROM cells_4g_tdd"""
+    if tech == '5G':
+        return f"""
+        SELECT
+            cell_name, gnb_id_actual AS site_id, gnb_name AS site_name,
+            '5G' AS technology, vendor, bw AS frequency_band,
+            CAST(azimuth AS REAL) AS azimuth, CAST(pci AS INTEGER) AS pci,
+            {_STATUS_5G} AS activity_status
+        FROM cells_5g"""
+    if tech == '4G':
+        return f"""
+        SELECT
+            cell_name, enb_id_actual AS site_id, enb_name AS site_name,
+            '4G-FDD' AS technology, vendor, band AS frequency_band,
+            CAST(azimuth AS REAL) AS azimuth, CAST(pci AS INTEGER) AS pci,
+            {_STATUS_4G_FDD} AS activity_status
+        FROM cells_4g_fdd
+        UNION ALL
+        SELECT
+            cell_name, enb_id_actual AS site_id, enb_name AS site_name,
+            '4G-TDD' AS technology, vendor, band AS frequency_band,
+            CAST(azimuth AS REAL) AS azimuth, CAST(pci AS INTEGER) AS pci,
+            {_STATUS_4G_TDD} AS activity_status
+        FROM cells_4g_tdd"""
+    return perf_per_tech_union_sql_with_activity()
