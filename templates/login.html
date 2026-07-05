@@ -4,49 +4,402 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Sign In</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-</head>
-<body>
-    <div class="auth-container">
-        <div class="auth-box">
-            <div class="auth-header">
-                <h1>PrimeNet</h1>
-                <p>Network Performance &amp; Configuration Platform</p>
-            </div>
-
-            <form id="login-form" class="auth-form">
-                <h2>Sign In</h2>
-                
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required autofocus>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-
-                <div id="error-message" class="error-message" style="display: none;"></div>
-
-                <button type="submit" class="btn-primary">Sign In</button>
-
-                <p class="auth-link">Internal users only. Contact administrator for account support.</p>
-            </form>
-        </div>
-    </div>
-
     <style>
+        :root {
+            --pn-bg-0: #020617;
+            --pn-bg-1: #061336;
+            --pn-cyan: #38bdf8;
+            --pn-cyan-soft: #7dd3fc;
+            --pn-ink: #e2eeff;
+            --pn-muted: #8fb3dd;
+            --pn-glass: rgba(8, 20, 52, 0.72);
+            --pn-line: rgba(96, 165, 250, 0.28);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--pn-ink);
+            min-height: 100vh;
+            overflow: hidden;
+            background:
+                radial-gradient(1200px 700px at 30% 40%, rgba(29, 78, 216, 0.22), transparent 65%),
+                radial-gradient(900px 600px at 85% 80%, rgba(14, 165, 233, 0.12), transparent 60%),
+                linear-gradient(160deg, var(--pn-bg-0) 0%, var(--pn-bg-1) 55%, #030a24 100%);
+        }
+
+        #constellation-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        /* Subtle scanline / vignette HUD overlay */
+        .hud-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(0deg, rgba(148, 197, 255, 0.016) 0 1px, transparent 1px 3px),
+                radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(1, 5, 18, 0.55) 100%);
+            z-index: 2;
+        }
+
+        .login-shell {
+            position: relative;
+            z-index: 3;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(360px, 480px);
+            align-items: center;
+            gap: 4vw;
+            padding: 4vh 6vw;
+        }
+
+        /* ── Brand / telemetry pane ─────────────────────────────── */
+        .brand-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+            max-width: 620px;
+        }
+
+        .brand-lockup {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .brand-logo {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 7px;
+            box-shadow:
+                0 0 0 1px rgba(125, 211, 252, 0.35),
+                0 0 34px rgba(56, 189, 248, 0.35);
+            animation: logo-pulse 4.5s ease-in-out infinite;
+        }
+
+        @keyframes logo-pulse {
+            0%, 100% { box-shadow: 0 0 0 1px rgba(125,211,252,0.35), 0 0 26px rgba(56,189,248,0.28); }
+            50%      { box-shadow: 0 0 0 1px rgba(125,211,252,0.55), 0 0 46px rgba(56,189,248,0.5); }
+        }
+
+        .brand-name {
+            font-size: clamp(2.1rem, 4.2vw, 3.2rem);
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            background: linear-gradient(92deg, #ffffff 0%, #bfe3ff 45%, #60c2f8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.05;
+        }
+
+        .brand-sub {
+            font-size: clamp(0.95rem, 1.4vw, 1.08rem);
+            color: var(--pn-muted);
+            letter-spacing: 0.04em;
+        }
+
+        .telemetry-card {
+            border: 1px solid var(--pn-line);
+            border-radius: 14px;
+            background: rgba(4, 12, 34, 0.55);
+            backdrop-filter: blur(6px);
+            padding: 16px 18px;
+            max-width: 480px;
+        }
+
+        .telemetry-head {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            color: var(--pn-cyan-soft);
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.9);
+            animation: live-blink 1.8s ease-in-out infinite;
+        }
+
+        @keyframes live-blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        .telemetry-ticker {
+            margin-top: 10px;
+            font-family: 'Consolas', 'SFMono-Regular', Menlo, monospace;
+            font-size: 0.86rem;
+            color: #b6d8ff;
+            min-height: 1.4em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .telemetry-ticker::before {
+            content: '»';
+            color: var(--pn-cyan);
+            margin-right: 8px;
+        }
+
+        .rat-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+            list-style: none;
+        }
+
+        .rat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: #cfe6ff;
+            border: 1px solid rgba(125, 211, 252, 0.22);
+            border-radius: 999px;
+            padding: 5px 11px;
+            background: rgba(8, 22, 56, 0.55);
+        }
+
+        .rat-chip i {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* ── Sign-in card ───────────────────────────────────────── */
+        .card-pane { display: flex; justify-content: center; }
+
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            border-radius: 18px;
+            border: 1px solid var(--pn-line);
+            background: var(--pn-glass);
+            backdrop-filter: blur(14px);
+            box-shadow:
+                0 24px 70px rgba(1, 6, 22, 0.75),
+                inset 0 1px 0 rgba(148, 197, 255, 0.12);
+            padding: 36px 36px 28px;
+            position: relative;
             overflow: hidden;
         }
-        .auth-container {
-            transition: transform 1200ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1200ms ease;
+
+        /* Corner brackets */
+        .auth-card::before,
+        .auth-card::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            border: 2px solid rgba(125, 211, 252, 0.55);
+            pointer-events: none;
         }
-        .auth-container.login-slide-up {
-            transform: translateY(-130%);
+        .auth-card::before { top: 10px; left: 10px; border-right: 0; border-bottom: 0; border-radius: 6px 0 0 0; }
+        .auth-card::after  { bottom: 10px; right: 10px; border-left: 0; border-top: 0; border-radius: 0 0 6px 0; }
+
+        .auth-card h2 {
+            font-size: 1.5rem;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        .auth-card .card-sub {
+            font-size: 0.86rem;
+            color: var(--pn-muted);
+            margin-bottom: 26px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--pn-cyan-soft);
+            margin-bottom: 7px;
+        }
+
+        .input-wrap { position: relative; }
+
+        .input-wrap .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.95rem;
+            opacity: 0.75;
+            pointer-events: none;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 12px 44px 12px 40px;
+            border-radius: 10px;
+            border: 1px solid rgba(96, 165, 250, 0.35);
+            background: rgba(3, 10, 30, 0.72);
+            color: var(--pn-ink);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-wrap input:focus {
+            border-color: var(--pn-cyan);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18), 0 0 18px rgba(56, 189, 248, 0.25);
+        }
+
+        .input-wrap input::placeholder { color: rgba(143, 179, 221, 0.45); }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: var(--pn-muted);
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+        }
+        .toggle-password:hover { color: var(--pn-cyan-soft); }
+
+        .capslock-hint {
+            display: none;
+            margin-top: 6px;
+            font-size: 0.76rem;
+            color: #fbbf24;
+        }
+        .capslock-hint.on { display: block; }
+
+        .error-message {
+            display: none;
+            margin: 4px 0 14px;
+            padding: 10px 12px;
+            border-radius: 9px;
+            border: 1px solid rgba(248, 113, 113, 0.5);
+            background: rgba(127, 29, 29, 0.35);
+            color: #fecaca;
+            font-size: 0.88rem;
+        }
+
+        .btn-signin {
+            width: 100%;
+            padding: 13px 16px;
+            margin-top: 6px;
+            border: 1px solid rgba(125, 211, 252, 0.5);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #04101f;
+            cursor: pointer;
+            background: linear-gradient(120deg, #7dd3fc 0%, #38bdf8 45%, #2563eb 100%);
+            background-size: 200% 100%;
+            transition: background-position 0.4s ease, box-shadow 0.25s ease, transform 0.15s ease;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.35);
+            position: relative;
+        }
+
+        .btn-signin:hover:not(:disabled) {
+            background-position: 100% 0;
+            box-shadow: 0 12px 38px rgba(56, 189, 248, 0.45);
+            transform: translateY(-1px);
+        }
+
+        .btn-signin:disabled { opacity: 0.75; cursor: wait; }
+
+        .btn-signin .btn-ping {
+            display: none;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(4, 16, 31, 0.35);
+            border-top-color: #04101f;
+            border-radius: 50%;
+            margin-right: 9px;
+            vertical-align: -2px;
+            animation: btn-spin 0.8s linear infinite;
+        }
+        .btn-signin.loading .btn-ping { display: inline-block; }
+
+        @keyframes btn-spin { to { transform: rotate(360deg); } }
+
+        .auth-note {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--pn-muted);
+        }
+
+        .card-footer-line {
+            margin-top: 22px;
+            padding-top: 14px;
+            border-top: 1px dashed rgba(96, 165, 250, 0.22);
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Consolas', 'SFMono-Regular', Menlo, monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: rgba(143, 179, 221, 0.75);
+        }
+
+        @keyframes card-shake {
+            10%, 90% { transform: translateX(-2px); }
+            20%, 80% { transform: translateX(3px); }
+            30%, 50%, 70% { transform: translateX(-5px); }
+            40%, 60% { transform: translateX(5px); }
+        }
+        .auth-card.shake { animation: card-shake 0.5s ease both; }
+
+        .page-credit {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 14px;
+            text-align: center;
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            color: rgba(143, 179, 221, 0.6);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* ── Post-login transition (kept from previous design) ──── */
+        .login-shell,
+        .page-credit {
+            transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1100ms ease;
+        }
+        body.login-success .login-shell,
+        body.login-success .page-credit {
+            transform: translateY(-12vh);
             opacity: 0;
         }
+
         .login-brand-transition {
             position: fixed;
             left: 0;
@@ -58,74 +411,219 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, rgba(180,205,224,0.98) 0%, rgba(127,166,194,0.96) 100%);
+            background:
+                radial-gradient(900px 500px at 50% 35%, rgba(56, 189, 248, 0.25), transparent 65%),
+                linear-gradient(160deg, #041030 0%, #0a2a6b 60%, #051336 100%);
             color: #ffffff;
-            transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1), opacity 1400ms ease;
-            opacity: 0.98;
+            transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .login-brand-transition.show {
-            transform: translateY(-100vh);
-        }
+        .login-brand-transition.show { transform: translateY(-100vh); }
         .login-brand-transition-logo {
             width: 88px;
             height: 88px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.94);
+            background: rgba(255, 255, 255, 0.94);
             padding: 10px;
             margin-bottom: 14px;
+            box-shadow: 0 0 46px rgba(56, 189, 248, 0.55);
         }
-        .login-brand-transition-title {
-            font-size: 2.4rem;
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: 0.01em;
-        }
-        .login-brand-transition-subtitle {
-            margin-top: 8px;
-            font-size: 1.02rem;
-            opacity: 0.96;
-        }
+        .login-brand-transition-title { font-size: 2.4rem; font-weight: 800; line-height: 1.1; letter-spacing: 0.01em; }
+        .login-brand-transition-subtitle { margin-top: 8px; font-size: 1.02rem; opacity: 0.92; }
         .login-brand-transition-credit {
             position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 26px;
+            left: 0; right: 0; bottom: 26px;
             text-align: center;
             font-size: 0.95rem;
             font-weight: 600;
-            opacity: 0.92;
-            letter-spacing: 0.01em;
+            opacity: 0.9;
+        }
+
+        /* ── Responsive ─────────────────────────────────────────── */
+        @media (max-width: 980px) {
+            body { overflow-y: auto; }
+            .login-shell {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 6vh 6vw 12vh;
+            }
+            .brand-pane { align-items: center; text-align: center; }
+            .brand-lockup { flex-direction: column; }
+            .telemetry-card { width: 100%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .brand-logo, .live-dot { animation: none; }
         }
     </style>
+</head>
+<body>
+    <canvas id="constellation-canvas" aria-hidden="true"></canvas>
+    <div class="hud-overlay" aria-hidden="true"></div>
+
+    <main class="login-shell">
+        <section class="brand-pane" aria-label="PrimeNet branding">
+            <div class="brand-lockup">
+                <img src="/static/images/favicon.png?v=4" alt="PrimeNet logo" class="brand-logo">
+                <div>
+                    <div class="brand-name">PrimeNet</div>
+                    <div class="brand-sub">Radio Network Performance &amp; Configuration Platform</div>
+                </div>
+            </div>
+
+            <div class="telemetry-card" aria-hidden="true">
+                <div class="telemetry-head"><span class="live-dot"></span> Network constellation &middot; live sweep</div>
+                <div class="telemetry-ticker" id="telemetry-ticker">INITIALIZING RADAR SWEEP&hellip;</div>
+                <ul class="rat-chips">
+                    <li class="rat-chip"><i style="background:#fbbf24"></i>2G GSM</li>
+                    <li class="rat-chip"><i style="background:#38bdf8"></i>3G UMTS</li>
+                    <li class="rat-chip"><i style="background:#34d399"></i>4G FDD</li>
+                    <li class="rat-chip"><i style="background:#a78bfa"></i>4G TDD</li>
+                    <li class="rat-chip"><i style="background:#f472b6"></i>5G NR</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card-pane">
+            <form id="login-form" class="auth-card" autocomplete="on">
+                <h2>Operator Sign In</h2>
+                <p class="card-sub">Authenticate to access the network command console.</p>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#128100;</span>
+                        <input type="text" id="username" name="username" placeholder="operator id" required autofocus autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrap">
+                        <span class="input-icon" aria-hidden="true">&#128273;</span>
+                        <input type="password" id="password" name="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" id="toggle-password" aria-label="Show password">&#128065;</button>
+                    </div>
+                    <div class="capslock-hint" id="capslock-hint">&#9888; Caps Lock is on</div>
+                </div>
+
+                <div id="error-message" class="error-message" role="alert"></div>
+
+                <button type="submit" class="btn-signin" id="signin-btn">
+                    <span class="btn-ping" aria-hidden="true"></span><span class="btn-label">Sign In</span>
+                </button>
+
+                <p class="auth-note">Internal users only. Contact administrator for account support.</p>
+
+                <div class="card-footer-line" aria-hidden="true">
+                    <span id="hud-clock">--:--:--</span>
+                    <span>CH 042 &middot; SECURE LINK</span>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <div class="page-credit">Developed by Malek Mohammad</div>
+
     <div id="loginBrandTransition" class="login-brand-transition" aria-hidden="true">
         <img src="/static/images/favicon.png?v=4" alt="PrimeNet logo" class="login-brand-transition-logo">
         <div class="login-brand-transition-title">PrimeNet</div>
         <div class="login-brand-transition-subtitle">Network Performance &amp; Configuration Platform</div>
         <div class="login-brand-transition-credit">Developed by Malek Mohammad</div>
     </div>
+
+    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=1.0"></script>
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.9"></script>
     <script>
+        // Interactive constellation + radar background
+        PrimeNetConstellation.initLoginScene(document.getElementById('constellation-canvas'));
+
+        // Rotating telemetry ticker
+        (function () {
+            const lines = [
+                'SWEEP 042° · 5G NR CARRIER LOCKED',
+                'CONSTELLATION SYNC · 5 RAT LAYERS TRACKED',
+                'PCI SCAN COMPLETE · 0 CONFLICTS DETECTED',
+                'UPLINK STABLE · RTT 12 ms · JITTER 0.4 ms',
+                'NEIGHBOR AUDIT NOMINAL · HANDOVERS OK',
+                'KPI PIPELINE ONLINE · HOURLY SYNC ARMED',
+            ];
+            const el = document.getElementById('telemetry-ticker');
+            let i = 0;
+            function next() {
+                el.textContent = lines[i % lines.length];
+                i += 1;
+            }
+            next();
+            setInterval(next, 3000);
+        })();
+
+        // HUD clock
+        (function () {
+            const el = document.getElementById('hud-clock');
+            function tick() {
+                const d = new Date();
+                el.textContent = 'UTC ' + d.toISOString().slice(11, 19);
+            }
+            tick();
+            setInterval(tick, 1000);
+        })();
+
+        // Show / hide password
+        document.getElementById('toggle-password').addEventListener('click', function () {
+            const input = document.getElementById('password');
+            const showing = input.type === 'text';
+            input.type = showing ? 'password' : 'text';
+            this.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+            input.focus();
+        });
+
+        // Caps lock hint
+        document.getElementById('password').addEventListener('keyup', function (e) {
+            const hint = document.getElementById('capslock-hint');
+            if (e.getModifierState) {
+                hint.classList.toggle('on', e.getModifierState('CapsLock'));
+            }
+        });
+
+        // Sign-in flow (same API contract as before)
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('error-message');
-            const authContainer = document.querySelector('.auth-container');
+            const card = document.querySelector('.auth-card');
+            const btn = document.getElementById('signin-btn');
+            const btnLabel = btn.querySelector('.btn-label');
             const brandTransition = document.getElementById('loginBrandTransition');
-            
+
+            errorDiv.style.display = 'none';
+            card.classList.remove('shake');
+            btn.disabled = true;
+            btn.classList.add('loading');
+            btnLabel.textContent = 'Authenticating…';
+
+            const fail = (message) => {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btnLabel.textContent = 'Sign In';
+                void card.offsetWidth;
+                card.classList.add('shake');
+            };
+
             try {
                 const response = await fetch('/api/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
+                    btnLabel.textContent = 'Access Granted';
                     sessionStorage.removeItem('legalStatementAcknowledged');
                     sessionStorage.removeItem('primenetPostLoginIntro');
                     try {
@@ -136,26 +634,21 @@
                             sessionStorage.setItem('primenetUserRole', String(data.user.role));
                         }
                     } catch (_) { /* ignore */ }
-                    if (authContainer) {
-                        authContainer.classList.add('login-slide-up');
-                    }
+
+                    document.body.classList.add('login-success');
                     setTimeout(() => {
-                        if (brandTransition) {
-                            brandTransition.classList.add('show');
-                        }
-                    }, 1200);
+                        if (brandTransition) brandTransition.classList.add('show');
+                    }, 1100);
                     if (data.must_change_password) {
-                        setTimeout(() => { window.location.href = '/profile?force_password_change=1'; }, 3000);
+                        setTimeout(() => { window.location.href = '/profile?force_password_change=1'; }, 2800);
                     } else {
-                        setTimeout(() => { window.location.href = '/'; }, 3000);
+                        setTimeout(() => { window.location.href = '/'; }, 2800);
                     }
                 } else {
-                    errorDiv.textContent = data.error || 'Login failed';
-                    errorDiv.style.display = 'block';
+                    fail(data.error || 'Login failed');
                 }
             } catch (error) {
-                errorDiv.textContent = 'Connection error. Please try again.';
-                errorDiv.style.display = 'block';
+                fail('Connection error. Please try again.');
             }
         });
     </script>

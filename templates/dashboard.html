@@ -6,6 +6,7 @@
     <title>PrimeNet - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=1.0">
 </head>
 <body>
     <div class="container">
@@ -34,6 +35,34 @@
         </header>
 
         <main class="dashboard-main">
+
+            <section class="constellation-deck" aria-label="Network constellation radar">
+                <div class="constellation-radar-wrap">
+                    <canvas id="network-radar-canvas"></canvas>
+                    <div class="radar-center-total">
+                        <strong id="radar-total-sites">{{ total_sites }}</strong>
+                        <span>on-air sites</span>
+                    </div>
+                    <div class="radar-tooltip" id="radar-tooltip" hidden></div>
+                </div>
+                <div class="constellation-side">
+                    <div class="constellation-head">
+                        <div class="constellation-title"><span class="live-dot"></span>Network Constellation</div>
+                        <div class="constellation-clock" id="constellation-clock">UTC --:--:--</div>
+                    </div>
+                    <p class="constellation-desc">
+                        Live radar view of the operational network. Each orbit is a radio access
+                        technology — hover a blip for site &amp; vendor detail, click a blip or a
+                        chip below to focus that layer.
+                    </p>
+                    <div class="radar-legend" id="radar-legend" role="group" aria-label="Technology layers"></div>
+                    <div class="constellation-footnote" aria-hidden="true">
+                        <span>SWEEP 6.5s</span>
+                        <span>ORBITS 2G&rarr;5G</span>
+                        <span id="radar-focus-note">FOCUS: ALL LAYERS</span>
+                    </div>
+                </div>
+            </section>
 
             <section class="dashboard-op-sites" aria-label="Operational sites by technology">
                 <div class="op-sites-summary-card">
@@ -617,8 +646,88 @@
         </div>
     </div>
 
+    <script id="radar-bootstrap-data" type="application/json">{{ {'columns': tech_site_columns, 'total': total_sites} | tojson }}</script>
+    <script src="{{ url_for('static', filename='js/constellation.js') }}?v=1.0"></script>
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.9"></script>
     <script>
+        // ── Network Constellation Radar ─────────────────────────────
+        let networkRadar = null;
+
+        function radarBootstrapData() {
+            try {
+                const el = document.getElementById('radar-bootstrap-data');
+                return el ? JSON.parse(el.textContent) : { columns: [], total: 0 };
+            } catch (_) {
+                return { columns: [], total: 0 };
+            }
+        }
+
+        function renderRadarLegend(columns) {
+            const legend = document.getElementById('radar-legend');
+            if (!legend) return;
+            const colors = (window.PrimeNetConstellation || {}).TECH_COLORS || {};
+            legend.innerHTML = (columns || []).map(col => `
+                <button type="button" class="radar-legend-chip" data-rat="${col.key}" style="--chip-color:${colors[col.key] || '#38bdf8'}">
+                    <i></i>
+                    <span>${col.title}</span>
+                    <span class="chip-count">${Number(col.count || 0).toLocaleString()}</span>
+                    <span class="chip-sub">${col.subtitle || ''}</span>
+                </button>
+            `).join('');
+            legend.querySelectorAll('.radar-legend-chip').forEach(chip => {
+                chip.addEventListener('click', () => focusRadarTech(chip.dataset.rat));
+            });
+            syncRadarLegendActive();
+        }
+
+        function syncRadarLegendActive() {
+            const current = networkRadar ? networkRadar.getFocus() : null;
+            document.querySelectorAll('.radar-legend-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.rat === current);
+            });
+            const note = document.getElementById('radar-focus-note');
+            if (note) note.textContent = current ? `FOCUS: ${current}` : 'FOCUS: ALL LAYERS';
+        }
+
+        function focusRadarTech(key) {
+            if (!networkRadar) return;
+            const next = networkRadar.getFocus() === key ? null : key;
+            networkRadar.setFocus(next);
+            syncRadarLegendActive();
+            if (next) {
+                document.querySelectorAll(`.op-sites-summary-col[data-rat="${CSS.escape(next)}"]`).forEach(col => {
+                    col.classList.remove('radar-target-flash');
+                    void col.offsetWidth;
+                    col.classList.add('radar-target-flash');
+                });
+            }
+        }
+
+        function initNetworkRadar() {
+            const canvas = document.getElementById('network-radar-canvas');
+            if (!canvas || !window.PrimeNetConstellation) return;
+            const data = radarBootstrapData();
+            networkRadar = PrimeNetConstellation.initRadar(canvas, {
+                columns: data.columns,
+                total: data.total,
+                tooltipEl: document.getElementById('radar-tooltip'),
+                centerEl: document.getElementById('radar-total-sites'),
+                onSelect: focusRadarTech,
+            });
+            renderRadarLegend(data.columns);
+            const clock = document.getElementById('constellation-clock');
+            if (clock) {
+                const tick = () => { clock.textContent = 'UTC ' + new Date().toISOString().slice(11, 19); };
+                tick();
+                setInterval(tick, 1000);
+            }
+        }
+
+        function updateNetworkRadar(columns, total) {
+            if (networkRadar) networkRadar.update(columns, total);
+            renderRadarLegend(columns || []);
+        }
+
         function openSection(name) {
             document.querySelectorAll('.section-panel').forEach(p => {
                 p.classList.add('hidden');
@@ -966,6 +1075,7 @@
                         nokiaPanelEl.textContent = vendorCounts.Nokia != null ? vendorCounts.Nokia : 0;
                     }
                 });
+                updateNetworkRadar(columns, data.total_sites);
             } catch (error) {
                 alert(error.message || 'Could not refresh operational site counts');
             } finally {
@@ -1474,6 +1584,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            initNetworkRadar();
             setupDashboardToolSearch();
             loadDashboardPreferences();
             replayDashboardCardWash(document.querySelector('.section-panel:not(.hidden)') || document);

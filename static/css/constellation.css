@@ -1,0 +1,249 @@
+/* PrimeNet — Network Constellation Radar deck (dashboard). */
+
+.constellation-deck {
+    display: grid;
+    grid-template-columns: minmax(280px, 420px) 1fr;
+    gap: 22px;
+    margin-bottom: 26px;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(63, 104, 168, 0.45);
+    background:
+        radial-gradient(900px 420px at 18% 20%, rgba(37, 99, 235, 0.18), transparent 60%),
+        linear-gradient(155deg, #050d24 0%, #081736 55%, #04102b 100%);
+    color: #dbeafe;
+    box-shadow: 0 16px 44px rgba(3, 10, 30, 0.35);
+    overflow: hidden;
+}
+
+body.dark-mode .constellation-deck {
+    border-color: rgba(63, 104, 168, 0.6);
+}
+
+.constellation-radar-wrap {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    max-height: 380px;
+    justify-self: center;
+    width: 100%;
+    max-width: 380px;
+}
+
+#network-radar-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.radar-center-total {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+.radar-center-total strong {
+    display: block;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: #f0f9ff;
+    text-shadow: 0 0 18px rgba(56, 189, 248, 0.65);
+    line-height: 1.1;
+}
+
+.radar-center-total span {
+    display: block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.85);
+    margin-top: 2px;
+}
+
+.radar-tooltip {
+    position: absolute;
+    z-index: 5;
+    min-width: 172px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(125, 211, 252, 0.4);
+    background: rgba(4, 12, 32, 0.94);
+    box-shadow: 0 10px 30px rgba(2, 8, 24, 0.7);
+    pointer-events: none;
+    font-size: 0.82rem;
+    color: #e0f2fe;
+}
+
+.radar-tip-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 800;
+    margin-bottom: 7px;
+    letter-spacing: 0.03em;
+}
+
+.radar-tip-title small {
+    font-weight: 500;
+    color: rgba(147, 197, 253, 0.8);
+}
+
+.radar-tip-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.radar-tip-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 2px 0;
+    color: rgba(191, 219, 254, 0.85);
+}
+
+.radar-tip-row strong { color: #f0f9ff; }
+
+/* ── Right-hand info column ─────────────────────────────────── */
+
+.constellation-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+
+.constellation-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.constellation-title {
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: #f0f9ff;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.constellation-title .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.9);
+    animation: constellation-live 1.8s ease-in-out infinite;
+}
+
+@keyframes constellation-live {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+.constellation-clock {
+    font-family: 'Consolas', 'SFMono-Regular', Menlo, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    color: rgba(147, 197, 253, 0.9);
+}
+
+.constellation-desc {
+    font-size: 0.84rem;
+    color: rgba(191, 219, 254, 0.75);
+    max-width: 62ch;
+}
+
+.radar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.radar-legend-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 13px;
+    border-radius: 11px;
+    border: 1px solid rgba(96, 165, 250, 0.28);
+    background: rgba(8, 22, 52, 0.6);
+    color: #dbeafe;
+    font: inherit;
+    font-size: 0.84rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.radar-legend-chip:hover {
+    border-color: rgba(125, 211, 252, 0.6);
+    transform: translateY(-1px);
+}
+
+.radar-legend-chip.active {
+    background: rgba(14, 42, 92, 0.9);
+    border-color: var(--chip-color, #38bdf8);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+}
+
+.radar-legend-chip i {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    background: var(--chip-color, #38bdf8);
+    box-shadow: 0 0 8px var(--chip-color, #38bdf8);
+}
+
+.radar-legend-chip .chip-count {
+    font-weight: 800;
+    color: #f0f9ff;
+    font-variant-numeric: tabular-nums;
+}
+
+.radar-legend-chip .chip-sub {
+    font-size: 0.7rem;
+    color: rgba(147, 197, 253, 0.7);
+}
+
+.constellation-footnote {
+    margin-top: auto;
+    font-family: 'Consolas', 'SFMono-Regular', Menlo, monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: rgba(125, 174, 232, 0.6);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+}
+
+/* Flash applied to the matching op-sites column when a tech is selected */
+@keyframes radar-target-flash {
+    0%   { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.75); }
+    100% { box-shadow: 0 0 0 14px rgba(56, 189, 248, 0); }
+}
+
+.op-sites-summary-col.radar-target-flash {
+    animation: radar-target-flash 0.9s ease-out 2;
+    border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+    .constellation-deck {
+        grid-template-columns: 1fr;
+    }
+    .constellation-radar-wrap {
+        max-width: 330px;
+    }
+}
