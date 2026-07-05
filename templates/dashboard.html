@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.3">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=1.0">
 </head>
-<body>
+<body class="has-constellation-bg">
+    <canvas id="dashboard-bg-canvas" class="dashboard-bg-canvas" aria-hidden="true"></canvas>
     <div class="container">
         <header>
             <div class="header-content">
@@ -1584,6 +1585,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            const bgCanvas = document.getElementById('dashboard-bg-canvas');
+            if (bgCanvas && window.PrimeNetConstellation) {
+                PrimeNetConstellation.initAmbientBackground(bgCanvas);
+            }
             initNetworkRadar();
             setupDashboardToolSearch();
             loadDashboardPreferences();

@@ -1,5 +1,26 @@
 /* PrimeNet — Network Constellation Radar deck (dashboard). */
 
+/* Full-page ambient constellation background behind the dashboard content. */
+.dashboard-bg-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+}
+
+body.has-constellation-bg .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Dark mode paints .container/.dashboard-main opaque — let the canvas show. */
+body.has-constellation-bg.dark-mode .container,
+body.has-constellation-bg.dark-mode .dashboard-main {
+    background: transparent;
+}
+
 .constellation-deck {
     display: grid;
     grid-template-columns: minmax(280px, 420px) 1fr;
