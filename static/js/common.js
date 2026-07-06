@@ -11,8 +11,20 @@ const PRIMENET_CLOCK_OFFSET_HOURS = 3;
 const PRIMENET_CLOCK_LABEL = 'UTC+3';
 
 function formatPrimeNetClock(date = new Date()) {
-    const shifted = new Date(date.getTime() + PRIMENET_CLOCK_OFFSET_HOURS * 3600000);
-    return `${PRIMENET_CLOCK_LABEL} ${shifted.toISOString().slice(11, 19)}`;
+    try {
+        const parts = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Amman',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+        }).formatToParts(date);
+        const pick = (type) => parts.find((p) => p.type === type)?.value || '00';
+        return `${PRIMENET_CLOCK_LABEL} ${pick('hour')}:${pick('minute')}:${pick('second')}`;
+    } catch (_) {
+        const shifted = new Date(date.getTime() + PRIMENET_CLOCK_OFFSET_HOURS * 3600000);
+        return `${PRIMENET_CLOCK_LABEL} ${shifted.toISOString().slice(11, 19)}`;
+    }
 }
 
 let _featureNavSections = null;
