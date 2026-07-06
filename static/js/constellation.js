@@ -109,18 +109,29 @@
     }
 
     /* ====================================================================
-     * LOGIN SCENES — rotating full-screen illustrations
+     * LOGIN SCENES — one illustration per login page visit
      * (radar sweep / sonar ping / star map / hex mesh)
      * ==================================================================== */
+    var LOGIN_SCENE_KEY = 'primenet-login-scene-idx';
+
+    function pickLoginSceneIndex(count) {
+        try {
+            var n = parseInt(localStorage.getItem(LOGIN_SCENE_KEY) || '0', 10);
+            if (!isFinite(n)) n = 0;
+            var idx = ((n % count) + count) % count;
+            localStorage.setItem(LOGIN_SCENE_KEY, String(n + 1));
+            return idx;
+        } catch (_) {
+            return Math.floor(Math.random() * count);
+        }
+    }
+
     function initLoginScene(canvas) {
         var ctx = canvas.getContext('2d');
         var vw = 0, vh = 0, cx = 0, cy = 0, R = 0;
         var mouse = { x: -1e4, y: -1e4 };
         var ripples = [];
         var last = performance.now();
-
-        var SCENE_SECONDS = 16;
-        var FADE_SECONDS = 1.6;
 
         /* ---------- scene: RADAR SWEEP (constellation + rotating sweep) -- */
         var radar = {
@@ -548,35 +559,10 @@
         };
 
         var scenes = [radar, sonar, stars, hexmesh];
-        var current = 0;
-        var next = -1;
-        var fadeT = 0;
-        var sceneTimer = SCENE_SECONDS;
-        var changeListeners = [];
+        var current = pickLoginSceneIndex(scenes.length);
 
-        function emitChange() {
-            for (var i = 0; i < changeListeners.length; i++) {
-                try { changeListeners[i](current, scenes[current].name); } catch (_) { /* ignore */ }
-            }
-        }
-
-        function switchTo(index) {
-            index = ((index % scenes.length) + scenes.length) % scenes.length;
-            if (index === current || next !== -1) return;
-            if (REDUCE_MOTION) {
-                current = index;
-                sceneTimer = SCENE_SECONDS;
-                emitChange();
-                frame(performance.now(), true);
-                return;
-            }
-            next = index;
-            fadeT = 0;
-        }
-
-        function drawScene(scene, dt, t, alpha) {
+        function drawScene(scene, dt, t) {
             ctx.save();
-            ctx.globalAlpha = alpha;
             /* per-scene mood tint */
             var tint = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(vw, vh) * 0.8);
             tint.addColorStop(0, scene.tint);
@@ -603,28 +589,7 @@
             last = now;
             var t = now / 1000;
             ctx.clearRect(0, 0, vw, vh);
-
-            if (!REDUCE_MOTION && !single) {
-                if (next === -1) {
-                    sceneTimer -= dt;
-                    if (sceneTimer <= 0) switchTo(current + 1);
-                } else {
-                    fadeT += dt / FADE_SECONDS;
-                    if (fadeT >= 1) {
-                        current = next;
-                        next = -1;
-                        sceneTimer = SCENE_SECONDS;
-                        emitChange();
-                    }
-                }
-            }
-
-            if (next === -1) {
-                drawScene(scenes[current], dt, t, 1);
-            } else {
-                drawScene(scenes[current], dt, t, 1 - fadeT);
-                drawScene(scenes[next], dt, t, fadeT);
-            }
+            drawScene(scenes[current], dt, t);
 
             /* click ripples on top of any scene */
             for (var i = ripples.length - 1; i >= 0; i--) {
@@ -663,11 +628,7 @@
 
         return {
             names: scenes.map(function (s) { return s.name; }),
-            getScene: function () { return current; },
-            setScene: switchTo,
-            onChange: function (cb) {
-                if (typeof cb === 'function') changeListeners.push(cb);
-            }
+            getScene: function () { return current; }
         };
     }
 

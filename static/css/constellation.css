@@ -1,6 +1,7 @@
 ﻿/* PrimeNet — Network Constellation Radar deck (dashboard). */
 
-/* Full-page ambient constellation background behind the dashboard content. */
+/* Full-page ambient constellation background behind page content. */
+.primenet-bg-canvas,
 .dashboard-bg-canvas {
     position: fixed;
     inset: 0;
@@ -10,38 +11,59 @@
     pointer-events: none;
 }
 
+body.has-constellation-bg {
+    background: transparent;
+}
+
+body.has-constellation-bg .container,
+body.has-constellation-bg .main-content,
+body.has-constellation-bg .dashboard-main,
+body.has-constellation-bg.radio-module-page {
+    background: transparent;
+}
+
 body.has-constellation-bg .container {
     position: relative;
     z-index: 1;
 }
 
-/* Dark mode paints .container/.dashboard-main opaque — let the canvas show. */
-body.has-constellation-bg.dark-mode .container,
-body.has-constellation-bg.dark-mode .dashboard-main {
-    background: transparent;
-}
-
-/* Constellation deck left, operational sites main card right */
-.dashboard-overview-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    gap: 24px;
-    align-items: center;
+.constellation-deck-full {
+    width: 100%;
     margin-bottom: 20px;
-    width: 100%;
 }
 
-.dashboard-overview-row .constellation-deck {
-    margin-bottom: 0;
-    min-width: 0;
+.constellation-head-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
-.dashboard-overview-row .dashboard-op-sites-main {
-    max-width: none;
-    margin: 0;
-    min-width: 0;
-    width: 100%;
-    align-self: center;
+.constellation-refresh-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(125, 211, 252, 0.45);
+    background: rgba(8, 22, 52, 0.55);
+    color: #dbeafe;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+
+.constellation-refresh-btn:hover {
+    border-color: rgba(125, 211, 252, 0.75);
+    background: rgba(14, 42, 92, 0.75);
+    transform: translateY(-1px);
+}
+
+.constellation-refresh-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .constellation-deck {
@@ -274,16 +296,61 @@ body.dark-mode .constellation-deck {
 
 /* ── Vendor balance dials (Huawei vs Nokia) ─────────────────── */
 
-.vendor-dials {
+.vendor-dials-section {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.vendor-dials-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     flex-wrap: wrap;
-    gap: 14px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(147, 197, 253, 0.85);
+}
+
+.vendor-dials-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: none;
+    color: rgba(191, 219, 254, 0.8);
+}
+
+.vendor-key-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 4px;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.vendor-key-huawei { background: #ef4444; color: #ef4444; }
+.vendor-key-nokia { background: #3b82f6; color: #3b82f6; }
+
+.vendor-dials {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: clamp(10px, 1.8vw, 18px);
+    width: 100%;
+    align-items: center;
 }
 
 .vendor-dial {
     position: relative;
-    width: 64px;
-    height: 64px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    justify-self: stretch;
 }
 
 .vendor-dial-svg {
@@ -317,13 +384,13 @@ body.dark-mode .constellation-deck {
 }
 
 .vendor-dial-center strong {
-    font-size: 0.62rem;
+    font-size: clamp(0.58rem, 1.1vw, 0.72rem);
     letter-spacing: 0.06em;
     color: #f0f9ff;
 }
 
 .vendor-dial-center span {
-    font-size: 0.6rem;
+    font-size: clamp(0.54rem, 1vw, 0.68rem);
     font-variant-numeric: tabular-nums;
     color: rgba(147, 197, 253, 0.85);
 }
@@ -407,22 +474,17 @@ body.dark-mode .constellation-deck {
     .gs-meta { display: none; }
 }
 
-/* Flash applied to the matching op-sites column when a tech is selected */
+/* Flash applied to the matching legend chip when a tech is selected */
 @keyframes radar-target-flash {
     0%   { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.75); }
     100% { box-shadow: 0 0 0 14px rgba(56, 189, 248, 0); }
 }
 
-.op-sites-summary-col.radar-target-flash {
+.radar-legend-chip.radar-target-flash {
     animation: radar-target-flash 0.9s ease-out 2;
-    border-radius: 10px;
 }
 
 @media (max-width: 1280px) {
-    .dashboard-overview-row {
-        grid-template-columns: 1fr;
-    }
-
     .constellation-deck {
         grid-template-columns: minmax(240px, 1fr) minmax(0, 1.2fr);
     }
@@ -449,5 +511,9 @@ body.dark-mode .constellation-deck {
     .radar-legend-chip {
         flex: 1 1 200px;
         width: auto;
+    }
+
+    .vendor-dials {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }

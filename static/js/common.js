@@ -7,6 +7,13 @@ const BRAND_FAVICON_PATH = '/static/images/favicon.png?v=4';
 const PAGE_TRANSITION_STORAGE_KEY = 'primenetPageEnterDirection';
 const NAV_SECTIONS_STORAGE_KEY = 'primenetNavSections';
 const NAV_ROLE_STORAGE_KEY = 'primenetUserRole';
+const PRIMENET_CLOCK_OFFSET_HOURS = 3;
+const PRIMENET_CLOCK_LABEL = 'UTC+3';
+
+function formatPrimeNetClock(date = new Date()) {
+    const shifted = new Date(date.getTime() + PRIMENET_CLOCK_OFFSET_HOURS * 3600000);
+    return `${PRIMENET_CLOCK_LABEL} ${shifted.toISOString().slice(11, 19)}`;
+}
 
 let _featureNavSections = null;
 let _featureNavLoadPromise = null;
@@ -19,6 +26,92 @@ function _isDashboardPage() {
 function _isPublicAuthPage() {
     const p = String(window.location?.pathname || '').trim();
     return p === '/login' || p === '/login/' || p === '/register' || p === '/register/';
+}
+
+const CONSTELLATION_CSS_VERSION = '1.9';
+const CONSTELLATION_JS_VERSION = '1.4';
+
+function _constellationBgExcluded(path) {
+    return /^\/(login|register|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);
+}
+
+function _shouldMountConstellationBackground() {
+    if (_isPublicAuthPage()) return false;
+    if (document.body.classList.contains('no-constellation-bg')) return false;
+    const path = String(window.location?.pathname || '').replace(/\/+$/, '') || '/';
+    if (_constellationBgExcluded(path)) return false;
+    return Boolean(
+        document.body.classList.contains('has-constellation-bg')
+        || document.querySelector('.container')
+    );
+}
+
+function _ensureConstellationStylesheet() {
+    if (document.querySelector('link[data-primenet-constellation-css]')) return;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `/static/css/constellation.css?v=${CONSTELLATION_CSS_VERSION}`;
+    link.setAttribute('data-primenet-constellation-css', '1');
+    document.head.appendChild(link);
+}
+
+async function _refreshAmbientNetworkActivity() {
+    try {
+        const res = await fetch('/api/dashboard/network-activity', {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { Accept: 'application/json' },
+        });
+        const data = await res.json().catch(() => ({}));
+        const bg = window.primeNetAmbientBg || window.dashboardAmbientBg;
+        if (res.ok && data.success && data.level != null && bg) {
+            bg.setActivity(data.level);
+        }
+    } catch (_) { /* ignore */ }
+}
+
+function _bootConstellationBackground() {
+    if (!window.PrimeNetConstellation || window.primeNetAmbientBg) return;
+    const canvas = document.getElementById('primenet-bg-canvas') || document.getElementById('dashboard-bg-canvas');
+    if (!canvas) return;
+    window.primeNetAmbientBg = PrimeNetConstellation.initAmbientBackground(canvas);
+    window.dashboardAmbientBg = window.primeNetAmbientBg;
+    if (!_isDashboardPage()) {
+        _refreshAmbientNetworkActivity();
+        setInterval(_refreshAmbientNetworkActivity, 10 * 60 * 1000);
+    }
+}
+
+function _mountConstellationBackground() {
+    if (!_shouldMountConstellationBackground()) return;
+    document.body.classList.add('has-constellation-bg');
+    _ensureConstellationStylesheet();
+
+    let canvas = document.getElementById('primenet-bg-canvas') || document.getElementById('dashboard-bg-canvas');
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.id = 'primenet-bg-canvas';
+        canvas.className = 'primenet-bg-canvas';
+        canvas.setAttribute('aria-hidden', 'true');
+        document.body.insertBefore(canvas, document.body.firstChild);
+    }
+
+    if (window.PrimeNetConstellation) {
+        _bootConstellationBackground();
+        return;
+    }
+
+    const existing = document.querySelector('script[data-primenet-constellation-js]');
+    if (existing) {
+        existing.addEventListener('load', _bootConstellationBackground, { once: true });
+        return;
+    }
+
+    const script = document.createElement('script');
+    script.src = `/static/js/constellation.js?v=${CONSTELLATION_JS_VERSION}`;
+    script.setAttribute('data-primenet-constellation-js', '1');
+    script.onload = _bootConstellationBackground;
+    document.head.appendChild(script);
 }
 
 function _showPostLoginIntro() {
@@ -452,6 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
     _wirePageLinkTransitions();
     _ensureThemeToggle();
     _applyTheme(_preferredTheme());
+    _mountConstellationBackground();
     _showPostLoginIntro();
     if (!_isPublicAuthPage()) {
         _loadFeatureNavSections();
