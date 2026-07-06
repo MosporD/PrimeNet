@@ -392,6 +392,139 @@ def dashboard_neighbor_health():
         return jsonify({'success': False, 'error': 'Neighbor health check failed'}), 500
 
 
+@auth_bp.route('/api/dashboard/network-activity', methods=['GET'])
+def dashboard_network_activity():
+    """Relative network traffic level (0..1) for dashboard visuals."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    try:
+        from core.network_activity import get_network_activity
+
+        force = (request.args.get('refresh') or '').strip().lower() in ('1', 'true', 'yes')
+        payload = get_network_activity(force_refresh=force)
+        resp = jsonify({'success': True, **payload})
+        resp.headers['Cache-Control'] = 'no-store, private'
+        return resp
+    except Exception:
+        logger.exception('Network activity check failed')
+        return jsonify({'success': True, 'level': None, 'vendors': {}})
+
+
+_GLOBAL_SEARCH_MAX_RESULTS = 10
+
+
+def _global_search_metadata(q: str) -> dict:
+    """Sites / cells / PCI matches from the metadata cell union."""
+    out = {'sites': [], 'cells': [], 'pci': []}
+    like = f'%{q}%'
+    union = perf_per_tech_union_sql_with_activity()
+    conn = connect_metadata()
+    try:
+        site_rows = execute_query(conn, f'''
+            SELECT CAST(site_id AS TEXT) AS site_id,
+                   MAX(COALESCE(site_name, '')) AS site_name,
+                   COUNT(*) AS cell_count,
+                   GROUP_CONCAT(DISTINCT technology) AS technologies,
+                   SUM(CASE WHEN activity_status = 'Active' THEN 1 ELSE 0 END) AS active_cells
+            FROM ({union}) v
+            WHERE site_id IS NOT NULL
+              AND (CAST(site_id AS TEXT) LIKE ? OR site_name LIKE ?)
+            GROUP BY CAST(site_id AS TEXT)
+            ORDER BY LENGTH(CAST(site_id AS TEXT)), CAST(site_id AS TEXT)
+            LIMIT ?
+        ''', (like, like, _GLOBAL_SEARCH_MAX_RESULTS)).fetchall()
+        out['sites'] = [dict(r) for r in site_rows]
+
+        cell_rows = execute_query(conn, f'''
+            SELECT cell_name, CAST(site_id AS TEXT) AS site_id, technology, vendor,
+                   activity_status, CAST(pci AS TEXT) AS pci
+            FROM ({union}) v
+            WHERE cell_name LIKE ?
+            ORDER BY LENGTH(cell_name), cell_name
+            LIMIT ?
+        ''', (like, _GLOBAL_SEARCH_MAX_RESULTS)).fetchall()
+        out['cells'] = [dict(r) for r in cell_rows]
+
+        if q.isdigit():
+            pci_rows = execute_query(conn, f'''
+                SELECT cell_name, CAST(site_id AS TEXT) AS site_id, technology, vendor,
+                       activity_status, CAST(pci AS TEXT) AS pci
+                FROM ({union}) v
+                WHERE pci = ?
+                ORDER BY technology, cell_name
+                LIMIT ?
+            ''', (int(q), _GLOBAL_SEARCH_MAX_RESULTS)).fetchall()
+            out['pci'] = [dict(r) for r in pci_rows]
+    finally:
+        conn.close()
+    return out
+
+
+def _global_search_parameters(q: str) -> list:
+    """Parameter dictionary matches (Nokia MO index + Huawei TOC), best-effort."""
+    results = []
+    try:
+        from modules.parameter_dictionary.nokia_loader import search_nokia_entries
+
+        for entry in search_nokia_entries(q, limit=4):
+            params = entry.get('parameters') or []
+            results.append({
+                'vendor': 'Nokia',
+                'name': entry.get('mo') or entry.get('description'),
+                'detail': entry.get('description') or '',
+                'technology': entry.get('technology') or '',
+                'sub': (params[0].get('full_name') or params[0].get('name')) if params else '',
+            })
+    except Exception:
+        logger.debug('Nokia parameter search unavailable', exc_info=True)
+    try:
+        from modules.parameter_dictionary.knowledge import parse_huawei_toc
+
+        ql = q.lower()
+        hits = 0
+        for entry in parse_huawei_toc():
+            name = str(entry.get('name') or '')
+            if ql in name.lower():
+                results.append({
+                    'vendor': 'Huawei',
+                    'name': name,
+                    'detail': '',
+                    'technology': '',
+                    'sub': '',
+                })
+                hits += 1
+                if hits >= 4:
+                    break
+    except Exception:
+        logger.debug('Huawei parameter search unavailable', exc_info=True)
+    return results
+
+
+@auth_bp.route('/api/global-search', methods=['GET'])
+def global_search():
+    """One search box: site IDs, cell names, PCIs, and parameter names."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    args = getattr(g, 'sanitized_args', None) or request.args
+    q = str(args.get('q') or '').strip()
+    if len(q) < 2:
+        return jsonify({'success': True, 'query': q,
+                        'sites': [], 'cells': [], 'pci': [], 'parameters': []})
+
+    payload = {'success': True, 'query': q}
+    try:
+        payload.update(_global_search_metadata(q))
+    except Exception:
+        logger.exception('Global search metadata lookup failed')
+        payload.update({'sites': [], 'cells': [], 'pci': []})
+    payload['parameters'] = _global_search_parameters(q)
+    resp = jsonify(payload)
+    resp.headers['Cache-Control'] = 'no-store, private'
+    return resp
+
+
 @auth_bp.route('/api/dashboard/operational-sites', methods=['GET'])
 def dashboard_operational_sites():
     """Return latest operational site counts per technology."""

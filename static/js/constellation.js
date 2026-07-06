@@ -109,18 +109,483 @@
     }
 
     /* ====================================================================
-     * LOGIN SCENE — full-screen constellation field + radar sweep
+     * LOGIN SCENES — rotating full-screen illustrations
+     * (radar sweep / sonar ping / star map / hex mesh)
      * ==================================================================== */
     function initLoginScene(canvas) {
         var ctx = canvas.getContext('2d');
-        var vw = 0, vh = 0;
-        var cx = 0, cy = 0, R = 0;
-        var nodes = [];
+        var vw = 0, vh = 0, cx = 0, cy = 0, R = 0;
+        var mouse = { x: -1e4, y: -1e4 };
         var ripples = [];
-        var mouse = { x: -1e4, y: -1e4, down: false };
-        var sweep = -Math.PI / 2;
         var last = performance.now();
-        var tintPool = ['#7dd3fc', '#7dd3fc', '#7dd3fc', '#38bdf8', TECH_COLORS['5G'], TECH_COLORS['4G-FDD'], TECH_COLORS['2G'], TECH_COLORS['4G-TDD']];
+
+        var SCENE_SECONDS = 16;
+        var FADE_SECONDS = 1.6;
+
+        /* ---------- scene: RADAR SWEEP (constellation + rotating sweep) -- */
+        var radar = {
+            name: 'RADAR SWEEP',
+            tint: 'rgba(56,189,248,0.05)',
+            nodes: [],
+            sweep: -Math.PI / 2,
+            build: function () {
+                var tintPool = ['#7dd3fc', '#7dd3fc', '#7dd3fc', '#38bdf8',
+                    TECH_COLORS['5G'], TECH_COLORS['4G-FDD'], TECH_COLORS['2G'], TECH_COLORS['4G-TDD']];
+                var count = Math.min(170, Math.max(60, Math.round((vw * vh) / 13500)));
+                var rand = mulberry32(20260705);
+                this.nodes = [];
+                for (var i = 0; i < count; i++) {
+                    this.nodes.push({
+                        x: rand() * vw, y: rand() * vh,
+                        vx: (rand() - 0.5) * 14, vy: (rand() - 0.5) * 14,
+                        r: 0.8 + rand() * 1.7, tw: rand() * TAU, glow: 0,
+                        tint: tintPool[Math.floor(rand() * tintPool.length)]
+                    });
+                }
+            },
+            draw: function (dt, t) {
+                drawRadarGrid(ctx, cx, cy, R, [R * 0.25, R * 0.5, R * 0.75, R], '#60a5fa');
+                if (!REDUCE_MOTION) {
+                    this.sweep = normalizeAngle(this.sweep + dt * (TAU / 7));
+                    drawSweep(ctx, cx, cy, R, this.sweep, '#38bdf8', 0.13);
+                }
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3.2, 0, TAU);
+                ctx.fillStyle = 'rgba(125,211,252,0.9)';
+                ctx.fill();
+
+                var nodes = this.nodes;
+                var i, j, n, m, dx, dy, dist;
+                for (i = 0; i < nodes.length; i++) {
+                    n = nodes[i];
+                    if (!REDUCE_MOTION) {
+                        n.x += n.vx * dt;
+                        n.y += n.vy * dt;
+                        dx = mouse.x - n.x; dy = mouse.y - n.y;
+                        dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 150 && dist > 0.001) {
+                            n.x += (dx / dist) * 9 * dt;
+                            n.y += (dy / dist) * 9 * dt;
+                        }
+                        if (n.x < -12) n.x = vw + 12; else if (n.x > vw + 12) n.x = -12;
+                        if (n.y < -12) n.y = vh + 12; else if (n.y > vh + 12) n.y = -12;
+                        dx = n.x - cx; dy = n.y - cy;
+                        if (dx * dx + dy * dy < R * R) {
+                            var diff = normalizeAngle(this.sweep - Math.atan2(dy, dx));
+                            if (diff < 0.06) n.glow = 1;
+                        }
+                        n.glow *= Math.exp(-dt * 1.6);
+                    }
+                }
+                for (i = 0; i < nodes.length; i++) {
+                    n = nodes[i];
+                    for (j = i + 1; j < nodes.length; j++) {
+                        m = nodes[j];
+                        dx = n.x - m.x; dy = n.y - m.y;
+                        var d2 = dx * dx + dy * dy;
+                        if (d2 < 110 * 110) {
+                            ctx.beginPath();
+                            ctx.moveTo(n.x, n.y);
+                            ctx.lineTo(m.x, m.y);
+                            ctx.strokeStyle = 'rgba(125,211,252,' + (0.10 * (1 - Math.sqrt(d2) / 110)).toFixed(3) + ')';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                    }
+                    dx = n.x - mouse.x; dy = n.y - mouse.y;
+                    dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 170) {
+                        ctx.beginPath();
+                        ctx.moveTo(n.x, n.y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.strokeStyle = 'rgba(56,189,248,' + (0.22 * (1 - dist / 170)).toFixed(3) + ')';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+                for (i = 0; i < nodes.length; i++) {
+                    n = nodes[i];
+                    var alpha = 0.35 + 0.25 * Math.sin(t * 1.4 + n.tw) + n.glow * 0.55;
+                    var radius = n.r + n.glow * 2.4;
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y, radius, 0, TAU);
+                    ctx.fillStyle = rgba(n.tint, Math.max(0.08, Math.min(1, alpha)));
+                    ctx.fill();
+                    if (n.glow > 0.35) {
+                        ctx.beginPath();
+                        ctx.arc(n.x, n.y, radius + 5 * n.glow, 0, TAU);
+                        ctx.strokeStyle = rgba(n.tint, 0.35 * n.glow);
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+        };
+
+        /* ---------- scene: SONAR PING (expanding waves + contacts) ------- */
+        var sonar = {
+            name: 'SONAR PING',
+            tint: 'rgba(45,212,191,0.06)',
+            contacts: [],
+            pings: [],
+            pingTimer: 0.4,
+            build: function () {
+                var rand = mulberry32(0x50AA12);
+                this.contacts = [];
+                for (var i = 0; i < 26; i++) {
+                    var a = rand() * TAU;
+                    var r = R * (0.15 + rand() * 0.82);
+                    this.contacts.push({
+                        angle: a, dist: r, drift: (rand() - 0.5) * 0.05,
+                        size: 1.6 + rand() * 2.2, glow: 0
+                    });
+                }
+                this.pings = [];
+                this.pingTimer = 0.4;
+            },
+            draw: function (dt, t) {
+                var green = '#34d399';
+                var teal = '#2dd4bf';
+                /* dashed range rings + bearing ticks */
+                ctx.save();
+                ctx.setLineDash([4, 10]);
+                for (var k = 1; k <= 4; k++) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, R * k / 4, 0, TAU);
+                    ctx.strokeStyle = rgba(teal, 0.13);
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+                ctx.restore();
+                ctx.strokeStyle = rgba(teal, 0.10);
+                ctx.beginPath();
+                ctx.moveTo(cx - R, cy); ctx.lineTo(cx + R, cy);
+                ctx.moveTo(cx, cy - R); ctx.lineTo(cx, cy + R);
+                ctx.stroke();
+                for (var a = 0; a < TAU - 0.001; a += TAU / 36) {
+                    ctx.beginPath();
+                    ctx.moveTo(cx + Math.cos(a) * (R - 5), cy + Math.sin(a) * (R - 5));
+                    ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R);
+                    ctx.strokeStyle = rgba(teal, 0.25);
+                    ctx.stroke();
+                }
+
+                /* expanding pings */
+                if (!REDUCE_MOTION) {
+                    this.pingTimer -= dt;
+                    if (this.pingTimer <= 0) {
+                        this.pings.push({ r: 6, a: 0.55 });
+                        this.pingTimer = 3.2;
+                    }
+                }
+                for (var p = this.pings.length - 1; p >= 0; p--) {
+                    var ping = this.pings[p];
+                    if (!REDUCE_MOTION) {
+                        ping.r += dt * R * 0.30;
+                        ping.a = 0.55 * (1 - ping.r / R);
+                    }
+                    if (ping.r >= R) { this.pings.splice(p, 1); continue; }
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, ping.r, 0, TAU);
+                    ctx.strokeStyle = rgba(teal, Math.max(0, ping.a));
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    /* light up contacts as the wavefront crosses them */
+                    for (var c = 0; c < this.contacts.length; c++) {
+                        if (Math.abs(this.contacts[c].dist - ping.r) < 9) this.contacts[c].glow = 1;
+                    }
+                }
+
+                /* contacts */
+                for (var i = 0; i < this.contacts.length; i++) {
+                    var ct = this.contacts[i];
+                    if (!REDUCE_MOTION) {
+                        ct.angle += ct.drift * dt;
+                        ct.glow *= Math.exp(-dt * 0.9);
+                    } else {
+                        ct.glow = 0.6;
+                    }
+                    var x = cx + Math.cos(ct.angle) * ct.dist;
+                    var y = cy + Math.sin(ct.angle) * ct.dist;
+                    var alpha = 0.10 + ct.glow * 0.85;
+                    ctx.beginPath();
+                    ctx.arc(x, y, ct.size + ct.glow * 2, 0, TAU);
+                    ctx.fillStyle = rgba(green, alpha);
+                    ctx.fill();
+                    if (ct.glow > 0.3) {
+                        ctx.beginPath();
+                        ctx.arc(x, y, ct.size + 6 * ct.glow, 0, TAU);
+                        ctx.strokeStyle = rgba(green, 0.3 * ct.glow);
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+
+                /* hub + cursor reticle */
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, TAU);
+                ctx.fillStyle = rgba(green, 0.9);
+                ctx.fill();
+                if (mouse.x > -1e3) {
+                    ctx.beginPath();
+                    ctx.arc(mouse.x, mouse.y, 14, 0, TAU);
+                    ctx.strokeStyle = rgba(green, 0.35);
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(mouse.x - 20, mouse.y); ctx.lineTo(mouse.x - 8, mouse.y);
+                    ctx.moveTo(mouse.x + 8, mouse.y); ctx.lineTo(mouse.x + 20, mouse.y);
+                    ctx.moveTo(mouse.x, mouse.y - 20); ctx.lineTo(mouse.x, mouse.y - 8);
+                    ctx.moveTo(mouse.x, mouse.y + 8); ctx.lineTo(mouse.x, mouse.y + 20);
+                    ctx.strokeStyle = rgba(green, 0.5);
+                    ctx.stroke();
+                }
+            }
+        };
+
+        /* ---------- scene: STAR MAP (starfield + constellation figures) -- */
+        var stars = {
+            name: 'STAR MAP',
+            tint: 'rgba(167,139,250,0.05)',
+            field: [],
+            figures: [],
+            shooting: null,
+            shootTimer: 4,
+            build: function () {
+                var rand = mulberry32(0x57A125);
+                var count = Math.min(260, Math.max(120, Math.round((vw * vh) / 6500)));
+                this.field = [];
+                for (var i = 0; i < count; i++) {
+                    this.field.push({
+                        x: rand() * vw, y: rand() * vh,
+                        z: 0.3 + rand() * 0.7,            /* parallax depth */
+                        r: 0.5 + rand() * 1.4,
+                        tw: rand() * TAU
+                    });
+                }
+                /* constellation figures: small connected clusters of bright stars */
+                this.figures = [];
+                for (var f = 0; f < 5; f++) {
+                    var fx = vw * (0.12 + rand() * 0.76);
+                    var fy = vh * (0.12 + rand() * 0.76);
+                    var pts = [];
+                    var px = fx, py = fy;
+                    var steps = 5 + Math.floor(rand() * 3);
+                    for (var s = 0; s < steps; s++) {
+                        pts.push({ x: px, y: py, tw: rand() * TAU });
+                        var ang = rand() * TAU;
+                        px += Math.cos(ang) * (50 + rand() * 90);
+                        py += Math.sin(ang) * (40 + rand() * 70);
+                    }
+                    this.figures.push(pts);
+                }
+                this.shooting = null;
+                this.shootTimer = 3 + rand() * 3;
+            },
+            draw: function (dt, t) {
+                var offX = (mouse.x > -1e3 ? (mouse.x - vw / 2) : 0) * 0.012;
+                var offY = (mouse.y > -1e3 ? (mouse.y - vh / 2) : 0) * 0.012;
+
+                for (var i = 0; i < this.field.length; i++) {
+                    var st = this.field[i];
+                    var alpha = 0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t * 1.6 + st.tw)) * st.z;
+                    ctx.beginPath();
+                    ctx.arc(st.x - offX * st.z * 10, st.y - offY * st.z * 10, st.r, 0, TAU);
+                    ctx.fillStyle = 'rgba(226,238,255,' + alpha.toFixed(3) + ')';
+                    ctx.fill();
+                }
+
+                /* constellation figures */
+                for (var f = 0; f < this.figures.length; f++) {
+                    var pts = this.figures[f];
+                    ctx.beginPath();
+                    for (var p = 0; p < pts.length; p++) {
+                        var x = pts[p].x - offX * 8, y = pts[p].y - offY * 8;
+                        if (p === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                    }
+                    ctx.strokeStyle = 'rgba(196,181,253,0.22)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    for (p = 0; p < pts.length; p++) {
+                        var vx = pts[p].x - offX * 8, vy = pts[p].y - offY * 8;
+                        var va = 0.55 + 0.35 * Math.sin(t * 1.2 + pts[p].tw);
+                        ctx.beginPath();
+                        ctx.arc(vx, vy, 2.1, 0, TAU);
+                        ctx.fillStyle = 'rgba(221,214,254,' + va.toFixed(3) + ')';
+                        ctx.fill();
+                        /* link bright vertices to a nearby cursor */
+                        var dx = vx - mouse.x, dy = vy - mouse.y;
+                        var dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 190) {
+                            ctx.beginPath();
+                            ctx.moveTo(vx, vy);
+                            ctx.lineTo(mouse.x, mouse.y);
+                            ctx.strokeStyle = 'rgba(196,181,253,' + (0.28 * (1 - dist / 190)).toFixed(3) + ')';
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                /* occasional shooting star */
+                if (!REDUCE_MOTION) {
+                    if (!this.shooting) {
+                        this.shootTimer -= dt;
+                        if (this.shootTimer <= 0) {
+                            var ang2 = Math.PI * (0.15 + Math.random() * 0.2);
+                            this.shooting = {
+                                x: vw * (0.1 + Math.random() * 0.8), y: vh * 0.08,
+                                vx: Math.cos(ang2) * 620, vy: Math.sin(ang2) * 620,
+                                life: 0.9
+                            };
+                            this.shootTimer = 4 + Math.random() * 5;
+                        }
+                    } else {
+                        var sh = this.shooting;
+                        sh.x += sh.vx * dt; sh.y += sh.vy * dt; sh.life -= dt;
+                        if (sh.life <= 0 || sh.x > vw + 60 || sh.y > vh + 60) {
+                            this.shooting = null;
+                        } else {
+                            var trail = 46;
+                            var grad = ctx.createLinearGradient(sh.x, sh.y, sh.x - sh.vx / 620 * trail, sh.y - sh.vy / 620 * trail);
+                            grad.addColorStop(0, 'rgba(255,255,255,' + (0.85 * sh.life).toFixed(3) + ')');
+                            grad.addColorStop(1, 'rgba(255,255,255,0)');
+                            ctx.beginPath();
+                            ctx.moveTo(sh.x, sh.y);
+                            ctx.lineTo(sh.x - sh.vx / 620 * trail, sh.y - sh.vy / 620 * trail);
+                            ctx.strokeStyle = grad;
+                            ctx.lineWidth = 1.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+        };
+
+        /* ---------- scene: HEX MESH (cellular coverage grid) ------------- */
+        var hexmesh = {
+            name: 'HEX MESH',
+            tint: 'rgba(56,189,248,0.04)',
+            cells: [],
+            waves: [],
+            waveTimer: 0.6,
+            size: 44,
+            build: function () {
+                var size = this.size;
+                var w = size * Math.sqrt(3);
+                var rand = mulberry32(0x4E7);
+                var sitePool = [TECH_COLORS['2G'], TECH_COLORS['3G'], TECH_COLORS['4G-FDD'], TECH_COLORS['4G-TDD'], TECH_COLORS['5G']];
+                this.cells = [];
+                for (var row = -1; row * size * 1.5 < vh + size; row++) {
+                    for (var col = -1; col * w < vw + w; col++) {
+                        var x = col * w + (row % 2 ? w / 2 : 0);
+                        var y = row * size * 1.5;
+                        var site = rand() < 0.06;
+                        this.cells.push({
+                            x: x, y: y, glow: 0, tw: rand() * TAU,
+                            site: site,
+                            color: site ? sitePool[Math.floor(rand() * sitePool.length)] : '#60a5fa'
+                        });
+                    }
+                }
+                this.waves = [];
+                this.waveTimer = 0.6;
+            },
+            hexPath: function (x, y, size) {
+                ctx.beginPath();
+                for (var k = 0; k < 6; k++) {
+                    var a = Math.PI / 3 * k + Math.PI / 6;
+                    var px = x + Math.cos(a) * size;
+                    var py = y + Math.sin(a) * size;
+                    if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+            },
+            draw: function (dt, t) {
+                if (!REDUCE_MOTION) {
+                    this.waveTimer -= dt;
+                    if (this.waveTimer <= 0 && this.waves.length < 3) {
+                        var seed = this.cells[Math.floor(Math.random() * this.cells.length)];
+                        if (seed) this.waves.push({ x: seed.x, y: seed.y, r: 10 });
+                        this.waveTimer = 2.6;
+                    }
+                    for (var wv = this.waves.length - 1; wv >= 0; wv--) {
+                        this.waves[wv].r += dt * 340;
+                        if (this.waves[wv].r > Math.max(vw, vh) * 1.1) this.waves.splice(wv, 1);
+                    }
+                }
+                var drawSize = this.size - 3;
+                for (var i = 0; i < this.cells.length; i++) {
+                    var cell = this.cells[i];
+                    var glow = 0;
+                    /* wavefront band */
+                    for (var w2 = 0; w2 < this.waves.length; w2++) {
+                        var dxw = cell.x - this.waves[w2].x, dyw = cell.y - this.waves[w2].y;
+                        var band = Math.abs(Math.sqrt(dxw * dxw + dyw * dyw) - this.waves[w2].r);
+                        if (band < 70) glow = Math.max(glow, 1 - band / 70);
+                    }
+                    /* cursor highlight */
+                    var dxm = cell.x - mouse.x, dym = cell.y - mouse.y;
+                    var dm = Math.sqrt(dxm * dxm + dym * dym);
+                    if (dm < 160) glow = Math.max(glow, 0.85 * (1 - dm / 160));
+
+                    var base = cell.site ? 0.16 : 0.05;
+                    var alpha = base + glow * 0.5 + (cell.site ? 0.06 * Math.sin(t * 1.5 + cell.tw) : 0);
+                    this.hexPath(cell.x, cell.y, drawSize);
+                    ctx.strokeStyle = rgba(cell.color, Math.min(0.85, alpha));
+                    ctx.lineWidth = cell.site ? 1.3 : 1;
+                    ctx.stroke();
+                    if (cell.site) {
+                        this.hexPath(cell.x, cell.y, drawSize);
+                        ctx.fillStyle = rgba(cell.color, 0.05 + glow * 0.10);
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.arc(cell.x, cell.y, 2.2 + glow * 1.5, 0, TAU);
+                        ctx.fillStyle = rgba(cell.color, 0.5 + glow * 0.5);
+                        ctx.fill();
+                    }
+                }
+            }
+        };
+
+        var scenes = [radar, sonar, stars, hexmesh];
+        var current = 0;
+        var next = -1;
+        var fadeT = 0;
+        var sceneTimer = SCENE_SECONDS;
+        var changeListeners = [];
+
+        function emitChange() {
+            for (var i = 0; i < changeListeners.length; i++) {
+                try { changeListeners[i](current, scenes[current].name); } catch (_) { /* ignore */ }
+            }
+        }
+
+        function switchTo(index) {
+            index = ((index % scenes.length) + scenes.length) % scenes.length;
+            if (index === current || next !== -1) return;
+            if (REDUCE_MOTION) {
+                current = index;
+                sceneTimer = SCENE_SECONDS;
+                emitChange();
+                frame(performance.now(), true);
+                return;
+            }
+            next = index;
+            fadeT = 0;
+        }
+
+        function drawScene(scene, dt, t, alpha) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            /* per-scene mood tint */
+            var tint = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(vw, vh) * 0.8);
+            tint.addColorStop(0, scene.tint);
+            tint.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = tint;
+            ctx.fillRect(0, 0, vw, vh);
+            scene.draw(dt, t);
+            ctx.restore();
+        }
 
         function resize() {
             vw = window.innerWidth;
@@ -129,120 +594,40 @@
             cx = vw > 980 ? vw * 0.33 : vw * 0.5;
             cy = vh * 0.52;
             R = Math.min(vw, vh) * 0.46;
-            buildNodes();
+            for (var i = 0; i < scenes.length; i++) scenes[i].build();
+            if (REDUCE_MOTION) frame(performance.now(), true);
         }
 
-        function buildNodes() {
-            var count = Math.min(170, Math.max(60, Math.round((vw * vh) / 13500)));
-            var rand = mulberry32(20260705);
-            nodes = [];
-            for (var i = 0; i < count; i++) {
-                nodes.push({
-                    x: rand() * vw,
-                    y: rand() * vh,
-                    vx: (rand() - 0.5) * 14,
-                    vy: (rand() - 0.5) * 14,
-                    r: 0.8 + rand() * 1.7,
-                    tw: rand() * TAU,
-                    glow: 0,
-                    tint: tintPool[Math.floor(rand() * tintPool.length)]
-                });
-            }
-        }
-
-        function frame(now) {
+        function frame(now, single) {
             var dt = Math.min(0.05, (now - last) / 1000);
             last = now;
             var t = now / 1000;
             ctx.clearRect(0, 0, vw, vh);
 
-            /* Radar grid + sweep behind the node field */
-            drawRadarGrid(ctx, cx, cy, R, [R * 0.25, R * 0.5, R * 0.75, R], '#60a5fa');
-            if (!REDUCE_MOTION) {
-                sweep = normalizeAngle(sweep + dt * (TAU / 7));
-                drawSweep(ctx, cx, cy, R, sweep, '#38bdf8', 0.13);
-            }
-            /* Hub */
-            ctx.beginPath();
-            ctx.arc(cx, cy, 3.2, 0, TAU);
-            ctx.fillStyle = 'rgba(125,211,252,0.9)';
-            ctx.fill();
-
-            var i, j, n, m, dx, dy, dist;
-            for (i = 0; i < nodes.length; i++) {
-                n = nodes[i];
-                if (!REDUCE_MOTION) {
-                    n.x += n.vx * dt;
-                    n.y += n.vy * dt;
-                    /* Gentle pull toward the cursor when nearby */
-                    dx = mouse.x - n.x; dy = mouse.y - n.y;
-                    dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 150 && dist > 0.001) {
-                        n.x += (dx / dist) * 9 * dt;
-                        n.y += (dy / dist) * 9 * dt;
-                    }
-                    if (n.x < -12) n.x = vw + 12; else if (n.x > vw + 12) n.x = -12;
-                    if (n.y < -12) n.y = vh + 12; else if (n.y > vh + 12) n.y = -12;
-                    /* Ping nodes as the sweep passes over them */
-                    dx = n.x - cx; dy = n.y - cy;
-                    if (dx * dx + dy * dy < R * R) {
-                        var diff = normalizeAngle(sweep - Math.atan2(dy, dx));
-                        if (diff < 0.06) n.glow = 1;
-                    }
-                    n.glow *= Math.exp(-dt * 1.6);
-                }
-            }
-
-            /* Node-to-node constellation links */
-            for (i = 0; i < nodes.length; i++) {
-                n = nodes[i];
-                for (j = i + 1; j < nodes.length; j++) {
-                    m = nodes[j];
-                    dx = n.x - m.x; dy = n.y - m.y;
-                    var d2 = dx * dx + dy * dy;
-                    if (d2 < 110 * 110) {
-                        var a = 0.10 * (1 - Math.sqrt(d2) / 110);
-                        ctx.beginPath();
-                        ctx.moveTo(n.x, n.y);
-                        ctx.lineTo(m.x, m.y);
-                        ctx.strokeStyle = 'rgba(125,211,252,' + a.toFixed(3) + ')';
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
+            if (!REDUCE_MOTION && !single) {
+                if (next === -1) {
+                    sceneTimer -= dt;
+                    if (sceneTimer <= 0) switchTo(current + 1);
+                } else {
+                    fadeT += dt / FADE_SECONDS;
+                    if (fadeT >= 1) {
+                        current = next;
+                        next = -1;
+                        sceneTimer = SCENE_SECONDS;
+                        emitChange();
                     }
                 }
-                /* Links to the cursor */
-                dx = n.x - mouse.x; dy = n.y - mouse.y;
-                dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 170) {
-                    ctx.beginPath();
-                    ctx.moveTo(n.x, n.y);
-                    ctx.lineTo(mouse.x, mouse.y);
-                    ctx.strokeStyle = 'rgba(56,189,248,' + (0.22 * (1 - dist / 170)).toFixed(3) + ')';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
             }
 
-            /* Nodes */
-            for (i = 0; i < nodes.length; i++) {
-                n = nodes[i];
-                var alpha = 0.35 + 0.25 * Math.sin(t * 1.4 + n.tw) + n.glow * 0.55;
-                var radius = n.r + n.glow * 2.4;
-                ctx.beginPath();
-                ctx.arc(n.x, n.y, radius, 0, TAU);
-                ctx.fillStyle = rgba(n.tint, Math.max(0.08, Math.min(1, alpha)));
-                ctx.fill();
-                if (n.glow > 0.35) {
-                    ctx.beginPath();
-                    ctx.arc(n.x, n.y, radius + 5 * n.glow, 0, TAU);
-                    ctx.strokeStyle = rgba(n.tint, 0.35 * n.glow);
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
+            if (next === -1) {
+                drawScene(scenes[current], dt, t, 1);
+            } else {
+                drawScene(scenes[current], dt, t, 1 - fadeT);
+                drawScene(scenes[next], dt, t, fadeT);
             }
 
-            /* Click ripples */
-            for (i = ripples.length - 1; i >= 0; i--) {
+            /* click ripples on top of any scene */
+            for (var i = ripples.length - 1; i >= 0; i--) {
                 var rp = ripples[i];
                 rp.r += dt * 160;
                 rp.a -= dt * 1.1;
@@ -254,7 +639,7 @@
                 ctx.stroke();
             }
 
-            if (!REDUCE_MOTION) requestAnimationFrame(frame);
+            if (!REDUCE_MOTION && !single) requestAnimationFrame(frame);
         }
 
         window.addEventListener('resize', resize);
@@ -271,10 +656,19 @@
 
         resize();
         if (REDUCE_MOTION) {
-            frame(performance.now());
+            frame(performance.now(), true);
         } else {
             requestAnimationFrame(frame);
         }
+
+        return {
+            names: scenes.map(function (s) { return s.name; }),
+            getScene: function () { return current; },
+            setScene: switchTo,
+            onChange: function (cb) {
+                if (typeof cb === 'function') changeListeners.push(cb);
+            }
+        };
     }
 
     /* ====================================================================
@@ -558,6 +952,8 @@
         var last = performance.now();
         var packetTimer = 0;
         var LINK_DIST = 150;
+        /* 0..1 network activity — paces the data-packet pulses (0.5 = neutral). */
+        var activityLevel = 0.5;
 
         function theme() {
             return AMBIENT_THEMES[document.body.classList.contains('dark-mode') ? 'dark' : 'light'];
@@ -688,12 +1084,13 @@
                 }
             }
 
-            /* Data packets travelling along links */
+            /* Data packets travelling along links — rate follows network activity */
             if (!REDUCE_MOTION && !single) {
+                var maxPackets = 2 + Math.round(activityLevel * 9);
                 packetTimer -= dt;
-                if (packetTimer <= 0 && packets.length < 7) {
+                if (packetTimer <= 0 && packets.length < maxPackets) {
                     spawnPacket();
-                    packetTimer = 0.5 + Math.random() * 0.9;
+                    packetTimer = (0.35 + Math.random() * 0.8) * (1.7 - 1.25 * activityLevel);
                 }
                 for (i = packets.length - 1; i >= 0; i--) {
                     var p = packets[i];
@@ -732,6 +1129,13 @@
 
         resize();
         if (!REDUCE_MOTION) requestAnimationFrame(frame);
+
+        return {
+            setActivity: function (level) {
+                var v = Number(level);
+                if (isFinite(v)) activityLevel = Math.max(0, Math.min(1, v));
+            }
+        };
     }
 
     window.PrimeNetConstellation = {

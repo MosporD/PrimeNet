@@ -70,6 +70,7 @@ from modules.change_impact import change_impact_bp
 from modules.radio_morning_report import radio_morning_report_bp
 from modules.fault_management import fault_management_bp
 from modules.elevation import elevation_bp
+from modules.sleeping_cells import sleeping_cells_bp
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(activation_bp)
@@ -107,6 +108,7 @@ app.register_blueprint(change_impact_bp)
 app.register_blueprint(radio_morning_report_bp)
 app.register_blueprint(fault_management_bp)
 app.register_blueprint(elevation_bp)
+app.register_blueprint(sleeping_cells_bp)
 
 
 def _env_true(key: str, default: bool = False) -> bool:
