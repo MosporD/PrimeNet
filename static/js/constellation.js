@@ -1099,9 +1099,245 @@
         };
     }
 
+    /* ====================================================================
+     * JORDAN SITE MAP — real site positions on a stylized country outline
+     * ==================================================================== */
+
+    /* Simplified Jordan border, [lon, lat], clockwise from the NW corner. */
+    var JORDAN_OUTLINE = [
+        [35.56, 32.64], [35.79, 32.74], [36.06, 32.66], [36.41, 32.38],
+        [36.83, 32.31], [37.77, 32.74], [38.79, 33.37],
+        [39.15, 32.13],
+        [37.00, 31.50],
+        [37.98, 30.49], [37.65, 30.33],
+        [36.75, 29.87], [36.07, 29.19],
+        [34.96, 29.36],
+        [35.00, 29.55], [35.16, 30.40], [35.29, 31.15], [35.46, 31.40],
+        [35.55, 31.77], [35.53, 32.10], [35.57, 32.38]
+    ];
+    var JORDAN_CITIES = [
+        { name: 'AMMAN', lon: 35.93, lat: 31.95 },
+        { name: 'IRBID', lon: 35.85, lat: 32.55 },
+        { name: 'AQABA', lon: 35.00, lat: 29.53 }
+    ];
+
+    function initJordanMap(canvas, opts) {
+        opts = opts || {};
+        var ctx = canvas.getContext('2d');
+        var wrap = canvas.parentElement;
+        var tooltipEl = opts.tooltipEl || null;
+        var vw = 0, vh = 0;
+        var sites = [];        /* {id, name, area, lat, lon, x, y, tw, glow} */
+        var sweep = -Math.PI / 2;
+        var mouse = { x: -1e4, y: -1e4 };
+        var hoverSite = null;
+        var last = performance.now();
+
+        /* Equirectangular projection fitted to the canvas. */
+        var proj = { scale: 1, ox: 0, oy: 0, lonK: Math.cos(31.4 * Math.PI / 180) };
+        var sweepCx = 0, sweepCy = 0, sweepR = 0;
+
+        function fitProjection() {
+            var lons = JORDAN_OUTLINE.map(function (p) { return p[0]; });
+            var lats = JORDAN_OUTLINE.map(function (p) { return p[1]; });
+            var lonMin = Math.min.apply(null, lons), lonMax = Math.max.apply(null, lons);
+            var latMin = Math.min.apply(null, lats), latMax = Math.max.apply(null, lats);
+            var spanX = (lonMax - lonMin) * proj.lonK;
+            var spanY = latMax - latMin;
+            var pad = 22;
+            proj.scale = Math.min((vw - pad * 2) / spanX, (vh - pad * 2) / spanY);
+            proj.ox = (vw - spanX * proj.scale) / 2 - lonMin * proj.lonK * proj.scale;
+            proj.oy = (vh - spanY * proj.scale) / 2 + latMax * proj.scale;
+        }
+
+        function px(lon) { return lon * proj.lonK * proj.scale + proj.ox; }
+        function py(lat) { return proj.oy - lat * proj.scale; }
+
+        function placeSites() {
+            for (var i = 0; i < sites.length; i++) {
+                sites[i].x = px(sites[i].lon);
+                sites[i].y = py(sites[i].lat);
+            }
+            sweepCx = px(35.93);   /* sweep radiates from Amman */
+            sweepCy = py(31.95);
+            sweepR = Math.sqrt(vw * vw + vh * vh);
+        }
+
+        function resize() {
+            var rect = wrap.getBoundingClientRect();
+            vw = Math.max(200, rect.width);
+            vh = Math.max(200, rect.height);
+            ctx = fitCanvas(canvas, vw, vh);
+            fitProjection();
+            placeSites();
+            if (REDUCE_MOTION) frame(performance.now(), true);
+        }
+
+        function outlinePath() {
+            ctx.beginPath();
+            for (var i = 0; i < JORDAN_OUTLINE.length; i++) {
+                var x = px(JORDAN_OUTLINE[i][0]);
+                var y = py(JORDAN_OUTLINE[i][1]);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+        }
+
+        function frame(now, single) {
+            var dt = Math.min(0.05, (now - last) / 1000);
+            last = now;
+            var t = now / 1000;
+            ctx.clearRect(0, 0, vw, vh);
+
+            /* Country fill + glowing border */
+            outlinePath();
+            var fill = ctx.createLinearGradient(0, 0, 0, vh);
+            fill.addColorStop(0, 'rgba(37, 99, 235, 0.10)');
+            fill.addColorStop(1, 'rgba(14, 42, 92, 0.14)');
+            ctx.fillStyle = fill;
+            ctx.fill();
+            outlinePath();
+            ctx.strokeStyle = 'rgba(125, 211, 252, 0.55)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            outlinePath();
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            /* Sweep radiating from Amman, clipped to the country shape */
+            if (!REDUCE_MOTION && !single) {
+                sweep = normalizeAngle(sweep + dt * (TAU / 9));
+            }
+            ctx.save();
+            outlinePath();
+            ctx.clip();
+            drawSweep(ctx, sweepCx, sweepCy, sweepR, sweep, '#38bdf8', 0.07);
+            ctx.restore();
+
+            /* City reference marks */
+            ctx.font = '600 9px Consolas, Menlo, monospace';
+            for (var c = 0; c < JORDAN_CITIES.length; c++) {
+                var city = JORDAN_CITIES[c];
+                var cxp = px(city.lon), cyp = py(city.lat);
+                ctx.beginPath();
+                ctx.moveTo(cxp - 5, cyp); ctx.lineTo(cxp + 5, cyp);
+                ctx.moveTo(cxp, cyp - 5); ctx.lineTo(cxp, cyp + 5);
+                ctx.strokeStyle = 'rgba(147, 197, 253, 0.5)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(147, 197, 253, 0.55)';
+                ctx.fillText(city.name, cxp + 8, cyp + 3);
+            }
+
+            /* Site dots */
+            hoverSite = null;
+            var bestDist = 13 * 13;
+            for (var i = 0; i < sites.length; i++) {
+                var s = sites[i];
+                if (!REDUCE_MOTION) {
+                    var ang = Math.atan2(s.y - sweepCy, s.x - sweepCx);
+                    if (normalizeAngle(sweep - ang) < 0.05) s.glow = 1;
+                    s.glow *= Math.exp(-dt * 1.1);
+                } else {
+                    s.glow = 0.4;
+                }
+                var mdx = mouse.x - s.x, mdy = mouse.y - s.y;
+                var md2 = mdx * mdx + mdy * mdy;
+                if (md2 < bestDist) { bestDist = md2; hoverSite = s; }
+
+                var alpha = 0.4 + 0.2 * Math.sin(t * 1.5 + s.tw) + s.glow * 0.5;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, 1.8 + s.glow * 1.6, 0, TAU);
+                ctx.fillStyle = rgba('#7dd3fc', Math.min(1, alpha));
+                ctx.fill();
+                if (s.glow > 0.35) {
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, 3.5 + 5 * s.glow, 0, TAU);
+                    ctx.strokeStyle = rgba('#38bdf8', 0.3 * s.glow);
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+
+            /* Hover halo + tooltip */
+            if (hoverSite) {
+                ctx.beginPath();
+                ctx.arc(hoverSite.x, hoverSite.y, 7, 0, TAU);
+                ctx.strokeStyle = 'rgba(125, 211, 252, 0.9)';
+                ctx.lineWidth = 1.4;
+                ctx.stroke();
+            }
+            canvas.style.cursor = hoverSite ? 'pointer' : 'default';
+            updateTooltip();
+
+            if (!REDUCE_MOTION && !single) requestAnimationFrame(frame);
+        }
+
+        function updateTooltip() {
+            if (!tooltipEl) return;
+            if (!hoverSite) {
+                tooltipEl.hidden = true;
+                return;
+            }
+            var name = hoverSite.name && hoverSite.name !== hoverSite.id ? ' <small>' + hoverSite.name + '</small>' : '';
+            tooltipEl.innerHTML =
+                '<div class="radar-tip-title"><span class="radar-tip-dot" style="background:#7dd3fc"></span>' +
+                hoverSite.id + name + '</div>' +
+                (hoverSite.area ? '<div class="radar-tip-row"><span>Area</span><strong>' + hoverSite.area + '</strong></div>' : '') +
+                '<div class="radar-tip-row"><span>Lat / Lon</span><strong>' +
+                Number(hoverSite.lat).toFixed(3) + ', ' + Number(hoverSite.lon).toFixed(3) + '</strong></div>';
+            tooltipEl.hidden = false;
+            var pad2 = 12;
+            var x = hoverSite.x + pad2, y = hoverSite.y + pad2;
+            if (x + tooltipEl.offsetWidth > vw - 6) x = hoverSite.x - tooltipEl.offsetWidth - pad2;
+            if (y + tooltipEl.offsetHeight > vh - 6) y = hoverSite.y - tooltipEl.offsetHeight - pad2;
+            tooltipEl.style.left = Math.max(4, x) + 'px';
+            tooltipEl.style.top = Math.max(4, y) + 'px';
+        }
+
+        canvas.addEventListener('mousemove', function (e) {
+            var rect = canvas.getBoundingClientRect();
+            mouse.x = e.clientX - rect.left;
+            mouse.y = e.clientY - rect.top;
+            if (REDUCE_MOTION) frame(performance.now(), true);
+        });
+        canvas.addEventListener('mouseleave', function () {
+            mouse.x = -1e4; mouse.y = -1e4;
+            if (tooltipEl) tooltipEl.hidden = true;
+        });
+        window.addEventListener('resize', resize);
+
+        resize();
+        if (REDUCE_MOTION) {
+            frame(performance.now(), true);
+        } else {
+            requestAnimationFrame(frame);
+        }
+
+        return {
+            update: function (list) {
+                var rand = mulberry32(0x10CA7E);
+                sites = (Array.isArray(list) ? list : []).map(function (row) {
+                    return {
+                        id: String(row.id != null ? row.id : ''),
+                        name: String(row.name || ''),
+                        area: String(row.area || ''),
+                        lat: Number(row.lat),
+                        lon: Number(row.lon),
+                        x: 0, y: 0, tw: rand() * TAU, glow: 0
+                    };
+                }).filter(function (s) { return isFinite(s.lat) && isFinite(s.lon); });
+                placeSites();
+                if (REDUCE_MOTION) frame(performance.now(), true);
+            }
+        };
+    }
+
     window.PrimeNetConstellation = {
         initLoginScene: initLoginScene,
         initRadar: initRadar,
+        initJordanMap: initJordanMap,
         initAmbientBackground: initAmbientBackground,
         TECH_COLORS: TECH_COLORS
     };

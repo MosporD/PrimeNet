@@ -411,6 +411,82 @@ def dashboard_network_activity():
         return jsonify({'success': True, 'level': None, 'vendors': {}})
 
 
+_SITE_MAP_MAX_POINTS = 550
+_SITE_MAP_CACHE_SECONDS = 600
+_site_map_cache = {'expires': 0.0, 'payload': None}
+
+# Rough bounding box for Jordan — drops obviously bad coordinates.
+_JO_LAT_MIN, _JO_LAT_MAX = 28.9, 33.6
+_JO_LON_MIN, _JO_LON_MAX = 34.7, 39.5
+
+
+def _thin_site_points(sites: list[dict], max_points: int) -> list[dict]:
+    """Grid-thin sites so the map stays a representative, uncluttered sample."""
+    if len(sites) <= max_points:
+        return sites
+    cell_deg = 0.02
+    while cell_deg <= 0.25:
+        buckets: dict[tuple[int, int], dict] = {}
+        for site in sites:
+            key = (int(site['lat'] / cell_deg), int(site['lon'] / cell_deg))
+            buckets.setdefault(key, site)
+        if len(buckets) <= max_points:
+            return list(buckets.values())
+        cell_deg *= 1.6
+    return list(buckets.values())[:max_points]
+
+
+@auth_bp.route('/api/dashboard/site-map', methods=['GET'])
+def dashboard_site_map():
+    """Unique on-air sites with coordinates for the dashboard Jordan map."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    import time as _time
+
+    now = _time.time()
+    if _site_map_cache['payload'] is not None and _site_map_cache['expires'] > now:
+        return jsonify(_site_map_cache['payload'])
+
+    try:
+        from core.radio.metadata import list_cells
+
+        by_site: dict[str, dict] = {}
+        for row in list_cells():
+            sid = str(row.get('site_id') or '').strip()
+            lat = row.get('latitude')
+            lon = row.get('longitude')
+            if not sid or sid in by_site or lat is None or lon is None:
+                continue
+            if not (_JO_LAT_MIN <= lat <= _JO_LAT_MAX and _JO_LON_MIN <= lon <= _JO_LON_MAX):
+                continue
+            by_site[sid] = {
+                'id': sid,
+                'name': str(row.get('site_name') or '').strip(),
+                'area': str(row.get('area') or '').strip(),
+                'lat': round(float(lat), 5),
+                'lon': round(float(lon), 5),
+            }
+        all_sites = list(by_site.values())
+        shown = _thin_site_points(all_sites, _SITE_MAP_MAX_POINTS)
+        payload = {
+            'success': True,
+            'sites': shown,
+            'total_unique': len(all_sites),
+            'shown': len(shown),
+        }
+    except Exception:
+        logger.exception('Site map lookup failed')
+        payload = {'success': True, 'sites': [], 'total_unique': 0, 'shown': 0}
+
+    _site_map_cache['payload'] = payload
+    _site_map_cache['expires'] = now + _SITE_MAP_CACHE_SECONDS
+    resp = jsonify(payload)
+    resp.headers['Cache-Control'] = 'no-store, private'
+    return resp
+
+
 _GLOBAL_SEARCH_MAX_RESULTS = 10
 
 
