@@ -7,6 +7,13 @@ const BRAND_FAVICON_PATH = '/static/images/favicon.png?v=4';
 const PAGE_TRANSITION_STORAGE_KEY = 'primenetPageEnterDirection';
 const NAV_SECTIONS_STORAGE_KEY = 'primenetNavSections';
 const NAV_ROLE_STORAGE_KEY = 'primenetUserRole';
+const PRIMENET_CLOCK_OFFSET_HOURS = 3;
+const PRIMENET_CLOCK_LABEL = 'UTC+3';
+
+function formatPrimeNetClock(date = new Date()) {
+    const shifted = new Date(date.getTime() + PRIMENET_CLOCK_OFFSET_HOURS * 3600000);
+    return `${PRIMENET_CLOCK_LABEL} ${shifted.toISOString().slice(11, 19)}`;
+}
 
 let _featureNavSections = null;
 let _featureNavLoadPromise = null;

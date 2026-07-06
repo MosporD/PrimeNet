@@ -6,10 +6,10 @@
     <title>PrimeNet - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.1">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.4">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=1.5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=2.0">
 </head>
 <body class="has-constellation-bg">
-    <canvas id="dashboard-bg-canvas" class="dashboard-bg-canvas" aria-hidden="true"></canvas>
+    <canvas id="primenet-bg-canvas" class="primenet-bg-canvas" aria-hidden="true"></canvas>
     <div class="container">
         <header>
             <div class="header-content">
@@ -37,8 +37,7 @@
 
         <main class="dashboard-main">
 
-            <section class="dashboard-overview-row" aria-label="Network overview">
-            <section class="constellation-deck" aria-label="Network constellation radar">
+            <section class="constellation-deck constellation-deck-full" aria-label="Network constellation map">
                 <div class="constellation-radar-wrap">
                     <canvas id="network-radar-canvas"></canvas>
                     <div class="radar-center-total map-total-badge">
@@ -50,74 +49,23 @@
                 <div class="constellation-side">
                     <div class="constellation-head">
                         <div class="constellation-title"><span class="live-dot"></span>Network Constellation &middot; Jordan</div>
-                        <div class="constellation-clock" id="constellation-clock">UTC --:--:--</div>
+                        <div class="constellation-head-actions">
+                            <div class="constellation-clock" id="constellation-clock">UTC+3 --:--:--</div>
+                            <button type="button" class="constellation-refresh-btn" id="constellation-refresh-btn" onclick="refreshConstellationData()">
+                                Refresh
+                            </button>
+                        </div>
                     </div>
                     <div class="radar-legend" id="radar-legend" role="group" aria-label="Technology layers"></div>
-                    <div class="vendor-dials" id="vendor-dials" aria-label="Vendor balance per technology"></div>
-                    <div class="constellation-footnote" aria-hidden="true">
-                        <span id="map-sites-note">MAP: LOADING&hellip;</span>
-                        <span id="radar-traffic-note">TRAFFIC PULSE: &mdash;</span>
-                    </div>
-                </div>
-            </section>
-
-                <div class="op-sites-summary-card dashboard-op-sites-main">
-                    <div class="op-sites-summary-head">
-                        <span>Operational sites by technology</span>
-                        <button type="button" class="op-sites-refresh-btn" id="op-sites-refresh-btn" onclick="refreshOperationalSites()">
-                            Refresh
-                        </button>
-                    </div>
-                    <div class="op-sites-summary-columns op-sites-summary-columns-main" role="presentation">
-                        <div class="op-sites-summary-col op-sites-summary-col-total">
-                            <div class="op-sites-summary-col-title">Unique Sites</div>
-                            <div class="op-sites-summary-col-value" id="op-sites-total-sites">{{ total_sites }}</div>
-                            <div class="op-sites-summary-col-sub">All RATs</div>
-                            <div class="op-sites-summary-col-unit">sites</div>
+                    <div class="vendor-dials-section">
+                        <div class="vendor-dials-head">
+                            <span>Vendor balance</span>
+                            <span class="vendor-dials-key" aria-hidden="true">
+                                <i class="vendor-key-dot vendor-key-huawei"></i>Huawei
+                                <i class="vendor-key-dot vendor-key-nokia"></i>Nokia
+                            </span>
                         </div>
-                        {% for col in tech_site_columns %}
-                        <div class="op-sites-summary-col" data-rat="{{ col['key'] }}">
-                            <div class="op-sites-summary-col-title">{{ col['title'] }}</div>
-                            <div class="op-sites-summary-col-value" id="op-sites-val-{{ col['key'] }}">{{ col['count'] }}</div>
-                            <div class="op-sites-summary-col-sub">{{ col['subtitle'] }}</div>
-                            <div class="op-sites-summary-col-unit">sites</div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </section>
-
-            <section class="dashboard-op-sites" aria-label="Operational sites by vendor">
-                <div class="op-sites-vendor-panels">
-                    <div class="op-sites-summary-card vendor-panel">
-                        <div class="op-sites-summary-head vendor-head vendor-head-huawei">
-                            <img src="/parameter_dictionary/static/images/huawei_logo.png" alt="Huawei" class="vendor-logo">
-                        </div>
-                        <div class="op-sites-summary-columns" role="presentation">
-                            {% for col in tech_site_columns %}
-                            <div class="op-sites-summary-col" data-rat="{{ col['key'] }}">
-                                <div class="op-sites-summary-col-title">{{ col['title'] }}</div>
-                                <div class="op-sites-summary-col-value" id="op-sites-vendor-huawei-{{ col['key'] }}">{{ col['vendor_counts']['Huawei'] if col.get('vendor_counts') else 0 }}</div>
-                                <div class="op-sites-summary-col-sub">{{ col['subtitle'] }}</div>
-                                <div class="op-sites-summary-col-unit">sites</div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="op-sites-summary-card vendor-panel">
-                        <div class="op-sites-summary-head vendor-head vendor-head-nokia">
-                            <img src="/parameter_dictionary/static/images/nokia_logo.png" alt="Nokia" class="vendor-logo">
-                        </div>
-                        <div class="op-sites-summary-columns" role="presentation">
-                            {% for col in tech_site_columns %}
-                            <div class="op-sites-summary-col" data-rat="{{ col['key'] }}">
-                                <div class="op-sites-summary-col-title">{{ col['title'] }}</div>
-                                <div class="op-sites-summary-col-value" id="op-sites-vendor-nokia-{{ col['key'] }}">{{ col['vendor_counts']['Nokia'] if col.get('vendor_counts') else 0 }}</div>
-                                <div class="op-sites-summary-col-sub">{{ col['subtitle'] }}</div>
-                                <div class="op-sites-summary-col-unit">sites</div>
-                            </div>
-                            {% endfor %}
-                        </div>
+                        <div class="vendor-dials" id="vendor-dials" aria-label="Vendor balance per technology"></div>
                     </div>
                 </div>
             </section>
@@ -655,7 +603,7 @@
 
     <script id="radar-bootstrap-data" type="application/json">{{ {'columns': tech_site_columns, 'total': total_sites} | tojson }}</script>
     <script src="{{ url_for('static', filename='js/constellation.js') }}?v=1.0"></script>
-    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.9"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=2.1"></script>
     <script>
         // ── Network map (Jordan) + legend ───────────────────────────
         let networkSiteMap = null;
@@ -682,21 +630,20 @@
                 </button>
             `).join('');
             legend.querySelectorAll('.radar-legend-chip').forEach(chip => {
-                chip.addEventListener('click', () => flashTechColumn(chip.dataset.rat));
+                chip.addEventListener('click', () => flashLegendChip(chip.dataset.rat));
             });
         }
 
-        function flashTechColumn(key) {
+        function flashLegendChip(key) {
             if (!key) return;
-            document.querySelectorAll(`.op-sites-summary-col[data-rat="${CSS.escape(key)}"]`).forEach(col => {
-                col.classList.remove('radar-target-flash');
-                void col.offsetWidth;
-                col.classList.add('radar-target-flash');
+            document.querySelectorAll(`.radar-legend-chip[data-rat="${CSS.escape(key)}"]`).forEach(chip => {
+                chip.classList.remove('radar-target-flash');
+                void chip.offsetWidth;
+                chip.classList.add('radar-target-flash');
             });
         }
 
         async function loadSiteMap() {
-            const note = document.getElementById('map-sites-note');
             try {
                 const res = await fetch('/api/dashboard/site-map', {
                     credentials: 'same-origin',
@@ -706,11 +653,6 @@
                 const data = await res.json().catch(() => ({}));
                 if (!res.ok || !data.success) return;
                 if (networkSiteMap) networkSiteMap.update(data.sites || []);
-                if (note) {
-                    note.textContent = data.total_unique
-                        ? `MAP: ${data.shown} OF ${data.total_unique} SITES`
-                        : 'MAP: NO COORDINATES';
-                }
             } catch (err) {
                 console.warn('Site map unavailable', err);
             }
@@ -728,9 +670,49 @@
             renderVendorDials(data.columns);
             const clock = document.getElementById('constellation-clock');
             if (clock) {
-                const tick = () => { clock.textContent = 'UTC ' + new Date().toISOString().slice(11, 19); };
+                const tick = () => { clock.textContent = formatPrimeNetClock(); };
                 tick();
                 setInterval(tick, 1000);
+            }
+        }
+
+        async function refreshConstellationData() {
+            const refreshBtn = document.getElementById('constellation-refresh-btn');
+            if (!refreshBtn || refreshBtn.disabled) {
+                return;
+            }
+
+            const defaultLabel = 'Refresh';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = 'Refreshing...';
+
+            try {
+                const response = await fetch('/api/dashboard/operational-sites', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: { Accept: 'application/json' },
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to refresh network constellation');
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.error || 'Request failed');
+                }
+                const columns = Array.isArray(data.tech_site_columns) ? data.tech_site_columns : [];
+                const totalEl = document.getElementById('radar-total-sites');
+                if (totalEl) {
+                    totalEl.textContent = data.total_sites != null ? Number(data.total_sites).toLocaleString() : '0';
+                }
+                updateNetworkRadar(columns, data.total_sites);
+                await loadSiteMap();
+            } catch (error) {
+                alert(error.message || 'Could not refresh network constellation');
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = defaultLabel;
             }
         }
 
@@ -785,7 +767,6 @@
 
         // ── Traffic pulse (real network activity drives the background) ──
         async function refreshNetworkActivity() {
-            const note = document.getElementById('radar-traffic-note');
             try {
                 const res = await fetch('/api/dashboard/network-activity', {
                     credentials: 'same-origin',
@@ -793,15 +774,10 @@
                     headers: { Accept: 'application/json' },
                 });
                 const data = await res.json().catch(() => ({}));
-                if (!res.ok || !data.success) return;
-                if (data.level == null) {
-                    if (note) note.textContent = 'TRAFFIC PULSE: N/A';
-                    return;
-                }
+                if (!res.ok || !data.success || data.level == null) return;
                 if (window.dashboardAmbientBg) {
                     window.dashboardAmbientBg.setActivity(data.level);
                 }
-                if (note) note.textContent = `TRAFFIC PULSE: ${Math.round(data.level * 100)}% OF PEAK`;
             } catch (err) {
                 console.warn('Network activity unavailable', err);
             }
@@ -1216,72 +1192,6 @@
                     }
                 });
             });
-        }
-
-        async function refreshOperationalSites() {
-            const refreshBtn = document.getElementById('op-sites-refresh-btn');
-            if (!refreshBtn || refreshBtn.disabled) {
-                return;
-            }
-
-            const defaultLabel = 'Refresh';
-            refreshBtn.disabled = true;
-            refreshBtn.textContent = 'Refreshing...';
-
-            try {
-                const response = await fetch('/api/dashboard/operational-sites', {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    cache: 'no-store',
-                    headers: { Accept: 'application/json' },
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to refresh operational site counts');
-                }
-
-                const data = await response.json();
-                if (!data.success) {
-                    throw new Error(data.error || 'Request failed');
-                }
-                const columns = Array.isArray(data.tech_site_columns) ? data.tech_site_columns : [];
-                const totalSitesEl = document.getElementById('op-sites-total-sites');
-                if (totalSitesEl) {
-                    totalSitesEl.textContent = data.total_sites != null ? data.total_sites : 0;
-                }
-
-                columns.forEach((column) => {
-                    const key = column && column.key != null ? String(column.key) : '';
-                    if (!key) return;
-                    // Prefer stable ids — CSS [data-rat="4G-FDD"] is easy to mis-parse across engines.
-                    const valueEl = document.getElementById(`op-sites-val-${key}`);
-                    if (valueEl) {
-                        valueEl.textContent = column.count != null ? column.count : 0;
-                    }
-                    const vendorCounts = column.vendor_counts || {};
-                    const huaweiEl = document.getElementById(`op-sites-val-${key}-huawei`);
-                    const nokiaEl = document.getElementById(`op-sites-val-${key}-nokia`);
-                    const huaweiPanelEl = document.getElementById(`op-sites-vendor-huawei-${key}`);
-                    const nokiaPanelEl = document.getElementById(`op-sites-vendor-nokia-${key}`);
-                    if (huaweiEl) {
-                        huaweiEl.textContent = vendorCounts.Huawei != null ? vendorCounts.Huawei : 0;
-                    }
-                    if (nokiaEl) {
-                        nokiaEl.textContent = vendorCounts.Nokia != null ? vendorCounts.Nokia : 0;
-                    }
-                    if (huaweiPanelEl) {
-                        huaweiPanelEl.textContent = vendorCounts.Huawei != null ? vendorCounts.Huawei : 0;
-                    }
-                    if (nokiaPanelEl) {
-                        nokiaPanelEl.textContent = vendorCounts.Nokia != null ? vendorCounts.Nokia : 0;
-                    }
-                });
-                updateNetworkRadar(columns, data.total_sites);
-            } catch (error) {
-                alert(error.message || 'Could not refresh operational site counts');
-            } finally {
-                refreshBtn.disabled = false;
-                refreshBtn.textContent = defaultLabel;
-            }
         }
 
         function openLegalStatement() {
@@ -1784,7 +1694,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const bgCanvas = document.getElementById('dashboard-bg-canvas');
+            const bgCanvas = document.getElementById('primenet-bg-canvas');
             if (bgCanvas && window.PrimeNetConstellation) {
                 window.dashboardAmbientBg = PrimeNetConstellation.initAmbientBackground(bgCanvas);
             }
