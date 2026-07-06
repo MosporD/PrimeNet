@@ -1,0 +1,37 @@
+---
+description: HTML template and static asset conventions for PrimeNet UI
+globs: "**/*.{html,css,js}"
+alwaysApply: false
+---
+
+# UI conventions
+
+## Stylesheet load order
+
+1. `static/css/common.css` — base resets and shared components
+2. Page or module CSS (`dashboard.css`, `radio_modules.css`, or module `static/*.css`)
+3. `constellation.css` — only on dashboard / pages using constellation background
+
+Use `url_for('static', filename='css/...')` with cache-bust `?v=X.X`.
+
+## Dashboard
+
+- Body class: `has-constellation-bg`
+- Canvas: `#primenet-bg-canvas` driven by `constellation.js`
+- Module cards in constellation deck — edit section blocks, not the whole 1800-line file
+
+## Radio modules
+
+- Extend behavior from `templates/radio_module.html` pattern: topbar, filters, `data-*` attrs on `<body>`
+- Shared JS: `static/js/common.js` (`logout()`, shared helpers)
+
+## Module templates
+
+- Standalone modules (e.g. network health) keep their own layout but should share `common.css` and header link back to dashboard
+- Prefer CSS classes over inline `style=""` attributes
+- Bump `?v=` only on files you change
+
+## Do not
+
+- Copy-paste entire `<head>` blocks — match existing link tags and class naming in sibling templates
+- Edit `modules/parameter_dictionary/huawei_params/` HTML

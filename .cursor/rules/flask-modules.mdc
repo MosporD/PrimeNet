@@ -1,0 +1,44 @@
+---
+description: Flask blueprint and module conventions for PrimeNet
+globs: modules/**/*.py
+alwaysApply: false
+---
+
+# Flask module patterns
+
+## New blueprint
+
+```python
+from flask import Blueprint, render_template, redirect, request, url_for
+from functools import wraps
+from database_enhanced import get_user_by_session
+
+my_bp = Blueprint(
+    "my_module",
+    __name__,
+    template_folder="templates",
+    static_folder="static",          # optional
+    static_url_path="/my-module/static",
+)
+```
+
+Register in `app.py`: import blueprint, then `app.register_blueprint(my_bp)`.
+
+## Auth decorator
+
+Reuse the `login_required` pattern: read `session_token` cookie, call `get_user_by_session`, redirect to `auth.login_page` on failure.
+
+## File layout
+
+- `routes.py` — HTTP handlers only
+- `logic.py` / `config.py` — business logic and constants
+- `templates/` — Jinja HTML
+- `static/` — module-specific CSS/JS when not shared
+
+## Data access
+
+- PM SQLite: `db/runtime.py` (`connect_pm_db`, `connect_metadata`)
+- Paths: `sync_config.py`
+- Shared radio logic: `core/radio/`
+
+Do not import from `huawei_params/`; use `core/cm_extractor/huawei_param_dict.py` for dictionary access.

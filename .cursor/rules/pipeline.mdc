@@ -1,0 +1,38 @@
+---
+description: ETL pipeline orchestration and path conventions
+globs: "{pipeline/**,scripts/pipeline/**,core/pipeline_*.py}"
+alwaysApply: false
+---
+
+# Pipeline conventions
+
+## Canonical entrypoints
+
+| Task | Script |
+|------|--------|
+| Full hourly pull + load | `pipeline/orchestrators/orchestrate_hourly_full.py` |
+| Full daily pull + load | `pipeline/orchestrators/orchestrate_daily_full.py` |
+| Watcher one-cycle | `pipeline/orchestrators/orchestrate_watcher_cycle.py` |
+| Hourly pull | `pipeline/pull/hourly/pull_all.py` |
+| Daily pull | `pipeline/pull/daily/pull_all.py` |
+| Hourly load | `pipeline/load/hourly/load_all.py` |
+| Daily load | `pipeline/load/daily/load_all.py` |
+
+## Path taxonomy
+
+`pipeline/paths.py` defines raw CSV layout under `raw/{vendor}/{cells,groups}/{rat}/{hourly,daily}/`.
+
+## Legacy scripts
+
+`scripts/pipeline/` and `scripts/pull_all_raw*.py` remain for compatibility. New work goes in `pipeline/`.
+
+## Huawei daily staging
+
+Daily exports land in `raw/huawei/{cells,groups}/all/daily`, then split by RAT before `pipeline/load/daily/load_all.py`.
+
+## Shared core
+
+- `core/pipeline_run.py`, `core/pipeline_load.py`, `core/pipeline_ingest_verify.py`
+- `core/raw_pm_files.py`, `core/pm_retention.py`
+
+`raw/` and `*.db` are runtime data — never treat as source to edit.
