@@ -41,7 +41,7 @@
             <section class="constellation-deck" aria-label="Network constellation radar">
                 <div class="constellation-radar-wrap">
                     <canvas id="network-radar-canvas"></canvas>
-                    <div class="radar-center-total">
+                    <div class="radar-center-total map-total-badge">
                         <strong id="radar-total-sites">{{ total_sites }}</strong>
                         <span>on-air sites</span>
                     </div>
@@ -49,13 +49,13 @@
                 </div>
                 <div class="constellation-side">
                     <div class="constellation-head">
-                        <div class="constellation-title"><span class="live-dot"></span>Network Constellation</div>
+                        <div class="constellation-title"><span class="live-dot"></span>Network Constellation &middot; Jordan</div>
                         <div class="constellation-clock" id="constellation-clock">UTC --:--:--</div>
                     </div>
                     <div class="radar-legend" id="radar-legend" role="group" aria-label="Technology layers"></div>
                     <div class="vendor-dials" id="vendor-dials" aria-label="Vendor balance per technology"></div>
                     <div class="constellation-footnote" aria-hidden="true">
-                        <span id="radar-focus-note">FOCUS: ALL LAYERS</span>
+                        <span id="map-sites-note">MAP: LOADING&hellip;</span>
                         <span id="radar-traffic-note">TRAFFIC PULSE: &mdash;</span>
                     </div>
                 </div>
@@ -657,8 +657,8 @@
     <script src="{{ url_for('static', filename='js/constellation.js') }}?v=1.0"></script>
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.9"></script>
     <script>
-        // ── Network Constellation Radar ─────────────────────────────
-        let networkRadar = null;
+        // ── Network map (Jordan) + legend ───────────────────────────
+        let networkSiteMap = null;
 
         function radarBootstrapData() {
             try {
@@ -682,29 +682,37 @@
                 </button>
             `).join('');
             legend.querySelectorAll('.radar-legend-chip').forEach(chip => {
-                chip.addEventListener('click', () => focusRadarTech(chip.dataset.rat));
-            });
-            syncRadarLegendActive();
-        }
-
-        function syncRadarLegendActive() {
-            const current = networkRadar ? networkRadar.getFocus() : null;
-            document.querySelectorAll('.radar-legend-chip').forEach(chip => {
-                chip.classList.toggle('active', chip.dataset.rat === current);
+                chip.addEventListener('click', () => flashTechColumn(chip.dataset.rat));
             });
         }
 
-        function focusRadarTech(key) {
-            if (!networkRadar) return;
-            const next = networkRadar.getFocus() === key ? null : key;
-            networkRadar.setFocus(next);
-            syncRadarLegendActive();
-            if (next) {
-                document.querySelectorAll(`.op-sites-summary-col[data-rat="${CSS.escape(next)}"]`).forEach(col => {
-                    col.classList.remove('radar-target-flash');
-                    void col.offsetWidth;
-                    col.classList.add('radar-target-flash');
+        function flashTechColumn(key) {
+            if (!key) return;
+            document.querySelectorAll(`.op-sites-summary-col[data-rat="${CSS.escape(key)}"]`).forEach(col => {
+                col.classList.remove('radar-target-flash');
+                void col.offsetWidth;
+                col.classList.add('radar-target-flash');
+            });
+        }
+
+        async function loadSiteMap() {
+            const note = document.getElementById('map-sites-note');
+            try {
+                const res = await fetch('/api/dashboard/site-map', {
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: { Accept: 'application/json' },
                 });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) return;
+                if (networkSiteMap) networkSiteMap.update(data.sites || []);
+                if (note) {
+                    note.textContent = data.total_unique
+                        ? `MAP: ${data.shown} OF ${data.total_unique} SITES`
+                        : 'MAP: NO COORDINATES';
+                }
+            } catch (err) {
+                console.warn('Site map unavailable', err);
             }
         }
 
@@ -712,13 +720,10 @@
             const canvas = document.getElementById('network-radar-canvas');
             if (!canvas || !window.PrimeNetConstellation) return;
             const data = radarBootstrapData();
-            networkRadar = PrimeNetConstellation.initRadar(canvas, {
-                columns: data.columns,
-                total: data.total,
+            networkSiteMap = PrimeNetConstellation.initJordanMap(canvas, {
                 tooltipEl: document.getElementById('radar-tooltip'),
-                centerEl: document.getElementById('radar-total-sites'),
-                onSelect: focusRadarTech,
             });
+            loadSiteMap();
             renderRadarLegend(data.columns);
             renderVendorDials(data.columns);
             const clock = document.getElementById('constellation-clock');
@@ -730,9 +735,10 @@
         }
 
         function updateNetworkRadar(columns, total) {
-            if (networkRadar) networkRadar.update(columns, total);
             renderRadarLegend(columns || []);
             renderVendorDials(columns || []);
+            const totalEl = document.getElementById('radar-total-sites');
+            if (totalEl && total != null) totalEl.textContent = Number(total).toLocaleString();
         }
 
         // ── Vendor balance dials (Huawei vs Nokia per technology) ──
