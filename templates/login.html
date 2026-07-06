@@ -389,6 +389,55 @@
             pointer-events: none;
         }
 
+        /* ── Scene switcher (rotating background illustrations) ── */
+        .scene-switcher {
+            position: fixed;
+            left: 26px;
+            bottom: 18px;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Consolas', 'SFMono-Regular', Menlo, monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.16em;
+            color: rgba(143, 179, 221, 0.75);
+        }
+
+        .scene-label {
+            min-width: 12ch;
+            transition: opacity 0.4s ease;
+        }
+
+        .scene-label.fading { opacity: 0; }
+
+        .scene-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .scene-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            border: 1px solid rgba(125, 211, 252, 0.5);
+            background: transparent;
+            padding: 0;
+            cursor: pointer;
+            transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+        }
+
+        .scene-dot:hover { transform: scale(1.25); }
+
+        .scene-dot.active {
+            background: var(--pn-cyan);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+        }
+
+        @media (max-width: 980px) {
+            .scene-switcher { left: 50%; transform: translateX(-50%); bottom: 40px; }
+        }
+
         /* ── Post-login transition (kept from previous design) ──── */
         .login-shell,
         .page-credit {
@@ -524,6 +573,11 @@
 
     <div class="page-credit">Developed by Malek Mohammad</div>
 
+    <div class="scene-switcher" id="scene-switcher" aria-label="Background scene">
+        <span class="scene-label" id="scene-label">RADAR SWEEP</span>
+        <div class="scene-dots" id="scene-dots"></div>
+    </div>
+
     <div id="loginBrandTransition" class="login-brand-transition" aria-hidden="true">
         <img src="/static/images/favicon.png?v=4" alt="PrimeNet logo" class="login-brand-transition-logo">
         <div class="login-brand-transition-title">PrimeNet</div>
@@ -534,8 +588,31 @@
     <script src="{{ url_for('static', filename='js/constellation.js') }}?v=1.0"></script>
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.9"></script>
     <script>
-        // Interactive constellation + radar background
-        PrimeNetConstellation.initLoginScene(document.getElementById('constellation-canvas'));
+        // Rotating background illustrations (radar / sonar / stars / hex mesh)
+        const loginScene = PrimeNetConstellation.initLoginScene(document.getElementById('constellation-canvas'));
+
+        (function () {
+            const label = document.getElementById('scene-label');
+            const dotsWrap = document.getElementById('scene-dots');
+            const dots = loginScene.names.map((name, i) => {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = 'scene-dot' + (i === 0 ? ' active' : '');
+                dot.title = name;
+                dot.setAttribute('aria-label', 'Switch background to ' + name);
+                dot.addEventListener('click', () => loginScene.setScene(i));
+                dotsWrap.appendChild(dot);
+                return dot;
+            });
+            loginScene.onChange((index, name) => {
+                label.classList.add('fading');
+                setTimeout(() => {
+                    label.textContent = name;
+                    label.classList.remove('fading');
+                }, 250);
+                dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+            });
+        })();
 
         // Rotating telemetry ticker
         (function () {
