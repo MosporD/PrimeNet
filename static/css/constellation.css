@@ -1,4 +1,4 @@
-/* PrimeNet — Network Constellation Radar deck (dashboard). */
+﻿/* PrimeNet — Network Constellation Radar deck (dashboard). */
 
 /* Full-page ambient constellation background behind the dashboard content. */
 .dashboard-bg-canvas {
@@ -21,12 +21,34 @@ body.has-constellation-bg.dark-mode .dashboard-main {
     background: transparent;
 }
 
+/* Constellation deck left, operational sites main card right */
+.dashboard-overview-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.dashboard-overview-row .constellation-deck {
+    margin-bottom: 0;
+    min-width: 0;
+}
+
+.dashboard-overview-row .dashboard-op-sites-main {
+    max-width: none;
+    margin: 0;
+    min-width: 0;
+    width: 100%;
+    align-self: center;
+}
+
 .constellation-deck {
     display: grid;
-    grid-template-columns: minmax(280px, 420px) 1fr;
-    gap: 22px;
-    margin-bottom: 26px;
-    padding: 20px;
+    grid-template-columns: minmax(260px, 1fr) minmax(280px, 1.2fr);
+    gap: 20px;
+    padding: 20px 22px;
     border-radius: 16px;
     border: 1px solid rgba(63, 104, 168, 0.45);
     background:
@@ -43,11 +65,12 @@ body.dark-mode .constellation-deck {
 
 .constellation-radar-wrap {
     position: relative;
-    aspect-ratio: 1 / 1;
-    max-height: 380px;
-    justify-self: center;
     width: 100%;
-    max-width: 380px;
+    max-width: 440px;
+    aspect-ratio: 1 / 1;
+    justify-self: center;
+    align-self: center;
+    margin: 0 auto;
 }
 
 #network-radar-canvas {
@@ -69,7 +92,7 @@ body.dark-mode .constellation-deck {
 
 .radar-center-total strong {
     display: block;
-    font-size: 1.45rem;
+    font-size: clamp(1.2rem, 2vw, 1.65rem);
     font-weight: 800;
     color: #f0f9ff;
     text-shadow: 0 0 18px rgba(56, 189, 248, 0.65);
@@ -132,13 +155,12 @@ body.dark-mode .constellation-deck {
 
 .radar-tip-row strong { color: #f0f9ff; }
 
-/* ── Right-hand info column ─────────────────────────────────── */
-
 .constellation-side {
     display: flex;
     flex-direction: column;
     gap: 14px;
     min-width: 0;
+    justify-content: center;
 }
 
 .constellation-head {
@@ -180,29 +202,28 @@ body.dark-mode .constellation-deck {
     color: rgba(147, 197, 253, 0.9);
 }
 
-.constellation-desc {
-    font-size: 0.84rem;
-    color: rgba(191, 219, 254, 0.75);
-    max-width: 62ch;
-}
-
 .radar-legend {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 10px;
+    width: 100%;
 }
 
 .radar-legend-chip {
-    display: inline-flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto;
     align-items: center;
-    gap: 9px;
-    padding: 8px 13px;
+    gap: 2px 12px;
+    width: 100%;
+    padding: 10px 14px;
     border-radius: 11px;
     border: 1px solid rgba(96, 165, 250, 0.28);
     background: rgba(8, 22, 52, 0.6);
     color: #dbeafe;
     font: inherit;
-    font-size: 0.84rem;
+    font-size: 0.88rem;
+    text-align: left;
     cursor: pointer;
     transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
@@ -219,8 +240,9 @@ body.dark-mode .constellation-deck {
 }
 
 .radar-legend-chip i {
-    width: 9px;
-    height: 9px;
+    grid-row: 1 / span 2;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     display: inline-block;
     background: var(--chip-color, #38bdf8);
@@ -228,25 +250,16 @@ body.dark-mode .constellation-deck {
 }
 
 .radar-legend-chip .chip-count {
+    grid-row: 1 / span 2;
     font-weight: 800;
     color: #f0f9ff;
     font-variant-numeric: tabular-nums;
+    font-size: 1rem;
 }
 
 .radar-legend-chip .chip-sub {
-    font-size: 0.7rem;
-    color: rgba(147, 197, 253, 0.7);
-}
-
-.constellation-footnote {
-    margin-top: auto;
-    font-family: 'Consolas', 'SFMono-Regular', Menlo, monospace;
     font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    color: rgba(125, 174, 232, 0.6);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 18px;
+    color: rgba(147, 197, 253, 0.7);
 }
 
 /* Flash applied to the matching op-sites column when a tech is selected */
@@ -260,11 +273,36 @@ body.dark-mode .constellation-deck {
     border-radius: 10px;
 }
 
+@media (max-width: 1280px) {
+    .dashboard-overview-row {
+        grid-template-columns: 1fr;
+    }
+
+    .constellation-deck {
+        grid-template-columns: minmax(240px, 1fr) minmax(0, 1.2fr);
+    }
+
+    .constellation-radar-wrap {
+        max-width: 380px;
+    }
+}
+
 @media (max-width: 900px) {
     .constellation-deck {
         grid-template-columns: 1fr;
     }
+
     .constellation-radar-wrap {
-        max-width: 330px;
+        max-width: 340px;
+    }
+
+    .radar-legend {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .radar-legend-chip {
+        flex: 1 1 200px;
+        width: auto;
     }
 }

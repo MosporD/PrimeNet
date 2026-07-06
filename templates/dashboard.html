@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.3">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=1.5">
 </head>
 <body class="has-constellation-bg">
     <canvas id="dashboard-bg-canvas" class="dashboard-bg-canvas" aria-hidden="true"></canvas>
@@ -37,6 +37,7 @@
 
         <main class="dashboard-main">
 
+            <section class="dashboard-overview-row" aria-label="Network overview">
             <section class="constellation-deck" aria-label="Network constellation radar">
                 <div class="constellation-radar-wrap">
                     <canvas id="network-radar-canvas"></canvas>
@@ -51,22 +52,11 @@
                         <div class="constellation-title"><span class="live-dot"></span>Network Constellation</div>
                         <div class="constellation-clock" id="constellation-clock">UTC --:--:--</div>
                     </div>
-                    <p class="constellation-desc">
-                        Live radar view of the operational network. Each orbit is a radio access
-                        technology — hover a blip for site &amp; vendor detail, click a blip or a
-                        chip below to focus that layer.
-                    </p>
                     <div class="radar-legend" id="radar-legend" role="group" aria-label="Technology layers"></div>
-                    <div class="constellation-footnote" aria-hidden="true">
-                        <span>SWEEP 6.5s</span>
-                        <span>ORBITS 2G&rarr;5G</span>
-                        <span id="radar-focus-note">FOCUS: ALL LAYERS</span>
-                    </div>
                 </div>
             </section>
 
-            <section class="dashboard-op-sites" aria-label="Operational sites by technology">
-                <div class="op-sites-summary-card">
+                <div class="op-sites-summary-card dashboard-op-sites-main">
                     <div class="op-sites-summary-head">
                         <span>Operational sites by technology</span>
                         <button type="button" class="op-sites-refresh-btn" id="op-sites-refresh-btn" onclick="refreshOperationalSites()">
@@ -90,6 +80,9 @@
                         {% endfor %}
                     </div>
                 </div>
+            </section>
+
+            <section class="dashboard-op-sites" aria-label="Operational sites by vendor">
                 <div class="op-sites-vendor-panels">
                     <div class="op-sites-summary-card vendor-panel">
                         <div class="op-sites-summary-head vendor-head vendor-head-huawei">
@@ -686,8 +679,6 @@
             document.querySelectorAll('.radar-legend-chip').forEach(chip => {
                 chip.classList.toggle('active', chip.dataset.rat === current);
             });
-            const note = document.getElementById('radar-focus-note');
-            if (note) note.textContent = current ? `FOCUS: ${current}` : 'FOCUS: ALL LAYERS';
         }
 
         function focusRadarTech(key) {
