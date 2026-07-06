@@ -53,6 +53,11 @@
                         <div class="constellation-clock" id="constellation-clock">UTC --:--:--</div>
                     </div>
                     <div class="radar-legend" id="radar-legend" role="group" aria-label="Technology layers"></div>
+                    <div class="vendor-dials" id="vendor-dials" aria-label="Vendor balance per technology"></div>
+                    <div class="constellation-footnote" aria-hidden="true">
+                        <span id="radar-focus-note">FOCUS: ALL LAYERS</span>
+                        <span id="radar-traffic-note">TRAFFIC PULSE: &mdash;</span>
+                    </div>
                 </div>
             </section>
 
@@ -124,9 +129,12 @@
             {% endif %}
 
             <section class="dashboard-tools-toolbar" aria-label="Dashboard module tools">
-                <div class="dashboard-tool-search-wrap">
-                    <label class="dashboard-tool-search-label" for="dashboard-tool-search">Find a tool</label>
-                    <input id="dashboard-tool-search" class="dashboard-tool-search" type="search" placeholder="Search modules…" autocomplete="off">
+                <div class="dashboard-tool-search-wrap global-search-wrap">
+                    <label class="dashboard-tool-search-label" for="dashboard-tool-search">Find anything</label>
+                    <input id="dashboard-tool-search" class="dashboard-tool-search" type="search"
+                           placeholder="Search tools, sites, cells, PCI, parameters…" autocomplete="off"
+                           role="combobox" aria-expanded="false" aria-controls="global-search-results">
+                    <div class="global-search-results" id="global-search-results" hidden></div>
                 </div>
             </section>
 
@@ -316,6 +324,11 @@
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Capacity Hotspots" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">&#9889;</div>
                         <div class="function-name">Capacity Hotspots</div>
+                    </a>
+                    <a href="/sleeping-cells" class="function-card" data-module-id="sleeping-cells" data-module-name="Sleeping Cell Detector">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Sleeping Cell Detector" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">&#128564;</div>
+                        <div class="function-name">Sleeping Cell Detector</div>
                     </a>
                     <a href="/layer-coverage" class="function-card" data-module-id="layer-coverage" data-module-name="Layer Coverage Gaps">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Layer Coverage Gaps" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
@@ -707,6 +720,7 @@
                 onSelect: focusRadarTech,
             });
             renderRadarLegend(data.columns);
+            renderVendorDials(data.columns);
             const clock = document.getElementById('constellation-clock');
             if (clock) {
                 const tick = () => { clock.textContent = 'UTC ' + new Date().toISOString().slice(11, 19); };
@@ -718,6 +732,194 @@
         function updateNetworkRadar(columns, total) {
             if (networkRadar) networkRadar.update(columns, total);
             renderRadarLegend(columns || []);
+            renderVendorDials(columns || []);
+        }
+
+        // ── Vendor balance dials (Huawei vs Nokia per technology) ──
+        const VENDOR_DIAL_COLORS = { Huawei: '#ef4444', Nokia: '#3b82f6' };
+
+        function renderVendorDials(columns) {
+            const wrap = document.getElementById('vendor-dials');
+            if (!wrap) return;
+            const cols = (columns || []).filter(col => col && col.vendor_counts);
+            const totals = { Huawei: 0, Nokia: 0 };
+            cols.forEach(col => {
+                totals.Huawei += Number(col.vendor_counts.Huawei || 0);
+                totals.Nokia += Number(col.vendor_counts.Nokia || 0);
+            });
+            const entries = [{ key: 'ALL', title: 'All RATs', counts: totals }]
+                .concat(cols.map(col => ({ key: col.key, title: col.title, counts: col.vendor_counts })));
+
+            wrap.innerHTML = entries.map(entry => {
+                const h = Number(entry.counts.Huawei || 0);
+                const n = Number(entry.counts.Nokia || 0);
+                const total = h + n;
+                const hPct = total ? (h / total) * 100 : 0;
+                return `
+                <div class="vendor-dial" title="${entry.title}: Huawei ${h.toLocaleString()} / Nokia ${n.toLocaleString()} sites">
+                    <svg viewBox="0 0 36 36" class="vendor-dial-svg" aria-hidden="true">
+                        <circle class="vendor-dial-ring vendor-dial-nokia" cx="18" cy="18" r="15.9" pathLength="100"></circle>
+                        <circle class="vendor-dial-ring vendor-dial-huawei" cx="18" cy="18" r="15.9" pathLength="100"
+                                style="stroke-dasharray: 0 100" data-target="${hPct.toFixed(1)}"></circle>
+                    </svg>
+                    <div class="vendor-dial-center">
+                        <strong>${entry.key}</strong>
+                        <span>${total ? Math.round(hPct) + '/' + Math.round(100 - hPct) : '—'}</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Animate arcs in on the next frame so the dasharray transition runs.
+            requestAnimationFrame(() => {
+                wrap.querySelectorAll('.vendor-dial-huawei').forEach(ring => {
+                    ring.style.strokeDasharray = `${ring.dataset.target} 100`;
+                });
+            });
+        }
+
+        // ── Traffic pulse (real network activity drives the background) ──
+        async function refreshNetworkActivity() {
+            const note = document.getElementById('radar-traffic-note');
+            try {
+                const res = await fetch('/api/dashboard/network-activity', {
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: { Accept: 'application/json' },
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) return;
+                if (data.level == null) {
+                    if (note) note.textContent = 'TRAFFIC PULSE: N/A';
+                    return;
+                }
+                if (window.dashboardAmbientBg) {
+                    window.dashboardAmbientBg.setActivity(data.level);
+                }
+                if (note) note.textContent = `TRAFFIC PULSE: ${Math.round(data.level * 100)}% OF PEAK`;
+            } catch (err) {
+                console.warn('Network activity unavailable', err);
+            }
+        }
+
+        // ── Global search (sites / cells / PCI / parameters) ──
+        let globalSearchTimer = null;
+        let globalSearchSeq = 0;
+
+        function escapeSearchHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function hideGlobalSearchResults() {
+            const box = document.getElementById('global-search-results');
+            const input = document.getElementById('dashboard-tool-search');
+            if (box) box.hidden = true;
+            if (input) input.setAttribute('aria-expanded', 'false');
+        }
+
+        function cellSearchLink(row) {
+            const params = new URLSearchParams();
+            if (row.cell_name) params.set('cell_name', row.cell_name);
+            if (row.technology) params.set('technology', row.technology);
+            if (row.vendor) params.set('vendor', row.vendor);
+            return `/performance?${params.toString()}`;
+        }
+
+        function renderGlobalSearchResults(data) {
+            const box = document.getElementById('global-search-results');
+            const input = document.getElementById('dashboard-tool-search');
+            if (!box) return;
+            const sections = [];
+
+            const statusDot = (status) =>
+                `<i class="gs-status ${String(status) === 'Active' ? 'gs-status-active' : 'gs-status-inactive'}"></i>`;
+
+            if ((data.sites || []).length) {
+                sections.push(`<div class="gs-section-title">Sites</div>` + data.sites.map(row => `
+                    <a class="gs-item" href="/performance?site_id=${encodeURIComponent(row.site_id)}">
+                        <span class="gs-icon">&#128225;</span>
+                        <span class="gs-main">${escapeSearchHtml(row.site_id)}${row.site_name ? ` <small>${escapeSearchHtml(row.site_name)}</small>` : ''}</span>
+                        <span class="gs-meta">${escapeSearchHtml(row.technologies || '')} &middot; ${Number(row.active_cells || 0)}/${Number(row.cell_count || 0)} active</span>
+                    </a>`).join(''));
+            }
+            if ((data.cells || []).length) {
+                sections.push(`<div class="gs-section-title">Cells</div>` + data.cells.map(row => `
+                    <a class="gs-item" href="${cellSearchLink(row)}">
+                        <span class="gs-icon">${statusDot(row.activity_status)}</span>
+                        <span class="gs-main">${escapeSearchHtml(row.cell_name)}</span>
+                        <span class="gs-meta">${escapeSearchHtml(row.technology || '')} &middot; ${escapeSearchHtml(row.vendor || '')} &middot; site ${escapeSearchHtml(row.site_id || '—')}</span>
+                    </a>`).join(''));
+            }
+            if ((data.pci || []).length) {
+                sections.push(`<div class="gs-section-title">PCI ${escapeSearchHtml(data.query)}</div>` + data.pci.map(row => `
+                    <a class="gs-item" href="${cellSearchLink(row)}">
+                        <span class="gs-icon">#</span>
+                        <span class="gs-main">${escapeSearchHtml(row.cell_name)}</span>
+                        <span class="gs-meta">PCI ${escapeSearchHtml(row.pci)} &middot; ${escapeSearchHtml(row.technology || '')} &middot; ${escapeSearchHtml(row.vendor || '')}</span>
+                    </a>`).join(''));
+            }
+            if ((data.parameters || []).length) {
+                sections.push(`<div class="gs-section-title">Parameters</div>` + data.parameters.map(row => `
+                    <a class="gs-item" href="/parameter-dictionary">
+                        <span class="gs-icon">&#128218;</span>
+                        <span class="gs-main">${escapeSearchHtml(row.name)}${row.sub ? ` <small>${escapeSearchHtml(row.sub)}</small>` : ''}</span>
+                        <span class="gs-meta">${escapeSearchHtml(row.vendor)}${row.technology ? ` &middot; ${escapeSearchHtml(row.technology)}` : ''}</span>
+                    </a>`).join(''));
+            }
+
+            if (!sections.length) {
+                box.innerHTML = `<div class="gs-empty">No network matches for &ldquo;${escapeSearchHtml(data.query)}&rdquo; &mdash; tool cards above are filtered too.</div>`;
+            } else {
+                box.innerHTML = sections.join('');
+            }
+            box.hidden = false;
+            if (input) input.setAttribute('aria-expanded', 'true');
+        }
+
+        function scheduleGlobalSearch(query) {
+            if (globalSearchTimer) clearTimeout(globalSearchTimer);
+            const q = String(query || '').trim();
+            if (q.length < 2) {
+                hideGlobalSearchResults();
+                return;
+            }
+            globalSearchTimer = setTimeout(async () => {
+                const seq = ++globalSearchSeq;
+                try {
+                    const res = await fetch(`/api/global-search?q=${encodeURIComponent(q)}`, {
+                        credentials: 'same-origin',
+                        cache: 'no-store',
+                        headers: { Accept: 'application/json' },
+                    });
+                    const data = await res.json().catch(() => ({}));
+                    if (seq !== globalSearchSeq) return; // stale response
+                    if (res.ok && data.success) renderGlobalSearchResults(data);
+                } catch (err) {
+                    console.warn('Global search failed', err);
+                }
+            }, 300);
+        }
+
+        function setupGlobalSearchDropdown() {
+            const input = document.getElementById('dashboard-tool-search');
+            const box = document.getElementById('global-search-results');
+            if (!input || !box) return;
+            input.addEventListener('input', () => scheduleGlobalSearch(input.value));
+            input.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    hideGlobalSearchResults();
+                } else if (event.key === 'Enter') {
+                    const first = box.querySelector('.gs-item');
+                    if (!box.hidden && first) {
+                        event.preventDefault();
+                        window.location.href = first.getAttribute('href');
+                    }
+                }
+            });
+            document.addEventListener('click', event => {
+                if (!event.target.closest('.global-search-wrap')) hideGlobalSearchResults();
+            });
         }
 
         function openSection(name) {
@@ -1578,10 +1780,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const bgCanvas = document.getElementById('dashboard-bg-canvas');
             if (bgCanvas && window.PrimeNetConstellation) {
-                PrimeNetConstellation.initAmbientBackground(bgCanvas);
+                window.dashboardAmbientBg = PrimeNetConstellation.initAmbientBackground(bgCanvas);
             }
             initNetworkRadar();
             setupDashboardToolSearch();
+            setupGlobalSearchDropdown();
+            refreshNetworkActivity();
+            setInterval(refreshNetworkActivity, 10 * 60 * 1000);
             loadDashboardPreferences();
             replayDashboardCardWash(document.querySelector('.section-panel:not(.hidden)') || document);
             document.addEventListener('keydown', event => {

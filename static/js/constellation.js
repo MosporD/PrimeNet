@@ -558,6 +558,8 @@
         var last = performance.now();
         var packetTimer = 0;
         var LINK_DIST = 150;
+        /* 0..1 network activity — paces the data-packet pulses (0.5 = neutral). */
+        var activityLevel = 0.5;
 
         function theme() {
             return AMBIENT_THEMES[document.body.classList.contains('dark-mode') ? 'dark' : 'light'];
@@ -688,12 +690,13 @@
                 }
             }
 
-            /* Data packets travelling along links */
+            /* Data packets travelling along links — rate follows network activity */
             if (!REDUCE_MOTION && !single) {
+                var maxPackets = 2 + Math.round(activityLevel * 9);
                 packetTimer -= dt;
-                if (packetTimer <= 0 && packets.length < 7) {
+                if (packetTimer <= 0 && packets.length < maxPackets) {
                     spawnPacket();
-                    packetTimer = 0.5 + Math.random() * 0.9;
+                    packetTimer = (0.35 + Math.random() * 0.8) * (1.7 - 1.25 * activityLevel);
                 }
                 for (i = packets.length - 1; i >= 0; i--) {
                     var p = packets[i];
@@ -732,6 +735,13 @@
 
         resize();
         if (!REDUCE_MOTION) requestAnimationFrame(frame);
+
+        return {
+            setActivity: function (level) {
+                var v = Number(level);
+                if (isFinite(v)) activityLevel = Math.max(0, Math.min(1, v));
+            }
+        };
     }
 
     window.PrimeNetConstellation = {

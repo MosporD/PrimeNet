@@ -34,6 +34,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "RF Optimization Workbench", "href": "/rf-optimization", "visibility": "admin"},
             {"label": "Neighbor Quality Analyzer", "href": "/neighbor-quality", "visibility": "admin"},
             {"label": "Capacity Hotspots", "href": "/capacity-hotspots", "visibility": "admin"},
+            {"label": "Sleeping Cell Detector", "href": "/sleeping-cells", "visibility": "admin"},
             {"label": "Layer Coverage Gaps", "href": "/layer-coverage", "visibility": "admin"},
             {"label": "Overshooting Detector", "href": "/overshooting-detector", "visibility": "admin"},
             {"label": "Change Impact Tracker", "href": "/change-impact", "visibility": "admin"},
