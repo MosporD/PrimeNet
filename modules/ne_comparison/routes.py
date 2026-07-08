@@ -14,6 +14,13 @@ from typing import Any
 
 from ncm_core import XMLComparator
 from database_enhanced import get_user_by_session, log_activity
+from core.cm_discrepancy.records import (
+    IDENTITY_COLUMNS as AUDIT_IDENTITY_COLUMNS,
+    normalize_value as _normalize_audit_value,
+    record_key as _record_key,
+    rows_to_records as _rows_to_records,
+    sheet_to_records as _sheet_to_records,
+)
 from core.cm_extractor.extraction import build_huawei_client, build_nokia_client
 from core.cm_extractor.huawei_client import HuaweiCmError
 from core.cm_extractor.huawei_semantics import _selection_rows, get_mo_object_catalog
@@ -39,10 +46,6 @@ NOKIA_DEFAULT_MO_CLASSES = {
 HUAWEI_DEFAULT_MO_CLASSES = ['ENODEBFUNCTION', 'CELL', 'CNOPERATOR']
 MAX_COMPARE_DIFFS = 2500
 MAX_AUDIT_VALUE_SAMPLES = 8
-AUDIT_IDENTITY_COLUMNS = {
-    'dn', 'distname', 'moid', '$instance', 'instance', 'ne',
-    'cell name', 'object name',
-}
 
 def login_required(f):
     """Decorator to require login"""
@@ -217,48 +220,6 @@ def _fetch_nokia_selection_sheet(
     if not sheets:
         return {}, list(warnings)
     return next(iter(sheets.values())), list(warnings)
-
-
-def _sheet_to_records(sheet: dict[str, Any], *, ignore_columns: set[str] | None = None) -> dict[str, dict[str, Any]]:
-    headers = [str(h) for h in (sheet.get('headers') or [])]
-    rows = sheet.get('rows') or []
-    ignore = {c.lower() for c in (ignore_columns or set())}
-    records: dict[str, dict[str, Any]] = {}
-    for idx, row in enumerate(rows):
-        record = {
-            header: row[pos] if pos < len(row) else ''
-            for pos, header in enumerate(headers)
-            if header.lower() not in ignore
-        }
-        key = _record_key(record, fallback=f'row-{idx + 1}')
-        records[key] = record
-    return records
-
-
-def _rows_to_records(rows: list[dict[str, Any]], *, ignore_columns: set[str] | None = None) -> dict[str, dict[str, Any]]:
-    ignore = {c.lower() for c in (ignore_columns or set())}
-    records: dict[str, dict[str, Any]] = {}
-    for idx, row in enumerate(rows):
-        record = {str(k): v for k, v in row.items() if str(k).lower() not in ignore}
-        key = _record_key(record, fallback=f'row-{idx + 1}')
-        records[key] = record
-    return records
-
-
-def _record_key(record: dict[str, Any], *, fallback: str) -> str:
-    priority = (
-        'DN', 'distName', 'moId', '$instance', 'instance',
-        'Local Cell ID', 'Cell Name', 'Cell ID', 'eNodeB ID',
-        'Nr Cell ID', 'BTS ID', 'TRX ID', 'Object Name',
-    )
-    for col in priority:
-        value = record.get(col)
-        if value not in (None, ''):
-            return f'{col}={value}'
-    for col, value in record.items():
-        if value not in (None, ''):
-            return f'{col}={value}'
-    return fallback
 
 
 def _diff_records(
@@ -441,14 +402,6 @@ def _ne_display_name(ne: dict[str, Any]) -> str:
         or ne.get('site_id')
         or 'NE'
     )
-
-
-def _normalize_audit_value(value: Any) -> str:
-    if value is None:
-        return ''
-    if isinstance(value, (dict, list, tuple)):
-        return str(value)
-    return str(value).strip()
 
 
 def _audit_status(score: float) -> str:
