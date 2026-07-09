@@ -31,6 +31,14 @@ _CELL_HEADER_MARKERS = (
     'enodeb function name',
 )
 
+_RET_HEADER_MARKERS = (
+    'device no',
+    'subunit no',
+    'tilt',
+    'actual tilt',
+    'online status',
+)
+
 
 def _split_columns(line: str) -> list[str]:
     stripped = line.strip()
@@ -147,7 +155,15 @@ def _is_likely_column_header_line(parts: list[str]) -> bool:
     hits = sum(1 for marker in _CELL_HEADER_MARKERS if marker in joined)
     if hits >= 2:
         return True
-    if 'local cell id' not in joined and 'cell name' not in joined and 'nr cell id' not in joined:
+    ret_hits = sum(1 for marker in _RET_HEADER_MARKERS if marker in joined)
+    if ret_hits >= 2:
+        return True
+    if (
+        'local cell id' not in joined
+        and 'cell name' not in joined
+        and 'nr cell id' not in joined
+        and ret_hits < 2
+    ):
         return False
     text_hits = sum(
         1 for part in parts
@@ -199,6 +215,8 @@ _CELL_BLOCK_START_KEYS = frozenset({
     _normalize_key('Local Cell ID'),
     _normalize_key('Local cell ID'),
     _normalize_key('Nr Cell ID'),
+    _normalize_key('Device No.'),
+    _normalize_key('Device No'),
 })
 
 

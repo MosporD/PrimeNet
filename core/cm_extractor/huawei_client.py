@@ -257,6 +257,58 @@ class HuaweiCmClient:
         self._last_mml_errors = errors
         return rows
 
+    def run_mml_reports(
+        self,
+        command: str,
+        ne_names: list[str],
+    ) -> tuple[list[dict[str, Any]], list[str]]:
+        """Run MML and return per-NE report text plus default parsed rows."""
+        if self.api_style == 'cn':
+            raise HuaweiCmError(
+                'CN U2020 Open API uses MML script tasks (HTTPS script URL + FTP result). '
+                'Set HUAWEI_CM_SCRIPT_BASE_URL and use run_cn_mml_script_task(), or set '
+                'HUAWEI_CM_API_STYLE=wireless for direct MML commands.',
+            )
+        if not ne_names:
+            raise HuaweiCmError('At least one NE name is required')
+        if len(ne_names) > 100:
+            raise HuaweiCmError(
+                f'MML single-command API supports at most 100 NEs ({len(ne_names)} given). '
+                'Use batch MML script mode for larger exports.',
+            )
+
+        command = normalize_mml_command(command)
+        payload = self._request_json(
+            'POST',
+            '/api/rest/mmlManagement/v1/command',
+            body={'command': command, 'neNames': ne_names},
+        )
+        reports: list[dict[str, Any]] = []
+        errors: list[str] = []
+        for item in payload.get('results') or []:
+            ne_name = str(item.get('name') or '').strip()
+            report = str(item.get('report') or '')
+            result = str(item.get('result') or '')
+            if self._is_mml_error_report(report, result=result):
+                errors.append(self._format_ne_mml_error(ne_name, report, result=result))
+                continue
+            rows = parse_mml_report(report)
+            reports.append({
+                'ne_name': ne_name,
+                'report': report,
+                'rows': rows,
+            })
+
+        top_message = ''
+        if isinstance(payload, dict):
+            top_message = str(payload.get('retMessage') or '').strip()
+        if top_message and self._is_mml_error_report(top_message):
+            if top_message not in errors:
+                errors.insert(0, top_message)
+
+        self._last_mml_errors = errors
+        return reports, errors
+
     @staticmethod
     def _missing_ne_names_from_errors(errors: list[str]) -> list[str]:
         missing: list[str] = []
@@ -640,6 +692,12 @@ class HuaweiCmClient:
         elif 'permission denied' in lower:
             message += (
                 ' Ask U2020 admin to grant MML rights for this command to your NBI user.'
+            )
+        elif 'execution failed' in lower:
+            message += (
+                ' For MOD RETSUBUNIT: confirm your NBI user has write/MOD rights, '
+                'the RET is online, and DEVICENO/SUBUNITNO/TILT are valid '
+                '(tilt is usually in 0.1° units, e.g. 80 = 8.0°).'
             )
         prefix = f'{ne_name}: ' if ne_name else ''
         return f'{prefix}{message}'

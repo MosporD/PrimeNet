@@ -549,18 +549,97 @@ function _ensureFeatureNavButton() {
     mount.appendChild(btn);
 }
 
+function _ensureHeaderNavCluster() {
+    if (_isDashboardPage() || _isPublicAuthPage()) return;
+    const headerContent = document.querySelector('header .header-content');
+    if (!headerContent) return;
+
+    let cluster = headerContent.querySelector('.header-nav-left');
+    if (!cluster) {
+        cluster = document.createElement('div');
+        cluster.className = 'header-nav-left';
+        headerContent.insertBefore(cluster, headerContent.firstChild);
+    }
+
+    const featureBtn = document.getElementById('feature-nav-btn');
+    if (featureBtn && featureBtn.parentElement !== cluster) {
+        cluster.appendChild(featureBtn);
+    }
+
+    const backLink = headerContent.querySelector(':scope > .back-link')
+        || headerContent.querySelector('.header-left > .back-link')
+        || headerContent.querySelector('.header-left .back-link');
+    if (backLink && backLink.parentElement !== cluster) {
+        cluster.appendChild(backLink);
+    }
+}
+
+function _injectModuleAdminLink(actions) {
+    if (!actions || actions.querySelector('[data-nav="admin"]')) return;
+    const role = String(sessionStorage.getItem(NAV_ROLE_STORAGE_KEY) || '').toLowerCase();
+    if (!['admin', 'noc_sys'].includes(role)) return;
+    const admin = document.createElement('a');
+    admin.href = '/admin-panel?section=user-admin';
+    admin.className = 'btn-header btn-header-admin';
+    admin.dataset.nav = 'admin';
+    admin.textContent = 'Admin';
+    const settings = actions.querySelector('[data-nav="settings"]');
+    if (settings && settings.nextSibling) {
+        actions.insertBefore(admin, settings.nextSibling);
+    } else {
+        actions.appendChild(admin);
+    }
+}
+
+function _ensureModuleHeaderActions() {
+    if (_isDashboardPage() || _isPublicAuthPage()) return;
+    const headerRight = document.querySelector('header .header-right');
+    if (!headerRight || headerRight.querySelector('.header-actions')) return;
+
+    let actions = document.createElement('div');
+    actions.className = 'header-actions module-header-actions';
+
+    const settings = document.createElement('a');
+    settings.href = '/profile';
+    settings.className = 'btn-header';
+    settings.dataset.nav = 'settings';
+    settings.textContent = 'Settings';
+    actions.appendChild(settings);
+
+    _injectModuleAdminLink(actions);
+
+    const logoutBtn = headerRight.querySelector('.btn-logout');
+    if (logoutBtn) {
+        logoutBtn.classList.remove('btn-logout');
+        logoutBtn.classList.add('btn-header', 'btn-header-outline');
+        actions.appendChild(logoutBtn);
+    }
+
+    const userName = headerRight.querySelector('.user-name, .user-greeting');
+    if (userName) {
+        userName.insertAdjacentElement('afterend', actions);
+    } else {
+        headerRight.prepend(actions);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     _runPageEnterTransition();
     _wirePageTransitionRestoreGuards();
     _ensureBrandFavicon();
     _ensureFeatureNavButton();
+    _ensureHeaderNavCluster();
+    _ensureModuleHeaderActions();
     _wirePageLinkTransitions();
     _ensureThemeToggle();
     _applyTheme(_preferredTheme());
     _mountConstellationBackground();
     _showPostLoginIntro();
     if (!_isPublicAuthPage()) {
-        _loadFeatureNavSections();
+        _loadFeatureNavSections().then(() => {
+            const actions = document.querySelector('header .module-header-actions');
+            if (actions) _injectModuleAdminLink(actions);
+        });
     }
 });
 

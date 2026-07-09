@@ -1046,36 +1046,39 @@ def list_huawei_db_sites(
             "LOWER(COALESCE(s.vendor, '')) LIKE '%huawei%'",
             "COALESCE(s.status, 'Active') = 'Active'",
             "NULLIF(TRIM(s.site_id), '') IS NOT NULL",
-            '''(
-                EXISTS (
-                    SELECT 1 FROM cells_4g_fdd f
-                    WHERE CAST(f.enb_id_actual AS TEXT) = s.site_id
-                      AND LOWER(COALESCE(f.vendor, '')) LIKE '%huawei%'
-                )
-                OR EXISTS (
-                    SELECT 1 FROM cells_4g_tdd t
-                    WHERE CAST(t.enb_id_actual AS TEXT) = s.site_id
-                      AND LOWER(COALESCE(t.vendor, '')) LIKE '%huawei%'
-                )
-            )''',
         ]
         if term:
             where.append('(s.site_id LIKE ? OR s.site_name LIKE ?)')
             like = f'%{term}%'
             params.extend([like, like])
+        # JOIN-based filter (faster than per-row EXISTS + correlated cell count).
         sql = f'''
+            WITH huawei_lte_sites AS (
+                SELECT CAST(enb_id_actual AS TEXT) AS site_id
+                FROM cells_4g_fdd
+                WHERE LOWER(COALESCE(vendor, '')) LIKE '%huawei%'
+                  AND NULLIF(TRIM(CAST(enb_id_actual AS TEXT)), '') IS NOT NULL
+                UNION
+                SELECT CAST(enb_id_actual AS TEXT) AS site_id
+                FROM cells_4g_tdd
+                WHERE LOWER(COALESCE(vendor, '')) LIKE '%huawei%'
+                  AND NULLIF(TRIM(CAST(enb_id_actual AS TEXT)), '') IS NOT NULL
+            ),
+            active_cell_counts AS (
+                SELECT site_id, COUNT(*) AS cell_count
+                FROM cells
+                WHERE COALESCE(status, 'Active') = 'Active'
+                GROUP BY site_id
+            )
             SELECT
                 s.site_id,
                 s.site_name,
                 s.latitude,
                 s.longitude,
-                (
-                    SELECT COUNT(*)
-                    FROM cells c
-                    WHERE c.site_id = s.site_id
-                      AND COALESCE(c.status, 'Active') = 'Active'
-                ) AS cell_count
+                COALESCE(cc.cell_count, 0) AS cell_count
             FROM sites s
+            INNER JOIN huawei_lte_sites lte ON lte.site_id = s.site_id
+            LEFT JOIN active_cell_counts cc ON cc.site_id = s.site_id
             WHERE {' AND '.join(where)}
             ORDER BY s.site_name COLLATE NOCASE
             LIMIT ?
@@ -1088,6 +1091,18 @@ def list_huawei_db_sites(
             [str(row['site_id']) for row in rows],
             min_source_score=_HUAWEI_SCOPE_MIN_METADATA_SCORE.get(level, 0),
         )
+
+        from core.cm_extractor.huawei_discovery import (
+            get_cached_discovery,
+            load_discovery_from_disk,
+            resolve_u2020_ne_name,
+        )
+
+        load_discovery_from_disk()
+        discovery_cache = get_cached_discovery(max_age_sec=10**9) or {}
+        catalog = discovery_cache.get('nes') or []
+        by_site_id = discovery_cache.get('nes_by_site_id') or {}
+
         items = []
         for row in rows:
             site_id = str(row['site_id'])
@@ -1100,16 +1115,6 @@ def list_huawei_db_sites(
             u2020_resolved = None
             u2020_source = ''
             try:
-                from core.cm_extractor.huawei_discovery import (
-                    get_cached_discovery,
-                    load_discovery_from_disk,
-                    resolve_u2020_ne_name,
-                )
-
-                load_discovery_from_disk()
-                cache = get_cached_discovery(max_age_sec=10**9)
-                catalog = (cache or {}).get('nes') or []
-                by_site_id = (cache or {}).get('nes_by_site_id') or {}
                 u2020_ne_name, u2020_source = resolve_u2020_ne_name(
                     site_id,
                     hint,

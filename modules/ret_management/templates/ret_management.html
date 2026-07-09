@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RET Management - PrimeNet</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.2">
+    <link rel="stylesheet" href="{{ url_for('ret_management.static', filename='ret_management.css') }}?v=1.2">
+</head>
+<body
+    data-huawei-enabled="{{ 'true' if huawei_enabled else 'false' }}"
+    data-cm-write-allowed="{{ 'true' if cm_write_allowed else 'false' }}"
+    data-username="{{ user.username }}">
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <a href="/dashboard" class="back-link">Dashboard</a>
+                    <h1>RET Management</h1>
+                    <p>View and edit antenna tilts — Huawei <code>RETSUBUNIT</code> and Nokia <code>LNCEL.angle</code></p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" onclick="logout()" class="btn-logout">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="vendor-tabs" role="tablist" aria-label="CM vendor">
+                <button type="button" class="vendor-tab active" data-vendor="nokia" role="tab" aria-selected="true">Nokia NetAct</button>
+                {% if huawei_enabled %}
+                <button type="button" class="vendor-tab" data-vendor="huawei" role="tab" aria-selected="false">Huawei U2020</button>
+                {% endif %}
+            </div>
+
+            <section class="panel">
+                <div class="connection-bar">
+                    <span id="cm-config-status" class="connection-pill">Checking CM credentials…</span>
+                </div>
+
+                <div class="workflow-step">
+                    <h2>1. Select network element</h2>
+                    <div class="picker-row">
+                        <input type="search" id="ne-search" class="search-input" placeholder="Search site name or id…" autocomplete="off">
+                        <select id="ne-select" size="10" aria-label="Network elements"></select>
+                        <div class="picker-actions">
+                            <button type="button" class="btn-primary" id="load-rets-btn">Load RET data</button>
+                            <span id="load-status" class="status-text" aria-live="polite"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="nokia-only-fields" class="form-inline-row">
+                    <div class="inline-field">
+                        <label for="conf-id">Configuration</label>
+                        <select id="conf-id">
+                            <option value="1">Live network (actual)</option>
+                            <option value="5">Reference / target</option>
+                        </select>
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="panel" id="results-panel" hidden>
+                <div class="results-head">
+                    <h2 id="results-title">RET data</h2>
+                    <div class="results-actions">
+                        <button type="button" class="btn-secondary" id="reload-btn">Reload</button>
+                        <button type="button" class="btn-primary" id="save-changes-btn" hidden>Apply changes</button>
+                    </div>
+                </div>
+                <p id="write-hint" class="field-hint" hidden>CM write is disabled for your account. Contact an administrator to enable RET edits.</p>
+                <div id="results-warnings" class="warnings-box" hidden></div>
+                <div class="table-wrap">
+                    <table id="ret-table" class="data-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <p id="empty-state" class="empty-state" hidden>No RET / LNCEL records returned for this NE.</p>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
+    <script src="{{ url_for('ret_management.static', filename='ret_management.js') }}?v=1.8"></script>
+</body>
+</html>

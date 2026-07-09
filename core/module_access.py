@@ -50,6 +50,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "XML Parser", "href": "/xml-parser", "visibility": "all"},
             {"label": "XML Generator", "href": "/excel-generator", "visibility": "all"},
             {"label": "NE Comparison", "href": "/ne-comparison", "visibility": "all"},
+            {"label": "RET Management", "href": "/ret-management", "visibility": "all"},
             {"label": "Config Task Scheduler", "href": "/config-task-scheduler", "visibility": "all"},
             {"label": "Config History", "href": "/config-history", "visibility": "all"},
             {"label": "Network Management", "href": "/network-management", "visibility": "all"},

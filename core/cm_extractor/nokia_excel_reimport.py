@@ -27,6 +27,8 @@ except ImportError:  # pragma: no cover - deployment image includes paramiko
 IDENTITY_COLUMNS = {'DN', 'moId', 'distName'}
 INTERNAL_SHEETS = {'INDEX', 'Empty', 'Skipped_NEs'}
 CONFIRMATION_PHRASE = 'APPLY NOKIA EXCEL CHANGES'
+_DEFAULT_REIMPORT_REMOTE_DIR = '/d/oss/global/var/racops/import'
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 @dataclass(frozen=True)
@@ -246,10 +248,18 @@ def compare_nokia_workbooks(
 
 
 def preview_root(username: str, token: str | None = None) -> Path:
-    root = Path('uploads') / 'cm_extractor' / 'reimport' / _safe_username(username)
+    root = _PROJECT_ROOT / 'uploads' / 'cm_extractor' / 'reimport' / _safe_username(username)
     if token:
         root = root / token
     return root
+
+
+def reimport_remote_dir() -> str:
+    """OMC SFTP folder for CM Operations actualImport uploads (not the export dir)."""
+    return (
+        os.environ.get('NOKIA_CM_REIMPORT_REMOTE_DIR', '').strip()
+        or _DEFAULT_REIMPORT_REMOTE_DIR
+    )
 
 
 def create_preview(
@@ -335,11 +345,8 @@ def _upload_to_omc(local_path: str, remote_name: str) -> str:
     cfg = nokia_export_ssh_settings()
     if not cfg.get('configured'):
         raise RuntimeError('Nokia CM SFTP is not configured. Set NOKIA_CM_SSH_* or NOKIA_PM_* in .env.')
-    remote_dir = (
-        os.environ.get('NOKIA_CM_REIMPORT_REMOTE_DIR')
-        or cfg.get('remote_dir')
-        or '/d/oss/global/var/racops/import'
-    )
+    remote_dir = reimport_remote_dir()
+    remote_path = posixpath.join(remote_dir, remote_name)
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
@@ -354,11 +361,26 @@ def _upload_to_omc(local_path: str, remote_name: str) -> str:
         try:
             try:
                 sftp.chdir(remote_dir)
-            except OSError:
-                sftp.mkdir(remote_dir)
-                sftp.chdir(remote_dir)
-            remote_path = posixpath.join(remote_dir, remote_name)
-            sftp.put(local_path, remote_path)
+            except OSError as exc:
+                try:
+                    sftp.mkdir(remote_dir)
+                    sftp.chdir(remote_dir)
+                except OSError as mkdir_exc:
+                    raise RuntimeError(
+                        f'Cannot access Nokia CM import folder {remote_dir!r} on '
+                        f'{cfg["host"]} as {cfg["username"]!r}. Set '
+                        f'NOKIA_CM_REIMPORT_REMOTE_DIR in .env to a writable import path. '
+                        f'({mkdir_exc or exc})'
+                    ) from mkdir_exc
+            try:
+                sftp.put(local_path, remote_path)
+            except (OSError, PermissionError) as exc:
+                raise RuntimeError(
+                    f'SFTP upload denied for {remote_path!r} on {cfg["host"]} '
+                    f'as {cfg["username"]!r}. The CM import folder must be writable by '
+                    f'the SFTP user (not the CM REST export folder). '
+                    f'Configure NOKIA_CM_REIMPORT_REMOTE_DIR if needed. ({exc})'
+                ) from exc
             return remote_path
         finally:
             sftp.close()

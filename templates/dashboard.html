@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.5">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=2.2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}?v=5.6">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/constellation.css') }}?v=2.3">
     <style>
         /* Hide legacy op-sites widgets if the browser still serves an older cached dashboard.html */
         .dashboard-overview-row,
@@ -58,7 +58,7 @@
                 </div>
                 <div class="constellation-side">
                     <div class="constellation-head">
-                        <div class="constellation-title"><span class="live-dot"></span>Network Constellation &middot; Jordan</div>
+                        <div class="constellation-title"><span class="live-dot"></span>Zain Jordan Network</div>
                         <div class="constellation-head-actions">
                             <div class="constellation-clock" id="constellation-clock">UTC+3 --:--:--</div>
                             <button type="button" class="constellation-refresh-btn" id="constellation-refresh-btn" onclick="refreshConstellationData()">
@@ -239,6 +239,11 @@
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Network Element Comparison" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
                         <div class="function-icon">🔍</div>
                         <div class="function-name">Network Element Comparison</div>
+                    </a>
+                    <a href="/ret-management" class="function-card" data-module-id="ret-management" data-module-name="RET Management">
+                        <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin RET Management" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
+                        <div class="function-icon">📐</div>
+                        <div class="function-name">RET Management</div>
                     </a>
                     <a href="/config-task-scheduler" class="function-card" data-module-id="config-task-scheduler" data-module-name="Configuration Job Scheduler">
                         <span class="favorite-toggle" role="button" tabindex="0" aria-label="Pin Configuration Job Scheduler" title="Pin tool" onclick="toggleDashboardFavorite(event, this)">☆</span>
@@ -763,13 +768,7 @@
             const wrap = document.getElementById('vendor-dials');
             if (!wrap) return;
             const cols = (columns || []).filter(col => col && col.vendor_counts);
-            const totals = { Huawei: 0, Nokia: 0 };
-            cols.forEach(col => {
-                totals.Huawei += Number(col.vendor_counts.Huawei || 0);
-                totals.Nokia += Number(col.vendor_counts.Nokia || 0);
-            });
-            const entries = [{ key: 'ALL', title: 'All RATs', counts: totals }]
-                .concat(cols.map(col => ({ key: col.key, title: col.title, counts: col.vendor_counts })));
+            const entries = cols.map(col => ({ key: col.key, title: col.title, counts: col.vendor_counts }));
 
             wrap.innerHTML = entries.map(entry => {
                 const h = Number(entry.counts.Huawei || 0);
@@ -785,7 +784,7 @@
                     </svg>
                     <div class="vendor-dial-center">
                         <strong>${entry.key}</strong>
-                        <span>${total ? Math.round(hPct) + '/' + Math.round(100 - hPct) : 'ظ¤'}</span>
+                        <span>${total ? Math.round(hPct) + '/' + Math.round(100 - hPct) : '—'}</span>
                     </div>
                 </div>`;
             }).join('');

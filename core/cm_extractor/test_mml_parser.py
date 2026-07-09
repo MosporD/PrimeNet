@@ -3,6 +3,38 @@
 from core.cm_extractor.mml_parser import parse_mml_report, repair_mml_rows
 
 
+def test_retsubunit_horizontal_table():
+    report = """
+Device No.  Subunit No.  Connect Port 1 Cabinet No.  Connect Port 1 Subrack No.  Tilt  Actual Tilt  Online Status
+0  1  0  0  6  6  Online
+0  2  0  0  4  4  Online
+"""
+    rows = parse_mml_report(report)
+    assert len(rows) == 2
+    assert rows[0]['Device No.'] == '0'
+    assert rows[0]['Subunit No.'] == '1'
+    assert rows[0]['Tilt'] == '6'
+
+
+def test_retsubunit_vertical_pairs():
+    report = """
+Device No.  =  0
+Subunit No.  =  1
+Tilt  =  6
+Actual Tilt  =  6
+Online Status  =  Online
+Device No.  =  0
+Subunit No.  =  2
+Tilt  =  4
+Actual Tilt  =  4
+Online Status  =  Online
+"""
+    rows = parse_mml_report(report)
+    assert len(rows) == 2
+    assert rows[1]['Subunit No.'] == '2'
+    assert rows[1]['Tilt'] == '4'
+
+
 def test_cell_horizontal_table():
     report = """
 Local Cell ID  Cell Name  Physical cell ID  Csg indicator  Cell active state
