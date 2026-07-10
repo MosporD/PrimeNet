@@ -47,6 +47,7 @@ NAV_SECTIONS: list[dict] = [
             {"label": "Parameter Dictionary", "href": "/parameter-dictionary", "visibility": "all"},
             {"label": "Configuration Data Extractor", "href": "/cm-extractor", "visibility": "all"},
             {"label": "CM Parameter Audit", "href": "/cm-parameter-audit", "visibility": "admin"},
+            {"label": "CM Discrepancy Audit", "href": "/cm-discrepancy-audit", "visibility": "admin"},
             {"label": "XML Parser", "href": "/xml-parser", "visibility": "all"},
             {"label": "XML Generator", "href": "/excel-generator", "visibility": "all"},
             {"label": "NE Comparison", "href": "/ne-comparison", "visibility": "all"},

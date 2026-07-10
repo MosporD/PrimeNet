@@ -937,6 +937,35 @@ def run_cm_extractor_scheduled_jobs():
         logger.exception('CM extractor scheduled jobs tick failed: %s', e)
 
 
+def run_cm_discrepancy_daily():
+    """Daily full-network CM discrepancy audit (Nokia + Huawei)."""
+    try:
+        from core.cm_discrepancy.scheduler import run_cm_discrepancy_daily as run_daily
+
+        # Nokia inventory should be fresh before resolving full-network targets.
+        refresh_nokia_cm_inventory()
+        results = run_daily()
+        for vendor, result in (results or {}).items():
+            if not isinstance(result, dict):
+                continue
+            if result.get('skipped'):
+                _log_sync('cm_discrepancy', vendor, 'skipped', 0, result.get('reason'))
+            elif result.get('error'):
+                _log_sync('cm_discrepancy', vendor, 'error', 0, str(result.get('error'))[:350])
+            else:
+                _log_sync(
+                    'cm_discrepancy',
+                    vendor,
+                    'ok' if result.get('status') == 'success' else 'error',
+                    int(result.get('total_mismatches') or 0),
+                    f"run #{result.get('run_id')}: {result.get('status')} "
+                    f"({result.get('mo_count')} MO, {result.get('objects')} objects)",
+                )
+    except Exception as e:
+        _log_sync('cm_discrepancy', 'all', 'error', 0, str(e))
+        logger.exception('CM discrepancy daily audit failed: %s', e)
+
+
 def _network_health_precalc_cron_hour() -> int:
     from modules.network_health import config as nh_cfg
     from sync_config import DAILY_PULL_HOUR
@@ -1102,6 +1131,25 @@ def start_scheduler():
             max_instances=1,
         )
 
+    # CM Discrepancy Audit: daily full-network run (Nokia + Huawei), off-peak.
+    try:
+        from core.cm_discrepancy.scheduler import daily_hour as cm_discrepancy_daily_hour
+        from core.cm_discrepancy.scheduler import enabled as cm_discrepancy_enabled
+
+        if cm_discrepancy_enabled():
+            disc_hour = cm_discrepancy_daily_hour()
+            _scheduler.add_job(
+                run_cm_discrepancy_daily,
+                trigger=CronTrigger(hour=disc_hour, minute=0),
+                id='cm_discrepancy_daily',
+                name=f'CM Discrepancy Audit daily full-network run ({disc_hour:02d}:00)',
+                replace_existing=True,
+                coalesce=True,
+                max_instances=1,
+            )
+    except Exception:
+        logger.exception('Failed to register CM discrepancy daily job')
+
     _scheduler.start()
     mode = flags['mode']
     _scheduler_mode_summary = dict(flags)
@@ -1149,3 +1197,4 @@ def trigger_cells_daily_now(): run_manual_category_sync('cells-daily')
 def trigger_groups_daily_now(): run_manual_category_sync('groups-daily')
 def trigger_nokia_cm_inventory_now(): refresh_nokia_cm_inventory()
 def trigger_cm_extractor_jobs_now(): run_cm_extractor_scheduled_jobs()
+def trigger_cm_discrepancy_now(): run_cm_discrepancy_daily()

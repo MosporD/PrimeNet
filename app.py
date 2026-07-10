@@ -66,6 +66,7 @@ from modules.layer_coverage import layer_coverage_bp
 from modules.overshooting_detector import overshooting_detector_bp
 from modules.rf_optimization import rf_optimization_bp
 from modules.cm_parameter_audit import cm_parameter_audit_bp
+from modules.cm_discrepancy_audit import cm_discrepancy_audit_bp
 from modules.change_impact import change_impact_bp
 from modules.radio_morning_report import radio_morning_report_bp
 from modules.fault_management import fault_management_bp
@@ -105,6 +106,7 @@ app.register_blueprint(layer_coverage_bp)
 app.register_blueprint(overshooting_detector_bp)
 app.register_blueprint(rf_optimization_bp)
 app.register_blueprint(cm_parameter_audit_bp)
+app.register_blueprint(cm_discrepancy_audit_bp)
 app.register_blueprint(change_impact_bp)
 app.register_blueprint(radio_morning_report_bp)
 app.register_blueprint(fault_management_bp)
