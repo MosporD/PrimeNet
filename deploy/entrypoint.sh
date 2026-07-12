@@ -31,6 +31,17 @@ case "${cmd}" in
       exec gunicorn -c deploy/gunicorn.conf.py app:app
     fi
     ;;
+  dev)
+    export NCM_BOOTSTRAP_ON_IMPORT=0
+    export NCM_DISABLE_SCHEDULER=1
+    export FLASK_DEBUG=1
+    _as_primenet python -m deploy.bootstrap
+    if id primenet >/dev/null 2>&1; then
+      exec runuser -u primenet -- python app.py
+    else
+      exec python app.py
+    fi
+    ;;
   scheduler)
     export NCM_BOOTSTRAP_ON_IMPORT=0
     export NCM_RUN_SCHEDULER=1

@@ -1,0 +1,35 @@
+# PrimeNet local development stack (live code mount + auto-reload)
+#
+# First time (or after requirements.txt / Dockerfile changes):
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# Day-to-day (code/templates/static only — no rebuild):
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Optional: include scheduler
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml --profile with-scheduler up
+#
+# Production (unchanged):
+#   docker compose up -d --build
+
+services:
+  web:
+    container_name: primenet-web-dev
+    restart: "no"
+    command: ["dev"]
+    environment:
+      FLASK_DEBUG: "1"
+      FLASK_PORT: "8000"
+    volumes:
+      - primenet-data:/data
+      - .:/app
+    healthcheck:
+      disable: true
+
+  scheduler:
+    profiles: ["with-scheduler"]
+    container_name: primenet-scheduler-dev
+    restart: "no"
+    volumes:
+      - primenet-data:/data
+      - .:/app
