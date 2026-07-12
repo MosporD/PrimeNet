@@ -417,6 +417,79 @@ def set_user_force_password_change(user_id: int, required: bool) -> bool:
     conn.close()
     return affected > 0
 
+
+def delete_user(user_id: int) -> tuple[bool, str]:
+    """Permanently delete a user and related application records."""
+    conn = get_db()
+    cursor = conn.cursor()
+    try:
+        _exec(cursor, 'SELECT id, username, role FROM users WHERE id = ?', (user_id,))
+        row = cursor.fetchone()
+        if not row:
+            return False, 'User not found'
+
+        username = row['username'] if isinstance(row, sqlite3.Row) else row[1]
+
+        for sql, params in (
+            ('DELETE FROM sessions WHERE user_id = ?', (user_id,)),
+            ('DELETE FROM activity_log WHERE user_id = ?', (user_id,)),
+            ('DELETE FROM task_updates WHERE user_id = ?', (user_id,)),
+            ('DELETE FROM filter_profiles WHERE user_id = ?', (user_id,)),
+            ('DELETE FROM user_preferences WHERE user_id = ?', (user_id,)),
+            ('DELETE FROM saved_views WHERE user_id = ?', (user_id,)),
+            ('DELETE FROM config_versions WHERE uploaded_by = ?', (user_id,)),
+            ('DELETE FROM report_archive WHERE generated_by = ?', (user_id,)),
+            ('UPDATE tasks SET assigned_to = NULL WHERE assigned_to = ?', (user_id,)),
+        ):
+            _exec(cursor, sql, params)
+
+        _exec(
+            cursor,
+            'DELETE FROM task_updates WHERE task_id IN (SELECT id FROM tasks WHERE created_by = ?)',
+            (user_id,),
+        )
+        _exec(cursor, 'DELETE FROM tasks WHERE created_by = ?', (user_id,))
+
+        _exec(cursor, 'SELECT id FROM config_scheduler_tasks WHERE created_by = ?', (user_id,))
+        scheduler_task_ids = [
+            (r['id'] if isinstance(r, sqlite3.Row) else r[0]) for r in cursor.fetchall()
+        ]
+        for task_id in scheduler_task_ids:
+            _exec(cursor, 'DELETE FROM config_scheduler_task_files WHERE task_id = ?', (task_id,))
+            _exec(cursor, 'DELETE FROM config_scheduler_result_files WHERE task_id = ?', (task_id,))
+        _exec(cursor, 'DELETE FROM config_scheduler_tasks WHERE created_by = ?', (user_id,))
+        _exec(cursor, 'DELETE FROM config_scheduler_result_files WHERE uploaded_by = ?', (user_id,))
+
+        _exec(cursor, 'DELETE FROM users WHERE id = ?', (user_id,))
+        if cursor.rowcount <= 0:
+            conn.rollback()
+            return False, 'User not found'
+
+        conn.commit()
+        return True, username
+    except Exception as exc:
+        conn.rollback()
+        return False, str(exc)
+    finally:
+        conn.close()
+
+
+def count_active_admins(exclude_user_id: int | None = None) -> int:
+    """Count active owner accounts, optionally excluding one user id."""
+    conn = get_db()
+    cursor = conn.cursor()
+    if exclude_user_id is not None:
+        _exec(
+            cursor,
+            "SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active AND id != ?",
+            (exclude_user_id,),
+        )
+    else:
+        _exec(cursor, "SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active")
+    row = cursor.fetchone()
+    conn.close()
+    return int((row[0] if row else 0) or 0)
+
 # ============================================================================
 # SESSION FUNCTIONS
 # ============================================================================

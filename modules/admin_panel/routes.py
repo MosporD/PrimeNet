@@ -10,7 +10,9 @@ from flask import Blueprint, request, jsonify, render_template, redirect, url_fo
 from functools import wraps
 
 from database_enhanced import (
+    count_active_admins,
     create_user,
+    delete_user,
     get_user_by_session,
     log_activity,
     get_all_users,
@@ -19,6 +21,16 @@ from database_enhanced import (
     update_user_role,
     update_user_status,
 )
+from core.cm_extractor.config import (
+    huawei_configured,
+    huawei_defaults,
+    nokia_configured,
+    nokia_defaults,
+)
+from core.cm_extractor.huawei_client import HuaweiCmClient, HuaweiCmError
+from core.cm_extractor.nokia_client import NokiaCmClient, NokiaCmError
+from core.huawei_pm.config import build_pm_client, pm_configured
+from core.huawei_pm.client import HuaweiPmError
 from sync_config import (
     DATABASES_ROOT,
     HUAWEI_PM_DAILY_DB,
@@ -277,6 +289,46 @@ def update_user_role(user_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@admin_panel_bp.route('/api/admin/users/<int:user_id>', methods=['DELETE'])
+def remove_user_account(user_id):
+    """Permanently delete a user account."""
+    user = get_current_user()
+    if not _can_access_user_admin(user):
+        return jsonify({'error': 'Owner or NOC SYS access required'}), 403
+
+    try:
+        actor_id = user.get('id') if isinstance(user, dict) else user[0]
+        if int(user_id) == int(actor_id):
+            return jsonify({'error': 'You cannot delete your own account'}), 400
+
+        target_users = [u for u in get_all_users() if int(u['id']) == int(user_id)]
+        if not target_users:
+            return jsonify({'error': 'User not found'}), 404
+
+        target = target_users[0]
+        if str(target.get('role', '')).strip().lower() == 'admin' and bool(target.get('is_active')):
+            if count_active_admins(exclude_user_id=user_id) < 1:
+                return jsonify({'error': 'Cannot delete the last active owner account'}), 400
+
+        success, result = delete_user(user_id)
+        if not success:
+            if result == 'User not found':
+                return jsonify({'error': result}), 404
+            return jsonify({'error': result}), 500
+
+        log_activity(
+            actor_id,
+            'admin_delete_user',
+            f'Deleted user {result} ({user_id})',
+        )
+        return jsonify({
+            'success': True,
+            'message': f'User {result} removed',
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @admin_panel_bp.route('/api/admin/users/<int:user_id>/status', methods=['PUT'])
 def update_user_status(user_id):
     """Update user active status"""
@@ -449,6 +501,169 @@ def _pm_database_definitions():
         ('Femto PM', 'sqlite', femto),
         ('Femto user KPIs', 'sqlite', femto_kpis),
     ]
+
+
+def _api_connection_row(
+    label: str,
+    *,
+    configured: bool,
+    endpoint: str = '',
+    missing: list[str] | None = None,
+) -> dict:
+    return {
+        'label': label,
+        'configured': configured,
+        'endpoint': endpoint,
+        'missing': missing or [],
+        'status': 'skipped',
+        'message': '',
+        'error': None,
+    }
+
+
+def _test_nokia_cm_connection() -> dict:
+    row = _api_connection_row('Nokia CM API', configured=nokia_configured())
+    cfg = nokia_defaults()
+    host = cfg.get('host') or cfg.get('base_url') or ''
+    row['endpoint'] = host
+    if not row['configured']:
+        row['message'] = 'Not configured (.env: NOKIA_CM_HOST, NOKIA_CM_USER, NOKIA_CM_PASSWORD)'
+        return row
+    try:
+        client = NokiaCmClient(
+            host=cfg['host'],
+            username=cfg['username'],
+            password=cfg['password'],
+            base_url=cfg.get('base_url') or '',
+            use_https=cfg['use_https'],
+            verify_ssl=cfg['verify_ssl'],
+            timeout=min(int(cfg.get('timeout') or 180), 60),
+            max_retries=cfg.get('max_retries', 2),
+            retry_base_delay_sec=cfg.get('retry_base_delay_sec', 2.0),
+        )
+        client.test_connection()
+        row['status'] = 'ok'
+        row['message'] = 'Connected to Nokia NetAct CM API'
+    except NokiaCmError as exc:
+        row['status'] = 'error'
+        row['error'] = str(exc)
+        row['message'] = str(exc)
+    except Exception as exc:
+        row['status'] = 'error'
+        row['error'] = str(exc)
+        row['message'] = f'Connection failed: {exc}'
+    return row
+
+
+def _test_huawei_cm_connection() -> dict:
+    import os
+
+    row = _api_connection_row('Huawei CM API', configured=huawei_configured())
+    cfg = huawei_defaults()
+    row['endpoint'] = f"{cfg.get('host') or ''}:{cfg.get('port') or 31127}".strip(':')
+    huawei_enabled = (os.environ.get('CM_HUAWEI_ENABLED') or 'true').strip().lower() not in (
+        '0', 'false', 'no', 'off',
+    )
+    if not huawei_enabled:
+        row['message'] = 'Huawei CM feature disabled (CM_HUAWEI_ENABLED=false)'
+        return row
+    if not row['configured']:
+        row['message'] = 'Not configured (.env: HUAWEI_CM_HOST, HUAWEI_CM_USER, HUAWEI_CM_PASSWORD)'
+        return row
+    try:
+        client = HuaweiCmClient(
+            host=cfg['host'],
+            username=cfg['username'],
+            password=cfg['password'],
+            port=int(cfg.get('port') or 31127),
+            use_https=cfg.get('use_https', True),
+            verify_ssl=cfg.get('verify_ssl', False),
+            api_style=cfg.get('api_style', 'wireless'),
+            client_ip=cfg.get('client_ip', ''),
+            timeout=min(int(cfg.get('timeout') or 180), 60),
+        )
+        result = client.test_connection()
+        row['status'] = 'ok'
+        row['message'] = result.get('message', 'Authentication successful')
+    except HuaweiCmError as exc:
+        row['status'] = 'error'
+        row['error'] = str(exc)
+        row['message'] = str(exc)
+    except Exception as exc:
+        row['status'] = 'error'
+        row['error'] = str(exc)
+        row['message'] = f'Connection failed: {exc}'
+    return row
+
+
+def _test_huawei_pm_connection() -> dict:
+    row = _api_connection_row('Huawei PM API', configured=pm_configured())
+    cfg = huawei_defaults()
+    row['endpoint'] = f"{cfg.get('host') or ''}:{cfg.get('port') or 31127}".strip(':')
+    if not row['configured']:
+        row['message'] = 'Not configured (uses HUAWEI_CM_* / HUAWEI_PM_* in .env)'
+        return row
+    try:
+        client = build_pm_client()
+        result = client.test_connection()
+        row['status'] = 'ok'
+        row['message'] = result.get('message', 'Huawei PM Open API authentication successful')
+    except (HuaweiPmError, HuaweiCmError, ValueError) as exc:
+        row['status'] = 'error'
+        row['error'] = str(exc)
+        row['message'] = str(exc)
+    except Exception as exc:
+        row['status'] = 'error'
+        row['error'] = str(exc)
+        row['message'] = f'Connection failed: {exc}'
+    return row
+
+
+@admin_panel_bp.route('/api/admin/test-api-connections', methods=['POST'])
+def test_api_connections():
+    """Live connectivity checks for vendor northbound APIs (Owner only)."""
+    user = get_current_user()
+    if not _is_owner(user):
+        return jsonify({'error': 'Owner access required'}), 403
+
+    data = request.get_json(silent=True) or {}
+    vendor = str(data.get('vendor') or 'all').strip().lower()
+
+    tests = {
+        'nokia_cm': _test_nokia_cm_connection,
+        'huawei_cm': _test_huawei_cm_connection,
+        'huawei_pm': _test_huawei_pm_connection,
+    }
+    if vendor != 'all' and vendor not in tests:
+        return jsonify({'error': 'Unknown vendor'}), 400
+
+    try:
+        results = {}
+        selected = tests if vendor == 'all' else {vendor: tests[vendor]}
+        for key, fn in selected.items():
+            results[key] = fn()
+
+        tested = [r for r in results.values() if r.get('status') in ('ok', 'error')]
+        ok_count = sum(1 for r in tested if r.get('status') == 'ok')
+        error_count = sum(1 for r in tested if r.get('status') == 'error')
+
+        log_activity(
+            (user.get('id') if isinstance(user, dict) else user[0]),
+            'admin_test_api_connections',
+            f'Tested API connections ({vendor}): {ok_count} ok, {error_count} failed',
+        )
+        return jsonify({
+            'success': True,
+            'results': results,
+            'summary': {
+                'tested': len(tested),
+                'ok': ok_count,
+                'failed': error_count,
+                'skipped': sum(1 for r in results.values() if r.get('status') == 'skipped'),
+            },
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @admin_panel_bp.route('/api/admin/pm-latest-timestamps', methods=['GET'])

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
-    <link rel="stylesheet" href="{{ url_for('admin_panel.static', filename='admin_panel.css') }}?v=1.2">
+    <link rel="stylesheet" href="{{ url_for('admin_panel.static', filename='admin_panel.css') }}?v=1.3">
 </head>
-<body>
+<body data-current-user-id="{{ user.id }}">
     <div class="container">
         <header>
             <div class="header-content">
@@ -45,6 +45,7 @@
                 <button class="admin-page-tab" data-page="sync-status" type="button" onclick="openAdminPage('sync-status')">Sync Status</button>
                 <button class="admin-page-tab" data-page="sync-history" type="button" onclick="openAdminPage('sync-history')">Sync History</button>
                 <button class="admin-page-tab" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
+                <button class="admin-page-tab" data-page="api-connections" type="button" onclick="openAdminPage('api-connections')">API Connections</button>
                 {% else %}
                 <button class="admin-page-tab active" data-page="user-admin" type="button" onclick="openAdminPage('user-admin')">User Administration</button>
                 {% endif %}
@@ -166,6 +167,48 @@
                     <div id="sync-history-pagination" class="table-pagination"></div>
                 </div>
             </div>
+
+            <div class="admin-page-panel" data-page="api-connections">
+                <div class="sync-section api-connections-section">
+                    <h2 class="section-title">API Connection Testing</h2>
+                    <p class="api-connections-intro">
+                        Run live checks against vendor northbound APIs using credentials from <code>.env</code>.
+                        SFTP sync connectivity is tested separately under Data Sync → Test Connectivity.
+                    </p>
+                    <div class="api-connections-actions">
+                        <button type="button" class="btn-sync test" id="test-all-apis-btn" onclick="testAllApiConnections()">Test All APIs</button>
+                    </div>
+                    <div class="api-connections-grid">
+                        <div class="api-connection-card" id="api-card-nokia_cm">
+                            <div class="api-connection-header">
+                                <h3>Nokia CM API</h3>
+                                <span class="api-status-pill" id="api-status-nokia_cm">Not tested</span>
+                            </div>
+                            <p class="api-connection-endpoint" id="api-endpoint-nokia_cm">NetAct CM Open API</p>
+                            <p class="api-connection-message" id="api-message-nokia_cm">Click Test to verify credentials and reachability.</p>
+                            <button type="button" class="btn-user-secondary" onclick="testApiConnection('nokia_cm')">Test Nokia CM</button>
+                        </div>
+                        <div class="api-connection-card" id="api-card-huawei_cm">
+                            <div class="api-connection-header">
+                                <h3>Huawei CM API</h3>
+                                <span class="api-status-pill" id="api-status-huawei_cm">Not tested</span>
+                            </div>
+                            <p class="api-connection-endpoint" id="api-endpoint-huawei_cm">U2020 northbound REST</p>
+                            <p class="api-connection-message" id="api-message-huawei_cm">Click Test to verify credentials and reachability.</p>
+                            <button type="button" class="btn-user-secondary" onclick="testApiConnection('huawei_cm')">Test Huawei CM</button>
+                        </div>
+                        <div class="api-connection-card" id="api-card-huawei_pm">
+                            <div class="api-connection-header">
+                                <h3>Huawei PM API</h3>
+                                <span class="api-status-pill" id="api-status-huawei_pm">Not tested</span>
+                            </div>
+                            <p class="api-connection-endpoint" id="api-endpoint-huawei_pm">MAE / PM Open API</p>
+                            <p class="api-connection-message" id="api-message-huawei_pm">Click Test to verify credentials and reachability.</p>
+                            <button type="button" class="btn-user-secondary" onclick="testApiConnection('huawei_pm')">Test Huawei PM</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
 
             <div class="admin-page-panel {% if not can_manage_sync %}active{% endif %}" data-page="user-admin">
@@ -253,6 +296,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.0"></script>
-    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.2"></script>
+    <script src="{{ url_for('admin_panel.static', filename='admin_panel.js') }}?v=1.3"></script>
 </body>
 </html>

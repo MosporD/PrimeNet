@@ -20,6 +20,8 @@ const ROLE_LABELS = {
     noc_sys: 'NOC SYS',
 };
 const DEFAULT_USER_PASSWORD = document.getElementById('default-user-password-label')?.textContent?.trim() || 'Zain@1234';
+const CURRENT_USER_ID = Number(document.body?.dataset?.currentUserId || 0);
+const API_CONNECTION_KEYS = ['nokia_cm', 'huawei_cm', 'huawei_pm'];
 
 document.addEventListener('DOMContentLoaded', () => {
     const sectionFromUrl = new URLSearchParams(window.location.search).get('section');
@@ -162,6 +164,9 @@ function displayUsers(users) {
                     <button class="action-btn status" onclick="toggleStatus(${Number(user.id)}, ${!!user.is_active})">
                         ${user.is_active ? 'Deactivate' : 'Activate'}
                     </button>
+                    ${Number(user.id) === CURRENT_USER_ID
+                        ? ''
+                        : `<button class="action-btn delete" onclick="removeUser(${Number(user.id)})">Remove</button>`}
                 </div>
             </td>
         </tr>
@@ -209,6 +214,34 @@ async function toggleRole(userId, currentRole) {
         }
     } catch (error) {
         showNotification('Error updating role', 'error');
+    }
+}
+
+async function removeUser(userId) {
+    const target = allUsers.find(u => Number(u.id) === Number(userId));
+    const username = target?.username || `user #${userId}`;
+    if (Number(userId) === CURRENT_USER_ID) {
+        showNotification('You cannot delete your own account', 'error');
+        return;
+    }
+    if (!confirm(`Permanently remove ${username}? This cannot be undone.`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            showNotification(data.error || 'Failed to remove user', 'error');
+            return;
+        }
+        showNotification(data.message || `User ${username} removed`, 'success');
+        loadAllUsers();
+    } catch (error) {
+        showNotification('Error removing user', 'error');
     }
 }
 
@@ -780,5 +813,103 @@ async function testConnectivity() {
         showSyncMsg(lines.join(' | '), 'success');
     } catch (e) {
         showSyncMsg('Error: ' + e.message, 'error');
+    }
+}
+
+function _setApiConnectionCard(key, result, testing = false) {
+    const card = document.getElementById(`api-card-${key}`);
+    const pill = document.getElementById(`api-status-${key}`);
+    const endpointEl = document.getElementById(`api-endpoint-${key}`);
+    const messageEl = document.getElementById(`api-message-${key}`);
+    if (!pill || !messageEl) return;
+
+    card?.classList.remove('api-ok', 'api-error', 'api-skipped', 'api-testing');
+    pill.classList.remove('ok', 'error', 'skipped', 'testing', 'neutral');
+
+    if (testing) {
+        card?.classList.add('api-testing');
+        pill.classList.add('testing');
+        pill.textContent = 'Testing…';
+        messageEl.textContent = 'Running live connection check…';
+        return;
+    }
+
+    if (result?.endpoint && endpointEl) {
+        endpointEl.textContent = result.endpoint;
+    }
+
+    const status = result?.status || 'skipped';
+    if (status === 'ok') {
+        card?.classList.add('api-ok');
+        pill.classList.add('ok');
+        pill.textContent = 'Connected';
+        messageEl.textContent = result.message || 'Connection successful';
+        return;
+    }
+    if (status === 'error') {
+        card?.classList.add('api-error');
+        pill.classList.add('error');
+        pill.textContent = 'Failed';
+        messageEl.textContent = result.message || result.error || 'Connection failed';
+        return;
+    }
+
+    card?.classList.add('api-skipped');
+    pill.classList.add('skipped');
+    pill.textContent = 'Skipped';
+    messageEl.textContent = result?.message || 'Not configured or disabled';
+}
+
+function _applyApiConnectionResults(results) {
+    Object.entries(results || {}).forEach(([key, result]) => {
+        _setApiConnectionCard(key, result, false);
+    });
+}
+
+async function testApiConnection(vendor) {
+    const keys = vendor === 'all' ? API_CONNECTION_KEYS : [vendor];
+    keys.forEach(key => _setApiConnectionCard(key, null, true));
+
+    try {
+        const response = await fetch('/api/admin/test-api-connections', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vendor }),
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            keys.forEach(key => _setApiConnectionCard(key, {
+                status: 'error',
+                message: data.error || `Request failed (HTTP ${response.status})`,
+            }, false));
+            showNotification(data.error || 'API connection test failed', 'error');
+            return;
+        }
+
+        _applyApiConnectionResults(data.results || {});
+        const summary = data.summary || {};
+        if ((summary.failed || 0) > 0) {
+            showNotification(`${summary.ok || 0} connected, ${summary.failed} failed`, 'error');
+        } else if ((summary.tested || 0) > 0) {
+            showNotification(`${summary.ok || 0} API connection(s) OK`, 'success');
+        } else {
+            showNotification('No APIs were configured for testing', 'info');
+        }
+    } catch (error) {
+        keys.forEach(key => _setApiConnectionCard(key, {
+            status: 'error',
+            message: error.message || 'Connection test failed',
+        }, false));
+        showNotification(error.message || 'API connection test failed', 'error');
+    }
+}
+
+async function testAllApiConnections() {
+    const btn = document.getElementById('test-all-apis-btn');
+    if (btn) btn.disabled = true;
+    try {
+        await testApiConnection('all');
+    } finally {
+        if (btn) btn.disabled = false;
     }
 }
