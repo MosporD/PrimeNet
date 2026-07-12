@@ -7,7 +7,7 @@ from core.cm_extractor.huawei_client import HuaweiCmError
 from core.cm_extractor.nokia_client import NokiaCmError
 from core.cm_extractor.site_catalog import list_huawei_areas, list_nokia_inventory_areas
 from core.radio.cm_live import query_live_parameter_status
-from core.radio.web import admin_required, format_user, get_current_user, json_error
+from core.radio.web import format_user, get_current_user, json_error, login_required
 from modules.cm_parameter_audit.cache import get_export_payload, store_export_payload
 from modules.cm_parameter_audit.export import build_audit_workbook
 
@@ -33,7 +33,7 @@ def _user_id(user) -> str:
 
 
 @cm_parameter_audit_bp.route("/cm-parameter-audit")
-@admin_required
+@login_required
 def cm_parameter_audit_page():
     return render_template(
         "cm_parameter_audit.html",
@@ -45,7 +45,7 @@ def cm_parameter_audit_page():
 
 
 @cm_parameter_audit_bp.route("/api/cm-parameter-audit/areas")
-@admin_required
+@login_required
 def cm_parameter_audit_areas():
     vendor = (request.args.get("vendor") or "nokia").strip().lower()
     scope_level = (request.args.get("scope_level") or "MRBTS").strip().upper()
@@ -60,7 +60,7 @@ def cm_parameter_audit_areas():
 
 
 @cm_parameter_audit_bp.route("/api/cm-parameter-audit/live", methods=["POST"])
-@admin_required
+@login_required
 def cm_parameter_audit_live():
     data = _json_body()
     user = get_current_user()
@@ -95,7 +95,7 @@ def cm_parameter_audit_live():
 
 @cm_parameter_audit_bp.route("/api/cm-parameter-audit/export", methods=["POST"])
 @cm_parameter_audit_bp.route("/api/cm-parameter-audit/export/<export_id>", methods=["GET"])
-@admin_required
+@login_required
 def cm_parameter_audit_export(export_id: str | None = None):
     """Export value distribution and network status into one Excel workbook."""
     user = get_current_user()

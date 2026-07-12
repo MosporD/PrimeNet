@@ -30,6 +30,12 @@ network_health_bp = Blueprint(
     static_url_path="/network-health/static",
 )
 
+
+@network_health_bp.before_request
+def _guard_network_health_access():
+    from core.module_access import module_access_before_request
+    return module_access_before_request("/network-health")
+
 _VALID_RATS = {r["key"] for r in cfg.RAT_OPTIONS}
 _VALID_VENDORS = {v["key"] for v in cfg.VENDOR_OPTIONS}
 

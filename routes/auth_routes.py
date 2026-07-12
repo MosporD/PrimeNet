@@ -218,9 +218,11 @@ def dashboard():
         return redirect(url_for('auth.login_page'))
 
     tech_site_columns, total_sites = get_operational_site_stats()
+    user_data = format_user_data(user)
     return render_template(
         'dashboard.html',
-        user=format_user_data(user),
+        user=user_data,
+        allowed_hrefs=allowed_hrefs_for_role(user_data),
         tech_site_columns=tech_site_columns,
         total_sites=total_sites,
     )

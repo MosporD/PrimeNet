@@ -8,14 +8,13 @@ from urllib.parse import urlparse
 #   all          — any authenticated user
 #   admin        — owner (admin) only
 #   admin_or_noc — admin or NOC SYS (user administration)
-#   dev          — hidden from navigation for everyone (dashboard .function-card-dev)
 NAV_SECTIONS: list[dict] = [
     {
         "title": "Overview & Performance",
         "links": [
             {"label": "Dashboard", "href": "/dashboard", "visibility": "all"},
             {"label": "Performance Explorer", "href": "/performance", "visibility": "all"},
-            {"label": "Huawei PM Query Studio", "href": "/performance-analytics", "visibility": "dev"},
+            {"label": "Huawei PM Query Studio", "href": "/performance-analytics", "visibility": "admin"},
             {"label": "Network Coverage Heatmap", "href": "/cell-heatmap", "visibility": "all"},
             {"label": "Network Map", "href": "/network-map", "visibility": "all"},
             {"label": "Neighbor Analysis", "href": "/neighbor-analysis", "visibility": "all"},
@@ -30,8 +29,8 @@ NAV_SECTIONS: list[dict] = [
     {
         "title": "Radio Optimization",
         "links": [
-            {"label": "SON Optimization Insights", "href": "/son-analytics", "visibility": "dev"},
-            {"label": "Network Health Overview", "href": "/network-health", "visibility": "dev"},
+            {"label": "SON Optimization Insights", "href": "/son-analytics", "visibility": "admin"},
+            {"label": "Network Health Overview", "href": "/network-health", "visibility": "admin"},
             {"label": "RF Optimization Workbench", "href": "/rf-optimization", "visibility": "admin"},
             {"label": "Neighbor Quality Analyzer", "href": "/neighbor-quality", "visibility": "admin"},
             {"label": "Capacity Hotspots", "href": "/capacity-hotspots", "visibility": "admin"},
@@ -47,7 +46,7 @@ NAV_SECTIONS: list[dict] = [
         "links": [
             {"label": "Parameter Dictionary", "href": "/parameter-dictionary", "visibility": "all"},
             {"label": "Configuration Data Extractor", "href": "/cm-extractor", "visibility": "all"},
-            {"label": "CM Parameter Audit", "href": "/cm-parameter-audit", "visibility": "admin"},
+            {"label": "CM Parameter Audit", "href": "/cm-parameter-audit", "visibility": "all"},
             {"label": "XML Parser", "href": "/xml-parser", "visibility": "all"},
             {"label": "XML Generator", "href": "/excel-generator", "visibility": "all"},
             {"label": "NE Comparison", "href": "/ne-comparison", "visibility": "all"},
@@ -85,13 +84,44 @@ def _role_key(user_or_role) -> str:
 
 
 def _link_visible(visibility: str, role: str) -> bool:
-    if visibility == "dev":
-        return False
     if visibility == "admin":
         return role == "admin"
     if visibility == "admin_or_noc":
         return role in {"admin", "noc_sys"}
     return True
+
+
+def enforce_module_access(href: str, user_or_role):
+    """
+    Return None when access is allowed, otherwise a Flask response
+    (redirect for pages, JSON 403 for API).
+    """
+    from flask import jsonify, redirect, request, url_for
+
+    if href_allowed_for_role(href, user_or_role):
+        return None
+
+    if (request.path or "").startswith("/api/") or request.is_json:
+        return jsonify({"success": False, "error": "Access denied."}), 403
+    return redirect(url_for("auth.dashboard"))
+
+
+def module_access_before_request(href: str):
+    """Blueprint before_request helper keyed to a module href."""
+    from flask import redirect, request, url_for
+    from database_enhanced import get_user_by_session
+
+    if request.endpoint and str(request.endpoint).endswith(".static"):
+        return None
+
+    token = request.cookies.get("session_token")
+    if not token:
+        return redirect(url_for("auth.login_page"))
+    user = get_user_by_session(token)
+    if not user:
+        return redirect(url_for("auth.login_page"))
+    request.current_user = user
+    return enforce_module_access(href, user)
 
 
 def navigation_sections_for_role(user_or_role) -> list[dict]:
@@ -123,4 +153,10 @@ def allowed_hrefs_for_role(user_or_role) -> list[str]:
 
 def href_allowed_for_role(href: str, user_or_role) -> bool:
     target = normalize_href(href)
-    return target in set(allowed_hrefs_for_role(user_or_role))
+    allowed = allowed_hrefs_for_role(user_or_role)
+    if target in allowed:
+        return True
+    for root in allowed:
+        if root != "/" and target.startswith(f"{root}/"):
+            return True
+    return False

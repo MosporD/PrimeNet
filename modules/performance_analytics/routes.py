@@ -37,6 +37,12 @@ performance_analytics_bp = Blueprint(
 )
 
 
+@performance_analytics_bp.before_request
+def _guard_performance_analytics_access():
+    from core.module_access import module_access_before_request
+    return module_access_before_request('/performance-analytics')
+
+
 def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):

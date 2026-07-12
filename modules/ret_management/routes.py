@@ -74,9 +74,8 @@ def _user_id(user) -> int:
     return user.get('id') if isinstance(user, dict) else user[0]
 
 
-def _cm_write_allowed_users() -> set[str]:
-    raw = os.environ.get('CM_WRITE_ALLOWED_USERS') or 'malek.mohammad'
-    return {item.strip().lower() for item in raw.split(',') if item.strip()}
+def _cm_write_allowed(user) -> bool:
+    return bool(user)
 
 
 def cm_write_required(f):
@@ -85,7 +84,7 @@ def cm_write_required(f):
         user = get_current_user()
         if not user:
             return jsonify({'error': 'Unauthorized'}), 401
-        if _username(user).lower() not in _cm_write_allowed_users():
+        if not _cm_write_allowed(user):
             return jsonify({'error': 'CM write actions are currently restricted.'}), 403
         return f(*args, **kwargs)
     return decorated
@@ -115,7 +114,7 @@ def ret_management_page():
         'ret_management.html',
         user=format_user_data(user),
         huawei_enabled=_huawei_feature_enabled(),
-        cm_write_allowed=_username(user).lower() in _cm_write_allowed_users(),
+        cm_write_allowed=_cm_write_allowed(user),
     )
 
 
@@ -129,7 +128,7 @@ def ret_defaults():
         'nokia_configured': status['nokia_configured'],
         'huawei_configured': status['huawei_configured'],
         'huawei_enabled': _huawei_feature_enabled(),
-        'cm_write_allowed': _username(user).lower() in _cm_write_allowed_users(),
+        'cm_write_allowed': _cm_write_allowed(user),
     })
 
 
