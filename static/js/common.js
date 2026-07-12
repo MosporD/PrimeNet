@@ -41,7 +41,7 @@ function _isPublicAuthPage() {
 }
 
 const CONSTELLATION_CSS_VERSION = '1.9';
-const CONSTELLATION_JS_VERSION = '1.4';
+const CONSTELLATION_JS_VERSION = '1.7';
 
 function _constellationBgExcluded(path) {
     return /^\/(login|register|network-map|neighbor-analysis|performance|performance-analytics|cell-heatmap|conflict-map|fault-management|femto-pm|network-health|son-analytics|drive-test-viewer)(\/|$)/.test(path);
@@ -253,7 +253,6 @@ function toggleDarkMode() {
 }
 
 function _ensureThemeToggle() {
-    if (_isPublicAuthPage()) return;
     if (document.getElementById('dark-mode-btn')) return;
     const btn = document.createElement('button');
     btn.id = 'dark-mode-btn';
@@ -263,19 +262,19 @@ function _ensureThemeToggle() {
     btn.setAttribute('aria-label', 'Toggle dark mode');
     btn.addEventListener('click', toggleDarkMode);
 
-    // The dashboard groups its header buttons inside `.header-actions`; on
-    // module pages the same selector also exists. Map pages use a custom
-    // `.map-header .header-right` container instead.
     const mount = document.querySelector('header .header-actions')
         || document.querySelector('header .header-right')
         || document.querySelector('.map-header .header-right')
         || document.querySelector('.ch-topbar .ch-topbar-actions')
         || document.querySelector('.son-topbar .son-topbar-actions')
         || document.querySelector('.nh-header .nh-header-right')
-        || document.querySelector('.nh-select-header');
+        || document.querySelector('.nh-select-header')
+        || document.querySelector('.login-theme-mount');
     if (!mount) return;
-    if (mount && mount.classList && mount.classList.contains('header-actions')) {
+    if (mount.classList && mount.classList.contains('header-actions')) {
         btn.classList.add('btn-header', 'btn-header-outline');
+    } else if (mount.classList && mount.classList.contains('login-theme-mount')) {
+        btn.className = 'login-theme-btn';
     }
     mount.appendChild(btn);
 }

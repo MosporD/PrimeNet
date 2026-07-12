@@ -112,21 +112,83 @@
      * LOGIN SCENES — one illustration per login page visit
      * (radar sweep / sonar ping / star map / hex mesh)
      * ==================================================================== */
-    var LOGIN_SCENE_KEY = 'primenet-login-scene-idx';
+    var BG_SCENE_KEY = 'primenet-bg-scene';
 
-    function pickLoginSceneIndex(count) {
-        try {
-            var n = parseInt(localStorage.getItem(LOGIN_SCENE_KEY) || '0', 10);
-            if (!isFinite(n)) n = 0;
-            var idx = ((n % count) + count) % count;
-            localStorage.setItem(LOGIN_SCENE_KEY, String(n + 1));
-            return idx;
-        } catch (_) {
-            return Math.floor(Math.random() * count);
+    var SCENE_PALETTES = {
+        radar: {
+            light: {
+                bgTop: '#e8f0fa', bgBottom: '#f3f7fc',
+                tint: 'rgba(37, 99, 235, 0.12)',
+                accent: '#2563eb', accentSoft: '#60a5fa', grid: '#93c5fd'
+            },
+            dark: {
+                bgTop: '#020617', bgBottom: '#061336',
+                tint: 'rgba(56, 189, 248, 0.05)',
+                accent: '#38bdf8', accentSoft: '#7dd3fc', grid: '#60a5fa'
+            }
+        },
+        sonar: {
+            light: {
+                bgTop: '#ecfdf5', bgBottom: '#f0fdf9',
+                tint: 'rgba(45, 212, 191, 0.14)',
+                accent: '#059669', accentSoft: '#34d399', grid: '#6ee7b7'
+            },
+            dark: {
+                bgTop: '#021a14', bgBottom: '#042f2a',
+                tint: 'rgba(45, 212, 191, 0.06)',
+                accent: '#34d399', accentSoft: '#2dd4bf', grid: '#2dd4bf'
+            }
+        },
+        stars: {
+            light: {
+                bgTop: '#f5f3ff', bgBottom: '#ede9fe',
+                tint: 'rgba(167, 139, 250, 0.12)',
+                accent: '#7c3aed', accentSoft: '#a78bfa', grid: '#c4b5fd'
+            },
+            dark: {
+                bgTop: '#0b0718', bgBottom: '#15082a',
+                tint: 'rgba(167, 139, 250, 0.05)',
+                accent: '#a78bfa', accentSoft: '#c4b5fd', grid: '#a78bfa'
+            }
+        },
+        hexmesh: {
+            light: {
+                bgTop: '#eff6ff', bgBottom: '#f8fafc',
+                tint: 'rgba(56, 189, 248, 0.10)',
+                accent: '#0284c7', accentSoft: '#38bdf8', grid: '#7dd3fc'
+            },
+            dark: {
+                bgTop: '#020617', bgBottom: '#031028',
+                tint: 'rgba(56, 189, 248, 0.04)',
+                accent: '#38bdf8', accentSoft: '#60a5fa', grid: '#60a5fa'
+            }
         }
+    };
+
+    function scenePalette(sceneId) {
+        var bucket = SCENE_PALETTES[sceneId] || SCENE_PALETTES.radar;
+        var dark = document.body.classList.contains('dark-mode');
+        return bucket[dark ? 'dark' : 'light'];
     }
 
-    function initLoginScene(canvas) {
+    /** Random on login; reuse session scene elsewhere until next login visit. */
+    function pickBackgroundSceneIndex(count, forceRandom) {
+        if (!forceRandom) {
+            try {
+                var saved = sessionStorage.getItem(BG_SCENE_KEY);
+                if (saved !== null && saved !== '') {
+                    var idx = parseInt(saved, 10);
+                    if (idx >= 0 && idx < count) return idx;
+                }
+            } catch (_) { /* ignore */ }
+        }
+        var picked = Math.floor(Math.random() * count);
+        try { sessionStorage.setItem(BG_SCENE_KEY, String(picked)); } catch (_) { /* ignore */ }
+        return picked;
+    }
+
+    function initPageBackground(canvas, options) {
+        options = options || {};
         var ctx = canvas.getContext('2d');
         var vw = 0, vh = 0, cx = 0, cy = 0, R = 0;
         var mouse = { x: -1e4, y: -1e4 };
@@ -135,6 +197,7 @@
 
         /* ---------- scene: RADAR SWEEP (constellation + rotating sweep) -- */
         var radar = {
+            id: 'radar',
             name: 'RADAR SWEEP',
             tint: 'rgba(56,189,248,0.05)',
             nodes: [],
@@ -154,15 +217,16 @@
                     });
                 }
             },
-            draw: function (dt, t) {
-                drawRadarGrid(ctx, cx, cy, R, [R * 0.25, R * 0.5, R * 0.75, R], '#60a5fa');
+            draw: function (dt, t, pal) {
+                pal = pal || scenePalette('radar');
+                drawRadarGrid(ctx, cx, cy, R, [R * 0.25, R * 0.5, R * 0.75, R], pal.grid);
                 if (!REDUCE_MOTION) {
                     this.sweep = normalizeAngle(this.sweep + dt * (TAU / 7));
-                    drawSweep(ctx, cx, cy, R, this.sweep, '#38bdf8', 0.13);
+                    drawSweep(ctx, cx, cy, R, this.sweep, pal.accent, 0.13);
                 }
                 ctx.beginPath();
                 ctx.arc(cx, cy, 3.2, 0, TAU);
-                ctx.fillStyle = 'rgba(125,211,252,0.9)';
+                ctx.fillStyle = rgba(pal.accentSoft, 0.9);
                 ctx.fill();
 
                 var nodes = this.nodes;
@@ -235,6 +299,7 @@
 
         /* ---------- scene: SONAR PING (expanding waves + contacts) ------- */
         var sonar = {
+            id: 'sonar',
             name: 'SONAR PING',
             tint: 'rgba(45,212,191,0.06)',
             contacts: [],
@@ -254,9 +319,10 @@
                 this.pings = [];
                 this.pingTimer = 0.4;
             },
-            draw: function (dt, t) {
-                var green = '#34d399';
-                var teal = '#2dd4bf';
+            draw: function (dt, t, pal) {
+                pal = pal || scenePalette('sonar');
+                var green = pal.accent;
+                var teal = pal.accentSoft;
                 /* dashed range rings + bearing ticks */
                 ctx.save();
                 ctx.setLineDash([4, 10]);
@@ -356,6 +422,7 @@
 
         /* ---------- scene: STAR MAP (starfield + constellation figures) -- */
         var stars = {
+            id: 'stars',
             name: 'STAR MAP',
             tint: 'rgba(167,139,250,0.05)',
             field: [],
@@ -393,16 +460,18 @@
                 this.shooting = null;
                 this.shootTimer = 3 + rand() * 3;
             },
-            draw: function (dt, t) {
+            draw: function (dt, t, pal) {
+                pal = pal || scenePalette('stars');
                 var offX = (mouse.x > -1e3 ? (mouse.x - vw / 2) : 0) * 0.012;
                 var offY = (mouse.y > -1e3 ? (mouse.y - vh / 2) : 0) * 0.012;
+                var starFill = document.body.classList.contains('dark-mode') ? '226,238,255' : '30,41,59';
 
                 for (var i = 0; i < this.field.length; i++) {
                     var st = this.field[i];
                     var alpha = 0.25 + 0.35 * (0.5 + 0.5 * Math.sin(t * 1.6 + st.tw)) * st.z;
                     ctx.beginPath();
                     ctx.arc(st.x - offX * st.z * 10, st.y - offY * st.z * 10, st.r, 0, TAU);
-                    ctx.fillStyle = 'rgba(226,238,255,' + alpha.toFixed(3) + ')';
+                    ctx.fillStyle = 'rgba(' + starFill + ',' + alpha.toFixed(3) + ')';
                     ctx.fill();
                 }
 
@@ -414,7 +483,7 @@
                         var x = pts[p].x - offX * 8, y = pts[p].y - offY * 8;
                         if (p === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
                     }
-                    ctx.strokeStyle = 'rgba(196,181,253,0.22)';
+                    ctx.strokeStyle = rgba(pal.accentSoft, 0.22);
                     ctx.lineWidth = 1;
                     ctx.stroke();
                     for (p = 0; p < pts.length; p++) {
@@ -422,7 +491,7 @@
                         var va = 0.55 + 0.35 * Math.sin(t * 1.2 + pts[p].tw);
                         ctx.beginPath();
                         ctx.arc(vx, vy, 2.1, 0, TAU);
-                        ctx.fillStyle = 'rgba(221,214,254,' + va.toFixed(3) + ')';
+                        ctx.fillStyle = rgba(pal.accentSoft, va);
                         ctx.fill();
                         /* link bright vertices to a nearby cursor */
                         var dx = vx - mouse.x, dy = vy - mouse.y;
@@ -431,7 +500,7 @@
                             ctx.beginPath();
                             ctx.moveTo(vx, vy);
                             ctx.lineTo(mouse.x, mouse.y);
-                            ctx.strokeStyle = 'rgba(196,181,253,' + (0.28 * (1 - dist / 190)).toFixed(3) + ')';
+                            ctx.strokeStyle = rgba(pal.accentSoft, 0.28 * (1 - dist / 190));
                             ctx.stroke();
                         }
                     }
@@ -474,6 +543,7 @@
 
         /* ---------- scene: HEX MESH (cellular coverage grid) ------------- */
         var hexmesh = {
+            id: 'hexmesh',
             name: 'HEX MESH',
             tint: 'rgba(56,189,248,0.04)',
             cells: [],
@@ -511,7 +581,8 @@
                 }
                 ctx.closePath();
             },
-            draw: function (dt, t) {
+            draw: function (dt, t, pal) {
+                pal = pal || scenePalette('hexmesh');
                 if (!REDUCE_MOTION) {
                     this.waveTimer -= dt;
                     if (this.waveTimer <= 0 && this.waves.length < 3) {
@@ -559,17 +630,23 @@
         };
 
         var scenes = [radar, sonar, stars, hexmesh];
-        var current = pickLoginSceneIndex(scenes.length);
+        var current = pickBackgroundSceneIndex(scenes.length, !!options.pickRandom);
 
         function drawScene(scene, dt, t) {
+            var pal = scenePalette(scene.id);
+            var bg = ctx.createLinearGradient(0, 0, 0, vh);
+            bg.addColorStop(0, pal.bgTop);
+            bg.addColorStop(1, pal.bgBottom);
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, vw, vh);
             ctx.save();
-            /* per-scene mood tint */
             var tint = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(vw, vh) * 0.8);
-            tint.addColorStop(0, scene.tint);
+            tint.addColorStop(0, pal.tint);
             tint.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = tint;
             ctx.fillRect(0, 0, vw, vh);
-            scene.draw(dt, t);
+            if (!document.body.classList.contains('dark-mode')) ctx.globalAlpha = 0.78;
+            scene.draw(dt, t, pal);
             ctx.restore();
         }
 
@@ -591,6 +668,8 @@
             ctx.clearRect(0, 0, vw, vh);
             drawScene(scenes[current], dt, t);
 
+            var ripplePal = scenePalette(scenes[current].id);
+
             /* click ripples on top of any scene */
             for (var i = ripples.length - 1; i >= 0; i--) {
                 var rp = ripples[i];
@@ -599,7 +678,7 @@
                 if (rp.a <= 0) { ripples.splice(i, 1); continue; }
                 ctx.beginPath();
                 ctx.arc(rp.x, rp.y, rp.r, 0, TAU);
-                ctx.strokeStyle = 'rgba(56,189,248,' + rp.a.toFixed(3) + ')';
+                ctx.strokeStyle = rgba(ripplePal.accent, rp.a);
                 ctx.lineWidth = 1.4;
                 ctx.stroke();
             }
@@ -618,6 +697,9 @@
         window.addEventListener('pointerdown', function (e) {
             ripples.push({ x: e.clientX, y: e.clientY, r: 4, a: 0.8 });
         });
+        document.addEventListener('primenet:theme-change', function () {
+            if (REDUCE_MOTION) frame(performance.now(), true);
+        });
 
         resize();
         if (REDUCE_MOTION) {
@@ -628,8 +710,17 @@
 
         return {
             names: scenes.map(function (s) { return s.name; }),
-            getScene: function () { return current; }
+            getScene: function () { return current; },
+            setActivity: function () { /* login scenes — no activity pacing */ }
         };
+    }
+
+    function initLoginScene(canvas) {
+        return initPageBackground(canvas, { pickRandom: true });
+    }
+
+    function initAmbientBackground(canvas) {
+        return initPageBackground(canvas, { pickRandom: false });
     }
 
     /* ====================================================================
@@ -880,226 +971,6 @@
     }
 
     /* ====================================================================
-     * AMBIENT BACKGROUND — theme-aware constellation behind page content
-     * (used as the dashboard's full-page background)
-     * ==================================================================== */
-    var AMBIENT_THEMES = {
-        light: {
-            bgTop: '#e8f0fa', bgBottom: '#f2f6fb',
-            tint: 'rgba(59, 130, 246, 0.10)',
-            node: '#1d4ed8', nodeAlpha: 0.55,
-            hub: '#2563eb', hubAlpha: 0.6,
-            link: [29, 78, 216], linkAlpha: 0.22,
-            mouseLink: [14, 116, 233], mouseAlpha: 0.30,
-            pulse: '#0284c7', pulseAlpha: 0.75
-        },
-        dark: {
-            bgTop: '#0a1326', bgBottom: '#101a2e',
-            tint: 'rgba(56, 189, 248, 0.10)',
-            node: '#7dd3fc', nodeAlpha: 0.85,
-            hub: '#38bdf8', hubAlpha: 0.9,
-            link: [125, 211, 252], linkAlpha: 0.20,
-            mouseLink: [56, 189, 248], mouseAlpha: 0.32,
-            pulse: '#38bdf8', pulseAlpha: 0.9
-        }
-    };
-
-    function initAmbientBackground(canvas) {
-        var ctx = canvas.getContext('2d');
-        var vw = 0, vh = 0;
-        var nodes = [];
-        var packets = [];
-        var mouse = { x: -1e4, y: -1e4 };
-        var last = performance.now();
-        var packetTimer = 0;
-        var LINK_DIST = 150;
-        /* 0..1 network activity — paces the data-packet pulses (0.5 = neutral). */
-        var activityLevel = 0.5;
-
-        function theme() {
-            return AMBIENT_THEMES[document.body.classList.contains('dark-mode') ? 'dark' : 'light'];
-        }
-
-        function resize() {
-            vw = window.innerWidth;
-            vh = Math.max(window.innerHeight, document.documentElement.clientHeight);
-            ctx = fitCanvas(canvas, vw, vh);
-            buildNodes();
-            if (REDUCE_MOTION) frame(performance.now(), true);
-        }
-
-        function buildNodes() {
-            var count = Math.min(150, Math.max(55, Math.round((vw * vh) / 14500)));
-            var rand = mulberry32(0xC0FFEE);
-            nodes = [];
-            for (var i = 0; i < count; i++) {
-                nodes.push({
-                    x: rand() * vw,
-                    y: rand() * vh,
-                    vx: (rand() - 0.5) * 10,
-                    vy: (rand() - 0.5) * 10,
-                    r: 1.1 + rand() * 1.9,
-                    tw: rand() * TAU,
-                    /* every ~9th node is a glowing "hub" site */
-                    hub: rand() < 0.11
-                });
-            }
-            packets = [];
-        }
-
-        function spawnPacket() {
-            /* Send a "data packet" pulse along a random existing link. */
-            var tries = 12;
-            while (tries-- > 0) {
-                var a = nodes[(Math.random() * nodes.length) | 0];
-                var b = nodes[(Math.random() * nodes.length) | 0];
-                if (!a || !b || a === b) continue;
-                var dx = b.x - a.x, dy = b.y - a.y;
-                if (dx * dx + dy * dy < LINK_DIST * LINK_DIST) {
-                    packets.push({ a: a, b: b, t: 0, speed: 0.9 + Math.random() * 0.8 });
-                    return;
-                }
-            }
-        }
-
-        function frame(now, single) {
-            var dt = Math.min(0.05, (now - last) / 1000);
-            last = now;
-            var t = now / 1000;
-            var th = theme();
-
-            /* Background wash */
-            var bg = ctx.createLinearGradient(0, 0, 0, vh);
-            bg.addColorStop(0, th.bgTop);
-            bg.addColorStop(1, th.bgBottom);
-            ctx.fillStyle = bg;
-            ctx.fillRect(0, 0, vw, vh);
-            var tint = ctx.createRadialGradient(vw * 0.2, vh * 0.1, 0, vw * 0.2, vh * 0.1, Math.max(vw, vh) * 0.7);
-            tint.addColorStop(0, th.tint);
-            tint.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = tint;
-            ctx.fillRect(0, 0, vw, vh);
-
-            var i, j, n, m, dx, dy, dist;
-            for (i = 0; i < nodes.length; i++) {
-                n = nodes[i];
-                if (!REDUCE_MOTION && !single) {
-                    n.x += n.vx * dt;
-                    n.y += n.vy * dt;
-                    if (n.x < -12) n.x = vw + 12; else if (n.x > vw + 12) n.x = -12;
-                    if (n.y < -12) n.y = vh + 12; else if (n.y > vh + 12) n.y = -12;
-                }
-            }
-
-            /* Links */
-            for (i = 0; i < nodes.length; i++) {
-                n = nodes[i];
-                for (j = i + 1; j < nodes.length; j++) {
-                    m = nodes[j];
-                    dx = n.x - m.x; dy = n.y - m.y;
-                    var d2 = dx * dx + dy * dy;
-                    if (d2 < LINK_DIST * LINK_DIST) {
-                        var a = th.linkAlpha * (1 - Math.sqrt(d2) / LINK_DIST);
-                        ctx.beginPath();
-                        ctx.moveTo(n.x, n.y);
-                        ctx.lineTo(m.x, m.y);
-                        ctx.strokeStyle = 'rgba(' + th.link[0] + ',' + th.link[1] + ',' + th.link[2] + ',' + a.toFixed(3) + ')';
-                        ctx.lineWidth = 1;
-                        ctx.stroke();
-                    }
-                }
-                dx = n.x - mouse.x; dy = n.y - mouse.y;
-                dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 180) {
-                    ctx.beginPath();
-                    ctx.moveTo(n.x, n.y);
-                    ctx.lineTo(mouse.x, mouse.y);
-                    ctx.strokeStyle = 'rgba(' + th.mouseLink[0] + ',' + th.mouseLink[1] + ',' + th.mouseLink[2] + ',' + (th.mouseAlpha * (1 - dist / 180)).toFixed(3) + ')';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            }
-
-            /* Nodes */
-            for (i = 0; i < nodes.length; i++) {
-                n = nodes[i];
-                var alpha = th.nodeAlpha * (0.65 + 0.35 * Math.sin(t * 1.2 + n.tw));
-                if (n.hub) {
-                    /* Glow halo around hub nodes */
-                    var halo = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 7);
-                    halo.addColorStop(0, rgba(th.hub, 0.35 * th.hubAlpha));
-                    halo.addColorStop(1, 'rgba(0,0,0,0)');
-                    ctx.fillStyle = halo;
-                    ctx.beginPath();
-                    ctx.arc(n.x, n.y, n.r * 7, 0, TAU);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(n.x, n.y, n.r + 1.2, 0, TAU);
-                    ctx.fillStyle = rgba(th.hub, Math.min(1, th.hubAlpha * (0.7 + 0.3 * Math.sin(t * 1.6 + n.tw))));
-                    ctx.fill();
-                } else {
-                    ctx.beginPath();
-                    ctx.arc(n.x, n.y, n.r, 0, TAU);
-                    ctx.fillStyle = rgba(th.node, Math.max(0.05, alpha));
-                    ctx.fill();
-                }
-            }
-
-            /* Data packets travelling along links — rate follows network activity */
-            if (!REDUCE_MOTION && !single) {
-                var maxPackets = 2 + Math.round(activityLevel * 9);
-                packetTimer -= dt;
-                if (packetTimer <= 0 && packets.length < maxPackets) {
-                    spawnPacket();
-                    packetTimer = (0.35 + Math.random() * 0.8) * (1.7 - 1.25 * activityLevel);
-                }
-                for (i = packets.length - 1; i >= 0; i--) {
-                    var p = packets[i];
-                    p.t += dt * p.speed;
-                    if (p.t >= 1) { packets.splice(i, 1); continue; }
-                    var px = p.a.x + (p.b.x - p.a.x) * p.t;
-                    var py = p.a.y + (p.b.y - p.a.y) * p.t;
-                    var fade = Math.sin(p.t * Math.PI);
-                    ctx.beginPath();
-                    ctx.arc(px, py, 2.1, 0, TAU);
-                    ctx.fillStyle = rgba(th.pulse, th.pulseAlpha * fade);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(px, py, 4.6, 0, TAU);
-                    ctx.strokeStyle = rgba(th.pulse, 0.3 * th.pulseAlpha * fade);
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-            }
-
-            if (!REDUCE_MOTION && !single) requestAnimationFrame(frame);
-        }
-
-        window.addEventListener('resize', resize);
-        window.addEventListener('mousemove', function (e) {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-        window.addEventListener('mouseleave', function () {
-            mouse.x = -1e4; mouse.y = -1e4;
-        });
-        /* Re-render once on theme toggles when animation is disabled. */
-        document.addEventListener('primenet:theme-change', function () {
-            if (REDUCE_MOTION) frame(performance.now(), true);
-        });
-
-        resize();
-        if (!REDUCE_MOTION) requestAnimationFrame(frame);
-
-        return {
-            setActivity: function (level) {
-                var v = Number(level);
-                if (isFinite(v)) activityLevel = Math.max(0, Math.min(1, v));
-            }
-        };
-    }
-
-    /* ====================================================================
      * JORDAN SITE MAP — real site positions on a stylized country outline
      * ==================================================================== */
 
@@ -1335,6 +1206,7 @@
     }
 
     window.PrimeNetConstellation = {
+        initPageBackground: initPageBackground,
         initLoginScene: initLoginScene,
         initRadar: initRadar,
         initJordanMap: initJordanMap,
