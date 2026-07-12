@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeNet - CM Parameter Audit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.2">
+    <link rel="stylesheet" href="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.css') }}?v=1.0">
+</head>
+<body class="cm-audit-page"
+      data-nokia-configured="{{ 'true' if nokia_configured else 'false' }}"
+      data-huawei-configured="{{ 'true' if huawei_configured else 'false' }}">
+    <div class="container">
+        <header class="cm-audit-topbar">
+            <div class="header-content">
+                <a href="/dashboard" class="back-link">Dashboard</a>
+                <div class="header-left">
+                    <h1>CM Parameter Audit</h1>
+                    <p>Select a parameter and scan live configuration values across the network.</p>
+                </div>
+                <div class="header-right">
+                    <span class="user-name">{{ user.username }}</span>
+                    <button type="button" class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content cm-audit-main">
+            <section class="cm-audit-panel">
+                <div class="vendor-tabs" role="tablist" aria-label="CM vendor">
+                    <button type="button" class="vendor-tab active" data-vendor="nokia">Nokia</button>
+                    {% if huawei_enabled %}
+                    <button type="button" class="vendor-tab" data-vendor="huawei">Huawei</button>
+                    {% endif %}
+                </div>
+
+                <div class="cm-audit-form">
+                    <div class="form-row vendor-scope-row">
+                        <div class="nokia-only scope-block" id="nokia-scope-block">
+                            <label for="audit-scope">Scope
+                                <select id="audit-scope">
+                                    <option value="MRBTS">MRBTS (LTE / NR)</option>
+                                    <option value="RNC">RNC (3G)</option>
+                                    <option value="BSC">BSC (2G)</option>
+                                </select>
+                            </label>
+                            <label for="audit-conf-id">Configuration
+                                <select id="audit-conf-id">
+                                    <option value="1">Live network</option>
+                                    <option value="5">Reference / target</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div class="huawei-only scope-block" id="huawei-scope-block" hidden>
+                            <label>Scope
+                                <input type="text" value="ENODEB (4G eNodeB)" readonly aria-readonly="true">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="audit-area">Area
+                            <select id="audit-area">
+                                <option value="all">All areas</option>
+                            </select>
+                        </label>
+                        <label for="audit-mo-search">MO class
+                            <input type="search" id="audit-mo-search" placeholder="Filter MO classes" autocomplete="off">
+                        </label>
+                        <label for="audit-mo">Selected MO
+                            <select id="audit-mo" disabled>
+                                <option value="">Load MO classes…</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="audit-param-search">Parameter
+                            <input type="search" id="audit-param-search" placeholder="Filter parameters" autocomplete="off" disabled>
+                        </label>
+                        <label for="audit-param">Selected parameter
+                            <select id="audit-param" disabled>
+                                <option value="">Select MO class first</option>
+                            </select>
+                        </label>
+                        <div class="form-action">
+                            <button type="button" class="btn-primary" id="audit-scan" disabled>Scan network live</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cm-audit-status" id="audit-status" hidden aria-live="polite"></section>
+
+            <section class="cm-audit-summary" id="audit-summary" hidden>
+                <div class="summary-card">
+                    <span>Network elements</span>
+                    <strong id="summary-nes">-</strong>
+                </div>
+                <div class="summary-card">
+                    <span>Objects</span>
+                    <strong id="summary-objects">-</strong>
+                </div>
+                <div class="summary-card">
+                    <span>Distinct values</span>
+                    <strong id="summary-distinct">-</strong>
+                </div>
+                <div class="summary-card">
+                    <span>Dominant value</span>
+                    <strong id="summary-dominant">-</strong>
+                </div>
+                <div class="summary-card">
+                    <span>Consistency</span>
+                    <strong id="summary-status" class="status-pill">-</strong>
+                </div>
+            </section>
+
+            <section class="cm-audit-distribution" id="audit-distribution" hidden>
+                <div class="section-head">
+                    <div>
+                        <h2>Value distribution</h2>
+                        <p class="distribution-note" id="distribution-note" hidden></p>
+                    </div>
+                    <button type="button" class="btn-secondary" id="audit-export" disabled>Export Excel report</button>
+                </div>
+                <div id="distribution-bars" class="distribution-bars"></div>
+            </section>
+
+            <section class="cm-audit-results" id="audit-results" hidden>
+                <div class="results-head">
+                    <h2>Network status</h2>
+                    <label class="results-filter">
+                        Filter
+                        <input type="search" id="audit-results-filter" placeholder="NE, cell, value, DN">
+                    </label>
+                </div>
+                <div class="results-table-wrap">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>NE</th>
+                                <th>Area</th>
+                                <th>Cell / Object</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-results-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="cm-audit-warnings" id="audit-warnings" hidden>
+                <h2>Warnings</h2>
+                <ul id="audit-warnings-list"></ul>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
+    <script src="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.js') }}?v=1.6"></script>
+</body>
+</html>
