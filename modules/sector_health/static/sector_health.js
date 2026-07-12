@@ -1,10 +1,15 @@
 /**
  * Sector Health — 2G/3G/5G counts; LTE pie = band share of LTE sectors (L35 excluded).
+ * Set window.SH_CONFIG.allCells = true on the all-cells page.
  */
 
 let _allAreas = [];
 let _loadTimer = null;
 const _charts = {};
+
+function shAllCellsMode() {
+    return Boolean(window.SH_CONFIG && window.SH_CONFIG.allCells);
+}
 
 const SH_BAND_COLOR = '#6c3483';
 const SH_OTHER_LTE_COLOR = '#dfe6e9';
@@ -116,6 +121,7 @@ function buildQueryParams() {
     if (area) p.set('area', area);
     if (rat) p.set('rat', rat);
     if (q) p.set('q', q);
+    if (shAllCellsMode()) p.set('all_cells', '1');
     return p;
 }
 
@@ -235,8 +241,9 @@ async function loadSectorHealth() {
         renderSummary(data);
         const gen = data.generated_at ? new Date(data.generated_at).toLocaleString() : '';
         const lteN = (data.health_summary || {}).lte_sector_count ?? 0;
+        const scope = data.active_only === false ? 'all configured cells' : 'active cells only';
         if (status) {
-            status.textContent = `Coverage snapshot${gen ? ` · ${gen}` : ''} · ${(data.filtered_sector_count ?? 0).toLocaleString()} in view · ${lteN.toLocaleString()} LTE (excl. L35).`;
+            status.textContent = `Coverage snapshot${gen ? ` · ${gen}` : ''} · ${(data.filtered_sector_count ?? 0).toLocaleString()} in view · ${lteN.toLocaleString()} LTE (excl. L35) · ${scope}.`;
         }
     } catch (e) {
         destroyCharts();

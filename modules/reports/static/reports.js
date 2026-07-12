@@ -2,11 +2,13 @@ const REPORT_META = {
     site_inventory:      { icon: '🏗️', desc: 'All active sites and cells with location, azimuth, PCI, tilt, and band data.' },
     pci_conflicts:       { icon: '⚠️', desc: 'Directional PCI/PSC conflict candidates (conflict_map module): technology, distance, azimuth vs. bearing, strictness.' },
     config_versions:     { icon: '📋', desc: 'Full log of all XML configuration versions uploaded to the version history module.' },
-    sector_health:       { icon: '📡', desc: 'Per-sector matrix of active tech/band layers across vendors — same data as the Sector Health dashboard.' },
+    sector_health:       { icon: '📡', desc: 'Per-sector matrix of on-air tech/band layers — same data as the Sector Health dashboard (active cells only).' },
+    sector_health_all:   { icon: '📋', desc: 'Per-sector matrix of all configured tech/band layers, including inactive/off-air cells — same data as Sector Health — All Cells.' },
 };
 
 const REPORT_TYPE_LABELS = {
     sector_health: 'Sector Health',
+    sector_health_all: 'Sector Health (All Cells)',
     sector_coverage: 'Sector Health',
 };
 

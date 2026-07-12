@@ -42,21 +42,65 @@ def get_current_user():
     return get_user_by_session(token) if token else None
 
 
+def _parse_all_cells_arg(raw: str) -> bool:
+    return str(raw or '').strip().lower() in ('1', 'true', 'yes', 'on')
+
+
+def _sector_health_page_context(*, all_cells: bool) -> dict:
+    if all_cells:
+        return {
+            'all_cells': True,
+            'page_title': 'Sector Health — All Cells',
+            'page_heading': '📡 Sector Health — All Cells',
+            'page_subtitle': (
+                'Configured tech/band layers from CM metadata — includes inactive and off-air cells. '
+                'LTE pies exclude L35.'
+            ),
+            'scope_note': 'Includes all configured cells regardless of activity status (admin_state / active_state).',
+            'alt_view_href': '/sector-health',
+            'alt_view_label': 'Active cells only',
+            'report_href': '/reports',
+            'report_label': 'All-cells Excel report',
+        }
+    return {
+        'all_cells': False,
+        'page_title': 'Sector Health',
+        'page_heading': '📡 Sector Health',
+        'page_subtitle': '2G / 3G / 5G sector counts; LTE pies (% of LTE sectors in view, excluding L35). Active cells only.',
+        'scope_note': 'Only on-air cells per vendor activity rules (admin_state / active_state).',
+        'alt_view_href': '/sector-health-all',
+        'alt_view_label': 'All configured cells',
+        'report_href': '/reports',
+        'report_label': 'Sector Health report',
+    }
+
+
 @sector_health_bp.route('/sector-health')
 @login_required
 def sector_health_page():
     user = get_current_user()
-    return render_template('sector_health.html', user=format_user(user))
+    ctx = _sector_health_page_context(all_cells=False)
+    return render_template('sector_health.html', user=format_user(user), **ctx)
+
+
+@sector_health_bp.route('/sector-health-all')
+@login_required
+def sector_health_all_page():
+    user = get_current_user()
+    ctx = _sector_health_page_context(all_cells=True)
+    return render_template('sector_health.html', user=format_user(user), **ctx)
 
 
 @sector_health_bp.route('/api/sector-health/data')
 @login_required
 def sector_health_data():
     try:
+        all_cells = _parse_all_cells_arg(request.args.get('all_cells', ''))
         payload = build_sector_health_api_response(
             area=str(request.args.get('area', '') or '').strip(),
             rat=str(request.args.get('rat', '') or '').strip(),
             search=str(request.args.get('q', '') or '').strip(),
+            active_only=not all_cells,
         )
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

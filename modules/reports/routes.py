@@ -373,7 +373,7 @@ def _generate_config_versions_report():
     return buf, f"Config_Versions_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx", len(rows)
 
 
-def _generate_sector_health():
+def _generate_sector_health_excel(*, active_only: bool = True):
     """Excel: one row per site-sector with Yes/No columns for every tech/band."""
     try:
         from openpyxl import Workbook
@@ -383,11 +383,11 @@ def _generate_sector_health():
 
     from .sector_coverage_data import load_sector_coverage_rows
 
-    sector_list, sorted_tb = load_sector_coverage_rows()
+    sector_list, sorted_tb = load_sector_coverage_rows(active_only=active_only)
 
     wb = Workbook()
     ws = wb.active
-    ws.title = 'Sector Health'
+    ws.title = 'Sector Health' if active_only else 'All Cells'
 
     hdr_fill = PatternFill(start_color='2C3E50', end_color='2C3E50', fill_type='solid')
     hdr_font = Font(color='FFFFFF', bold=True, size=10)
@@ -443,7 +443,8 @@ def _generate_sector_health():
     summary = wb.create_sheet('Summary')
     summary_hdr_fill = PatternFill(start_color='1A5276', end_color='1A5276', fill_type='solid')
     summary_hdr_font = Font(color='FFFFFF', bold=True)
-    for ci, h in enumerate(['Tech / Band', 'Active Sectors', 'Total Sites'], 1):
+    sector_col_label = 'Active Sectors' if active_only else 'Sectors'
+    for ci, h in enumerate(['Tech / Band', sector_col_label, 'Total Sites'], 1):
         cell = summary.cell(row=1, column=ci, value=h)
         cell.fill = summary_hdr_fill
         cell.font = summary_hdr_font
@@ -464,7 +465,19 @@ def _generate_sector_health():
     wb.save(buf)
     buf.seek(0)
     pull_date = datetime.now().strftime('%Y-%m-%d')
-    return buf, f"Sector_Health_{pull_date}.xlsx", len(sector_list)
+    if active_only:
+        filename = f"Sector_Health_{pull_date}.xlsx"
+    else:
+        filename = f"Sector_Health_All_Cells_{pull_date}.xlsx"
+    return buf, filename, len(sector_list)
+
+
+def _generate_sector_health():
+    return _generate_sector_health_excel(active_only=True)
+
+
+def _generate_sector_health_all():
+    return _generate_sector_health_excel(active_only=False)
 
 
 REPORT_TYPES = {
@@ -472,6 +485,7 @@ REPORT_TYPES = {
     'pci_conflicts':      ('Conflict Report',      _generate_pci_conflicts),
     'config_versions':    ('Configuration Log',   _generate_config_versions_report),
     'sector_health':      ('Sector Health',        _generate_sector_health),
+    'sector_health_all':  ('Sector Health (All Cells)', _generate_sector_health_all),
 }
 
 # Legacy report type id from before rename

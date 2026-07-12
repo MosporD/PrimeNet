@@ -2,7 +2,11 @@
 Shared SQLite helpers for metadata inventory UNION queries (reports + conflict map).
 """
 
+import re
+
 from db.runtime import execute_query
+
+_CELL_SUFFIX_RE = re.compile(r'[-_][A-Za-z]\d*$')
 
 
 def _sql_ident(name: str) -> str:
@@ -20,6 +24,23 @@ def _pick_col(candidates: list[str], low_to_real: dict[str, str]) -> str | None:
         if real:
             return real
     return None
+
+
+def site_name_from_cell_name(cell_name: str | None) -> str:
+    """Strip trailing sector/cell suffix (e.g. -A2, _B1) to derive the site name."""
+    raw = str(cell_name or '').strip()
+    if not raw or raw == '?':
+        return ''
+    return _CELL_SUFFIX_RE.sub('', raw).strip()
+
+
+def resolve_site_name(*site_name_candidates: str | None, cell_name: str | None = None) -> str:
+    """Prefer the first real configured site name; otherwise derive from cell_name."""
+    for candidate in site_name_candidates:
+        name = str(candidate or '').strip()
+        if name and name != '?':
+            return name
+    return site_name_from_cell_name(cell_name)
 
 
 def _metadata_inventory_union_sql(conn) -> str:

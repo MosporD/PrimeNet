@@ -8,7 +8,12 @@ from datetime import datetime, timezone
 
 from db.runtime import connect_metadata, execute_query
 from modules.sync.metadata_active_sql import PER_TABLE_ACTIVE_WHERE
-from .metadata_helpers import _metadata_table_columns, _sql_ident
+from .metadata_helpers import (
+    _metadata_table_columns,
+    _pick_col,
+    _sql_ident,
+    resolve_site_name,
+)
 
 EXCLUDED_TECH_BANDS = {
     '2G / DCS1800',
@@ -119,10 +124,13 @@ def compute_health_summary(sectors: list[dict], lte_bands: list[str]) -> dict:
     }
 
 
-def load_sector_coverage_rows(conn=None) -> tuple[list[dict], list[str]]:
+def load_sector_coverage_rows(conn=None, *, active_only: bool = True) -> tuple[list[dict], list[str]]:
     """
     Returns (sector_list, sorted_tech_bands).
     Each sector dict: site_id, site_name, vendors (set), area, sector, tech_bands (set).
+
+    When active_only is True (default), only on-air cells per PER_TABLE_ACTIVE_WHERE are included.
+    When False, every configured cell row is included regardless of activity status.
     """
     close_conn = False
     if conn is None:
@@ -139,18 +147,25 @@ def load_sector_coverage_rows(conn=None) -> tuple[list[dict], list[str]]:
 
             s_col = low.get(site_col)
             n_col = low.get(name_col) or low.get('site_name')
+            cell_col = _pick_col(
+                ['cell_name', 'cell name', 'wcel name', 'lncel name', 'nrcel name', 'bts name'],
+                low,
+            )
             b_col = low.get(band_col)
             v_col = low.get('vendor')
             a_col = low.get('area')
             sec_col = low.get('sector')
             az_col = low.get('azimuth')
 
-            active_where = PER_TABLE_ACTIVE_WHERE.get(table, '1=1')
+            active_where = (
+                PER_TABLE_ACTIVE_WHERE.get(table, '1=1') if active_only else '1=1'
+            )
 
             sql = f"""
                 SELECT
                     {_sql_ident(s_col) if s_col else 'NULL'} AS site_id,
                     {_sql_ident(n_col) if n_col else 'NULL'} AS site_name,
+                    {_sql_ident(cell_col) if cell_col else 'NULL'} AS cell_name,
                     {_sql_ident(v_col) if v_col else 'NULL'} AS vendor,
                     {_sql_ident(a_col) if a_col else 'NULL'} AS area,
                     {_sql_ident(sec_col) if sec_col else 'NULL'} AS sector,
@@ -163,6 +178,7 @@ def load_sector_coverage_rows(conn=None) -> tuple[list[dict], list[str]]:
             rows = execute_query(conn, sql, ()).fetchall()
             for r in rows:
                 rd = dict(r)
+                rd['site_name'] = resolve_site_name(rd.get('site_name'), cell_name=rd.get('cell_name'))
                 band_raw = str(rd.get('frequency_band') or '').strip()
                 if not band_raw:
                     band_raw = 'N/A'
@@ -192,6 +208,12 @@ def load_sector_coverage_rows(conn=None) -> tuple[list[dict], list[str]]:
                     'sector': sec,
                     'tech_bands': set(),
                 }
+            else:
+                sectors[key]['site_name'] = resolve_site_name(
+                    sectors[key]['site_name'],
+                    r.get('site_name'),
+                    cell_name=r.get('cell_name'),
+                )
             v = str(r.get('vendor') or '').strip()
             if v:
                 sectors[key]['vendors'].add(v)
@@ -259,17 +281,17 @@ def _filter_sectors(sectors: list[dict], *, area: str = '', rat: str = '', searc
     return out
 
 
-def build_sector_health_bundle() -> tuple[list[str], list[dict]]:
+def build_sector_health_bundle(*, active_only: bool = True) -> tuple[list[str], list[dict]]:
     """Load sectors once: (lte_bands_for_health, lightweight rows for filtering)."""
-    sector_list, sorted_tb = load_sector_coverage_rows()
+    sector_list, sorted_tb = load_sector_coverage_rows(active_only=active_only)
     lte_bands = _lte_bands_for_health(sorted_tb)
     rows = [_sector_to_payload(sec, lte_bands) for sec in sector_list]
     return lte_bands, rows
 
 
-def build_sector_coverage_payload() -> dict:
+def build_sector_coverage_payload(*, active_only: bool = True) -> dict:
     """Full payload (Excel report tooling) — includes all sectors."""
-    sector_list, sorted_tb = load_sector_coverage_rows()
+    sector_list, sorted_tb = load_sector_coverage_rows(active_only=active_only)
     lte_bands = _lte_bands_from(sorted_tb)
     sectors_out = [_sector_to_payload(sec, lte_bands, include_full_coverage=True) for sec in sector_list]
 
@@ -312,14 +334,16 @@ def build_sector_health_api_response(
     area: str = '',
     rat: str = '',
     search: str = '',
+    active_only: bool = True,
 ) -> dict:
     """Summary-only API for Sector Health (no sector table)."""
-    lte_bands, all_rows = build_sector_health_bundle()
+    lte_bands, all_rows = build_sector_health_bundle(active_only=active_only)
     areas = sorted({s['area'] for s in all_rows if s.get('area')})
     filtered = _filter_sectors(all_rows, area=area, rat=rat, search=search)
 
     return {
         'generated_at': datetime.now(timezone.utc).isoformat(),
+        'active_only': active_only,
         'lte_tech_bands': lte_bands,
         'rat_techs': list(RAT_COUNT_TECHS),
         'lte_excluded_bands': sorted(LTE_HEALTH_EXCLUDED_BAND_LABELS),
