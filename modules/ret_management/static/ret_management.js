@@ -263,8 +263,8 @@
             columns.forEach((col) => {
                 const td = document.createElement('td');
                 const raw = vendor === 'huawei' ? resolveHuaweiField(row, col) : (row[col] ?? '');
-                const isTiltCell = vendor === 'huawei' && col === editCol;
-                const value = isTiltCell
+                const isTiltCell = col === editCol;
+                const value = isTiltCell && vendor === 'huawei'
                     ? (resolveHuaweiField(row, 'Tilt') || resolveHuaweiField(row, 'Actual Tilt'))
                     : raw;
                 if (isTiltCell && cmWriteAllowed && hasEditColumn) {
