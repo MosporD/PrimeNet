@@ -117,9 +117,9 @@
     var SCENE_PALETTES = {
         radar: {
             light: {
-                bgTop: '#e8f0fa', bgBottom: '#f3f7fc',
-                tint: 'rgba(37, 99, 235, 0.12)',
-                accent: '#2563eb', accentSoft: '#60a5fa', grid: '#93c5fd'
+                bgTop: '#ffffff', bgBottom: '#000000',
+                tint: 'rgba(185, 185, 185, 0.8)',
+                accent: '#0b1c30', accentSoft: '#030405', grid: '#030405'
             },
             dark: {
                 bgTop: '#020617', bgBottom: '#061336',
@@ -129,9 +129,9 @@
         },
         sonar: {
             light: {
-                bgTop: '#ecfdf5', bgBottom: '#f0fdf9',
-                tint: 'rgba(45, 212, 191, 0.14)',
-                accent: '#059669', accentSoft: '#34d399', grid: '#6ee7b7'
+                bgTop: '#ffffff', bgBottom: '#000000',
+                tint: 'rgba(91, 176, 255, 0.59)',
+                accent: '#0b1c30', accentSoft: '#030405', grid: '#030405'
             },
             dark: {
                 bgTop: '#021a14', bgBottom: '#042f2a',
@@ -141,9 +141,9 @@
         },
         stars: {
             light: {
-                bgTop: '#f5f3ff', bgBottom: '#ede9fe',
-                tint: 'rgba(167, 139, 250, 0.12)',
-                accent: '#7c3aed', accentSoft: '#a78bfa', grid: '#c4b5fd'
+                bgTop: '#ffffff', bgBottom: '#000000',
+                tint: 'rgba(255, 255, 255, 0.5)',
+                accent: '#0b1c30', accentSoft: '#030405', grid: '#030405'
             },
             dark: {
                 bgTop: '#0b0718', bgBottom: '#15082a',
@@ -153,13 +153,13 @@
         },
         hexmesh: {
             light: {
-                bgTop: '#eff6ff', bgBottom: '#f8fafc',
-                tint: 'rgba(56, 189, 248, 0.10)',
-                accent: '#0284c7', accentSoft: '#38bdf8', grid: '#7dd3fc'
+                bgTop: '#ffffff', bgBottom: '#000000',
+                tint: 'rgba(0, 183, 255, 0.1)',
+                accent: '#ffffff', accentSoft: '#ffffff', grid: '#7dd3fc'
             },
             dark: {
                 bgTop: '#020617', bgBottom: '#031028',
-                tint: 'rgba(56, 189, 248, 0.04)',
+                tint: 'rgba(238, 2, 2, 0.12)',
                 accent: '#38bdf8', accentSoft: '#60a5fa', grid: '#60a5fa'
             }
         }
