@@ -863,14 +863,28 @@ def _parse_vertical_blocks(lines: list[str]) -> list[dict[str, Any]]:
 
 
 def normalize_mml_command(command: str) -> str:
-    """Normalize MML to U2020 form ``COMMAND:;`` (colon required before semicolon)."""
+    """Normalize MML to U2020 form.
+
+    Parameterless commands end with ``:;`` (e.g. ``LST RETSUBUNIT:;``).
+    Parameterized commands end with ``;`` only (e.g.
+    ``MOD RETSUBUNIT:DEVICENO=21,SUBUNITNO=1,TILT=40;``).
+    """
     cmd = (command or '').strip()
     if not cmd:
         return ''
+
     if cmd.endswith(':;'):
-        return cmd
-    if cmd.endswith(';'):
-        return f'{cmd[:-1].rstrip(":")}:;'
-    if cmd.endswith(':'):
-        return f'{cmd};'
+        cmd = cmd[:-2].rstrip()
+    elif cmd.endswith(';'):
+        cmd = cmd[:-1].rstrip()
+    elif cmd.endswith(':'):
+        cmd = cmd[:-1].rstrip()
+
+    if ':' in cmd:
+        head, _, params = cmd.partition(':')
+        head = head.strip()
+        params = params.strip()
+        if params:
+            return f'{head}:{params};'
+        return f'{head}:;'
     return f'{cmd}:;'

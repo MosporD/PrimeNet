@@ -1,6 +1,22 @@
 """Regression tests for Huawei MML report parsing."""
 
-from core.cm_extractor.mml_parser import parse_mml_report, repair_mml_rows
+from core.cm_extractor.mml_parser import normalize_mml_command, parse_mml_report, repair_mml_rows
+
+
+def test_normalize_mml_command_parameterless():
+    assert normalize_mml_command('LST RETSUBUNIT') == 'LST RETSUBUNIT:;'
+    assert normalize_mml_command('LST RETSUBUNIT:;') == 'LST RETSUBUNIT:;'
+
+
+def test_normalize_mml_command_with_parameters():
+    assert (
+        normalize_mml_command('MOD RETSUBUNIT:DEVICENO=21,SUBUNITNO=1,TILT=40')
+        == 'MOD RETSUBUNIT:DEVICENO=21,SUBUNITNO=1,TILT=40;'
+    )
+    assert (
+        normalize_mml_command('MOD RETSUBUNIT: DEVICENO=21,SUBUNITNO=1,TILT=30:;')
+        == 'MOD RETSUBUNIT:DEVICENO=21,SUBUNITNO=1,TILT=30;'
+    )
 
 
 def test_retsubunit_horizontal_table():

@@ -697,7 +697,7 @@ class HuaweiCmClient:
             message += (
                 ' For MOD RETSUBUNIT: confirm your NBI user has write/MOD rights, '
                 'the RET is online, and DEVICENO/SUBUNITNO/TILT are valid '
-                '(tilt is usually in 0.1° units, e.g. 80 = 8.0°).'
+                '(TILT is in 0.1° steps — e.g. 40 = 4.0°, same as manual MML).'
             )
         prefix = f'{ne_name}: ' if ne_name else ''
         return f'{prefix}{message}'

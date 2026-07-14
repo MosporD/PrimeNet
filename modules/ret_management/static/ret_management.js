@@ -218,6 +218,20 @@
         return vendor === 'huawei' && rows.length > 0;
     }
 
+    function huaweiTiltColumnLabel(col) {
+        if (vendor !== 'huawei') return col;
+        if (col === 'Tilt' || isHuaweiTiltColumn(col)) return 'Tilt (MML)';
+        if (col === 'Actual Tilt' || normalizeKey(col).includes('actualtilt')) return 'Actual Tilt (MML)';
+        return col;
+    }
+
+    function huaweiTiltHint(value) {
+        const text = String(value || '').trim();
+        if (!text || text.includes('.') || !/^-?\d+$/.test(text)) return '';
+        const deg = Number(text) / 10;
+        return Number.isFinite(deg) ? `≈ ${deg}°` : '';
+    }
+
     function renderTable(rows) {
         currentRows = rows;
         pendingChanges.clear();
@@ -244,9 +258,11 @@
         const headRow = document.createElement('tr');
         columns.forEach((col) => {
             const th = document.createElement('th');
-            th.textContent = col;
+            th.textContent = huaweiTiltColumnLabel(col);
             if (col === editCol && cmWriteAllowed && hasEditColumn) {
-                th.title = vendor === 'huawei' ? 'Editable — applied via MOD RETSUBUNIT' : 'Editable — applied via Nokia CM import';
+                th.title = vendor === 'huawei'
+                    ? 'Editable — U2020 MML 0.1° units (40 = 4.0°), sent as MOD RETSUBUNIT TILT'
+                    : 'Editable — applied via Nokia CM import';
             }
             headRow.appendChild(th);
         });
@@ -272,8 +288,13 @@
                     input.type = 'text';
                     input.className = 'tilt-input';
                     input.value = value;
+                    input.placeholder = vendor === 'huawei' ? 'e.g. 40 (=4°)' : '';
+                    input.title = vendor === 'huawei' ? huaweiTiltHint(value) : '';
                     input.dataset.original = String(value);
                     input.addEventListener('input', () => {
+                        if (vendor === 'huawei') {
+                            input.title = huaweiTiltHint(input.value);
+                        }
                         const key = tr.dataset.rowKey;
                         if (input.value !== input.dataset.original) {
                             pendingChanges.set(key, { row, index, value: input.value });

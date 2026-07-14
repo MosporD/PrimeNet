@@ -26,6 +26,8 @@ from core.cm_extractor.site_catalog import (
 HUAWEI_MO = 'RETSUBUNIT'
 NOKIA_MO_CLASS = 'NOKLTE:LNCEL'
 NOKIA_ANGLE_PARAMS = ['angle', 'name']
+# U2020 MOD RETSUBUNIT TILT is in 0.1° steps (40 = 4.0°, 80 = 8.0°). 32767 means unset.
+HUAWEI_TILT_UNSET = 32767
 
 # Column order from huawei_param_dict_catalog.json for RETSUBUNIT LST output.
 HUAWEI_RET_COLUMNS: tuple[str, ...] = (
@@ -75,6 +77,55 @@ _RET_COLUMN_TEMPLATES: dict[int, tuple[str, ...]] = {
         'Online Status',
     ),
 }
+
+def _format_degrees(deg: float) -> str:
+    rounded = round(deg, 1)
+    if rounded == int(rounded):
+        return str(int(rounded))
+    return f'{rounded:.1f}'
+
+
+def mml_tilt_to_degrees_display(raw: str) -> str:
+    """Human-readable degrees label for an MML tilt value (40 → 4.0°)."""
+    text = str(raw or '').strip()
+    if not text:
+        return ''
+    try:
+        if '.' in text:
+            return _format_degrees(float(text))
+        as_int = int(text)
+        if as_int == HUAWEI_TILT_UNSET:
+            return ''
+        return _format_degrees(as_int / 10.0)
+    except ValueError:
+        return text
+
+
+def normalize_mml_tilt_input(value: str) -> str:
+    """Validate tilt for MOD RETSUBUNIT — pass through U2020 MML integer (0.1° steps)."""
+    text = str(value or '').strip()
+    if not text:
+        raise ValueError('Tilt value is required')
+    if '.' in text:
+        raise ValueError(
+            f'Invalid tilt value {text!r} — use U2020 MML integer units '
+            f'(0.1° steps, e.g. 40 for 4.0°, same as manual MOD RETSUBUNIT)'
+        )
+    try:
+        mml = int(text)
+    except ValueError as exc:
+        raise ValueError(
+            f'Invalid tilt value {text!r} — use U2020 MML integer units '
+            f'(0.1° steps, e.g. 40 for 4.0°)'
+        ) from exc
+    if mml == HUAWEI_TILT_UNSET:
+        raise ValueError('Tilt 32767 is reserved (unset) on U2020')
+    if mml < -900 or mml > 900:
+        raise ValueError(
+            f'Tilt {mml} is out of range (-900 to +900, i.e. -90° to +90° in 0.1° steps)'
+        )
+    return str(mml)
+
 
 _HUAWEI_FIELD_ALIASES: dict[str, tuple[str, ...]] = {
     'Device No.': ('Device No.', 'DeviceNo', 'DEVICENO', 'Device No'),
@@ -139,17 +190,6 @@ def _alias_lookup(row: dict[str, Any], canonical: str) -> str:
                 if text:
                     return text
     return ''
-    """Drop rows where the parser treated the title line as data."""
-    device = _alias_lookup(row, 'Device No.')
-    subunit = _alias_lookup(row, 'Subunit No.')
-    tilt = _alias_lookup(row, 'Tilt')
-    if device.lower() in ('device no.', 'device no', 'deviceno'):
-        return True
-    if subunit.lower() in ('subunit no.', 'subunit no', 'subunitno'):
-        return True
-    if tilt.lower() == 'tilt':
-        return True
-    return False
 
 
 def _ret_column_template(value_count: int) -> tuple[str, ...]:
@@ -674,20 +714,18 @@ def build_huawei_mod_command(
 ) -> str:
     device_no = str(device_no or '').strip()
     subunit_no = str(subunit_no or '').strip()
-    tilt = str(tilt or '').strip()
     if not device_no or not subunit_no:
         raise ValueError('Device No. and Subunit No. are required')
-    if not tilt:
-        raise ValueError('Tilt value is required')
+    mml_tilt = normalize_mml_tilt_input(tilt)
 
-    parts = [f'DEVICENO={device_no}', f'SUBUNITNO={subunit_no}', f'TILT={tilt}']
+    parts = [f'DEVICENO={device_no}', f'SUBUNITNO={subunit_no}', f'TILT={mml_tilt}']
     for key, value in (extra or {}).items():
         token = re.sub(r'[^A-Za-z0-9]+', '', str(key or '')).upper()
         val = str(value or '').strip()
         if token and val:
             parts.append(f'{token}={val}')
-    # U2020 expects comma-separated parameters without spaces (matches LST/DSP scoped form).
-    return normalize_mml_command(f'MOD {HUAWEI_MO}: {",".join(parts)}')
+    # U2020 expects comma-separated parameters without spaces (matches manual MML form).
+    return normalize_mml_command(f'MOD {HUAWEI_MO}:{",".join(parts)}')
 
 
 def _huawei_mml_vendor_request(command: str, ne_name: str) -> dict[str, Any]:
@@ -715,11 +753,8 @@ def apply_huawei_ret_update(
 
     device_no = str(device_no or '').strip()
     subunit_no = str(subunit_no or '').strip()
-    tilt = str(tilt or '').strip()
     if not device_no or not subunit_no:
         raise ValueError('Device No. and Subunit No. are required')
-    if not tilt:
-        raise ValueError('Tilt value is required')
 
     command = build_huawei_mod_command(
         device_no=device_no,
@@ -737,6 +772,15 @@ def apply_huawei_ret_update(
                 report_excerpt = report[:800]
                 break
         message = f'{detail} Command: {command}'
+        if 'tilt' in detail.lower() and 'invalid' in detail.lower():
+            mml_match = re.search(r'TILT=(\d+)', command, re.IGNORECASE)
+            if mml_match:
+                mml_val = mml_match.group(1)
+                deg_label = mml_tilt_to_degrees_display(mml_val)
+                message += (
+                    f' U2020 TILT uses 0.1° steps (e.g. 40 = 4.0°); '
+                    f'TILT={mml_val} means {deg_label}°.'
+                )
         if report_excerpt and report_excerpt.lower() not in detail.lower():
             message = f'{message} Report: {report_excerpt}'
         raise HuaweiCmError(
