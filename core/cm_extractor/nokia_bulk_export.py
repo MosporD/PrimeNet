@@ -443,8 +443,8 @@ def run_controller_bulk_export(
     object_count, sheet_names, row_count, warnings.
     """
     level = normalize_scope_level(scope_level)
-    if level not in ('RNC', 'BSC'):
-        raise NokiaBulkExportError('Bulk CM Operations export is only supported for RNC and BSC scope.')
+    if level not in ('MRBTS', 'RNC', 'BSC'):
+        raise NokiaBulkExportError('Bulk CM Operations export supports MRBTS, RNC, and BSC scope.')
 
     bulk_cfg = nokia_bulk_export_settings()
     op_timeout = operation_timeout_sec or bulk_cfg['operation_timeout_sec']
@@ -527,7 +527,8 @@ def run_controller_bulk_export(
 
     warnings: list[str] = []
     if len(dns) > 1:
-        warnings.append(f'Combined export for {len(dns)} controller(s) in one RAML file.')
+        scope_label = 'site(s)' if level == 'MRBTS' else 'controller(s)'
+        warnings.append(f'Combined export for {len(dns)} {scope_label} in one RAML file.')
     warnings.append(
         f'CM Operations export: {object_count} MO instance(s) from NetAct Import_Export → '
         f'{len(sheet_names)} Excel sheet(s). MO filter: {mo_summary}.'
@@ -568,10 +569,9 @@ def export_controller_selection_to_excel(
     selections: list[dict[str, Any]],
 ) -> tuple[int, list[str], str]:
     """
-    RNC/BSC extract via CM Operations Import_Export (full MO tree), not persistency API.
+    Extract via CM Operations Import_Export (full MO tree), not persistency API.
 
-    CM Open API query/getManagedObjects only exposes a tiny subset of child MOs
-    (e.g. 2 FMCS vs 26+ via Import_Export on the same RNC).
+    Supported scopes: MRBTS (heavy LTE MOs), RNC, and BSC.
     """
     result = run_controller_bulk_export(
         cm_client,

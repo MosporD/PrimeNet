@@ -10,6 +10,11 @@ from core.radio.cm_live import query_live_parameter_status
 from core.radio.web import format_user, get_current_user, json_error, login_required
 from modules.cm_parameter_audit.cache import get_export_payload, store_export_payload
 from modules.cm_parameter_audit.export import build_audit_workbook
+from pathlib import Path
+
+from sync_config import PROJECT_ROOT
+
+_AUDIT_EXPORTS_DIR = Path(PROJECT_ROOT) / 'uploads' / 'cm_parameter_audit' / 'exports'
 
 cm_parameter_audit_bp = Blueprint(
     "cm_parameter_audit",
@@ -107,7 +112,15 @@ def cm_parameter_audit_export(export_id: str | None = None):
             token = str(data.get("export_id") or "").strip()
 
         payload = get_export_payload(token, user_id=_user_id(user)) if token else None
+        saved_workbook = _AUDIT_EXPORTS_DIR / f'{token}.xlsx' if token else None
         if payload is None:
+            if saved_workbook and saved_workbook.is_file():
+                return send_file(
+                    saved_workbook,
+                    as_attachment=True,
+                    download_name=saved_workbook.name,
+                    mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                )
             return jsonify({
                 "success": False,
                 "error": "Export session expired or not found. Run the live scan again.",
@@ -121,6 +134,10 @@ def cm_parameter_audit_export(export_id: str | None = None):
                 "error": "Nothing to export. Run a live scan first.",
             }), 400
         workbook, filename = build_audit_workbook(payload)
+        if token:
+            _AUDIT_EXPORTS_DIR.mkdir(parents=True, exist_ok=True)
+            saved_workbook = _AUDIT_EXPORTS_DIR / f'{token}.xlsx'
+            saved_workbook.write_bytes(workbook.getvalue())
         return send_file(
             workbook,
             as_attachment=True,

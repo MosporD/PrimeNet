@@ -130,7 +130,7 @@ def run_extraction(payload: dict[str, Any], output_path: str,
         if not selections:
             raise ValueError('Select at least one managed object class and its parameters')
         client = build_nokia_client()
-        row_count, sheet_names, summary = export_nokia_selection_to_excel(
+        row_count, sheet_names, summary, _extraction_mode = export_nokia_selection_to_excel(
             client,
             output_path,
             selections=selections,

@@ -1721,7 +1721,10 @@ def export_sites_kml():
 def get_neighbor_lines():
     """Neighbor lines; ``vendor`` scopes the **source** for raw export linking (targets may be any vendor).
 
-    Query ``cell_name`` (normalized) matches the **source** cell only: outgoing handovers from that cell.
+    Query ``cell_name`` (normalized) matches the **source** cell for outgoing (default) or the
+    **target** cell when ``direction=incoming``.
+
+    ``direction``: ``outgoing`` (default) or ``incoming`` — which side ``cell_name`` / ``site_id`` filter applies to.
 
     ``failures_only=1`` (or ``true``): return only links with estimated failures meeting
     ``min_failures`` (default **1.0**): failures = ``attempts × (1 − SR/100)`` (or ``attempts − successes``);
@@ -1741,6 +1744,8 @@ def get_neighbor_lines():
         '1', 'true', 'yes', 'on',
     )
     min_failures = max(0.0, _safe_float(request.args.get('min_failures'), 1.0))
+    direction = (request.args.get('direction') or 'outgoing').strip().lower()
+    incoming = direction == 'incoming'
 
     if not technology:
         return jsonify({'error': 'technology is required'}), 400
@@ -1806,6 +1811,7 @@ def get_neighbor_lines():
                             max_lines=max_lines,
                             failures_only=failures_only,
                             min_failures=float(min_failures),
+                            direction='incoming' if incoming else 'outgoing',
                         )
                         all_lines.extend(lines)
                         skipped += sk
@@ -1860,7 +1866,10 @@ def get_neighbor_lines():
             where.insert(0, "vendor = ?")
             params.insert(0, vendor)
         if cell_norm:
-            where.append("source_cell_norm = ?")
+            if incoming:
+                where.append("target_cell_norm = ?")
+            else:
+                where.append("source_cell_norm = ?")
             params.append(cell_norm)
 
         max_period = execute_query(nconn,
@@ -1900,7 +1909,10 @@ def get_neighbor_lines():
                 skipped_missing += 1
                 continue
             if site_id:
-                if str(src.get("site_id")) != site_id and str(dst.get("site_id")) != site_id:
+                if incoming:
+                    if str(dst.get("site_id")) != site_id:
+                        continue
+                elif str(src.get("site_id")) != site_id and str(dst.get("site_id")) != site_id:
                     continue
             attempts_val = float(r["ho_attempts"] or 0)
             succ_raw = r["ho_successes"]

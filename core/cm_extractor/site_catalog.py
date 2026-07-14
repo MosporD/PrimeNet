@@ -206,11 +206,25 @@ def resolve_bulk_export_dns(
     """
     Map PrimeNet site ids to Import_Export DN scope strings.
 
-    CM Operations actualExport expects PLMN-tree DNs like PLMN-PLMN/RNC-2012.
+    CM Operations actualExport expects PLMN-tree DNs like PLMN-PLMN/RNC-2012
+    or PLMN-PLMN/MRBTS-1201.
     """
     level = normalize_scope_level(scope_level)
+    if level == 'MRBTS':
+        resolved: list[str] = []
+        seen: set[str] = set()
+        for raw_id in site_ids:
+            token = str(raw_id or '').strip()
+            if not token:
+                continue
+            dn = f'{plmn_prefix}/MRBTS-{token}'
+            if dn not in seen:
+                seen.add(dn)
+                resolved.append(dn)
+        return resolved
+
     if level not in ('RNC', 'BSC'):
-        raise ValueError('Bulk export DN resolution supports RNC and BSC only')
+        raise ValueError('Bulk export DN resolution supports MRBTS, RNC, and BSC')
 
     controllers = list_netact_plmn_controllers(client, level)
     by_instance = {c['instance']: c['dn'] for c in controllers if c.get('instance')}

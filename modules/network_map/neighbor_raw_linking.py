@@ -33,6 +33,11 @@ def _norm_cell_key(value: object) -> str:
     return re.sub(r"\s+", " ", str(value or "").strip()).lower()
 
 
+def _normalize_neighbor_direction(direction: str) -> str:
+    d = (direction or "").strip().lower()
+    return "incoming" if d == "incoming" else "outgoing"
+
+
 def _to_int(v: object) -> int | None:
     if v is None:
         return None
@@ -679,6 +684,137 @@ def _gather_4g_lncel_and_eci_for_scope(
     return sorted(names), sorted(ecis)
 
 
+def _gather_2g_export_keys_for_target_scope(
+    meta: sqlite3.Connection,
+    site_id_filter: str,
+    cell_norm: str,
+) -> list[str]:
+    """Export keys for a 2G **target** cell/site (any vendor)."""
+    site = (site_id_filter or "").strip()
+    cell_n = (cell_norm or "").strip()
+    rows = meta.execute(
+        """
+        SELECT cell_name, cell_id, site_id
+        FROM cells_2g
+        WHERE lat IS NOT NULL AND long IS NOT NULL
+        """
+    ).fetchall()
+    picked: list[tuple[object, object]] = []
+    for cn, cid, sid in rows:
+        if site and str(sid or "").strip() != site:
+            continue
+        if cell_n and _norm_cell_key(cn) != cell_n:
+            continue
+        picked.append((cn, cid))
+    if not picked:
+        return []
+    keys: set[str] = set()
+    for cn, cid in picked:
+        keys.update(_export_cell_id_keys(cid))
+        keys.update(_export_cell_id_keys(cn))
+        nk = _norm_cell_key(cn)
+        if nk:
+            keys.add(nk)
+    return [k for k in keys if k]
+
+
+def _gather_3g_export_keys_for_target_scope(
+    meta: sqlite3.Connection,
+    site_id_filter: str,
+    cell_norm: str,
+) -> list[str]:
+    site = (site_id_filter or "").strip()
+    cell_n = (cell_norm or "").strip()
+    rows = meta.execute(
+        """
+        SELECT cell_name, cell_id, nodeb_id
+        FROM cells_3g
+        WHERE lat IS NOT NULL AND long IS NOT NULL
+        """
+    ).fetchall()
+    keys: set[str] = set()
+    for cn, cid, sid in rows:
+        if site and str(sid or "").strip() != site and str(_to_int(sid) or "") != site:
+            continue
+        if cell_n and _norm_cell_key(cn) != cell_n:
+            continue
+        keys.update(_export_cell_id_keys(cid))
+        keys.update(_export_cell_id_keys(cn))
+    return [k for k in keys if k]
+
+
+def _gather_4g_lncel_and_eci_for_target_scope(
+    meta: sqlite3.Connection,
+    tech_u: str,
+    site_id_filter: str,
+    cell_norm: str,
+) -> tuple[list[str], list[int]]:
+    site = (site_id_filter or "").strip()
+    cell_n = (cell_norm or "").strip()
+    names: set[str] = set()
+    ecis: set[int] = set()
+    for table in ("cells_4g_fdd",):
+        q = f"""
+            SELECT cell_name, enb_id_actual, cell_id
+            FROM "{table}"
+            WHERE lat IS NOT NULL AND long IS NOT NULL
+        """
+        for cn, enb, cid in meta.execute(q).fetchall():
+            if site:
+                eb = str(enb or "").strip()
+                if eb != site and str(_to_int(enb) or "") != site:
+                    continue
+            if cell_n and _norm_cell_key(cn) != cell_n:
+                continue
+            nk = _norm_cell_key(cn)
+            if nk:
+                names.add(nk)
+            enb_i = _to_int(enb)
+            cid_i = _to_int(cid)
+            if enb_i is not None and cid_i is not None:
+                ecis.add(enb_i * 256 + cid_i)
+    return sorted(names), sorted(ecis)
+
+
+def _sql_scope_single_text_column(
+    col: str,
+    values: list[str],
+) -> tuple[str, list[str]] | None:
+    vals = [str(v) for v in values if str(v).strip()][:3500]
+    if not vals:
+        return None
+    ph = ",".join("?" * len(vals))
+    sql = f'TRIM(CAST("{col}" AS TEXT)) IN ({ph})'
+    return sql, vals
+
+
+def _sql_scope_4g_slim_target(
+    eci_col: str,
+    ecis: list[int],
+) -> tuple[str, list[Any]] | None:
+    if not ecis:
+        return None
+    ph = ",".join("?" * len(ecis))
+    sql = f'CAST(TRIM(CAST("{eci_col}" AS TEXT)) AS INTEGER) IN ({ph})'
+    return sql, list(ecis)
+
+
+def _sql_scope_huawei_wide_4g_target(
+    enb_col: str,
+    cid_col: str,
+    ecis: list[int],
+) -> tuple[str, list[Any]] | None:
+    if not ecis:
+        return None
+    ph = ",".join("?" * len(ecis))
+    eci_expr = (
+        f'(CAST(TRIM(CAST("{enb_col}" AS TEXT)) AS INTEGER) * 256 + '
+        f'(ABS(CAST(TRIM(CAST("{cid_col}" AS TEXT)) AS INTEGER)) % 256))'
+    )
+    sql = f"({eci_expr} IN ({ph}))"
+    return sql, list(ecis)
+
+
 def _sql_scope_in_two_text_columns(
     col_a: str,
     col_b: str,
@@ -757,6 +893,7 @@ def build_raw_neighbor_lines(
     max_scan_rows: int = 8000,
     failures_only: bool = False,
     min_failures: float = 1.0,
+    direction: str = "outgoing",
 ) -> tuple[list[dict], int, int, str | None, str | None]:
     """
     Returns (lines, skipped_missing_coords, total_candidates, period_start, message).
@@ -765,7 +902,10 @@ def build_raw_neighbor_lines(
     Target coordinates are resolved from the full metadata inventory so the far end can be another vendor.
 
     When ``cell_norm`` is set (user picked a cell), only handovers **from** that cell are kept
-    (resolved source ``cell_name`` matches); rows where that cell is only the target are dropped.
+    (resolved source ``cell_name`` matches) unless ``direction`` is ``incoming``, in which case only
+    handovers **to** that cell are kept (resolved target ``cell_name`` matches).
+
+    ``direction``: ``outgoing`` (default) filters by source cell/site; ``incoming`` filters by target.
 
     When ``failures_only`` is true, only links with estimated failures **≥ min_failures**
     (default ``1.0`` so near-zero noise is excluded). The attempts floor ``min_attempts`` is **not**
@@ -789,6 +929,7 @@ def build_raw_neighbor_lines(
     if raw_table not in allowed:
         return [], 0, 0, None, "invalid raw neighbor table"
 
+    incoming = _normalize_neighbor_direction(direction) == "incoming"
     cols = _table_columns(neighbor_conn, raw_table)
     huawei_wide = raw_table.startswith("huawei_neighbor") and not _is_slim_neighbor_table(raw_table, cols)
     rate_col: str | None = None
@@ -844,10 +985,16 @@ def build_raw_neighbor_lines(
                 col_sql = ", ".join(f'"{c}"' for c in dict.fromkeys(select_cols))
 
                 if site_id_filter.strip() or cell_norm.strip():
-                    keys = _gather_2g_export_keys_for_scope(
-                        meta, vendor, site_id_filter, cell_norm
-                    )
-                    sc = _sql_scope_in_two_text_columns(seg_col, ci_col, keys)
+                    if incoming:
+                        keys = _gather_2g_export_keys_for_target_scope(
+                            meta, site_id_filter, cell_norm
+                        )
+                        sc = _sql_scope_single_text_column(ci_col, keys)
+                    else:
+                        keys = _gather_2g_export_keys_for_scope(
+                            meta, vendor, site_id_filter, cell_norm
+                        )
+                        sc = _sql_scope_in_two_text_columns(seg_col, ci_col, keys)
                     if sc:
                         narrow_where, narrow_params = sc
                     else:
@@ -898,10 +1045,16 @@ def build_raw_neighbor_lines(
                 if _is_slim_neighbor_table(raw_table, cols) and (
                     site_id_filter.strip() or cell_norm.strip()
                 ):
-                    keys = _gather_2g_export_keys_for_scope(
-                        meta, vendor, site_id_filter, cell_norm
-                    )
-                    sc = _sql_scope_in_two_text_columns(seg_col, ci_col, keys)
+                    if incoming:
+                        keys = _gather_2g_export_keys_for_target_scope(
+                            meta, site_id_filter, cell_norm
+                        )
+                        sc = _sql_scope_single_text_column(ci_col, keys)
+                    else:
+                        keys = _gather_2g_export_keys_for_scope(
+                            meta, vendor, site_id_filter, cell_norm
+                        )
+                        sc = _sql_scope_in_two_text_columns(seg_col, ci_col, keys)
                     if sc:
                         narrow_where, narrow_params = sc
                     else:
@@ -952,10 +1105,16 @@ def build_raw_neighbor_lines(
                 col_sql = ", ".join(f'"{c}"' for c in dict.fromkeys(select_cols))
 
                 if site_id_filter.strip() or cell_norm.strip():
-                    keys = _gather_3g_export_keys_for_scope(
-                        meta, vendor, site_id_filter, cell_norm
-                    )
-                    sc = _sql_scope_in_two_text_columns(sc_col, tc_col, keys)
+                    if incoming:
+                        keys = _gather_3g_export_keys_for_target_scope(
+                            meta, site_id_filter, cell_norm
+                        )
+                        sc = _sql_scope_single_text_column(tc_col, keys)
+                    else:
+                        keys = _gather_3g_export_keys_for_scope(
+                            meta, vendor, site_id_filter, cell_norm
+                        )
+                        sc = _sql_scope_in_two_text_columns(sc_col, tc_col, keys)
                     if sc:
                         narrow_where, narrow_params = sc
                     else:
@@ -1024,10 +1183,16 @@ def build_raw_neighbor_lines(
                 if _is_slim_neighbor_table(raw_table, cols) and (
                     site_id_filter.strip() or cell_norm.strip()
                 ):
-                    keys = _gather_3g_export_keys_for_scope(
-                        meta, vendor, site_id_filter, cell_norm
-                    )
-                    sc = _sql_scope_in_two_text_columns(sc_col, tc_col, keys)
+                    if incoming:
+                        keys = _gather_3g_export_keys_for_target_scope(
+                            meta, site_id_filter, cell_norm
+                        )
+                        sc = _sql_scope_single_text_column(tc_col, keys)
+                    else:
+                        keys = _gather_3g_export_keys_for_scope(
+                            meta, vendor, site_id_filter, cell_norm
+                        )
+                        sc = _sql_scope_in_two_text_columns(sc_col, tc_col, keys)
                     if sc:
                         narrow_where, narrow_params = sc
                     else:
@@ -1086,10 +1251,16 @@ def build_raw_neighbor_lines(
                 col_sql = ", ".join(f'"{c}"' for c in dict.fromkeys(select_cols))
 
                 if site_id_filter.strip() or cell_norm.strip():
-                    lns, ecs = _gather_4g_lncel_and_eci_for_scope(
-                        meta, vendor, tech_u, site_id_filter, cell_norm
-                    )
-                    sc4 = _sql_scope_huawei_wide_4g(src_col, enb_col, cid_col, lns, ecs)
+                    if incoming:
+                        _lns, ecs = _gather_4g_lncel_and_eci_for_target_scope(
+                            meta, tech_u, site_id_filter, cell_norm
+                        )
+                        sc4 = _sql_scope_huawei_wide_4g_target(enb_col, cid_col, ecs)
+                    else:
+                        lns, ecs = _gather_4g_lncel_and_eci_for_scope(
+                            meta, vendor, tech_u, site_id_filter, cell_norm
+                        )
+                        sc4 = _sql_scope_huawei_wide_4g(src_col, enb_col, cid_col, lns, ecs)
                     if sc4:
                         narrow_where, narrow_params = sc4
                     else:
@@ -1169,10 +1340,16 @@ def build_raw_neighbor_lines(
                 if _is_slim_neighbor_table(raw_table, cols) and (
                     site_id_filter.strip() or cell_norm.strip()
                 ):
-                    lns, ecs = _gather_4g_lncel_and_eci_for_scope(
-                        meta, vendor, tech_u, site_id_filter, cell_norm
-                    )
-                    sc4 = _sql_scope_4g_slim(src_col, eci_col, lns, ecs)
+                    if incoming:
+                        _lns, ecs = _gather_4g_lncel_and_eci_for_target_scope(
+                            meta, tech_u, site_id_filter, cell_norm
+                        )
+                        sc4 = _sql_scope_4g_slim_target(eci_col, ecs)
+                    else:
+                        lns, ecs = _gather_4g_lncel_and_eci_for_scope(
+                            meta, vendor, tech_u, site_id_filter, cell_norm
+                        )
+                        sc4 = _sql_scope_4g_slim(src_col, eci_col, lns, ecs)
                     if sc4:
                         narrow_where, narrow_params = sc4
                     else:
@@ -1222,11 +1399,19 @@ def build_raw_neighbor_lines(
             skipped += 1
             continue
         if cell_norm:
-            sn = _norm_cell_key(src.get("cell_name"))
-            if sn != cell_norm:
-                continue
+            if incoming:
+                tn = _norm_cell_key(tgt.get("cell_name"))
+                if tn != cell_norm:
+                    continue
+            else:
+                sn = _norm_cell_key(src.get("cell_name"))
+                if sn != cell_norm:
+                    continue
         if site_id_filter:
-            if str(src.get("site_id")) != site_id_filter and str(tgt.get("site_id")) != site_id_filter:
+            if incoming:
+                if str(tgt.get("site_id")) != site_id_filter:
+                    continue
+            elif str(src.get("site_id")) != site_id_filter and str(tgt.get("site_id")) != site_id_filter:
                 continue
 
         successes = None

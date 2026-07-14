@@ -6,7 +6,7 @@
     <title>PrimeNet - Neighbor Analysis</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.27">
+    <link rel="stylesheet" href="{{ url_for('network_map.static', filename='network_map.css') }}?v=1.28">
 </head>
 <body class="map-page neighbor-only-page">
     <header class="map-header">
@@ -38,6 +38,15 @@
                     <div class="map-controls">
                         <input type="text" id="site-search" placeholder="Search sites..." onkeyup="searchSites()">
                         <div class="neighbor-data-picker" aria-label="Neighbor export data source">
+                            <div class="neighbor-field neighbor-field-full">
+                                <label for="neighbor-direction">Handover direction</label>
+                                <select id="neighbor-direction" onchange="onNeighborDirectionChange()"
+                                        aria-label="Outgoing from source cell or incoming to target cell">
+                                    <option value="" selected disabled>Choose direction…</option>
+                                    <option value="outgoing">Outgoing — handovers from source cell</option>
+                                    <option value="incoming">Incoming — handovers to target cell</option>
+                                </select>
+                            </div>
                             <div class="neighbor-field neighbor-field-full">
                                 <label for="vendor-filter">Neighbor export vendor (HO source)</label>
                                 <select id="vendor-filter" onchange="filterByVendor()"
@@ -107,7 +116,7 @@
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=2.0"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.34"></script>
+    <script src="{{ url_for('network_map.static', filename='map.js') }}?v=2.36"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initializeMap();

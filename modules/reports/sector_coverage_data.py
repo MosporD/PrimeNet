@@ -46,6 +46,15 @@ RAT_HAS_FIELD = {'2G': 'has_2g', '3G': 'has_3g', '5G': 'has_5g'}
 # LTE bands excluded from Sector Health totals / pies (different deployment scope).
 LTE_HEALTH_EXCLUDED_BAND_LABELS = frozenset({'L35'})
 
+# Canonical LTE layer categories for sector completeness checks (report column).
+LTE_LAYER_CATEGORIES = ('L18', 'L18+', 'L9', 'L21')
+_LTE_LAYER_CATEGORY_BANDS: dict[str, frozenset[str]] = {
+    'L18': frozenset({'L18'}),
+    'L18+': frozenset({'L18NEW', 'L18+', 'L18PLUS'}),
+    'L9': frozenset({'L9'}),
+    'L21': frozenset({'L21'}),
+}
+
 
 def _meta_conn():
     return connect_metadata()
@@ -86,6 +95,40 @@ def _lte_bands_for_health(sorted_tb: list[str]) -> list[str]:
         tb for tb in sorted_tb
         if _tech_of(tb) in LTE_TECHS and not _is_lte_health_excluded_band(tb)
     ]
+
+
+def _lte_band_labels_in_sector(tech_bands: set[str] | list[str]) -> set[str]:
+    """Uppercase LTE band labels present on a sector (excludes L35)."""
+    labels: set[str] = set()
+    for tb in tech_bands:
+        if _tech_of(tb) in LTE_TECHS and not _is_lte_health_excluded_band(tb):
+            label = _band_label(tb).strip().upper()
+            if label:
+                labels.add(label)
+    return labels
+
+
+def sector_has_lte_layer_category(tech_bands: set[str] | list[str], category: str) -> bool:
+    """True when the sector has the given canonical LTE layer (L18, L18+, L9, L21)."""
+    labels = _lte_band_labels_in_sector(tech_bands)
+    aliases = _LTE_LAYER_CATEGORY_BANDS.get(category)
+    if not aliases:
+        return False
+    return bool(labels & aliases)
+
+
+def missing_lte_layer_categories(tech_bands: set[str] | list[str]) -> list[str]:
+    """Missing canonical LTE layers for a sector, in display order."""
+    return [
+        category for category in LTE_LAYER_CATEGORIES
+        if not sector_has_lte_layer_category(tech_bands, category)
+    ]
+
+
+def format_missing_lte_layers(tech_bands: set[str] | list[str]) -> str:
+    """Comma-separated missing LTE layer categories, or empty when complete."""
+    missing = missing_lte_layer_categories(tech_bands)
+    return ', '.join(missing)
 
 
 def _pct(count: int, total: int) -> float:
@@ -241,6 +284,7 @@ def _sector_to_payload(sec: dict, lte_bands: list[str], *, include_full_coverage
         'has_5g': _has_rat(tb_set, '5G'),
         'has_lte': _sector_has_lte(lte_coverage),
         'lte_coverage': lte_coverage,
+        'missing_lte_layers': missing_lte_layer_categories(tb_set),
     }
     if include_full_coverage:
         row['tech_bands'] = sorted(tb_set, key=_sort_key_tb)

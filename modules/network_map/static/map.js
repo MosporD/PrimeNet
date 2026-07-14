@@ -165,6 +165,7 @@ function initializeMap() {
         if (modSel) modSel.value = 'neighbor-explorer';
         const controls = document.getElementById('neighbor-controls');
         if (controls) controls.style.display = '';
+        _setNeighborFiltersLocked(true);
     }
 
     // Base map styles
@@ -238,7 +239,9 @@ async function loadNetworkStats() {
         }
         buildTechButtons(s.tech_counts || {});
         if (NEIGHBOR_ONLY_MODE && neighborEnabled && map) {
-            await loadNetworkSites();
+            if (_neighborDirectionSelected()) {
+                await loadNetworkSites();
+            }
             _neighborPanelIdle();
         }
     } catch (e) {
@@ -281,10 +284,62 @@ function _syncActiveTechFromNeighborRatSelect() {
 }
 
 async function onNeighborRatChange() {
+    if (NEIGHBOR_ONLY_MODE && !_neighborDirectionSelected()) return;
     _syncActiveTechFromNeighborRatSelect();
     clearNeighborOverlay();
     await updateTechSpecificFilter();
     await refreshNeighborWedgePresentation();
+}
+
+/** Neighbor-only: outgoing (source) vs incoming (target) handover perspective. */
+function _neighborDirectionSelected() {
+    const v = String(document.getElementById('neighbor-direction')?.value || '').trim();
+    return v === 'outgoing' || v === 'incoming';
+}
+
+function _neighborDirection() {
+    return document.getElementById('neighbor-direction')?.value === 'incoming' ? 'incoming' : 'outgoing';
+}
+
+function _neighborIncomingMode() {
+    return _neighborDirection() === 'incoming';
+}
+
+function _neighborDrawButtonLabel() {
+    return _neighborIncomingMode() ? 'Show incoming' : 'Draw relations';
+}
+
+function _setNeighborFiltersLocked(locked) {
+    if (!NEIGHBOR_ONLY_MODE) return;
+    const picker = document.querySelector('.neighbor-data-picker');
+    const toolbar = document.getElementById('neighbor-controls');
+    const search = document.getElementById('site-search');
+    if (picker) picker.classList.toggle('neighbor-filters-locked', locked);
+    if (toolbar) toolbar.classList.toggle('neighbor-filters-locked', locked);
+    if (search) search.disabled = locked;
+}
+
+async function onNeighborDirectionChange() {
+    if (!NEIGHBOR_ONLY_MODE) return;
+    const ready = _neighborDirectionSelected();
+    _setNeighborFiltersLocked(!ready);
+    clearNeighborOverlay();
+    selectedNeighborCell = '';
+    selectedSiteId = null;
+    lastNeighborSiteContext = null;
+    sitesData = [];
+    lastLoadedScopeKey = '';
+    document.getElementById('site-info-panel').style.display = 'none';
+    if (!ready) {
+        displaySites([]);
+        _showEmptyState();
+        _neighborPanelIdle();
+        return;
+    }
+    rebuildNeighborRatSelectForExportVendor();
+    await updateTechSpecificFilter();
+    await loadNetworkSites();
+    _neighborPanelIdle();
 }
 
 function buildTechButtons(counts) {
@@ -603,7 +658,7 @@ async function loadNetworkSites() {
         }
 
         const scopeKey = NEIGHBOR_ONLY_MODE
-            ? `neighbor-sites|${activeTechSpecific}`
+            ? `neighbor-sites|${_neighborDirection()}|${activeTechSpecific}`
             : `${activeTech}|${activeTechSpecific}`;
         const shouldFetchFromServer = !sitesData.length || lastLoadedScopeKey !== scopeKey;
         if (!shouldFetchFromServer) {
@@ -1018,7 +1073,7 @@ function drawSectorWedge(site, group) {
                         style="padding:6px 10px;background:${color};
                                color:white;border:none;border-radius:6px;cursor:pointer;
                                width:100%;font-weight:600;text-align:left;">
-                    ${NEIGHBOR_ONLY_MODE ? '<strong>Draw relations</strong>' : c.cell_name}
+                    ${NEIGHBOR_ONLY_MODE ? `<strong>${escapeHtml(_neighborDrawButtonLabel())}</strong>` : c.cell_name}
                     <span style="font-weight:500;opacity:.9;font-size:.85em;display:block;margin-top:2px;">${NEIGHBOR_ONLY_MODE ? `${escapeHtml(c.cell_name)}${meta}` : meta}</span>
                 </button>`;
                   }
@@ -1065,7 +1120,7 @@ function drawSectorWedge(site, group) {
                         const click = NEIGHBOR_ONLY_MODE
                             ? `neighborDrawRelationsForCell(${JSON.stringify(nbr)})`
                             : `showCellKPIs(${JSON.stringify(kpi)})`;
-                        const label = NEIGHBOR_ONLY_MODE ? 'Draw relations' : 'View cell details';
+                        const label = NEIGHBOR_ONLY_MODE ? _neighborDrawButtonLabel() : 'View cell details';
                         return `<button onclick='${click}'
                       style="margin-top:10px;padding:6px 14px;background:${color};
                              color:white;border:none;border-radius:6px;cursor:pointer;
@@ -1140,7 +1195,7 @@ function displaySiteInfo(site, cells) {
                 ? `onclick='showCellKPIs(${JSON.stringify(cellPayload)})'`
                 : '';
             const drawBtn = NEIGHBOR_ONLY_MODE && onAir
-                ? `<button type="button" class="neighbor-draw-cell-btn" onclick='neighborDrawRelationsForCell(${JSON.stringify(drawPayload)})'>Draw relations</button>`
+                ? `<button type="button" class="neighbor-draw-cell-btn" onclick='neighborDrawRelationsForCell(${JSON.stringify(drawPayload)})'>${_neighborDrawButtonLabel()}</button>`
                 : '';
             const metaLine = [`Az: ${c.azimuth ?? '—'}°`, c.frequency_band ? String(c.frequency_band).trim() : '']
                 .filter(Boolean)
@@ -1710,19 +1765,27 @@ function updateNeighborMetricHint() {
     }
 }
 
-/** Neighbor-only: short panel copy (no auto-loaded lines until Draw relations). */
+/** Neighbor-only: short panel copy (no auto-loaded lines until a cell action). */
 function _neighborPanelIdle() {
     const panel = document.getElementById('neighbor-explorer-panel');
     if (!panel || !neighborEnabled || !NEIGHBOR_ONLY_MODE) return;
     panel.style.display = 'block';
     const n = neighborLineData.length;
+    const action = _neighborDrawButtonLabel();
+    const role = _neighborIncomingMode() ? 'target' : 'source';
+    if (!_neighborDirectionSelected()) {
+        panel.innerHTML = `
+            <div class="site-meta-row">Choose <strong>Handover direction</strong> above to load the map and filters.</div>`;
+        return;
+    }
     if (selectedNeighborCell) {
         panel.innerHTML = `
-            <div class="site-meta-row">Cell: <strong>${escapeHtml(selectedNeighborCell)}</strong></div>
-            <div class="site-meta-row">Lines on map: ${n}. Use <strong>Draw relations</strong> on a cell after changing export vendor or RAT.</div>`;
+            <div class="site-meta-row">Cell (${role}): <strong>${escapeHtml(selectedNeighborCell)}</strong></div>
+            <div class="site-meta-row">Lines on map: ${n}. Use <strong>${escapeHtml(action)}</strong> on a cell after changing export vendor or RAT.</div>`;
     } else {
         panel.innerHTML = `
-            <div class="site-meta-row">Lines on map: ${n}. Open a site, pick a cell, then <strong>Draw relations</strong> (export vendor and RAT choose which file is queried).</div>`;
+            <div class="site-meta-row">Perspective: <strong>${_neighborIncomingMode() ? 'Incoming (target)' : 'Outgoing (source)'}</strong></div>
+            <div class="site-meta-row">Lines on map: ${n}. Open a site, pick a ${role} cell, then <strong>${escapeHtml(action)}</strong>.</div>`;
     }
 }
 
@@ -1732,7 +1795,7 @@ async function drawNeighborRelations() {
         const sid = String(selectedSiteId || '').trim();
         const cn = String(selectedNeighborCell || '').trim();
         if (!sid || !cn) {
-            showNotification('Open a site in the panel, then use Draw relations on a cell.', 'info');
+            showNotification(`Open a site in the panel, then use ${_neighborDrawButtonLabel()} on a cell.`, 'info');
             return;
         }
     }
@@ -1809,6 +1872,36 @@ function _neighborLineEndpoint(lat, lng, azimuthDeg, offsetM) {
     return [lat + rLat * Math.cos(rad), lng + rLng * Math.sin(rad)];
 }
 
+/** Geographic bearing from point 1 to point 2 (degrees, 0 = north). */
+function _neighborLineBearingDeg(lat1, lng1, lat2, lng2) {
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δλ = (lng2 - lng1) * Math.PI / 180;
+    const y = Math.sin(Δλ) * Math.cos(φ2);
+    const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+function _neighborLinePointAlong(src, dst, fraction) {
+    const t = Math.max(0, Math.min(1, Number(fraction) || 0));
+    return [
+        src[0] + (dst[0] - src[0]) * t,
+        src[1] + (dst[1] - src[1]) * t,
+    ];
+}
+
+/** Small arrowhead on the line showing HO direction (source → target). */
+function _neighborLineArrowIcon(color, bearingDeg) {
+    const c = color || '#34495e';
+    const rot = Number.isFinite(Number(bearingDeg)) ? Number(bearingDeg) : 0;
+    return L.divIcon({
+        className: 'neighbor-line-arrow',
+        html: `<div class="neighbor-line-arrow-head" style="border-bottom-color:${escapeHtmlAttr(c)};transform:rotate(${rot}deg);"></div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+    });
+}
+
 function clearNeighborOverlay() {
     neighborLineData = [];
     if (neighborLinesLayer) neighborLinesLayer.clearLayers();
@@ -1841,6 +1934,7 @@ function onMapModuleChange() {
 function onNeighborFiltersChanged() {
     updateNeighborMetricHint();
     if (neighborEnabled && !NEIGHBOR_ONLY_MODE) refreshNeighborOverlay();
+    if (neighborEnabled && NEIGHBOR_ONLY_MODE && selectedNeighborCell) refreshNeighborOverlay();
 }
 
 function _neighborPanelUnavailable(reason) {
@@ -1888,6 +1982,7 @@ async function refreshNeighborOverlay() {
     qs.set('max_lines', String(Number.isFinite(maxLines) ? Math.max(10, maxLines) : 300));
     if (selectedSiteId) qs.set('site_id', selectedSiteId);
     if (selectedNeighborCell) qs.set('cell_name', selectedNeighborCell);
+    qs.set('direction', _neighborDirection());
     if (_neighborFailuresMode()) {
         qs.set('failures_only', '1');
         const mf = Number.isFinite(minRaw) ? Math.max(0, minRaw) : 1;
@@ -2009,14 +2104,25 @@ function renderNeighborLines(lines) {
         }
         const src = _neighborLineEndpoint(laS, loS, ln.source_azimuth, offM);
         const dst = _neighborLineEndpoint(laT, loT, ln.target_azimuth, offM);
+        const lineColor = _neighborLineColor(ln);
+        const lineWeight = _neighborLineWeight(
+            fo ? (Number(ln.ho_failures) || 0) : ln.ho_attempts,
+            maxAttempts,
+        );
         const poly = L.polyline([src, dst], {
-            color: _neighborLineColor(ln),
-            weight: _neighborLineWeight(
-                fo ? (Number(ln.ho_failures) || 0) : ln.ho_attempts,
-                maxAttempts,
-            ),
+            color: lineColor,
+            weight: lineWeight,
             opacity: 0.72,
             pane: 'overlayPane',
+        }).addTo(neighborLinesLayer);
+        const bearing = _neighborLineBearingDeg(src[0], src[1], dst[0], dst[1]);
+        const arrowPt = _neighborLinePointAlong(src, dst, 0.82);
+        L.marker(arrowPt, {
+            icon: _neighborLineArrowIcon(lineColor, bearing),
+            interactive: false,
+            keyboard: false,
+            pane: 'overlayPane',
+            zIndexOffset: 200,
         }).addTo(neighborLinesLayer);
         const sr = ln.ho_success_rate;
         const srText = (sr == null || !Number.isFinite(Number(sr))) ? '—' : `${Number(sr).toFixed(2)}%`;
@@ -2069,32 +2175,40 @@ async function renderNeighborExplorerPanel(vendor, technology, periodStart, minA
     panel.style.display = 'block';
     if (!selectedNeighborCell) {
         panel.innerHTML = `
-            <div class="site-meta-row">Select a cell for outgoing/incoming ranking.</div>
+            <div class="site-meta-row">Select a ${_neighborIncomingMode() ? 'target' : 'source'} cell for neighbor ranking.</div>
             <div class="site-meta-row">Lines on map: ${neighborLineData.length}</div>`;
         return;
     }
+    const incomingMode = _neighborIncomingMode();
     if (rawNeighborTables) {
         const cellKey = String(selectedNeighborCell || '').trim().toLowerCase();
         const rows = neighborLineData
-            .filter((ln) => String(ln.source_cell || '').trim().toLowerCase() === cellKey)
+            .filter((ln) => {
+                const side = incomingMode
+                    ? String(ln.target_cell || '').trim().toLowerCase()
+                    : String(ln.source_cell || '').trim().toLowerCase();
+                return side === cellKey;
+            })
             .slice(0, 10);
         const mkRows = (items) => items.length
             ? items.map((r) => {
                 const rel = String(r.relation_scope || '').toLowerCase();
                 const relText = rel === 'intra' ? ' · intra' : (rel === 'inter' ? ' · inter' : '');
+                const peer = incomingMode ? (r.source_cell || '') : (r.target_cell || '');
                 return `
                 <div class="neighbor-row">
-                    <div class="neighbor-row-name">${escapeHtml(r.target_cell || '')}${relText}</div>
+                    <div class="neighbor-row-name">${escapeHtml(peer)}${relText}</div>
                     <div class="neighbor-row-attempts">${Number(r.ho_attempts || 0).toLocaleString()}</div>
                     <div class="neighbor-row-rate">${r.ho_success_rate == null ? '—' : Number(r.ho_success_rate).toFixed(1) + '%'}</div>
                 </div>`;
             }).join('')
-            : '<div class="site-meta-row">No outgoing rows in current scope.</div>';
+            : `<div class="site-meta-row">No ${incomingMode ? 'incoming' : 'outgoing'} rows in current scope.</div>`;
+        const listHead = incomingMode ? 'Incoming neighbors (sources)' : 'Outgoing neighbors (targets)';
         panel.innerHTML = `
             <div class="neighbor-subtitle">
-                Cell: <strong>${escapeHtml(selectedNeighborCell)}</strong>
+                Cell (${incomingMode ? 'target' : 'source'}): <strong>${escapeHtml(selectedNeighborCell)}</strong>
             </div>
-            <div class="neighbor-list-head">Outgoing neighbors</div>
+            <div class="neighbor-list-head">${listHead}</div>
             ${mkRows(rows)}
             <div class="site-meta-row">Relation flag: intra when source and target eNB/site are the same.</div>`;
         return;
@@ -2112,8 +2226,9 @@ async function renderNeighborExplorerPanel(vendor, technology, periodStart, minA
         if (!data.success) throw new Error(data.error || 'cell summary failed');
         const outgoing = data.outgoing || [];
         const incoming = data.incoming || [];
-        const mkRows = (rows) => rows.length
-            ? rows.map((r) => `
+        const rows = incomingMode ? incoming : outgoing;
+        const mkRows = (items) => items.length
+            ? items.map((r) => `
                 <div class="neighbor-row">
                     <div class="neighbor-row-name">${escapeHtml(r.neighbor_cell)}</div>
                     <div class="neighbor-row-attempts">${Number(r.ho_attempts || 0).toLocaleString()}</div>
@@ -2121,14 +2236,13 @@ async function renderNeighborExplorerPanel(vendor, technology, periodStart, minA
                 </div>
             `).join('')
             : '<div class="site-meta-row">No rows in current scope.</div>';
+        const listHead = incomingMode ? 'Incoming neighbors (sources)' : 'Outgoing neighbors (targets)';
         panel.innerHTML = `
             <div class="neighbor-subtitle">
-                Cell: <strong>${escapeHtml(selectedNeighborCell)}</strong>
+                Cell (${incomingMode ? 'target' : 'source'}): <strong>${escapeHtml(selectedNeighborCell)}</strong>
             </div>
-            <div class="neighbor-list-head">Outgoing neighbors</div>
-            ${mkRows(outgoing)}
-            <div class="neighbor-list-head">Incoming neighbors</div>
-            ${mkRows(incoming)}`;
+            <div class="neighbor-list-head">${listHead}</div>
+            ${mkRows(rows)}`;
     } catch (e) {
         panel.innerHTML = '<div class="site-meta-row" style="color:#e74c3c;">Failed to load cell summary.</div>';
     }
@@ -2194,6 +2308,7 @@ function buildAreaFilter(sites) {
 // ─── Filter callbacks (all funnel into runFilters) ────────────────────────────
 
 function searchSites() {
+    if (NEIGHBOR_ONLY_MODE && !_neighborDirectionSelected()) return;
     if (!sitesData.length) {
         loadNetworkSites();
         return;
@@ -2203,6 +2318,7 @@ function searchSites() {
 
 function filterByVendor() {
     if (NEIGHBOR_ONLY_MODE) {
+        if (!_neighborDirectionSelected()) return;
         rebuildNeighborRatSelectForExportVendor();
         if (neighborEnabled) {
             clearNeighborOverlay();
@@ -2426,6 +2542,7 @@ function _groupCellsIntoWedges(site, cells) {
 // ─── Empty state + filter wiring ──────────────────────────────────────────────
 
 function _hasActiveFilters() {
+    if (NEIGHBOR_ONLY_MODE && !_neighborDirectionSelected()) return false;
     const term    = (document.getElementById('site-search')?.value || '').trim();
     const vendor  = document.getElementById('vendor-filter')?.value || 'all';
     const area    = document.getElementById('area-filter')?.value || 'all';
@@ -2505,7 +2622,8 @@ function _showEmptyState() {
         panel.innerHTML = `
         <div style="color:#2c3e50;font-weight:800;margin-bottom:6px;">Neighbor Analysis</div>
         <div style="color:#555;font-size:0.88em;line-height:1.6;">
-            Search or filter sites, open a site, choose export vendor and RAT, then use <strong>Draw relations</strong> on a cell in the site list to plot handovers.
+            Choose <strong>Handover direction</strong> first (outgoing from a source cell, or incoming to a target cell).
+            Then search or filter sites, open a site, and use the cell action to plot handovers.
         </div>
     `;
     } else {

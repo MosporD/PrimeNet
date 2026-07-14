@@ -344,7 +344,9 @@
         }
         setStatus('Building Excel report…', 'loading');
         try {
-            const res = await fetch(`/api/cm-parameter-audit/export/${encodeURIComponent(lastExportId)}`);
+            const res = await fetch(`/api/cm-parameter-audit/export/${encodeURIComponent(lastExportId)}`, {
+                credentials: 'same-origin',
+            });
             if (!res.ok) {
                 let message = 'Export failed';
                 try {

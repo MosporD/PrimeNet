@@ -381,9 +381,14 @@ def _generate_sector_health_excel(*, active_only: bool = True):
     except ImportError:
         raise RuntimeError('openpyxl is required for report generation')
 
-    from .sector_coverage_data import load_sector_coverage_rows
+    from .sector_coverage_data import (
+        _lte_bands_for_health,
+        format_missing_lte_layers,
+        load_sector_coverage_rows,
+    )
 
     sector_list, sorted_tb = load_sector_coverage_rows(active_only=active_only)
+    lte_bands_health = _lte_bands_for_health(sorted_tb)
 
     wb = Workbook()
     ws = wb.active
@@ -395,6 +400,8 @@ def _generate_sector_health_excel(*, active_only: bool = True):
     yes_font = Font(color='FFFFFF', bold=True, size=10)
     no_fill  = PatternFill(start_color='F2F3F4', end_color='F2F3F4', fill_type='solid')
     no_font  = Font(color='BDC3C7', size=10)
+    warn_fill = PatternFill(start_color='FADBD8', end_color='FADBD8', fill_type='solid')
+    warn_font = Font(color='922B21', size=10)
     thin_border = Border(
         left=Side(style='thin', color='D5D8DC'),
         right=Side(style='thin', color='D5D8DC'),
@@ -402,8 +409,9 @@ def _generate_sector_health_excel(*, active_only: bool = True):
         bottom=Side(style='thin', color='D5D8DC'),
     )
 
-    fixed_headers = ['Site ID', 'Site Name', 'Vendor', 'Area', 'Sector']
+    fixed_headers = ['Site ID', 'Site Name', 'Vendor', 'Area', 'Sector', 'LTE', 'Missing LTE layers']
     all_headers = fixed_headers + sorted_tb
+    band_col_start = len(fixed_headers) + 1
 
     for col_idx, h in enumerate(all_headers, 1):
         cell = ws.cell(row=1, column=col_idx, value=h)
@@ -421,8 +429,28 @@ def _generate_sector_health_excel(*, active_only: bool = True):
         ws.cell(row=row_idx, column=4, value=sec['area']).border = thin_border
         ws.cell(row=row_idx, column=5, value=sec['sector']).border = thin_border
 
+        lte_cell = ws.cell(row=row_idx, column=6)
+        lte_cell.alignment = Alignment(horizontal='center')
+        lte_cell.border = thin_border
+        has_lte = any(tb in sec['tech_bands'] for tb in lte_bands_health)
+        if has_lte:
+            lte_cell.value = 'Yes'
+            lte_cell.fill = yes_fill
+            lte_cell.font = yes_font
+        else:
+            lte_cell.value = '—'
+            lte_cell.fill = no_fill
+            lte_cell.font = no_font
+
+        missing_layers = format_missing_lte_layers(sec['tech_bands'])
+        missing_cell = ws.cell(row=row_idx, column=7, value=missing_layers or '—')
+        missing_cell.border = thin_border
+        if missing_layers:
+            missing_cell.fill = warn_fill
+            missing_cell.font = warn_font
+
         for tb_idx, tb in enumerate(sorted_tb):
-            cell = ws.cell(row=row_idx, column=6 + tb_idx)
+            cell = ws.cell(row=row_idx, column=band_col_start + tb_idx)
             cell.alignment = Alignment(horizontal='center')
             cell.border = thin_border
             if tb in sec['tech_bands']:
@@ -438,7 +466,7 @@ def _generate_sector_health_excel(*, active_only: bool = True):
         max_len = max((len(str(c.value)) if c.value else 0) for c in col)
         ws.column_dimensions[col[0].column_letter].width = min(max(max_len + 3, 10), 30)
 
-    ws.freeze_panes = 'F2'
+    ws.freeze_panes = ws.cell(row=2, column=band_col_start).coordinate
 
     summary = wb.create_sheet('Summary')
     summary_hdr_fill = PatternFill(start_color='1A5276', end_color='1A5276', fill_type='solid')

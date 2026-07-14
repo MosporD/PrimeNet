@@ -13,6 +13,12 @@ from functools import wraps
 
 from flask import Blueprint, g, jsonify, redirect, render_template, request, send_file, url_for
 
+from core.cm_extractor.export_store import (
+    create_export_path,
+    get_export_record,
+    list_user_exports,
+    update_export_record,
+)
 from core.cm_extractor.config import (
     huawei_configured,
     huawei_defaults,
@@ -81,6 +87,147 @@ cm_extractor_bp = Blueprint(
 )
 
 TEMP_FILES: dict[str, dict] = {}
+
+
+def _site_id_count(data: dict) -> int:
+    site_ids = data.get('site_ids') or []
+    if isinstance(site_ids, str):
+        site_ids = [s.strip() for s in site_ids.split(',') if s.strip()]
+    return len(site_ids)
+
+
+def _extract_is_long_running(data: dict) -> bool:
+    """Large full-MO exports can exceed reverse-proxy / gunicorn HTTP timeouts."""
+    vendor = (data.get('vendor') or '').lower()
+    n_sites = _site_id_count(data)
+    if vendor == 'nokia':
+        scope_level = (data.get('scope_level') or 'MRBTS').strip().upper()
+        if scope_level in ('RNC', 'BSC'):
+            return True
+        if n_sites < 10:
+            return False
+        selections = data.get('selections') or []
+        # CM Operations bulk (Import_Export + SFTP) finishes in seconds — keep sync.
+        try:
+            from core.cm_extractor.nokia_bulk_routing import should_use_bulk_export
+            site_ids = data.get('site_ids') or []
+            if isinstance(site_ids, str):
+                site_ids = [s.strip() for s in site_ids.split(',') if s.strip()]
+            if should_use_bulk_export(
+                scope_level=scope_level,
+                site_ids=[str(s).strip() for s in site_ids if str(s).strip()],
+                selections=selections,
+            ):
+                return False
+        except Exception:
+            pass
+        for sel in selections:
+            if (sel.get('export_mode') or '').strip().lower() == 'full':
+                return True
+            if len(sel.get('parameters') or []) >= 50:
+                return True
+    elif vendor == 'huawei' and n_sites >= 25:
+        return True
+    return False
+
+
+def _perform_extract(data: dict, output_path: str, user) -> dict:
+    """Run CM extraction and return the API response payload (without file paths)."""
+    vendor = (data.get('vendor') or '').lower()
+    warnings: list[str] = []
+
+    if vendor == 'nokia':
+        conf_id, scope_level, site_ids, selections = _nokia_selection_payload(data)
+        client = _nokia_client()
+        row_count, sheet_names, summary, extraction_mode = export_nokia_selection_to_excel(
+            client,
+            output_path,
+            selections=selections,
+            site_ids=site_ids,
+            scope_level=scope_level,
+            conf_id=conf_id,
+        )
+        label = f'Nokia CM ({row_count} rows, {len(sheet_names)} sheets)'
+        mode = extraction_mode
+    elif vendor == 'huawei':
+        if not huawei_visible(user):
+            raise PermissionError('Huawei CM extraction is not enabled.')
+        ne_names, selections, skipped = _huawei_selection_payload(data)
+        client = _huawei_client(data)
+
+        if len(selections) == 1 and selections[0].get('mo_id') == 'CUSTOM':
+            command = (selections[0].get('command') or data.get('command') or '').strip()
+            if not command:
+                raise ValueError('MML command is required')
+            client.clear_skipped_mml_nes()
+            for row in skipped:
+                client._record_skipped_mml_nes([row['NE name']], reason=row['Reason'])
+            rows = client.run_mml_chunked(command, ne_names) if ne_names else []
+            mml_errors = client.consume_mml_errors()
+            skipped_nes = client.consume_skipped_mml_nes()
+            if not rows and mml_errors and not skipped_nes:
+                raise HuaweiCmError('; '.join(mml_errors[:5]))
+            from core.cm_extractor.excel_writer import write_huawei_sheets_excel
+            sheets = {'MML_Result': rows}
+            sheet_names = ['MML_Result']
+            warnings = [f'MML: {err}' for err in mml_errors]
+            if skipped_nes:
+                sheets['Skipped_NEs'] = skipped_nes
+                sheet_names.append('Skipped_NEs')
+                preview = ', '.join(row['NE name'] for row in skipped_nes[:8])
+                suffix = '…' if len(skipped_nes) > 8 else ''
+                warnings.append(
+                    f'Skipped {len(skipped_nes)} NE(s) — see Skipped_NEs sheet ({preview}{suffix}).',
+                )
+            write_huawei_sheets_excel(output_path, sheets)
+            row_count = len(rows)
+            summary = f'Huawei MML custom command on {len(ne_names)} NE(s), {row_count} row(s).'
+        else:
+            row_count, sheet_names, summary, warnings = export_huawei_selection_to_excel(
+                client,
+                output_path,
+                ne_names=ne_names,
+                selections=selections,
+                pre_skipped_nes=skipped,
+            )
+        label = f'Huawei MML ({row_count} rows, {len(sheet_names)} sheets)'
+        mode = 'selection'
+    else:
+        raise ValueError('Unknown vendor')
+
+    filename = f'{vendor}_cm_extract.xlsx'
+    log_activity(_user_id(user), 'cm_extract', label)
+    response = {
+        'success': True,
+        'file_id': None,  # filled by caller
+        'filename': filename,
+        'row_count': row_count,
+    }
+    if vendor in ('nokia', 'huawei'):
+        response['summary'] = summary
+        response['sheet_names'] = sheet_names
+        response['extraction_mode'] = mode
+    if vendor == 'huawei' and warnings:
+        response['warnings'] = warnings
+    return response
+
+
+def _extract_worker(file_id: str, output_path: str, data: dict, user) -> None:
+    update_export_record(file_id, status='running')
+    try:
+        result = _perform_extract(data, output_path, user)
+        update_export_record(
+            file_id,
+            status='done',
+            row_count=result.get('row_count'),
+            sheet_names=result.get('sheet_names', []),
+            summary=result.get('summary', ''),
+            warnings=result.get('warnings', []),
+            extraction_mode=result.get('extraction_mode'),
+            label=result.get('summary', '')[:200],
+        )
+    except Exception as exc:
+        update_export_record(file_id, status='error', error=str(exc) or 'Extraction failed')
 
 
 def login_required(f):
@@ -847,94 +994,46 @@ def extract():
 
     data = _json_body()
     vendor = (data.get('vendor') or '').lower()
-    file_id = str(uuid.uuid4())
-    output_path = os.path.join(tempfile.gettempdir(), f'cm_extract_{file_id}.xlsx')
+    filename = f'{vendor}_cm_extract.xlsx'
 
     try:
-        warnings: list[str] = []
-        if vendor == 'nokia':
-            conf_id, scope_level, site_ids, selections = _nokia_selection_payload(data)
-            client = _nokia_client()
-            row_count, sheet_names, summary = export_nokia_selection_to_excel(
-                client,
-                output_path,
-                selections=selections,
-                site_ids=site_ids,
-                scope_level=scope_level,
-                conf_id=conf_id,
-            )
-            label = f'Nokia CM ({row_count} rows, {len(sheet_names)} sheets)'
-            mode = (
-                'bulk_operations'
-                if scope_level in ('RNC', 'BSC') and nokia_export_ssh_settings().get('configured')
-                else 'selection'
-            )
+        file_id, output_path = create_export_path(
+            user_id=_user_id(user),
+            filename=filename,
+            vendor=vendor,
+        )
+        update_export_record(file_id, status='pending')
 
-        elif vendor == 'huawei':
-            if not huawei_visible(user):
-                return jsonify({'error': 'Huawei CM extraction is not enabled.'}), 403
-            ne_names, selections, skipped = _huawei_selection_payload(data)
-            client = _huawei_client(data)
+        if _extract_is_long_running(data):
+            threading.Thread(
+                target=_extract_worker,
+                args=(file_id, str(output_path), data, user),
+                daemon=True,
+            ).start()
+            return jsonify({
+                'success': True,
+                'async': True,
+                'file_id': file_id,
+                'status': 'running',
+            })
 
-            if len(selections) == 1 and selections[0].get('mo_id') == 'CUSTOM':
-                command = (selections[0].get('command') or data.get('command') or '').strip()
-                if not command:
-                    return jsonify({'error': 'MML command is required'}), 400
-                client.clear_skipped_mml_nes()
-                for row in skipped:
-                    client._record_skipped_mml_nes([row['NE name']], reason=row['Reason'])
-                rows = client.run_mml_chunked(command, ne_names) if ne_names else []
-                mml_errors = client.consume_mml_errors()
-                skipped_nes = client.consume_skipped_mml_nes()
-                if not rows and mml_errors and not skipped_nes:
-                    raise HuaweiCmError('; '.join(mml_errors[:5]))
-                from core.cm_extractor.excel_writer import write_huawei_sheets_excel
-                sheets = {'MML_Result': rows}
-                sheet_names = ['MML_Result']
-                warnings = [f'MML: {err}' for err in mml_errors]
-                if skipped_nes:
-                    sheets['Skipped_NEs'] = skipped_nes
-                    sheet_names.append('Skipped_NEs')
-                    preview = ', '.join(row['NE name'] for row in skipped_nes[:8])
-                    suffix = '…' if len(skipped_nes) > 8 else ''
-                    warnings.append(f'Skipped {len(skipped_nes)} NE(s) — see Skipped_NEs sheet ({preview}{suffix}).')
-                write_huawei_sheets_excel(output_path, sheets)
-                row_count = len(rows)
-                summary = f'Huawei MML custom command on {len(ne_names)} NE(s), {row_count} row(s).'
-            else:
-                row_count, sheet_names, summary, warnings = export_huawei_selection_to_excel(
-                    client,
-                    output_path,
-                    ne_names=ne_names,
-                    selections=selections,
-                    pre_skipped_nes=skipped,
-                )
-            label = f'Huawei MML ({row_count} rows, {len(sheet_names)} sheets)'
-            mode = 'selection'
-        else:
-            return jsonify({'error': 'Unknown vendor'}), 400
+        update_export_record(file_id, status='running')
+        result = _perform_extract(data, str(output_path), user)
+        update_export_record(
+            file_id,
+            status='done',
+            row_count=result.get('row_count'),
+            sheet_names=result.get('sheet_names', []),
+            summary=result.get('summary', ''),
+            warnings=result.get('warnings', []),
+            extraction_mode=result.get('extraction_mode'),
+            label=result.get('summary', '')[:200],
+        )
+        result['file_id'] = file_id
+        return jsonify(result)
 
-        filename = f'{vendor}_cm_extract.xlsx'
-        TEMP_FILES[file_id] = {
-            'path': output_path,
-            'filename': filename,
-            'user_id': _user_id(user),
-        }
-        log_activity(_user_id(user), 'cm_extract', label)
-        response = {
-            'success': True,
-            'file_id': file_id,
-            'filename': filename,
-            'row_count': row_count,
-        }
-        if vendor in ('nokia', 'huawei'):
-            response['summary'] = summary
-            response['sheet_names'] = sheet_names
-            response['extraction_mode'] = mode
-        if vendor == 'huawei' and warnings:
-            response['warnings'] = warnings
-        return jsonify(response)
-
+    except PermissionError as exc:
+        return jsonify({'error': str(exc)}), 403
     except (NokiaCmError, HuaweiCmError) as exc:
         return jsonify({'error': str(exc)}), 502
     except ConnectionError as exc:
@@ -943,6 +1042,39 @@ def extract():
         return jsonify({'error': str(exc)}), 400
     except Exception:
         return jsonify({'error': 'Extraction failed'}), 500
+
+
+@cm_extractor_bp.route('/api/cm-extractor/extract-status/<file_id>')
+def extract_status(file_id: str):
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    info = get_export_record(file_id, user_id=_user_id(user), require_file=False)
+    if not info:
+        return jsonify({'error': 'Extraction not found'}), 404
+
+    status = info.get('status') or 'done'
+    if status == 'error':
+        return jsonify({
+            'success': False,
+            'status': 'error',
+            'error': info.get('error') or 'Extraction failed',
+        })
+    if status in ('pending', 'running'):
+        return jsonify({'success': True, 'status': status, 'file_id': file_id})
+
+    return jsonify({
+        'success': True,
+        'status': 'done',
+        'file_id': file_id,
+        'filename': info.get('filename'),
+        'row_count': info.get('row_count'),
+        'sheet_names': info.get('sheet_names', []),
+        'summary': info.get('summary', ''),
+        'warnings': info.get('warnings', []),
+        'extraction_mode': info.get('extraction_mode'),
+    })
 
 
 def _can_manage_job(user, job) -> bool:
@@ -1116,15 +1248,31 @@ def download_scheduled_run(run_id: int):
     return send_file(run['file_path'], as_attachment=True, download_name=run.get('file_name') or 'cm_extract.xlsx')
 
 
+@cm_extractor_bp.route('/api/cm-extractor/exports', methods=['GET'])
+def list_saved_exports():
+    user = get_current_user()
+    if not user:
+        return jsonify({'error': 'Unauthorized'}), 401
+    limit = min(50, max(1, int(request.args.get('limit', 20) or 20)))
+    exports = list_user_exports(_user_id(user), limit=limit)
+    return jsonify({'success': True, 'exports': exports})
+
+
 @cm_extractor_bp.route('/api/cm-extractor/download/<file_id>')
 def download(file_id):
     user = get_current_user()
     if not user:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    info = TEMP_FILES.get(file_id)
-    if not info or info.get('user_id') != _user_id(user):
+    info = get_export_record(file_id, user_id=_user_id(user))
+    if not info:
         return jsonify({'error': 'File not found'}), 404
+
+    status = info.get('status') or 'done'
+    if status in ('pending', 'running'):
+        return jsonify({'error': 'Extraction still running'}), 409
+    if status == 'error':
+        return jsonify({'error': info.get('error') or 'Extraction failed'}), 500
 
     log_activity(_user_id(user), 'file_download', f'Downloaded {info["filename"]}')
     return send_file(info['path'], as_attachment=True, download_name=info['filename'])

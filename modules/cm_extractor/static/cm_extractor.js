@@ -1765,6 +1765,98 @@ async function executeNokiaReimport() {
     }
 }
 
+async function pollExtractStatus(fileId) {
+    const maxWaitMs = 45 * 60 * 1000;
+    const started = Date.now();
+    while (Date.now() - started < maxWaitMs) {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const response = await fetch(`/api/cm-extractor/extract-status/${fileId}`, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+        });
+        const data = await response.json().catch(() => ({}));
+        if (response.status === 401) {
+            throw new Error('PrimeNet session expired — refresh the page and sign in again.');
+        }
+        if (!response.ok && response.status !== 404) {
+            throw new Error(data.error || `Status check failed (HTTP ${response.status})`);
+        }
+        if (data.status === 'error') {
+            throw new Error(data.error || 'Extraction failed');
+        }
+        if (data.status === 'done' && data.success) {
+            return data;
+        }
+    }
+    throw new Error('Extraction timed out after 45 minutes. Try fewer sites or use a scheduled job.');
+}
+
+function showExtractResults(data) {
+    const resultsSection = document.getElementById('results-section');
+    lastFileId = data.file_id;
+    const sheetNames = data.sheet_names || [];
+    const sheetLabel = sheetNames.length
+        ? `${sheetNames.length} sheet(s): ${sheetNames.join(', ')}`
+        : '1 sheet';
+    document.getElementById('results-message').textContent =
+        `Ready — ${data.row_count} row(s) across ${sheetLabel}.`;
+    const modeLabel = data.extraction_mode === 'bulk_operations'
+        ? 'Method: CM Operations bulk export (Import_Export)'
+        : (data.extraction_mode === 'selection'
+            ? 'Method: CM Open API (persistency queries)'
+            : '');
+    document.getElementById('results-summary').textContent =
+        [modeLabel, data.summary || ''].filter(Boolean).join(' — ');
+    if (data.warnings?.length) {
+        document.getElementById('results-summary').textContent +=
+            ` Warnings: ${data.warnings.slice(0, 3).join('; ')}` +
+            (data.warnings.length > 3 ? ` …and ${data.warnings.length - 3} more` : '');
+    }
+    finishExtractProgress(true);
+    resultsSection.hidden = false;
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    const notifyMsg = data.warnings?.length
+        ? `Extraction complete with ${data.warnings.length} warning(s)`
+        : (sheetNames.length > 1
+            ? `Extraction complete — ${sheetNames.length} sheets`
+            : 'Extraction complete');
+        showNotification(notifyMsg, data.warnings?.length ? 'warning' : 'success');
+    loadRecentExports();
+}
+
+async function loadRecentExports() {
+    const container = document.getElementById('recent-exports');
+    if (!container) return;
+    try {
+        const response = await fetch('/api/cm-extractor/exports?limit=10', { credentials: 'same-origin' });
+        const data = await response.json();
+        if (!data.success) {
+            container.innerHTML = '<p class="field-hint">Could not load recent exports.</p>';
+            return;
+        }
+        const items = data.exports || [];
+        if (!items.length) {
+            container.innerHTML = '<p class="field-hint">No saved exports yet.</p>';
+            return;
+        }
+        container.innerHTML = items.map((item) => {
+            const when = item.stored_at
+                ? new Date(item.stored_at * 1000).toLocaleString()
+                : '';
+            const label = item.summary || item.filename || 'CM export';
+            return `
+                <div class="scheduler-job-card">
+                    <div class="scheduler-job-title">${escapeHtml(label.slice(0, 80))}</div>
+                    <div class="scheduler-job-meta">${escapeHtml(when)} · ${escapeHtml(item.row_count ?? '?')} rows</div>
+                    <a class="link-btn" href="/api/cm-extractor/download/${encodeURIComponent(item.file_id)}">Download</a>
+                </div>
+            `;
+        }).join('');
+    } catch (_err) {
+        container.innerHTML = '<p class="field-hint">Could not load recent exports.</p>';
+    }
+}
+
 async function extract(vendor) {
     const resultsSection = document.getElementById('results-section');
     resultsSection.hidden = true;
@@ -1800,39 +1892,29 @@ async function extract(vendor) {
         const response = await fetch('/api/cm-extractor/extract', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
             body: JSON.stringify(payload),
         });
         const data = await response.json();
+        if (response.status === 401) {
+            finishExtractProgress(false);
+            showNotification('PrimeNet session expired — refresh the page and sign in again.', 'error');
+            return;
+        }
         if (!data.success) {
             finishExtractProgress(false);
             showNotification(data.error || 'Extraction failed', 'error');
             return;
         }
-        lastFileId = data.file_id;
-        const sheetNames = data.sheet_names || [];
-        const sheetLabel = sheetNames.length
-            ? `${sheetNames.length} sheet(s): ${sheetNames.join(', ')}`
-            : '1 sheet';
-        document.getElementById('results-message').textContent =
-            `Ready — ${data.row_count} row(s) across ${sheetLabel}.`;
-        document.getElementById('results-summary').textContent = data.summary || '';
-        if (data.warnings?.length) {
-            document.getElementById('results-summary').textContent +=
-                ` Warnings: ${data.warnings.slice(0, 3).join('; ')}` +
-                (data.warnings.length > 3 ? ` …and ${data.warnings.length - 3} more` : '');
+        if (data.async) {
+            const finalData = await pollExtractStatus(data.file_id);
+            showExtractResults(finalData);
+            return;
         }
-        finishExtractProgress(true);
-        resultsSection.hidden = false;
-        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        const notifyMsg = data.warnings?.length
-            ? `Extraction complete with ${data.warnings.length} warning(s)`
-            : (sheetNames.length > 1
-                ? `Extraction complete — ${sheetNames.length} sheets`
-                : 'Extraction complete');
-        showNotification(notifyMsg, data.warnings?.length ? 'warning' : 'success');
+        showExtractResults(data);
     } catch (error) {
         finishExtractProgress(false);
-        showNotification('Extraction failed', 'error');
+        showNotification(error.message || 'Extraction failed', 'error');
     } finally {
         stopControllerExtractPhaseTimer();
     }
@@ -1907,6 +1989,7 @@ function setupScheduler() {
 
     document.getElementById('scheduler-new-btn').addEventListener('click', openScheduleModal);
     document.getElementById('scheduler-refresh-btn').addEventListener('click', loadScheduledJobs);
+    document.getElementById('recent-exports-refresh-btn')?.addEventListener('click', loadRecentExports);
     document.getElementById('schedule-modal-close').addEventListener('click', closeScheduleModal);
     document.getElementById('schedule-modal-cancel').addEventListener('click', closeScheduleModal);
     document.getElementById('sched-job-create-btn').addEventListener('click', createScheduledJob);
@@ -1947,6 +2030,7 @@ function setupScheduler() {
     onSchedScheduleTypeChange();
     updateSchedStoragePreview();
     loadScheduledJobs();
+    loadRecentExports();
     startJobNotificationPolling();
 }
 

@@ -117,9 +117,9 @@
     var SCENE_PALETTES = {
         radar: {
             light: {
-                bgTop: '#ffffff', bgBottom: '#000000',
-                tint: 'rgba(185, 185, 185, 0.8)',
-                accent: '#0b1c30', accentSoft: '#030405', grid: '#030405'
+                bgTop: '#f5f7fa', bgBottom: '#e3edf5',
+                tint: 'rgba(127, 166, 194, 0.14)',
+                accent: '#6d95b3', accentSoft: '#8fb1ca', grid: '#7fa6c2'
             },
             dark: {
                 bgTop: '#020617', bgBottom: '#061336',
@@ -129,9 +129,9 @@
         },
         sonar: {
             light: {
-                bgTop: '#ffffff', bgBottom: '#000000',
-                tint: 'rgba(91, 176, 255, 0.59)',
-                accent: '#0b1c30', accentSoft: '#030405', grid: '#030405'
+                bgTop: '#eef5fc', bgBottom: '#d6e6f5',
+                tint: 'rgba(143, 177, 202, 0.16)',
+                accent: '#6d95b3', accentSoft: '#8fb1ca', grid: '#7fa6c2'
             },
             dark: {
                 bgTop: '#021a14', bgBottom: '#042f2a',
@@ -141,9 +141,9 @@
         },
         stars: {
             light: {
-                bgTop: '#ffffff', bgBottom: '#000000',
-                tint: 'rgba(255, 255, 255, 0.5)',
-                accent: '#0b1c30', accentSoft: '#030405', grid: '#030405'
+                bgTop: '#f5f7fa', bgBottom: '#e8f0f8',
+                tint: 'rgba(180, 205, 224, 0.22)',
+                accent: '#6d95b3', accentSoft: '#8fb1ca', grid: '#7fa6c2'
             },
             dark: {
                 bgTop: '#0b0718', bgBottom: '#15082a',
@@ -153,9 +153,9 @@
         },
         hexmesh: {
             light: {
-                bgTop: '#ffffff', bgBottom: '#000000',
-                tint: 'rgba(0, 183, 255, 0.1)',
-                accent: '#ffffff', accentSoft: '#ffffff', grid: '#7dd3fc'
+                bgTop: '#ffffff', bgBottom: '#eef5fc',
+                tint: 'rgba(127, 166, 194, 0.1)',
+                accent: '#7fa6c2', accentSoft: '#b4cde0', grid: '#8fb1ca'
             },
             dark: {
                 bgTop: '#020617', bgBottom: '#031028',
@@ -262,7 +262,7 @@
                             ctx.beginPath();
                             ctx.moveTo(n.x, n.y);
                             ctx.lineTo(m.x, m.y);
-                            ctx.strokeStyle = 'rgba(125,211,252,' + (0.10 * (1 - Math.sqrt(d2) / 110)).toFixed(3) + ')';
+                            ctx.strokeStyle = rgba(pal.accentSoft, 0.10 * (1 - Math.sqrt(d2) / 110));
                             ctx.lineWidth = 1;
                             ctx.stroke();
                         }
@@ -273,7 +273,7 @@
                         ctx.beginPath();
                         ctx.moveTo(n.x, n.y);
                         ctx.lineTo(mouse.x, mouse.y);
-                        ctx.strokeStyle = 'rgba(56,189,248,' + (0.22 * (1 - dist / 170)).toFixed(3) + ')';
+                        ctx.strokeStyle = rgba(pal.accent, 0.22 * (1 - dist / 170));
                         ctx.lineWidth = 1;
                         ctx.stroke();
                     }
@@ -464,7 +464,7 @@
                 pal = pal || scenePalette('stars');
                 var offX = (mouse.x > -1e3 ? (mouse.x - vw / 2) : 0) * 0.012;
                 var offY = (mouse.y > -1e3 ? (mouse.y - vh / 2) : 0) * 0.012;
-                var starFill = document.body.classList.contains('dark-mode') ? '226,238,255' : '30,41,59';
+                var starFill = document.body.classList.contains('dark-mode') ? '226,238,255' : '44,62,80';
 
                 for (var i = 0; i < this.field.length; i++) {
                     var st = this.field[i];

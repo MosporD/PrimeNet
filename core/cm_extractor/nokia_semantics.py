@@ -1496,28 +1496,34 @@ def export_nokia_selection_to_excel(
     scope_level: str = 'MRBTS',
     conf_id: int = 1,
 ) -> tuple[int, list[str], str]:
+    from core.cm_extractor.config import build_nokia_operations_client, nokia_export_ssh_settings
+    from core.cm_extractor.nokia_bulk_export import (
+        NokiaBulkExportError,
+        export_controller_selection_to_excel,
+    )
+    from core.cm_extractor.nokia_bulk_routing import should_use_bulk_export
+
     level = normalize_scope_level(scope_level)
 
-    if level in ('RNC', 'BSC'):
-        from core.cm_extractor.config import build_nokia_operations_client, nokia_export_ssh_settings
-        from core.cm_extractor.nokia_bulk_export import (
-            NokiaBulkExportError,
-            export_controller_selection_to_excel,
-        )
-
-        if nokia_export_ssh_settings().get('configured'):
-            try:
-                ops_client = build_nokia_operations_client()
-                return export_controller_selection_to_excel(
-                    client,
-                    ops_client,
-                    output_path,
-                    scope_level=level,
-                    site_ids=site_ids,
-                    selections=selections,
-                )
-            except NokiaBulkExportError as exc:
+    if should_use_bulk_export(scope_level=level, site_ids=site_ids, selections=selections):
+        try:
+            ops_client = build_nokia_operations_client()
+            row_count, sheet_names, summary = export_controller_selection_to_excel(
+                client,
+                ops_client,
+                output_path,
+                scope_level=level,
+                site_ids=site_ids,
+                selections=selections,
+            )
+            return row_count, sheet_names, summary, 'bulk_operations'
+        except NokiaBulkExportError as exc:
+            if level in ('RNC', 'BSC'):
                 raise NokiaCmError(str(exc)) from exc
+            import logging
+            logging.getLogger(__name__).warning(
+                'MRBTS bulk export failed, falling back to Open API: %s', exc,
+            )
 
     sheets, total_rows, sheet_names, warnings = extract_nokia_selection(
         client,
@@ -1532,6 +1538,12 @@ def export_nokia_selection_to_excel(
             'SFTP is not configured — RNC/BSC extract used CM Open API, which returns '
             'only a subset of MO instances on this NetAct. Set NOKIA_CM_SSH_* or '
             'NOKIA_PM_* (OMC ftpuser) for complete CM Operations export.',
+        )
+    elif should_use_bulk_export(scope_level=level, site_ids=site_ids, selections=selections):
+        warnings.insert(
+            0,
+            'CM Operations bulk export failed or was skipped — used CM Open API instead. '
+            'Large exports may be slower and can rate-limit NetAct.',
         )
     write_nokia_multi_sheet_excel(output_path, sheets)
 
@@ -1549,4 +1561,4 @@ def export_nokia_selection_to_excel(
     )
     if warnings:
         summary += ' Note: ' + ' '.join(warnings)
-    return total_rows, sheet_names, summary
+    return total_rows, sheet_names, summary, 'selection'
