@@ -63,3 +63,65 @@ def is_percentage_kpi(column_name: str) -> bool:
 def filter_absolute_kpis(columns: list[str]) -> list[str]:
     """Keep only non-percentage KPI column names, preserving order."""
     return [c for c in columns if not is_percentage_kpi(c)]
+
+
+# Static PM identifier columns — not performance KPIs.
+_META_LITERAL_DENY = frozenset({
+    "plmn name",
+    "rnc name",
+    "cell name",
+    "site name",
+    "nodeb name",
+    "enodeb name",
+    "enb name",
+    "gnodeb name",
+    "nr name",
+    "bts name",
+    "wbts name",
+    "timestamp",
+    "cell_name",
+    "site_name",
+    "time",
+    "date",
+})
+
+_META_REGEXES: tuple[re.Pattern[str], ...] = tuple(
+    re.compile(p, re.IGNORECASE)
+    for p in (
+        r"\bplmn\b",
+        r"\brnc\s+name\b",
+        r"\bcell\s+name\b",
+        r"\bsite\s+name\b",
+        r"\bnodeb\s+name\b",
+        r"\benodeb\s+name\b",
+        r"\bintegrity\b",
+        r"\bduplex\b",
+        r"\bindication\b",
+        r"\bindex\b",
+    )
+)
+
+
+def is_metadata_kpi(column_name: str) -> bool:
+    """True for identifier / dimension columns that are not benchmark KPIs."""
+    name = str(column_name or "").strip()
+    if not name:
+        return True
+    low = name.lower()
+    if low in _META_LITERAL_DENY:
+        return True
+    for rx in _META_REGEXES:
+        if rx.search(name):
+            return True
+    return False
+
+
+def filter_metadata_kpis(columns: list[str]) -> list[str]:
+    """Drop metadata / identifier columns, preserving order."""
+    return [c for c in columns if not is_metadata_kpi(c)]
+
+
+def filter_network_health_kpis(columns: list[str], *, exclude_percentage: bool = True) -> list[str]:
+    """Benchmark KPIs only: optional %/rate exclusion, always drop metadata identifiers."""
+    base = filter_absolute_kpis(columns) if exclude_percentage else list(columns)
+    return filter_metadata_kpis(base)

@@ -181,9 +181,28 @@ document.getElementById('nokia-area-select').addEventListener('change', () => {
     if (document.getElementById('nokia-area-filter-list')?.checked) renderSiteList();
 });
 loadCmExtractorDefaults();
-loadNokiaSites();
-loadNokiaAreas();
+initNokiaCatalog();
 loadMoClasses();
+
+async function initNokiaCatalog() {
+    await reconcileNokiaInventory();
+    await loadNokiaSites();
+}
+
+async function reconcileNokiaInventory() {
+    try {
+        const response = await fetch('/api/cm-extractor/nokia/reconcile', {
+            method: 'POST',
+            credentials: 'same-origin',
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            console.warn('Nokia inventory reconcile skipped:', data.error || response.status);
+        }
+    } catch (error) {
+        console.warn('Nokia inventory reconcile failed:', error);
+    }
+}
 
 const SCOPE_PASTE_PLACEHOLDER = {
     MRBTS: 'Paste MRBTS ids (comma, space, or new line)\ne.g. 101, 102, 1211',
@@ -349,6 +368,15 @@ function parsePastedSiteIds(text) {
     )];
 }
 
+function resolveNokiaCatalogSiteId(id) {
+    const token = String(id || '').trim();
+    if (!token) return token;
+    const direct = nokiaSiteCatalog.find((site) => site.site_id === token);
+    if (direct) return direct.site_id;
+    const byMetadata = nokiaSiteCatalog.find((site) => site.metadata_site_id === token);
+    return byMetadata ? byMetadata.site_id : token;
+}
+
 function applyPastedSiteIds() {
     const ids = parsePastedSiteIds(document.getElementById('nokia-site-paste').value);
     const statusEl = document.getElementById('nokia-site-paste-status');
@@ -361,8 +389,9 @@ function applyPastedSiteIds() {
     const known = new Set(nokiaSiteCatalog.map((site) => site.site_id));
     const unknown = [];
     ids.forEach((id) => {
-        selectedSiteIds.add(id);
-        if (!known.has(id)) unknown.push(id);
+        const resolvedId = resolveNokiaCatalogSiteId(id);
+        selectedSiteIds.add(resolvedId);
+        if (!known.has(resolvedId)) unknown.push(id);
     });
 
     renderSiteList();
@@ -389,7 +418,7 @@ async function loadNokiaSites() {
 
     try {
         const scope = encodeURIComponent(getScopeLevel());
-        const response = await fetch(`/api/cm-extractor/nokia/sites?scope=${scope}&limit=3000`, {
+        const response = await fetch(`/api/cm-extractor/nokia/sites?scope=${scope}&limit=3000&v=2`, {
             credentials: 'same-origin',
         });
         const data = await response.json();
@@ -400,6 +429,7 @@ async function loadNokiaSites() {
         if (!nokiaSiteCatalog.length) {
             throw new Error(`No ${getScopeLevel()} entries found in the database. Run metadata sync first.`);
         }
+        await loadNokiaAreas();
         listEl.hidden = false;
         renderSiteList();
     } catch (error) {
@@ -416,7 +446,7 @@ async function loadNokiaAreas() {
     if (!select || !row) return;
     try {
         const scope = encodeURIComponent(getScopeLevel());
-        const response = await fetch(`/api/cm-extractor/nokia/areas?scope=${scope}`, {
+        const response = await fetch(`/api/cm-extractor/nokia/areas?scope=${scope}&v=2`, {
             credentials: 'same-origin',
         });
         const data = await response.json();
@@ -470,7 +500,7 @@ function filteredSites() {
     return nokiaSiteCatalog.filter((site) => {
         if (area && site.area !== area) return false;
         if (!query) return true;
-        const hay = `${site.site_id} ${site.site_name} ${site.label} ${site.area || ''} ${site.cluster || ''}`.toLowerCase();
+        const hay = `${site.site_id} ${site.metadata_site_id || ''} ${site.site_name} ${site.label} ${site.area || ''} ${site.cluster || ''}`.toLowerCase();
         return hay.includes(query);
     });
 }
@@ -994,14 +1024,42 @@ function renderHuaweiParameterGroups() {
             });
         });
     });
+    filterHuaweiParameterList();
+}
+
+function _paramLabelMatchesQuery(label, query) {
+    if (!query) return true;
+    const paramId = (label.dataset.paramId || '').toLowerCase();
+    const title = (label.getAttribute('title') || '').toLowerCase();
+    const text = (label.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    return paramId.includes(query) || title.includes(query) || text.includes(query);
+}
+
+function _applyParamGroupVisibility(groupsRoot) {
+    if (!groupsRoot) return;
+    groupsRoot.querySelectorAll('.param-mo-group, .param-group-block').forEach((block) => {
+        if (block.querySelector('.full-mo-note')) {
+            block.hidden = false;
+            return;
+        }
+        const checks = block.querySelectorAll('.param-check, .param-checkbox');
+        if (!checks.length) {
+            block.hidden = false;
+            return;
+        }
+        const anyVisible = [...checks].some((el) => !el.hidden);
+        block.hidden = !anyVisible;
+    });
 }
 
 function filterHuaweiParameterList() {
-    const query = document.getElementById('huawei-param-search').value.trim().toLowerCase();
-    document.querySelectorAll('#huawei-param-groups .param-checkbox').forEach((label) => {
-        const paramId = (label.dataset.paramId || '').toLowerCase();
-        label.hidden = Boolean(query && !paramId.includes(query));
+    const query = (document.getElementById('huawei-param-search')?.value || '').trim().toLowerCase();
+    const groupsEl = document.getElementById('huawei-param-groups');
+    if (!groupsEl) return;
+    groupsEl.querySelectorAll('.param-checkbox').forEach((label) => {
+        label.hidden = Boolean(query && !_paramLabelMatchesQuery(label, query));
     });
+    _applyParamGroupVisibility(groupsEl);
 }
 
 function buildHuaweiSelections() {
@@ -1064,13 +1122,10 @@ function buildHuaweiNeNamesFromSelection() {
 }
 
 function buildHuaweiPayload() {
-    const neNames = buildHuaweiNeNamesFromSelection();
-    const siteIds = [...selectedHuaweiSiteIds];
     return {
         ...huaweiPayload(),
         scope_level: getHuaweiScopeLevel(),
-        site_ids: siteIds,
-        ne_names: neNames.length === siteIds.length ? neNames : [],
+        site_ids: [...selectedHuaweiSiteIds],
         selections: buildHuaweiSelections(),
     };
 }
@@ -1400,10 +1455,12 @@ async function refreshParameterPanels() {
 
 function filterParameterList() {
     const query = (document.getElementById('nokia-param-search')?.value || '').trim().toLowerCase();
-    document.querySelectorAll('.param-check').forEach((label) => {
-        const paramId = (label.dataset.paramId || '').toLowerCase();
-        label.hidden = Boolean(query && !paramId.includes(query));
+    const groupsEl = document.getElementById('nokia-param-groups');
+    if (!groupsEl) return;
+    groupsEl.querySelectorAll('.param-check').forEach((label) => {
+        label.hidden = Boolean(query && !_paramLabelMatchesQuery(label, query));
     });
+    _applyParamGroupVisibility(groupsEl);
 }
 
 function buildNokiaSelections() {
@@ -1895,10 +1952,26 @@ async function extract(vendor) {
             credentials: 'same-origin',
             body: JSON.stringify(payload),
         });
-        const data = await response.json();
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (_) {
+            data = {};
+        }
         if (response.status === 401) {
             finishExtractProgress(false);
             showNotification('PrimeNet session expired — refresh the page and sign in again.', 'error');
+            return;
+        }
+        if (!response.ok) {
+            finishExtractProgress(false);
+            const payloadMsg = data.error || '';
+            const hint = response.status === 413
+                ? 'Request too large — try fewer sites, fewer parameters per MO, or use Full MO export.'
+                : (response.status === 400 && /too many items/i.test(payloadMsg)
+                    ? 'Too many sites or parameters in one request — try fewer sites or Full MO export.'
+                    : '');
+            showNotification(payloadMsg || hint || `Extraction failed (HTTP ${response.status})`, 'error');
             return;
         }
         if (!data.success) {
@@ -2214,7 +2287,7 @@ function schedFilteredSites() {
     const query = (document.getElementById('sched-site-search')?.value || '').trim().toLowerCase();
     return schedState.siteCatalog.filter((site) => {
         if (!query) return true;
-        const hay = `${site.site_id} ${site.site_name || ''} ${site.label || ''} ${site.area || ''}`.toLowerCase();
+        const hay = `${site.site_id} ${site.metadata_site_id || ''} ${site.site_name || ''} ${site.label || ''} ${site.area || ''}`.toLowerCase();
         return hay.includes(query);
     });
 }
@@ -2271,7 +2344,10 @@ function schedApplyPastedSites() {
         statusEl.textContent = 'No IDs found in pasted text.';
         return;
     }
-    ids.forEach((id) => schedState.selectedSiteIds.add(id));
+    ids.forEach((id) => {
+        const resolvedId = schedState.vendor === 'huawei' ? id : resolveNokiaCatalogSiteId(id);
+        schedState.selectedSiteIds.add(resolvedId);
+    });
     schedRenderSiteList();
     statusEl.hidden = false;
     statusEl.textContent = `Added ${ids.length} id(s).`;

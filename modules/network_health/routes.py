@@ -83,7 +83,6 @@ def network_health_select():
     return render_template(
         "network_health_select.html",
         user=format_user(user),
-        stage_label="Development Stage",
         rats=cfg.RAT_OPTIONS,
         vendors=cfg.VENDOR_OPTIONS,
         default_rat=cfg.DEFAULT_RAT,
@@ -102,11 +101,12 @@ def network_health_view():
     return render_template(
         "network_health.html",
         user=format_user(user),
-        stage_label="Development Stage",
         vendor=vendor,
         vendor_label=vendor_cfg.get("label", vendor.title()),
         rat=rat,
         rat_label=rat_cfg.get("label", rat),
+        vendors=cfg.VENDOR_OPTIONS,
+        rats=cfg.RAT_OPTIONS,
     )
 
 

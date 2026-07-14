@@ -287,7 +287,7 @@ def _compute_precomputed_table_runtime(
 
 def list_kpi_columns(vendor: str, rat: str) -> list[str]:
     """KPI column names with PM data for the selected vendor + RAT (daily scope)."""
-    cache_key = f"{vendor}|{rat}|no_pct_v1"
+    cache_key = f"{vendor}|{rat}|nh_kpi_v2"
     now = time.time()
     cached = _KPI_CACHE.get("data") or {}
     if (
@@ -319,10 +319,9 @@ def list_kpi_columns(vendor: str, rat: str) -> list[str]:
             merged.append(name)
 
     out = _drop_duplicate_kpis(sorted(merged, key=lambda s: s.lower()))
-    if cfg.EXCLUDE_PERCENTAGE_KPIS:
-        from .kpi_filter import filter_absolute_kpis
+    from .kpi_filter import filter_network_health_kpis
 
-        out = filter_absolute_kpis(out)
+    out = filter_network_health_kpis(out, exclude_percentage=cfg.EXCLUDE_PERCENTAGE_KPIS)
     data = dict(cached)
     data[cache_key] = out
     _KPI_CACHE["data"] = data

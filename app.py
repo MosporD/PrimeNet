@@ -274,7 +274,10 @@ def validate_and_sanitize_request_input():
     - Provide sanitized payloads via flask.g for route handlers.
     """
     max_query_len = 4096
-    max_json_bytes = 1_000_000
+    path = (request.path or '').lower()
+    is_cm_extractor_api = path.startswith('/api/cm-extractor/')
+    max_json_bytes = 8_000_000 if is_cm_extractor_api else 1_000_000
+    max_json_items = 100_000 if is_cm_extractor_api else 5_000
     max_form_bytes = 1_000_000
     if len(request.query_string or b"") > max_query_len:
         return jsonify({'error': 'Query string too large'}), 413
@@ -316,7 +319,7 @@ def validate_and_sanitize_request_input():
                 g.sanitized_json = sanitize_json(
                     parsed,
                     max_depth=10,
-                    max_items=5000,
+                    max_items=max_json_items,
                     max_key_len=128,
                     max_str_len=4096,
                 )

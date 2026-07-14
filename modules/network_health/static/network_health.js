@@ -14,6 +14,7 @@
         area: '',
         cluster: null,
         sort: 'increased',
+        columnSort: { field: 'delta', dir: 'desc' },
         cellFilter: '',
         selectedCell: null,
         cells: [],
@@ -37,27 +38,9 @@
         return n.toFixed(2);
     }
 
-    function showPrecalcStaleBanner(stale, vendorKey, ratKey) {
-        let el = document.getElementById('nh-precalc-stale-banner');
-        if (!stale) {
-            if (el) el.remove();
-            return;
-        }
-        if (!el) {
-            el = document.createElement('div');
-            el.id = 'nh-precalc-stale-banner';
-            el.className = 'nh-precalc-stale-banner';
-            const header = document.querySelector('.nh-header');
-            if (header && header.nextSibling) {
-                header.parentNode.insertBefore(el, header.nextSibling);
-            } else {
-                body.insertBefore(el, body.firstChild);
-            }
-        }
-        el.textContent =
-            'PM data changed since last precalc — showing cached tables. ' +
-            'Rebuild: python scripts/build_network_health_precalc.py --vendor ' +
-            vendorKey + ' --rat ' + ratKey;
+    function showPrecalcStaleBanner() {
+        const el = document.getElementById('nh-precalc-stale-banner');
+        if (el) el.remove();
     }
 
     function shortKpiLabel(name, maxLen) {
@@ -366,7 +349,7 @@
         if (resetSelection) state.selectedCell = null;
         const rows = filterTableRows(state.tableByKpi[state.kpi] || []);
         state.cells = rows;
-        renderTable(sortCells(rows, state.sort), { keepSelection: !resetSelection });
+        renderTable(sortRows(rows), { keepSelection: !resetSelection });
     }
 
     async function loadPrecalcStatus() {
@@ -408,7 +391,7 @@
                 state.precomputedKpis[k] = true;
             });
             state.totalKpiCount = data.total_kpi_count || state.kpis.length;
-            showPrecalcStaleBanner(data.precalc_stale, vendor, rat);
+            showPrecalcStaleBanner();
             if (loading) loading.hidden = true;
             if (!state.kpi) {
                 const pre = data.precomputed_kpis || [];
@@ -507,15 +490,33 @@
         return vals.pre.toFixed(2) === vals.post.toFixed(2);
     }
 
-    function sortCells(rows, mode) {
+    function rowNumericField(row, field) {
+        if (field === 'pre') return prePostValues(row).pre;
+        if (field === 'post') return prePostValues(row).post;
+        if (field === 'delta') {
+            const n = Number(row.delta);
+            return Number.isNaN(n) ? null : n;
+        }
+        return null;
+    }
+
+    function updateSortHeaderUi() {
+        const field = state.columnSort.field || 'delta';
+        const dir = state.columnSort.dir || 'desc';
+        document.querySelectorAll('.nh-sort-th').forEach(function (btn) {
+            const active = btn.dataset.sort === field;
+            btn.classList.toggle('active', active);
+            const icon = btn.querySelector('.nh-sort-icon');
+            if (icon) icon.textContent = active ? (dir === 'asc' ? '▲' : '▼') : '';
+        });
+    }
+
+    function sortRows(rows) {
         const list = (rows || []).slice();
-        const m = (mode || 'increased').toLowerCase();
-        if (m === 'decreased') {
-            list.sort(function (a, b) {
-                const d = Number(a.delta || 0) - Number(b.delta || 0);
-                return d !== 0 ? d : String(a.cell_name || '').localeCompare(String(b.cell_name || ''));
-            });
-        } else if (m === 'no_change') {
+        const field = state.columnSort.field || 'delta';
+        const asc = state.columnSort.dir === 'asc';
+
+        if (state.sort === 'no_change' && field === 'delta') {
             list.sort(function (a, b) {
                 const aNc = isNoChangeRow(a) ? 0 : 1;
                 const bNc = isNoChangeRow(b) ? 0 : 1;
@@ -523,12 +524,28 @@
                 const d = Math.abs(Number(a.delta || 0)) - Math.abs(Number(b.delta || 0));
                 return d !== 0 ? d : String(a.cell_name || '').localeCompare(String(b.cell_name || ''));
             });
-        } else {
-            list.sort(function (a, b) {
-                const d = Number(b.delta || 0) - Number(a.delta || 0);
-                return d !== 0 ? d : String(a.cell_name || '').localeCompare(String(b.cell_name || ''));
-            });
+            return list;
         }
+
+        if (field === 'cell_name') {
+            list.sort(function (a, b) {
+                const c = String(a.cell_name || '').localeCompare(String(b.cell_name || ''));
+                return asc ? c : -c;
+            });
+            return list;
+        }
+
+        list.sort(function (a, b) {
+            const av = rowNumericField(a, field);
+            const bv = rowNumericField(b, field);
+            if (av == null && bv == null) {
+                return String(a.cell_name || '').localeCompare(String(b.cell_name || ''));
+            }
+            if (av == null) return 1;
+            if (bv == null) return -1;
+            if (av !== bv) return asc ? av - bv : bv - av;
+            return String(a.cell_name || '').localeCompare(String(b.cell_name || ''));
+        });
         return list;
     }
 
@@ -572,6 +589,50 @@
         refreshTable(true);
     }
 
+    function exportTableCsv() {
+        if (!state.kpi) {
+            showNotification('Select a KPI first', 'info');
+            return;
+        }
+        const rows = sortRows(filterTableRows(state.tableByKpi[state.kpi] || []));
+        if (!rows.length) {
+            showNotification('No rows to export', 'info');
+            return;
+        }
+        const escCsv = function (v) {
+            const s = v == null ? '' : String(v);
+            if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+            return s;
+        };
+        const lines = [
+            ['KPI', 'Cell Name', 'Pre', 'Post', 'Delta', 'Area', 'Cluster', 'RNC', 'Vendor'].map(escCsv).join(','),
+        ];
+        rows.forEach(function (r) {
+            const vals = prePostValues(r);
+            lines.push([
+                state.kpi,
+                r.cell_name,
+                vals.pre != null ? vals.pre : (r.week_avg != null ? r.week_avg : ''),
+                vals.post != null ? vals.post : (r.today_value != null ? r.today_value : ''),
+                r.delta,
+                r.area || '',
+                r.cluster != null ? r.cluster : '',
+                r.rnc || '',
+                r.vendor || '',
+            ].map(escCsv).join(','));
+        });
+        const blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const safeKpi = String(state.kpi).replace(/[^\w.-]+/g, '_').slice(0, 40);
+        a.href = url;
+        a.download = 'network_health_' + vendor + '_' + rat + '_' + safeKpi + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
     function destroyChart(key) {
         if (state.charts[key]) {
             state.charts[key].destroy();
@@ -593,6 +654,13 @@
         }
     }
 
+    function chartTheme() {
+        const dark = document.body?.classList?.contains('dark-mode');
+        return dark
+            ? { tick: '#a9b7c9', grid: 'rgba(148, 163, 184, 0.12)', legend: '#d8e2ef' }
+            : { tick: '#6d7f92', grid: 'rgba(127, 166, 194, 0.16)', legend: '#2c3e50' };
+    }
+
     function buildChart(canvasId, key, labels, avgValues, linearValues, yLabel, seriesLabel) {
         destroyChart(key);
         setChartEmpty(canvasId, canvasId + '-empty', false);
@@ -601,10 +669,8 @@
 
         const prefix = seriesLabel || (key === 'hourly' ? 'Hourly' : 'Daily');
         const ctx = canvas.getContext('2d');
-        const dark = document.body?.classList?.contains('dark-mode');
-        const tickColor = dark ? '#a9b7c9' : '#6d95b3';
-        const gridColor = dark ? 'rgba(148, 163, 184, 0.12)' : '#e3edf5';
-        const legendColor = dark ? '#d8e2ef' : '#2c3e50';
+        const theme = chartTheme();
+        const isHourly = key === 'hourly';
         state.charts[key] = new Chart(ctx, {
             type: 'line',
             data: {
@@ -614,10 +680,12 @@
                         label: prefix + ' · ' + yLabel,
                         data: avgValues,
                         borderColor: '#7fa6c2',
-                        backgroundColor: 'rgba(127, 166, 194, 0.08)',
-                        borderWidth: 2,
+                        backgroundColor: 'rgba(127, 166, 194, 0.12)',
+                        borderWidth: 2.5,
                         pointRadius: 0,
-                        tension: 0.25,
+                        pointHoverRadius: 3,
+                        tension: 0.28,
+                        fill: true,
                     },
                     {
                         label: prefix + ' trend',
@@ -625,7 +693,7 @@
                         borderColor: '#6d95b3',
                         backgroundColor: 'transparent',
                         borderWidth: 1.5,
-                        borderDash: [4, 3],
+                        borderDash: [5, 4],
                         pointRadius: 0,
                         tension: 0,
                     },
@@ -633,23 +701,45 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 2.2,
-                layout: { padding: { top: 4, right: 8, bottom: 0, left: 0 } },
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                layout: { padding: { top: 6, right: 10, bottom: 2, left: 4 } },
                 plugins: {
                     legend: {
                         display: true,
-                        labels: { color: legendColor, boxWidth: 14, font: { size: 11 } },
+                        position: 'top',
+                        align: 'start',
+                        labels: {
+                            color: theme.legend,
+                            boxWidth: 12,
+                            font: { size: 11, weight: '600' },
+                            padding: 10,
+                        },
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function (items) {
+                                if (!items.length) return '';
+                                const idx = items[0].dataIndex;
+                                return String(labels[idx] || '');
+                            },
+                        },
                     },
                 },
                 scales: {
                     x: {
-                        ticks: { color: tickColor, maxTicksLimit: 8, font: { size: 10 } },
-                        grid: { color: gridColor },
+                        ticks: {
+                            color: theme.tick,
+                            maxTicksLimit: isHourly ? 8 : 10,
+                            maxRotation: 0,
+                            autoSkip: true,
+                            font: { size: 10 },
+                        },
+                        grid: { color: theme.grid },
                     },
                     y: {
-                        ticks: { color: tickColor, font: { size: 10 } },
-                        grid: { color: gridColor },
+                        ticks: { color: theme.tick, font: { size: 10 } },
+                        grid: { color: theme.grid },
                     },
                 },
             },
@@ -714,17 +804,16 @@
             }
 
             if (data.hourly && data.hourly.length) {
-                const step = Math.max(1, Math.ceil(data.hourly.length / 10));
-                const labels = data.hourly.map(function (p, i) {
-                    if (i % step !== 0) return '';
+                const hourly = data.hourly;
+                const labels = hourly.map(function (p) {
                     return formatHourlyTick(p.timestamp);
                 });
                 buildChart(
                     'nh-chart-hourly',
                     'hourly',
                     labels,
-                    data.hourly.map(function (p) { return p.value; }),
-                    data.hourly.map(function (p) { return p.linear; }),
+                    hourly.map(function (p) { return p.value; }),
+                    hourly.map(function (p) { return p.linear; }),
                     kpiLabel,
                     'Hourly'
                 );
@@ -760,11 +849,55 @@
         document.getElementById('nh-cell-search')?.addEventListener('keydown', function (ev) {
             if (ev.key !== 'Enter') return;
             ev.preventDefault();
-            const rows = sortCells(filterTableRows(state.tableByKpi[state.kpi] || []), state.sort);
+            const rows = sortRows(filterTableRows(state.tableByKpi[state.kpi] || []));
             if (rows.length) {
                 selectCell(rows[0].cell_name, { scroll: true });
             }
         });
+
+        document.getElementById('nh-export-btn')?.addEventListener('click', exportTableCsv);
+
+        document.querySelectorAll('.nh-sort-th').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                const field = btn.dataset.sort || 'delta';
+                if (state.columnSort.field === field) {
+                    state.columnSort.dir = state.columnSort.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    state.columnSort.field = field;
+                    state.columnSort.dir = field === 'cell_name' ? 'asc' : 'desc';
+                }
+                if (field === 'delta') {
+                    state.sort = state.columnSort.dir === 'asc' ? 'decreased' : 'increased';
+                    document.querySelectorAll('.nh-change-btn').forEach(function (b) {
+                        b.classList.toggle('active', b.dataset.change === state.sort);
+                    });
+                } else {
+                    document.querySelectorAll('.nh-change-btn').forEach(function (b) {
+                        b.classList.remove('active');
+                    });
+                }
+                updateSortHeaderUi();
+                refreshTable(false);
+            });
+        });
+
+        const contextBtn = document.getElementById('nh-context-switch-btn');
+        const contextMenu = document.getElementById('nh-context-menu');
+        if (contextBtn && contextMenu) {
+            contextBtn.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                const open = !contextMenu.hidden;
+                contextMenu.hidden = open;
+                contextBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+            });
+            document.addEventListener('click', function () {
+                contextMenu.hidden = true;
+                contextBtn.setAttribute('aria-expanded', 'false');
+            });
+            contextMenu.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+            });
+        }
 
         document.getElementById('nh-area-list')?.addEventListener('click', function (ev) {
             const btn = ev.target.closest('.nh-area-btn');
@@ -791,9 +924,17 @@
         document.querySelectorAll('.nh-change-btn').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 state.sort = btn.dataset.change || 'increased';
+                if (state.sort === 'decreased') {
+                    state.columnSort = { field: 'delta', dir: 'asc' };
+                } else if (state.sort === 'increased') {
+                    state.columnSort = { field: 'delta', dir: 'desc' };
+                } else {
+                    state.columnSort = { field: 'delta', dir: 'desc' };
+                }
                 document.querySelectorAll('.nh-change-btn').forEach(function (b) {
                     b.classList.toggle('active', b === btn);
                 });
+                updateSortHeaderUi();
                 refreshTable(false);
             });
         });
@@ -811,6 +952,7 @@
             el.remove();
         });
         bindEvents();
+        updateSortHeaderUi();
         loadAreas().then(function () {
             loadClusters().then(loadKpis);
         });

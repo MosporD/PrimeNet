@@ -558,15 +558,50 @@ def nokia_areas():
 
     scope_level = (request.args.get('scope') or 'MRBTS').strip().upper()
     try:
+        from core.cm_extractor.nokia_discovery import _METADATA_ENRICHMENT_VERSION
+
         areas = list_nokia_inventory_areas(scope_level=scope_level)
         return jsonify({
             'success': True,
             'areas': areas,
             'count': len(areas),
             'scope_level': scope_level,
+            'enrichment_version': _METADATA_ENRICHMENT_VERSION,
         })
     except Exception as exc:
         return jsonify({'success': False, 'error': f'Failed to load areas: {exc}'}), 500
+
+
+@cm_extractor_bp.route('/api/cm-extractor/nokia/reconcile', methods=['POST'])
+def nokia_reconcile_inventory():
+    """Reload NetAct inventory from disk and re-apply metadata area mapping."""
+    user = get_current_user()
+    if not user:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    try:
+        from core.cm_extractor.nokia_discovery import (
+            _METADATA_ENRICHMENT_VERSION,
+            ensure_nokia_inventory_enriched,
+            reload_inventory_from_disk,
+        )
+
+        reload_inventory_from_disk(force=True)
+        changed = ensure_nokia_inventory_enriched(persist=True)
+        areas = list_nokia_inventory_areas(scope_level='MRBTS')
+        south_jordan = next(
+            (row for row in areas if row.get('area') == 'South Jordan'),
+            None,
+        )
+        return jsonify({
+            'success': True,
+            'changed': changed,
+            'enrichment_version': _METADATA_ENRICHMENT_VERSION,
+            'south_jordan': south_jordan,
+            'area_count': len(areas),
+        })
+    except Exception as exc:
+        return jsonify({'success': False, 'error': f'Reconcile failed: {exc}'}), 500
 
 
 @cm_extractor_bp.route('/api/cm-extractor/nokia/discover', methods=['POST'])

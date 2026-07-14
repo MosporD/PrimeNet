@@ -10,9 +10,9 @@
 
     <title>PrimeNet — Network Health — {{ rat_label }} {{ vendor_label }}</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.3">
 
-    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=5.4">
+    <link rel="stylesheet" href="{{ url_for('network_health.static', filename='network_health.css') }}?v=5.6">
 
 </head>
 
@@ -30,23 +30,57 @@
 
         <div class="nh-header-left">
 
-            <a href="/network-health" class="nh-home-link" title="Change RAT / Vendor">&#8962;</a>
+            <a href="/dashboard" class="nh-home-link" title="Dashboard">&#8962;</a>
 
-            <div class="nh-context-badge">
+            <div class="nh-context-switcher">
 
-                <span class="nh-context-rat">{{ rat_label }}</span>
+                <button type="button" class="nh-context-badge nh-context-badge-btn" id="nh-context-switch-btn"
 
-                <span class="nh-context-sep">·</span>
+                        aria-haspopup="true" aria-expanded="false" aria-controls="nh-context-menu"
 
-                <span class="nh-context-vendor">{{ vendor_label }}</span>
+                        title="Switch vendor or RAT">
+
+                    <span class="nh-context-rat">{{ rat_label }}</span>
+
+                    <span class="nh-context-sep">·</span>
+
+                    <span class="nh-context-vendor">{{ vendor_label }}</span>
+
+                    <span class="nh-context-caret" aria-hidden="true">▾</span>
+
+                </button>
+
+                <div class="nh-context-menu" id="nh-context-menu" role="menu" hidden>
+
+                    {% for v in vendors %}
+
+                        {% for r in rats %}
+
+                    <a class="nh-context-menu-item{% if v.key == vendor and r.key == rat %} active{% endif %}"
+
+                       role="menuitem"
+
+                       href="/network-health/view?vendor={{ v.key }}&rat={{ r.key }}">
+
+                        <span class="nh-context-menu-rat">{{ r.label }}</span>
+
+                        <span class="nh-context-menu-sep">·</span>
+
+                        <span class="nh-context-menu-vendor">{{ v.label }}</span>
+
+                    </a>
+
+                        {% endfor %}
+
+                    {% endfor %}
+
+                </div>
 
             </div>
 
         </div>
 
         <div class="nh-header-right">
-
-            <span class="nh-stage-badge">{{ stage_label }}</span>
 
             <span class="nh-user">{{ user.username }}</span>
 
@@ -116,7 +150,7 @@
 
                 </label>
 
-                <div class="nh-change-filters" role="group" aria-label="Sort table">
+                <div class="nh-change-filters" role="group" aria-label="Quick sort by delta">
 
                     <button type="button" class="nh-change-btn" data-change="decreased">Decreased</button>
 
@@ -125,6 +159,12 @@
                     <button type="button" class="nh-change-btn" data-change="no_change">No Change</button>
 
                 </div>
+
+                <button type="button" class="nh-export-btn" id="nh-export-btn" title="Export visible table to CSV">
+
+                    Export CSV
+
+                </button>
 
             </div>
 
@@ -138,13 +178,13 @@
 
                         <tr>
 
-                            <th>Cell Name</th>
+                            <th><button type="button" class="nh-sort-th" data-sort="cell_name">Cell Name <span class="nh-sort-icon" aria-hidden="true"></span></button></th>
 
-                            <th class="num">Pre</th>
+                            <th class="num"><button type="button" class="nh-sort-th" data-sort="pre">Pre <span class="nh-sort-icon" aria-hidden="true"></span></button></th>
 
-                            <th class="num">Post</th>
+                            <th class="num"><button type="button" class="nh-sort-th" data-sort="post">Post <span class="nh-sort-icon" aria-hidden="true"></span></button></th>
 
-                            <th class="num">Delta</th>
+                            <th class="num"><button type="button" class="nh-sort-th active" data-sort="delta">Delta <span class="nh-sort-icon" aria-hidden="true">▼</span></button></th>
 
                         </tr>
 
@@ -168,26 +208,30 @@
 
             <div class="nh-chart-head" id="nh-chart-title">Select a cell</div>
 
-            <div class="nh-charts-row">
+            <div class="nh-charts-stack">
 
-                <div class="nh-chart-block">
+                <div class="nh-kpi-chart-card nh-chart-block">
 
-                    <div class="nh-chart-label">Daily</div>
+                    <div class="nh-kpi-chart-name">Daily</div>
 
                     <div class="nh-chart-canvas-wrap">
+
                         <canvas id="nh-chart-daily" aria-label="Daily KPI trend"></canvas>
+
                     </div>
 
                     <div class="nh-chart-empty" id="nh-chart-daily-empty" hidden>No daily data</div>
 
                 </div>
 
-                <div class="nh-chart-block">
+                <div class="nh-kpi-chart-card nh-chart-block">
 
-                    <div class="nh-chart-label">Hourly</div>
+                    <div class="nh-kpi-chart-name">Hourly</div>
 
                     <div class="nh-chart-canvas-wrap">
+
                         <canvas id="nh-chart-hourly" aria-label="Hourly KPI trend"></canvas>
+
                     </div>
 
                     <div class="nh-chart-empty" id="nh-chart-hourly-empty" hidden>No hourly data</div>
@@ -240,7 +284,7 @@
 
     <script src="{{ url_for('performance.static', filename='chart.umd.min.js') }}"></script>
 
-    <script src="{{ url_for('network_health.static', filename='network_health.js') }}?v=5.4"></script>
+    <script src="{{ url_for('network_health.static', filename='network_health.js') }}?v=5.6"></script>
 
 </body>
 

@@ -8,6 +8,8 @@ from db.runtime import connect_metadata, execute_query
 
 SCOPE_LEVELS = ('MRBTS', 'RNC', 'BSC')
 _PASTE_SPLIT_RE = re.compile(r'[\s,;]+')
+# NetAct MRBTS instance ids often prefix PrimeNet metadata ids (e.g. 50801 → 801).
+_NOKIA_NETACT_MRBTS_PREFIXES = ('50', '51', '52', '53', '54', '55')
 
 
 def normalize_scope_level(scope_level: str) -> str:
@@ -96,6 +98,89 @@ def scope_dn_needles(
     if level == 'RNC':
         return _rnc_dn_needles(token, resolved)
     return (f'/BSC-{token}', f'/BSC-{resolved}') if resolved != token else (f'/BSC-{token}',)
+
+
+def _known_nokia_metadata_site_ids() -> set[str]:
+    conn = connect_metadata()
+    try:
+        rows = execute_query(
+            conn,
+            "SELECT site_id FROM sites WHERE NULLIF(TRIM(site_id), '') IS NOT NULL",
+            [],
+        ).fetchall()
+        return {str(row['site_id']).strip() for row in rows if str(row['site_id'] or '').strip()}
+    finally:
+        conn.close()
+
+
+def resolve_nokia_metadata_site_id(
+    netact_site_id: str,
+    *,
+    known_metadata_ids: set[str] | None = None,
+) -> str:
+    """
+    Map a NetAct MRBTS instance id to the PrimeNet metadata ``site_id``.
+
+    Many NetAct NEs use a two-digit prefix + metadata id (``50801`` → ``801``).
+    When ``known_metadata_ids`` is supplied, only returns a mapped id that exists
+    in metadata; otherwise returns the best-effort metadata form.
+    """
+    token = str(netact_site_id or '').strip()
+    if not token:
+        return ''
+    if known_metadata_ids is not None and token in known_metadata_ids:
+        return token
+    if len(token) == 5 and token.isdigit() and token[:2] in _NOKIA_NETACT_MRBTS_PREFIXES:
+        suffix = token[2:]
+        candidates: list[str] = []
+        if suffix:
+            candidates.append(suffix)
+            stripped = suffix.lstrip('0')
+            if stripped and stripped not in candidates:
+                candidates.append(stripped)
+        for candidate in candidates:
+            if known_metadata_ids is None or candidate in known_metadata_ids:
+                return candidate
+    return token
+
+
+def nokia_mrbts_area_for_site(
+    netact_site_id: str,
+    *,
+    known_metadata_ids: set[str] | None = None,
+    clusters: dict[str, str] | None = None,
+    cluster_to_area: dict[str, str] | None = None,
+    area_map: dict[str, dict[str, str]] | None = None,
+) -> tuple[str, str, str]:
+    """Return ``(metadata_site_id, area, cluster)`` for a NetAct MRBTS id."""
+    metadata_site_id = resolve_nokia_metadata_site_id(
+        netact_site_id,
+        known_metadata_ids=known_metadata_ids,
+    )
+    lookup_ids = [metadata_site_id]
+    if metadata_site_id != netact_site_id:
+        lookup_ids.append(str(netact_site_id or '').strip())
+
+    clusters = clusters if clusters is not None else site_cluster_map('nokia', 'MRBTS')
+    cluster_to_area = cluster_to_area if cluster_to_area is not None else cluster_area_map()
+    area_map = area_map if area_map is not None else nokia_area_map('MRBTS')
+
+    cluster = ''
+    for lookup_id in lookup_ids:
+        if lookup_id and lookup_id in clusters:
+            cluster = clusters[lookup_id]
+            break
+
+    area = ''
+    for lookup_id in lookup_ids:
+        if lookup_id and lookup_id in area_map:
+            area = str(area_map[lookup_id].get('area') or '').strip()
+            if area:
+                break
+    if not area and cluster:
+        area = str(cluster_to_area.get(cluster) or '').strip()
+
+    return metadata_site_id, area, cluster
 
 
 def parse_site_id_text(text: str) -> list[str]:
@@ -485,8 +570,9 @@ def list_nokia_inventory_sites(
     level = normalize_scope_level(scope_level)
     records: list[dict[str, str]] | None = None
     try:
-        from core.cm_extractor.nokia_discovery import get_cached_nokia_inventory
+        from core.cm_extractor.nokia_discovery import ensure_nokia_inventory_enriched, get_cached_nokia_inventory
 
+        ensure_nokia_inventory_enriched(persist=True)
         records = get_cached_nokia_inventory(level)
     except Exception:
         records = None
@@ -506,29 +592,50 @@ def list_nokia_inventory_sites(
     if not records:
         return list_nokia_db_sites(query, scope_level=level, limit=limit), 'metadata'
 
-    names = _nokia_metadata_names([r.get('site_id', '') for r in records])
+    known_metadata_ids = _known_nokia_metadata_site_ids()
+    metadata_ids = [
+        resolve_nokia_metadata_site_id(str(rec.get('site_id') or ''), known_metadata_ids=known_metadata_ids)
+        for rec in records
+    ]
+    names = _nokia_metadata_names([mid for mid in metadata_ids if mid])
+    clusters = site_cluster_map('nokia', 'MRBTS')
+    cluster_to_area = cluster_area_map()
+    area_map = nokia_area_map('MRBTS')
     term = (query or '').strip().lower()
     cap = max(1, min(int(limit), 5000))
 
     items: list[dict[str, Any]] = []
-    for rec in records:
+    for rec, metadata_site_id in zip(records, metadata_ids):
         site_id = str(rec.get('site_id') or '').strip()
         if not site_id:
             continue
-        meta = names.get(site_id) or {}
+        meta = names.get(metadata_site_id) or names.get(site_id) or {}
         site_name = meta.get('site_name') or rec.get('ne_name') or site_id
-        area = rec.get('area', '')
-        cluster = rec.get('cluster', '')
+        _meta_id, area, cluster = nokia_mrbts_area_for_site(
+            site_id,
+            known_metadata_ids=known_metadata_ids,
+            clusters=clusters,
+            cluster_to_area=cluster_to_area,
+            area_map=area_map,
+        )
+        if _meta_id:
+            metadata_site_id = _meta_id
         netact_id = resolve_scope_instance_id(site_id, level, site_name=site_name)
         label = f'{site_name} ({site_id})'
-        if level == 'RNC' and netact_id != site_id:
+        if metadata_site_id and metadata_site_id != site_id:
+            label = f'{site_name} ({metadata_site_id} → NetAct {site_id})'
+        elif level == 'RNC' and netact_id != site_id:
             label = f'{site_name} ({site_id} → NetAct {netact_id})'
         if term:
-            hay = f'{site_id} {site_name} {area} {cluster} {rec.get("dn", "")}'.lower()
+            hay = (
+                f'{site_id} {metadata_site_id} {site_name} {area} {cluster} '
+                f'{rec.get("dn", "")}'
+            ).lower()
             if term not in hay:
                 continue
         items.append({
             'site_id': site_id,
+            'metadata_site_id': metadata_site_id,
             'site_name': site_name,
             'netact_instance_id': netact_id,
             'area': area,
@@ -551,16 +658,27 @@ def list_nokia_inventory_areas(scope_level: str = 'MRBTS') -> list[dict[str, str
     if level != 'MRBTS':
         return []
     try:
-        from core.cm_extractor.nokia_discovery import get_cached_nokia_inventory
+        from core.cm_extractor.nokia_discovery import ensure_nokia_inventory_enriched, get_cached_nokia_inventory
 
+        ensure_nokia_inventory_enriched(persist=True)
         records = get_cached_nokia_inventory(level)
     except Exception:
         records = None
     if not records:
         return list_nokia_areas(level)
+    known_metadata_ids = _known_nokia_metadata_site_ids()
+    clusters = site_cluster_map('nokia', 'MRBTS')
+    cluster_to_area = cluster_area_map()
+    area_map = nokia_area_map('MRBTS')
     counts: dict[str, int] = {}
     for rec in records:
-        area = (rec.get('area') or '').strip()
+        _meta_id, area, _cluster = nokia_mrbts_area_for_site(
+            str(rec.get('site_id') or ''),
+            known_metadata_ids=known_metadata_ids,
+            clusters=clusters,
+            cluster_to_area=cluster_to_area,
+            area_map=area_map,
+        )
         if area:
             counts[area] = counts.get(area, 0) + 1
     return [
