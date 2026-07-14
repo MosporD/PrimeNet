@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 """
-PrimeNet — Engineering Deep-Dive deck generator.
+PrimeNet — Deep-dive deck for RADIO (RAN) ENGINEERS.
 
-Design goals:
-- Audience: engineers. In-depth architecture / data-flow / algorithm content.
-- Built as a *demo companion*: the presenter constantly switches between the
-  live PrimeNet tool and these slides, so the visual language mirrors the app
-  (constellation dark theme) and every major topic carries an explicit
-  "SWITCH TO TOOL" cue with an exact click-path, plus "BACK TO DECK" recaps.
+Not a developer deck: the depth is radio-engineering depth — KPI recipes,
+detection algorithms with real thresholds, CM/RET workflows, data cadence.
+Built as a demo companion: constellation dark theme mirrors the app, and
+amber "SWITCH TO TOOL" checkpoints carry exact click-paths.
 """
 
 import math
@@ -15,28 +13,27 @@ import random
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
 from pptx.enum.shapes import MSO_SHAPE
-from pptx.enum.text import MSO_AUTO_SIZE
 from pptx.oxml.ns import qn
 
 # ---------------------------------------------------------------- palette ----
-BG        = RGBColor(0x0F, 0x17, 0x22)   # constellation background
-BG2       = RGBColor(0x0B, 0x11, 0x1A)   # deeper panel for dividers
+BG        = RGBColor(0x0F, 0x17, 0x22)
+BG2       = RGBColor(0x0B, 0x11, 0x1A)
 PANEL     = RGBColor(0x18, 0x22, 0x30)
 PANEL2    = RGBColor(0x1B, 0x27, 0x36)
-PANEL3    = RGBColor(0x22, 0x32, 0x46)
 BORDER    = RGBColor(0x30, 0x42, 0x58)
 TEXT      = RGBColor(0xE8, 0xEE, 0xF7)
 MUTED     = RGBColor(0xA9, 0xB7, 0xC9)
 FAINT     = RGBColor(0x74, 0x86, 0x9C)
-ACCENT    = RGBColor(0x8B, 0xC1, 0xFF)   # link blue
+ACCENT    = RGBColor(0x8B, 0xC1, 0xFF)
 TEAL      = RGBColor(0x3D, 0xD6, 0xB0)
-GOLD      = RGBColor(0xF2, 0xB8, 0x4B)   # DEMO / switch cue
+GOLD      = RGBColor(0xF2, 0xB8, 0x4B)
 PURPLE    = RGBColor(0xB0, 0x8C, 0xFF)
-CRIT      = RGBColor(0xE5, 0x54, 0x8A)   # pinkish-red for accents
+CRIT      = RGBColor(0xE5, 0x54, 0x8A)
 ORANGE    = RGBColor(0xE9, 0x91, 0x3A)
 WHITE     = RGBColor(0xFF, 0xFF, 0xFF)
+CODEBG    = RGBColor(0x0C, 0x13, 0x1D)
 
 EMU_IN = 914400
 SW, SH = 13.333, 7.5
@@ -61,7 +58,6 @@ def _set_fill(shape, color):
 
 
 def _no_shadow(shape):
-    # python-pptx auto-shadows some autoshapes; strip it.
     sp = shape._element
     spPr = sp.find(qn('p:spPr'))
     if spPr is None:
@@ -94,21 +90,16 @@ def rect(slide, x, y, w, h, fill=None, line=None, line_w=1.0, radius=0.06,
     return sp
 
 
-def line(slide, x1, y1, x2, y2, color=BORDER, w=1.0, dash=None):
+def line(slide, x1, y1, x2, y2, color=BORDER, w=1.0):
     ln = slide.shapes.add_connector(2, Inches(x1), Inches(y1), Inches(x2), Inches(y2))
     ln.line.color.rgb = color
     ln.line.width = Pt(w)
-    if dash:
-        d = ln.line._get_or_add_ln()
-        pd = d.makeelement(qn('a:prstDash'), {'val': dash})
-        d.append(pd)
     _no_shadow(ln)
     return ln
 
 
 def text(slide, x, y, w, h, runs, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
          space_after=4, line_spacing=1.06, wrap=True):
-    """runs: list of paragraphs; each paragraph is list of (txt, size, color, bold, font, italic)."""
     tb = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
     tf = tb.text_frame
     tf.word_wrap = wrap
@@ -142,16 +133,10 @@ def slide_base(divider=False):
     return s
 
 
-def constellation(slide, n=46, seed=1, box=(0, 0, SW, SH), link=1.7, alpha_dim=True):
-    """Sparse star field with a few connecting lines — the PrimeNet motif."""
+def constellation(slide, n=46, seed=1, box=(0, 0, SW, SH), link=1.7):
     random.seed(seed)
     x0, y0, x1, y1 = box
-    pts = []
-    for _ in range(n):
-        px = random.uniform(x0, x1)
-        py = random.uniform(y0, y1)
-        pts.append((px, py))
-    # links between near points
+    pts = [(random.uniform(x0, x1), random.uniform(y0, y1)) for _ in range(n)]
     for i, a in enumerate(pts):
         for b in pts[i + 1:]:
             d = math.hypot(a[0] - b[0], a[1] - b[1])
@@ -160,8 +145,7 @@ def constellation(slide, n=46, seed=1, box=(0, 0, SW, SH), link=1.7, alpha_dim=T
     for (px, py) in pts:
         r = random.choice([0.02, 0.03, 0.045, 0.03])
         c = random.choice([ACCENT, TEAL, RGBColor(0x3A, 0x4A, 0x60), MUTED, ACCENT])
-        dot = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(px), Inches(py),
-                                     Inches(r), Inches(r))
+        dot = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(px), Inches(py), Inches(r), Inches(r))
         _set_fill(dot, c)
         _no_shadow(dot)
 
@@ -171,7 +155,7 @@ def footer(slide, section=""):
     _slide_no += 1
     line(slide, 0.55, SH - 0.52, SW - 0.55, SH - 0.52, color=RGBColor(0x22, 0x30, 0x42), w=0.75)
     text(slide, 0.55, SH - 0.47, 6.5, 0.3,
-         [[("PrimeNet", 9, ACCENT, True), ("  ·  Engineering Deep-Dive", 9, FAINT, False)]],
+         [[("PrimeNet", 9, ACCENT, True), ("  ·  RAN Engineering Deep-Dive", 9, FAINT, False)]],
          anchor=MSO_ANCHOR.MIDDLE)
     if section:
         text(slide, SW / 2 - 2.5, SH - 0.47, 5.0, 0.3, [[(section, 9, FAINT, False)]],
@@ -182,21 +166,18 @@ def footer(slide, section=""):
 
 def header(slide, kicker, title, kicker_color=ACCENT):
     rect(slide, 0.55, 0.5, 0.09, 0.62, fill=kicker_color, shape=MSO_SHAPE.RECTANGLE)
-    text(slide, 0.78, 0.46, 11.8, 0.3,
-         [[(kicker.upper(), 11, kicker_color, True)]])
+    text(slide, 0.78, 0.46, 11.8, 0.3, [[(kicker.upper(), 11, kicker_color, True)]])
     text(slide, 0.77, 0.7, 12.0, 0.6, [[(title, 25, TEXT, True, FONT_L)]])
 
 
-def chip(slide, x, y, w, label, color, txtcolor=None, h=0.34, size=10.5, bold=True):
-    c = rect(slide, x, y, w, h, fill=None, line=color, line_w=1.25, radius=0.5)
-    text(slide, x, y - 0.005, w, h, [[(label, size, txtcolor or color, bold)]],
+def chip(slide, x, y, w, label, color, h=0.34, size=10.5):
+    rect(slide, x, y, w, h, fill=None, line=color, line_w=1.25, radius=0.5)
+    text(slide, x, y - 0.005, w, h, [[(label, size, color, True)]],
          align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-    return c
 
 
 def bullets(slide, x, y, w, h, items, size=13, gap=7, lead=ACCENT, tcolor=TEXT,
             line_spacing=1.05):
-    """items: list of (bold_lead, rest) or plain string."""
     paras = []
     for it in items:
         if isinstance(it, tuple):
@@ -210,13 +191,13 @@ def bullets(slide, x, y, w, h, items, size=13, gap=7, lead=ACCENT, tcolor=TEXT,
 
 
 def demo_cue(slide, y, title, steps, watch=None):
-    """Amber 'switch to the live tool' band — the core companion-deck device."""
     x, w = 0.55, SW - 1.10
     h = 1.3 if watch else 1.06
     rect(slide, x, y, w, h, fill=RGBColor(0x22, 0x1C, 0x0E), line=GOLD, line_w=1.25, radius=0.05)
     rect(slide, x, y, 0.09, h, fill=GOLD, shape=MSO_SHAPE.RECTANGLE)
     text(slide, x + 0.28, y + 0.12, 6.5, 0.3,
-         [[("⟳  SWITCH TO TOOL", 12, GOLD, True), ("   — live demo checkpoint", 10.5, RGBColor(0xC9,0xB0,0x82), False, FONT, True)]])
+         [[("⟳  SWITCH TO TOOL", 12, GOLD, True),
+           ("   — live demo checkpoint", 10.5, RGBColor(0xC9, 0xB0, 0x82), False, FONT, True)]])
     text(slide, x + 0.28, y + 0.44, w - 0.6, 0.3, [[(title, 12, TEXT, True)]])
     text(slide, x + 0.28, y + 0.71, w - 0.6, 0.4,
          [[("Click path:  ", 10.5, GOLD, True), (steps, 10.5, MUTED, False, MONO)]])
@@ -226,56 +207,60 @@ def demo_cue(slide, y, title, steps, watch=None):
     return h
 
 
-# ============================================================ SLIDE 1: TITLE
+def formula_card(slide, x, y, w, h, title, lines_, title_color=TEAL):
+    rect(slide, x, y, w, h, fill=CODEBG, line=BORDER, radius=0.04)
+    text(slide, x + 0.25, y + 0.13, w - 0.45, 0.3, [[(title, 11, title_color, True)]])
+    yy = y + 0.48
+    for t, c in lines_:
+        text(slide, x + 0.27, yy, w - 0.5, 0.3, [[(t, 11, c, False, MONO)]])
+        yy += 0.3
+    return yy
+
+
+# ============================================================ 1 · TITLE
 s = slide_base(divider=True)
 constellation(s, n=70, seed=7, link=1.9)
-# center glow panel
-text(s, 0.9, 1.5, 11.5, 0.4, [[("ENGINEERING DEEP-DIVE", 15, ACCENT, True)]])
-text(s, 0.85, 1.95, 11.6, 1.5, [[("PrimeNet", 62, WHITE, True, FONT_L)]])
-text(s, 0.9, 3.15, 11.5, 0.6,
-     [[("Radio network performance & configuration platform — under the hood", 18, MUTED, False, FONT_L)]])
-# meta chips
-chips = [("Flask modular monolith", ACCENT), ("Nokia + Huawei", TEAL),
-         ("2G · 3G · 4G · 5G", PURPLE), ("37 feature modules", GOLD)]
+text(s, 0.9, 1.45, 11.5, 0.4, [[("FOR RADIO ENGINEERS — HOW IT ACTUALLY WORKS", 15, ACCENT, True)]])
+text(s, 0.85, 1.9, 11.6, 1.5, [[("PrimeNet", 62, WHITE, True, FONT_L)]])
+text(s, 0.9, 3.1, 11.5, 0.6,
+     [[("KPIs, detections, CM & RET — the radio engineering inside the tool", 18, MUTED, False, FONT_L)]])
+chips = [("Nokia + Huawei", TEAL), ("2G · 3G · 4G · 5G", PURPLE),
+         ("Hourly & daily PM", ACCENT), ("CM read + governed write", GOLD)]
 cx = 0.9
 for lab, col in chips:
     wch = 0.24 + 0.105 * len(lab)
-    chip(s, cx, 4.05, wch, lab, col, h=0.42, size=11.5)
+    chip(s, cx, 4.0, wch, lab, col, h=0.42, size=11.5)
     cx += wch + 0.22
-# how-to-read note
-rect(s, 0.9, 5.05, 11.5, 1.05, fill=RGBColor(0x14,0x1E,0x2B), line=GOLD, line_w=1.0, radius=0.05)
-rect(s, 0.9, 5.05, 0.09, 1.05, fill=GOLD, shape=MSO_SHAPE.RECTANGLE)
-text(s, 1.15, 5.2, 11.0, 0.8,
+rect(s, 0.9, 5.0, 11.5, 1.05, fill=RGBColor(0x14, 0x1E, 0x2B), line=GOLD, line_w=1.0, radius=0.05)
+rect(s, 0.9, 5.0, 0.09, 1.05, fill=GOLD, shape=MSO_SHAPE.RECTANGLE)
+text(s, 1.15, 5.15, 11.0, 0.8,
      [[("⟳  This is a companion deck.  ", 12.5, GOLD, True),
        ("Amber bands mark ", 12, MUTED, False),
        ("live-tool checkpoints", 12, TEXT, True),
-       (" — keep PrimeNet open in a second window and switch to it whenever you see one.", 12, MUTED, False)],
-      [("The slides carry the engineering that the UI doesn't show; the tool carries the proof.", 11, FAINT, False, FONT, True)]],
+       (" — keep PrimeNet open in a second window and switch whenever you see one.", 12, MUTED, False)],
+      [("Slides explain the logic behind each screen; the tool shows it running on your network.", 11, FAINT, False, FONT, True)]],
      space_after=5)
-text(s, 0.9, 6.55, 11.5, 0.3, [[("Presenter: Malek Mohammad   ·   Audience: RAN / platform engineers", 11, FAINT, False)]])
+text(s, 0.9, 6.5, 11.5, 0.3, [[("Presenter: Malek Mohammad   ·   Audience: RF / RAN optimization engineers", 11, FAINT, False)]])
 
-# ============================================================ SLIDE 2: HOW TO USE
+# ============================================================ 2 · HOW TO RUN
 s = slide_base()
 header(s, "Presenter guide", "How to run this session")
-# two-window setup illustration
-lx = 0.55
-text(s, lx, 1.35, 7.2, 0.4, [[("The two-window rhythm", 14, TEAL, True)]])
-bullets(s, lx, 1.75, 7.2, 3.0, [
-    ("Deck = the “why”. ", "Architecture, data flow, algorithms, and design trade-offs that never appear on screen."),
-    ("Tool = the “proof”. ", "Every claim is demonstrable live; the deck tells you exactly where to click."),
-    ("Ideal layout: ", "two monitors, or deck on the left half / PrimeNet on the right half."),
-    ("Cadence: ", "explain a subsystem → hit its amber checkpoint → return on the recap line."),
-    ("Login once up front ", "so activation and session are warm before the first demo."),
+text(s, 0.55, 1.35, 7.2, 0.4, [[("The two-window rhythm", 14, TEAL, True)]])
+bullets(s, 0.55, 1.75, 7.2, 3.0, [
+    ("Deck = the logic. ", "Thresholds, formulas, and workflows the UI doesn't spell out — why a cell got flagged."),
+    ("Tool = your network. ", "Every detection shown on a slide is then shown live, on real cells."),
+    ("Layout: ", "deck on one half of the screen, PrimeNet on the other — or two monitors."),
+    ("Cadence: ", "explain one detection → amber checkpoint → find a real example live → back to deck."),
+    ("Login before starting ", "and keep a busy area in mind — live examples land better than slides."),
 ], size=13, gap=9)
-# legend card
 rx, rw = 8.15, 4.65
 rect(s, rx, 1.35, rw, 4.55, fill=PANEL, line=BORDER, radius=0.04)
 text(s, rx + 0.3, 1.55, rw - 0.6, 0.3, [[("SLIDE LEGEND", 11, MUTED, True)]])
 legend = [
     (GOLD,  "⟳ SWITCH TO TOOL", "Stop talking, start clicking. Click-path is monospaced."),
-    (TEAL,  "Point out",        "The one thing the audience must notice on screen."),
-    (ACCENT,"▸ blue bullets",   "Load-bearing engineering detail."),
-    (PURPLE,"◆ diagrams",       "Data-flow / lifecycle maps to anchor the mental model."),
+    (TEAL,  "Point out",        "What the audience must notice on the live screen."),
+    (ACCENT, "▸ blue bullets",  "The radio logic — thresholds, weights, evidence."),
+    (CRIT,  "formula cards",    "The actual scoring math the tool runs, verbatim."),
 ]
 yy = 2.0
 for col, lab, desc in legend:
@@ -284,21 +269,21 @@ for col, lab, desc in legend:
     text(s, rx + 0.6, yy + 0.26, rw - 0.9, 0.5, [[(desc, 10.5, MUTED, False)]])
     yy += 0.86
 text(s, rx + 0.3, yy + 0.05, rw - 0.6, 0.6,
-     [[("If a demo env is offline, the deck still stands alone — just narrate the checkpoint.", 10.5, FAINT, False, FONT, True)]])
+     [[("No live network? The deck stands alone — every checkpoint has enough context to narrate.", 10.5, FAINT, False, FONT, True)]])
 footer(s, "Presenter guide")
 
-# ============================================================ SLIDE 3: AGENDA
+# ============================================================ 3 · AGENDA
 s = slide_base()
 header(s, "Roadmap", "What we'll cover")
 agenda = [
-    ("01", "System at a glance", "Scale, shape, and the modular-monolith bet", ACCENT),
-    ("02", "Architecture & a module's anatomy", "Blueprints, folders, shared core", TEAL),
-    ("03", "Request lifecycle", "The before_request middleware chain & security", PURPLE),
-    ("04", "Data platform & ETL", "SFTP pull → raw taxonomy → SQLite load", GOLD),
-    ("05", "Orchestration & scheduling", "Daily/hourly/watcher, APScheduler", ORANGE),
-    ("06", "CM Extractor & write-back", "Nokia CM Open API, Huawei MML, RET", ACCENT),
-    ("07", "Radio analytics engine", "The shared scoring model & insight catalog", TEAL),
-    ("08", "Frontend & deployment", "Theme system, Docker, extending PrimeNet", PURPLE),
+    ("01", "Your day in PrimeNet", "The monitor → detect → diagnose → change → verify loop", ACCENT),
+    ("02", "The data underneath", "PM cadence, sources, metadata — what \"latest\" means", TEAL),
+    ("03", "KPIs across two vendors", "Recipes & aliases: one KPI name, per-vendor counters", PURPLE),
+    ("04", "How issues are scored", "Severity, evidence, and reading an issue card", GOLD),
+    ("05", "The detections, in depth", "Sleeping cells · overshooting · neighbors · capacity", CRIT),
+    ("06", "CM: reading the network", "MO trees, live vs plan config, parameter dictionary", ACCENT),
+    ("07", "Audits, changes & RET", "Golden-parameter audit, change impact, safe tilt writes", TEAL),
+    ("08", "The daily loop & trust", "Morning report, sector health, data freshness", PURPLE),
 ]
 colw, rowh = 5.9, 1.18
 x0, y0 = 0.6, 1.45
@@ -312,323 +297,390 @@ for i, (n, t, d, col) in enumerate(agenda):
     text(s, cx + 1.35, cy + 0.62, colw - 1.5, 0.4, [[(d, 11, MUTED, False)]])
 footer(s, "Roadmap")
 
-# ============================================================ SLIDE 4: AT A GLANCE
+# ============================================================ 4 · WORKFLOW LOOP
 s = slide_base()
-header(s, "Section 01", "System at a glance")
-stats = [
-    ("37", "feature modules", "each a self-contained Flask blueprint", ACCENT),
-    ("2", "RAN vendors", "Nokia & Huawei, one shared UI", TEAL),
-    ("4", "generations", "2G / 3G / 4G / 5G KPIs & CM", PURPLE),
-    ("3", "SFTP sources", "Nokia PM · Huawei PM · Metadata", GOLD),
-]
-cw = 2.92
-for i, (big, lab, sub, col) in enumerate(stats):
-    cx = 0.6 + i * (cw + 0.13)
-    rect(s, cx, 1.4, cw, 1.7, fill=PANEL, line=BORDER, radius=0.06)
-    text(s, cx + 0.25, 1.5, cw - 0.5, 0.9, [[(big, 44, col, True, FONT_L)]])
-    text(s, cx + 0.27, 2.42, cw - 0.5, 0.3, [[(lab, 13, TEXT, True)]])
-    text(s, cx + 0.27, 2.72, cw - 0.5, 0.4, [[(sub, 10, MUTED, False)]])
-# narrative
-text(s, 0.6, 3.35, 12.1, 0.4, [[("The shape of the system", 14, TEAL, True)]])
-bullets(s, 0.6, 3.72, 6.05, 3.0, [
-    ("One process, many modules. ", "A modular monolith: 37 blueprints registered in app.py, one SQLite-backed runtime, one auth/session layer."),
-    ("Vendor + RAT are data, not forks. ", "Nokia/Huawei and 2G–5G differences live in adapters and a path taxonomy, not parallel apps."),
-    ("Read-heavy analytics, guarded writes. ", "PM analytics are read-only; CM write-back (RET, mass-modify) is explicit and audited."),
-], size=12.5, gap=8)
-bullets(s, 6.85, 3.72, 5.85, 3.0, [
-    ("Why a monolith? ", "Small ops team, shared SQLite data, no per-module network hops — deploy is a single container."),
-    ("Cohesion via convention. ", "Every module follows the same folder + blueprint contract, so 37 modules stay legible."),
-    ("Escape hatches exist. ", "Heavy CM/FM work delegates to core/ clients; the pipeline runs as separate orchestrated jobs."),
-], size=12.5, gap=8, lead=TEAL)
-footer(s, "01 · Overview")
-
-# ============================================================ SLIDE 5: ARCHITECTURE
-s = slide_base()
-header(s, "Section 02", "Architecture: the modular monolith")
-# layered diagram
-def band(x, y, w, h, title, items, col, tsize=11.5):
-    rect(s, x, y, w, h, fill=PANEL, line=col, line_w=1.25, radius=0.05)
-    rect(s, x, y, 0.07, h, fill=col, shape=MSO_SHAPE.RECTANGLE)
-    text(s, x + 0.22, y + 0.09, w - 0.35, 0.3, [[(title, tsize, col, True)]])
-    text(s, x + 0.22, y + 0.42, w - 0.35, h - 0.5, [[(items, 10, MUTED, False)]], line_spacing=1.02)
-
-band(1.6, 1.35, 10.1, 0.86, "App shell — app.py",
-     "Loads .env → activation gate → registers 37 blueprints → before/after_request hooks → error handlers → health probe", ACCENT)
-# arrow
-line(s, 6.65, 2.21, 6.65, 2.45, color=BORDER, w=1.5)
-band(0.6, 2.5, 5.75, 1.55, "Feature modules  ·  modules/<name>/",
-     "routes.py  (blueprint)\ntemplates/   (Jinja pages)\nstatic/      (module CSS/JS)\nlogic.py     (module compute)\n\n37 modules — Performance, CM Extractor,\nRET, Sector Health, SON, Fault Mgmt …", TEAL, tsize=12)
-band(6.55, 2.5, 6.15, 1.55, "Shared infrastructure",
-     "routes/auth_routes.py      login / session\ncore/                       vendor clients, scoring, radio,\n                            cm_extractor, activation, licensing\nutils/  ·  db/runtime.py    SQLite access, path constants\ncore/module_access.py       RBAC visibility rules", PURPLE, tsize=12)
-line(s, 6.65, 4.05, 6.65, 4.3, color=BORDER, w=1.5)
-band(0.6, 4.35, 5.75, 1.35, "Data platform",
-     "SQLite files under databases/\n   cells / groups / metadata / admin\nCanonical taxonomy: pipeline/paths.py\nActivation-gated connections (db/runtime.py)", GOLD, tsize=12)
-band(6.55, 4.35, 6.15, 1.35, "ETL pipeline  ·  pipeline/",
-     "pull/  →  raw/{vendor}/{domain}/{rat}/{tf}\nload/  →  databases/…\norchestrators/ (daily · hourly · watcher)\nAPScheduler drives recurring jobs", ORANGE, tsize=12)
-text(s, 0.6, 5.9, 12.1, 0.6,
-     [[("Contract, not framework:  ", 12, TEAL, True),
-       ("a new capability is a folder that follows the module shape and one register_blueprint() line. That single convention is what keeps 37 modules maintainable by a small team.", 12, MUTED, False)]])
-footer(s, "02 · Architecture")
-
-# ============================================================ SLIDE 6: MODULE ANATOMY
-s = slide_base()
-header(s, "Section 02", "Anatomy of a module")
-# left: tree
-rect(s, 0.55, 1.4, 5.7, 3.9, fill=RGBColor(0x0C,0x13,0x1D), line=BORDER, radius=0.04)
-tree = [
-    ("modules/capacity_hotspots/", ACCENT, True),
-    ("├─ __init__.py", MUTED, False),
-    ("├─ routes.py", TEAL, False),
-    ("│    @login_required", FAINT, False),
-    ("│    capacity_hotspots_bp = Blueprint(…)", FAINT, False),
-    ("├─ logic.py            # compute / scoring", TEAL, False),
-    ("├─ templates/", MUTED, False),
-    ("│    └─ capacity_hotspots.html", FAINT, False),
-    ("└─ static/", MUTED, False),
-    ("     ├─ capacity_hotspots.css", FAINT, False),
-    ("     └─ capacity_hotspots.js", FAINT, False),
-]
-yy = 1.62
-for t, c, b in tree:
-    text(s, 0.8, yy, 5.3, 0.3, [[(t, 12, c, b, MONO)]])
-    yy += 0.335
-# right: the contract
-text(s, 6.55, 1.4, 6.1, 0.3, [[("The module contract", 14, TEAL, True)]])
-bullets(s, 6.55, 1.78, 6.15, 3.0, [
-    ("Blueprint per module. ", "Own url_prefix, template_folder=\"templates\", module-local static_folder."),
-    ("Auth by decorator. ", "Copy the login_required pattern; session rides a session_token cookie."),
-    ("Thin routes. ", "routes.py validates + delegates; real work sits in logic.py or core/."),
-    ("Visibility is declared. ", "core/module_access.py maps each route to all / admin / admin_or_noc."),
-    ("Registered once. ", "Import + app.register_blueprint(...) in app.py — the only global touch-point."),
-], size=12, gap=7)
-footer(s, "02 · Architecture")
-demo_cue(s, 5.5,
-         "Open any module and show the identical shell — header, filters, dark-mode toggle.",
-         "Dashboard → Radio Optimization → Capacity Hotspots",
-         watch="Same chrome across modules = the contract paying off. Toggle dark mode; it persists.")
-
-# ============================================================ SLIDE 7: REQUEST LIFECYCLE
-s = slide_base()
-header(s, "Section 03", "Request lifecycle: the middleware chain")
-text(s, 0.55, 1.28, 12.2, 0.3,
-     [[("Every request threads four ", 12, MUTED, False), ("@app.before_request", 12, TEAL, True, MONO),
-       (" guards before a blueprint ever runs:", 12, MUTED, False)]])
-steps = [
-    ("1", "Activation gate", "enforce_monthly_operator_activation — locked → /activation (or 403 on /api).", ACCENT),
-    ("2", "Input safety", "Validate + sanitize args / form / JSON; reject malformed or oversized bodies (413/400).", TEAL),
-    ("3", "CSRF origin", "State-changing + cookie auth ⇒ Origin/Referer must be same-origin, else 403.", PURPLE),
-    ("4", "Password rotation", "Force expired credentials to /profile before any other page.", GOLD),
-]
-x = 0.55
-bw = 3.0
-for i, (n, t, d, col) in enumerate(steps):
-    cx = x + i * (bw + 0.1)
-    rect(s, cx, 1.72, bw, 1.95, fill=PANEL, line=col, line_w=1.25, radius=0.05)
-    text(s, cx + 0.22, 1.85, 0.8, 0.6, [[(n, 26, col, True, FONT_L)]])
-    text(s, cx + 0.22, 2.5, bw - 0.4, 0.35, [[(t, 12.5, TEXT, True)]])
-    text(s, cx + 0.22, 2.85, bw - 0.4, 0.9, [[(d, 10, MUTED, False)]])
-    if i < 3:
-        text(s, cx + bw - 0.03, 2.4, 0.2, 0.4, [[("→", 16, FAINT, True)]])
-# after_request
-rect(s, 0.55, 3.95, 12.2, 0.95, fill=PANEL2, line=BORDER, radius=0.05)
-text(s, 0.8, 4.05, 4.0, 0.3, [[("@app.after_request", 12.5, ORANGE, True, MONO)]])
-text(s, 0.8, 4.38, 11.9, 0.5,
-     [[("Security headers on every response:  ", 11, MUTED, False),
-       ("CSP", 11, TEXT, True), (" (self + unpkg + OSM/ArcGIS tiles), ", 10.5, MUTED, False),
-       ("X-Content-Type-Options", 11, TEXT, True), (", ", 10.5, MUTED, False),
-       ("X-Frame-Options", 11, TEXT, True), (", ", 10.5, MUTED, False),
-       ("Referrer-Policy", 11, TEXT, True), (", ", 10.5, MUTED, False),
-       ("Permissions-Policy", 11, TEXT, True), (", optional HSTS.", 10.5, MUTED, False)]])
-text(s, 0.55, 5.05, 12.2, 0.7,
-     [[("Engineering note:  ", 11.5, TEAL, True),
-       ("access logs use a ConciseRequestHandler that strips query strings — KPI selections can be thousands of chars, so the raw URL never hits the log. Fail-closed by default: unknown state ⇒ redirect/deny, not allow.", 11.5, MUTED, False)]])
-footer(s, "03 · Request lifecycle")
-
-# ============================================================ SLIDE 8: SECURITY / ACTIVATION
-s = slide_base()
-header(s, "Section 03", "Security, sessions & activation")
-col2 = [
-    ("Auth & sessions", TEAL, [
-        ("session_token cookie ", "server-side sessions; lifetime via SESSION_LIFETIME_HOURS (default 2h)."),
-        ("RBAC ", "three tiers — all / admin (owner) / admin_or_noc — enforced in nav + routes."),
-        ("Password policy ", "forced rotation short-circuits the whole app until changed."),
-    ]),
-    ("Operator activation", GOLD, [
-        ("Monthly gate ", "install_sqlite_gate() + activation_gate wrap DB access; unactivated ⇒ 503/redirect."),
-        ("License client ", "core/license_client + license_tokens verify the operator token."),
-        ("Health-aware ", "/health returns locked / degraded / ok for orchestrators & LBs."),
-    ]),
-    ("Input & transport", PURPLE, [
-        ("Global sanitizer ", "depth/'size/length caps on args, form, JSON via utils/input_safety."),
-        ("CSRF ", "same-origin check for cookie-auth mutations."),
-        ("Secrets ", "SFTP/CM creds only in local .env — never committed; server-side only."),
-    ]),
-]
-cw = 3.98
-for i, (t, col, items) in enumerate(col2):
-    cx = 0.55 + i * (cw + 0.13)
-    rect(s, cx, 1.4, cw, 4.35, fill=PANEL, line=BORDER, radius=0.04)
-    rect(s, cx, 1.4, cw, 0.5, fill=col, shape=MSO_SHAPE.RECTANGLE)
-    text(s, cx + 0.22, 1.4, cw - 0.4, 0.5, [[(t, 13, BG, True)]], anchor=MSO_ANCHOR.MIDDLE)
-    yy = 2.05
-    for lead, rest in items:
-        text(s, cx + 0.22, yy, cw - 0.42, 1.2,
-             [[("● ", 11, col, True), (lead, 11.5, WHITE, True)],
-              [(rest, 10.5, MUTED, False)]], space_after=2, line_spacing=1.03)
-        yy += 1.18
-footer(s, "03 · Security")
-
-# ============================================================ SLIDE 9: DATA PLATFORM
-s = slide_base()
-header(s, "Section 04", "Data platform: SQLite + a path taxonomy")
-text(s, 0.55, 1.3, 7.0, 0.4, [[("Why SQLite (on purpose)", 14, TEAL, True)]])
-bullets(s, 0.55, 1.7, 6.1, 3.2, [
-    ("Zero-ops, file-per-scope. ", "PM KPIs, metadata, users, admin each live in their own .db under databases/."),
-    ("Deterministic paths. ", "pipeline/paths.py is the single source of truth for where data lives."),
-    ("Portable. ", "NCM_DATA_ROOT relocates the whole data tree to a mounted volume in Docker."),
-    ("Gated access. ", "db/runtime.py installs the activation gate before any connection opens."),
-    ("Automatic PM columns. ", "KPI column detection is runtime-automatic — no per-vendor mapping to maintain."),
-], size=12, gap=7)
-# taxonomy card
-rx, rw = 6.9, 5.85
-rect(s, rx, 1.3, rw, 4.3, fill=RGBColor(0x0C,0x13,0x1D), line=BORDER, radius=0.04)
-text(s, rx + 0.28, 1.5, rw - 0.5, 0.3, [[("CANONICAL TAXONOMY", 11, MUTED, True)]])
-tax = [
-    ("raw/", ACCENT),
-    ("  {vendor}/{domain}/{rat}/{timeframe}/", FAINT),
-    ("  nokia/cells/4g/hourly/  ← one RAT per folder", TEAL),
-    ("  huawei/cells/all/daily/ ← staging, then RAT split", TEAL),
-    ("", MUTED),
-    ("databases/", ACCENT),
-    ("  {domain}/{vendor}/{tech}/{timeframe}/*.db", FAINT),
-    ("  cells/nokia/all/hourly/…", TEAL),
-    ("", MUTED),
-    ("vendors   = nokia · huawei · metadata", MUTED),
-    ("domains   = cells · groups · neighbors · …", MUTED),
-    ("rats      = 2g · 3g · 4g · 5g", MUTED),
-    ("timeframes= hourly · daily · snapshot", MUTED),
-]
-yy = 1.9
-for t, c in tax:
-    text(s, rx + 0.3, yy, rw - 0.5, 0.3, [[(t, 11.5, c, (c in (ACCENT,)), MONO)]])
-    yy += 0.275
-footer(s, "04 · Data platform")
-
-# ============================================================ SLIDE 10: ETL PIPELINE
-s = slide_base()
-header(s, "Section 04", "ETL pipeline: source → raw → SQLite")
-# pipeline flow
+header(s, "Section 01", "Your day in PrimeNet: one optimization loop")
 stages = [
-    ("SOURCES", "3× SFTP servers\nNokia PM · Huawei PM\n· Metadata", ACCENT),
-    ("PULL", "pipeline/pull/…\nparamiko SFTP,\nper vendor/rat/tf", TEAL),
-    ("RAW", "raw/ taxonomy\none RAT per folder\n(Huawei staged→split)", PURPLE),
-    ("LOAD", "pipeline/load/…\nauto column detect,\nupsert into SQLite", GOLD),
-    ("DATABASES", "databases/*.db\nread by 37 modules\n+ radio engine", ORANGE),
+    ("MONITOR", "Morning Report\nSector Health\nNetwork Map / Heatmap", ACCENT),
+    ("DETECT", "Sleeping Cells\nOvershooting\nCapacity Hotspots\nNeighbor Quality", CRIT),
+    ("DIAGNOSE", "Performance Explorer\nKPI trends & evidence\nParameter Dictionary", TEAL),
+    ("CHANGE", "RET tilt / CM edits\nExcel mass-modify\n(plan first, then apply)", GOLD),
+    ("VERIFY", "Change Impact Tracker\nConfig History\nnext-day KPIs", PURPLE),
 ]
 bw = 2.28
 for i, (t, d, col) in enumerate(stages):
     cx = 0.55 + i * (bw + 0.18)
-    rect(s, cx, 1.5, bw, 1.7, fill=PANEL, line=col, line_w=1.25, radius=0.06)
+    rect(s, cx, 1.5, bw, 1.85, fill=PANEL, line=col, line_w=1.25, radius=0.06)
     rect(s, cx, 1.5, bw, 0.42, fill=col, shape=MSO_SHAPE.RECTANGLE)
     text(s, cx, 1.5, bw, 0.42, [[(t, 12, BG, True)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-    text(s, cx + 0.15, 2.0, bw - 0.3, 1.1, [[(d, 10.5, MUTED, False, MONO)]], line_spacing=1.05)
+    text(s, cx + 0.15, 2.02, bw - 0.3, 1.25, [[(d, 10.5, MUTED, False)]], line_spacing=1.15)
     if i < 4:
-        text(s, cx + bw - 0.02, 2.15, 0.22, 0.4, [[("→", 18, FAINT, True)]])
-bullets(s, 0.55, 3.5, 12.1, 2.0, [
-    ("Idempotent by design. ", "Pull writes into a deterministic tree; load re-runs safely — reprocessing a day just overwrites its rows."),
-    ("Vendor asymmetry handled early. ", "Huawei daily exports stage in raw/huawei/{cells,groups}/all/daily, then split by RAT before load."),
-    ("Verified, not assumed. ", "core/pipeline_ingest_verify + pm_health check row counts / freshness before data is trusted downstream."),
-    ("Prefer orchestrators. ", "pipeline/orchestrators/ over ad-hoc scripts — the taxonomy + entry points are the contract."),
+        text(s, cx + bw - 0.02, 2.2, 0.22, 0.4, [[("→", 18, FAINT, True)]])
+# loop-back arrow note
+text(s, 0.55, 3.5, 12.2, 0.3,
+     [[("↺  Verify feeds Monitor — every applied change shows up in tomorrow's morning report and impact tracker.", 11.5, FAINT, False, FONT, True)]])
+bullets(s, 0.55, 3.95, 12.1, 1.6, [
+    ("Everything is cell-level and evidence-backed. ", "Each detection carries the KPI values that triggered it — no black-box 'AI says so'."),
+    ("Both vendors, one workflow. ", "Nokia and Huawei cells appear in the same lists with the same severities; you don't switch tools per vendor."),
+    ("Reads are free, writes are staged. ", "All analytics are read-only; tilt/parameter changes go through an explicit plan → apply → history flow."),
+], size=12.5, gap=8)
+footer(s, "01 · Workflow")
+demo_cue(s, 5.72,
+         "Show the dashboard: the module deck maps 1:1 to this loop.",
+         "Login → Dashboard  (hover the Radio Optimization section)")
+
+# ============================================================ 5 · DATA UNDERNEATH
+s = slide_base()
+header(s, "Section 02", "The data underneath")
+# left: sources & cadence
+text(s, 0.55, 1.32, 6.1, 0.4, [[("Where the numbers come from", 14, TEAL, True)]])
+srcs = [
+    ("Nokia PM", "NetAct exports over SFTP", "hourly + daily", ACCENT),
+    ("Huawei PM", "U2020 exports over SFTP", "hourly + daily", CRIT),
+    ("Metadata", "site/cell inventory, azimuths, coords, on-air state", "snapshot", TEAL),
+]
+yy = 1.72
+for name, d, cad, col in srcs:
+    rect(s, 0.55, yy, 6.1, 0.72, fill=PANEL, line=BORDER, radius=0.06)
+    rect(s, 0.55, yy, 0.07, 0.72, fill=col, shape=MSO_SHAPE.RECTANGLE)
+    text(s, 0.8, yy + 0.09, 1.6, 0.3, [[(name, 12, TEXT, True)]])
+    text(s, 0.8, yy + 0.38, 4.3, 0.3, [[(d, 10, MUTED, False)]])
+    text(s, 5.0, yy + 0.09, 1.55, 0.5, [[(cad, 10.5, col, True)]], align=PP_ALIGN.RIGHT)
+    yy += 0.82
+bullets(s, 0.55, 4.35, 6.1, 1.9, [
+    ("Hourly ", "drives near-real-time views (sector health, busy-hour checks)."),
+    ("Daily ", "drives baselines and detections — a stable day-level series per cell."),
+    ("Metadata joins everything: ", "cell → site, area, vendor, technology, azimuth, on-air state."),
 ], size=12, gap=7)
-footer(s, "04 · ETL")
-demo_cue(s, 5.62,
-         "Show a live sync run and the resulting freshness / row counts.",
-         "Dashboard → Sync   (watch a pull→load cycle, then Network Health for freshness)")
-
-# ============================================================ SLIDE 11: ORCHESTRATION
-s = slide_base()
-header(s, "Section 05", "Orchestration & scheduling")
-cards = [
-    ("orchestrate_daily_full", ACCENT, "Full daily cycle: pull every source's daily exports, split RATs, load all domains, verify. The heavy nightly run."),
-    ("orchestrate_hourly_full", TEAL, "Lighter hourly cadence for near-real-time KPIs — same pull→load→verify shape, hourly timeframe."),
-    ("orchestrate_watcher_cycle", PURPLE, "Watches for freshly-dropped files and ingests on arrival — bridges the gap between scheduled runs."),
+# right: per-RAT organization
+rx, rw = 6.95, 5.8
+rect(s, rx, 1.32, rw, 4.0, fill=CODEBG, line=BORDER, radius=0.04)
+text(s, rx + 0.28, 1.5, rw - 0.5, 0.3, [[("HOW PM IS ORGANIZED", 11, MUTED, True)]])
+org = [
+    ("per vendor    nokia · huawei", ACCENT),
+    ("per RAT       2G · 3G · 4G · 5G", TEAL),
+    ("              (4G FDD/TDD share the 4G table)", FAINT),
+    ("per cadence   hourly · daily", PURPLE),
+    ("per scope     cells · groups (clusters/areas)", GOLD),
+    ("", MUTED),
+    ("KPI columns are detected automatically at", MUTED),
+    ("import — new counters in a vendor export", MUTED),
+    ("appear as new KPIs, no mapping to maintain.", MUTED),
 ]
-for i, (t, col, d) in enumerate(cards):
-    cx = 0.55 + i * (4.05)
-    rect(s, cx, 1.45, 3.9, 1.9, fill=PANEL, line=col, line_w=1.25, radius=0.05)
-    rect(s, cx, 1.45, 0.07, 1.9, fill=col, shape=MSO_SHAPE.RECTANGLE)
-    text(s, cx + 0.24, 1.6, 3.6, 0.5, [[(t, 12.5, col, True, MONO)]])
-    text(s, cx + 0.24, 2.15, 3.55, 1.1, [[(d, 11, MUTED, False)]], line_spacing=1.06)
-bullets(s, 0.55, 3.7, 12.1, 2.0, [
-    ("APScheduler in-process. ", "Recurring jobs run inside the app (requirements: APScheduler) — no external cron dependency for the core cadence."),
-    ("Config Task Scheduler module. ", "User-facing scheduling of CM jobs (exports, audits) with its own persistence and status UI."),
-    ("Windows dev affordance. ", "A live-sync logger terminal + auto-browser open are dev-only, disabled by NCM_CONTAINER in Docker."),
-    ("Observability. ", "sync_log entries stream live; /health surfaces DB reachability for external schedulers."),
-], size=12, gap=7)
-footer(s, "05 · Orchestration")
+yy = 1.92
+for t, c in org:
+    text(s, rx + 0.3, yy, rw - 0.55, 0.3, [[(t, 11.5, c, False, MONO)]])
+    yy += 0.345
+text(s, 0.55, 5.5, 12.2, 0.5,
+     [[("Why you should care:  ", 12, TEAL, True),
+       ("every detection later in this deck runs on the daily per-cell series; if a day's file is late, that day is simply absent — the tool never interpolates fake data.", 12, MUTED, False)]])
+footer(s, "02 · Data")
 
-# ============================================================ SLIDE 12: CM EXTRACTOR
+# ============================================================ 6 · KPI RECIPES
 s = slide_base()
-header(s, "Section 06", "CM Extractor: reading two vendors")
-# Nokia
-rect(s, 0.55, 1.4, 6.0, 3.05, fill=PANEL, line=ACCENT, line_w=1.25, radius=0.05)
-text(s, 0.8, 1.55, 5.5, 0.3, [[("NOKIA — CM Open API (NetAct)", 13, ACCENT, True)]])
-text(s, 0.8, 1.95, 5.5, 2.4, [[
-    ("Two REST interfaces, HTTP Basic:", 11, TEXT, True)]], space_after=4)
-nk = [
-    ("persistency/v1", "read CM — queries, MO lists, parameter reads"),
-    ("operations/v1", "Configurator ops — Provision, Export, Import_Export"),
-    ("confId", "1 = live · 5 = reference · other = plan (writes)"),
-    ("DN paths", "PLMN-…/RNC-42/WBTS-176/WCEL-1  ·  class NOKRNC:WCEL"),
-    ("Throttled", "batch size + delay + retries to dodge NetAct 429s"),
+header(s, "Section 03", "One KPI, two vendors: recipes & aliases")
+text(s, 0.55, 1.28, 12.2, 0.35,
+     [[("You ask for a concept (\"utilization\"); PrimeNet resolves the right per-vendor counter column automatically:", 12, MUTED, False)]])
+# recipe table
+rows = [
+    ("utilization", "higher = worse", "DL/UL PRB Usage Rate(%)", "E-UTRAN Avg PRB usage per TTI DL", CRIT),
+    ("users", "higher = worse", "Average User Number · RRC Connected Users", "Active Users", ORANGE),
+    ("traffic", "higher = worse", "Traffic Volume · Payload", "Data Volume · DL/UL Traffic", GOLD),
+    ("throughput", "lower = worse", "User/Cell Throughput", "Average Throughput", TEAL),
+    ("accessibility / retainability / mobility / interference", "category presets", "vendor formulas per RAT", "vendor formulas per RAT", PURPLE),
 ]
-yy = 2.32
-for a, b in nk:
-    text(s, 0.8, yy, 5.5, 0.4, [[("• ", 11, ACCENT, True), (a, 11, TEXT, True, MONO), ("  " + b, 10, MUTED, False)]])
-    yy += 0.4
-# Huawei
-rect(s, 6.72, 1.4, 6.0, 3.05, fill=PANEL, line=CRIT, line_w=1.25, radius=0.05)
-text(s, 6.97, 1.55, 5.5, 0.3, [[("HUAWEI — MML / U2020", 13, CRIT, True)]])
-hw = [
-    ("MML discovery", "enumerate NEs & MO scope via MML commands"),
-    ("huawei_client", "session, command exec, response parsing"),
-    ("mml_parser", "structured tables out of raw MML text"),
-    ("param dict", "19k scraped reference pages resolve semantics"),
-    ("RET / tilt", "RET MOD command formatting + tilt handling"),
-]
-yy = 2.05
-for a, b in hw:
-    text(s, 6.97, yy, 5.5, 0.4, [[("• ", 11, CRIT, True), (a, 11, TEXT, True, MONO), ("  " + b, 10, MUTED, False)]])
-    yy += 0.45
-text(s, 0.55, 4.62, 12.2, 0.5,
-     [[("One UI, two protocols.  ", 12, TEAL, True),
-       ("core/cm_extractor/ hides the Nokia-REST vs Huawei-MML split behind a common extract → normalize → Excel path; the module layer never sees the difference.", 12, MUTED, False)]])
-footer(s, "06 · CM Extractor")
-demo_cue(s, 5.55,
-         "Run an extraction and open the generated Excel — show the MO/parameter structure.",
-         "Dashboard → Configuration → Configuration Data Extractor → pick scope → Extract")
+ty = 1.75
+rect(s, 0.55, ty, 12.2, 0.42, fill=PANEL2, line=None, radius=0.03)
+for cx, lab, wd in ((0.75, "RECIPE", 3.2), (4.05, "DIRECTION", 1.7), (5.9, "HUAWEI COUNTERS (examples)", 3.4), (9.45, "NOKIA COUNTERS (examples)", 3.2)):
+    text(s, cx, ty + 0.06, wd, 0.3, [[(lab, 10, MUTED, True)]])
+yy = ty + 0.5
+for rec, direc, hw, nk, col in rows:
+    rect(s, 0.55, yy, 12.2, 0.58, fill=PANEL, line=BORDER, radius=0.03)
+    rect(s, 0.55, yy, 0.06, 0.58, fill=col, shape=MSO_SHAPE.RECTANGLE)
+    text(s, 0.75, yy + 0.05, 3.25, 0.5, [[(rec, 11, TEXT, True, MONO)]], anchor=MSO_ANCHOR.MIDDLE)
+    text(s, 4.05, yy + 0.05, 1.75, 0.5, [[(direc, 10, col, True)]], anchor=MSO_ANCHOR.MIDDLE)
+    text(s, 5.9, yy + 0.05, 3.4, 0.5, [[(hw, 9.5, MUTED, False)]], anchor=MSO_ANCHOR.MIDDLE)
+    text(s, 9.45, yy + 0.05, 3.25, 0.5, [[(nk, 9.5, MUTED, False)]], anchor=MSO_ANCHOR.MIDDLE)
+    yy += 0.64
+text(s, 0.55, yy + 0.05, 12.2, 0.5,
+     [[("Matching is normalized (case/punctuation-insensitive) per vendor + RAT — so cross-vendor comparisons like \"top PRB utilization cells network-wide\" are one query, not two exports and a VLOOKUP.", 11.5, MUTED, False)]])
+footer(s, "03 · KPIs")
+demo_cue(s, 5.82,
+         "Query the same KPI across Nokia and Huawei cells in one screen.",
+         "Dashboard → Performance Explorer → vendor: All → pick a KPI → Top-N")
 
-# ============================================================ SLIDE 13: CM WRITE-BACK / RET
+# ============================================================ 7 · SCORING MODEL
 s = slide_base()
-header(s, "Section 06", "Write-back: RET, mass-modify & audit", kicker_color=GOLD)
-bullets(s, 0.55, 1.4, 6.05, 3.6, [
-    ("Reads are cheap; writes are governed. ", "Analytics never mutate the network — CM changes go through explicit, reviewable flows."),
-    ("RET Management. ", "Read + write electrical tilt across vendors; Huawei RET MOD command formatting and tilt handling are handled centrally."),
-    ("Nokia mass-modify. ", "nokia_mass_modify + Excel re-import: export MOs → edit in Excel → validate → write back to a plan confId."),
-    ("CM Parameter Audit. ", "Live scanner that diffs current parameters against expected, exportable to Excel."),
-    ("Config History. ", "Every applied change is recorded — what/when/who for rollback and forensics."),
+header(s, "Section 04", "How issues are scored (read this once, use it everywhere)")
+bullets(s, 0.55, 1.38, 6.15, 2.6, [
+    ("Additive, capped signals. ", "Each detection sums a few capped penalty terms; the total is clipped to 0–100."),
+    ("Severity is just a banding of the score ", "— same thresholds in every module (right)."),
+    ("Evidence rides along. ", "Every issue carries the raw KPI values (pre / post / delta, dates, distances) that produced its score."),
+    ("Stable identity. ", "The same cell + problem keeps the same issue ID across days — you can track it until it's fixed."),
+], size=12.5, gap=8)
+# severity bands
+rect(s, 0.55, 4.15, 6.15, 1.5, fill=CODEBG, line=BORDER, radius=0.04)
+text(s, 0.83, 4.28, 5.6, 0.3, [[("SEVERITY BANDS (ALL MODULES)", 11, MUTED, True)]])
+bands = [("Critical", "≥ 85", CRIT), ("High", "≥ 70", ORANGE), ("Medium", "≥ 45", GOLD), ("Low", "> 0", TEAL), ("Info", "0", FAINT)]
+cx = 0.85
+for lab, thr, col in bands:
+    rect(s, cx, 4.68, 1.06, 0.62, fill=PANEL, line=col, line_w=1.25, radius=0.1)
+    text(s, cx, 4.74, 1.06, 0.3, [[(lab, 10.5, col, True)]], align=PP_ALIGN.CENTER)
+    text(s, cx, 5.0, 1.06, 0.3, [[(thr, 10.5, TEXT, False, MONO)]], align=PP_ALIGN.CENTER)
+    cx += 1.14
+# anatomy of an issue card
+rx, rw = 7.0, 5.75
+rect(s, rx, 1.38, rw, 4.27, fill=PANEL, line=BORDER, radius=0.04)
+text(s, rx + 0.28, 1.52, rw - 0.5, 0.3, [[("ANATOMY OF AN ISSUE CARD", 11, MUTED, True)]])
+card = [
+    ("Sleeping cell AMM0416_L18_1", 13, CRIT, True, FONT),
+    ("Critical · score 92 · Availability · Huawei · 4G", 10, MUTED, False, FONT),
+    ("", 4, MUTED, False, FONT),
+    ("\"CM state Active but 'Traffic Volume' flatlined for 3 day(s):", 10.5, TEXT, False, MONO),
+    ("  latest=0.01 vs baseline avg 412.6 over previous 7 day(s)\"", 10.5, TEXT, False, MONO),
+    ("", 4, MUTED, False, FONT),
+    ("evidence: { kpi, days_asleep, baseline_avg,", 10.5, GOLD, False, MONO),
+    ("            quiet_cutoff, recent[], baseline[] }", 10.5, GOLD, False, MONO),
+    ("", 4, MUTED, False, FONT),
+    ("recommendation: check alarms, TX path, RET/RRU,", 10.5, TEAL, False, MONO),
+    ("  transmission — likely silent outage or barred cell", 10.5, TEAL, False, MONO),
+]
+yy = 1.92
+for t, sz, c, b, f in card:
+    text(s, rx + 0.3, yy, rw - 0.55, 0.32, [[(t, sz, c, b, f)]])
+    yy += 0.31 if t else 0.12
+text(s, rx + 0.28, yy + 0.12, rw - 0.5, 0.4,
+     [[("Title → what · Summary → why · Evidence → proof · Recommendation → next action", 10, FAINT, False, FONT, True)]])
+footer(s, "04 · Scoring")
+
+# ============================================================ 8 · SLEEPING CELLS
+s = slide_base()
+header(s, "Section 05", "Detection 1 — Sleeping cells", kicker_color=CRIT)
+text(s, 0.55, 1.28, 12.2, 0.35,
+     [[("Definition:  ", 12, CRIT, True),
+       ("a cell that is on-air per CM (activity = Active) but whose daily traffic collapsed to ~zero against its own baseline — a silent outage no alarm caught.", 12, MUTED, False)]])
+bullets(s, 0.55, 1.8, 6.15, 3.3, [
+    ("Baseline = the cell's own history. ", "7 previous days of daily traffic (or users, if no traffic KPI exists for that table)."),
+    ("Recent window = last 2 days. ", "The cell is a candidate only if its best recent day is still below the quiet cutoff."),
+    ("Quiet cutoff is relative: ", "2% of the baseline average, floored at 0.05 — a small cell isn't flagged for being small."),
+    ("Low-traffic cells excluded: ", "baseline average < 1.0 (KPI units) is ignored — nothing meaningful to lose."),
+    ("Days-asleep counts back ", "consecutive quiet days from the newest sample — it can exceed the 2-day window."),
 ], size=12, gap=8)
-# write flow
+formula_card(s, 7.0, 1.8, 5.75, 2.35, "SCORE (0–100)", [
+    ("score = 45                    # base: it IS asleep", TEAL),
+    ("      + min(25, √baseline_avg)  # bigger cell,", TEXT),
+    ("                                # bigger loss", FAINT),
+    ("      + min(30, days_asleep×10) # longer = worse", TEXT),
+    ("", MUTED),
+    ("quiet_cutoff = max(0.05, 0.02 × baseline_avg)", GOLD),
+])
+text(s, 7.0, 4.35, 5.75, 0.75,
+     [[("Reading it:  ", 11, TEAL, True),
+       ("a busy cell (baseline 400+) asleep 3 days lands ≈ 45+20+30 = 95 → Critical. A quiet rural cell asleep 1 day ≈ 45+3+10 = 58 → Medium.", 11, MUTED, False)]])
+footer(s, "05 · Detections")
+demo_cue(s, 5.55,
+         "Open Sleeping Cells; expand one issue and show recent[] vs baseline[] in the evidence.",
+         "Dashboard → Radio Optimization → Sleeping Cell Detector",
+         watch="CM says Active, PM says dead — that gap is the whole detection.")
+
+# ============================================================ 9 · OVERSHOOTING
+s = slide_base()
+header(s, "Section 05", "Detection 2 — Overshooting", kicker_color=ORANGE)
+text(s, 0.55, 1.28, 12.2, 0.35,
+     [[("Definition:  ", 12, ORANGE, True),
+       ("a cell handing over to neighbors far beyond its intended footprint — serving where it shouldn't, degrading HO performance and polluting the far cell's area.", 12, MUTED, False)]])
+bullets(s, 0.55, 1.8, 6.15, 3.2, [
+    ("Source: the HO relation matrix. ", "Per source→target neighbor line: attempts, failures, success rate, inter-site distance (min 5 attempts to count)."),
+    ("Distance gate: ", "relations under 8 km are ignored — normal grid geometry, not overshooting."),
+    ("Three penalty terms: ", "distance beyond 8 km, HO failure ratio, and HO success rate below 95%."),
+    ("Keep threshold: ", "score < 30 is dropped — only actionable candidates surface."),
+    ("First-pass heuristic by design: ", "needs no TA/MR/RSRP data; confirm with TA or drive-test evidence before tilting."),
+], size=12, gap=8)
+formula_card(s, 7.0, 1.8, 5.75, 2.3, "SCORE (0–100)", [
+    ("if distance < 8 km: skip", FAINT),
+    ("score = min(45, (distance − 8) × 4)", TEXT),
+    ("      + min(25, failures/attempts × 100)", TEXT),
+    ("      + max(0, 95 − HO_success_rate)", TEXT),
+    ("keep if score ≥ 30", GOLD),
+])
+text(s, 7.0, 4.3, 5.75, 0.8,
+     [[("Action path:  ", 11, TEAL, True),
+       ("evidence includes source azimuth → check the bearing, then downtilt (RET module), power, or clean the neighbor plan. 15 km + failing HOs ≈ 28+x → strong candidate.", 11, MUTED, False)]])
+footer(s, "05 · Detections")
+demo_cue(s, 5.55,
+         "Sort by score; pick a candidate and cross-check its azimuth & distance on the map.",
+         "Radio Optimization → Overshooting Detector  →  Network Map (same cell)",
+         watch="Far-target distance + failure ratio in the evidence block — then the geometry on the map.")
+
+# ============================================================ 10 · NEIGHBOR QUALITY
+s = slide_base()
+header(s, "Section 05", "Detection 3 — Neighbor quality", kicker_color=TEAL)
+text(s, 0.55, 1.28, 12.2, 0.35,
+     [[("Every defined neighbor relation is scored by summing independent penalties — one bad relation can fail for several reasons at once:", 12, MUTED, False)]])
+# penalty table
+pens = [
+    ("Poor HO success", "(95 − SR) × 1.4", "SR 88% → 9.8 pts; missing SR data → flat 10", CRIT),
+    ("HO failures", "min(35, fail/attempts × 100)", "failure ratio capped at 35 pts", ORANGE),
+    ("Excessive distance", "+20 if ≥ 12 km", "geometry sanity check on the relation", GOLD),
+    ("Missing reciprocal", "+15 if B→A not defined", "one-way neighbors break return mobility", PURPLE),
+    ("Cross-vendor edge", "+8 if vendors differ", "Nokia↔Huawei borders need extra attention", ACCENT),
+]
+ty = 1.78
+rect(s, 0.55, ty, 12.2, 0.4, fill=PANEL2, line=None, radius=0.03)
+for cx, lab, wd in ((0.75, "SIGNAL", 2.6), (3.45, "PENALTY", 3.1), (6.7, "READING IT", 5.9)):
+    text(s, cx, ty + 0.05, wd, 0.3, [[(lab, 10, MUTED, True)]])
+yy = ty + 0.48
+for sig, pen, note, col in pens:
+    rect(s, 0.55, yy, 12.2, 0.56, fill=PANEL, line=BORDER, radius=0.03)
+    rect(s, 0.55, yy, 0.06, 0.56, fill=col, shape=MSO_SHAPE.RECTANGLE)
+    text(s, 0.75, yy + 0.04, 2.65, 0.5, [[(sig, 11, TEXT, True)]], anchor=MSO_ANCHOR.MIDDLE)
+    text(s, 3.45, yy + 0.04, 3.15, 0.5, [[(pen, 10.5, col, True, MONO)]], anchor=MSO_ANCHOR.MIDDLE)
+    text(s, 6.7, yy + 0.04, 5.9, 0.5, [[(note, 10, MUTED, False)]], anchor=MSO_ANCHOR.MIDDLE)
+    yy += 0.62
+text(s, 0.55, yy + 0.03, 12.2, 0.35,
+     [[("Relations need ≥10 HO attempts to be judged; total score < 25 is discarded. Summary strings are engineer-readable: ", 11, MUTED, False),
+       ("\"HO SR 88.2%, 214 failed HOs, missing reciprocal, 14.1 km\"", 11, TEAL, False, MONO)]])
+footer(s, "05 · Detections")
+demo_cue(s, 5.85,
+         "Filter to one area; show a relation failing on multiple penalties at once.",
+         "Radio Optimization → Neighbor Quality Analyzer → area filter")
+
+# ============================================================ 11 · CAPACITY + COVERAGE
+s = slide_base()
+header(s, "Section 05", "Detections 4 & 5 — Capacity hotspots · Layer gaps", kicker_color=GOLD)
+# left: capacity
+rect(s, 0.55, 1.4, 6.05, 4.1, fill=PANEL, line=GOLD, line_w=1.25, radius=0.05)
+text(s, 0.82, 1.55, 5.6, 0.3, [[("CAPACITY HOTSPOTS", 12.5, GOLD, True)]])
+text(s, 0.82, 1.9, 5.55, 0.7,
+     [[("Finds cells whose PRB utilization is both rising and already high — growth pressure, not a one-day spike.", 11, MUTED, False)]])
+formula_card(s, 0.82, 2.6, 5.5, 1.7, "SCORE", [
+    ("delta = |latest − baseline| utilization", TEXT),
+    ("score = min(45, delta × 2)", TEXT),
+    ("      + max(0, latest − 70) × 1.2", TEXT),
+    ("keep if score ≥ 20", GOLD),
+])
+text(s, 0.82, 4.42, 5.5, 0.95,
+     [[("The 70% knee:  ", 10.5, TEAL, True),
+       ("below ~70% PRB, users rarely feel it; each point above 70 adds 1.2 pts. Recommendation: busy-hour PRB/users review → carrier add or sector split.", 10.5, MUTED, False)]])
+# right: layer gaps
+rect(s, 6.75, 1.4, 6.0, 4.1, fill=PANEL, line=PURPLE, line_w=1.25, radius=0.05)
+text(s, 7.02, 1.55, 5.5, 0.3, [[("LAYER COVERAGE GAPS", 12.5, PURPLE, True)]])
+text(s, 7.02, 1.9, 5.5, 0.7,
+     [[("Inventory-based (no PM needed): per sector, which technology layers exist vs which the grid design expects.", 11, MUTED, False)]])
+formula_card(s, 7.02, 2.6, 5.45, 1.7, "SCORE", [
+    ("+35 if LTE missing entirely", TEXT),
+    ("+20 if 3G missing", TEXT),
+    ("+min(35, missing_layers × 7)", TEXT),
+    ("  (per absent LTE band, e.g. L18/L21)", FAINT),
+])
+text(s, 7.02, 4.42, 5.45, 0.95,
+     [[("Use it for:  ", 10.5, TEAL, True),
+       ("finding sectors where a band was never integrated, decommissioned by mistake, or metadata is stale — validate design before chasing 'coverage complaints'.", 10.5, MUTED, False)]])
+footer(s, "05 · Detections")
+demo_cue(s, 5.72,
+         "Show a hotspot cell's utilization trend, then a sector with a missing band.",
+         "Capacity Hotspots → evidence  ·  then  Layer Coverage Gaps")
+
+# ============================================================ 12 · CM READING
+s = slide_base()
+header(s, "Section 06", "CM: reading the live network")
+bullets(s, 0.55, 1.38, 6.1, 3.5, [
+    ("Live config on demand. ", "PrimeNet reads current parameter values straight from the OSS — NetAct for Nokia, U2020 for Huawei — not from a stale weekly export."),
+    ("The MO tree is your address system. ", "Nokia: PLMN → RNC/BSC → WBTS/WCEL (3G), MRBTS → LNCEL (4G). Every cell/parameter has one distinguished name (DN)."),
+    ("Live vs plan. ", "Reads target the actual network; writes go to a plan configuration first — nothing edits live directly."),
+    ("Huawei side speaks MML. ", "The same UI drives LST/MOD commands under the hood; responses are parsed into the same tables."),
+    ("Parameter Dictionary: ", "~19,000 Huawei parameter reference pages searchable offline — meaning, range, impact, before you touch anything."),
+], size=12, gap=8)
+# right: DN example card
 rx, rw = 6.9, 5.85
-rect(s, rx, 1.4, rw, 3.55, fill=RGBColor(0x0C,0x13,0x1D), line=GOLD, line_w=1.0, radius=0.04)
-text(s, rx + 0.28, 1.55, rw - 0.5, 0.3, [[("SAFE WRITE FLOW", 11, GOLD, True)]])
+rect(s, rx, 1.38, rw, 3.5, fill=CODEBG, line=BORDER, radius=0.04)
+text(s, rx + 0.28, 1.52, rw - 0.5, 0.3, [[("ONE CELL, TWO VENDORS", 11, MUTED, True)]])
+dn = [
+    ("Nokia (3G cell):", TEAL),
+    ("  PLMN-PLMN/RNC-521/WBTS-176/WCEL-1", TEXT),
+    ("  class NOKRNC:WCEL — read via CM API", FAINT),
+    ("", MUTED),
+    ("Huawei (4G cell):", CRIT),
+    ("  LST CELL: LOCALCELLID=1;", TEXT),
+    ("  MOD CELLALGOSWITCH: … ;", TEXT),
+    ("  MML over U2020 — parsed to same table", FAINT),
+    ("", MUTED),
+    ("→ same grid in the UI, vendor hidden", GOLD),
+]
+yy = 1.92
+for t, c in dn:
+    text(s, rx + 0.3, yy, rw - 0.55, 0.3, [[(t, 11.5, c, False, MONO)]])
+    yy += 0.3
+text(s, rx, 5.0, rw, 0.5,
+     [[("Exports land as Excel — the same file format the mass-modify flow re-imports.", 10.5, FAINT, False, FONT, True)]])
+footer(s, "06 · CM")
+demo_cue(s, 5.62,
+         "Extract one site's cells; open the Excel; look up one parameter in the dictionary.",
+         "Configuration → Configuration Data Extractor → site scope → Extract  ·  Parameter Dictionary")
+
+# ============================================================ 13 · AUDIT & CHANGE IMPACT
+s = slide_base()
+header(s, "Section 07", "CM Parameter Audit & Change Impact")
+# left: audit
+rect(s, 0.55, 1.4, 6.05, 4.15, fill=PANEL, line=ACCENT, line_w=1.25, radius=0.05)
+text(s, 0.82, 1.55, 5.5, 0.3, [[("GOLDEN-PARAMETER AUDIT", 12.5, ACCENT, True)]])
+text(s, 0.82, 1.9, 5.55, 0.65,
+     [[("You define the golden config as rules; the tool scans the latest CM snapshot and flags every violation.", 11, MUTED, False)]])
+rules = [
+    ("equals", "value must match expected (e.g. qRxLevMin = -128)", TEAL),
+    ("range", "numeric bounds (e.g. 0 ≤ tilt offset ≤ 10)", GOLD),
+    ("not_empty", "parameter must be set at all", PURPLE),
+]
+yy = 2.6
+for rt, d, col in rules:
+    rect(s, 0.82, yy, 5.5, 0.55, fill=CODEBG, line=BORDER, radius=0.05)
+    text(s, 1.0, yy + 0.05, 1.5, 0.45, [[(rt, 11, col, True, MONO)]], anchor=MSO_ANCHOR.MIDDLE)
+    text(s, 2.5, yy + 0.05, 3.75, 0.45, [[(d, 9.5, MUTED, False)]], anchor=MSO_ANCHOR.MIDDLE)
+    yy += 0.63
+text(s, 0.82, yy + 0.02, 5.5, 0.9,
+     [[("Rules carry vendor / RAT / MO-class scope and their own severity (Critical→90 … Low→30). Findings export to Excel for the change board.", 10.5, MUTED, False)]])
+# right: change impact
+rect(s, 6.75, 1.4, 6.0, 4.15, fill=PANEL, line=CRIT, line_w=1.25, radius=0.05)
+text(s, 7.02, 1.55, 5.5, 0.3, [[("CHANGE IMPACT TRACKER", 12.5, CRIT, True)]])
+text(s, 7.02, 1.9, 5.5, 0.65,
+     [[("Answers the morning-after question: did yesterday's parameter changes hurt anything?", 11, MUTED, False)]])
+steps = [
+    ("1", "Diff CM snapshots → list of parameter changes per cell"),
+    ("2", "Pull the degraded-cells list from daily PM (accessibility, retainability…)"),
+    ("3", "Correlate: change + degradation on the same cell → score 65; change alone → 35"),
+    ("4", "Summary names both: \"pci changed 101→237. PM degradation also seen in Retainability (−4.2%)\""),
+]
+yy = 2.6
+for n, d in steps:
+    text(s, 7.02, yy, 5.5, 0.65,
+         [[(n + "  ", 12, CRIT, True, MONO), (d, 10.5, MUTED, False)]], line_spacing=1.05)
+    yy += 0.72
+footer(s, "07 · Audit & impact")
+demo_cue(s, 5.72,
+         "Run the audit on one vendor/RAT; then show a correlated change in Change Impact.",
+         "Configuration → CM Parameter Audit → Scan  ·  Radio Optimization → Change Impact Tracker")
+
+# ============================================================ 14 · RET
+s = slide_base()
+header(s, "Section 07", "RET: reading & changing tilts safely", kicker_color=GOLD)
+bullets(s, 0.55, 1.4, 6.05, 3.6, [
+    ("Read tilts across both vendors ", "in one grid — current electrical tilt per antenna/RET unit, joined to cell & site metadata."),
+    ("Writes are explicit, never bulk-blind. ", "You stage the target tilt per RET unit; the tool generates the vendor command (Huawei RET MOD / Nokia CM write)."),
+    ("Value handling is vendor-aware. ", "Tilt units, offsets, and command formatting differ per vendor — the tool normalizes so you type degrees, not vendor syntax."),
+    ("Every applied change is recorded ", "in Config History: what, when, who, old → new — your rollback reference."),
+    ("Close the loop with Change Impact: ", "tomorrow, the tilt change shows up correlated with its KPI effect."),
+], size=12, gap=8)
+# right: tilt workflow
+rx, rw = 6.9, 5.85
+rect(s, rx, 1.4, rw, 3.55, fill=CODEBG, line=GOLD, line_w=1.0, radius=0.04)
+text(s, rx + 0.28, 1.55, rw - 0.5, 0.3, [[("TILT CHANGE — TYPICAL FLOW", 11, GOLD, True)]])
 flow = [
-    ("1  Export", "read live MOs (confId 1) → Excel", ACCENT),
-    ("2  Edit", "operator edits values in Excel", TEAL),
-    ("3  Validate", "re-import checks types / ranges / DNs", PURPLE),
-    ("4  Stage", "write to a plan confId (not live)", GOLD),
-    ("5  Provision", "operations/v1 applies the plan", ORANGE),
-    ("6  Record", "Config History logs the change", CRIT),
+    ("1  Detect", "overshooting candidate at 14 km, azimuth 120°", ACCENT),
+    ("2  Confirm", "map geometry + HO evidence + (TA if available)", TEAL),
+    ("3  Read", "current tilt: 2° electrical on that RET unit", PURPLE),
+    ("4  Stage", "target 4° — review generated command", GOLD),
+    ("5  Apply", "execute; result logged to Config History", ORANGE),
+    ("6  Verify", "next-day Change Impact + neighbor HO SR", CRIT),
 ]
 yy = 2.0
 for t, d, col in flow:
@@ -638,216 +690,82 @@ for t, d, col in flow:
     if col != CRIT:
         line(s, rx + 0.38, yy + 0.2, rx + 0.38, yy + 0.42, color=BORDER, w=1.0)
     yy += 0.47
-footer(s, "06 · CM write-back")
+footer(s, "07 · RET")
+demo_cue(s, 5.62,
+         "Read tilts for one site; stage (but don't apply) a change and show the generated command.",
+         "Configuration → RET Management → site filter",
+         watch="The vendor command preview — degrees in, vendor syntax out.")
 
-# ============================================================ SLIDE 14: RADIO ENGINE
+# ============================================================ 15 · DAILY LOOP
 s = slide_base()
-header(s, "Section 07", "Radio analytics engine: one scoring model")
-text(s, 0.55, 1.28, 12.2, 0.3,
-     [[("Every radio insight module emits the same normalized ", 12, MUTED, False),
-       ("issue", 12, TEAL, True, MONO), (" — from core/radio/scoring.py:", 12, MUTED, False)]])
-# code card
-rect(s, 0.55, 1.68, 6.4, 3.85, fill=RGBColor(0x0A,0x10,0x18), line=BORDER, radius=0.03)
-code = [
-    ("def issue(module, category, title,", TEAL),
-    ("          summary, score, cells, …):", TEAL),
-    ("    severity = severity_from_score(score)", TEXT),
-    ("    return {", MUTED),
-    ("      'id': stable_id(module, category,", ACCENT),
-    ("                      title, site_id, cells),", ACCENT),
-    ("      'severity': severity,   # Crit→Info", TEXT),
-    ("      'score': round(score, 2),", TEXT),
-    ("      'cells': cells, 'site_id': …,", MUTED),
-    ("      'evidence': {kpi, pre, post, delta},", GOLD),
-    ("      'recommendation': …,", MUTED),
-    ("      'source_url': '/capacity-hotspots' }", MUTED),
-]
-yy = 1.85
-for t, c in code:
-    text(s, 0.78, yy, 6.0, 0.3, [[(t, 11, c, False, MONO)]])
-    yy += 0.305
-# right explanation
-text(s, 7.2, 1.68, 5.5, 0.3, [[("Why this matters", 14, TEAL, True)]])
-bullets(s, 7.2, 2.06, 5.55, 3.0, [
-    ("Uniform issue shape. ", "Filtering, sorting, severity roll-ups and the UI are written once and reused by every module."),
-    ("Deterministic IDs. ", "stable_id = sha256(parts)[:16] — the same problem keeps the same id across runs, so dedup & tracking work."),
-    ("Bounded, additive scores. ", "bounded_score sums capped signals → 0–100; thresholds map to Critical/High/Medium/Low/Info."),
-    ("Evidence travels with the verdict. ", "pre/post/delta KPIs are attached, so “why” is auditable, not a black box."),
-], size=12, gap=7)
-# severity legend strip
-sevs = [("Critical ≥85", CRIT), ("High ≥70", ORANGE), ("Medium ≥45", GOLD), ("Low >0", TEAL), ("Info 0", FAINT)]
-cx = 0.55
-for lab, col in sevs:
-    w = 0.2 + 0.1 * len(lab)
-    chip(s, cx, 5.68, w, lab, col, h=0.32, size=10)
-    cx += w + 0.18
-footer(s, "07 · Radio engine")
+header(s, "Section 08", "The daily loop: morning report & sector health")
+# left: morning report
+rect(s, 0.55, 1.4, 6.05, 3.05, fill=PANEL, line=ORANGE, line_w=1.25, radius=0.05)
+text(s, 0.82, 1.55, 5.5, 0.3, [[("RADIO MORNING REPORT", 12.5, ORANGE, True)]])
+bullets(s, 0.82, 1.95, 5.55, 2.3, [
+    ("One overnight roll-up ", "of every detection: sleeping cells, hotspots, neighbor issues, audit failures."),
+    ("Ranked by severity ", "so the first 15 minutes of the day are triage, not hunting."),
+    ("Each line links back ", "to its source module with evidence intact."),
+], size=11.5, gap=6)
+# right: sector health
+rect(s, 6.75, 1.4, 6.0, 3.05, fill=PANEL, line=TEAL, line_w=1.25, radius=0.05)
+text(s, 7.02, 1.55, 5.5, 0.3, [[("SECTOR HEALTH MONITOR", 12.5, TEAL, True)]])
+bullets(s, 7.02, 1.95, 5.5, 2.3, [
+    ("Per-sector KPI composite ", "across accessibility, retainability, mobility, interference."),
+    ("All-cells variant ", "covers the whole network, with site names derived from cell names."),
+    ("Your drill-down surface ", "when a report line needs context: is it one cell or the whole sector?"),
+], size=11.5, gap=6, lead=TEAL)
+text(s, 0.55, 4.62, 12.2, 0.5,
+     [[("Trusting the numbers:  ", 12, TEAL, True),
+       ("data freshness is visible (per-vendor last-loaded day), missing days are shown as missing, and no KPI is ever interpolated. If the report looks quiet, check freshness before celebrating.", 12, MUTED, False)]])
+footer(s, "08 · Daily loop")
+demo_cue(s, 5.55,
+         "Open the morning report; follow one Critical line to its module and evidence.",
+         "Radio Optimization → Radio Morning Report → click a finding")
 
-# ============================================================ SLIDE 15: INSIGHT CATALOG
-s = slide_base()
-header(s, "Section 07", "The insight catalog")
-text(s, 0.55, 1.25, 12.2, 0.3,
-     [[("Same engine, different recipes — each module scores a specific failure mode:", 12, MUTED, False)]])
-cat = [
-    ("Capacity Hotspots", "busy-hour PRB/utilization delta vs baseline → carrier/split advice", ACCENT),
-    ("Sleeping Cells", "traffic/accessibility collapse vs history → outage-suspect cells", CRIT),
-    ("Overshooting", "TA / distance vs footprint → down-tilt / power candidates", ORANGE),
-    ("Layer Coverage Gaps", "missing LTE band per sector from coverage payload", PURPLE),
-    ("Neighbor Quality", "relation health, missing/one-way neighbors, HO KPIs", TEAL),
-    ("Sector Health", "per-sector KPI composite, all-cells variant", ACCENT),
-    ("SON Analytics", "cross-cutting optimization insights & priorities", GOLD),
-    ("Change Impact", "before/after KPI deltas around a config change", TEAL),
-    ("RF Optimization", "workbench aggregating candidate actions", PURPLE),
-    ("Radio Morning Report", "overnight roll-up of the above into one brief", ORANGE),
-]
-cw, rh = 6.05, 0.82
-for i, (t, d, col) in enumerate(cat):
-    cx = 0.55 + (i % 2) * (cw + 0.12)
-    cy = 1.65 + (i // 2) * (rh + 0.06)
-    rect(s, cx, cy, cw, rh, fill=PANEL, line=BORDER, radius=0.06)
-    rect(s, cx, cy, 0.07, rh, fill=col, shape=MSO_SHAPE.RECTANGLE)
-    text(s, cx + 0.24, cy + 0.09, cw - 0.4, 0.3, [[(t, 12, TEXT, True)]])
-    text(s, cx + 0.24, cy + 0.42, cw - 0.4, 0.35, [[(d, 10, MUTED, False)]])
-# compact inline demo pointer (full catalog fills the slide)
-rect(s, 0.55, 6.28, 12.2, 0.4, fill=RGBColor(0x22,0x1C,0x0E), line=GOLD, line_w=1.0, radius=0.12)
-text(s, 0.55, 6.28, 12.2, 0.4,
-     [[("⟳  SWITCH TO TOOL:  ", 11, GOLD, True),
-       ("open any two of these side-by-side and show the identical issue table + severity roll-up.", 10.5, MUTED, False)]],
-     align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-footer(s, "07 · Radio engine")
-
-# ============================================================ SLIDE 16: FRONTEND
-s = slide_base()
-header(s, "Section 08", "Frontend architecture")
-cols = [
-    ("Theme system", TEAL, [
-        "body.dark-mode is the single switch; all CSS keys off it.",
-        "Persisted in localStorage (primenet-theme); applied on every load.",
-        "primenet:theme-change event syncs Chart.js instances live.",
-        "Dark tokens (--dm-bg/panel/text…) in common.css; module CSS inherits.",
-    ]),
-    ("Shared shells", ACCENT, [
-        "common.css / common.js — header, toggle, tables, buttons.",
-        "radio_module.html — one filter shell for all radio modules.",
-        "dashboard = constellation.css + constellation.js (always-dark deck).",
-        "Cache-bust ?v=X.X bumped only on files actually changed.",
-    ]),
-    ("Rendering & maps", PURPLE, [
-        "Server-rendered Jinja + progressive JS per module.",
-        "Chart.js for KPI trends; theme-aware defaults.",
-        "Leaflet maps — CSP allow-lists OSM & ArcGIS tile hosts.",
-        "unpkg is the only external script/style origin permitted.",
-    ]),
-]
-for i, (t, col, items) in enumerate(cols):
-    cx = 0.55 + i * (4.05)
-    rect(s, cx, 1.4, 3.9, 4.2, fill=PANEL, line=BORDER, radius=0.04)
-    rect(s, cx, 1.4, 3.9, 0.5, fill=col, shape=MSO_SHAPE.RECTANGLE)
-    text(s, cx + 0.22, 1.4, 3.6, 0.5, [[(t, 13, BG, True)]], anchor=MSO_ANCHOR.MIDDLE)
-    yy = 2.1
-    for it in items:
-        text(s, cx + 0.22, yy, 3.5, 0.8, [[("▸ ", 11, col, True), (it, 11, MUTED, False)]], line_spacing=1.04)
-        yy += 0.85
-footer(s, "08 · Frontend")
-
-# ============================================================ SLIDE 17: DEPLOYMENT
-s = slide_base()
-header(s, "Section 08", "Deployment & operations")
-bullets(s, 0.55, 1.4, 6.05, 3.8, [
-    ("Single container. ", "Dockerfile + gunicorn (GUNICORN_WORKERS/THREADS/TIMEOUT); docker-compose maps PRIMENET_HTTP_PORT."),
-    ("Stateful volume. ", "Mount NCM_DATA_ROOT=/data — databases, raw, sync_downloads persist outside the image."),
-    ("Config via env. ", ".env holds SFTP + CM/FM creds and tuning; nothing secret is committed."),
-    ("Health probe. ", "/health & /api/health report locked / degraded / ok for LBs and orchestrators."),
-    ("Hardening switches. ", "NCM_ENABLE_HSTS when HTTPS-only; NCM_CONTAINER disables dev-only Windows helpers."),
-    ("Bootstrap. ", "First run seeds an admin from NCM_BOOTSTRAP_ADMIN_* only when the users table is empty."),
-], size=12, gap=8)
-# env card
-rx, rw = 6.9, 5.85
-rect(s, rx, 1.4, rw, 3.85, fill=RGBColor(0x0C,0x13,0x1D), line=BORDER, radius=0.04)
-text(s, rx + 0.28, 1.55, rw - 0.5, 0.3, [[("KEY ENVIRONMENT", 11, MUTED, True)]])
-env = [
-    ("NCM_DATA_ROOT=/data", ACCENT),
-    ("NCM_CONTAINER=1", FAINT),
-    ("GUNICORN_WORKERS=2  THREADS=4", TEAL),
-    ("FLASK_SECRET_KEY=…", GOLD),
-    ("SESSION_LIFETIME_HOURS=2", FAINT),
-    ("NOKIA_PM_HOST / HUAWEI_PM_HOST / METADATA_HOST", TEAL),
-    ("NOKIA_CM_HOST / USER / PASSWORD", PURPLE),
-    ("NOKIA_CM_MO_BATCH_SIZE=150", FAINT),
-    ("NOKIA_CM_BATCH_DELAY_SEC=0.4", FAINT),
-    ("NOKIA_FM_* (Keycloak/OAuth, Fault Mgmt)", CRIT),
-    ("NCM_ENABLE_HSTS=1", GOLD),
-]
-yy = 1.95
-for t, c in env:
-    text(s, rx + 0.3, yy, rw - 0.5, 0.3, [[(t, 11, c, False, MONO)]])
-    yy += 0.29
-footer(s, "08 · Deployment")
-
-# ============================================================ SLIDE 18: EXTENDING
-s = slide_base()
-header(s, "Section 08", "Extending PrimeNet: add a module")
-steps = [
-    ("1", "Scaffold the folder", "modules/<name>/ with routes.py, templates/, static/, logic.py — copy an existing module as the template.", ACCENT),
-    ("2", "Define the blueprint", "<name>_bp = Blueprint(..., template_folder=\"templates\"); guard routes with login_required.", TEAL),
-    ("3", "Register once", "Import + app.register_blueprint(<name>_bp) in app.py — the only global edit.", PURPLE),
-    ("4", "Wire visibility", "Add the route to core/module_access.py with all / admin / admin_or_noc.", GOLD),
-    ("5", "Reuse the shell", "Load common.css/js (+ radio_module.html for radio filters) so theme & chrome come free.", ORANGE),
-    ("6", "Emit issues (if analytic)", "Return core/radio.scoring.issue() dicts to inherit filtering, severity & UI.", CRIT),
-]
-for i, (n, t, d, col) in enumerate(steps):
-    cx = 0.55 + (i % 2) * 6.15
-    cy = 1.45 + (i // 2) * 1.4
-    rect(s, cx, cy, 5.95, 1.25, fill=PANEL, line=BORDER, radius=0.06)
-    rect(s, cx, cy, 0.6, 1.25, fill=col, shape=MSO_SHAPE.RECTANGLE)
-    text(s, cx, cy, 0.6, 1.25, [[(n, 26, BG, True, FONT_L)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-    text(s, cx + 0.78, cy + 0.14, 5.0, 0.35, [[(t, 13, TEXT, True)]])
-    text(s, cx + 0.78, cy + 0.5, 5.05, 0.7, [[(d, 10.5, MUTED, False)]], line_spacing=1.04)
-footer(s, "08 · Extending")
-
-# ============================================================ SLIDE 19: DEMO RUNBOOK
+# ============================================================ 16 · RUNBOOK
 s = slide_base(divider=True)
 constellation(s, n=40, seed=3, link=1.7)
 rect(s, 0.55, 0.5, 0.09, 0.62, fill=GOLD, shape=MSO_SHAPE.RECTANGLE)
 text(s, 0.78, 0.46, 11.8, 0.3, [[("APPENDIX", 11, GOLD, True)]])
-text(s, 0.77, 0.7, 12.0, 0.6, [[("End-to-end demo runbook", 25, TEXT, True, FONT_L)]])
-text(s, 0.55, 1.35, 12.2, 0.3,
-     [[("A single continuous click-path — narrate each subsystem as you pass through it:", 12, MUTED, False)]])
+text(s, 0.77, 0.7, 12.0, 0.6, [[("End-to-end demo runbook (the full loop, live)", 25, TEXT, True, FONT_L)]])
 run = [
-    ("Login & Dashboard", "Show the constellation deck & RBAC-filtered nav.", "Overview of modules by role"),
-    ("Sync", "Trigger/observe a pull→load; then Network Health for freshness.", "ETL taxonomy in action"),
-    ("Performance Explorer", "Query KPIs across vendor/RAT.", "Automatic column detection"),
-    ("CM Extractor", "Extract a scope → open the Excel output.", "One UI, Nokia REST + Huawei MML"),
-    ("Capacity Hotspots", "Sort by score; expand evidence on a row.", "The shared issue/scoring model"),
-    ("RET Management", "Read tilt; walk the safe write flow (don't apply).", "Governed CM write-back"),
-    ("Config History", "Show a recorded change.", "Auditability & rollback"),
+    ("Morning Report", "Start where the day starts — ranked overnight findings.", "Triage"),
+    ("Sleeping Cells", "Drill into a Critical: recent[] vs baseline[] evidence.", "Detection logic"),
+    ("Performance Explorer", "Trend the same cell's traffic KPI to confirm the flatline.", "KPI verification"),
+    ("Overshooting → Map", "Pick a candidate; check azimuth & distance geometry.", "Diagnosis"),
+    ("RET Management", "Read the tilt; stage the fix; show the vendor command.", "Change (staged)"),
+    ("CM Parameter Audit", "Scan the same area against golden rules.", "Config hygiene"),
+    ("Change Impact", "Show yesterday's changes correlated with PM deltas.", "Verification"),
 ]
-yy = 1.85
+yy = 1.55
 for i, (t, d, why) in enumerate(run):
-    rect(s, 0.55, yy, 12.2, 0.66, fill=RGBColor(0x14,0x1E,0x2B), line=BORDER, radius=0.05)
+    rect(s, 0.55, yy, 12.2, 0.66, fill=RGBColor(0x14, 0x1E, 0x2B), line=BORDER, radius=0.05)
     rect(s, 0.55, yy, 0.5, 0.66, fill=GOLD, shape=MSO_SHAPE.RECTANGLE)
-    text(s, 0.55, yy, 0.5, 0.66, [[(str(i+1), 18, BG, True, FONT_L)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    text(s, 0.55, yy, 0.5, 0.66, [[(str(i + 1), 18, BG, True, FONT_L)]], align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
     text(s, 1.2, yy, 3.1, 0.66, [[(t, 12.5, TEXT, True)]], anchor=MSO_ANCHOR.MIDDLE)
     text(s, 4.35, yy, 5.0, 0.66, [[(d, 11, MUTED, False)]], anchor=MSO_ANCHOR.MIDDLE)
     text(s, 9.45, yy, 3.15, 0.66, [[("↳ " + why, 10.5, TEAL, False, FONT, True)]], anchor=MSO_ANCHOR.MIDDLE)
-    yy += 0.735
+    yy += 0.72
+text(s, 0.55, yy + 0.02, 12.2, 0.3,
+     [[("≈ 20 minutes at demo pace. Steps 1–4 are safe anywhere; steps 5–7 stage changes only — nothing is applied during the demo.", 11, FAINT, False, FONT, True)]])
 
-# ============================================================ SLIDE 20: CLOSE
+# ============================================================ 17 · CLOSE
 s = slide_base(divider=True)
 constellation(s, n=64, seed=11, link=2.0)
-text(s, 0.9, 2.2, 11.5, 0.4, [[("TAKEAWAYS", 14, ACCENT, True)]])
-text(s, 0.85, 2.6, 11.6, 1.0, [[("One contract, 37 modules", 44, WHITE, True, FONT_L)]])
-bullets(s, 0.9, 3.85, 11.5, 2.0, [
-    ("A modular monolith ", "trades microservice overhead for a single, legible, single-container deploy."),
-    ("Data flow is deterministic ", "— a path taxonomy + idempotent ETL make SQLite a feature, not a limitation."),
-    ("Two vendors, one surface ", "— REST vs MML complexity is absorbed in core/, never in modules."),
-    ("Analytics share one scoring model ", "— uniform issues make new insights cheap and auditable."),
+text(s, 0.9, 2.1, 11.5, 0.4, [[("TAKEAWAYS", 14, ACCENT, True)]])
+text(s, 0.85, 2.5, 11.6, 1.0, [[("Evidence in, action out", 44, WHITE, True, FONT_L)]])
+bullets(s, 0.9, 3.75, 11.5, 2.2, [
+    ("Every detection is explainable ", "— fixed formulas, visible thresholds, raw KPI evidence on every issue card."),
+    ("Two vendors disappear ", "— KPI recipes and CM adapters give you one workflow across Nokia and Huawei, 2G–5G."),
+    ("The loop closes ", "— detect → diagnose → staged change → next-day impact, with Config History as the audit trail."),
+    ("Nothing is interpolated, nothing writes blind ", "— missing data shows as missing; changes stage before they apply."),
 ], size=13, gap=8)
-rect(s, 0.9, 6.15, 11.5, 0.7, fill=RGBColor(0x14,0x1E,0x2B), line=GOLD, line_w=1.0, radius=0.06)
+rect(s, 0.9, 6.15, 11.5, 0.7, fill=RGBColor(0x14, 0x1E, 0x2B), line=GOLD, line_w=1.0, radius=0.06)
 text(s, 0.9, 6.15, 11.5, 0.7,
-     [[("Questions?  ", 14, GOLD, True), ("Let's go back to the tool and dig into whatever you want to see.", 13, TEXT, False)]],
+     [[("Questions?  ", 14, GOLD, True), ("Name a site — let's run the loop on it live.", 13, TEXT, False)]],
      align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 
 out = "/home/user/PrimeNet/PrimeNet_Engineering_DeepDive.pptx"
 prs.save(out)
-print("saved", out, "slides:", len(prs.slides.__iter__.__self__._sldIdLst))
+print("saved", out, "slides:", len(prs.slides._sldIdLst))
