@@ -806,6 +806,16 @@ def _resolve_key_cols(df):
 
 def _ensure_columns(conn, table, cols):
     existing = {r[1] for r in conn.execute(f'PRAGMA table_info("{table}")').fetchall()}
+    if not existing:
+        col_defs = ['"cell_name" TEXT', '"timestamp" TEXT'] + [
+            f'"{c}" REAL' for c in cols
+        ]
+        conn.execute(
+            f'CREATE TABLE IF NOT EXISTS "{table}" ('
+            + ', '.join(col_defs)
+            + ', UNIQUE (cell_name, timestamp) ON CONFLICT REPLACE)'
+        )
+        return
     for col in cols:
         if col not in existing:
             conn.execute(f'ALTER TABLE "{table}" ADD COLUMN "{col}" REAL')
@@ -844,16 +854,19 @@ def _coerce_kpi_cell_value(val):
 
 def _insert_df(db_path, df, technology):
     """
-    Insert all rows of df into the technology-specific table (e.g. "4G_Hourly").
+    Insert rows into area-partitioned technology tables (e.g. ``4G_CELLS_HOURLY__WEST_AMMAN``).
     df must have 'cell_name' and 'timestamp' columns.
     All other columns stored as-is with their original names.
     Returns (inserted, skipped).
     """
-    table = pm_table_name(technology)
+    from core.site_area import build_cell_area_index, pm_area_table_name, resolve_cell_area
+
+    base_table = pm_table_name(technology)
     kpi_cols = [
         c for c in df.columns
         if c not in ('cell_name', 'timestamp') and c not in _DUPLICATE_KPI_NAMES
     ]
+    cell_index = build_cell_area_index()
 
     conn = sqlite3.connect(db_path, timeout=120)
     try:
@@ -864,22 +877,20 @@ def _insert_df(db_path, df, technology):
     # Faster bulk ingest while keeping durability reasonable for periodic PM loads.
     conn.execute('PRAGMA synchronous=NORMAL')
     conn.execute('PRAGMA temp_store=MEMORY')
-    _ensure_columns(conn, table, kpi_cols)
 
     inserted = 0
     skipped = 0
     col_names = ['cell_name', 'timestamp'] + kpi_cols
     quoted_cols = ', '.join(f'"{c}"' for c in col_names)
     placeholders = ', '.join(['?'] * len(col_names))
-    sql = f'INSERT OR REPLACE INTO "{table}" ({quoted_cols}) VALUES ({placeholders})'
-    batch: list[tuple] = []
 
-    # NumPy-backed scan: avoids pandas iterrows() (very slow on large PM exports).
     cell_arr = df['cell_name'].to_numpy()
     ts_arr = df['timestamp'].to_numpy()
     kpi_arrs = [df[c].to_numpy(copy=False) for c in kpi_cols]
     n = len(df)
-    row_vals: list = [None] * len(col_names)
+
+    batches: dict[str, list[tuple]] = {}
+    ensured: set[str] = set()
 
     for i in range(n):
         cell_name = str(cell_arr[i]).strip()
@@ -892,25 +903,41 @@ def _insert_df(db_path, df, technology):
             skipped += 1
             continue
 
+        area = resolve_cell_area(cell_name, cell_index=cell_index)
+        table = pm_area_table_name(base_table, area)
+        if table not in ensured:
+            _ensure_columns(conn, table, kpi_cols)
+            ensured.add(table)
+
+        row_vals: list = [None] * len(col_names)
         row_vals[0] = cell_name
         row_vals[1] = ts
         for j, col in enumerate(kpi_cols):
             row_vals[2 + j] = _coerce_kpi_cell_value(kpi_arrs[j][i])
 
-        batch.append(tuple(row_vals))
+        batches.setdefault(table, []).append(tuple(row_vals))
         inserted += 1
 
-        if len(batch) >= PM_INSERT_BATCH_SIZE:
-            conn.executemany(sql, batch)
-            batch.clear()
+        if len(batches[table]) >= PM_INSERT_BATCH_SIZE:
+            sql = f'INSERT OR REPLACE INTO "{table}" ({quoted_cols}) VALUES ({placeholders})'
+            conn.executemany(sql, batches[table])
+            batches[table].clear()
 
-    if batch:
+    for table, batch in batches.items():
+        if not batch:
+            continue
+        sql = f'INSERT OR REPLACE INTO "{table}" ({quoted_cols}) VALUES ({placeholders})'
         conn.executemany(sql, batch)
+        _ensure_pm_cell_timestamp_index_sqlite(conn, table)
 
-    _ensure_pm_cell_timestamp_index_sqlite(conn, table)
+    for table in ensured:
+        _ensure_pm_cell_timestamp_index_sqlite(conn, table)
+
     conn.commit()
     conn.close()
-    logger.info(f'[{technology}] {db_path} → {table}: {inserted} inserted, {skipped} skipped.')
+    logger.info(
+        f'[{technology}] {db_path} → {base_table} partitions: {inserted} inserted, {skipped} skipped.'
+    )
     return inserted, skipped
 
 
@@ -1389,8 +1416,31 @@ def huawei_pm_user_tables(db_path: str | None = None) -> list[str]:
 
 
 def huawei_pm_kpi_tables(db_path: str | None = None) -> list[str]:
-    """Fixed RAT tables (same as Nokia PM layout)."""
-    return [pm_table_name(t) for t in PM_TECHNOLOGIES]
+    """RAT tables including area partitions when present in the DB."""
+    path = HUAWEI_PM_DB if db_path is None else db_path
+    bases = [pm_table_name(t) for t in PM_TECHNOLOGIES]
+    if not path or not os.path.isfile(path):
+        return bases
+    try:
+        conn = sqlite3.connect(path, timeout=15)
+        try:
+            names = [
+                r[0]
+                for r in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+                ).fetchall()
+            ]
+        finally:
+            conn.close()
+    except sqlite3.Error:
+        return bases
+    from core.site_area import list_pm_partition_tables
+
+    out: list[str] = []
+    for base in bases:
+        parts = list_pm_partition_tables(names, base)
+        out.extend(parts or [base])
+    return out
 
 
 def huawei_table_matches_technology(table: str, technology: str | None) -> bool:
@@ -1400,7 +1450,7 @@ def huawei_table_matches_technology(table: str, technology: str | None) -> bool:
     tech = technology.strip().upper()
     t = table.upper()
     legacy = pm_table_name(technology)
-    if table == legacy or t == legacy.upper():
+    if table == legacy or t == legacy.upper() or t.startswith(legacy.upper() + "__"):
         return True
     if tech in t:
         return True
@@ -1420,23 +1470,38 @@ def huawei_pm_table_for_cell(
     cell_technology: str | None = None,
     db_path: str | None = None,
 ) -> str | None:
-    """Pick the hourly table for this cell (prefer tech match, then any table containing the cell)."""
+    """Pick the hourly table for this cell (prefer area partition, then base)."""
+    from core.site_area import list_pm_partition_tables, pm_area_table_name, resolve_cell_area
+
     path = HUAWEI_PM_DB if db_path is None else db_path
-    preferred = pm_table_name(cell_technology or '4G')
-    probe_order = [preferred] + [pm_table_name(t) for t in PM_TECHNOLOGIES if pm_table_name(t) != preferred]
+    base = pm_table_name(cell_technology or '4G')
+    preferred = pm_area_table_name(base, resolve_cell_area(cell_name))
+    probe_order = [preferred, base]
 
     conn = sqlite3.connect(path, timeout=15)
-    for tbl in probe_order:
-        try:
-            if conn.execute(
-                f'SELECT 1 FROM "{tbl}" WHERE cell_name = ? LIMIT 1',
-                (cell_name,),
-            ).fetchone():
-                conn.close()
-                return tbl
-        except sqlite3.OperationalError:
-            continue
-    conn.close()
+    try:
+        names = [
+            r[0]
+            for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+        ]
+        for base_cand in [base] + [pm_table_name(t) for t in PM_TECHNOLOGIES if pm_table_name(t) != base]:
+            for tbl in list_pm_partition_tables(names, base_cand):
+                if tbl not in probe_order:
+                    probe_order.append(tbl)
+
+        for tbl in probe_order:
+            try:
+                if conn.execute(
+                    f'SELECT 1 FROM "{tbl}" WHERE cell_name = ? LIMIT 1',
+                    (cell_name,),
+                ).fetchone():
+                    return tbl
+            except sqlite3.OperationalError:
+                continue
+    finally:
+        conn.close()
     return preferred
 
 

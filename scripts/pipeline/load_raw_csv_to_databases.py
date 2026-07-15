@@ -71,6 +71,9 @@ from pipeline.paths import PM_RATS, raw_path
 HASH_COL = "_sync_row_hash"
 HASH_LOOKUP_BATCH = 500
 
+# Lazy cache for cell_name → area during a load run.
+_CELL_AREA_INDEX_CACHE: dict[str, str] | None = None
+
 
 def _safe_table_name_from_file(file_name: str) -> str:
     stem = os.path.splitext(os.path.basename(file_name))[0].strip().lower()
@@ -132,21 +135,24 @@ def _canonical_table_for_label(
 
 
 def _drop_non_canonical_tables(conn: sqlite3.Connection, label: str, scope: str = "hourly") -> None:
-    keep: set[str] = set()
+    keep_bases: set[str] = set()
+    keep_extra: set[str] = set()
     scope_tag = "DAILY" if str(scope).lower() == "daily" else "HOURLY"
     if label.endswith("-cells"):
-        keep = {f"{t}_CELLS_{scope_tag}" for t in ("2G", "3G", "4G", "5G")}
+        keep_bases = {f"{t}_CELLS_{scope_tag}" for t in ("2G", "3G", "4G", "5G")}
     elif label.endswith("-groups"):
-        keep = {f"{t}_GROUPS_{scope_tag}" for t in ("2G", "3G", "4G", "5G")}
-        # Keep app-managed schema tables if present.
-        keep.update({"groups", "group_cells"})
-    if not keep:
+        keep_bases = {f"{t}_GROUPS_{scope_tag}" for t in ("2G", "3G", "4G", "5G")}
+        keep_extra = {"groups", "group_cells"}
+    else:
         return
     rows = conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
     ).fetchall()
     for (name,) in rows:
-        if name in keep:
+        if name in keep_extra:
+            continue
+        # Keep monotable and area partitions (e.g. 4G_CELLS_HOURLY__WEST_AMMAN).
+        if any(name == base or name.startswith(f"{base}__") for base in keep_bases):
             continue
         conn.execute(f'DROP TABLE IF EXISTS "{name}"')
         print(f"[{label}] dropped non-canonical table: {name}")
@@ -468,6 +474,117 @@ def _filter_missing_cell_time_rows(
     return df.loc[unique_mask & missing_pair_mask].copy()
 
 
+def _pm_cell_area_index() -> dict[str, str]:
+    global _CELL_AREA_INDEX_CACHE
+    if _CELL_AREA_INDEX_CACHE is None:
+        from core.site_area import build_cell_area_index
+
+        _CELL_AREA_INDEX_CACHE = build_cell_area_index()
+        print(f"[pm-area] loaded cell→area index ({len(_CELL_AREA_INDEX_CACHE)} cells)")
+    return _CELL_AREA_INDEX_CACHE
+
+
+def _use_area_partitions(label: str) -> bool:
+    return str(label or "").endswith("-cells")
+
+
+def _partition_frames_by_area(
+    df: pd.DataFrame,
+    base_table: str,
+    cell_col: str | None,
+) -> list[tuple[str, pd.DataFrame]]:
+    """Split a PM frame into (area_table, subframe) using metadata routing."""
+    from core.site_area import pm_area_table_name, resolve_cell_area
+
+    if df.empty:
+        return []
+    if not cell_col or cell_col not in df.columns:
+        from core.site_area import UNKNOWN_AREA
+
+        return [(pm_area_table_name(base_table, UNKNOWN_AREA), df)]
+
+    cell_index = _pm_cell_area_index()
+    areas = df[cell_col].map(
+        lambda v: resolve_cell_area(v, cell_index=cell_index)
+    )
+    out: list[tuple[str, pd.DataFrame]] = []
+    for area, sub in df.groupby(areas, sort=False):
+        out.append((pm_area_table_name(base_table, str(area)), sub))
+    return out
+
+
+def _append_dataframe_to_table(
+    conn: sqlite3.Connection,
+    table: str,
+    df: pd.DataFrame,
+    label: str,
+    *,
+    apply_time_filter: bool,
+) -> int:
+    """Append rows to one SQLite table; optional (cell, time) dedupe filter."""
+    if df.empty:
+        return 0
+    table_exists = _table_exists(conn, table)
+    if not table_exists:
+        df.to_sql(table, conn, if_exists="append", index=False)
+        return len(df)
+
+    db_cols = [c for c in _pragma_column_names(conn, table) if c != HASH_COL]
+    if set(db_cols) != set(df.columns):
+        db_cols = _ensure_table_columns(conn, table, db_cols, list(df.columns))
+    aligned = df.reindex(columns=db_cols)
+    work = aligned
+    if apply_time_filter:
+        cell_col, ts_col = _resolve_cell_time_key_columns(db_cols, df)
+        if cell_col is not None and ts_col is not None:
+            work = _filter_missing_cell_time_rows(conn, table, aligned, cell_col, ts_col, label)
+        elif ts_col is not None:
+            max_ts = _max_ts_in_column(conn, table, ts_col, label)
+            ts_vals = _parse_timestamp_series(aligned[ts_col], label, ts_col)
+            if max_ts is not None and pd.notna(max_ts):
+                work = aligned.loc[(ts_vals > max_ts) & ts_vals.notna()].copy()
+            else:
+                work = aligned.loc[ts_vals.notna()].copy()
+    if work.empty:
+        return 0
+    work.to_sql(table, conn, if_exists="append", index=False)
+    return len(work)
+
+
+def _load_pm_frame_to_tables(
+    conn: sqlite3.Connection,
+    base_table: str,
+    df: pd.DataFrame,
+    label: str,
+    fn: str,
+    *,
+    apply_time_filter: bool,
+) -> int:
+    """
+    Write a PM frame into area partition tables (cells) or the monotable (groups).
+    Returns total inserted rows.
+    """
+    if df.empty:
+        return 0
+
+    if not _use_area_partitions(label):
+        return _append_dataframe_to_table(
+            conn, base_table, df, label, apply_time_filter=apply_time_filter
+        )
+
+    cell_col, _ts_col = _resolve_cell_time_key_columns(list(df.columns), df)
+    inserted = 0
+    parts = _partition_frames_by_area(df, base_table, cell_col)
+    for table, sub in parts:
+        n = _append_dataframe_to_table(
+            conn, table, sub, label, apply_time_filter=apply_time_filter
+        )
+        inserted += n
+        if n:
+            print(f"[{label}] {fn} → {table}: +{n} rows")
+    return inserted
+
+
 def _load_csv_file_incremental_in_chunks(
     conn: sqlite3.Connection,
     table: str,
@@ -476,16 +593,11 @@ def _load_csv_file_incremental_in_chunks(
     fn: str,
 ) -> None:
     it = _csv_chunk_iter(full_path, label, chunksize=CSV_CHUNK_SIZE)
-    table_exists = _table_exists(conn, table)
-    table_existed_at_start = table_exists
-    db_cols: list[str] | None = None
-    cell_col: str | None = None
-    ts_col: str | None = None
-    max_ts: pd.Timestamp | None = None
     total_rows = 0
     inserted_rows = 0
     chunk_count = 0
     first_sample: pd.DataFrame | None = None
+    touched_tables: set[str] = set()
 
     for chunk in it:
         if chunk is None or chunk.empty:
@@ -494,70 +606,49 @@ def _load_csv_file_incremental_in_chunks(
         if first_sample is None:
             first_sample = chunk
         total_rows += len(chunk)
-
-        if not table_exists:
-            # First insert creates table shape; no time filter needed for fresh table.
-            chunk.to_sql(table, conn, if_exists="append", index=False)
-            inserted_rows += len(chunk)
-            table_exists = True
-            db_cols = list(chunk.columns)
-            continue
-
-        if db_cols is None:
-            raw_db_cols = _pragma_column_names(conn, table)
-            db_cols = [c for c in raw_db_cols if c != HASH_COL]
-            if set(db_cols) != set(chunk.columns):
-                before_cols = len(db_cols)
-                db_cols = _ensure_table_columns(conn, table, db_cols, list(chunk.columns))
-                print(
-                    f"[{label}] incremental {fn} -> table {table}: "
-                    f"columns changed, evolved schema ({before_cols}->{len(db_cols)} columns)"
-                )
-
-        aligned = chunk.reindex(columns=db_cols)
-        work = aligned
-        if RAW_LOADER_TIME_FILTER:
-            if cell_col is None or ts_col is None:
-                det_cell, det_ts = _resolve_cell_time_key_columns(db_cols, chunk)
-                cell_col = det_cell
-                ts_col = det_ts
-                if ts_col is not None and max_ts is None:
-                    max_ts = _max_ts_in_column(conn, table, ts_col, label)
-            if cell_col is not None and ts_col is not None:
-                work = _filter_missing_cell_time_rows(conn, table, aligned, cell_col, ts_col, label)
-            elif ts_col is not None and max_ts is not None and pd.notna(max_ts):
-                ts_vals = _parse_timestamp_series(aligned[ts_col], label, ts_col)
-                work = aligned.loc[(ts_vals > max_ts) & ts_vals.notna()].copy()
-
-        if work.empty:
-            continue
-        work.to_sql(table, conn, if_exists="append", index=False)
-        inserted_rows += len(work)
-        if RAW_LOADER_TIME_FILTER and ts_col is not None:
-            ts_vals = _parse_timestamp_series(aligned[ts_col], label, ts_col)
-            chunk_max = ts_vals.max()
-            if pd.notna(chunk_max):
-                chunk_max = pd.Timestamp(chunk_max)
-                if max_ts is None or pd.isna(max_ts) or chunk_max > max_ts:
-                    max_ts = chunk_max
+        n = _load_pm_frame_to_tables(
+            conn,
+            table,
+            chunk,
+            label,
+            fn,
+            apply_time_filter=bool(RAW_LOADER_TIME_FILTER),
+        )
+        inserted_rows += n
+        if _use_area_partitions(label):
+            cell_col, _ = _resolve_cell_time_key_columns(list(chunk.columns), chunk)
+            for area_table, _sub in _partition_frames_by_area(chunk, table, cell_col):
+                touched_tables.add(area_table)
+        else:
+            touched_tables.add(table)
 
     dedupe_note = ""
     if (
         RAW_LOADER_TIME_FILTER
-        and table_existed_at_start
         and chunk_count > 1
-        and db_cols
         and first_sample is not None
+        and touched_tables
     ):
-        dedupe_cell_col, dedupe_ts_col = _resolve_cell_time_key_columns(db_cols, first_sample)
+        dedupe_cell_col, dedupe_ts_col = _resolve_cell_time_key_columns(
+            list(first_sample.columns), first_sample
+        )
         if dedupe_cell_col and dedupe_ts_col:
-            removed = _dedupe_table_on_cell_time(conn, table, dedupe_cell_col, dedupe_ts_col)
-            if removed:
-                dedupe_note = f", deduped {removed} rows on ({dedupe_cell_col}, {dedupe_ts_col})"
+            removed_total = 0
+            for tname in sorted(touched_tables):
+                if not _table_exists(conn, tname):
+                    continue
+                removed_total += _dedupe_table_on_cell_time(
+                    conn, tname, dedupe_cell_col, dedupe_ts_col
+                )
+            if removed_total:
+                dedupe_note = (
+                    f", deduped {removed_total} rows on ({dedupe_cell_col}, {dedupe_ts_col})"
+                )
 
     print(
         f"[{label}] incremental {fn} -> table {table}: "
-        f"+{inserted_rows} rows (file {total_rows} rows, chunked{dedupe_note})"
+        f"+{inserted_rows} rows (file {total_rows} rows, chunked"
+        f"{' area-split' if _use_area_partitions(label) else ''}{dedupe_note})"
     )
 
 
@@ -783,71 +874,54 @@ def _load_file_incremental(
     if df_raw.empty:
         print(f"[{label}] incremental {fn} -> table {table}: skip (empty)")
         return
-
-    if not _table_exists(conn, table):
-        if df_raw.empty:
-            print(f"[{label}] incremental {fn} -> table {table}: skip (empty)")
-            return
-        df_raw.to_sql(table, conn, if_exists='append', index=False)
-        print(f"[{label}] incremental {fn} -> table {table}: created ({len(df_raw)} rows)")
-        return
-
-    db_cols = _pragma_column_names(conn, table)
-    # Backward compatibility: legacy tables may still have old hash column.
-    data_cols = [c for c in db_cols if c != HASH_COL]
-    incoming_cols = list(df_raw.columns)
-    if set(data_cols) != set(incoming_cols):
-        if df_raw.empty:
-            print(f"[{label}] incremental {fn} -> table {table}: skip (empty)")
-            return
-        before_cols = len(data_cols)
-        data_cols = _ensure_table_columns(conn, table, data_cols, incoming_cols)
-        print(
-            f"[{label}] incremental {fn} -> table {table}: "
-            f"columns changed, evolved schema ({before_cols}->{len(data_cols)} columns)"
-        )
-
-    aligned = df_raw.reindex(columns=data_cols)
-    work = aligned
-    time_note = ''
-
-    if RAW_LOADER_TIME_FILTER:
-        cell_col, ts_col = _resolve_cell_time_key_columns(data_cols, df_raw)
-        db_ts = _match_column_name(data_cols, ts_col)
-        if cell_col is not None and db_ts is not None:
-            work = _filter_missing_cell_time_rows(conn, table, aligned, cell_col, db_ts, label)
-            time_note = f'missing ({cell_col}, {db_ts}) keys'
-        elif ts_col is not None and db_ts is not None:
-            max_ts = _max_ts_in_column(conn, table, db_ts, label)
-            ts_vals = _parse_timestamp_series(aligned[db_ts], label, db_ts)
-            if max_ts is not None and pd.notna(max_ts):
-                mask = (ts_vals > max_ts) & ts_vals.notna()
-                time_note = f"time>{max_ts}"
-            else:
-                mask = ts_vals.notna()
-                time_note = 'time filter (no prior MAX, all rows with valid times)'
-            work = aligned.loc[mask].copy()
-            if work.empty:
-                print(
-                    f"[{label}] incremental {fn} -> table {table}: "
-                    f"+0 rows after time filter ({time_note}, file {len(df_raw)} rows)"
-                )
-                return
-
-    if work.empty:
-        print(
-            f"[{label}] incremental {fn} -> table {table}: "
-            f"+0 rows after time filter (file {len(df_raw)} rows)"
-        )
-        return
-
-    # No hash-based dedupe: rows are assumed unique by (cell, time) in source.
-    work.to_sql(table, conn, if_exists='append', index=False)
-    extra = f' [{time_note}]' if time_note else ''
+    inserted = _load_pm_frame_to_tables(
+        conn,
+        table,
+        df_raw,
+        label,
+        fn,
+        apply_time_filter=bool(RAW_LOADER_TIME_FILTER),
+    )
+    split_note = " area-split" if _use_area_partitions(label) else ""
     print(
         f"[{label}] incremental {fn} -> table {table}: "
-        f"+{len(work)} rows (file {len(df_raw)} rows, after filter {len(work)}{extra})"
+        f"+{inserted} rows (file {len(df_raw)} rows{split_note})"
     )
+
+
+def _replace_pm_frame_to_tables(
+    conn: sqlite3.Connection,
+    base_table: str,
+    df: pd.DataFrame,
+    label: str,
+    fn: str,
+) -> None:
+    """Full replace for cells (area partitions) or groups (monotable)."""
+    if not _use_area_partitions(label):
+        df.to_sql(base_table, conn, if_exists="replace", index=False)
+        print(f"[{label}] replaced {fn} -> table {base_table} ({len(df)} rows)")
+        return
+
+    # Drop existing partitions for this base, then rewrite by area.
+    existing = [
+        r[0]
+        for r in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+        ).fetchall()
+    ]
+    for name in existing:
+        if name == base_table or name.startswith(f"{base_table}__"):
+            conn.execute(f'DROP TABLE IF EXISTS "{name}"')
+    if df.empty:
+        print(f"[{label}] replaced {fn} -> {base_table} partitions: 0 rows")
+        return
+    cell_col, _ = _resolve_cell_time_key_columns(list(df.columns), df)
+    total = 0
+    for table, sub in _partition_frames_by_area(df, base_table, cell_col):
+        sub.to_sql(table, conn, if_exists="append", index=False)
+        total += len(sub)
+        print(f"[{label}] replaced {fn} -> table {table} ({len(sub)} rows)")
+    print(f"[{label}] replaced {fn} -> {base_table} partitions total {total} rows")
 
 
 def _metadata_canonical_table(table: str) -> str | None:
@@ -1024,8 +1098,7 @@ def _load_folder_tabular_to_db(
                             out.to_sql(canonical, conn, if_exists="replace", index=False)
                             print(f"[metadata] replaced {fn} -> table {canonical} ({len(out)} rows)")
                         else:
-                            df.to_sql(table, conn, if_exists="replace", index=False)
-                            print(f"[{label}] replaced {fn} -> table {table} ({len(df)} rows)")
+                            _replace_pm_frame_to_tables(conn, table, df, label, fn)
                 loaded += 1
             except Exception as e:
                 print(f"[{label}] failed {fn}: {e}")

@@ -42,6 +42,10 @@ from sync_config import (
     PM_TECHNOLOGIES,
     pm_table_name,
 )
+from core.site_area import (
+    list_pm_partition_tables,
+    preferred_pm_table,
+)
 from db.runtime import connect_app, connect_metadata, execute_query
 from database_enhanced import get_user_by_session, log_activity
 from modules.sync.metadata_active_sql import (
@@ -877,12 +881,13 @@ def _resolve_pm_table_bundle(
     db_path: str,
     vendor: str,
     technology: str,
+    preferred: str | None = None,
 ) -> dict | None:
-    key = _pm_table_meta_cache_key(db_path, vendor, technology)
+    key = _pm_table_meta_cache_key(db_path, vendor, technology) + f'||{preferred or ""}'
     hit = _PM_TABLE_META_CACHE.get(key)
     if hit:
         return hit
-    table = _resolve_pm_table_sqlite(conn, vendor, technology, '', None)
+    table = _resolve_pm_table_sqlite(conn, vendor, technology, '', preferred)
     if not table:
         return None
     cell_col, time_col = _resolve_pm_axis_columns_sqlite(conn, table)
@@ -1119,6 +1124,7 @@ def _resolve_pm_table_sqlite(
     ).fetchall()
     tables = [r[0] for r in rows]
     tech = '4G' if technology in ('4G-FDD', '4G-TDD') else technology
+    base = pm_table_name(tech) if tech else None
     candidates: list[str] = []
     for t in tables:
         tt = _table_technology(t)
@@ -1127,8 +1133,15 @@ def _resolve_pm_table_sqlite(
         c_col, t_col = _resolve_pm_axis_columns_sqlite(conn, t)
         if c_col and t_col:
             candidates.append(t)
-    if preferred in candidates:
-        candidates.insert(0, candidates.pop(candidates.index(preferred)))
+
+    def _prefer_first(name: str | None) -> None:
+        if name and name in candidates:
+            candidates.insert(0, candidates.pop(candidates.index(name)))
+
+    # Prefer exact area table, then monotable, then remaining partitions.
+    _prefer_first(base)
+    if preferred:
+        _prefer_first(preferred)
     if not cell_name:
         return candidates[0] if candidates else None
     for t in candidates:
@@ -1163,6 +1176,136 @@ def _resolve_pm_table_sqlite(
     return candidates[0] if candidates else None
 
 
+def _preferred_pm_table_for_site(technology: str, site_id) -> str:
+    tech = '4G' if technology in ('4G-FDD', '4G-TDD') else (technology or '4G')
+    return preferred_pm_table(pm_table_name(tech), site_id)
+
+
+def _sqlite_table_names(conn: sqlite3.Connection) -> set[str]:
+    rows = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+    ).fetchall()
+    return {r[0] for r in rows}
+
+
+def _pm_dual_read_tables(
+    conn: sqlite3.Connection,
+    technology: str,
+    site_id=None,
+    *,
+    preferred: str | None = None,
+) -> list[str]:
+    """
+    Tables to read during the dual-read window.
+
+    Order: area partition first (new ingest), then legacy monotable (pre-cutover
+    history). After retention drains the monotable it simply stops contributing.
+    No migration required.
+    """
+    tech = '4G' if technology in ('4G-FDD', '4G-TDD') else (technology or '4G')
+    base = pm_table_name(tech)
+    area = preferred or (
+        preferred_pm_table(base, site_id) if site_id is not None else None
+    )
+    existing = _sqlite_table_names(conn)
+    out: list[str] = []
+    for name in (area, base):
+        if name and name in existing and name not in out:
+            out.append(name)
+    return out
+
+
+def _query_cell_trend_from_tables(
+    pm_conn: sqlite3.Connection,
+    tables: list[str],
+    cell_name: str,
+    requested_kpis: list[str] | None,
+    pm_db: str,
+) -> tuple[list[dict], str | None, str | None, str | None]:
+    """
+    UNION-style merge across dual-read tables.
+
+    Prefer area-partition rows when the same timestamp exists in both (first
+    table wins). Returns (rows, primary_table, cell_col, time_col).
+    """
+    if not tables:
+        return [], None, None, None
+
+    primary = tables[0]
+    cell_col, time_col = _resolve_pm_axis_columns_sqlite(pm_conn, primary)
+    if not cell_col or not time_col:
+        return [], primary, cell_col, time_col
+
+    full_kpi = _get_pm_cols_for_table(pm_db, primary)
+    kpi_cols = _trend_kpi_columns(full_kpi, requested_kpis)
+    extra_time = _pm_extra_trend_time_columns(pm_conn, primary)
+    base_cols = (
+        f'{_sqlite_ident(cell_col)} AS "cell_name", '
+        f'{_sqlite_ident(time_col)} AS "timestamp", '
+        f'{_sqlite_text_lit(time_col)} AS "__time_source"'
+    )
+    if kpi_cols:
+        col_list = base_cols + extra_time + ', ' + ', '.join(f'"{c}"' for c in kpi_cols)
+    else:
+        col_list = base_cols + extra_time
+
+    merged: list[dict] = []
+    seen_ts: set[str] = set()
+
+    def _absorb(rows: list) -> None:
+        for r in rows:
+            row = dict(r)
+            key = str(row.get('timestamp') or '').strip()
+            if key and key in seen_ts:
+                continue
+            if key:
+                seen_ts.add(key)
+            merged.append(row)
+
+    for table in tables:
+        c_col, t_col = _resolve_pm_axis_columns_sqlite(pm_conn, table)
+        if not c_col or not t_col:
+            continue
+        # Re-resolve column list when schemas differ across tables.
+        if c_col != cell_col or t_col != time_col:
+            et = _pm_extra_trend_time_columns(pm_conn, table)
+            bc = (
+                f'{_sqlite_ident(c_col)} AS "cell_name", '
+                f'{_sqlite_ident(t_col)} AS "timestamp", '
+                f'{_sqlite_text_lit(t_col)} AS "__time_source"'
+            )
+            # KPI cols that exist on this table only.
+            table_kpis = [c for c in (kpi_cols or []) if c in _get_pm_cols_for_table(pm_db, table)]
+            cl = bc + et + (', ' + ', '.join(f'"{c}"' for c in table_kpis) if table_kpis else '')
+        else:
+            cl = col_list
+            c_col, t_col = cell_col, time_col
+
+        rows = pm_conn.execute(
+            f'''
+            SELECT {cl}
+            FROM {_sqlite_ident(table)}
+            WHERE LOWER(TRIM(CAST({_sqlite_ident(c_col)} AS TEXT))) = LOWER(TRIM(?))
+            ORDER BY {_sqlite_ident(t_col)} ASC
+            ''',
+            (cell_name,),
+        ).fetchall()
+        if not rows:
+            rows = pm_conn.execute(
+                f'''
+                SELECT {cl}
+                FROM {_sqlite_ident(table)}
+                WHERE LOWER(TRIM(CAST({_sqlite_ident(c_col)} AS TEXT))) LIKE LOWER(TRIM(?))
+                ORDER BY {_sqlite_ident(t_col)} ASC
+                ''',
+                (f'%{cell_name}%',),
+            ).fetchall()
+        _absorb(rows)
+
+    merged.sort(key=lambda r: str(r.get('timestamp') or ''))
+    return merged, primary, cell_col, time_col
+
+
 def _pm_cell_names_for_vendor_technology(vendor: str, technology: str, scope: str) -> set[str]:
     """Cell names with retained PM rows for the current Performance object scope."""
     db_path = _pm_db_for_vendor(vendor, scope)
@@ -1174,25 +1317,35 @@ def _pm_cell_names_for_vendor_technology(vendor: str, technology: str, scope: st
     try:
         conn = sqlite3.connect(db_path, timeout=15)
         conn.row_factory = sqlite3.Row
-        table = _resolve_pm_table_sqlite(conn, vendor, technology)
-        if not table:
-            return set()
-        cell_col, _time_col = _resolve_pm_axis_columns_sqlite(conn, table)
-        if not cell_col:
-            return set()
-        rows = conn.execute(
-            f'''
-            SELECT DISTINCT TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT)) AS cell_name
-            FROM {_sqlite_ident(table)}
-            WHERE {_sqlite_ident(cell_col)} IS NOT NULL
-              AND TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT)) <> ''
-            ''',
-        ).fetchall()
-        names = {
-            str(r['cell_name'] or '').strip().lower()
-            for r in rows
-            if str(r['cell_name'] or '').strip()
-        }
+        existing = [
+            r[0]
+            for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+        ]
+        tech = '4G' if technology in ('4G-FDD', '4G-TDD') else technology
+        base = pm_table_name(tech)
+        tables = list_pm_partition_tables(existing, base)
+        if not tables:
+            hit = _resolve_pm_table_sqlite(conn, vendor, technology)
+            tables = [hit] if hit else []
+        for table in tables:
+            cell_col, _time_col = _resolve_pm_axis_columns_sqlite(conn, table)
+            if not cell_col:
+                continue
+            rows = conn.execute(
+                f'''
+                SELECT DISTINCT TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT)) AS cell_name
+                FROM {_sqlite_ident(table)}
+                WHERE {_sqlite_ident(cell_col)} IS NOT NULL
+                  AND TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT)) <> ''
+                ''',
+            ).fetchall()
+            names.update(
+                str(r['cell_name'] or '').strip().lower()
+                for r in rows
+                if str(r['cell_name'] or '').strip()
+            )
     except sqlite3.Error:
         try:
             current_app.logger.exception(
@@ -1407,12 +1560,19 @@ def _get_pm_cols(db_path, technology=None):
     techs = [technology] if technology else PM_TECHNOLOGIES
     try:
         conn = sqlite3.connect(db_path, timeout=30)
+        existing = [
+            r[0]
+            for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+            ).fetchall()
+        ]
         for tech in techs:
-            table = pm_table_name(tech)
-            try:
-                result.update(_kpi_columns_for_sqlite_table(conn, table))
-            except sqlite3.OperationalError:
-                continue
+            base = pm_table_name(tech)
+            for table in list_pm_partition_tables(existing, base) or [base]:
+                try:
+                    result.update(_kpi_columns_for_sqlite_table(conn, table))
+                except sqlite3.OperationalError:
+                    continue
         conn.close()
     except Exception:
         pass
@@ -2352,12 +2512,7 @@ def get_cell_trend(cell_id):
     cell_name = cell['cell_name']
     cell_tech = cell.get('technology', '4G')
     pm_db     = _pm_db_for_vendor(vendor, data_scope)
-    if vendor == 'Huawei':
-        from modules.sync.pm_processor import huawei_pm_table_for_cell
-
-        table = huawei_pm_table_for_cell(cell_name, cell_tech, pm_db)
-    else:
-        table = pm_table_name(cell_tech)
+    table = _preferred_pm_table_for_site(cell_tech, cell.get('site_id'))
 
     requested_kpis = _requested_trend_kpi_names()
     trend_cache_key = _trend_cache_key(
@@ -2379,53 +2534,30 @@ def get_cell_trend(cell_id):
         if table:
             pm_conn = _open_pm_db(pm_db)
             pm_conn.row_factory = sqlite3.Row
-            table = _resolve_pm_table_sqlite(pm_conn, str(vendor or ''), str(cell_tech or ''), cell_name, table)
-            if table:
-                cell_col, time_col = _resolve_pm_axis_columns_sqlite(pm_conn, table)
-                full_kpi = _get_pm_cols_for_table(pm_db, table)
-                kpi_cols = _trend_kpi_columns(full_kpi, requested_kpis)
-            else:
-                cell_col, time_col = None, None
-            if not table or not cell_col or not time_col:
-                trend = []
-            else:
-                extra_time = _pm_extra_trend_time_columns(pm_conn, table)
-                base_cols = (
-                    f'{_sqlite_ident(cell_col)} AS "cell_name", '
-                    f'{_sqlite_ident(time_col)} AS "timestamp", '
-                    f'{_sqlite_text_lit(time_col)} AS "__time_source"'
+            tables = _pm_dual_read_tables(
+                pm_conn, str(cell_tech or ''), cell.get('site_id'), preferred=table
+            )
+            if not tables:
+                hit = _resolve_pm_table_sqlite(
+                    pm_conn, str(vendor or ''), str(cell_tech or ''), cell_name, table
                 )
-                if kpi_cols:
-                    col_list = base_cols + extra_time + ', ' + ', '.join(f'"{c}"' for c in kpi_cols)
-                else:
-                    col_list = base_cols + extra_time
-
-                trend = [dict(r) for r in pm_conn.execute(f'''
-                    SELECT {col_list}
-                    FROM "{table}"
-                    WHERE LOWER(TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT))) = LOWER(TRIM(?))
-                    ORDER BY {_sqlite_ident(time_col)} ASC
-                ''', (cell_name,)).fetchall()]
-                if not trend:
-                    trend = [dict(r) for r in pm_conn.execute(f'''
-                        SELECT {col_list}
-                        FROM "{table}"
-                        WHERE LOWER(TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT))) LIKE LOWER(TRIM(?))
-                        ORDER BY {_sqlite_ident(time_col)} ASC
-                    ''', (f'%{cell_name}%',)).fetchall()]
-                _log_trend_time_parse_sample(
-                    current_app.logger,
-                    endpoint='get_cell_trend',
-                    vendor=str(vendor),
-                    table=str(table),
-                    time_col=str(time_col),
-                    rows=trend,
-                    granularity=granularity,
-                )
-                current_app.logger.info(
-                    "get_cell_trend(cell_id=%s) vendor=%s table=%s cell_col=%s time_col=%s rows=%s",
-                    cell_id, vendor, table, cell_col, time_col, len(trend)
-                )
+                tables = [hit] if hit else []
+            trend, table, cell_col, time_col = _query_cell_trend_from_tables(
+                pm_conn, tables, cell_name, requested_kpis, pm_db
+            )
+            _log_trend_time_parse_sample(
+                current_app.logger,
+                endpoint='get_cell_trend',
+                vendor=str(vendor),
+                table=str(table),
+                time_col=str(time_col),
+                rows=trend,
+                granularity=granularity,
+            )
+            current_app.logger.info(
+                "get_cell_trend(cell_id=%s) vendor=%s tables=%s cell_col=%s time_col=%s rows=%s",
+                cell_id, vendor, tables, cell_col, time_col, len(trend)
+            )
             pm_conn.close()
     except Exception:
         current_app.logger.exception('get_cell_trend: PM query failed cell_id=%s', cell_id)
@@ -2494,12 +2626,7 @@ def get_cell_trend_by_name():
     tech = cell.get('technology', '4G')
     pm_db = _pm_db_for_vendor(vendor, data_scope)
     pm_tech = '4G' if tech in ('4G-FDD', '4G-TDD') else tech
-    if vendor == 'Huawei':
-        from modules.sync.pm_processor import huawei_pm_table_for_cell
-
-        table = huawei_pm_table_for_cell(cell_name, pm_tech, pm_db)
-    else:
-        table = pm_table_name(pm_tech)
+    table = _preferred_pm_table_for_site(pm_tech, cell.get('site_id'))
 
     requested_kpis = _requested_trend_kpi_names()
     trend_cache_key = _trend_cache_key(
@@ -2521,50 +2648,30 @@ def get_cell_trend_by_name():
         if table:
             pm_conn = _open_pm_db(pm_db)
             pm_conn.row_factory = sqlite3.Row
-            table = _resolve_pm_table_sqlite(pm_conn, str(vendor or ''), str(pm_tech or ''), cell_name, table)
-            if table:
-                cell_col, time_col = _resolve_pm_axis_columns_sqlite(pm_conn, table)
-                full_kpi = _get_pm_cols_for_table(pm_db, table)
-                kpi_cols = _trend_kpi_columns(full_kpi, requested_kpis)
-            else:
-                cell_col, time_col = None, None
-            if not table or not cell_col or not time_col:
-                trend = []
-            else:
-                extra_time = _pm_extra_trend_time_columns(pm_conn, table)
-                col_list = (
-                    f'{_sqlite_ident(cell_col)} AS "cell_name", '
-                    f'{_sqlite_ident(time_col)} AS "timestamp", '
-                    f'{_sqlite_text_lit(time_col)} AS "__time_source"'
-                    + extra_time
-                    + (', ' + ', '.join(f'"{c}"' for c in kpi_cols) if kpi_cols else '')
+            tables = _pm_dual_read_tables(
+                pm_conn, str(pm_tech or ''), cell.get('site_id'), preferred=table
+            )
+            if not tables:
+                hit = _resolve_pm_table_sqlite(
+                    pm_conn, str(vendor or ''), str(pm_tech or ''), cell_name, table
                 )
-                trend = [dict(r) for r in pm_conn.execute(f'''
-                    SELECT {col_list}
-                    FROM "{table}"
-                    WHERE LOWER(TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT))) = LOWER(TRIM(?))
-                    ORDER BY {_sqlite_ident(time_col)} ASC
-                ''', (cell_name,)).fetchall()]
-                if not trend:
-                    trend = [dict(r) for r in pm_conn.execute(f'''
-                        SELECT {col_list}
-                        FROM "{table}"
-                        WHERE LOWER(TRIM(CAST({_sqlite_ident(cell_col)} AS TEXT))) LIKE LOWER(TRIM(?))
-                        ORDER BY {_sqlite_ident(time_col)} ASC
-                    ''', (f'%{cell_name}%',)).fetchall()]
-                _log_trend_time_parse_sample(
-                    current_app.logger,
-                    endpoint='get_cell_trend_by_name',
-                    vendor=str(vendor),
-                    table=str(table),
-                    time_col=str(time_col),
-                    rows=trend,
-                    granularity=granularity,
-                )
-                current_app.logger.info(
-                    "get_cell_trend_by_name(cell=%r vendor=%r tech=%r table=%s cell_col=%s time_col=%s rows=%s",
-                    cell_name, vendor, pm_tech, table, cell_col, time_col, len(trend)
-                )
+                tables = [hit] if hit else []
+            trend, table, cell_col, time_col = _query_cell_trend_from_tables(
+                pm_conn, tables, cell_name, requested_kpis, pm_db
+            )
+            _log_trend_time_parse_sample(
+                current_app.logger,
+                endpoint='get_cell_trend_by_name',
+                vendor=str(vendor),
+                table=str(table),
+                time_col=str(time_col),
+                rows=trend,
+                granularity=granularity,
+            )
+            current_app.logger.info(
+                "get_cell_trend_by_name(cell=%r vendor=%r tech=%r tables=%s cell_col=%s time_col=%s rows=%s",
+                cell_name, vendor, pm_tech, tables, cell_col, time_col, len(trend)
+            )
             pm_conn.close()
     except Exception:
         current_app.logger.exception(
@@ -2773,12 +2880,23 @@ def get_pm_table():
     requested_kpis = _requested_trend_kpi_names()
     try:
         conn = _open_pm_db(db_path)
-        bundle = _resolve_pm_table_bundle(conn, db_path, vendor, technology)
+        preferred = None
+        if scoped_cell_names:
+            preferred = _resolve_pm_table_sqlite(
+                conn, vendor, technology, scoped_cell_names[0], None
+            )
+        bundle = _resolve_pm_table_bundle(conn, db_path, vendor, technology, preferred=preferred)
         if not bundle:
             conn.close()
             return jsonify(empty)
 
         table = bundle['table']
+        dual_tables = _pm_dual_read_tables(
+            conn, technology, None, preferred=preferred or table
+        ) or [table]
+        # Include bundle table if dual-read missed it (e.g. unexpected name).
+        if table not in dual_tables:
+            dual_tables.insert(0, table)
         resolved_cell_col = bundle['cell_col']
         resolved_time_col = bundle['time_col']
         existing_static = bundle['existing_static']
@@ -2797,6 +2915,7 @@ def get_pm_table():
             )
             for c in ordered_cols
         )
+        table_cache_key_name = '+'.join(dual_tables)
 
         scoped_sig = '|'.join(sorted({n.lower() for n in scoped_cell_names}))
         group_sig = '|'.join(sorted({g.lower() for g in scoped_group_refs}))
@@ -2804,7 +2923,7 @@ def get_pm_table():
         table_cache_key = _pm_table_cache_key(
             vendor,
             technology,
-            table,
+            table_cache_key_name,
             f'{search}||{scoped_sig}||{group_sig}||{kpi_sig}',
             page,
             page_size,
@@ -2830,6 +2949,97 @@ def get_pm_table():
             params.extend(scope_params)
         where_clause = ' AND '.join(where_parts)
 
+        def _fetch_from_dual(
+            order_sql: str,
+            *,
+            limit: int | None = None,
+            offset: int | None = None,
+            ascending_dedupe: bool = True,
+        ) -> tuple[list[dict], int]:
+            """
+            Dual-read: query area partition + legacy monotable, dedupe by
+            (cell, timestamp) preferring the first table (area / new data).
+            """
+            if len(dual_tables) == 1:
+                lim = ''
+                qparams = list(params)
+                if limit is not None:
+                    lim = ' LIMIT ?'
+                    qparams.append(limit)
+                    if offset is not None:
+                        lim += ' OFFSET ?'
+                        qparams.append(offset)
+                rows = conn.execute(
+                    f'''
+                    SELECT {col_select} FROM {_sqlite_ident(dual_tables[0])}
+                    WHERE {where_clause}
+                    ORDER BY {order_sql}{lim}
+                    ''',
+                    qparams,
+                ).fetchall()
+                total_n = conn.execute(
+                    f'SELECT COUNT(*) FROM {_sqlite_ident(dual_tables[0])} WHERE {where_clause}',
+                    params,
+                ).fetchone()[0]
+                return [dict(r) for r in rows], int(total_n)
+
+            seen: set[tuple[str, str]] = set()
+            merged: list[dict] = []
+            for tname in dual_tables:
+                c_col, t_col = _resolve_pm_axis_columns_sqlite(conn, tname)
+                if not c_col or not t_col:
+                    continue
+                # Rebuild select against this table's axis columns.
+                t_col_select = ', '.join(
+                    _pm_table_select_col(
+                        c,
+                        resolved_cell_col=c_col,
+                        resolved_time_col=t_col,
+                    )
+                    for c in ordered_cols
+                )
+                t_where = list(where_parts)
+                t_params = list(params)
+                # where_parts may reference primary cell col — rebuild for this table.
+                t_where = ['1=1']
+                t_params = []
+                if search:
+                    t_where.append(f'{_sqlite_ident(c_col)} LIKE ?')
+                    t_params.append(f'%{search}%')
+                scope_sql2, scope_params2 = _pm_table_cell_scope_sql(c_col, scoped_cell_names)
+                if scope_sql2:
+                    t_where.append(scope_sql2)
+                    t_params.extend(scope_params2)
+                t_where_clause = ' AND '.join(t_where)
+                rows = conn.execute(
+                    f'''
+                    SELECT {t_col_select} FROM {_sqlite_ident(tname)}
+                    WHERE {t_where_clause}
+                    ORDER BY {_sqlite_ident(t_col)} {'ASC' if ascending_dedupe else 'DESC'}
+                    ''',
+                    t_params,
+                ).fetchall()
+                for r in rows:
+                    row = dict(r)
+                    key = (
+                        str(row.get('cell_name') or row.get(c_col) or '').strip().lower(),
+                        str(row.get('timestamp') or row.get(t_col) or '').strip(),
+                    )
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    merged.append(row)
+            merged.sort(
+                key=lambda r: str(r.get('timestamp') or ''),
+                reverse=not ascending_dedupe,
+            )
+            total_n = len(merged)
+            if offset is not None or limit is not None:
+                start = offset or 0
+                end = start + limit if limit is not None else None
+                merged = merged[start:end]
+            return merged, total_n
+
         column_labels = {'timestamp': ts_label, 'cell_name': cell_label}
         for dc in ('Date', 'date'):
             if dc in ordered_cols:
@@ -2841,19 +3051,12 @@ def get_pm_table():
         scoped_query = bool(scoped_cell_names)
         if scoped_query and not export_csv and not for_charts:
             offset = (page - 1) * page_size
-            rows = conn.execute(f'''
-                SELECT {col_select} FROM "{table}"
-                WHERE  {where_clause}
-                ORDER  BY {_sqlite_ident(resolved_time_col)} DESC
-                LIMIT  ? OFFSET ?
-            ''', params + [page_size, offset]).fetchall()
-            row_dicts = [dict(r) for r in rows]
-            if len(row_dicts) < page_size:
-                total = offset + len(row_dicts)
-            else:
-                total = conn.execute(
-                    f'SELECT COUNT(*) FROM "{table}" WHERE {where_clause}', params
-                ).fetchone()[0]
+            row_dicts, total = _fetch_from_dual(
+                f'{_sqlite_ident(resolved_time_col)} DESC',
+                limit=page_size,
+                offset=offset,
+                ascending_dedupe=False,
+            )
             conn.close()
             payload = {
                 'success':       True,
@@ -2872,9 +3075,10 @@ def get_pm_table():
             out['cached'] = False
             return jsonify(out)
 
-        total  = conn.execute(
-            f'SELECT COUNT(*) FROM "{table}" WHERE {where_clause}', params
-        ).fetchone()[0]
+        row_dicts, total = _fetch_from_dual(
+            f'{_sqlite_ident(resolved_time_col)} DESC',
+            ascending_dedupe=False,
+        )
 
         if export_csv:
             if total > _PM_EXPORT_MAX_ROWS:
@@ -2885,13 +3089,7 @@ def get_pm_table():
                         f'({total:,} matched). Narrow your selection or search.'
                     ),
                 }), 400
-            rows = conn.execute(f'''
-                SELECT {col_select} FROM "{table}"
-                WHERE  {where_clause}
-                ORDER  BY {_sqlite_ident(resolved_time_col)} DESC
-            ''', params).fetchall()
             conn.close()
-            row_dicts = [dict(r) for r in rows]
             return _pm_table_csv_response(ordered_cols, column_labels, row_dicts, vendor, technology)
 
         if for_charts:
@@ -2903,18 +3101,15 @@ def get_pm_table():
                         f'(limit {_PM_CHARTS_MAX_ROWS:,}). Narrow your cell selection.'
                     ),
                 }), 400
-            rows = conn.execute(f'''
-                SELECT {col_select} FROM "{table}"
-                WHERE  {where_clause}
-                ORDER  BY {_sqlite_ident(resolved_time_col)} ASC
-            ''', params).fetchall()
+            # Charts want ascending time.
+            row_dicts.sort(key=lambda r: str(r.get('timestamp') or ''))
             conn.close()
             payload = {
                 'success':       True,
                 'columns':       ordered_cols,
                 'static_cols':   existing_static,
                 'column_labels': column_labels,
-                'rows':          [dict(r) for r in rows],
+                'rows':          row_dicts,
                 'total':         total,
                 'page':          1,
                 'page_size':     total,
@@ -2926,12 +3121,12 @@ def get_pm_table():
             return jsonify(payload)
 
         offset = (page - 1) * page_size
-        rows   = conn.execute(f'''
-            SELECT {col_select} FROM "{table}"
-            WHERE  {where_clause}
-            ORDER  BY {_sqlite_ident(resolved_time_col)} DESC
-            LIMIT  ? OFFSET ?
-        ''', params + [page_size, offset]).fetchall()
+        page_rows, _ = _fetch_from_dual(
+            f'{_sqlite_ident(resolved_time_col)} DESC',
+            limit=page_size,
+            offset=offset,
+            ascending_dedupe=False,
+        )
         conn.close()
 
         payload = {
@@ -2939,7 +3134,7 @@ def get_pm_table():
             'columns':       ordered_cols,
             'static_cols':   existing_static,
             'column_labels': column_labels,
-            'rows':          [dict(r) for r in rows],
+            'rows':          page_rows,
             'total':         total,
             'page':          page,
             'page_size':     page_size,

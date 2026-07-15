@@ -14,6 +14,7 @@ from sync_config import (
     NOKIA_PM_DB,
     pm_table_name,
 )
+from core.site_area import list_pm_partition_tables
 
 PM_DATA_SCOPE = "daily"
 
@@ -274,30 +275,41 @@ def _resolve_pm_source(
     db_fallback: str | None,
     technology: str,
     scope: str,
-) -> tuple[str, str] | None:
-    """Pick db + table; fall back to hourly if daily table empty."""
+) -> list[tuple[str, str]]:
+    """Pick db + table partitions; fall back to hourly if daily empty."""
     table_daily = pm_table_name_for_scope(technology, scope)
     table_hourly = pm_table_name(technology)
+    found: list[tuple[str, str]] = []
 
-    if os.path.isfile(db_primary):
-        conn = sqlite3.connect(db_primary, timeout=30)
+    def _collect(db_path: str, base: str) -> list[tuple[str, str]]:
+        if not os.path.isfile(db_path):
+            return []
+        conn = sqlite3.connect(db_path, timeout=30)
         try:
-            if _table_has_rows(conn, table_daily):
-                return db_primary, table_daily
+            names = [
+                r[0]
+                for r in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
+                ).fetchall()
+            ]
+            hits = []
+            for table in list_pm_partition_tables(names, base) or [base]:
+                if _table_has_rows(conn, table):
+                    hits.append((db_path, table))
+            return hits
         finally:
             conn.close()
 
-    if db_fallback and os.path.isfile(db_fallback):
-        conn = sqlite3.connect(db_fallback, timeout=30)
-        try:
-            if _table_has_rows(conn, table_hourly):
-                return db_fallback, table_hourly
-        finally:
-            conn.close()
-
+    found = _collect(db_primary, table_daily)
+    if found:
+        return found
+    if db_fallback:
+        found = _collect(db_fallback, table_hourly)
+        if found:
+            return found
     if os.path.isfile(db_primary):
-        return db_primary, table_daily
-    return None
+        return [(db_primary, table_daily)]
+    return []
 
 
 def vendor_pm_sources(
@@ -311,9 +323,8 @@ def vendor_pm_sources(
     sources: list[tuple[str, str, str]] = []
 
     def _add(vlabel: str, primary: str, fallback: str | None) -> None:
-        resolved = _resolve_pm_source(vlabel, primary, fallback, technology, sc)
-        if resolved:
-            sources.append((vlabel, resolved[0], resolved[1]))
+        for db_path, table in _resolve_pm_source(vlabel, primary, fallback, technology, sc):
+            sources.append((vlabel, db_path, table))
 
     if v in ("all", "nokia"):
         primary = NOKIA_PM_DAILY_DB if sc == "daily" else NOKIA_PM_DB
