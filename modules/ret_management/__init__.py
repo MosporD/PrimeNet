@@ -1,4 +1,4 @@
-"""RET Management — Huawei RETSUBUNIT and Nokia LNCEL angle read/write."""
+"""RET Management — Huawei RETSUBUNIT and Nokia RETU angle read/write."""
 
 from modules.ret_management.routes import ret_management_bp
 

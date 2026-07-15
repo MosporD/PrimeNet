@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RET Management - PrimeNet</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.2">
-    <link rel="stylesheet" href="{{ url_for('ret_management.static', filename='ret_management.css') }}?v=1.2">
+    <link rel="stylesheet" href="{{ url_for('ret_management.static', filename='ret_management.css') }}?v=1.3">
 </head>
 <body
     data-huawei-enabled="{{ 'true' if huawei_enabled else 'false' }}"
@@ -17,7 +17,7 @@
                 <div class="header-left">
                     <a href="/dashboard" class="back-link">Dashboard</a>
                     <h1>RET Management</h1>
-                    <p>View and edit antenna tilts — Huawei <code>RETSUBUNIT</code> and Nokia <code>LNCEL.angle</code></p>
+                    <p>View and edit antenna tilts — Huawei <code>RETSUBUNIT</code> and Nokia <code>RETU_R.angle</code></p>
                 </div>
                 <div class="header-right">
                     <span class="user-name">{{ user.username }}</span>
@@ -51,16 +51,6 @@
                     </div>
                 </div>
 
-                <div id="nokia-only-fields" class="form-inline-row">
-                    <div class="inline-field">
-                        <label for="conf-id">Configuration</label>
-                        <select id="conf-id">
-                            <option value="1">Live network (actual)</option>
-                            <option value="5">Reference / target</option>
-                        </select>
-                    </div>
-                </div>
-
             </section>
 
             <section class="panel" id="results-panel" hidden>
@@ -73,18 +63,25 @@
                 </div>
                 <p id="write-hint" class="field-hint" hidden>Huawei tilt uses U2020 MML units (0.1° steps): enter 40 for 4.0°, same as manual MOD RETSUBUNIT.</p>
                 <div id="results-warnings" class="warnings-box" hidden></div>
+                <div class="table-toolbar">
+                    <label class="table-filter">
+                        <span class="sr-only">Filter table</span>
+                        <input type="search" id="ret-table-filter" placeholder="Filter or search table…" autocomplete="off">
+                    </label>
+                    <span id="ret-table-meta" class="table-meta" aria-live="polite"></span>
+                </div>
                 <div class="table-wrap">
                     <table id="ret-table" class="data-table">
                         <thead></thead>
                         <tbody></tbody>
                     </table>
                 </div>
-                <p id="empty-state" class="empty-state" hidden>No RET / LNCEL records returned for this NE.</p>
+                <p id="empty-state" class="empty-state" hidden>No RET / RETU records returned for this NE.</p>
             </section>
         </main>
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
-    <script src="{{ url_for('ret_management.static', filename='ret_management.js') }}?v=1.11"></script>
+    <script src="{{ url_for('ret_management.static', filename='ret_management.js') }}?v=1.15"></script>
 </body>
 </html>

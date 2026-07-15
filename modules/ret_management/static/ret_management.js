@@ -19,17 +19,27 @@
     const retTable = document.getElementById('ret-table');
     const emptyState = document.getElementById('empty-state');
     const writeHint = document.getElementById('write-hint');
-    const nokiaOnly = document.getElementById('nokia-only-fields');
-    const confId = document.getElementById('conf-id');
+    const tableFilterInput = document.getElementById('ret-table-filter');
+    const tableMeta = document.getElementById('ret-table-meta');
 
     let vendor = 'nokia';
     let neItems = [];
     let currentRows = [];
     let serverColumns = [];
     let pendingChanges = new Map();
+    let nokiaMoClass = '';
+    let sortState = { col: null, dir: 1 };
+    let tableFilter = '';
+    /** Always live network (NetAct conf_id=1). */
+    const LIVE_CONF_ID = 1;
 
     const HUAWEI_EDIT_COL = 'Tilt';
     const NOKIA_EDIT_COL = 'angle';
+    const NOKIA_PREFERRED_COLS = [
+        'DN', '$instance', 'sectorID', 'angle', 'minAngle', 'maxAngle', 'mechanicalAngle',
+        'baseStationID', 'antModel', 'antSerial', 'antBearing', 'subunitNumber',
+        'installDate', 'operationalState',
+    ];
 
     function normalizeKey(text) {
         return String(text || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -109,11 +119,14 @@
 
     function updateVendorUi() {
         const isNokia = vendor === 'nokia';
-        nokiaOnly.hidden = !isNokia;
-        resultsTitle.textContent = isNokia ? 'LNCEL antenna angles' : 'RETSUBUNIT tilts (LST + DSP)';
+        resultsTitle.textContent = isNokia ? 'RETU_R antenna angles' : 'RETSUBUNIT tilts (LST + DSP)';
         pendingChanges.clear();
         currentRows = [];
         serverColumns = [];
+        nokiaMoClass = '';
+        sortState = { col: null, dir: 1 };
+        tableFilter = '';
+        if (tableFilterInput) tableFilterInput.value = '';
         resultsPanel.hidden = true;
         loadNeList();
     }
@@ -199,11 +212,11 @@
         }
         if (!rows.length) {
             return vendor === 'nokia'
-                ? ['DN', 'name', 'angle']
+                ? NOKIA_PREFERRED_COLS.slice()
                 : ['Device No.', 'Subunit No.', 'Subunit Name', 'Tilt', 'Actual Tilt', 'Online Status'];
         }
         const preferred = vendor === 'nokia'
-            ? ['DN', 'name', 'angle']
+            ? NOKIA_PREFERRED_COLS
             : ['Device No.', 'Subunit No.', 'Subunit Name', 'Tilt', 'Actual Tilt', 'Online Status', 'NE'];
         const keys = new Set();
         rows.forEach((row) => Object.keys(row).forEach((k) => keys.add(k)));
@@ -232,38 +245,119 @@
         return Number.isFinite(deg) ? `≈ ${deg}°` : '';
     }
 
+    function cellDisplayValue(row, col, editCol) {
+        const raw = vendor === 'huawei' ? resolveHuaweiField(row, col) : (row[col] ?? '');
+        if (col === editCol && vendor === 'huawei') {
+            return resolveHuaweiField(row, 'Tilt') || resolveHuaweiField(row, 'Actual Tilt') || raw;
+        }
+        return raw == null ? '' : raw;
+    }
+
+    function compareValues(a, b) {
+        const sa = String(a ?? '').trim();
+        const sb = String(b ?? '').trim();
+        const na = Number(sa);
+        const nb = Number(sb);
+        if (sa !== '' && sb !== '' && Number.isFinite(na) && Number.isFinite(nb)) {
+            return na - nb;
+        }
+        return sa.localeCompare(sb, undefined, { numeric: true, sensitivity: 'base' });
+    }
+
+    function visibleRows(editCol) {
+        let rows = currentRows.map((row, index) => ({ row, index }));
+        if (tableFilter) {
+            const term = tableFilter.toLowerCase();
+            rows = rows.filter(({ row }) => {
+                const columns = displayColumns(currentRows);
+                return columns.some((col) => String(cellDisplayValue(row, col, editCol)).toLowerCase().includes(term))
+                    || Object.values(row).some((v) => String(v ?? '').toLowerCase().includes(term));
+            });
+        }
+        if (sortState.col) {
+            const col = sortState.col;
+            const dir = sortState.dir;
+            rows.sort((left, right) => dir * compareValues(
+                cellDisplayValue(left.row, col, editCol),
+                cellDisplayValue(right.row, col, editCol),
+            ));
+        }
+        return rows;
+    }
+
+    function updateTableMeta(shown, total) {
+        if (!tableMeta) return;
+        if (!total) {
+            tableMeta.textContent = '';
+            return;
+        }
+        const parts = [`${shown} of ${total}`];
+        if (sortState.col) {
+            parts.push(`sorted by ${sortState.col} ${sortState.dir > 0 ? '↑' : '↓'}`);
+        }
+        if (tableFilter) {
+            parts.push('filtered');
+        }
+        tableMeta.textContent = parts.join(' · ');
+    }
+
     function renderTable(rows) {
-        currentRows = rows;
-        pendingChanges.clear();
+        if (Array.isArray(rows)) {
+            currentRows = rows;
+            pendingChanges.clear();
+        }
         const thead = retTable.querySelector('thead');
         const tbody = retTable.querySelector('tbody');
         thead.innerHTML = '';
         tbody.innerHTML = '';
 
-        if (!rows.length) {
+        if (!currentRows.length) {
             emptyState.hidden = false;
             retTable.hidden = true;
             saveBtn.hidden = true;
+            updateTableMeta(0, 0);
             return;
         }
 
         emptyState.hidden = true;
         retTable.hidden = false;
-        const columns = displayColumns(rows);
+        const columns = displayColumns(currentRows);
         const editCol = resolveEditColumn(columns);
         const hasEditColumn = vendor === 'huawei'
-            ? huaweiCanEdit(rows) && (columns.includes(editCol) || resolveHuaweiField(rows[0], 'Tilt') !== '')
+            ? huaweiCanEdit(currentRows) && (columns.includes(editCol) || resolveHuaweiField(currentRows[0], 'Tilt') !== '')
             : columns.includes(editCol);
 
         const headRow = document.createElement('tr');
         columns.forEach((col) => {
             const th = document.createElement('th');
-            th.textContent = huaweiTiltColumnLabel(col);
-            if (col === editCol && cmWriteAllowed && hasEditColumn) {
-                th.title = vendor === 'huawei'
-                    ? 'Editable — U2020 MML 0.1° units (40 = 4.0°), sent as MOD RETSUBUNIT TILT'
-                    : 'Editable — applied via Nokia CM import';
+            th.className = 'sortable-th';
+            th.dataset.col = col;
+            const label = huaweiTiltColumnLabel(col);
+            let marker = '';
+            if (sortState.col === col) {
+                marker = sortState.dir > 0 ? ' ↑' : ' ↓';
             }
+            th.textContent = `${label}${marker}`;
+            th.title = col === editCol && cmWriteAllowed && hasEditColumn
+                ? (vendor === 'huawei'
+                    ? 'Editable — U2020 MML 0.1° units (40 = 4.0°). Click header to sort.'
+                    : 'Editable — RETU.angle. Click header to sort.')
+                : 'Click to sort. Click again to reverse.';
+            th.tabIndex = 0;
+            th.addEventListener('click', () => {
+                if (sortState.col === col) {
+                    sortState.dir = -sortState.dir;
+                } else {
+                    sortState = { col, dir: 1 };
+                }
+                renderTable();
+            });
+            th.addEventListener('keydown', (ev) => {
+                if (ev.key === 'Enter' || ev.key === ' ') {
+                    ev.preventDefault();
+                    th.click();
+                }
+            });
             headRow.appendChild(th);
         });
         if (cmWriteAllowed && hasEditColumn) {
@@ -273,29 +367,31 @@
         }
         thead.appendChild(headRow);
 
-        rows.forEach((row, index) => {
+        const shown = visibleRows(editCol);
+        shown.forEach(({ row, index }) => {
             const tr = document.createElement('tr');
-            tr.dataset.rowKey = rowKey(row, index);
+            const key = rowKey(row, index);
+            tr.dataset.rowKey = key;
             columns.forEach((col) => {
                 const td = document.createElement('td');
-                const raw = vendor === 'huawei' ? resolveHuaweiField(row, col) : (row[col] ?? '');
+                const value = cellDisplayValue(row, col, editCol);
                 const isTiltCell = col === editCol;
-                const value = isTiltCell && vendor === 'huawei'
-                    ? (resolveHuaweiField(row, 'Tilt') || resolveHuaweiField(row, 'Actual Tilt'))
-                    : raw;
                 if (isTiltCell && cmWriteAllowed && hasEditColumn) {
+                    const pending = pendingChanges.get(key);
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.className = 'tilt-input';
-                    input.value = value;
+                    input.value = pending ? pending.value : value;
                     input.placeholder = vendor === 'huawei' ? 'e.g. 40 (=4°)' : '';
-                    input.title = vendor === 'huawei' ? huaweiTiltHint(value) : '';
+                    input.title = vendor === 'huawei' ? huaweiTiltHint(input.value) : '';
                     input.dataset.original = String(value);
+                    if (pending && pending.value !== String(value)) {
+                        tr.classList.add('row-changed');
+                    }
                     input.addEventListener('input', () => {
                         if (vendor === 'huawei') {
                             input.title = huaweiTiltHint(input.value);
                         }
-                        const key = tr.dataset.rowKey;
                         if (input.value !== input.dataset.original) {
                             pendingChanges.set(key, { row, index, value: input.value });
                             tr.classList.add('row-changed');
@@ -324,6 +420,7 @@
             tbody.appendChild(tr);
         });
 
+        updateTableMeta(shown.length, currentRows.length);
         saveBtn.hidden = !cmWriteAllowed || !hasEditColumn || pendingChanges.size === 0;
     }
 
@@ -340,14 +437,16 @@
         setStatus(loadStatus, 'Applying change…');
         try {
             if (vendor === 'nokia') {
-                const res = await fetch('/api/ret-management/nokia/lncel/update', {
+                const res = await fetch('/api/ret-management/nokia/retu/update', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        mo_class: nokiaMoClass || undefined,
                         updates: [{
                             dist_name: row.DN || row.dn,
                             angle: tiltValue,
                             old_angle: row.angle ?? '',
+                            mo_class: nokiaMoClass || undefined,
                         }],
                         wait: true,
                     }),
@@ -406,7 +505,7 @@
         try {
             let url;
             if (vendor === 'nokia') {
-                url = `/api/ret-management/nokia/lncel?site_id=${encodeURIComponent(ne.site_id)}&conf_id=${encodeURIComponent(confId.value)}`;
+                url = `/api/ret-management/nokia/retu?site_id=${encodeURIComponent(ne.site_id)}&conf_id=${LIVE_CONF_ID}`;
             } else {
                 url = `/api/ret-management/huawei/rets?site_id=${encodeURIComponent(ne.site_id)}`;
                 if (ne.ne_name) url += `&ne_name=${encodeURIComponent(ne.ne_name)}`;
@@ -415,9 +514,14 @@
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Failed to load RET data');
             serverColumns = data.columns || [];
+            nokiaMoClass = data.mo_class || '';
+            sortState = { col: null, dir: 1 };
+            tableFilter = '';
+            if (tableFilterInput) tableFilterInput.value = '';
             showWarnings(data.warnings);
             renderTable(data.rows || []);
-            setStatus(loadStatus, `Loaded ${(data.rows || []).length} record(s) for ${ne.label}`, 'ok');
+            const moLabel = nokiaMoClass ? ` [${nokiaMoClass}]` : '';
+            setStatus(loadStatus, `Loaded ${(data.rows || []).length} record(s) for ${ne.label}${moLabel}`, 'ok');
         } catch (err) {
             renderTable([]);
             setStatus(loadStatus, err.message, 'error');
@@ -438,12 +542,13 @@
                         dist_name: row.DN || row.dn,
                         angle: value,
                         old_angle: row.angle ?? row[NOKIA_EDIT_COL] ?? '',
+                        mo_class: nokiaMoClass || undefined,
                     });
                 });
-                const res = await fetch('/api/ret-management/nokia/lncel/update', {
+                const res = await fetch('/api/ret-management/nokia/retu/update', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ updates, wait: true }),
+                    body: JSON.stringify({ updates, wait: true, mo_class: nokiaMoClass || undefined }),
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Nokia update failed');
@@ -496,6 +601,12 @@
     loadBtn.addEventListener('click', loadRets);
     reloadBtn.addEventListener('click', loadRets);
     saveBtn.addEventListener('click', saveChanges);
+    if (tableFilterInput) {
+        tableFilterInput.addEventListener('input', () => {
+            tableFilter = tableFilterInput.value.trim();
+            renderTable();
+        });
+    }
 
     updateVendorUi();
     fetchDefaults();

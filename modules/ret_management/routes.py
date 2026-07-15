@@ -219,16 +219,17 @@ def huawei_ret_update():
         return jsonify({'error': str(exc)}), 500
 
 
-@ret_management_bp.route('/api/ret-management/nokia/lncel', methods=['GET'])
+@ret_management_bp.route('/api/ret-management/nokia/retu', methods=['GET'])
+@ret_management_bp.route('/api/ret-management/nokia/lncel', methods=['GET'])  # legacy alias
 @login_required
-def nokia_lncel_list():
+def nokia_retu_list():
     if not nokia_configured():
         return jsonify({'error': 'Nokia NetAct CM is not configured.'}), 400
     try:
         site_id = (request.args.get('site_id') or '').strip()
-        conf_id = int(request.args.get('conf_id') or 1)
+        conf_id = 1  # Always live network for RET management
         client = build_nokia_client()
-        rows, warnings = ret_logic.fetch_nokia_lncel_angles(
+        rows, warnings, mo_class = ret_logic.fetch_nokia_retu_angles(
             client,
             site_id=site_id,
             conf_id=conf_id,
@@ -238,6 +239,8 @@ def nokia_lncel_list():
             'vendor': 'nokia',
             'site_id': site_id,
             'conf_id': conf_id,
+            'mo_class': mo_class,
+            'columns': list(ret_logic.NOKIA_DISPLAY_COLUMNS),
             'rows': rows,
             'warnings': warnings,
         })
@@ -247,10 +250,11 @@ def nokia_lncel_list():
         return jsonify({'error': str(exc)}), 500
 
 
-@ret_management_bp.route('/api/ret-management/nokia/lncel/update', methods=['POST'])
+@ret_management_bp.route('/api/ret-management/nokia/retu/update', methods=['POST'])
+@ret_management_bp.route('/api/ret-management/nokia/lncel/update', methods=['POST'])  # legacy alias
 @login_required
 @cm_write_required
-def nokia_lncel_update():
+def nokia_retu_update():
     if not nokia_configured():
         return jsonify({'error': 'Nokia NetAct CM is not configured.'}), 400
     data = _json_body()
@@ -259,17 +263,24 @@ def nokia_lncel_update():
         if not isinstance(updates, list):
             updates = [data] if data.get('dist_name') or data.get('dn') else []
         user = get_current_user()
+        mo_class = str(data.get('mo_class') or '').strip() or None
+        if not mo_class:
+            try:
+                mo_class = ret_logic.resolve_nokia_retu_mo_class(build_nokia_client())
+            except Exception:
+                mo_class = ret_logic.NOKIA_MO_CLASS_FALLBACK
         result = ret_logic.apply_nokia_angle_changes(
             _username(user),
             updates,
             wait=bool(data.get('wait', True)),
+            mo_class=mo_class,
         )
         log_activity(
             _user_id(user),
             'ret_management_nokia_angle',
-            f'Updated LNCEL angle ({len(updates)} change(s))',
+            f'Updated RETU angle via RETU_R read ({len(updates)} change(s)) on {mo_class}',
         )
-        return jsonify({'success': True, **result})
+        return jsonify({'success': True, 'mo_class': mo_class, **result})
     except (NokiaCmError, NokiaOperationsError, ValueError, RuntimeError) as exc:
         return jsonify({'error': str(exc)}), 400
     except OSError as exc:
@@ -281,7 +292,7 @@ def nokia_lncel_update():
                     'not a NetAct CM API rejection. RET apply uses Provision_Mass_Modification '
                     '(no file upload). Restart the Flask server, then hard-refresh the page. '
                     'If it persists, ask sys admins to confirm NOKIA_CM_USER can run '
-                    'Provision_Mass_Modification on LNCEL angle — SFTP write access is not required.'
+                    'Provision_Mass_Modification on RETU angle — SFTP write access is not required.'
                 ),
             }), 500
         return jsonify({'error': str(exc)}), 500

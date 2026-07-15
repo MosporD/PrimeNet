@@ -1,4 +1,4 @@
-"""RET Management business logic — Huawei RETSUBUNIT and Nokia LNCEL angle."""
+"""RET Management business logic — Huawei RETSUBUNIT and Nokia RETU angle."""
 
 from __future__ import annotations
 
@@ -13,6 +13,8 @@ from core.cm_extractor.nokia_mass_modify import apply_mass_modifications
 from core.cm_extractor.nokia_operations_client import NokiaOperationsError
 from core.cm_extractor.nokia_semantics import (
     build_mo_path,
+    get_mo_class_catalog,
+    query_parameters_individually,
     query_selected_parameters,
     resolve_scope_instance_id,
 )
@@ -24,8 +26,45 @@ from core.cm_extractor.site_catalog import (
 )
 
 HUAWEI_MO = 'RETSUBUNIT'
-NOKIA_MO_CLASS = 'NOKLTE:LNCEL'
-NOKIA_ANGLE_PARAMS = ['angle', 'name']
+# Runtime RETU_R holds live angles; writes go to config RETU via configDN.
+NOKIA_MO_ABBREV_READ = 'RETU_R'
+NOKIA_MO_ABBREV_WRITE = 'RETU'
+NOKIA_MO_CLASS_READ_FALLBACK = 'com.nokia.srbts.eqmr:RETU_R'
+NOKIA_MO_CLASS_WRITE_FALLBACK = 'com.nokia.srbts.eqm:RETU'
+# Params verified on NetAct EQMR (antFreqBand / antBeamwidth are not defined).
+NOKIA_RETU_PARAMS: tuple[str, ...] = (
+    '$instance',
+    'angle',
+    'minAngle',
+    'maxAngle',
+    'mechanicalAngle',
+    'sectorID',
+    'baseStationID',
+    'subunitNumber',
+    'antModel',
+    'antSerial',
+    'antBearing',
+    'installDate',
+    'installerID',
+    'operationalState',
+    'configDN',
+)
+NOKIA_DISPLAY_COLUMNS: tuple[str, ...] = (
+    'DN',
+    '$instance',
+    'sectorID',
+    'angle',
+    'minAngle',
+    'maxAngle',
+    'mechanicalAngle',
+    'baseStationID',
+    'antModel',
+    'antSerial',
+    'antBearing',
+    'subunitNumber',
+    'installDate',
+    'operationalState',
+)
 # U2020 MOD RETSUBUNIT TILT is in 0.1° steps (40 = 4.0°, 80 = 8.0°). 32767 means unset.
 HUAWEI_TILT_UNSET = 32767
 
@@ -813,52 +852,186 @@ def resolve_huawei_ne(site_id: str, ne_name: str | None = None) -> str:
     return names[0]
 
 
-def fetch_nokia_lncel_angles(
+def _score_mo_adaptation(adaptation: str, *, prefer_runtime: bool) -> int:
+    """Score NetAct adaptations for RETU read (eqmr) or write (eqm)."""
+    adapt = (adaptation or '').strip().lower()
+    score = 0
+    if prefer_runtime:
+        if 'eqmr' in adapt:
+            score += 20
+        elif adapt.endswith('.eqm') or adapt == 'eqm':
+            score -= 5
+    else:
+        if 'eqmr' in adapt:
+            score -= 20
+        elif adapt.endswith('.eqm') or adapt == 'eqm':
+            score += 10
+        elif 'eqm' in adapt:
+            score += 5
+    if 'srbts' in adapt:
+        score += 5
+    if 'nokia' in adapt or adapt.startswith('com.'):
+        score += 1
+    if adapt.startswith('com.nokia.srbts.hw'):
+        score -= 50
+    return score
+
+
+def _resolve_mo_class_by_abbreviation(
+    client: NokiaCmClient | None,
+    abbreviation: str,
+    *,
+    prefer_runtime: bool,
+    fallback: str,
+) -> str:
+    abbrev = (abbreviation or '').strip().upper()
+    if client is not None:
+        try:
+            catalog = get_mo_class_catalog(client, ran_only=True, scope_level='MRBTS')
+        except Exception:
+            catalog = []
+        matches = [
+            item for item in catalog
+            if (item.get('abbreviation') or '').strip().upper() == abbrev
+        ]
+        if matches:
+            matches.sort(
+                key=lambda item: (
+                    _score_mo_adaptation(
+                        str(item.get('adaptation') or ''),
+                        prefer_runtime=prefer_runtime,
+                    ),
+                    str(item.get('version') or ''),
+                ),
+                reverse=True,
+            )
+            return matches[0]['id']
+    return fallback
+
+
+def resolve_nokia_retu_read_mo_class(client: NokiaCmClient | None = None) -> str:
+    """Runtime RETU_R — live angle / device status."""
+    return _resolve_mo_class_by_abbreviation(
+        client,
+        NOKIA_MO_ABBREV_READ,
+        prefer_runtime=True,
+        fallback=NOKIA_MO_CLASS_READ_FALLBACK,
+    )
+
+
+def resolve_nokia_retu_write_mo_class(client: NokiaCmClient | None = None) -> str:
+    """Config RETU — Provision_Mass_Modification target for angle."""
+    return _resolve_mo_class_by_abbreviation(
+        client,
+        NOKIA_MO_ABBREV_WRITE,
+        prefer_runtime=False,
+        fallback=NOKIA_MO_CLASS_WRITE_FALLBACK,
+    )
+
+
+# Backward-compatible name used by routes during migration.
+resolve_nokia_retu_mo_class = resolve_nokia_retu_write_mo_class
+NOKIA_MO_CLASS_FALLBACK = NOKIA_MO_CLASS_WRITE_FALLBACK
+
+
+def config_retu_dist_name(row: dict[str, Any]) -> str:
+    """Map a runtime RETU_R row to the config RETU distinguished name for writes."""
+    config_dn = str(row.get('configDN') or '').strip()
+    if config_dn:
+        if config_dn.startswith('PLMN-'):
+            return config_dn
+        return f'PLMN-PLMN/{config_dn.lstrip("/")}'
+
+    runtime_dn = str(row.get('runtime_DN') or row.get('DN') or row.get('dn') or '').strip()
+    if not runtime_dn:
+        return ''
+    return (
+        runtime_dn
+        .replace('/EQM_R-', '/EQM-')
+        .replace('/APEQM_R-', '/APEQM-')
+        .replace('/ALD_R-', '/ALD-')
+        .replace('/RETU_R-', '/RETU-')
+    )
+
+
+def fetch_nokia_retu_angles(
     client: NokiaCmClient,
     *,
     site_id: str,
     conf_id: int = 1,
-) -> tuple[list[dict[str, Any]], list[str]]:
+) -> tuple[list[dict[str, Any]], list[str], str]:
+    """
+    Read live RET angles from RETU_R.
+
+    Returns (rows, warnings, write_mo_class). Each row's DN is the config RETU
+    DN used for angle writes; runtime_DN keeps the RETU_R path.
+    """
     site_id = str(site_id or '').strip()
     if not site_id:
         raise ValueError('site_id is required')
 
-    adaptation, abbreviation = NOKIA_MO_CLASS.split(':', 1)
+    read_mo_class = resolve_nokia_retu_read_mo_class(client)
+    write_mo_class = resolve_nokia_retu_write_mo_class(client)
+    if ':' not in read_mo_class:
+        raise ValueError(f'Invalid RETU_R MO class id: {read_mo_class}')
+    adaptation, abbreviation = read_mo_class.split(':', 1)
+    params = list(NOKIA_RETU_PARAMS)
     path_element_id = resolve_scope_instance_id(site_id, 'MRBTS')
+    warnings: list[str] = []
+
+    def _query(mo_path: str) -> tuple[list[str], list[list[Any]]]:
+        try:
+            return query_selected_parameters(
+                client,
+                mo_path,
+                params,
+                adaptation=adaptation,
+                abbreviation=abbreviation,
+                conf_id=conf_id,
+                site_id=site_id,
+                scope_level='MRBTS',
+            )
+        except NokiaCmError:
+            # Avoid surfacing noisy batch errors; retry per-parameter quietly.
+            return query_parameters_individually(
+                client,
+                mo_path,
+                params,
+                conf_id=conf_id,
+                site_id=site_id,
+                scope_level='MRBTS',
+                include_all_columns=True,
+            )
+
     mo_path = build_mo_path(
         adaptation,
         abbreviation,
         scope_level='MRBTS',
         element_id=path_element_id,
     )
-    headers, rows = query_selected_parameters(
-        client,
-        mo_path,
-        NOKIA_ANGLE_PARAMS,
-        adaptation=adaptation,
-        abbreviation=abbreviation,
-        conf_id=conf_id,
-        site_id=site_id,
-        scope_level='MRBTS',
-    )
+    headers, rows = _query(mo_path)
     if not rows:
         mo_path = build_mo_path(adaptation, abbreviation, scope_level='MRBTS', element_id=None)
-        headers, rows = query_selected_parameters(
-            client,
-            mo_path,
-            NOKIA_ANGLE_PARAMS,
-            adaptation=adaptation,
-            abbreviation=abbreviation,
-            conf_id=conf_id,
-            site_id=site_id,
-            scope_level='MRBTS',
-        )
+        headers, rows = _query(mo_path)
 
     records = _rows_to_records(headers, rows)
-    warnings: list[str] = []
+    for record in records:
+        runtime_dn = str(record.get('DN') or record.get('dn') or '').strip()
+        if runtime_dn:
+            record['runtime_DN'] = runtime_dn
+        write_dn = config_retu_dist_name(record)
+        if write_dn:
+            record['DN'] = write_dn
+
     if not records:
-        warnings.append('No LNCEL instances returned for this site.')
-    return records, warnings
+        warnings.append(
+            f'No {abbreviation} instances returned for this site ({read_mo_class}).'
+        )
+    return records, warnings, write_mo_class
+
+
+# Backward-compatible alias during LNCEL → RETU migration.
+fetch_nokia_lncel_angles = fetch_nokia_retu_angles
 
 
 def apply_nokia_angle_changes(
@@ -866,28 +1039,42 @@ def apply_nokia_angle_changes(
     updates: list[dict[str, Any]],
     *,
     wait: bool = True,
+    mo_class: str | None = None,
 ) -> dict[str, Any]:
     del username  # mass modification uses CM REST credentials, not per-user SFTP staging
     if not updates:
         raise ValueError('No angle updates provided')
 
+    class_id = (mo_class or '').strip() or NOKIA_MO_CLASS_WRITE_FALLBACK
     mass_updates: list[dict[str, Any]] = []
     for item in updates:
-        dist_name = str(item.get('dist_name') or item.get('dn') or item.get('DN') or '').strip()
+        dist_name = str(
+            item.get('dist_name')
+            or item.get('dn')
+            or item.get('DN')
+            or config_retu_dist_name(item)
+            or ''
+        ).strip()
         angle = str(item.get('angle') if item.get('angle') is not None else '').strip()
         if not dist_name:
             raise ValueError('Each update requires dist_name (DN)')
         if not angle:
             raise ValueError('Each update requires angle')
+        # Never write to runtime RETU_R — remap if a client still sends it.
+        if '/RETU_R-' in dist_name:
+            dist_name = config_retu_dist_name({'DN': dist_name})
+        item_class = str(item.get('mo_class') or item.get('mo_class_id') or class_id).strip()
+        if item_class.endswith(':RETU_R') or item_class.upper().endswith('RETU_R'):
+            item_class = NOKIA_MO_CLASS_WRITE_FALLBACK
         mass_updates.append({
             'dist_name': dist_name,
             'parameter': 'angle',
             'new_value': angle,
             'old_value': str(item.get('old_angle') or ''),
-            'mo_class': 'NOKLTE:LNCEL',
+            'mo_class': item_class,
         })
 
-    return apply_mass_modifications(mass_updates, wait=wait)
+    return apply_mass_modifications(mass_updates, wait=wait, mo_class=class_id)
 
 
 def vendor_status() -> dict[str, bool]:

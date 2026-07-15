@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PrimeNet - CM Parameter Audit</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}?v=1.3">
-    <link rel="stylesheet" href="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.css') }}?v=1.1">
 </head>
 <body class="cm-audit-page"
       data-nokia-configured="{{ 'true' if nokia_configured else 'false' }}"
@@ -64,24 +64,21 @@
                                 <option value="all">All areas</option>
                             </select>
                         </label>
-                        <label for="audit-mo-search">MO class
-                            <input type="search" id="audit-mo-search" placeholder="Filter MO classes" autocomplete="off">
+                        <label class="combo-field" for="audit-mo-input">MO class
+                            <div class="combo-wrap">
+                                <input type="search" id="audit-mo-input" placeholder="Search and select MO…" autocomplete="off" disabled>
+                                <ul id="audit-mo-list" class="combo-list" hidden role="listbox"></ul>
+                            </div>
                         </label>
-                        <label for="audit-mo">Selected MO
-                            <select id="audit-mo" disabled>
-                                <option value="">Load MO classes…</option>
-                            </select>
-                        </label>
+                        <div class="form-action form-action-spacer" aria-hidden="true"></div>
                     </div>
 
                     <div class="form-row">
-                        <label for="audit-param-search">Parameter
-                            <input type="search" id="audit-param-search" placeholder="Filter parameters" autocomplete="off" disabled>
-                        </label>
-                        <label for="audit-param">Selected parameter
-                            <select id="audit-param" disabled>
-                                <option value="">Select MO class first</option>
-                            </select>
+                        <label class="combo-field" for="audit-param-input">Parameter
+                            <div class="combo-wrap">
+                                <input type="search" id="audit-param-input" placeholder="Search and select parameter…" autocomplete="off" disabled>
+                                <ul id="audit-param-list" class="combo-list" hidden role="listbox"></ul>
+                            </div>
                         </label>
                         <div class="form-action">
                             <button type="button" class="btn-primary" id="audit-scan" disabled>Scan network live</button>
@@ -134,15 +131,16 @@
                         <input type="search" id="audit-results-filter" placeholder="NE, cell, value, DN">
                     </label>
                 </div>
+                <p id="audit-results-meta" class="results-meta" aria-live="polite"></p>
                 <div class="results-table-wrap">
-                    <table class="results-table">
+                    <table class="results-table" id="audit-results-table">
                         <thead>
                             <tr>
-                                <th>NE</th>
-                                <th>Area</th>
-                                <th>Cell / Object</th>
-                                <th>Value</th>
-                                <th>Status</th>
+                                <th class="sortable-th" data-sort="ne">NE</th>
+                                <th class="sortable-th" data-sort="area">Area</th>
+                                <th class="sortable-th" data-sort="object">Cell / Object</th>
+                                <th class="sortable-th" data-sort="value">Value</th>
+                                <th class="sortable-th" data-sort="status">Status</th>
                             </tr>
                         </thead>
                         <tbody id="audit-results-body"></tbody>
@@ -158,6 +156,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/common.js') }}?v=1.2"></script>
-    <script src="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.js') }}?v=1.7"></script>
+    <script src="{{ url_for('cm_parameter_audit.static', filename='cm_parameter_audit.js') }}?v=1.8"></script>
 </body>
 </html>

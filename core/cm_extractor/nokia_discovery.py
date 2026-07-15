@@ -30,8 +30,9 @@ from core.cm_extractor.site_catalog import (
 
 _CATALOG_PATH = Path(__file__).resolve().parents[2] / 'data' / 'nokia_netact_inventory.json'
 _CACHE_TTL_SEC = 6 * 3600
-# Bump when metadata enrichment rules change (e.g. NetAct 50801 -> metadata 801).
-_METADATA_ENRICHMENT_VERSION = 2
+# Bump when metadata enrichment rules change (e.g. NetAct 50801 -> metadata 801,
+# or longest-suffix mapping 53308 -> 3308 instead of 308).
+_METADATA_ENRICHMENT_VERSION = 3
 
 # MO paths that enumerate site-level NEs per scope (all PLMNs).
 _MRBTS_MO_PATH = '/NetActCommon:PLMN/MRBTS as $m'

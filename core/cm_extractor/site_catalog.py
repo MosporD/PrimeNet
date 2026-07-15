@@ -121,15 +121,37 @@ def resolve_nokia_metadata_site_id(
     """
     Map a NetAct MRBTS instance id to the PrimeNet metadata ``site_id``.
 
-    Many NetAct NEs use a two-digit prefix + metadata id (``50801`` → ``801``).
-    When ``known_metadata_ids`` is supplied, only returns a mapped id that exists
-    in metadata; otherwise returns the best-effort metadata form.
+    NetAct NEs often prefix the metadata id (``50801`` → ``801``,
+    ``53308`` → ``3308``). When multiple metadata ids are suffixes of the
+    NetAct id (``308`` and ``3308`` both suffix ``53308``), prefer the
+    **longest** known metadata id so shorter sites are not chosen by
+    mistake.
+
+    When ``known_metadata_ids`` is supplied, only returns a mapped id that
+    exists in metadata; otherwise returns the legacy two-digit-prefix form.
     """
     token = str(netact_site_id or '').strip()
     if not token:
         return ''
     if known_metadata_ids is not None and token in known_metadata_ids:
         return token
+
+    if known_metadata_ids is not None and token.isdigit() and len(token) >= 4:
+        # Prefer longest proper suffix that exists in metadata (min length 2).
+        best = ''
+        for length in range(len(token) - 1, 1, -1):
+            cand = token[-length:]
+            variants = [cand]
+            stripped = cand.lstrip('0')
+            if stripped and stripped not in variants:
+                variants.append(stripped)
+            for candidate in variants:
+                if candidate in known_metadata_ids and len(candidate) > len(best):
+                    best = candidate
+            if best:
+                return best
+        return token
+
     if len(token) == 5 and token.isdigit() and token[:2] in _NOKIA_NETACT_MRBTS_PREFIXES:
         suffix = token[2:]
         candidates: list[str] = []
